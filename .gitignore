@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+webapp/node_modules/
+**/node_modules/
+
+# Next.js build output
+.next/
+webapp/.next/
+**/.next/
+out/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Env files
+.env
+.env.*
+!.env.example
+
+# OS / Editor
+.DS_Store
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
