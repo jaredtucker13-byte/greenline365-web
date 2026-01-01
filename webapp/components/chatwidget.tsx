@@ -24,7 +24,7 @@ export default function ChatWidget() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('https://n8n.srv1156042.hstgr.cloud/webhook/66392a57-93ac-4faf-aa60-4829b037819d/chat', {
+      const response = await fetch('https://n8n.srv1156042.hstgr.cloud/webhook/81af9bf6-f2ae-4b0d-8dfb-50c35110b6b9', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: userMessage.content, action: 'chat' })
