@@ -1,10 +1,10 @@
-import './globals.css';
-import type { Metadata } from 'next';
-import N8nChatWidget from './components/N8nChatWidget';
+import "./globals.css";
+import type { Metadata } from "next";
+import ChatWidget from "../components/chatwidget";
 
 export const metadata: Metadata = {
-  title: 'GreenLine365',
-  description: 'Investor-Ready Website',
+  title: "GreenLine365",
+  description: "Investor-Ready Website",
 };
 
 export default function RootLayout({
@@ -16,8 +16,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         {children}
-        <div id="n8n-chat"></div>
-        <N8nChatWidget />
+        <ChatWidget />
       </body>
     </html>
   );
