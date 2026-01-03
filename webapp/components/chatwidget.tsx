@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -18,9 +18,14 @@ export default function ChatWidget({ onClose }: ChatWidgetProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [showTryMe, setShowTryMe] = useState(true);
   const [hasClicked, setHasClicked] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Check if user has clicked before (using localStorage)
   useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, isLoading]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
     const clicked = localStorage.getItem('chatWidgetClicked');
     if (clicked === 'true') {
       setShowTryMe(false);
@@ -28,53 +33,69 @@ export default function ChatWidget({ onClose }: ChatWidgetProps) {
     }
   }, []);
 
+  const closeWidget = () => {
+    setIsOpen(false);
+    onClose?.();
+  };
+
   const handleBubbleClick = () => {
-    setIsOpen(!isOpen);
+    setIsOpen((prev) => !prev);
+
     if (!hasClicked) {
       setShowTryMe(false);
       setHasClicked(true);
-      localStorage.setItem('chatWidgetClicked', 'true');
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('chatWidgetClicked', 'true');
+      }
     }
   };
 
   const sendMessage = async () => {
-    if (!message.trim() || isLoading) return;
+    if (isLoading) return;
 
     const userMessage = message.trim();
+    if (!userMessage) return;
+
     setMessage('');
-    
-    // Add user message to chat
-    setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
     setIsLoading(true);
 
+    setMessages((prev) => [...prev, { role: 'user', content: userMessage }]);
+
     try {
-      // Call YOUR backend at /api/chat
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           message: userMessage,
-          userId: 'guest-' + Date.now()
-        })
+          messages: [...messages, { role: 'user', content: userMessage }],
+        }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to get response');
+        const errText = await response.text().catch(() => '');
+        throw new Error(`API ${response.status}: ${errText || 'Failed to get response'}`);
       }
 
       const data = await response.json();
-      
-      // Add assistant response to chat
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: data.reply || data.message || 'I received your message!'
-      }]);
+      const assistantReply =
+        data?.choices?.[0]?.message?.content ??
+        data?.reply ??
+        data?.message ??
+        'No response';
+
+      setMessages((prev) => [...prev, { role: 'assistant', content: assistantReply }]);
     } catch (error) {
       console.error('Chat error:', error);
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: 'Sorry, I encountered an error. Please try again.'
-      }]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          content:
+            error instanceof Error
+              ? `Error: ${error.message}`
+              : 'Sorry, I encountered an error. Please try again.',
+        },
+      ]);
     } finally {
       setIsLoading(false);
     }
@@ -82,107 +103,134 @@ export default function ChatWidget({ onClose }: ChatWidgetProps) {
 
   return (
     <>
-      {/* "Try me" cloud tooltip - floats above bubble */}
       {showTryMe && !hasClicked && (
-        <div className="fixed bottom-24 right-6 z-50 animate-bounce">
-          <div className="relative bg-white text-[#0a1a1a] px-4 py-2 rounded-2xl shadow-xl font-semibold text-sm whitespace-nowrap">
-            Try me! 💬
-            {/* Little pointer/tail pointing down to bubble */}
-            <div className="absolute -bottom-2 right-6 w-4 h-4 bg-white transform rotate-45"></div>
+        <div className="fixed bottom-24 right-6 z-50">
+          <div className="relative px-4 py-2 rounded-2xl text-sm font-semibold bg-black/70 text-emerald-100 border border-emerald-500/20 backdrop-blur-xl shadow-[0_0_40px_rgba(16,185,129,0.18)]">
+            Try me
+            <div className="absolute -bottom-2 right-8 w-4 h-4 rotate-45 bg-black/70 border-r border-b border-emerald-500/20" />
           </div>
         </div>
       )}
 
-      {/* Sticky floating bubble button */}
       <button
         onClick={handleBubbleClick}
-        className="fixed bottom-6 right-6 z-50 w-16 h-16 bg-gradient-to-br from-[#5DFECA] to-[#4ade80] rounded-full shadow-2xl shadow-[#5DFECA]/50 hover:scale-110 transition-transform flex items-center justify-center"
+        className="fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-black/70 border border-emerald-500/20 backdrop-blur-xl shadow-[0_0_50px_rgba(16,185,129,0.18)] hover:scale-110 transition-transform flex items-center justify-center"
+        aria-label={isOpen ? 'Close chat' : 'Open chat'}
+        type="button"
       >
         {isOpen ? (
-          <svg className="w-8 h-8 text-[#0a1a1a]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-7 h-7 text-emerald-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         ) : (
-          <svg className="w-8 h-8 text-[#0a1a1a]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-7 h-7 text-emerald-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
           </svg>
         )}
       </button>
 
-      {/* Chat window */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 z-40 w-96 max-w-[calc(100vw-3rem)] bg-[#1a1b26] rounded-3xl shadow-2xl border-2 border-[#5DFECA]/20 overflow-hidden">
-          {/* Header */}
-          <div className="bg-gradient-to-r from-[#1f2335] to-[#24283b] p-5 border-b border-[#5DFECA]/10">
-            <div className="flex items-center justify-between">
+        <div className="fixed bottom-24 right-6 z-40 w-[340px] sm:w-[360px] max-w-[calc(100vw-3rem)] rounded-3xl overflow-hidden bg-black/70 border border-emerald-500/15 backdrop-blur-xl shadow-[0_0_70px_rgba(16,185,129,0.14)]">
+          
+          <div className="p-5 border-b border-emerald-500/10 bg-black/30">
+            <div className="flex items-start justify-between gap-4">
               <div>
-                <h3 className="text-white font-bold text-lg">GreenLine365 Assistant</h3>
-                <p className="text-[#5DFECA] text-xs">Online • Ready to help</p>
+                <div className="text-[10px] tracking-[0.35em] uppercase font-semibold text-emerald-300/80">
+                  PROTOCOL: ACTIVE ASSISTANT
+                </div>
+                <div className="mt-1 text-2xl font-black text-white">Command Center</div>
               </div>
-              <button
-                onClick={() => setIsOpen(false)}
-                className="text-white/60 hover:text-white transition-colors"
-              >
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-400/90" />
+                <span className="w-2 h-2 rounded-full bg-emerald-400/50" />
+                <span className="w-2 h-2 rounded-full bg-emerald-400/25" />
+
+                <button
+                  onClick={closeWidget}
+                  className="ml-2 w-9 h-9 rounded-full border border-emerald-500/15 bg-black/40 hover:bg-black/60 transition-colors flex items-center justify-center"
+                  type="button"
+                  aria-label="Close"
+                >
+                  <svg className="w-5 h-5 text-emerald-200" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* Messages */}
-          <div className="h-96 overflow-y-auto p-5 space-y-4 bg-[#1a1b26]">
+          <div className="h-[320px] overflow-y-auto px-5 py-4 space-y-4">
             {messages.length === 0 && (
-              <div className="text-center text-white/40 py-8">
-                <p className="text-sm">Ask me anything about GreenLine365!</p>
-                <p className="text-xs mt-2">Try: "How would this work for a barbershop in Windermere?"</p>
+              <div>
+                <div className="rounded-2xl p-4 bg-white/5 border border-white/10 text-white/90">
+                  <div className="text-sm font-semibold">System Online.</div>
+                  <div className="text-sm text-white/80 mt-1 leading-relaxed">
+                    Initializing Tactical Assistant. How can I help you own the neighborhood today?
+                  </div>
+                </div>
+
+                <div className="mt-2 text-[10px] tracking-[0.3em] uppercase text-white/35">
+                  COMMAND OUTBOUND • ONLINE
+                </div>
               </div>
             )}
 
             {messages.map((msg, idx) => (
               <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[80%] p-4 rounded-2xl ${
-                  msg.role === 'user'
-                    ? 'bg-gradient-to-br from-[#5DFECA] to-[#4ade80] text-[#0a1a1a] rounded-br-sm'
-                    : 'bg-[#24283b] text-white rounded-bl-sm border border-[#5DFECA]/10'
-                }`}>
-                  <p className="text-sm leading-relaxed">{msg.content}</p>
+                <div
+                  className={
+                    msg.role === 'user'
+                      ? 'max-w-[78%] rounded-2xl rounded-br-md px-4 py-3 text-sm text-black bg-emerald-400 shadow-[0_0_25px_rgba(16,185,129,0.18)]'
+                      : 'max-w-[78%] rounded-2xl rounded-bl-md px-4 py-3 text-sm text-white/90 bg-white/5 border border-white/10'
+                }
+                >
+                  <p className="leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                 </div>
               </div>
             ))}
 
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-[#24283b] p-4 rounded-2xl rounded-bl-sm border border-[#5DFECA]/10">
-                  <div className="flex gap-1">
-                    <span className="w-2 h-2 bg-[#5DFECA] rounded-full animate-bounce"></span>
-                    <span className="w-2 h-2 bg-[#5DFECA] rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></span>
-                    <span className="w-2 h-2 bg-[#5DFECA] rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></span>
-                  </div>
+                <div className="max-w-[78%] rounded-2xl rounded-bl-md px-4 py-3 text-sm text-white/70 bg-white/5 border border-white/10">
+                  Initializing…
                 </div>
               </div>
             )}
+
+            <div ref={messagesEndRef} />
           </div>
 
-          {/* Input */}
-          <div className="p-5 bg-[#1f2335] border-t border-[#5DFECA]/10 rounded-b-3xl">
-            <div className="flex gap-3">
+          <div className="p-5 border-t border-emerald-500/10 bg-black/30">
+            <div className="flex items-center gap-3">
               <input
                 type="text"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
-                placeholder="Type your question..."
-                className="flex-1 bg-[#1a1b26] text-white border-2 border-[#5DFECA]/10 rounded-2xl px-4 py-3 outline-none focus:border-[#5DFECA] transition-all placeholder-white/30"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) sendMessage();
+                }}
+                placeholder="Initiate command…"
+                className="flex-1 rounded-2xl px-4 py-3 text-sm outline-none bg-black/50 border border-emerald-500/15 text-white/90 placeholder:text-white/35 focus:ring-2 focus:ring-emerald-400/30"
                 disabled={isLoading}
               />
-              <button 
+
+              <button
                 onClick={sendMessage}
                 disabled={isLoading || !message.trim()}
-                className="bg-gradient-to-br from-[#5DFECA] to-[#4ade80] text-[#0a1a1a] px-6 py-3 rounded-2xl font-bold hover:brightness-110 transition-all shadow-lg disabled:opacity-50"
+                className="w-12 h-12 rounded-2xl flex items-center justify-center bg-emerald-400 text-black font-bold shadow-[0_0_25px_rgba(16,185,129,0.20)] hover:brightness-110 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                type="button"
+                aria-label="Send"
               >
-                Send
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12h13M13 5l7 7-7 7" />
+                </svg>
               </button>
+            </div>
+
+            <div className="mt-3 flex items-center justify-between text-[10px] tracking-[0.25em] uppercase text-white/25">
+              <span>ENCRYPTION: AES-256</span>
+              <span>CONNECTION: ENHANCED</span>
             </div>
           </div>
         </div>
