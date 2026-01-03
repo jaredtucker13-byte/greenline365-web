@@ -1,39 +1,80 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 
-export default function ChatWidget() {
+interface Message {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+interface ChatWidgetProps {
+  onClose?: () => void;
+}
+
+export default function ChatWidget({ onClose }: ChatWidgetProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState<Array<{role: string; content: string}>>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const [showTryMe, setShowTryMe] = useState(true);
+  const [hasClicked, setHasClicked] = useState(false);
 
+  // Check if user has clicked before (using localStorage)
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    const clicked = localStorage.getItem('chatWidgetClicked');
+    if (clicked === 'true') {
+      setShowTryMe(false);
+      setHasClicked(true);
     }
-  }, [messages, isLoading]);
+  }, []);
+
+  const handleBubbleClick = () => {
+    setIsOpen(!isOpen);
+    if (!hasClicked) {
+      setShowTryMe(false);
+      setHasClicked(true);
+      localStorage.setItem('chatWidgetClicked', 'true');
+    }
+  };
 
   const sendMessage = async () => {
     if (!message.trim() || isLoading) return;
-    
-    const userMessage = { role: 'user', content: message };
-    setMessages(prev => [...prev, userMessage]);
+
+    const userMessage = message.trim();
     setMessage('');
+    
+    // Add user message to chat
+    setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
     setIsLoading(true);
 
     try {
-      const response = await fetch('https://n8n.srv1156042.hstgr.cloud/webhook/63b9d5c8-b9c4-4e97-be06-2e4f3e0df180/chat', {
+      // Call YOUR backend at /api/chat
+      const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMessage.content, action: 'chat' })
+        body: JSON.stringify({ 
+          message: userMessage,
+          userId: 'guest-' + Date.now()
+        })
       });
 
+      if (!response.ok) {
+        throw new Error('Failed to get response');
+      }
+
       const data = await response.json();
-      setMessages(prev => [...prev, { role: 'assistant', content: data.reply || 'No response' }]);
+      
+      // Add assistant response to chat
+      setMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: data.reply || data.message || 'I received your message!'
+      }]);
     } catch (error) {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Connection error. Please try again.' }]);
+      console.error('Chat error:', error);
+      setMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: 'Sorry, I encountered an error. Please try again.'
+      }]);
     } finally {
       setIsLoading(false);
     }
@@ -41,71 +82,71 @@ export default function ChatWidget() {
 
   return (
     <>
-      <style jsx>{`
-        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
-        @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(93, 254, 202, 0.7); } 50% { box-shadow: 0 0 0 15px rgba(93, 254, 202, 0); } }
-        .chat-float { animation: float 3s ease-in-out infinite; }
-        .chat-pulse { animation: pulse 2s infinite; }
-      `}</style>
-
-      {/* Floating Chat Button */}
-      {!isOpen && (
-        <button
-          onClick={() => setIsOpen(true)}
-          className="chat-float chat-pulse fixed bottom-8 right-8 w-16 h-16 bg-gradient-to-br from-[#5DFECA] to-[#22c55e] rounded-full shadow-2xl hover:scale-110 transition-all z-50 flex items-center justify-center text-3xl"
-        >
-          💬
-        </button>
+      {/* "Try me" cloud tooltip - floats above bubble */}
+      {showTryMe && !hasClicked && (
+        <div className="fixed bottom-24 right-6 z-50 animate-bounce">
+          <div className="relative bg-white text-[#0a1a1a] px-4 py-2 rounded-2xl shadow-xl font-semibold text-sm whitespace-nowrap">
+            Try me! 💬
+            {/* Little pointer/tail pointing down to bubble */}
+            <div className="absolute -bottom-2 right-6 w-4 h-4 bg-white transform rotate-45"></div>
+          </div>
+        </div>
       )}
 
-      {/* Chat Window */}
+      {/* Sticky floating bubble button */}
+      <button
+        onClick={handleBubbleClick}
+        className="fixed bottom-6 right-6 z-50 w-16 h-16 bg-gradient-to-br from-[#5DFECA] to-[#4ade80] rounded-full shadow-2xl shadow-[#5DFECA]/50 hover:scale-110 transition-transform flex items-center justify-center"
+      >
+        {isOpen ? (
+          <svg className="w-8 h-8 text-[#0a1a1a]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        ) : (
+          <svg className="w-8 h-8 text-[#0a1a1a]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+          </svg>
+        )}
+      </button>
+
+      {/* Chat window */}
       {isOpen && (
-        <div className="fixed bottom-8 right-8 w-[420px] h-[640px] bg-[#1a1b26] rounded-3xl shadow-2xl flex flex-col z-50 border border-[#5DFECA]/20">
-          
+        <div className="fixed bottom-24 right-6 z-40 w-96 max-w-[calc(100vw-3rem)] bg-[#1a1b26] rounded-3xl shadow-2xl border-2 border-[#5DFECA]/20 overflow-hidden">
           {/* Header */}
-          <div className="bg-gradient-to-r from-[#1f2335] to-[#1a2f1a] p-6 border-b border-[#5DFECA]/10 flex justify-between items-center rounded-t-3xl">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-[#5DFECA] to-[#22c55e] rounded-2xl flex items-center justify-center shadow-lg">
-                <span className="text-2xl">🤖</span>
-              </div>
+          <div className="bg-gradient-to-r from-[#1f2335] to-[#24283b] p-5 border-b border-[#5DFECA]/10">
+            <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-white font-bold">Instant Assistant</h3>
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 bg-[#5DFECA] rounded-full animate-pulse"></span>
-                  <p className="text-[#5DFECA] text-xs font-medium">Aiden • Online</p>
-                </div>
+                <h3 className="text-white font-bold text-lg">GreenLine365 Assistant</h3>
+                <p className="text-[#5DFECA] text-xs">Online • Ready to help</p>
               </div>
+              <button
+                onClick={() => setIsOpen(false)}
+                className="text-white/60 hover:text-white transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
-            <button 
-              onClick={() => setIsOpen(false)}
-              className="text-white/60 hover:text-white text-3xl transition-colors leading-none p-2 hover:bg-white/5 rounded-lg"
-            >
-              ×
-            </button>
           </div>
 
           {/* Messages */}
-          <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-4 bg-[#1a1b26]">
+          <div className="h-96 overflow-y-auto p-5 space-y-4 bg-[#1a1b26]">
             {messages.length === 0 && (
-              <div className="text-center mt-20 space-y-4">
-                <p className="text-white/60 text-sm">
-                  Welcome to GreenLine365. I'm Aiden.<br/>
-                  How can I help your business grow today?
-                </p>
-                <p className="text-[#5DFECA]/40 text-xs italic">
-                  e.g. "How would this work for a landscaping business?"
-                </p>
+              <div className="text-center text-white/40 py-8">
+                <p className="text-sm">Ask me anything about GreenLine365!</p>
+                <p className="text-xs mt-2">Try: "How would this work for a barbershop in Windermere?"</p>
               </div>
             )}
-            
-            {messages.map((msg, i) => (
-              <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`p-4 rounded-2xl max-w-[85%] ${
-                  msg.role === 'user' 
-                    ? 'bg-gradient-to-br from-[#5DFECA] to-[#4ade80] text-[#0a1a1a] font-semibold rounded-br-sm' 
-                    : 'bg-[#24283b] text-white/90 border border-[#5DFECA]/10 rounded-bl-sm'
+
+            {messages.map((msg, idx) => (
+              <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-[80%] p-4 rounded-2xl ${
+                  msg.role === 'user'
+                    ? 'bg-gradient-to-br from-[#5DFECA] to-[#4ade80] text-[#0a1a1a] rounded-br-sm'
+                    : 'bg-[#24283b] text-white rounded-bl-sm border border-[#5DFECA]/10'
                 }`}>
-                  {msg.content}
+                  <p className="text-sm leading-relaxed">{msg.content}</p>
                 </div>
               </div>
             ))}
