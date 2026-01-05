@@ -1,22 +1,16 @@
 import "./globals.css";
-import type { Metadata } from "next";
-import ChatWidget from "../components/chatwidget";
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+import ChatWidget from "./components/chatwidget"; // Your chat bubble
 
-export const metadata: Metadata = {
-  title: "GreenLine365",
-  description: "Investor-Ready Website",
-};
-
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
-        {children}
-        <ChatWidget />
+        <Navbar /> {/* Shows at the top */}
+        <main>{children}</main> {/* Your actual page content */}
+        <ChatWidget /> {/* The chat bubble */}
+        <Footer /> {/* Shows at the bottom */}
       </body>
     </html>
   );

@@ -7,11 +7,11 @@ interface Message {
   content: string;
 }
 
-interface ChatWidgetProps {
+interface ChatwidgetProps {
   onClose?: () => void;
 }
 
-export default function ChatWidget({ onClose }: ChatWidgetProps) {
+export default function ChatWidget({ onClose }: ChatwidgetProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [message, setMessage] = useState('');
@@ -26,7 +26,7 @@ export default function ChatWidget({ onClose }: ChatWidgetProps) {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const clicked = localStorage.getItem('chatWidgetClicked');
+    const clicked = localStorage.getItem('chatwidgetClicked');
     if (clicked === 'true') {
       setShowTryMe(false);
       setHasClicked(true);
@@ -45,21 +45,20 @@ export default function ChatWidget({ onClose }: ChatWidgetProps) {
       setShowTryMe(false);
       setHasClicked(true);
       if (typeof window !== 'undefined') {
-        localStorage.setItem('chatWidgetClicked', 'true');
+        localStorage.setItem('chatwidgetClicked', 'true');
       }
     }
   };
 
   const sendMessage = async () => {
-    if (isLoading) return;
+    if (isLoading || !message.trim()) return;
 
     const userMessage = message.trim();
-    if (!userMessage) return;
-
     setMessage('');
     setIsLoading(true);
 
-    setMessages((prev) => [...prev, { role: 'user', content: userMessage }]);
+    const updatedMessages = [...messages, { role: 'user' as const, content: userMessage }];
+    setMessages(updatedMessages);
 
     try {
       const response = await fetch('/api/chat', {
@@ -67,7 +66,7 @@ export default function ChatWidget({ onClose }: ChatWidgetProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: userMessage,
-          messages: [...messages, { role: 'user', content: userMessage }],
+          messages: updatedMessages,
         }),
       });
 
@@ -183,7 +182,7 @@ export default function ChatWidget({ onClose }: ChatWidgetProps) {
                     msg.role === 'user'
                       ? 'max-w-[78%] rounded-2xl rounded-br-md px-4 py-3 text-sm text-black bg-emerald-400 shadow-[0_0_25px_rgba(16,185,129,0.18)]'
                       : 'max-w-[78%] rounded-2xl rounded-bl-md px-4 py-3 text-sm text-white/90 bg-white/5 border border-white/10'
-                }
+                  }
                 >
                   <p className="leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                 </div>
@@ -208,7 +207,10 @@ export default function ChatWidget({ onClose }: ChatWidgetProps) {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) sendMessage();
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                  }
                 }}
                 placeholder="Initiate command…"
                 className="flex-1 rounded-2xl px-4 py-3 text-sm outline-none bg-black/50 border border-emerald-500/15 text-white/90 placeholder:text-white/35 focus:ring-2 focus:ring-emerald-400/30"
