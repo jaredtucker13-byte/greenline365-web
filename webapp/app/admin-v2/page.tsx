@@ -23,7 +23,25 @@ import HybridCalendar from './components/HybridCalendar';
 import ContentForge from './components/ContentForge';
 import LocalPulse from './components/LocalPulse';
 import AnalyticsWidgets from './components/AnalyticsWidgets';
+import DemoController from './components/DemoController';
 import type { CalendarEvent, LocalTrend, ActivityItem, TeamMetrics, PipelineStage, BookingTrend } from './lib/types';
+
+// ============================================
+// DEMO CONFIG TYPE
+// ============================================
+interface DemoConfig {
+  businessName: string;
+  city: string;
+  primaryColor: string;
+  accentColor: string;
+}
+
+const defaultDemoConfig: DemoConfig = {
+  businessName: 'GreenLine365',
+  city: 'Tampa, FL',
+  primaryColor: '#39FF14',
+  accentColor: '#0CE293',
+};
 
 // ============================================
 // MOCK DATA (Replace with Supabase in production)
