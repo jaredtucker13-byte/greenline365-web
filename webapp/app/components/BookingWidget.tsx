@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface BookingWidgetProps {
   source?: string; // For tracking which company/widget
@@ -35,6 +35,24 @@ export default function BookingWidget({
   const [phone, setPhone] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
+  const [availableDates, setAvailableDates] = useState<string[]>([]);
+  const [mounted, setMounted] = useState(false);
+
+  // Generate dates only on client to avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+    const dates: string[] = [];
+    const today = new Date();
+    for (let i = 1; i <= 30; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() + i);
+      // Skip weekends
+      if (date.getDay() !== 0 && date.getDay() !== 6) {
+        dates.push(date.toISOString().split('T')[0]);
+      }
+    }
+    setAvailableDates(dates);
+  }, []);
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
@@ -79,20 +97,35 @@ export default function BookingWidget({
     return `${hours.padStart(2, '0')}:${minutes}:00`;
   };
 
-  // Get next 30 days for date selection
-  const getAvailableDates = () => {
-    const dates = [];
-    const today = new Date();
-    for (let i = 1; i <= 30; i++) {
-      const date = new Date(today);
-      date.setDate(today.getDate() + i);
-      // Skip weekends
-      if (date.getDay() !== 0 && date.getDay() !== 6) {
-        dates.push(date.toISOString().split('T')[0]);
-      }
-    }
-    return dates;
+  const formatDate = (dateStr: string) => {
+    const d = new Date(dateStr + 'T00:00:00');
+    return {
+      dayName: d.toLocaleDateString('en-US', { weekday: 'short' }),
+      dayNum: d.getDate(),
+      month: d.toLocaleDateString('en-US', { month: 'short' })
+    };
   };
+
+  if (!mounted) {
+    return (
+      <div className="space-y-4">
+        <div className="flex gap-2 mb-6">
+          <div className="h-1 flex-1 rounded-full bg-gray-200" />
+          <div className="h-1 flex-1 rounded-full bg-gray-200" />
+          <div className="h-1 flex-1 rounded-full bg-gray-200" />
+          <div className="h-1 flex-1 rounded-full bg-gray-200" />
+        </div>
+        <div className="animate-pulse">
+          <div className="h-4 bg-gray-200 rounded w-24 mb-3" />
+          <div className="grid grid-cols-3 gap-2">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="h-20 bg-gray-100 rounded-lg" />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (isComplete) {
     return (
@@ -120,7 +153,7 @@ export default function BookingWidget({
             key={s}
             className={`h-1 flex-1 rounded-full transition-all ${
               ['date', 'time', 'details', 'confirm'].indexOf(step) >= i
-                ? 'bg-emerald-500'
+                ? ''
                 : 'bg-gray-200'
             }`}
             style={['date', 'time', 'details', 'confirm'].indexOf(step) >= i ? { backgroundColor: primaryColor } : {}}
@@ -134,11 +167,8 @@ export default function BookingWidget({
             Select a Date
           </label>
           <div className="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto">
-            {getAvailableDates().map((date) => {
-              const d = new Date(date);
-              const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
-              const dayNum = d.getDate();
-              const month = d.toLocaleDateString('en-US', { month: 'short' });
+            {availableDates.map((date) => {
+              const { dayName, dayNum, month } = formatDate(date);
               
               return (
                 <button
@@ -174,7 +204,7 @@ export default function BookingWidget({
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            {new Date(selectedDate).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+            {selectedDate && new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
           </button>
           <label className="block text-sm font-semibold text-gray-700 mb-3">
             Select a Time
@@ -211,7 +241,7 @@ export default function BookingWidget({
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            {selectedTime} on {new Date(selectedDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+            {selectedTime} on {selectedDate && new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
           </button>
           
           <div>
@@ -278,7 +308,7 @@ export default function BookingWidget({
               <div className="flex justify-between">
                 <span className="text-gray-500">Date</span>
                 <span className="text-gray-900 font-medium">
-                  {new Date(selectedDate).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                  {selectedDate && new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
                 </span>
               </div>
               <div className="flex justify-between">
