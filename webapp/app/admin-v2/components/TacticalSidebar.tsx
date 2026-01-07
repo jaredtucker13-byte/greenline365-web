@@ -54,7 +54,32 @@ const icons: Record<string, React.ReactElement> = {
   ),
 };
 
-export default function TacticalSidebar({ activeItem, onNewBooking, onNewContent, pendingCount }: SidebarProps) {
+export default function TacticalSidebar({ activeItem, onNewBooking, onNewContent, pendingCount, onDemoControllerToggle }: SidebarProps) {
+  // Triple-click handler for hidden Demo Controller
+  const [clickCount, setClickCount] = useState(0);
+  const [clickTimer, setClickTimer] = useState<NodeJS.Timeout | null>(null);
+
+  const handleVersionClick = useCallback(() => {
+    if (clickTimer) {
+      clearTimeout(clickTimer);
+    }
+
+    const newCount = clickCount + 1;
+    setClickCount(newCount);
+
+    if (newCount >= 3) {
+      // Triple click detected - open Demo Controller
+      setClickCount(0);
+      onDemoControllerToggle?.();
+    } else {
+      // Reset after 500ms
+      const timer = setTimeout(() => {
+        setClickCount(0);
+      }, 500);
+      setClickTimer(timer);
+    }
+  }, [clickCount, clickTimer, onDemoControllerToggle]);
+
   return (
     <aside className="w-64 h-screen bg-[#1A1A1A] border-r border-[#39FF14]/20 flex flex-col fixed left-0 top-0 z-40">
       {/* Logo */}
