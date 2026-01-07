@@ -263,6 +263,7 @@ export default function TacticalCommandCenter() {
           setShowContentForge(true);
         }}
         pendingCount={pendingCount}
+        onDemoControllerToggle={() => setShowDemoController(true)}
       />
 
       {/* Main Content */}
