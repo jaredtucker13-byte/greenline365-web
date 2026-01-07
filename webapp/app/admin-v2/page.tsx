@@ -297,7 +297,7 @@ export default function TacticalCommandCenter() {
             {/* Local Pulse - 1/3 width */}
             <div>
               <LocalPulse
-                location="Tampa, FL"
+                location={demoConfig.city}
                 trends={mockTrends}
                 onForgeContent={handleForgeFromTrend}
               />
