@@ -180,6 +180,10 @@ export default function TacticalCommandCenter() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [events, setEvents] = useState<CalendarEvent[]>(mockEvents);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
+  
+  // Demo Controller State
+  const [showDemoController, setShowDemoController] = useState(false);
+  const [demoConfig, setDemoConfig] = useState<DemoConfig>(defaultDemoConfig);
 
   // Navigation handlers
   const handlePrev = () => {
