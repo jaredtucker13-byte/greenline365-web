@@ -367,6 +367,22 @@ export default function TacticalCommandCenter() {
         selectedDate={selectedDate}
         onSchedule={handleScheduleContent}
       />
+
+      {/* Demo Controller Modal - Hidden, activated by triple-click on version */}
+      <DemoController
+        isOpen={showDemoController}
+        onClose={() => setShowDemoController(false)}
+        currentConfig={demoConfig}
+        onConfigChange={setDemoConfig}
+      />
+
+      {/* Dynamic CSS Variables for Demo Mode */}
+      <style jsx global>{`
+        :root {
+          --demo-primary: ${demoConfig.primaryColor};
+          --demo-accent: ${demoConfig.accentColor};
+        }
+      `}</style>
     </div>
   );
 }
