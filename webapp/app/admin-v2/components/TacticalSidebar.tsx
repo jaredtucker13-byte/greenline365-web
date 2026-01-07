@@ -8,9 +8,10 @@
  * - Dashboard, Schedule, Analytics, Settings navigation
  * - Action buttons: New Booking, New Content, Pending Approvals
  * - Status indicators: SYSTEM ONLINE, AES-256 ENCRYPTED
+ * - Hidden Demo Controller trigger (triple-click on version)
  */
 
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 
@@ -19,6 +20,7 @@ interface SidebarProps {
   onNewBooking: () => void;
   onNewContent: () => void;
   pendingCount: number;
+  onDemoControllerToggle?: () => void;
 }
 
 const navItems = [
