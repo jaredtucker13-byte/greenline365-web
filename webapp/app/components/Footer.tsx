@@ -1,14 +1,102 @@
-import Link from "next/link";
+import Link from 'next/link';
 
 export default function Footer() {
   return (
-    <footer className="p-10 bg-gray-50 border-t mt-20 text-center">
-      <div className="space-x-6 mb-4">
-        <Link href="/waitlist" className="hover:underline">Join Waitlist</Link>
-        <Link href="/newsletter" className="hover:underline">Newsletter</Link>
-        <Link href="/support" className="hover:underline">Support</Link>
+    <footer className="border-t border-white/10 bg-black/30">
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        <div className="grid md:grid-cols-4 gap-8">
+          {/* Brand */}
+          <div className="md:col-span-1">
+            <Link href="/" className="text-2xl font-bold">
+              <span className="text-white">Green</span>
+              <span className="text-emerald-400">Line365</span>
+            </Link>
+            <p className="mt-4 text-white/50 text-sm">
+              Your AI-assisted planning and accountability partner.
+            </p>
+          </div>
+
+          {/* Product */}
+          <div>
+            <h4 className="text-white font-semibold mb-4">Product</h4>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/pricing" className="text-white/50 hover:text-white transition text-sm">
+                  Pricing
+                </Link>
+              </li>
+              <li>
+                <Link href="/about" className="text-white/50 hover:text-white transition text-sm">
+                  Features
+                </Link>
+              </li>
+              <li>
+                <Link href="/waitlist" className="text-white/50 hover:text-white transition text-sm">
+                  Join Waitlist
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Company */}
+          <div>
+            <h4 className="text-white font-semibold mb-4">Company</h4>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/about" className="text-white/50 hover:text-white transition text-sm">
+                  About
+                </Link>
+              </li>
+              <li>
+                <Link href="/support" className="text-white/50 hover:text-white transition text-sm">
+                  Support
+                </Link>
+              </li>
+              <li>
+                <Link href="/newsletter" className="text-white/50 hover:text-white transition text-sm">
+                  Newsletter
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Connect */}
+          <div>
+            <h4 className="text-white font-semibold mb-4">Connect</h4>
+            <ul className="space-y-2">
+              <li>
+                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-white/50 hover:text-white transition text-sm">
+                  Twitter
+                </a>
+              </li>
+              <li>
+                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-white/50 hover:text-white transition text-sm">
+                  LinkedIn
+                </a>
+              </li>
+              <li>
+                <Link href="/support" className="text-white/50 hover:text-white transition text-sm">
+                  Contact Us
+                </Link>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="mt-12 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-white/40 text-sm">
+            © {new Date().getFullYear()} GreenLine365. All rights reserved.
+          </p>
+          <div className="flex gap-6">
+            <Link href="/coming-soon" className="text-white/40 hover:text-white/60 transition text-sm">
+              Privacy Policy
+            </Link>
+            <Link href="/coming-soon" className="text-white/40 hover:text-white/60 transition text-sm">
+              Terms of Service
+            </Link>
+          </div>
+        </div>
       </div>
-      <p className="text-sm text-gray-500">© 2026 GreenLine365. All rights reserved.</p>
     </footer>
   );
 }

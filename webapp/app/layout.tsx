@@ -1,16 +1,21 @@
-import "./globals.css";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
-import ChatWidget from "./components/chatwidget"; // Your chat bubble
+import './globals.css';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+import ChatWidget from './components/chatwidget';
+
+export const metadata = {
+  title: 'GreenLine365 - Your AI Planning Partner',
+  description: 'AI-assisted planning and accountability partner. Stop guessing, start growing.',
+};
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>
-        <Navbar /> {/* Shows at the top */}
-        <main>{children}</main> {/* Your actual page content */}
-        <ChatWidget /> {/* The chat bubble */}
-        <Footer /> {/* Shows at the bottom */}
+      <body className="min-h-screen bg-gradient-to-br from-gray-900 via-emerald-950/20 to-gray-900">
+        <Navbar />
+        <main>{children}</main>
+        <ChatWidget />
+        <Footer />
       </body>
     </html>
   );
