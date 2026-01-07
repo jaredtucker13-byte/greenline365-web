@@ -10,6 +10,7 @@
  * - Status indicators: SYSTEM ONLINE, AES-256 ENCRYPTED
  */
 
+import React from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 
@@ -27,7 +28,7 @@ const navItems = [
   { id: 'settings', label: 'Settings', icon: 'cog' },
 ];
 
-const icons: Record<string, JSX.Element> = {
+const icons: Record<string, React.ReactElement> = {
   grid: (
     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
@@ -57,9 +58,13 @@ export default function TacticalSidebar({ activeItem, onNewBooking, onNewContent
       {/* Logo */}
       <div className="p-6 border-b border-[#39FF14]/10">
         <Link href="/" className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-[#39FF14]/10 border border-[#39FF14]/30 flex items-center justify-center">
+          <motion.div 
+            className="w-10 h-10 rounded-lg bg-[#39FF14]/10 border border-[#39FF14]/30 flex items-center justify-center"
+            animate={{ boxShadow: ['0 0 10px rgba(57,255,20,0.3)', '0 0 20px rgba(57,255,20,0.5)', '0 0 10px rgba(57,255,20,0.3)'] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
             <span className="text-[#39FF14] font-bold text-lg">G</span>
-          </div>
+          </motion.div>
           <div>
             <span className="text-white font-bold">Green</span>
             <span className="text-[#39FF14] font-bold">Line365</span>
@@ -74,7 +79,11 @@ export default function TacticalSidebar({ activeItem, onNewBooking, onNewContent
           animate={{ opacity: 1 }}
           className="flex items-center gap-2"
         >
-          <span className="w-2 h-2 rounded-full bg-[#39FF14] animate-pulse" />
+          <motion.span 
+            className="w-2 h-2 rounded-full bg-[#39FF14]"
+            animate={{ scale: [1, 1.2, 1], opacity: [1, 0.7, 1] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          />
           <span className="text-[10px] tracking-widest text-[#39FF14] font-mono">SYSTEM ONLINE</span>
         </motion.div>
         <div className="flex items-center gap-2">
@@ -90,7 +99,7 @@ export default function TacticalSidebar({ activeItem, onNewBooking, onNewContent
         {navItems.map((item) => (
           <motion.button
             key={item.id}
-            whileHover={{ x: 4 }}
+            whileHover={{ x: 4, boxShadow: '0 0 15px rgba(57,255,20,0.2)' }}
             whileTap={{ scale: 0.98 }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
               activeItem === item.id
@@ -104,6 +113,8 @@ export default function TacticalSidebar({ activeItem, onNewBooking, onNewContent
               <motion.div
                 layoutId="activeIndicator"
                 className="ml-auto w-1.5 h-1.5 rounded-full bg-[#39FF14]"
+                animate={{ scale: [1, 1.3, 1] }}
+                transition={{ duration: 1, repeat: Infinity }}
               />
             )}
           </motion.button>
@@ -113,7 +124,7 @@ export default function TacticalSidebar({ activeItem, onNewBooking, onNewContent
       {/* Action Buttons */}
       <div className="p-4 space-y-3 border-t border-[#39FF14]/10">
         <motion.button
-          whileHover={{ scale: 1.02 }}
+          whileHover={{ scale: 1.02, boxShadow: '0 0 25px rgba(57,255,20,0.4)' }}
           whileTap={{ scale: 0.98 }}
           onClick={onNewBooking}
           className="w-full py-3 px-4 rounded-lg border border-[#39FF14] text-[#39FF14] font-semibold hover:bg-[#39FF14]/10 transition-all flex items-center justify-center gap-2"
@@ -125,7 +136,7 @@ export default function TacticalSidebar({ activeItem, onNewBooking, onNewContent
         </motion.button>
         
         <motion.button
-          whileHover={{ scale: 1.02 }}
+          whileHover={{ scale: 1.02, boxShadow: '0 0 25px rgba(12,226,147,0.4)' }}
           whileTap={{ scale: 0.98 }}
           onClick={onNewContent}
           className="w-full py-3 px-4 rounded-lg border border-[#0CE293] text-[#0CE293] font-semibold hover:bg-[#0CE293]/10 transition-all flex items-center justify-center gap-2"
@@ -138,8 +149,10 @@ export default function TacticalSidebar({ activeItem, onNewBooking, onNewContent
 
         {pendingCount > 0 && (
           <motion.button
-            whileHover={{ scale: 1.02 }}
+            whileHover={{ scale: 1.02, boxShadow: '0 0 25px rgba(255,200,0,0.4)' }}
             whileTap={{ scale: 0.98 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
             className="w-full py-3 px-4 rounded-lg border border-[#FFC800] text-[#FFC800] font-semibold hover:bg-[#FFC800]/10 transition-all flex items-center justify-center gap-2"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
