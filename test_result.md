@@ -65,14 +65,10 @@ metadata:
   test_sequence: 1
 
 test_plan:
-  current_focus:
-    - "Landing Page Load"
-    - "Admin V2 Page Load"
-    - "Demo Controller Modal"
-    - "Content Forge Modal"
+  current_focus: []
   stuck_tasks: []
-  test_all: true
-  test_priority: "high_first"
+  test_all: false
+  test_priority: "completed"
 
 agent_communication:
   - agent: "testing"
