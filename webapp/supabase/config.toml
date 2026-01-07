@@ -1,0 +1,50 @@
+# GreenLine365 Supabase Configuration
+[project]
+id = "rawlqwjdfzicjepzmcng"
+
+[api]
+enabled = true
+# Port to use for the API URL.
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+# Port to use for the local database URL.
+port = 54322
+# The database major version to use. Supports 15 and above.
+major_version = 15
+
+[studio]
+enabled = true
+port = 54323
+api_url = "http://localhost"
+
+# Seed data configration
+[db.seed]
+enabled = true
+sql_paths = ["./seed.sql"]
+
+[auth]
+enabled = true
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["https://greenline365.com"]
+jwt_expiry = 3600
+enable_signup = true
+enable_anonymous_sign_ins = false
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = false
+
+# Edge Functions configuration
+[functions.schedule-blast]
+verify_jwt = true
+
+[functions.local-trends]
+verify_jwt = false
+
+[functions.lead-alerts]
+verify_jwt = true
