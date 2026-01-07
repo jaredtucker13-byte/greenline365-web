@@ -190,9 +190,16 @@ export default function TacticalSidebar({ activeItem, onNewBooking, onNewContent
         )}
       </div>
 
-      {/* Version */}
+      {/* Version - Triple click to open Demo Controller */}
       <div className="p-4 border-t border-[#39FF14]/10">
-        <p className="text-[10px] text-gray-600 font-mono text-center">TACTICAL V2.0 // BUILD 2026.01</p>
+        <motion.p 
+          onClick={handleVersionClick}
+          whileHover={{ color: '#39FF14' }}
+          className="text-[10px] text-gray-600 font-mono text-center cursor-pointer select-none transition-colors"
+          title="Triple-click for Demo Mode"
+        >
+          TACTICAL V2.0 // BUILD 2026.01
+        </motion.p>
       </div>
     </aside>
   );
