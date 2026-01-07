@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase/client';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import { EventClickArg } from '@fullcalendar/core';
 
 interface Booking {
   id: string;
@@ -121,8 +122,11 @@ export default function CommandCenter() {
     }
   }
 
-  const handleEventClick = (info: { event: { extendedProps: { booking: Booking } } }) => {
-    setSelectedBooking(info.event.extendedProps.booking);
+  const handleEventClick = (info: EventClickArg) => {
+    const booking = info.event.extendedProps.booking as Booking;
+    if (booking) {
+      setSelectedBooking(booking);
+    }
   };
 
   return (
