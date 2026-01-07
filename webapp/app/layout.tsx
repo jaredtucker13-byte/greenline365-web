@@ -11,7 +11,7 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-gradient-to-br from-gray-900 via-emerald-950/20 to-gray-900">
+      <body className="min-h-screen bg-[#050a08]">
         <Navbar />
         <main>{children}</main>
         <ChatWidget />
