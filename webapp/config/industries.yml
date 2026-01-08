@@ -1,0 +1,69 @@
+# Industries Configuration
+# Maps industries to default demo profiles for booking flow
+
+industries:
+  - id: technology
+    name: Technology & Software
+    default_demo_profile_id: greenline365
+    icon: "💻"
+    description: SaaS, apps, and tech services
+
+  - id: food_beverage
+    name: Food & Beverage
+    default_demo_profile_id: tampa-bay-bakery
+    icon: "🍽️"
+    description: Restaurants, cafes, and food service
+
+  - id: automotive
+    name: Automotive
+    default_demo_profile_id: miami-auto-group
+    icon: "🚗"
+    description: Dealerships, repair shops, and auto services
+
+  - id: healthcare
+    name: Healthcare & Wellness
+    default_demo_profile_id: orlando-med-spa
+    icon: "🏥"
+    description: Medical practices, spas, and wellness centers
+
+  - id: fitness
+    name: Fitness & Sports
+    default_demo_profile_id: jacksonville-fitness
+    icon: "💪"
+    description: Gyms, fitness studios, and sports facilities
+
+  - id: real_estate
+    name: Real Estate
+    default_demo_profile_id: st-pete-realty
+    icon: "🏠"
+    description: Residential and commercial real estate
+
+  - id: retail
+    name: Retail & E-commerce
+    default_demo_profile_id: greenline365
+    icon: "🛍️"
+    description: Shops, stores, and online retail
+
+  - id: professional_services
+    name: Professional Services
+    default_demo_profile_id: greenline365
+    icon: "💼"
+    description: Consulting, legal, accounting, and more
+
+  - id: hospitality
+    name: Hospitality & Tourism
+    default_demo_profile_id: greenline365
+    icon: "🏨"
+    description: Hotels, travel, and tourism services
+
+  - id: education
+    name: Education & Training
+    default_demo_profile_id: greenline365
+    icon: "📚"
+    description: Schools, courses, and training programs
+
+  - id: other
+    name: Other
+    default_demo_profile_id: greenline365
+    icon: "🔧"
+    description: Other industries not listed

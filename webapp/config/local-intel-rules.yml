@@ -1,0 +1,129 @@
+# Local Intelligence Rules Configuration
+# Defines categories, icons, and colors for Local Pulse / Daily Trend Hunter
+
+categories:
+  - id: sports
+    name: Sports & Athletics
+    icon: "🏈"
+    color: "#10B981"
+    glow_color: "rgba(16, 185, 129, 0.4)"
+    keywords:
+      - game
+      - match
+      - tournament
+      - playoff
+      - championship
+      - league
+    suggested_actions:
+      - "Create game-day specials or promotions"
+      - "Post team-themed social content"
+      - "Extend hours for game nights"
+
+  - id: community
+    name: Community Events
+    icon: "🎉"
+    color: "#8B5CF6"
+    glow_color: "rgba(139, 92, 246, 0.4)"
+    keywords:
+      - festival
+      - parade
+      - fair
+      - market
+      - gathering
+      - celebration
+    suggested_actions:
+      - "Set up a booth or sponsor the event"
+      - "Create event-themed promotions"
+      - "Partner with local vendors"
+
+  - id: business
+    name: Business & Networking
+    icon: "💼"
+    color: "#3B82F6"
+    glow_color: "rgba(59, 130, 246, 0.4)"
+    keywords:
+      - conference
+      - mixer
+      - networking
+      - trade show
+      - expo
+      - seminar
+    suggested_actions:
+      - "Attend for lead generation"
+      - "Offer special B2B packages"
+      - "Schedule follow-up campaigns"
+
+  - id: entertainment
+    name: Entertainment
+    icon: "🎭"
+    color: "#EC4899"
+    glow_color: "rgba(236, 72, 153, 0.4)"
+    keywords:
+      - concert
+      - show
+      - movie
+      - theater
+      - performance
+      - exhibition
+    suggested_actions:
+      - "Partner with venue for promotions"
+      - "Create themed content"
+      - "Offer pre/post-event specials"
+
+  - id: weather
+    name: Weather & Seasonal
+    icon: "☀️"
+    color: "#F59E0B"
+    glow_color: "rgba(245, 158, 11, 0.4)"
+    keywords:
+      - sunny
+      - rain
+      - storm
+      - cold
+      - hot
+      - hurricane
+    suggested_actions:
+      - "Adjust hours based on conditions"
+      - "Promote weather-appropriate services"
+      - "Plan indoor/outdoor alternatives"
+
+  - id: holiday
+    name: Holidays & Observances
+    icon: "🎄"
+    color: "#EF4444"
+    glow_color: "rgba(239, 68, 68, 0.4)"
+    keywords:
+      - holiday
+      - christmas
+      - thanksgiving
+      - independence
+      - memorial
+      - labor
+    suggested_actions:
+      - "Create holiday-themed campaigns"
+      - "Plan special hours or closures"
+      - "Launch seasonal promotions"
+
+  - id: other
+    name: Other
+    icon: "📌"
+    color: "#6B7280"
+    glow_color: "rgba(107, 114, 128, 0.4)"
+    keywords: []
+    suggested_actions:
+      - "Evaluate opportunity for relevance"
+      - "Monitor for potential impact"
+
+traffic_levels:
+  low:
+    label: "Low Traffic"
+    color: "#6B7280"
+    badge_class: "bg-gray-500/20 text-gray-300"
+  medium:
+    label: "Medium Traffic"
+    color: "#F59E0B"
+    badge_class: "bg-amber-500/20 text-amber-300"
+  high:
+    label: "High Traffic"
+    color: "#EF4444"
+    badge_class: "bg-red-500/20 text-red-300"

@@ -1,0 +1,70 @@
+# Demo Profiles Configuration
+# Used by Demo Controller and demo booking system
+# Each profile represents a business type for B2B demonstrations
+
+profiles:
+  - id: greenline365
+    slug: greenline365
+    business_name: GreenLine365
+    city_location: Tampa, FL
+    industry: technology
+    primary_color: "#39FF14"
+    accent_color: "#0CE293"
+    description: AI-powered planning and accountability platform
+    logo_url: null
+    is_default: true
+
+  - id: tampa-bay-bakery
+    slug: tampa-bay-bakery
+    business_name: Tampa Bay Bakery
+    city_location: Tampa, FL
+    industry: food_beverage
+    primary_color: "#FF6B35"
+    accent_color: "#F7C59F"
+    description: Local artisan bakery and cafe
+    logo_url: null
+    is_default: false
+
+  - id: miami-auto-group
+    slug: miami-auto-group
+    business_name: Miami Auto Group
+    city_location: Miami, FL
+    industry: automotive
+    primary_color: "#00D4FF"
+    accent_color: "#7B68EE"
+    description: Premium automotive dealership
+    logo_url: null
+    is_default: false
+
+  - id: orlando-med-spa
+    slug: orlando-med-spa
+    business_name: Orlando Med Spa
+    city_location: Orlando, FL
+    industry: healthcare
+    primary_color: "#E91E8C"
+    accent_color: "#9B59B6"
+    description: Medical spa and wellness center
+    logo_url: null
+    is_default: false
+
+  - id: jacksonville-fitness
+    slug: jacksonville-fitness
+    business_name: Jacksonville Fitness
+    city_location: Jacksonville, FL
+    industry: fitness
+    primary_color: "#FFD700"
+    accent_color: "#FF4500"
+    description: Full-service fitness center and gym
+    logo_url: null
+    is_default: false
+
+  - id: st-pete-realty
+    slug: st-pete-realty
+    business_name: St. Pete Realty
+    city_location: St. Petersburg, FL
+    industry: real_estate
+    primary_color: "#4A90D9"
+    accent_color: "#2ECC71"
+    description: Residential and commercial real estate
+    logo_url: null
+    is_default: false
