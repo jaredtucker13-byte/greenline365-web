@@ -482,3 +482,152 @@ CREATE POLICY "Allow all for demo_weekly_trend_ideas" ON demo_weekly_trend_ideas
 
 GRANT ALL ON demo_weekly_trend_ideas TO anon;
 GRANT ALL ON demo_weekly_trend_ideas TO service_role;
+
+-- ============================================
+-- PROFILES TABLE (for user roles/admin access)
+-- Links to auth.users via id
+-- ============================================
+CREATE TABLE IF NOT EXISTS profiles (
+  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  email TEXT UNIQUE NOT NULL,
+  full_name TEXT,
+  avatar_url TEXT,
+  is_admin BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS idx_profiles_email ON profiles(email);
+CREATE INDEX IF NOT EXISTS idx_profiles_is_admin ON profiles(is_admin);
+
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+
+-- Users can read their own profile
+CREATE POLICY "Users can view own profile" ON profiles
+  FOR SELECT
+  USING (auth.uid() = id);
+
+-- Users can update their own profile
+CREATE POLICY "Users can update own profile" ON profiles
+  FOR UPDATE
+  USING (auth.uid() = id);
+
+-- Allow insert for new signups
+CREATE POLICY "Allow insert for authenticated users" ON profiles
+  FOR INSERT
+  WITH CHECK (auth.uid() = id);
+
+-- Admins can view all profiles
+CREATE POLICY "Admins can view all profiles" ON profiles
+  FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM profiles WHERE id = auth.uid() AND is_admin = true
+    )
+  );
+
+GRANT ALL ON profiles TO authenticated;
+GRANT SELECT ON profiles TO anon;
+
+-- ============================================
+-- SITE CONTENT TABLE (editable copy)
+-- For admin content management
+-- ============================================
+CREATE TABLE IF NOT EXISTS site_content (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  key TEXT UNIQUE NOT NULL,
+  value TEXT NOT NULL,
+  description TEXT,
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_by UUID REFERENCES auth.users(id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_site_content_key ON site_content(key);
+
+ALTER TABLE site_content ENABLE ROW LEVEL SECURITY;
+
+-- Anyone can read site content
+CREATE POLICY "Anyone can read site content" ON site_content
+  FOR SELECT
+  USING (true);
+
+-- Only admins can update site content
+CREATE POLICY "Admins can update site content" ON site_content
+  FOR UPDATE
+  USING (
+    EXISTS (
+      SELECT 1 FROM profiles WHERE id = auth.uid() AND is_admin = true
+    )
+  );
+
+-- Only admins can insert site content
+CREATE POLICY "Admins can insert site content" ON site_content
+  FOR INSERT
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM profiles WHERE id = auth.uid() AND is_admin = true
+    )
+  );
+
+GRANT SELECT ON site_content TO anon;
+GRANT ALL ON site_content TO authenticated;
+
+-- ============================================
+-- SITE SETTINGS TABLE (brand/theme settings)
+-- ============================================
+CREATE TABLE IF NOT EXISTS site_settings (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  key TEXT UNIQUE NOT NULL,
+  value JSONB NOT NULL DEFAULT '{}',
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_by UUID REFERENCES auth.users(id)
+);
+
+INSERT INTO site_settings (key, value) VALUES 
+  ('brand', '{"primary_color": "#39FF14", "accent_color": "#0CE293", "logo_url": null, "support_email": "support@greenline365.com"}')
+ON CONFLICT (key) DO NOTHING;
+
+ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anyone can read site settings" ON site_settings
+  FOR SELECT
+  USING (true);
+
+CREATE POLICY "Admins can update site settings" ON site_settings
+  FOR UPDATE
+  USING (
+    EXISTS (
+      SELECT 1 FROM profiles WHERE id = auth.uid() AND is_admin = true
+    )
+  );
+
+GRANT SELECT ON site_settings TO anon;
+GRANT ALL ON site_settings TO authenticated;
+
+-- ============================================
+-- FUNCTION: Auto-create profile on signup
+-- ============================================
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.profiles (id, email, full_name)
+  VALUES (
+    NEW.id,
+    NEW.email,
+    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.email)
+  );
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Trigger to auto-create profile
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- ============================================
+-- ADMIN SETUP SCRIPT
+-- Run this AFTER signing up to make yourself admin:
+-- UPDATE profiles SET is_admin = true WHERE email = 'jared.tucker13@gmail.com';
+-- ============================================
