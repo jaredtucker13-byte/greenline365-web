@@ -1,25 +1,43 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase/client';
 
-// Industries from config (would normally be loaded from YAML)
-const industries = [
-  { id: 'technology', name: 'Technology & Software', icon: '💻', default_demo_profile_id: 'greenline365' },
-  { id: 'food_beverage', name: 'Food & Beverage', icon: '🍽️', default_demo_profile_id: 'tampa-bay-bakery' },
-  { id: 'automotive', name: 'Automotive', icon: '🚗', default_demo_profile_id: 'miami-auto-group' },
-  { id: 'healthcare', name: 'Healthcare & Wellness', icon: '🏥', default_demo_profile_id: 'orlando-med-spa' },
-  { id: 'fitness', name: 'Fitness & Sports', icon: '💪', default_demo_profile_id: 'jacksonville-fitness' },
-  { id: 'real_estate', name: 'Real Estate', icon: '🏠', default_demo_profile_id: 'st-pete-realty' },
-  { id: 'retail', name: 'Retail & E-commerce', icon: '🛍️', default_demo_profile_id: 'greenline365' },
-  { id: 'professional_services', name: 'Professional Services', icon: '💼', default_demo_profile_id: 'greenline365' },
-  { id: 'hospitality', name: 'Hospitality & Tourism', icon: '🏨', default_demo_profile_id: 'greenline365' },
-  { id: 'education', name: 'Education & Training', icon: '📚', default_demo_profile_id: 'greenline365' },
-  { id: 'other', name: 'Other', icon: '🔧', default_demo_profile_id: 'greenline365' },
+// Demo Profile type from database
+interface DemoProfile {
+  id: string;
+  slug: string;
+  business_name: string;
+  city_location: string;
+  primary_color: string;
+  accent_color: string;
+  industry: string;
+}
+
+// Industry type from database
+interface Industry {
+  id: string;
+  name: string;
+  default_demo_profile_id: string;
+  icon: string;
+  description: string;
+}
+
+// Fallback industries if DB fetch fails
+const fallbackIndustries: Industry[] = [
+  { id: 'technology', name: 'Technology & Software', icon: '💻', default_demo_profile_id: 'greenline365', description: '' },
+  { id: 'food_beverage', name: 'Food & Beverage', icon: '🍽️', default_demo_profile_id: 'tampa-bay-bakery', description: '' },
+  { id: 'automotive', name: 'Automotive', icon: '🚗', default_demo_profile_id: 'miami-auto-group', description: '' },
+  { id: 'healthcare', name: 'Healthcare & Wellness', icon: '🏥', default_demo_profile_id: 'orlando-med-spa', description: '' },
+  { id: 'fitness', name: 'Fitness & Sports', icon: '💪', default_demo_profile_id: 'jacksonville-fitness', description: '' },
+  { id: 'real_estate', name: 'Real Estate', icon: '🏠', default_demo_profile_id: 'st-pete-realty', description: '' },
+  { id: 'retail', name: 'Retail & E-commerce', icon: '🛍️', default_demo_profile_id: 'greenline365', description: '' },
+  { id: 'professional_services', name: 'Professional Services', icon: '💼', default_demo_profile_id: 'greenline365', description: '' },
+  { id: 'hospitality', name: 'Hospitality & Tourism', icon: '🏨', default_demo_profile_id: 'greenline365', description: '' },
+  { id: 'education', name: 'Education & Training', icon: '📚', default_demo_profile_id: 'greenline365', description: '' },
+  { id: 'other', name: 'Other', icon: '🔧', default_demo_profile_id: 'greenline365', description: '' },
 ];
 
 export default function DemoCalendarPage() {
