@@ -31,18 +31,21 @@ export default function Navbar() {
             <Link href="/about" className="text-white/70 hover:text-white transition">
               About
             </Link>
+            <Link href="/how-it-works" className="text-white/70 hover:text-white transition">
+              How It Works
+            </Link>
             <Link href="/pricing" className="text-white/70 hover:text-white transition">
               Pricing
             </Link>
             <Link href="/support" className="text-white/70 hover:text-white transition">
               Support
             </Link>
-            <button
-              onClick={scrollToBooking}
+            <Link
+              href="/demo-calendar"
               className="px-5 py-2 bg-emerald-500 text-black font-semibold rounded-lg hover:bg-emerald-400 transition"
             >
               Book Demo
-            </button>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -69,18 +72,25 @@ export default function Navbar() {
             <Link href="/about" className="block text-white/70 hover:text-white transition py-2" onClick={() => setMobileMenuOpen(false)}>
               About
             </Link>
+            <Link href="/how-it-works" className="block text-white/70 hover:text-white transition py-2" onClick={() => setMobileMenuOpen(false)}>
+              How It Works
+            </Link>
+            <Link href="/use-cases" className="block text-white/70 hover:text-white transition py-2" onClick={() => setMobileMenuOpen(false)}>
+              Use Cases
+            </Link>
             <Link href="/pricing" className="block text-white/70 hover:text-white transition py-2" onClick={() => setMobileMenuOpen(false)}>
               Pricing
             </Link>
             <Link href="/support" className="block text-white/70 hover:text-white transition py-2" onClick={() => setMobileMenuOpen(false)}>
               Support
             </Link>
-            <button
-              onClick={scrollToBooking}
-              className="w-full px-5 py-2 bg-emerald-500 text-black font-semibold rounded-lg hover:bg-emerald-400 transition"
+            <Link
+              href="/demo-calendar"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block w-full px-5 py-2 bg-emerald-500 text-black font-semibold rounded-lg hover:bg-emerald-400 transition text-center"
             >
               Book Demo
-            </button>
+            </Link>
           </div>
         )}
       </div>
