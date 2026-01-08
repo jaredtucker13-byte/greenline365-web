@@ -1,36 +1,237 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GreenLine365
 
-## Getting Started
+AI-powered business planning and accountability platform with Tactical Command Center.
 
-First, run the development server:
+## 🚀 Getting Started
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+### Prerequisites
+
+- Node.js 18+
+- npm or yarn
+- Supabase account (for database)
+
+### Environment Setup
+
+Create a `.env.local` file in the root directory:
+
+```env
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+
+# OpenRouter API (for AI chat)
+OPENROUTER_API_KEY=your-openrouter-key
+
+# SendGrid (for email - optional)
+SENDGRID_API_KEY=your-sendgrid-key
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Installation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# Install dependencies
+npm install
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Run development server
+npm run dev
 
-## Learn More
+# Build for production
+npm run build
+```
 
-To learn more about Next.js, take a look at the following resources:
+Open [http://localhost:3000](http://localhost:3000) to view the app.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📁 Project Structure
 
-## Deploy on Vercel
+```
+webapp/
+├── app/                    # Next.js App Router pages
+│   ├── about/             # About page
+│   ├── admin/             # Admin dashboard v1
+│   ├── admin-v2/          # Tactical Command Center
+│   │   ├── components/    # Command Center components
+│   │   │   ├── DemoController.tsx
+│   │   │   ├── HybridCalendar.tsx
+│   │   │   ├── ContentForge.tsx
+│   │   │   └── ...
+│   │   └── page.tsx
+│   ├── api/               # API routes
+│   │   ├── bookings/
+│   │   ├── chat/
+│   │   └── verify-email/
+│   ├── blog/              # Blog page
+│   ├── demo-calendar/     # Demo booking flow
+│   ├── demo/[sessionId]/  # Demo session experience
+│   ├── how-it-works/      # How it works page
+│   ├── pricing/           # Pricing page
+│   ├── use-cases/         # Industry use cases
+│   ├── waitlist/          # Waitlist signup
+│   └── components/        # Shared components
+├── config/                # Configuration files (YAML)
+│   ├── demo-profiles.yml  # Demo Controller presets
+│   ├── industries.yml     # Industry mappings
+│   ├── local-intel-rules.yml  # Local Pulse categories
+│   └── companion-prompts.yml  # AI Companion prompts
+├── database/              # Database schema
+│   └── schema.sql         # Supabase SQL schema
+├── lib/                   # Utility libraries
+│   └── supabase/          # Supabase client
+├── scripts/               # Utility scripts
+│   ├── seed.ts            # TypeScript seed script
+│   └── seed-simple.js     # JavaScript seed script
+└── supabase/              # Supabase Edge Functions
+    └── functions/
+        ├── schedule-blast/
+        ├── local-trends/
+        └── lead-alerts/
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## ⚙️ Configuration (`/config`)
+
+The `/config` directory contains YAML configuration files that define app behavior:
+
+### `demo-profiles.yml`
+Defines presets for the Demo Controller (B2B sales demos):
+- `id`: Unique identifier
+- `slug`: URL-friendly slug
+- `business_name`: Display name
+- `city_location`: City/location
+- `industry`: Industry category
+- `primary_color`: Brand primary color (hex)
+- `accent_color`: Brand accent color (hex)
+
+### `industries.yml`
+Maps industries to default demo profiles:
+- `id`: Industry identifier
+- `name`: Display name
+- `default_demo_profile_id`: Links to demo-profiles.yml
+- `icon`: Emoji icon
+- `description`: Short description
+
+### `local-intel-rules.yml`
+Defines Local Pulse / Daily Trend Hunter categories:
+- Category definitions with icons and colors
+- Keyword triggers for categorization
+- Suggested actions per category
+- Traffic level configurations
+
+### `companion-prompts.yml`
+AI Companion system prompts and templates:
+- Default system prompt
+- Greeting templates
+- Context modifiers by industry/time
+- Error response templates
+
+---
+
+## 🗄️ Database Setup
+
+### 1. Run Schema Migration
+
+Execute the SQL in `/database/schema.sql` in your Supabase SQL Editor:
+
+```sql
+-- Tables created:
+-- bookings, content_schedule, local_trends, leads, activity_log,
+-- client_config, demo_profiles, demo_sessions, industries,
+-- waitlist_submissions, newsletter_subscriptions
+```
+
+### 2. Seed from Config
+
+```bash
+# Using the simple JavaScript seeder
+node scripts/seed-simple.js
+
+# Or with TypeScript (requires ts-node)
+npx ts-node scripts/seed.ts
+```
+
+This populates `demo_profiles` and `industries` tables from config files.
+
+---
+
+## 🎮 Demo Controller Flow
+
+The Demo Controller allows B2B sales demos with customized branding:
+
+1. **Hidden Trigger**: Triple-click on "TACTICAL V2.0" in sidebar
+2. **Select Preset**: Choose from pre-configured business profiles
+3. **Customize**: Modify business name, colors, location
+4. **Apply**: Config is applied to the Command Center UI
+
+### Online Demo Flow (`/demo-calendar` → `/demo/[sessionId]`)
+
+1. User visits `/demo-calendar`
+2. Fills in name, email, company, industry
+3. System matches industry → `demo_profile_id` (via `industries.yml`)
+4. Creates `demo_sessions` row in Supabase
+5. Redirects to `/demo/[sessionId]` with themed experience
+
+---
+
+## 🚀 Deployment
+
+### Vercel (Recommended)
+
+1. Push code to GitHub
+2. Connect repo to Vercel
+3. Add environment variables in Vercel dashboard
+4. Deploy!
+
+### Supabase Edge Functions
+
+```bash
+# Install Supabase CLI
+npm install -g supabase
+
+# Login and link project
+supabase login
+supabase link --project-ref your-project-ref
+
+# Deploy functions
+supabase functions deploy schedule-blast
+supabase functions deploy local-trends
+supabase functions deploy lead-alerts
+```
+
+---
+
+## 📝 API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/bookings` | POST | Create new booking |
+| `/api/chat` | POST | AI chat completion |
+| `/api/verify-email` | POST | Email verification (mocked) |
+
+---
+
+## 🔗 Key Routes
+
+| Route | Description |
+|-------|-------------|
+| `/` | Landing page |
+| `/about` | About page |
+| `/how-it-works` | Product walkthrough |
+| `/use-cases` | Industry use cases |
+| `/pricing` | Pricing page |
+| `/demo-calendar` | Book a demo |
+| `/demo/[sessionId]` | Demo experience |
+| `/admin-v2` | Tactical Command Center |
+| `/dashboard` | Redirects to /admin-v2 |
+| `/waitlist` | Join waitlist |
+| `/newsletter` | Newsletter signup |
+| `/blog` | Blog (coming soon) |
+| `/support` | Support page |
+
+---
+
+## 📄 License
+
+Proprietary - GreenLine365
