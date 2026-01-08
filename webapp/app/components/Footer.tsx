@@ -21,13 +21,23 @@ export default function Footer() {
             <h4 className="text-white font-semibold mb-4">Product</h4>
             <ul className="space-y-2">
               <li>
+                <Link href="/how-it-works" className="text-white/50 hover:text-white transition text-sm">
+                  How It Works
+                </Link>
+              </li>
+              <li>
+                <Link href="/use-cases" className="text-white/50 hover:text-white transition text-sm">
+                  Use Cases
+                </Link>
+              </li>
+              <li>
                 <Link href="/pricing" className="text-white/50 hover:text-white transition text-sm">
                   Pricing
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="text-white/50 hover:text-white transition text-sm">
-                  Features
+                <Link href="/demo-calendar" className="text-white/50 hover:text-white transition text-sm">
+                  Book Demo
                 </Link>
               </li>
               <li>
@@ -45,6 +55,11 @@ export default function Footer() {
               <li>
                 <Link href="/about" className="text-white/50 hover:text-white transition text-sm">
                   About
+                </Link>
+              </li>
+              <li>
+                <Link href="/blog" className="text-white/50 hover:text-white transition text-sm">
+                  Blog
                 </Link>
               </li>
               <li>
