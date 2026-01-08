@@ -1,16 +1,56 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase/client';
+import type { User } from '@supabase/supabase-js';
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const scrollToBooking = () => {
-    const bookingSection = document.getElementById('booking');
-    if (bookingSection) {
-      bookingSection.scrollIntoView({ behavior: 'smooth' });
-    }
+  useEffect(() => {
+    // Get initial session
+    const getSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user || null);
+      
+      if (session?.user) {
+        // Check if user is admin
+        const { data } = await supabase
+          .from('profiles')
+          .select('is_admin')
+          .eq('id', session.user.id)
+          .single();
+        setIsAdmin(data?.is_admin || false);
+      }
+      setLoading(false);
+    };
+
+    getSession();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      setUser(session?.user || null);
+      if (session?.user) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('is_admin')
+          .eq('id', session.user.id)
+          .single();
+        setIsAdmin(data?.is_admin || false);
+      } else {
+        setIsAdmin(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
     setMobileMenuOpen(false);
   };
 
@@ -24,7 +64,7 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-6">
             <Link href="/" className="text-white/70 hover:text-white transition">
               Home
             </Link>
@@ -40,6 +80,38 @@ export default function Navbar() {
             <Link href="/support" className="text-white/70 hover:text-white transition">
               Support
             </Link>
+            
+            {/* Auth Section */}
+            {!loading && (
+              <>
+                {user ? (
+                  <div className="flex items-center space-x-4">
+                    {isAdmin && (
+                      <Link
+                        href="/dashboard"
+                        className="text-emerald-400 hover:text-emerald-300 transition font-medium"
+                      >
+                        Dashboard
+                      </Link>
+                    )}
+                    <button
+                      onClick={handleSignOut}
+                      className="text-white/70 hover:text-white transition"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                ) : (
+                  <Link
+                    href="/login"
+                    className="text-white/70 hover:text-white transition"
+                  >
+                    Login
+                  </Link>
+                )}
+              </>
+            )}
+            
             <Link
               href="/demo-calendar"
               className="px-5 py-2 bg-emerald-500 text-black font-semibold rounded-lg hover:bg-emerald-400 transition"
