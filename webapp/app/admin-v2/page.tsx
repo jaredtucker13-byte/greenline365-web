@@ -6,6 +6,7 @@
  * 
  * A production-scale command center featuring:
  * - Tactical Dark aesthetic with Neon Green accents
+ * - Collapsible Sidebar (icons-only when collapsed)
  * - Hybrid Calendar (Bookings + Content)
  * - Content Forge modal
  * - Local Pulse trend hunter
@@ -17,7 +18,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import TacticalSidebar from './components/TacticalSidebar';
+import CollapsibleSidebar from './components/CollapsibleSidebar';
 import TacticalHeader from './components/TacticalHeader';
 import HybridCalendar from './components/HybridCalendar';
 import ContentForge from './components/ContentForge';
