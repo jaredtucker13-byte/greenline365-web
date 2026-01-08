@@ -1,3 +1,28 @@
+backend:
+  - task: "Waitlist API Endpoint"
+    implemented: true
+    working: true
+    file: "/app/webapp/app/api/waitlist/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED: Waitlist API endpoint working correctly. Valid data submission returns 201 with success message. Duplicate email handling returns 409 with appropriate error. Missing email validation returns 400 with error message. All scenarios tested successfully."
+
+  - task: "Newsletter API Endpoint"
+    implemented: true
+    working: true
+    file: "/app/webapp/app/api/newsletter/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED: Newsletter API endpoint working correctly. Valid data submission returns 201 with success message. Duplicate email handling returns 409 with appropriate error. Missing email validation returns 400 with error message. All scenarios tested successfully."
+
 frontend:
   - task: "Demo Calendar Page Navigation and Form"
     implemented: true
