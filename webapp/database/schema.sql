@@ -215,3 +215,156 @@ CREATE POLICY "Allow all for client_config" ON client_config
 
 GRANT ALL ON client_config TO anon;
 GRANT ALL ON client_config TO service_role;
+
+
+-- ============================================
+-- DEMO PROFILES TABLE
+-- Stores demo configurations for B2B pitches
+-- Populated from /config/demo-profiles.yml
+-- ============================================
+CREATE TABLE IF NOT EXISTS demo_profiles (
+  id TEXT PRIMARY KEY,
+  slug TEXT UNIQUE NOT NULL,
+  business_name TEXT NOT NULL,
+  city_location TEXT,
+  industry TEXT,
+  primary_color TEXT DEFAULT '#39FF14',
+  accent_color TEXT DEFAULT '#0CE293',
+  description TEXT,
+  logo_url TEXT,
+  is_default BOOLEAN DEFAULT false,
+  settings JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS idx_demo_profiles_slug ON demo_profiles(slug);
+CREATE INDEX IF NOT EXISTS idx_demo_profiles_industry ON demo_profiles(industry);
+
+ALTER TABLE demo_profiles ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow all for demo_profiles" ON demo_profiles
+  FOR ALL
+  USING (true);
+
+GRANT ALL ON demo_profiles TO anon;
+GRANT ALL ON demo_profiles TO service_role;
+
+-- ============================================
+-- DEMO SESSIONS TABLE
+-- Tracks individual demo bookings/sessions
+-- ============================================
+CREATE TABLE IF NOT EXISTS demo_sessions (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  company TEXT,
+  website TEXT,
+  industry TEXT,
+  phone TEXT,
+  demo_profile_id TEXT REFERENCES demo_profiles(id),
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'scheduled', 'completed', 'cancelled')),
+  scheduled_at TIMESTAMPTZ,
+  completed_at TIMESTAMPTZ,
+  notes TEXT,
+  metadata JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS idx_demo_sessions_email ON demo_sessions(email);
+CREATE INDEX IF NOT EXISTS idx_demo_sessions_status ON demo_sessions(status);
+CREATE INDEX IF NOT EXISTS idx_demo_sessions_demo_profile ON demo_sessions(demo_profile_id);
+CREATE INDEX IF NOT EXISTS idx_demo_sessions_created_at ON demo_sessions(created_at DESC);
+
+ALTER TABLE demo_sessions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow all for demo_sessions" ON demo_sessions
+  FOR ALL
+  USING (true);
+
+GRANT ALL ON demo_sessions TO anon;
+GRANT ALL ON demo_sessions TO service_role;
+
+-- ============================================
+-- INDUSTRIES TABLE
+-- Maps industries to default demo profiles
+-- Populated from /config/industries.yml
+-- ============================================
+CREATE TABLE IF NOT EXISTS industries (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  default_demo_profile_id TEXT REFERENCES demo_profiles(id),
+  icon TEXT,
+  description TEXT,
+  sort_order INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_industries_default_profile ON industries(default_demo_profile_id);
+
+ALTER TABLE industries ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow all for industries" ON industries
+  FOR ALL
+  USING (true);
+
+GRANT ALL ON industries TO anon;
+GRANT ALL ON industries TO service_role;
+
+-- ============================================
+-- WAITLIST SUBMISSIONS TABLE
+-- Stores waitlist signups
+-- ============================================
+CREATE TABLE IF NOT EXISTS waitlist_submissions (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  name TEXT,
+  company TEXT,
+  industry TEXT,
+  source TEXT DEFAULT 'website',
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'invited', 'converted')),
+  metadata JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS idx_waitlist_email ON waitlist_submissions(email);
+CREATE INDEX IF NOT EXISTS idx_waitlist_status ON waitlist_submissions(status);
+CREATE INDEX IF NOT EXISTS idx_waitlist_created_at ON waitlist_submissions(created_at DESC);
+
+ALTER TABLE waitlist_submissions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow all for waitlist_submissions" ON waitlist_submissions
+  FOR ALL
+  USING (true);
+
+GRANT ALL ON waitlist_submissions TO anon;
+GRANT ALL ON waitlist_submissions TO service_role;
+
+-- ============================================
+-- NEWSLETTER SUBSCRIPTIONS TABLE
+-- Stores newsletter signups
+-- ============================================
+CREATE TABLE IF NOT EXISTS newsletter_subscriptions (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  name TEXT,
+  status TEXT DEFAULT 'active' CHECK (status IN ('active', 'unsubscribed', 'bounced')),
+  source TEXT DEFAULT 'website',
+  preferences JSONB DEFAULT '{}',
+  subscribed_at TIMESTAMPTZ DEFAULT NOW(),
+  unsubscribed_at TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS idx_newsletter_email ON newsletter_subscriptions(email);
+CREATE INDEX IF NOT EXISTS idx_newsletter_status ON newsletter_subscriptions(status);
+
+ALTER TABLE newsletter_subscriptions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow all for newsletter_subscriptions" ON newsletter_subscriptions
+  FOR ALL
+  USING (true);
+
+GRANT ALL ON newsletter_subscriptions TO anon;
+GRANT ALL ON newsletter_subscriptions TO service_role;
