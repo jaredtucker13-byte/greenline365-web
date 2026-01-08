@@ -1,4 +1,5 @@
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient, User, Session } from '@supabase/supabase-js';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -7,20 +8,24 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 function createSupabaseClient(): SupabaseClient {
   if (!supabaseUrl || !supabaseAnonKey) {
     console.warn('Supabase environment variables not set. Using mock client.');
-    // Return a mock client that won't crash but won't work either
-    // This allows the app to build and show UI even without Supabase configured
     return {
       from: () => ({
-        select: () => Promise.resolve({ data: [], error: null }),
-        insert: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } }),
-        update: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } }),
-        delete: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } }),
-        upsert: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } }),
+        select: () => ({ data: [], error: null, single: () => ({ data: null, error: null }) }),
+        insert: () => ({ data: null, error: { message: 'Supabase not configured' }, select: () => ({ single: () => ({ data: null, error: null }) }) }),
+        update: () => ({ data: null, error: { message: 'Supabase not configured' }, eq: () => ({ select: () => ({ single: () => ({ data: null, error: null }) }) }) }),
+        delete: () => ({ data: null, error: { message: 'Supabase not configured' } }),
+        upsert: () => ({ data: null, error: { message: 'Supabase not configured' } }),
+        eq: () => ({ select: () => ({ single: () => ({ data: null, error: null }) }) }),
+        order: () => ({ data: [], error: null }),
       }),
       auth: {
         getSession: () => Promise.resolve({ data: { session: null }, error: null }),
-        signIn: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } }),
+        getUser: () => Promise.resolve({ data: { user: null }, error: null }),
+        signInWithPassword: () => Promise.resolve({ data: { user: null, session: null }, error: { message: 'Supabase not configured' } }),
+        signUp: () => Promise.resolve({ data: { user: null, session: null }, error: { message: 'Supabase not configured' } }),
         signOut: () => Promise.resolve({ error: null }),
+        signInWithOAuth: () => Promise.resolve({ data: { url: null, provider: 'google' }, error: { message: 'Supabase not configured' } }),
+        onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
       },
     } as unknown as SupabaseClient;
   }
@@ -29,6 +34,62 @@ function createSupabaseClient(): SupabaseClient {
 }
 
 export const supabase = createSupabaseClient();
+
+// Auth helper functions
+export async function signUp(email: string, password: string, fullName?: string) {
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        full_name: fullName || email,
+      },
+    },
+  });
+  return { data, error };
+}
+
+export async function signIn(email: string, password: string) {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+  return { data, error };
+}
+
+export async function signInWithGoogle() {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: `${typeof window !== 'undefined' ? window.location.origin : ''}/auth/callback`,
+    },
+  });
+  return { data, error };
+}
+
+export async function signOut() {
+  const { error } = await supabase.auth.signOut();
+  return { error };
+}
+
+export async function getSession(): Promise<{ session: Session | null; user: User | null }> {
+  const { data: { session } } = await supabase.auth.getSession();
+  return { session, user: session?.user || null };
+}
+
+export async function getUser() {
+  const { data: { user } } = await supabase.auth.getUser();
+  return user;
+}
+
+export async function isAdmin(userId: string): Promise<boolean> {
+  const { data } = await supabase
+    .from('profiles')
+    .select('is_admin')
+    .eq('id', userId)
+    .single();
+  return data?.is_admin || false;
+}
 
 // Type definitions for your booking data
 export interface BookingData {
@@ -45,10 +106,10 @@ export interface BookingData {
   alternate_datetime?: string;
   email: string;
   phone?: string;
-  status: 'pending' | 'confirmed' | 'cancelled';
+  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
   created_at?: string;
-  source?: string; // For tracking which widget/company created the booking
-  external_calendar_id?: string; // For future cal.com/Google Calendar integration
+  source?: string;
+  external_calendar_id?: string;
 }
 
 // Booking functions
