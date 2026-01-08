@@ -186,6 +186,10 @@ export default function TacticalCommandCenter() {
   const [showDemoController, setShowDemoController] = useState(false);
   const [demoConfig, setDemoConfig] = useState<DemoConfig>(defaultDemoConfig);
 
+  // Sidebar State
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   // Navigation handlers
   const handlePrev = () => {
     setCurrentDate(prev => {
