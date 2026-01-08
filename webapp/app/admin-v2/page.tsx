@@ -258,9 +258,9 @@ export default function TacticalCommandCenter() {
   );
 
   return (
-    <div className="min-h-screen bg-[#121212]">
-      {/* Sidebar */}
-      <TacticalSidebar
+    <div className="min-h-screen bg-[#121212] flex">
+      {/* Collapsible Sidebar */}
+      <CollapsibleSidebar
         activeItem="schedule"
         onNewBooking={() => console.log('New booking')}
         onNewContent={() => {
@@ -269,10 +269,14 @@ export default function TacticalCommandCenter() {
         }}
         pendingCount={pendingCount}
         onDemoControllerToggle={() => setShowDemoController(true)}
+        isCollapsed={sidebarCollapsed}
+        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        isMobileOpen={mobileMenuOpen}
+        onMobileToggle={() => setMobileMenuOpen(!mobileMenuOpen)}
       />
 
       {/* Main Content */}
-      <div className="ml-64">
+      <div className="flex-1 min-w-0">
         {/* Header */}
         <TacticalHeader
           title="COMMAND CENTER"
