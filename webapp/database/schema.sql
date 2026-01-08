@@ -368,3 +368,117 @@ CREATE POLICY "Allow all for newsletter_subscriptions" ON newsletter_subscriptio
 
 GRANT ALL ON newsletter_subscriptions TO anon;
 GRANT ALL ON newsletter_subscriptions TO service_role;
+
+
+-- ============================================
+-- DEMO REQUESTS TABLE
+-- Tracks demo requests with website URL for future scraping
+-- ============================================
+CREATE TABLE IF NOT EXISTS demo_requests (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  email TEXT NOT NULL,
+  name TEXT,
+  company TEXT,
+  industry TEXT,
+  website_url TEXT,
+  selected_demo_profile_id TEXT REFERENCES demo_profiles(id),
+  scrape_status TEXT DEFAULT 'pending' CHECK (scrape_status IN ('pending', 'processing', 'completed', 'failed', 'skipped')),
+  scraped_data JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS idx_demo_requests_email ON demo_requests(email);
+CREATE INDEX IF NOT EXISTS idx_demo_requests_scrape_status ON demo_requests(scrape_status);
+CREATE INDEX IF NOT EXISTS idx_demo_requests_created_at ON demo_requests(created_at DESC);
+
+ALTER TABLE demo_requests ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow all for demo_requests" ON demo_requests
+  FOR ALL
+  USING (true);
+
+GRANT ALL ON demo_requests TO anon;
+GRANT ALL ON demo_requests TO service_role;
+
+-- ============================================
+-- INGESTED WEBSITE DATA TABLE
+-- Stores scraped website content for demo personalization
+-- ============================================
+CREATE TABLE IF NOT EXISTS ingested_website_data (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  demo_request_id UUID REFERENCES demo_requests(id),
+  website_url TEXT NOT NULL,
+  business_name TEXT,
+  services TEXT[],
+  key_phrases TEXT[],
+  raw_content TEXT,
+  structured_data JSONB DEFAULT '{}',
+  scraped_at TIMESTAMPTZ DEFAULT NOW(),
+  expires_at TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS idx_ingested_website_url ON ingested_website_data(website_url);
+CREATE INDEX IF NOT EXISTS idx_ingested_demo_request ON ingested_website_data(demo_request_id);
+
+ALTER TABLE ingested_website_data ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow all for ingested_website_data" ON ingested_website_data
+  FOR ALL
+  USING (true);
+
+GRANT ALL ON ingested_website_data TO anon;
+GRANT ALL ON ingested_website_data TO service_role;
+
+-- ============================================
+-- DEMO LOCAL PULSE EVENTS (Seeded Demo Data)
+-- Seeded local events for demo presentations
+-- ============================================
+CREATE TABLE IF NOT EXISTS demo_local_pulse_events (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  demo_profile_id TEXT REFERENCES demo_profiles(id),
+  title TEXT NOT NULL,
+  description TEXT,
+  event_date TIMESTAMPTZ,
+  expected_traffic TEXT CHECK (expected_traffic IN ('low', 'medium', 'high')),
+  category TEXT,
+  suggested_action TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_demo_local_pulse_profile ON demo_local_pulse_events(demo_profile_id);
+
+ALTER TABLE demo_local_pulse_events ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow all for demo_local_pulse_events" ON demo_local_pulse_events
+  FOR ALL
+  USING (true);
+
+GRANT ALL ON demo_local_pulse_events TO anon;
+GRANT ALL ON demo_local_pulse_events TO service_role;
+
+-- ============================================
+-- DEMO WEEKLY TREND IDEAS (Seeded Demo Data)
+-- Seeded content ideas for demo presentations
+-- ============================================
+CREATE TABLE IF NOT EXISTS demo_weekly_trend_ideas (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  demo_profile_id TEXT REFERENCES demo_profiles(id),
+  title TEXT NOT NULL,
+  content TEXT,
+  platforms TEXT[],
+  optimal_time TEXT,
+  category TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_demo_weekly_trends_profile ON demo_weekly_trend_ideas(demo_profile_id);
+
+ALTER TABLE demo_weekly_trend_ideas ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow all for demo_weekly_trend_ideas" ON demo_weekly_trend_ideas
+  FOR ALL
+  USING (true);
+
+GRANT ALL ON demo_weekly_trend_ideas TO anon;
+GRANT ALL ON demo_weekly_trend_ideas TO service_role;
