@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
 import crypto from 'crypto';
 
-// N8N Webhook URL - Test environment
-const N8N_WEBHOOK_URL = 'https://n8n.srv1156042.hstgr.cloud/webhook-test/ab195f12-f784-4317-a7b7-66b0c0361e6f';
+// N8N Webhook URL - Production
+const N8N_WEBHOOK_URL = 'https://n8n.srv1156042.hstgr.cloud/webhook/ab195f12-f784-4317-a7b7-66b0c0361e6f';
 
 // Generate a random 6-digit OTP
 function generateOTP(): string {
