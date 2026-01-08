@@ -620,14 +620,21 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Trigger to auto-create profile
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
-
 -- ============================================
 -- ADMIN SETUP SCRIPT
 -- Run this AFTER signing up to make yourself admin:
 -- UPDATE profiles SET is_admin = true WHERE email = 'jared.tucker13@gmail.com';
 -- ============================================
+
+-- ============================================
+-- IMPORTANT: Trigger Setup (Run in Supabase Dashboard)
+-- ============================================
+-- After running this schema, set up the trigger in Supabase Dashboard:
+-- 1. Go to Database > Triggers
+-- 2. Create new trigger with these settings:
+--    - Name: on_auth_user_created
+--    - Table: auth.users (in the auth schema)
+--    - Events: INSERT
+--    - Type: AFTER
+--    - Orientation: ROW
+--    - Function: public.handle_new_user()
