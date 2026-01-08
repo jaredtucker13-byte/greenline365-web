@@ -156,6 +156,40 @@ export default function Navbar() {
             <Link href="/support" className="block text-white/70 hover:text-white transition py-2" onClick={() => setMobileMenuOpen(false)}>
               Support
             </Link>
+            
+            {/* Mobile Auth Section */}
+            {!loading && (
+              <>
+                {user ? (
+                  <>
+                    {isAdmin && (
+                      <Link
+                        href="/dashboard"
+                        className="block text-emerald-400 hover:text-emerald-300 transition py-2 font-medium"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Dashboard
+                      </Link>
+                    )}
+                    <button
+                      onClick={handleSignOut}
+                      className="block text-white/70 hover:text-white transition py-2 w-full text-left"
+                    >
+                      Sign Out
+                    </button>
+                  </>
+                ) : (
+                  <Link
+                    href="/login"
+                    className="block text-white/70 hover:text-white transition py-2"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Login
+                  </Link>
+                )}
+              </>
+            )}
+            
             <Link
               href="/demo-calendar"
               onClick={() => setMobileMenuOpen(false)}
