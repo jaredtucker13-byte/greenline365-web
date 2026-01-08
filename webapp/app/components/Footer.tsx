@@ -103,11 +103,14 @@ export default function Footer() {
             © {new Date().getFullYear()} GreenLine365. All rights reserved.
           </p>
           <div className="flex gap-6">
-            <Link href="/coming-soon" className="text-white/40 hover:text-white/60 transition text-sm">
+            <Link href="/privacy" className="text-white/40 hover:text-white/60 transition text-sm">
               Privacy Policy
             </Link>
-            <Link href="/coming-soon" className="text-white/40 hover:text-white/60 transition text-sm">
+            <Link href="/terms" className="text-white/40 hover:text-white/60 transition text-sm">
               Terms of Service
+            </Link>
+            <Link href="/trust" className="text-white/40 hover:text-white/60 transition text-sm">
+              Trust & Security
             </Link>
           </div>
         </div>
