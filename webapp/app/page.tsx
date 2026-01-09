@@ -321,52 +321,52 @@ export default function HomePage() {
           {/* Booking Widget Product */}
           <div className="grid md:grid-cols-2 gap-12 items-center mb-20">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/20 border border-blue-500/30 rounded-full mb-4">
-                <span className="text-xs text-blue-300 font-semibold">PRODUCT #1</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1 glass-green border border-neon-green-500/30 rounded-full mb-4">
+                <span className="text-xs text-neon-green-500 font-semibold tracking-wider uppercase">Product #1</span>
               </div>
-              <h3 className="text-3xl font-bold text-white mb-4">Universal Booking Widget</h3>
-              <p className="text-gray-300 mb-6">
+              <h3 className="text-3xl font-display font-bold text-white mb-4">Universal Booking Widget</h3>
+              <p className="text-white/70 mb-6 leading-relaxed">
                 Our embeddable booking widget can be added to any website. Perfect for businesses 
                 that want to offer seamless scheduling to their customers.
               </p>
               <ul className="space-y-3 mb-8">
-                <li className="flex items-center gap-3 text-gray-200">
-                  <svg className="w-5 h-5 text-emerald-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <li className="flex items-center gap-3 text-white/80">
+                  <svg className="w-5 h-5 text-neon-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                   Customizable colors to match your brand
                 </li>
-                <li className="flex items-center gap-3 text-gray-200">
-                  <svg className="w-5 h-5 text-emerald-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <li className="flex items-center gap-3 text-white/80">
+                  <svg className="w-5 h-5 text-neon-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                   Integrates with Google Calendar, Cal.com, and more
                 </li>
-                <li className="flex items-center gap-3 text-gray-200">
-                  <svg className="w-5 h-5 text-emerald-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <li className="flex items-center gap-3 text-white/80">
+                  <svg className="w-5 h-5 text-neon-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                   Track bookings from multiple sources
                 </li>
-                <li className="flex items-center gap-3 text-gray-200">
-                  <svg className="w-5 h-5 text-emerald-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <li className="flex items-center gap-3 text-white/80">
+                  <svg className="w-5 h-5 text-neon-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                   White-label solution for agencies
                 </li>
               </ul>
-              <button
+              <Button
+                variant="primary"
                 onClick={() => setShowWidget(true)}
-                className="px-6 py-3 bg-emerald-500 text-black font-semibold rounded-xl hover:bg-emerald-400 transition"
               >
                 Try the Widget
-              </button>
+              </Button>
             </div>
             
-            <div className="bg-white rounded-2xl p-6 shadow-xl">
-              <h4 className="text-lg font-bold text-gray-900 mb-4 text-center">Quick Book Demo</h4>
+            <GlassCard variant="strong" className="p-8">
+              <h4 className="text-xl font-display font-bold text-white mb-6 text-center">Quick Book Demo</h4>
               <BookingWidget source="landing-page-demo" />
-            </div>
+            </GlassCard>
           </div>
 
           {/* Chat Widget Product */}
