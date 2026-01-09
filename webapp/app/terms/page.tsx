@@ -34,7 +34,21 @@ const sections = [
   { id: 'contact', title: '13. Contact Information' },
 ];
 
-export default function TermsPage() {
+async function getTermsContent() {
+  const supabase = createServerClient();
+  const { data } = await supabase
+    .from('site_content')
+    .select('value')
+    .eq('key', 'terms_of_service')
+    .single();
+  
+  return data?.value || null;
+}
+
+export default async function TermsPage() {
+  const customContent = await getTermsContent();
+  const useCustomContent = customContent && customContent.length > 200; // Only use if admin has added substantial content
+
   return (
     <div className="py-12 md:py-16">
       <div className="max-w-5xl mx-auto px-6">
