@@ -17,6 +17,9 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen">
+      {/* Floating Testimonial */}
+      <FloatingTestimonial />
+      
       {/* Hero Section - Enhanced with MASSIVE Depth */}
       <section className="relative min-h-screen flex items-center overflow-hidden pt-20">
         {/* Background - Pure Dark */}
