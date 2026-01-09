@@ -1,8 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import MultiStepBookingForm from './components/MultiStepBookingForm';
 import BookingWidget from './components/BookingWidget';
+import { Button } from '@/components/ui/os';
+import { NeonText } from '@/components/ui/os';
+import { GlassCard } from '@/components/ui/os';
 
 export default function HomePage() {
   const [showFullForm, setShowFullForm] = useState(false);
