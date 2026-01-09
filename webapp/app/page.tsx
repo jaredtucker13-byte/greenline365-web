@@ -15,41 +15,123 @@ export default function HomePage() {
   return (
     <main className="min-h-screen">
       {/* Hero Section */}
-      <section className="min-h-[80vh] flex flex-col items-center justify-center p-8 text-center">
-        <div className="max-w-3xl">
-          <div className="mb-6 inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/20 border border-emerald-500/30 rounded-full">
-            <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-            <span className="text-sm text-emerald-200 font-medium">Now accepting early access signups</span>
-          </div>
-          
-          <h1 className="text-5xl md:text-7xl font-extrabold mb-6">
-            <span className="text-white">Your Daily</span>
-            <br />
-            <span className="bg-gradient-to-r from-emerald-400 to-green-300 bg-clip-text text-transparent">
-              AI Planning Partner
+      <section className="relative min-h-[90vh] flex flex-col items-center justify-center p-8 text-center overflow-hidden">
+        {/* Animated Background Elements */}
+        <motion.div 
+          className="absolute top-1/4 -left-20 w-96 h-96 bg-radial-green opacity-30 blur-3xl"
+          animate={{ 
+            scale: [1, 1.2, 1],
+            x: [0, 50, 0],
+          }}
+          transition={{ 
+            duration: 8, 
+            repeat: Infinity,
+            ease: 'easeInOut'
+          }}
+        />
+        <motion.div 
+          className="absolute bottom-1/4 -right-20 w-96 h-96 bg-radial-teal opacity-20 blur-3xl"
+          animate={{ 
+            scale: [1, 1.3, 1],
+            x: [0, -50, 0],
+          }}
+          transition={{ 
+            duration: 10, 
+            repeat: Infinity,
+            ease: 'easeInOut',
+            delay: 1
+          }}
+        />
+        
+        <div className="relative z-10 max-w-5xl">
+          {/* Status Badge */}
+          <motion.div 
+            className="mb-8 inline-flex items-center gap-2 px-4 py-2 glass-green rounded-full border border-neon-green-500/30"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <motion.span 
+              className="w-2 h-2 bg-neon-green-500 rounded-full shadow-neon-green"
+              animate={{ opacity: [1, 0.5, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            />
+            <span className="text-sm text-neon-green-400 font-semibold tracking-wide">
+              Now accepting early access signups
             </span>
-          </h1>
+          </motion.div>
           
-          <p className="text-xl text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed">
+          {/* Main Headline with Animation */}
+          <motion.h1 
+            className="text-5xl md:text-7xl lg:text-8xl font-display font-bold mb-6 leading-tight"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+          >
+            <span className="text-white block">Your Daily</span>
+            <NeonText variant="gradient" glow className="block mt-2">
+              AI Planning Partner
+            </NeonText>
+          </motion.h1>
+          
+          {/* Subheadline */}
+          <motion.p 
+            className="text-xl md:text-2xl text-white/70 mb-12 max-w-3xl mx-auto leading-relaxed font-body"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.8 }}
+          >
             Stop guessing, start growing. GreenLine365 is your AI-assisted planning 
-            and accountability partner that helps you dominate your market.
-          </p>
+            and accountability partner that helps you <span className="text-neon-green-500 font-semibold">dominate your market</span>.
+          </motion.p>
           
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <button
+          {/* CTA Buttons */}
+          <motion.div 
+            className="flex flex-col sm:flex-row justify-center gap-4"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7, duration: 0.8 }}
+          >
+            <Button
+              variant="primary"
+              size="lg"
               onClick={() => setShowFullForm(true)}
-              className="px-8 py-4 bg-emerald-500 text-black font-bold rounded-xl hover:bg-emerald-400 transition-all shadow-[0_0_30px_rgba(16,185,129,0.3)] hover:shadow-[0_0_40px_rgba(16,185,129,0.4)]"
+              icon={
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              }
             >
               Schedule Your Demo
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="secondary"
+              size="lg"
               onClick={() => setShowWidget(true)}
-              className="px-8 py-4 border-2 border-emerald-400 text-emerald-300 font-bold rounded-xl hover:bg-emerald-500/20 transition"
             >
               Quick Book
-            </button>
-          </div>
+            </Button>
+          </motion.div>
         </div>
+        
+        {/* Scroll Indicator */}
+        <motion.div
+          className="absolute bottom-8 left-1/2 -translate-x-1/2"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1, y: [0, 10, 0] }}
+          transition={{ 
+            opacity: { delay: 1.2 },
+            y: { duration: 2, repeat: Infinity }
+          }}
+        >
+          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center pt-2">
+            <motion.div 
+              className="w-1 h-2 bg-neon-green-500 rounded-full"
+              animate={{ y: [0, 12, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            />
+          </div>
+        </motion.div>
       </section>
 
       {/* Features Section */}
