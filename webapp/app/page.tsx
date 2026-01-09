@@ -489,6 +489,9 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Sticky Process Section - How It Works */}
+      <StickyProcessSection />
+
       {/* Q&A Flip Card Section */}
       <section className="py-24 px-6 relative overflow-hidden">
         {/* Background */}
