@@ -22,18 +22,18 @@ export default function TrendHunterDemo() {
 
         {/* Daily Trend Hunter Component */}
         <DailyTrendHunter
-          userId=\"67f6536d-6521-4ac8-a6a5-9827bb35f4cc\"
-          trendType=\"manual\"
+          userId="67f6536d-6521-4ac8-a6a5-9827bb35f4cc"
+          trendType="manual"
           onTrendsLoaded={handleTrendsLoaded}
         />
 
         {/* Info Section */}
-        <div className=\"mt-16 max-w-4xl mx-auto\">
-          <div className=\"bg-black/40 backdrop-blur-xl border border-[#00e676]/20 rounded-2xl p-8\">
-            <h2 className=\"text-2xl font-bold text-white mb-4\">
+        <div className="mt-16 max-w-4xl mx-auto">
+          <div className="bg-black/40 backdrop-blur-xl border border-[#00e676]/20 rounded-2xl p-8">
+            <h2 className="text-2xl font-bold text-white mb-4">
               How It Works
             </h2>
-            <div className=\"space-y-4 text-gray-300\">
+            <div className="space-y-4 text-gray-300">
               <div className=\"flex items-start gap-3\">
                 <span className=\"text-2xl\">1️⃣</span>
                 <div>
