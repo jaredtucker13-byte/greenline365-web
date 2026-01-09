@@ -404,6 +404,21 @@ export default function HomePage() {
         </motion.div>
       </section>
 
+      {/* Logo Ticker - Trusted By */}
+      <section className="py-12 border-y border-white/5">
+        <div className="max-w-7xl mx-auto px-6">
+          <motion.p 
+            className="text-center text-white/40 text-sm font-semibold tracking-wider uppercase mb-8"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+          >
+            Trusted by 500+ Local Businesses
+          </motion.p>
+          <LogoTicker />
+        </div>
+      </section>
+
       {/* Features Section */}
       <section className="py-24 px-8 relative">
         {/* Background Circuit Pattern */}
