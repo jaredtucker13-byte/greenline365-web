@@ -135,40 +135,71 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-8">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-white text-center mb-12">Why Choose GreenLine365?</h2>
+      <section className="py-24 px-8 relative">
+        {/* Background Circuit Pattern */}
+        <div className="absolute inset-0 circuit-bg opacity-5" />
+        
+        <div className="max-w-7xl mx-auto relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-display font-bold text-white mb-4">
+              Why Choose <NeonText variant="green" glow>GreenLine365</NeonText>?
+            </h2>
+            <p className="text-xl text-white/60 max-w-2xl mx-auto">
+              Built for modern businesses who demand results
+            </p>
+          </motion.div>
           
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="p-6 rounded-2xl bg-gray-900/60 border border-gray-700 hover:border-emerald-500/50 transition">
-              <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="grid md:grid-cols-3 gap-6">
+            <GlassCard variant="default" hover className="p-8 group">
+              <motion.div 
+                className="w-14 h-14 bg-neon-green-500/20 rounded-xl flex items-center justify-center mb-6 group-hover:shadow-neon-green transition-shadow duration-300"
+                whileHover={{ scale: 1.05, rotate: 5 }}
+              >
+                <svg className="w-7 h-7 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
-              </div>
-              <h3 className="text-xl font-bold text-white mb-2">AI-Powered Insights</h3>
-              <p className="text-gray-300">Get intelligent recommendations based on your business goals and market trends.</p>
-            </div>
+              </motion.div>
+              <h3 className="text-2xl font-display font-bold text-white mb-3">AI-Powered Insights</h3>
+              <p className="text-white/70 leading-relaxed">
+                Get intelligent recommendations based on your business goals and market trends.
+              </p>
+            </GlassCard>
             
-            <div className="p-6 rounded-2xl bg-gray-900/60 border border-gray-700 hover:border-emerald-500/50 transition">
-              <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <GlassCard variant="default" hover className="p-8 group">
+              <motion.div 
+                className="w-14 h-14 bg-neon-teal-500/20 rounded-xl flex items-center justify-center mb-6 group-hover:shadow-neon-teal transition-shadow duration-300"
+                whileHover={{ scale: 1.05, rotate: -5 }}
+              >
+                <svg className="w-7 h-7 text-neon-teal-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-              </div>
-              <h3 className="text-xl font-bold text-white mb-2">Smart Scheduling</h3>
-              <p className="text-gray-300">Seamlessly integrate with your calendar. Book demos, meetings, and follow-ups effortlessly.</p>
-            </div>
+              </motion.div>
+              <h3 className="text-2xl font-display font-bold text-white mb-3">Smart Scheduling</h3>
+              <p className="text-white/70 leading-relaxed">
+                Seamlessly integrate with your calendar. Book demos, meetings, and follow-ups effortlessly.
+              </p>
+            </GlassCard>
             
-            <div className="p-6 rounded-2xl bg-gray-900/60 border border-gray-700 hover:border-emerald-500/50 transition">
-              <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <GlassCard variant="default" hover className="p-8 group">
+              <motion.div 
+                className="w-14 h-14 bg-neon-green-500/20 rounded-xl flex items-center justify-center mb-6 group-hover:shadow-neon-green transition-shadow duration-300"
+                whileHover={{ scale: 1.05, rotate: 5 }}
+              >
+                <svg className="w-7 h-7 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
-              </div>
-              <h3 className="text-xl font-bold text-white mb-2">Accountability System</h3>
-              <p className="text-gray-300">Stay on track with daily check-ins and progress tracking that keeps you accountable.</p>
-            </div>
+              </motion.div>
+              <h3 className="text-2xl font-display font-bold text-white mb-3">Accountability System</h3>
+              <p className="text-white/70 leading-relaxed">
+                Stay on track with daily check-ins and progress tracking that keeps you accountable.
+              </p>
+            </GlassCard>
           </div>
         </div>
       </section>
