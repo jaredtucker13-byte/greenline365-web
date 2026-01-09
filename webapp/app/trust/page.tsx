@@ -150,6 +150,13 @@ export default async function TrustPage() {
 
           {/* Main Content */}
           <main className="lg:col-span-3 space-y-12">
+            {useCustomContent ? (
+              <div 
+                className="prose prose-invert max-w-none text-white/70"
+                dangerouslySetInnerHTML={{ __html: customContent }}
+              />
+            ) : (
+              <>
             {/* Hero Card */}
             <div className="bg-gradient-to-br from-emerald-500/10 to-cyan-500/5 border border-emerald-500/20 rounded-2xl p-6 md:p-8">
               <div className="flex items-start gap-4">
