@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { createServerClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {
   title: 'Trust & Security Whitepaper | GreenLine365 - Enterprise Security',
