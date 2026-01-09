@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/supabase/client';
 import type { User } from '@supabase/supabase-js';
 import { Button } from '@/components/ui/os';
-import { useGSAP, createNavBlur } from '@/lib/gsap';
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -15,8 +14,8 @@ export default function Navbar() {
   const [loading, setLoading] = useState(true);
   const [scrolled, setScrolled] = useState(false);
 
-  // GSAP scroll effect
-  useGSAP(() => {
+  // Scroll detection for nav blur effect
+  useEffect(() => {
     if (typeof window !== 'undefined') {
       const handleScroll = () => {
         setScrolled(window.scrollY > 20);
