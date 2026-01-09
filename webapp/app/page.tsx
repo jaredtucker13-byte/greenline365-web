@@ -468,6 +468,108 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Q&A Flip Card Section */}
+      <section className="py-24 px-6 relative overflow-hidden">
+        {/* Background */}
+        <div className="absolute inset-0 bg-gradient-to-b from-os-dark to-os-dark-900" />
+        <div className="absolute top-0 left-1/2 w-[1000px] h-[1000px] -translate-x-1/2 bg-radial-green opacity-10 blur-3xl" />
+        
+        <div className="max-w-7xl mx-auto relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-display font-bold text-white mb-4">
+              Frequently Asked <NeonText variant="green" glow>Questions</NeonText>
+            </h2>
+            <p className="text-xl text-white/60 max-w-2xl mx-auto">
+              Click or hover on any card to reveal the answer
+            </p>
+          </motion.div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              {
+                question: "How does GreenLine365 work?",
+                answer: "GreenLine365 is an AI-powered operating system that connects your business with the local economy through automated scheduling, reputation management, and smart marketing tools."
+              },
+              {
+                question: "What makes you different?",
+                answer: "Unlike generic CRMs, we're built specifically for local businesses. Our AI understands local markets and optimizes for real-world foot traffic and community engagement."
+              },
+              {
+                question: "How quickly can I get started?",
+                answer: "Most businesses are fully onboarded within 24 hours. Our AI handles the heavy lifting - you just need to connect your calendar and social accounts."
+              },
+              {
+                question: "Do you integrate with my tools?",
+                answer: "Yes! We integrate with Google Calendar, Facebook, Instagram, Yelp, and 50+ other platforms. If you use it, we connect to it."
+              },
+              {
+                question: "What's the ROI?",
+                answer: "Our customers see an average 40% increase in lead conversion within the first 60 days. Most pay back their investment in the first month."
+              },
+              {
+                question: "Is there a contract?",
+                answer: "No long-term contracts. Pay monthly and cancel anytime. We're confident you'll love it, so we don't lock you in."
+              }
+            ].map((faq, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="flip-card-container h-64"
+                style={{ perspective: '1000px' }}
+              >
+                <motion.div
+                  className="flip-card relative w-full h-full"
+                  whileHover={{ rotateY: 180 }}
+                  transition={{ duration: 0.6 }}
+                  style={{ transformStyle: 'preserve-3d' }}
+                >
+                  {/* Front of Card */}
+                  <div 
+                    className="flip-card-front absolute inset-0 glass-strong rounded-2xl p-6 flex items-center justify-center border border-neon-green-500/20"
+                    style={{ backfaceVisibility: 'hidden' }}
+                  >
+                    <div className="text-center">
+                      <div className="w-12 h-12 bg-neon-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg className="w-6 h-6 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                      <h3 className="text-lg font-display font-bold text-white">
+                        {faq.question}
+                      </h3>
+                    </div>
+                  </div>
+                  
+                  {/* Back of Card */}
+                  <div 
+                    className="flip-card-back absolute inset-0 glass-green rounded-2xl p-6 flex items-center justify-center border border-neon-green-500/30"
+                    style={{ 
+                      backfaceVisibility: 'hidden',
+                      transform: 'rotateY(180deg)'
+                    }}
+                  >
+                    <div>
+                      <p className="text-white/80 leading-relaxed text-sm">
+                        {faq.answer}
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Booking Calendar Section - Redesigned */}
       <section className="py-24 px-6 relative overflow-hidden" id="booking">
         {/* Background Effects */}
