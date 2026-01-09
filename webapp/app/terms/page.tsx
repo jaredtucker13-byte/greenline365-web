@@ -104,6 +104,13 @@ export default async function TermsPage() {
 
           {/* Main Content */}
           <main className="lg:col-span-3 space-y-10">
+            {useCustomContent ? (
+              <div 
+                className="prose prose-invert max-w-none text-white/70"
+                dangerouslySetInnerHTML={{ __html: customContent }}
+              />
+            ) : (
+              <>
             {/* Introduction Card */}
             <div className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-500/20 rounded-xl p-6">
               <p className="text-white/80 leading-relaxed">
