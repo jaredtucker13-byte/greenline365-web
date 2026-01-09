@@ -14,104 +14,267 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex flex-col items-center justify-center p-8 text-center overflow-hidden">
+      {/* Hero Section - Redesigned */}
+      <section className="relative min-h-screen flex items-center overflow-hidden pt-20">
         {/* Animated Background Elements */}
+        <div className="absolute inset-0 bg-os-dark" />
         <motion.div 
-          className="absolute top-1/4 -left-20 w-96 h-96 bg-radial-green opacity-30 blur-3xl"
+          className="absolute top-1/4 left-0 w-[800px] h-[800px] bg-radial-green opacity-20 blur-3xl"
           animate={{ 
             scale: [1, 1.2, 1],
-            x: [0, 50, 0],
+            x: [0, 100, 0],
           }}
           transition={{ 
-            duration: 8, 
+            duration: 15, 
             repeat: Infinity,
             ease: 'easeInOut'
           }}
         />
         <motion.div 
-          className="absolute bottom-1/4 -right-20 w-96 h-96 bg-radial-teal opacity-20 blur-3xl"
+          className="absolute bottom-1/4 right-0 w-[600px] h-[600px] bg-radial-teal opacity-15 blur-3xl"
           animate={{ 
             scale: [1, 1.3, 1],
-            x: [0, -50, 0],
+            x: [0, -80, 0],
           }}
           transition={{ 
-            duration: 10, 
+            duration: 12, 
             repeat: Infinity,
             ease: 'easeInOut',
-            delay: 1
+            delay: 2
           }}
         />
         
-        <div className="relative z-10 max-w-5xl">
-          {/* Status Badge */}
-          <motion.div 
-            className="mb-8 inline-flex items-center gap-2 px-4 py-2 glass-green rounded-full border border-neon-green-500/30"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <motion.span 
-              className="w-2 h-2 bg-neon-green-500 rounded-full shadow-neon-green"
-              animate={{ opacity: [1, 0.5, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
-            <span className="text-sm text-neon-green-400 font-semibold tracking-wide">
-              Now accepting early access signups
-            </span>
-          </motion.div>
-          
-          {/* Main Headline with Animation */}
-          <motion.h1 
-            className="text-5xl md:text-7xl lg:text-8xl font-display font-bold mb-6 leading-tight"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.8 }}
-          >
-            <span className="text-white block">Your Daily</span>
-            <NeonText variant="gradient" glow className="block mt-2">
-              AI Planning Partner
-            </NeonText>
-          </motion.h1>
-          
-          {/* Subheadline */}
-          <motion.p 
-            className="text-xl md:text-2xl text-white/70 mb-12 max-w-3xl mx-auto leading-relaxed font-body"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.8 }}
-          >
-            Stop guessing, start growing. GreenLine365 is your AI-assisted planning 
-            and accountability partner that helps you <span className="text-neon-green-500 font-semibold">dominate your market</span>.
-          </motion.p>
-          
-          {/* CTA Buttons */}
-          <motion.div 
-            className="flex flex-col sm:flex-row justify-center gap-4"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7, duration: 0.8 }}
-          >
-            <Button
-              variant="primary"
-              size="lg"
-              onClick={() => setShowFullForm(true)}
-              icon={
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              }
+        <div className="relative z-10 max-w-7xl mx-auto px-6 w-full">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            {/* Left Side - Content */}
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
             >
-              Schedule Your Demo
-            </Button>
-            <Button
-              variant="secondary"
-              size="lg"
-              onClick={() => setShowWidget(true)}
+              {/* Status Badge */}
+              <motion.div 
+                className="mb-8 inline-flex items-center gap-2 px-4 py-2 glass-green rounded-full border border-neon-green-500/30"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <motion.span 
+                  className="w-2 h-2 bg-neon-green-500 rounded-full shadow-neon-green"
+                  animate={{ opacity: [1, 0.5, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                />
+                <span className="text-sm text-neon-green-400 font-semibold tracking-wide">
+                  STATUS: ONLINE
+                </span>
+              </motion.div>
+              
+              {/* Main Headline */}
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-display font-bold mb-6 leading-tight">
+                <span className="text-white block mb-2">The Operating System</span>
+                <span className="text-white block mb-2">for the</span>
+                <NeonText variant="green" glow className="block">
+                  Local Economy
+                </NeonText>
+              </h1>
+              
+              {/* Subheadline */}
+              <p className="text-xl md:text-2xl text-white/70 mb-10 leading-relaxed max-w-xl">
+                Stop competing with algorithms. Start winning. Start running infrastructure that 
+                connects <span className="text-neon-green-500 font-semibold">local life</span> with local commerce.
+              </p>
+              
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button
+                  variant="primary"
+                  size="lg"
+                  onClick={() => setShowFullForm(true)}
+                >
+                  Start Your Engine
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="lg"
+                  onClick={() => setShowWidget(true)}
+                  icon={
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                  }
+                >
+                  See the Network
+                </Button>
+              </div>
+              
+              {/* Stats Row */}
+              <motion.div 
+                className="mt-12 grid grid-cols-3 gap-6"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8 }}
+              >
+                <div>
+                  <div className="text-3xl font-display font-bold text-neon-green-500 mb-1">500+</div>
+                  <div className="text-sm text-white/60">Businesses</div>
+                </div>
+                <div>
+                  <div className="text-3xl font-display font-bold text-neon-green-500 mb-1">40%</div>
+                  <div className="text-sm text-white/60">More Leads</div>
+                </div>
+                <div>
+                  <div className="text-3xl font-display font-bold text-neon-green-500 mb-1">24/7</div>
+                  <div className="text-sm text-white/60">Always On</div>
+                </div>
+              </motion.div>
+            </motion.div>
+            
+            {/* Right Side - Phone Mockup */}
+            <motion.div
+              className="relative hidden lg:block"
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
             >
-              Quick Book
-            </Button>
-          </motion.div>
+              {/* Glow Effect Behind Phone */}
+              <div className="absolute inset-0 bg-neon-green-500/20 blur-3xl rounded-full scale-75" />
+              
+              {/* Phone Mockup Container */}
+              <motion.div
+                className="relative z-10"
+                animate={{ 
+                  y: [0, -20, 0],
+                }}
+                transition={{ 
+                  duration: 6, 
+                  repeat: Infinity,
+                  ease: 'easeInOut'
+                }}
+              >
+                {/* Phone Frame */}
+                <div className="relative mx-auto w-[320px] h-[650px] bg-os-dark-900 rounded-[3rem] p-3 shadow-2xl border-4 border-white/10">
+                  {/* Phone Screen */}
+                  <div className="w-full h-full bg-gradient-to-b from-os-dark to-os-dark-800 rounded-[2.5rem] overflow-hidden relative">
+                    {/* Status Bar */}
+                    <div className="px-6 py-3 flex justify-between items-center text-xs text-white/60">
+                      <span>9:41</span>
+                      <div className="flex gap-1">
+                        <div className="w-4 h-4 rounded-sm border border-white/40" />
+                        <div className="w-4 h-4 rounded-sm border border-white/40" />
+                        <div className="w-4 h-4 rounded-sm border border-white/40" />
+                      </div>
+                    </div>
+                    
+                    {/* App Content */}
+                    <div className="px-4 py-6 space-y-4">
+                      {/* Header */}
+                      <div className="glass-strong rounded-2xl p-4 border border-neon-green-500/20">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="w-10 h-10 rounded-full bg-neon-green-500/20 flex items-center justify-center">
+                            <svg className="w-5 h-5 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                          </div>
+                          <div>
+                            <div className="text-white font-semibold text-sm">GreenLine360 BACS</div>
+                            <div className="text-white/50 text-xs">Last synced 2 min ago</div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Quick Actions */}
+                      <div className="space-y-2">
+                        <div className="glass rounded-xl p-3 flex items-center justify-between border border-white/10 hover:border-neon-green-500/30 transition-colors">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-lg bg-neon-green-500/20 flex items-center justify-center">
+                              <div className="w-2 h-2 bg-neon-green-500 rounded-full" />
+                            </div>
+                            <span className="text-white text-sm font-medium">Page Reliability</span>
+                          </div>
+                          <svg className="w-4 h-4 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </div>
+                        
+                        <div className="glass rounded-xl p-3 flex items-center justify-between border border-white/10">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-lg bg-neon-teal-500/20 flex items-center justify-center">
+                              <div className="w-2 h-2 bg-neon-teal-500 rounded-full" />
+                            </div>
+                            <span className="text-white text-sm font-medium">Auto Response Qual</span>
+                          </div>
+                          <svg className="w-4 h-4 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </div>
+                        
+                        <div className="glass rounded-xl p-3 flex items-center justify-between border border-white/10">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-lg bg-neon-amber-500/20 flex items-center justify-center">
+                              <div className="w-2 h-2 bg-neon-amber-500 rounded-full" />
+                            </div>
+                            <span className="text-white text-sm font-medium">Local Reach</span>
+                          </div>
+                          <svg className="w-4 h-4 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </div>
+                        
+                        <div className="glass rounded-xl p-3 flex items-center justify-between border border-white/10">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-lg bg-neon-green-500/20 flex items-center justify-center">
+                              <div className="w-2 h-2 bg-neon-green-500 rounded-full" />
+                            </div>
+                            <span className="text-white text-sm font-medium">Fundraiser Status</span>
+                          </div>
+                          <svg className="w-4 h-4 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </div>
+                        
+                        <div className="glass rounded-xl p-3 flex items-center justify-between border border-white/10">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+                              <div className="w-2 h-2 bg-white/60 rounded-full" />
+                            </div>
+                            <span className="text-white text-sm font-medium">Confidence Testing</span>
+                          </div>
+                          <svg className="w-4 h-4 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </div>
+                      </div>
+                      
+                      {/* Bottom Stats */}
+                      <div className="glass-strong rounded-2xl p-4 mt-4 border border-white/10">
+                        <div className="grid grid-cols-4 gap-2 text-center">
+                          <div>
+                            <div className="text-white/40 text-xs mb-1">Posts</div>
+                            <div className="text-white font-semibold">1,55K</div>
+                          </div>
+                          <div>
+                            <div className="text-white/40 text-xs mb-1">Leads</div>
+                            <div className="text-neon-green-500 font-semibold">847</div>
+                          </div>
+                          <div>
+                            <div className="text-white/40 text-xs mb-1">Reach</div>
+                            <div className="text-white font-semibold">2.3M</div>
+                          </div>
+                          <div>
+                            <div className="text-white/40 text-xs mb-1">ROI</div>
+                            <div className="text-neon-green-500 font-semibold">340%</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Phone Notch */}
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-os-dark-900 rounded-b-2xl" />
+                </div>
+              </motion.div>
+            </motion.div>
+          </div>
         </div>
         
         {/* Scroll Indicator */}
