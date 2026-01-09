@@ -437,10 +437,10 @@ export default function HomePage() {
             
             <GlassCard variant="default" hover className="p-8 group">
               <motion.div 
-                className="w-14 h-14 bg-neon-teal-500/20 rounded-xl flex items-center justify-center mb-6 group-hover:shadow-neon-teal transition-shadow duration-300"
+                className="w-14 h-14 bg-neon-amber-500/20 rounded-xl flex items-center justify-center mb-6 group-hover:shadow-neon-amber transition-shadow duration-300"
                 whileHover={{ scale: 1.05, rotate: -5 }}
               >
-                <svg className="w-7 h-7 text-neon-teal-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-7 h-7 text-neon-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </motion.div>
