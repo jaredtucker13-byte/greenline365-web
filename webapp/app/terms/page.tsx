@@ -493,8 +493,7 @@ export default async function TermsPage() {
                 </Link>
               </div>
             </div>
-          </main>
-            </>
+              </>
             )}
           </main>
         </div>
