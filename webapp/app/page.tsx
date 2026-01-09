@@ -14,15 +14,62 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen">
-      {/* Hero Section - Redesigned */}
+      {/* Hero Section - Enhanced with MASSIVE Depth */}
       <section className="relative min-h-screen flex items-center overflow-hidden pt-20">
-        {/* Animated Background Elements */}
+        {/* Background - Pure Dark */}
         <div className="absolute inset-0 bg-os-dark" />
+        
+        {/* LAYER 1 - Deepest Background Shapes */}
+        <motion.div 
+          className="absolute top-0 left-1/4 w-[1200px] h-[1200px] rounded-full bg-gradient-to-br from-neon-green-500/5 to-transparent blur-3xl"
+          animate={{ 
+            scale: [1, 1.3, 1],
+            rotate: [0, 90, 0],
+            opacity: [0.3, 0.5, 0.3]
+          }}
+          transition={{ 
+            duration: 25, 
+            repeat: Infinity,
+            ease: 'easeInOut'
+          }}
+        />
+        
+        {/* LAYER 2 - Mid Background Orbs */}
+        <motion.div 
+          className="absolute top-1/3 right-1/4 w-[900px] h-[900px] rounded-full bg-gradient-to-tl from-neon-green-500/8 to-transparent blur-3xl"
+          animate={{ 
+            scale: [1, 1.4, 1],
+            x: [0, -100, 0],
+            opacity: [0.4, 0.6, 0.4]
+          }}
+          transition={{ 
+            duration: 20, 
+            repeat: Infinity,
+            ease: 'easeInOut',
+            delay: 3
+          }}
+        />
+        
+        {/* LAYER 3 - Floating Grid Lines */}
+        <motion.div 
+          className="absolute inset-0 circuit-bg opacity-5"
+          animate={{ 
+            backgroundPosition: ['0px 0px', '40px 40px', '0px 0px']
+          }}
+          transition={{ 
+            duration: 30, 
+            repeat: Infinity,
+            ease: 'linear'
+          }}
+        />
+        
+        {/* LAYER 4 - Main Glow Elements */}
         <motion.div 
           className="absolute top-1/4 left-0 w-[800px] h-[800px] bg-radial-green opacity-20 blur-3xl"
           animate={{ 
             scale: [1, 1.2, 1],
             x: [0, 100, 0],
+            y: [0, 50, 0]
           }}
           transition={{ 
             duration: 15, 
@@ -30,11 +77,14 @@ export default function HomePage() {
             ease: 'easeInOut'
           }}
         />
+        
+        {/* LAYER 5 - Accent Glow (Changed from teal to amber) */}
         <motion.div 
-          className="absolute bottom-1/4 right-0 w-[600px] h-[600px] bg-radial-teal opacity-15 blur-3xl"
+          className="absolute bottom-1/4 right-0 w-[600px] h-[600px] bg-gradient-radial from-neon-amber-500/15 via-neon-green-500/10 to-transparent blur-3xl"
           animate={{ 
             scale: [1, 1.3, 1],
             x: [0, -80, 0],
+            rotate: [0, 45, 0]
           }}
           transition={{ 
             duration: 12, 
@@ -43,6 +93,27 @@ export default function HomePage() {
             delay: 2
           }}
         />
+        
+        {/* LAYER 6 - Floating Particles */}
+        {[...Array(8)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-2 h-2 bg-neon-green-500/30 rounded-full"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              y: [0, -100, 0],
+              opacity: [0, 1, 0],
+            }}
+            transition={{
+              duration: 8 + Math.random() * 4,
+              repeat: Infinity,
+              delay: Math.random() * 5,
+            }}
+          />
+        ))}
         
         <div className="relative z-10 max-w-7xl mx-auto px-6 w-full">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
@@ -73,9 +144,19 @@ export default function HomePage() {
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-display font-bold mb-6 leading-tight">
                 <span className="text-white block mb-2">The Operating System</span>
                 <span className="text-white block mb-2">for the</span>
-                <NeonText variant="green" glow className="block">
+                <motion.span 
+                  className="block bg-gradient-to-r from-neon-green-400 via-neon-green-500 to-neon-green-400 bg-clip-text text-transparent bg-[length:200%_100%] glow-text"
+                  animate={{
+                    backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: 'linear',
+                  }}
+                >
                   Local Economy
-                </NeonText>
+                </motion.span>
               </h1>
               
               {/* Subheadline */}
@@ -93,18 +174,38 @@ export default function HomePage() {
                 >
                   Start Your Engine
                 </Button>
-                <Button
-                  variant="secondary"
-                  size="lg"
+                
+                {/* Animated Border Button */}
+                <motion.button
                   onClick={() => setShowWidget(true)}
-                  icon={
+                  className="relative px-6 py-3 text-base font-semibold text-white rounded-full overflow-hidden group"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  {/* Animated Border */}
+                  <motion.div
+                    className="absolute inset-0 rounded-full"
+                    style={{
+                      background: 'linear-gradient(90deg, transparent, transparent, #00FF00, transparent, transparent)',
+                      backgroundSize: '200% 100%',
+                    }}
+                    animate={{
+                      backgroundPosition: ['200% 0%', '-200% 0%'],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: 'linear',
+                    }}
+                  />
+                  <div className="absolute inset-[2px] bg-os-dark rounded-full" />
+                  <span className="relative z-10 flex items-center gap-2">
+                    See the Network
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>
-                  }
-                >
-                  See the Network
-                </Button>
+                  </span>
+                </motion.button>
               </div>
               
               {/* Stats Row */}
