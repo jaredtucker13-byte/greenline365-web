@@ -8,14 +8,14 @@ export default function TrendHunterDemo() {
   };
 
   return (
-    <div className=\"min-h-screen bg-gradient-to-b from-black via-gray-900 to-black\">
+    <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black">
       {/* Header */}
-      <div className=\"container mx-auto px-4 py-8\">
-        <div className=\"text-center mb-8\">
-          <h1 className=\"text-5xl font-bold text-white mb-4\">
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center mb-8">
+          <h1 className="text-5xl font-bold text-white mb-4">
             Daily Trend Hunter Demo
           </h1>
-          <p className=\"text-gray-400 text-lg\">
+          <p className="text-gray-400 text-lg">
             Test the Daily Trend Hunter with your N8N webhook
           </p>
         </div>
