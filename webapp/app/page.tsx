@@ -7,9 +7,9 @@ import BookingWidget from './components/BookingWidget';
 import { Button } from '@/components/ui/os';
 import { NeonText } from '@/components/ui/os';
 import { GlassCard } from '@/components/ui/os';
-import StickyProcessSection from './components/StickyProcessSection';
-import LogoTicker from './components/LogoTicker';
-import FloatingTestimonial from './components/FloatingTestimonial';
+import StickyProcessSection from '@/components/StickyProcessSection';
+import LogoTicker from '@/components/LogoTicker';
+import FloatingTestimonial from '@/components/FloatingTestimonial';
 
 export default function HomePage() {
   const [showFullForm, setShowFullForm] = useState(false);
