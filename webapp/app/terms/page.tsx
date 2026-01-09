@@ -494,6 +494,9 @@ export default async function TermsPage() {
               </div>
             </div>
           </main>
+            </>
+            )}
+          </main>
         </div>
       </div>
     </div>
