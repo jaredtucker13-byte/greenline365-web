@@ -533,6 +533,9 @@ export default async function TrustPage() {
               </div>
             </div>
           </main>
+            </>
+            )}
+          </main>
         </div>
       </div>
     </div>
