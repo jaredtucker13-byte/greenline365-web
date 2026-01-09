@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { createServerClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {
   title: 'Terms of Service | GreenLine365 - AI Business Automation Platform',
