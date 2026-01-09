@@ -575,7 +575,7 @@ export default function HomePage() {
         {/* Background Effects */}
         <div className="absolute inset-0 bg-gradient-to-b from-os-dark via-os-dark-800 to-os-dark" />
         <div className="absolute top-1/4 left-0 w-96 h-96 bg-radial-green opacity-10 blur-3xl" />
-        <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-radial-teal opacity-10 blur-3xl" />
+        <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-gradient-radial from-neon-amber-500/10 to-transparent blur-3xl" />
         
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="grid lg:grid-cols-5 gap-8 items-stretch">
