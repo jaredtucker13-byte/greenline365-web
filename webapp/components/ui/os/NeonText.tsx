@@ -1,10 +1,10 @@
 'use client';
 
-import { motion, HTMLMotionProps } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
-interface NeonTextProps extends Omit<HTMLMotionProps<'span'>, 'children'> {
+interface NeonTextProps {
   children: ReactNode;
   variant?: 'green' | 'teal' | 'gradient';
   glow?: boolean;
@@ -18,7 +18,6 @@ export function NeonText({
   glow = false,
   animate = true,
   className,
-  ...props
 }: NeonTextProps) {
   const variantStyles = {
     green: 'text-neon-green-500',
@@ -28,25 +27,25 @@ export function NeonText({
   
   const glowStyles = glow ? 'glow-text' : '';
   
-  const Component = animate ? motion.span : 'span';
-  const motionProps = animate ? {
-    initial: { opacity: 0 },
-    animate: { opacity: 1 },
-    transition: { duration: 0.5 }
-  } : {};
+  const classes = cn(
+    'font-display font-bold',
+    variantStyles[variant],
+    glowStyles,
+    className
+  );
+  
+  if (!animate) {
+    return <span className={classes}>{children}</span>;
+  }
   
   return (
-    <Component
-      className={cn(
-        'font-display font-bold',
-        variantStyles[variant],
-        glowStyles,
-        className
-      )}
-      {...motionProps}
-      {...props}
+    <motion.span
+      className={classes}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
     >
       {children}
-    </Component>
+    </motion.span>
   );
 }
