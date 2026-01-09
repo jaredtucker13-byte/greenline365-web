@@ -61,7 +61,21 @@ const subprocessors = [
   },
 ];
 
-export default function TrustPage() {
+async function getTrustContent() {
+  const supabase = createServerClient();
+  const { data } = await supabase
+    .from('site_content')
+    .select('value')
+    .eq('key', 'trust_security')
+    .single();
+  
+  return data?.value || null;
+}
+
+export default async function TrustPage() {
+  const customContent = await getTrustContent();
+  const useCustomContent = customContent && customContent.length > 200; // Only use if admin has added substantial content
+
   return (
     <div className="py-12 md:py-16">
       <div className="max-w-5xl mx-auto px-6">
