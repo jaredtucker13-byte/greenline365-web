@@ -35,7 +35,6 @@ export default function DailyTrendHunter({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate zip code
     if (!/^\d{5}$/.test(zipCode)) {
       setError('Please enter a valid 5-digit zip code');
       return;
@@ -48,14 +47,8 @@ export default function DailyTrendHunter({
     try {
       const response = await fetch('/api/daily-trend-hunter', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          zipCode,
-          userId,
-          trendType
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ zipCode, userId, trendType }),
       });
 
       const data = await response.json();
@@ -88,71 +81,44 @@ export default function DailyTrendHunter({
   };
 
   const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case 'sports': return '⚽';
-      case 'community': return '🏘️';
-      case 'business': return '💼';
-      case 'entertainment': return '🎭';
-      case 'weather': return '🌤️';
-      default: return '📌';
-    }
-  };
-
-  const getTimeRemaining = () => {
-    if (!expiresAt) return null;
-    
-    const now = new Date().getTime();
-    const expiry = new Date(expiresAt).getTime();
-    const diff = expiry - now;
-    
-    if (diff <= 0) return 'Expired';
-    
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    
-    return `${hours}h ${minutes}m remaining`;
+    const icons: Record<string, string> = {
+      sports: '⚽',
+      community: '🏘️',
+      business: '💼',
+      entertainment: '🎭',
+      weather: '🌤️'
+    };
+    return icons[category] || '📌';
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 py-8\">
-      {/* Header */}
-      <div className="text-center mb-8\">
-        <h2 className="text-3xl md:text-4xl font-bold text-white mb-3\">
+    <div className="w-full max-w-6xl mx-auto px-4 py-8">
+      <div className="text-center mb-8">
+        <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
           Daily Trend Hunter 🎯
         </h2>
-        <p className="text-gray-400 text-base md:text-lg\">
+        <p className="text-gray-400 text-base md:text-lg">
           Discover local opportunities and trending topics in your area
         </p>
       </div>
 
-      {/* Zip Code Input */}
-      <form onSubmit={handleSubmit} className="mb-8\">
-        <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto\">
+      <form onSubmit={handleSubmit} className="mb-8">
+        <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
           <input
-            type=\"text\"
+            type="text"
             value={zipCode}
-            onChange={(e) => setZipCode(e.target.value.replace(/\\D/g, '').slice(0, 5))}
-            placeholder=\"Enter ZIP code (e.g., 10001)\"
-            className="flex-1 px-6 py-4 bg-black/40 border border-[#00e676]/30 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-[#00e676] transition-all\"
+            onChange={(e) => setZipCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
+            placeholder="Enter ZIP code (e.g., 10001)"
+            className="flex-1 px-6 py-4 bg-black/40 border border-[#00e676]/30 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-[#00e676] transition-all"
             disabled={loading}
             maxLength={5}
           />
           <button
-            type=\"submit\"
+            type="submit"
             disabled={loading || zipCode.length !== 5}
-            className="px-8 py-4 bg-[#00e676] hover:bg-[#00e676]/90 disabled:bg-gray-600 disabled:cursor-not-allowed text-black font-semibold rounded-xl transition-all transform hover:scale-105 active:scale-95\"
+            className="px-8 py-4 bg-[#00e676] hover:bg-[#00e676]/90 disabled:bg-gray-600 disabled:cursor-not-allowed text-black font-semibold rounded-xl transition-all transform hover:scale-105 active:scale-95"
           >
-            {loading ? (
-              <span className="flex items-center gap-2\">
-                <svg className="animate-spin h-5 w-5\" viewBox=\"0 0 24 24\">
-                  <circle className="opacity-25\" cx=\"12\" cy=\"12\" r=\"10\" stroke=\"currentColor\" strokeWidth=\"4\" fill=\"none\" />
-                  <path className="opacity-75\" fill=\"currentColor\" d=\"M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z\" />
-                </svg>
-                Finding...
-              </span>
-            ) : (
-              'Hunt Trends'
-            )}
+            {loading ? 'Finding...' : 'Hunt Trends'}
           </button>
         </div>
 
@@ -160,35 +126,20 @@ export default function DailyTrendHunter({
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mt-4 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-center max-w-md mx-auto\"
+            className="mt-4 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-center max-w-md mx-auto"
           >
             {error}
           </motion.div>
         )}
       </form>
 
-      {/* Expiry Timer */}
-      {expiresAt && trendType === 'live_pulse' && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="mb-6 text-center\"
-        >
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-500/10 border border-yellow-500/30 rounded-full text-yellow-400 text-sm\">
-            <span className="animate-pulse\">⏱️</span>
-            <span className="font-medium\">{getTimeRemaining()}</span>
-          </div>
-        </motion.div>
-      )}
-
-      {/* Trends Results */}
-      <AnimatePresence mode=\"wait\">
+      <AnimatePresence mode="wait">
         {trends.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6\"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
             {trends.map((trend, index) => (
               <motion.div
@@ -196,67 +147,39 @@ export default function DailyTrendHunter({
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="group relative bg-gradient-to-br from-black/60 to-black/40 backdrop-blur-xl border border-[#00e676]/20 rounded-2xl p-6 hover:border-[#00e676]/50 transition-all duration-300 hover:scale-105\"
+                className="group relative bg-gradient-to-br from-black/60 to-black/40 backdrop-blur-xl border border-[#00e676]/20 rounded-2xl p-6 hover:border-[#00e676]/50 transition-all duration-300 hover:scale-105"
               >
-                {/* Category Icon */}
-                <div className="absolute -top-3 -right-3 w-12 h-12 bg-[#00e676] rounded-full flex items-center justify-center text-2xl shadow-lg shadow-[#00e676]/20\">
+                <div className="absolute -top-3 -right-3 w-12 h-12 bg-[#00e676] rounded-full flex items-center justify-center text-2xl shadow-lg shadow-[#00e676]/20">
                   {getCategoryIcon(trend.category)}
                 </div>
 
-                {/* Traffic Indicator */}
-                <div className="flex items-center gap-2 mb-3\">
+                <div className="flex items-center gap-2 mb-3">
                   <span className={`text-xs font-semibold uppercase tracking-wide ${getTrafficColor(trend.expected_traffic)}`}>
                     {trend.expected_traffic} traffic
                   </span>
-                  <span className="text-gray-600\">•</span>
-                  <span className="text-xs text-gray-500 capitalize\">{trend.category}</span>
                 </div>
 
-                {/* Title */}
-                <h3 className="text-xl font-bold text-white mb-2 line-clamp-2\">
+                <h3 className="text-xl font-bold text-white mb-2 line-clamp-2">
                   {trend.title}
                 </h3>
 
-                {/* Description */}
-                <p className="text-gray-400 text-sm mb-4 line-clamp-3\">
+                <p className="text-gray-400 text-sm mb-4 line-clamp-3">
                   {trend.description}
                 </p>
 
-                {/* Suggested Action */}
                 {trend.suggested_action && (
-                  <div className="bg-[#00e676]/10 border border-[#00e676]/20 rounded-xl p-3 mb-4\">
-                    <p className="text-[#00e676] text-sm font-medium\">
+                  <div className="bg-[#00e676]/10 border border-[#00e676]/20 rounded-xl p-3 mb-4">
+                    <p className="text-[#00e676] text-sm font-medium">
                       💡 {trend.suggested_action}
                     </p>
                   </div>
                 )}
 
-                {/* Location & Date */}
-                <div className="flex items-center justify-between text-xs text-gray-500\">
-                  <span>📍 {trend.location}</span>
-                  <span>{new Date(trend.event_date).toLocaleDateString()}</span>
-                </div>
-
-                {/* Forge Content Button */}
-                <button className="mt-4 w-full py-2 bg-[#00e676]/10 hover:bg-[#00e676]/20 border border-[#00e676]/30 text-[#00e676] font-medium rounded-lg transition-all text-sm\">
+                <button className="mt-4 w-full py-2 bg-[#00e676]/10 hover:bg-[#00e676]/20 border border-[#00e676]/30 text-[#00e676] font-medium rounded-lg transition-all text-sm">
                   Forge Content →
                 </button>
               </motion.div>
             ))}
-          </motion.div>
-        )}
-
-        {/* No Results */}
-        {!loading && trends.length === 0 && zipCode.length === 5 && !error && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-12\"
-          >
-            <div className="text-6xl mb-4\">🔍</div>
-            <p className="text-gray-400 text-lg\">
-              Enter a zip code to discover trending opportunities
-            </p>
           </motion.div>
         )}
       </AnimatePresence>
