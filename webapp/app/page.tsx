@@ -204,16 +204,108 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Booking Calendar Section */}
-      <section className="py-20 px-8 bg-gradient-to-b from-transparent via-emerald-950/30 to-transparent" id="booking">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-white mb-4">Book Your Strategy Session</h2>
-            <p className="text-gray-300">Complete our quick form and we&apos;ll schedule a personalized demo for your business.</p>
-          </div>
-          
-          <div className="bg-gray-900/80 backdrop-blur-xl border border-gray-700 rounded-3xl p-8 shadow-[0_0_60px_rgba(16,185,129,0.1)]">
-            <MultiStepBookingForm />
+      {/* Booking Calendar Section - Redesigned */}
+      <section className="py-24 px-6 relative overflow-hidden" id="booking">
+        {/* Background Effects */}
+        <div className="absolute inset-0 bg-gradient-to-b from-os-dark via-os-dark-800 to-os-dark" />
+        <div className="absolute top-1/4 left-0 w-96 h-96 bg-radial-green opacity-10 blur-3xl" />
+        <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-radial-teal opacity-10 blur-3xl" />
+        
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="grid lg:grid-cols-5 gap-8 items-stretch">
+            {/* Left Sidebar - Value Proposition */}
+            <div className="lg:col-span-2 glass-strong rounded-2xl p-8 md:p-10 flex flex-col justify-between">
+              {/* Logo/Brand Section */}
+              <div>
+                <div className="flex items-center gap-3 mb-8">
+                  <div className="w-10 h-10 rounded-lg bg-neon-green-500/20 border border-neon-green-500/50 flex items-center justify-center">
+                    <svg className="w-5 h-5 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div className="font-display font-bold text-white">
+                      <span className="text-white">GreenLine</span>
+                      <span className="text-neon-green-500">365</span>
+                    </div>
+                    <div className="text-xs text-white/40 uppercase tracking-wider">Business OS</div>
+                  </div>
+                </div>
+                
+                <div className="mb-6">
+                  <span className="text-xs text-neon-green-500 font-semibold tracking-wider uppercase">
+                    Automated Sales
+                  </span>
+                </div>
+                
+                {/* Main Headline */}
+                <h2 className="text-4xl md:text-5xl font-display font-bold mb-6 leading-tight">
+                  <span className="text-white block">Stop Losing</span>
+                  <NeonText variant="green" glow className="block">
+                    Revenue.
+                  </NeonText>
+                </h2>
+                
+                <p className="text-white/70 text-lg mb-8 leading-relaxed">
+                  Turn missed calls into closed deals with AI-powered scheduling that works 24/7. 
+                  Never lose another customer to a busy signal.
+                </p>
+                
+                {/* Feature List */}
+                <div className="space-y-4 mb-8">
+                  <div className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-neon-green-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <svg className="w-3 h-3 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <span className="text-white/80">Increase lead conversion by 40%</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-neon-green-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <svg className="w-3 h-3 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <span className="text-white/80">Zero missed calls, 24/7/365</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-neon-green-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <svg className="w-3 h-3 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <span className="text-white/80">Integrates with your calendar</span>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Social Proof */}
+              <div className="pt-8 border-t border-white/10">
+                <div className="flex items-center gap-2 mb-2">
+                  {[...Array(5)].map((_, i) => (
+                    <svg key={i} className="w-5 h-5 text-neon-green-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+                <p className="text-white/60 text-sm">Trusted by 500+ businesses</p>
+              </div>
+            </div>
+            
+            {/* Right Side - Booking Form */}
+            <div className="lg:col-span-3 glass rounded-2xl p-8 md:p-10">
+              <div className="mb-8">
+                <h3 className="text-2xl md:text-3xl font-display font-bold text-white mb-3">
+                  Book Your Strategy Session
+                </h3>
+                <p className="text-white/60">
+                  Complete our quick form and we&apos;ll schedule a personalized demo for your business.
+                </p>
+              </div>
+              
+              <MultiStepBookingForm />
+            </div>
           </div>
         </div>
       </section>
