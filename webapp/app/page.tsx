@@ -540,56 +540,84 @@ export default function HomePage() {
                 question: "Is there a contract?",
                 answer: "No long-term contracts. Pay monthly and cancel anytime. We're confident you'll love it, so we don't lock you in."
               }
-            ].map((faq, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="flip-card-container h-64"
-                style={{ perspective: '1000px' }}
-              >
+            ].map((faq, index) => {
+              const features = [
+                ["AI-powered insights", "24/7 automation", "Lead tracking"],
+                ["Built for local markets", "Community-focused", "Foot traffic optimization"],
+                ["Quick onboarding", "Simple setup", "Instant results"],
+                ["50+ integrations", "Universal compatibility", "One-click sync"],
+                ["40% conversion boost", "60-day ROI", "First month payback"],
+                ["Monthly billing", "Cancel anytime", "No commitments"]
+              ];
+              
+              return (
                 <motion.div
-                  className="flip-card relative w-full h-full"
-                  whileHover={{ rotateY: 180 }}
-                  transition={{ duration: 0.6 }}
-                  style={{ transformStyle: 'preserve-3d' }}
+                  key={index}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  className="flip-card-container h-80"
+                  style={{ perspective: '1000px' }}
                 >
-                  {/* Front of Card */}
-                  <div 
-                    className="flip-card-front absolute inset-0 glass-strong rounded-2xl p-6 flex items-center justify-center border border-neon-green-500/20"
-                    style={{ backfaceVisibility: 'hidden' }}
+                  <motion.div
+                    className="flip-card relative w-full h-full cursor-pointer"
+                    whileHover={{ rotateY: 180 }}
+                    transition={{ duration: 0.6 }}
+                    style={{ transformStyle: 'preserve-3d' }}
                   >
-                    <div className="text-center">
-                      <div className="w-12 h-12 bg-neon-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg className="w-6 h-6 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+                    {/* Front of Card */}
+                    <div 
+                      className="flip-card-front absolute inset-0 glass-strong rounded-2xl p-8 border border-neon-green-500/20"
+                      style={{ backfaceVisibility: 'hidden' }}
+                    >
+                      <div className="flex flex-col h-full">
+                        <div className="w-12 h-12 bg-neon-green-500/20 rounded-full flex items-center justify-center mb-6">
+                          <svg className="w-6 h-6 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </div>
+                        <h3 className="text-xl font-display font-bold text-white mb-4">
+                          {faq.question}
+                        </h3>
+                        <div className="space-y-2 flex-1">
+                          {features[index].map((feature, i) => (
+                            <div key={i} className="flex items-center gap-2 text-white/70 text-sm">
+                              <div className="w-1.5 h-1.5 bg-neon-green-500 rounded-full" />
+                              <span>{feature}</span>
+                            </div>
+                          ))}
+                        </div>
+                        <p className="text-xs text-white/40 mt-4 text-center">Hover to learn more</p>
                       </div>
-                      <h3 className="text-lg font-display font-bold text-white">
-                        {faq.question}
-                      </h3>
                     </div>
-                  </div>
-                  
-                  {/* Back of Card */}
-                  <div 
-                    className="flip-card-back absolute inset-0 glass-green rounded-2xl p-6 flex items-center justify-center border border-neon-green-500/30"
-                    style={{ 
-                      backfaceVisibility: 'hidden',
-                      transform: 'rotateY(180deg)'
-                    }}
-                  >
-                    <div>
-                      <p className="text-white/80 leading-relaxed text-sm">
-                        {faq.answer}
-                      </p>
+                    
+                    {/* Back of Card */}
+                    <div 
+                      className="flip-card-back absolute inset-0 glass-green rounded-2xl p-8 border border-neon-green-500/30"
+                      style={{ 
+                        backfaceVisibility: 'hidden',
+                        transform: 'rotateY(180deg)'
+                      }}
+                    >
+                      <div className="flex flex-col h-full">
+                        <h3 className="text-lg font-display font-bold text-white mb-4">
+                          {faq.question}
+                        </h3>
+                        <p className="text-white/80 leading-relaxed text-sm flex-1">
+                          {faq.answer}
+                        </p>
+                        <div className="mt-4 pt-4 border-t border-white/10">
+                          <p className="text-xs text-neon-green-400 font-semibold">
+                            ✓ Included in all plans
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  </motion.div>
                 </motion.div>
-              </motion.div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
