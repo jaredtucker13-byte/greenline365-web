@@ -131,7 +131,8 @@ async function getDefaultTenant() {
 
 // Generate available time slots based on business hours
 function generateTimeSlots(date: string, businessHours: any): string[] {
-  const dayOfWeek = new Date(date).toLocaleDateString('en-US', { weekday: 'lowercase' });
+  const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+  const dayOfWeek = dayNames[new Date(date).getDay()];
   const hours = businessHours?.[dayOfWeek] || '9:00 AM - 5:00 PM';
   
   if (hours.toLowerCase() === 'closed') {
