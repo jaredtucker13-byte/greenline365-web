@@ -504,17 +504,15 @@ export default function HomePage() {
                   </div>
                 ))}
               </div>
-            </motion.div>
+            </div>
             
             {/* Right - Widget */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
+            <div
+              data-trend-widget
               className="glass-strong rounded-2xl p-5 border border-neon-green-500/20"
             >
               <DailyTrendHunter trendType="manual" />
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
@@ -522,16 +520,14 @@ export default function HomePage() {
       {/* ========== FAQ - 3 Column Grid ========== */}
       <section className="py-16" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+          <div
+            data-section-header
             className="text-center mb-10"
           >
             <h2 className="font-display font-bold text-white mb-3" style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)' }}>
               Frequently Asked <span className="text-neon-green-500">Questions</span>
             </h2>
-          </motion.div>
+          </div>
           
           <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))' }}>
             {[
@@ -542,13 +538,10 @@ export default function HomePage() {
               { q: "What's the ROI?", a: "Customers see an average 40% increase in lead conversion within the first 60 days.", bullets: ['40% conversion boost', '60-day ROI', 'First month payback'] },
               { q: "Is there a contract?", a: "No long-term contracts. Pay monthly and cancel anytime. We don't lock you in.", bullets: ['Monthly billing', 'Cancel anytime', 'No commitments'] }
             ].map((faq, i) => (
-              <motion.div
+              <div
                 key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.05 }}
-                className="glass rounded-2xl p-5 border border-white/10 hover:border-neon-green-500/30 transition-colors"
+                data-faq-card
+                className="glass rounded-2xl p-5 border border-white/10 hover:border-neon-green-500/30 transition-colors gsap-hover-lift"
                 style={{ maxWidth: '400px', justifySelf: 'center', width: '100%' }}
               >
                 <div className="w-9 h-9 bg-neon-green-500/20 rounded-full flex items-center justify-center mb-4">
@@ -564,7 +557,7 @@ export default function HomePage() {
                     </div>
                   ))}
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -575,10 +568,8 @@ export default function HomePage() {
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
           <div className="grid lg:grid-cols-2 gap-6">
             {/* Left - Value Prop */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
+            <div
+              data-booking-left
               className="glass-strong rounded-2xl p-6 flex flex-col justify-between"
             >
               <div>
