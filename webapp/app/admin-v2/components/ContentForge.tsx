@@ -85,6 +85,10 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
   const [isUploading, setIsUploading] = useState(false);
   const [activeTab, setActiveTab] = useState<'content' | 'hashtags' | 'blog'>('content');
   
+  // Image Analysis State (Autopilot)
+  const [isAnalyzingImage, setIsAnalyzingImage] = useState(false);
+  const [analysisComplete, setAnalysisComplete] = useState(false);
+  
   // Calendar State
   const [showCalendar, setShowCalendar] = useState(false);
   const [scheduledDate, setScheduledDate] = useState<Date>(selectedDate || new Date());
