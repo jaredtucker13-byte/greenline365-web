@@ -591,6 +591,14 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
 
                 {activeTab === 'hashtags' && (
                   <>
+                    {/* AI Generate Button */}
+                    <button
+                      onClick={generateSmartHashtags}
+                      className="w-full mb-3 px-4 py-2 rounded-lg bg-gradient-to-r from-[#39FF14]/20 to-[#39FF14]/10 border border-[#39FF14]/30 text-[#39FF14] text-sm font-medium hover:from-[#39FF14]/30 hover:to-[#39FF14]/20 transition-all flex items-center justify-center gap-2"
+                    >
+                      <span>✨</span> Generate Smart Hashtags with AI
+                    </button>
+
                     {/* Standard Hashtags */}
                     <div className="p-3 rounded-lg bg-[#39FF14]/5 border border-[#39FF14]/20">
                       <h3 className="text-sm font-semibold text-[#39FF14] mb-3">📌 Standard Hashtags (Always Included)</h3>
