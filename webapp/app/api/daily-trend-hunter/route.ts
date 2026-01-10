@@ -230,9 +230,10 @@ export async function POST(request: NextRequest) {
           n8n_response: { trends: formattedTrends, source },
           trends_count: formattedTrends.length,
           status: 'success'
-        }).catch(() => {}); // Ignore logging errors
+        });
       } catch (e) {
         // Ignore Supabase errors - don't fail the request
+        console.log('Supabase logging skipped');
       }
     }
 
