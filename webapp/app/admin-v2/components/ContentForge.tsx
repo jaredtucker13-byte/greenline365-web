@@ -1219,51 +1219,134 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                 )}
 
                 {activeTab === 'blog' && (
-                  <div className="grid grid-cols-2 gap-4">
-                    {/* Left - Blog Settings */}
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-xs font-medium text-gray-400 mb-2">Blog Title</label>
-                        <input
-                          type="text"
-                          value={blogTitle}
-                          onChange={(e) => setBlogTitle(e.target.value)}
-                          placeholder="Enter blog title..."
-                          className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm placeholder:text-gray-500 focus:border-[#39FF14]/50 outline-none"
-                        />
+                  <div className="space-y-4">
+                    {/* Blog Header */}
+                    <div className="grid grid-cols-2 gap-4">
+                      {/* Left - Blog Settings */}
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-xs font-medium text-gray-400 mb-2">Blog Title</label>
+                          <input
+                            type="text"
+                            value={blogTitle}
+                            onChange={(e) => setBlogTitle(e.target.value)}
+                            placeholder="Enter a compelling blog title..."
+                            className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm placeholder:text-gray-500 focus:border-[#39FF14]/50 outline-none"
+                          />
+                          <p className="text-xs text-gray-500 mt-1">{blogTitle.length}/60 characters (ideal for SEO)</p>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-medium text-gray-400 mb-2">SEO Description</label>
+                          <textarea
+                            value={blogSeoDescription}
+                            onChange={(e) => setBlogSeoDescription(e.target.value)}
+                            rows={2}
+                            placeholder="Meta description for search engines..."
+                            className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm placeholder:text-gray-500 focus:border-[#39FF14]/50 outline-none resize-none"
+                          />
+                          <p className={`text-xs mt-1 ${blogSeoDescription.length > 160 ? 'text-red-400' : 'text-gray-500'}`}>
+                            {blogSeoDescription.length}/160 characters {blogSeoDescription.length > 160 && '(too long!)'}
+                          </p>
+                        </div>
                       </div>
 
-                      <div>
-                        <label className="block text-xs font-medium text-gray-400 mb-2">SEO Description</label>
-                        <textarea
-                          value={blogSeoDescription}
-                          onChange={(e) => setBlogSeoDescription(e.target.value)}
-                          rows={3}
-                          placeholder="Meta description for search engines..."
-                          className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm placeholder:text-gray-500 focus:border-[#39FF14]/50 outline-none resize-none"
-                        />
-                        <p className="text-xs text-gray-500 mt-1">{blogSeoDescription.length}/160 characters</p>
-                      </div>
+                      {/* Right - SEO Preview & Actions */}
+                      <div className="space-y-3">
+                        {/* SEO Preview Card */}
+                        <div className="p-3 rounded-lg bg-white/5 border border-[#2D3748]">
+                          <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">Google Preview</p>
+                          <div className="space-y-1">
+                            <p className="text-[#8AB4F8] text-sm truncate hover:underline cursor-pointer">
+                              {blogTitle || 'Your Blog Title Here'} - GreenLine365
+                            </p>
+                            <p className="text-[#BDC1C6] text-xs">greenline365.com › blog › {blogTitle ? blogTitle.toLowerCase().replace(/\s+/g, '-').slice(0, 20) : 'your-post'}</p>
+                            <p className="text-[#BDC1C6] text-xs line-clamp-2">
+                              {blogSeoDescription || 'Your meta description will appear here. Make it compelling to improve click-through rates from search results.'}
+                            </p>
+                          </div>
+                        </div>
 
-                      <button
-                        onClick={generateBlogContent}
-                        disabled={isGeneratingBlog || !blogTitle.trim()}
-                        className="w-full px-4 py-3 rounded-lg bg-gradient-to-r from-[#8A2BE2] to-[#39FF14] text-black font-semibold disabled:opacity-50 flex items-center justify-center gap-2"
-                      >
-                        {isGeneratingBlog ? '⏳ Generating...' : '🧠 Generate Blog Content'}
-                      </button>
+                        {/* Generate Button */}
+                        <button
+                          onClick={generateBlogContent}
+                          disabled={isGeneratingBlog || !blogTitle.trim()}
+                          className="w-full px-4 py-2.5 rounded-lg bg-gradient-to-r from-[#8A2BE2] to-[#39FF14] text-black font-semibold text-sm disabled:opacity-50 flex items-center justify-center gap-2"
+                        >
+                          {isGeneratingBlog ? '⏳ Generating...' : '🧠 Generate Blog Content'}
+                        </button>
+
+                        {/* Quick tips */}
+                        <div className="text-[10px] text-gray-500">
+                          💡 Tip: Use the AI Assistant for brainstorming topics and outlines
+                        </div>
+                      </div>
                     </div>
 
-                    {/* Right - Blog Content */}
-                    <div>
-                      <label className="block text-xs font-medium text-gray-400 mb-2">Blog Content</label>
+                    {/* Blog Content Editor */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <label className="block text-xs font-medium text-gray-400">Blog Content</label>
+                        <div className="flex items-center gap-3 text-xs text-gray-500">
+                          <span>{blogBody.split(/\s+/).filter(w => w).length} words</span>
+                          <span>~{Math.ceil(blogBody.split(/\s+/).filter(w => w).length / 200)} min read</span>
+                        </div>
+                      </div>
+                      
+                      {/* Formatting Toolbar */}
+                      <div className="flex gap-1 p-1 rounded-lg bg-[#1A1A1A] border border-[#2D3748]">
+                        {[
+                          { icon: 'H1', action: () => setBlogBody(prev => `## ${prev}`) },
+                          { icon: 'H2', action: () => setBlogBody(prev => `### ${prev}`) },
+                          { icon: 'B', action: () => setBlogBody(prev => `**${prev}**`), bold: true },
+                          { icon: 'I', action: () => setBlogBody(prev => `*${prev}*`), italic: true },
+                          { icon: '•', action: () => setBlogBody(prev => `${prev}\n- `) },
+                          { icon: '1.', action: () => setBlogBody(prev => `${prev}\n1. `) },
+                          { icon: '"', action: () => setBlogBody(prev => `${prev}\n> `) },
+                          { icon: '🔗', action: () => setBlogBody(prev => `${prev}[link text](url)`) },
+                        ].map((tool, i) => (
+                          <button
+                            key={i}
+                            onClick={tool.action}
+                            className={`px-2 py-1 rounded text-xs hover:bg-[#2D3748] transition ${tool.bold ? 'font-bold' : ''} ${tool.italic ? 'italic' : ''} text-gray-400 hover:text-white`}
+                          >
+                            {tool.icon}
+                          </button>
+                        ))}
+                        <div className="flex-1" />
+                        <span className="text-[10px] text-gray-600 px-2 py-1">Markdown supported</span>
+                      </div>
+
                       <textarea
                         value={blogBody}
                         onChange={(e) => setBlogBody(e.target.value)}
-                        rows={14}
-                        placeholder="Write your blog content here... (Markdown supported)"
-                        className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm placeholder:text-gray-500 focus:border-[#39FF14]/50 outline-none resize-none font-mono"
+                        rows={12}
+                        placeholder="Write your blog content here...
+
+## Introduction
+Start with a hook that grabs attention.
+
+## Main Points
+- Point 1
+- Point 2
+- Point 3
+
+## Conclusion
+End with a call to action."
+                        className="w-full px-4 py-3 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm placeholder:text-gray-600 focus:border-[#39FF14]/50 outline-none resize-none font-mono leading-relaxed"
                       />
+                    </div>
+
+                    {/* Blog Distribution Preview */}
+                    <div className="p-3 rounded-lg bg-[#0D0D0D] border border-[#2D3748]">
+                      <p className="text-xs text-gray-400 mb-2">📤 This blog will be reformatted for:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {['Full Blog Post', 'Instagram Carousel', 'Twitter Thread', 'LinkedIn Article', 'Email Newsletter'].map(format => (
+                          <span key={format} className="px-2 py-1 rounded-full bg-[#39FF14]/10 text-[#39FF14] text-xs">
+                            {format}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 )}
