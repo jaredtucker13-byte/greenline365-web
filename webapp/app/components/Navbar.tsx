@@ -196,6 +196,14 @@ export default function Navbar() {
                 <>
                   {user ? (
                     <div className="flex items-center gap-2 ml-2">
+                      {isSuperAdmin && (
+                        <Link
+                          href="/god-mode"
+                          className="px-4 py-2 text-sm font-medium text-red-400 hover:text-red-300 transition-colors"
+                        >
+                          God Mode
+                        </Link>
+                      )}
                       {isAdmin && (
                         <Link
                           href="/dashboard"
@@ -214,17 +222,13 @@ export default function Navbar() {
                   ) : (
                     <Link
                       href="/login"
-                      className="px-4 py-2 text-sm font-medium text-white/70 hover:text-neon-green-500 transition-colors"
+                      className="px-4 py-2 text-sm font-medium glass-green hover:glass-strong border border-neon-green-500/30 rounded-lg transition-all"
                     >
-                      Login
+                      Sign In / Sign Up
                     </Link>
                   )}
                 </>
               )}
-              
-              <Button variant="primary" size="sm" className="ml-2">
-                Book Demo
-              </Button>
             </div>
 
             {/* Mobile Menu Button */}
