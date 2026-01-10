@@ -23,6 +23,8 @@ import TacticalHeader from './components/TacticalHeader';
 import HybridCalendar from './components/HybridCalendar';
 import ContentForge from './components/ContentForge';
 import LocalPulse from './components/LocalPulse';
+import WeeklyTrendBatch from './components/WeeklyTrendBatch';
+import LiveLocalPulse from './components/LiveLocalPulse';
 import AnalyticsWidgets from './components/AnalyticsWidgets';
 import DemoController from './components/DemoController';
 import type { CalendarEvent, LocalTrend, ActivityItem, TeamMetrics, PipelineStage, BookingTrend } from './lib/types';
