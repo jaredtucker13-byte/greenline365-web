@@ -691,8 +691,8 @@ interface ChatContentProps {
   setCurrentMode: (mode: AssistantMode) => void;
   styles: ReturnType<typeof getModeStyles>;
   quickActions: Array<{ text: string; icon: string }>;
-  messagesEndRef: React.RefObject<HTMLDivElement>;
-  inputRef: React.RefObject<HTMLInputElement>;
+  messagesEndRef: React.RefObject<HTMLDivElement | null>;
+  inputRef: React.RefObject<HTMLInputElement | null>;
   onClose?: () => void;
   isExpanded?: boolean;
   setIsExpanded?: (expanded: boolean) => void;
