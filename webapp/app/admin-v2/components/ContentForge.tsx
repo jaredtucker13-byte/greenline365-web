@@ -466,6 +466,7 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
     setImagePreview(null);
     setCaption('');
     setKeywords([]);
+    setSuggestedKeywords([]);
     setProductDescription('');
     setBlogTitle('');
     setBlogBody('');
