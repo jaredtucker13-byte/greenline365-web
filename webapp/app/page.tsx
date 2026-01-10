@@ -68,7 +68,7 @@ export default function HomePage() {
                 <Button variant="primary" size="lg" onClick={() => setShowFullForm(true)} data-testid="hero-start-btn">
                   Start Your Engine
                 </Button>
-                <Button variant="outline" size="lg" onClick={() => setShowWidget(true)} data-testid="hero-network-btn">
+                <Button variant="secondary" size="lg" onClick={() => setShowWidget(true)} data-testid="hero-network-btn">
                   See the Network →
                 </Button>
               </div>
