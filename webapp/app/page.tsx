@@ -9,629 +9,329 @@ import DailyTrendHunter from './components/DailyTrendHunter';
 import { Button } from '@/components/ui/os';
 import { NeonText } from '@/components/ui/os';
 import { GlassCard } from '@/components/ui/os';
-import StickyProcessSection from '@/components/StickyProcessSection';
-import LogoTicker from '@/components/LogoTicker';
+
 export default function HomePage() {
   const [showFullForm, setShowFullForm] = useState(false);
   const [showWidget, setShowWidget] = useState(false);
 
   return (
-    <main className="min-h-screen">
-      
-      {/* Hero Section - Enhanced with MASSIVE Depth */}
-      <section className="relative min-h-screen flex items-center overflow-hidden pt-20">
-        {/* Background - Pure Dark */}
+    <main className="min-h-screen bg-os-dark">
+      {/* ========== HERO SECTION - 50/50 Split ========== */}
+      <section className="relative min-h-[90vh] flex items-center overflow-hidden pt-20">
+        {/* Background Effects */}
         <div className="absolute inset-0 bg-os-dark" />
-        
-        {/* LAYER 1 - Deepest Background Shapes */}
         <motion.div 
-          className="absolute top-0 left-1/4 w-[1200px] h-[1200px] rounded-full bg-gradient-to-br from-neon-green-500/5 to-transparent blur-3xl"
-          animate={{ 
-            scale: [1, 1.3, 1],
-            rotate: [0, 90, 0],
-            opacity: [0.3, 0.5, 0.3]
-          }}
-          transition={{ 
-            duration: 25, 
-            repeat: Infinity,
-            ease: 'easeInOut'
-          }}
+          className="absolute top-0 left-1/4 w-[800px] h-[800px] rounded-full bg-gradient-to-br from-neon-green-500/5 to-transparent blur-3xl"
+          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+          transition={{ duration: 20, repeat: Infinity }}
+        />
+        <motion.div 
+          className="absolute bottom-1/4 right-0 w-[500px] h-[500px] bg-gradient-radial from-neon-green-500/10 to-transparent blur-3xl"
+          animate={{ scale: [1, 1.3, 1], x: [0, -50, 0] }}
+          transition={{ duration: 15, repeat: Infinity }}
         />
         
-        {/* LAYER 2 - Mid Background Orbs */}
-        <motion.div 
-          className="absolute top-1/3 right-1/4 w-[900px] h-[900px] rounded-full bg-gradient-to-tl from-neon-green-500/8 to-transparent blur-3xl"
-          animate={{ 
-            scale: [1, 1.4, 1],
-            x: [0, -100, 0],
-            opacity: [0.4, 0.6, 0.4]
-          }}
-          transition={{ 
-            duration: 20, 
-            repeat: Infinity,
-            ease: 'easeInOut',
-            delay: 3
-          }}
-        />
-        
-        {/* LAYER 3 - Floating Grid Lines */}
-        <motion.div 
-          className="absolute inset-0 circuit-bg opacity-5"
-          animate={{ 
-            backgroundPosition: ['0px 0px', '40px 40px', '0px 0px']
-          }}
-          transition={{ 
-            duration: 30, 
-            repeat: Infinity,
-            ease: 'linear'
-          }}
-        />
-        
-        {/* LAYER 4 - Main Glow Elements */}
-        <motion.div 
-          className="absolute top-1/4 left-0 w-[800px] h-[800px] bg-radial-green opacity-20 blur-3xl"
-          animate={{ 
-            scale: [1, 1.2, 1],
-            x: [0, 100, 0],
-            y: [0, 50, 0]
-          }}
-          transition={{ 
-            duration: 15, 
-            repeat: Infinity,
-            ease: 'easeInOut'
-          }}
-        />
-        
-        {/* LAYER 5 - Accent Glow (Changed from teal to amber) */}
-        <motion.div 
-          className="absolute bottom-1/4 right-0 w-[600px] h-[600px] bg-gradient-radial from-neon-amber-500/15 via-neon-green-500/10 to-transparent blur-3xl"
-          animate={{ 
-            scale: [1, 1.3, 1],
-            x: [0, -80, 0],
-            rotate: [0, 45, 0]
-          }}
-          transition={{ 
-            duration: 12, 
-            repeat: Infinity,
-            ease: 'easeInOut',
-            delay: 2
-          }}
-        />
-        
-        {/* LAYER 6 - Floating Particles (static positions to avoid hydration mismatch) */}
-        {[
-          { left: 10, top: 20, duration: 9, delay: 1 },
-          { left: 25, top: 60, duration: 10, delay: 2 },
-          { left: 40, top: 35, duration: 8, delay: 0.5 },
-          { left: 55, top: 75, duration: 11, delay: 3 },
-          { left: 70, top: 15, duration: 9, delay: 1.5 },
-          { left: 85, top: 50, duration: 10, delay: 4 },
-          { left: 15, top: 80, duration: 8, delay: 2.5 },
-          { left: 90, top: 40, duration: 12, delay: 0 },
-        ].map((particle, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-2 h-2 bg-neon-green-500/30 rounded-full"
-            style={{
-              left: `${particle.left}%`,
-              top: `${particle.top}%`,
-            }}
-            animate={{
-              y: [0, -100, 0],
-              opacity: [0, 1, 0],
-            }}
-            transition={{
-              duration: particle.duration,
-              repeat: Infinity,
-              delay: particle.delay,
-            }}
-          />
-        ))}
-        
-        <div className="relative z-10 max-w-7xl mx-auto px-6 w-full">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            {/* Left Side - Content */}
+        <div className="relative z-10 w-full max-w-[1280px] mx-auto px-4 sm:px-6">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            {/* Left Column - Text Content */}
             <motion.div
-              initial={{ opacity: 0, x: -50 }}
+              initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
+              transition={{ duration: 0.6 }}
             >
-              {/* Status Badge */}
               <motion.div 
-                className="mb-8 inline-flex items-center gap-2 px-4 py-2 glass-green rounded-full border border-neon-green-500/30"
-                initial={{ opacity: 0, y: 20 }}
+                className="mb-6 inline-flex items-center gap-2 px-3 py-1.5 glass-green rounded-full border border-neon-green-500/30"
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
               >
                 <motion.span 
-                  className="w-2 h-2 bg-neon-green-500 rounded-full shadow-neon-green"
+                  className="w-2 h-2 bg-neon-green-500 rounded-full"
                   animate={{ opacity: [1, 0.5, 1] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 />
-                <span className="text-sm text-neon-green-400 font-semibold tracking-wide">
-                  STATUS: ONLINE
-                </span>
+                <span className="text-xs text-neon-green-400 font-semibold tracking-wide">STATUS: ONLINE</span>
               </motion.div>
               
-              {/* Main Headline */}
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-display font-bold mb-6 leading-tight">
-                <span className="text-white block mb-2">The Operating System</span>
-                <span className="text-white block mb-2">for the</span>
-                <motion.span 
-                  className="block bg-gradient-to-r from-neon-green-400 via-neon-green-500 to-neon-green-400 bg-clip-text text-transparent bg-[length:200%_100%] glow-text"
-                  animate={{
-                    backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: 'linear',
-                  }}
-                >
-                  Local Economy
-                </motion.span>
+              <h1 className="font-display font-bold mb-4 leading-tight" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)' }}>
+                <span className="text-white block">The Operating System</span>
+                <span className="text-white block">for the</span>
+                <span className="text-neon-green-500 block">Local Economy</span>
               </h1>
               
-              {/* Subheadline */}
-              <p className="text-xl md:text-2xl text-white/70 mb-10 leading-relaxed max-w-xl">
+              <p className="text-white/70 mb-6 leading-relaxed max-w-xl" style={{ fontSize: 'clamp(1rem, 2vw, 1.25rem)' }}>
                 Stop competing with algorithms. Start winning. Start running infrastructure that 
                 connects <span className="text-neon-green-500 font-semibold">local life</span> with local commerce.
               </p>
               
-              {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button
-                  variant="primary"
-                  size="lg"
-                  onClick={() => setShowFullForm(true)}
-                  data-testid="hero-start-engine-btn"
-                >
+              <div className="flex flex-wrap gap-3 mb-8">
+                <Button variant="primary" size="lg" onClick={() => setShowFullForm(true)} data-testid="hero-start-btn">
                   Start Your Engine
                 </Button>
-                
-                {/* Animated Border Button */}
-                <motion.button
-                  onClick={() => setShowWidget(true)}
-                  className="relative px-6 py-3 text-base font-semibold text-white rounded-full overflow-hidden group"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  data-testid="hero-see-network-btn"
-                >
-                  {/* Animated Border */}
-                  <motion.div
-                    className="absolute inset-0 rounded-full"
-                    style={{
-                      background: 'linear-gradient(90deg, transparent, transparent, #00FF00, transparent, transparent)',
-                      backgroundSize: '200% 100%',
-                    }}
-                    animate={{
-                      backgroundPosition: ['200% 0%', '-200% 0%'],
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: 'linear',
-                    }}
-                  />
-                  <div className="absolute inset-[2px] bg-os-dark rounded-full" />
-                  <span className="relative z-10 flex items-center gap-2">
-                    See the Network
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
-                  </span>
-                </motion.button>
+                <Button variant="outline" size="lg" onClick={() => setShowWidget(true)} data-testid="hero-network-btn">
+                  See the Network →
+                </Button>
               </div>
               
-              {/* Stats Row */}
-              <motion.div 
-                className="mt-12 grid grid-cols-3 gap-6"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8 }}
-              >
-                <div>
-                  <div className="text-3xl font-display font-bold text-neon-green-500 mb-1">500+</div>
-                  <div className="text-sm text-white/60">Businesses</div>
-                </div>
-                <div>
-                  <div className="text-3xl font-display font-bold text-neon-green-500 mb-1">40%</div>
-                  <div className="text-sm text-white/60">More Leads</div>
-                </div>
-                <div>
-                  <div className="text-3xl font-display font-bold text-neon-green-500 mb-1">24/7</div>
-                  <div className="text-sm text-white/60">Always On</div>
-                </div>
-              </motion.div>
+              <div className="grid grid-cols-3 gap-4">
+                {[
+                  { value: '500+', label: 'Businesses' },
+                  { value: '40%', label: 'More Leads' },
+                  { value: '24/7', label: 'Always On' }
+                ].map((stat, i) => (
+                  <div key={i} className="text-center">
+                    <div className="text-2xl font-display font-bold text-neon-green-500">{stat.value}</div>
+                    <div className="text-xs text-white/50">{stat.label}</div>
+                  </div>
+                ))}
+              </div>
             </motion.div>
             
-            {/* Right Side - Phone Mockup */}
+            {/* Right Column - Phone Mockup */}
             <motion.div
-              className="relative hidden lg:block"
-              initial={{ opacity: 0, x: 50 }}
+              className="relative hidden lg:flex justify-center"
+              initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
             >
-              {/* Glow Effect Behind Phone */}
-              <div className="absolute inset-0 bg-neon-green-500/20 blur-3xl rounded-full scale-75" />
-              
-              {/* Phone Mockup Container */}
+              <div className="absolute inset-0 bg-neon-green-500/10 blur-3xl rounded-full scale-75" />
               <motion.div
                 className="relative z-10"
-                animate={{ 
-                  y: [0, -20, 0],
-                }}
-                transition={{ 
-                  duration: 6, 
-                  repeat: Infinity,
-                  ease: 'easeInOut'
-                }}
+                animate={{ y: [0, -15, 0] }}
+                transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
               >
-                {/* Phone Frame */}
-                <div className="relative mx-auto w-[320px] h-[650px] bg-os-dark-900 rounded-[3rem] p-3 shadow-2xl border-4 border-white/10">
-                  {/* Phone Screen */}
-                  <div className="w-full h-full bg-gradient-to-b from-os-dark to-os-dark-800 rounded-[2.5rem] overflow-hidden relative">
-                    {/* Status Bar */}
-                    <div className="px-6 py-3 flex justify-between items-center text-xs text-white/60">
+                <div className="relative w-[280px] h-[560px] bg-os-dark-900 rounded-[2.5rem] p-2 border-4 border-white/10">
+                  <div className="w-full h-full bg-gradient-to-b from-os-dark to-os-dark-800 rounded-[2rem] overflow-hidden">
+                    <div className="px-4 py-2 flex justify-between text-xs text-white/50">
                       <span>9:41</span>
                       <div className="flex gap-1">
-                        <div className="w-4 h-4 rounded-sm border border-white/40" />
-                        <div className="w-4 h-4 rounded-sm border border-white/40" />
-                        <div className="w-4 h-4 rounded-sm border border-white/40" />
+                        <div className="w-3 h-3 border border-white/30 rounded-sm" />
+                        <div className="w-3 h-3 border border-white/30 rounded-sm" />
                       </div>
                     </div>
-                    
-                    {/* App Content */}
-                    <div className="px-4 py-6 space-y-4">
-                      {/* Header */}
-                      <div className="glass-strong rounded-2xl p-4 border border-neon-green-500/20">
-                        <div className="flex items-center gap-3 mb-3">
-                          <div className="w-10 h-10 rounded-full bg-neon-green-500/20 flex items-center justify-center">
-                            <svg className="w-5 h-5 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div className="px-3 py-4 space-y-3">
+                      <div className="glass-strong rounded-xl p-3 border border-neon-green-500/20">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="w-8 h-8 rounded-full bg-neon-green-500/20 flex items-center justify-center">
+                            <svg className="w-4 h-4 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                             </svg>
                           </div>
                           <div>
-                            <div className="text-white font-semibold text-sm">GreenLine360 BACS</div>
-                            <div className="text-white/50 text-xs">Last synced 2 min ago</div>
+                            <div className="text-white font-semibold text-xs">GreenLine360</div>
+                            <div className="text-white/40 text-[10px]">Synced 2 min ago</div>
                           </div>
                         </div>
                       </div>
-                      
-                      {/* Quick Actions */}
-                      <div className="space-y-2">
-                        {[
-                          { name: 'Page Reliability', color: 'neon-green' },
-                          { name: 'Auto Response Qual', color: 'neon-teal' },
-                          { name: 'Local Reach', color: 'neon-amber' },
-                          { name: 'Fundraiser Status', color: 'neon-green' },
-                          { name: 'Confidence Testing', color: 'white' },
-                        ].map((item, i) => (
-                          <div key={i} className="glass rounded-xl p-3 flex items-center justify-between border border-white/10 hover:border-neon-green-500/30 transition-colors">
-                            <div className="flex items-center gap-3">
-                              <div className={`w-8 h-8 rounded-lg bg-${item.color}-500/20 flex items-center justify-center`}>
-                                <div className={`w-2 h-2 bg-${item.color}-500 rounded-full`} />
-                              </div>
-                              <span className="text-white text-sm font-medium">{item.name}</span>
+                      {['Page Reliability', 'Auto Response', 'Local Reach', 'Fundraiser Status'].map((item, i) => (
+                        <div key={i} className="glass rounded-lg p-2.5 flex items-center justify-between border border-white/10">
+                          <div className="flex items-center gap-2">
+                            <div className={`w-6 h-6 rounded-md bg-neon-green-500/20 flex items-center justify-center`}>
+                              <div className="w-1.5 h-1.5 bg-neon-green-500 rounded-full" />
                             </div>
-                            <svg className="w-4 h-4 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                            </svg>
+                            <span className="text-white text-xs">{item}</span>
                           </div>
-                        ))}
-                      </div>
-                      
-                      {/* Bottom Stats */}
-                      <div className="glass-strong rounded-2xl p-4 mt-4 border border-white/10">
-                        <div className="grid grid-cols-4 gap-2 text-center">
-                          <div>
-                            <div className="text-white/40 text-xs mb-1">Posts</div>
-                            <div className="text-white font-semibold">1,55K</div>
-                          </div>
-                          <div>
-                            <div className="text-white/40 text-xs mb-1">Leads</div>
-                            <div className="text-neon-green-500 font-semibold">847</div>
-                          </div>
-                          <div>
-                            <div className="text-white/40 text-xs mb-1">Reach</div>
-                            <div className="text-white font-semibold">2.3M</div>
-                          </div>
-                          <div>
-                            <div className="text-white/40 text-xs mb-1">ROI</div>
-                            <div className="text-neon-green-500 font-semibold">340%</div>
-                          </div>
+                          <svg className="w-3 h-3 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </div>
+                      ))}
+                      <div className="glass-strong rounded-xl p-3 border border-white/10 mt-4">
+                        <div className="grid grid-cols-4 gap-1 text-center">
+                          {[
+                            { label: 'Posts', value: '1.5K' },
+                            { label: 'Leads', value: '847', green: true },
+                            { label: 'Reach', value: '2.3M' },
+                            { label: 'ROI', value: '340%', green: true }
+                          ].map((s, i) => (
+                            <div key={i}>
+                              <div className="text-white/40 text-[9px]">{s.label}</div>
+                              <div className={`text-xs font-semibold ${s.green ? 'text-neon-green-500' : 'text-white'}`}>{s.value}</div>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     </div>
                   </div>
-                  
-                  {/* Phone Notch */}
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-os-dark-900 rounded-b-2xl" />
                 </div>
               </motion.div>
             </motion.div>
           </div>
         </div>
-        
-        {/* Scroll Indicator */}
-        <motion.div
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1, y: [0, 10, 0] }}
-          transition={{ 
-            opacity: { delay: 1.2 },
-            y: { duration: 2, repeat: Infinity }
-          }}
-        >
-          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center pt-2">
-            <motion.div 
-              className="w-1 h-2 bg-neon-green-500 rounded-full"
-              animate={{ y: [0, 12, 0] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
-          </div>
-        </motion.div>
       </section>
 
-      {/* Logo Ticker - Trusted By */}
-      <section className="py-12 border-y border-white/5">
-        <div className="max-w-7xl mx-auto px-6">
-          <motion.p 
-            className="text-center text-white/40 text-sm font-semibold tracking-wider uppercase mb-8"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-          >
-            Trusted by 500+ Local Businesses
-          </motion.p>
-          <LogoTicker />
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-24 px-8 relative">
-        {/* Background Circuit Pattern */}
-        <div className="absolute inset-0 circuit-bg opacity-5" />
-        
-        <div className="max-w-7xl mx-auto relative z-10">
+      {/* ========== FEATURES - 3 Column Grid ========== */}
+      <section className="py-16" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
+            className="text-center mb-10"
           >
-            <h2 className="text-4xl md:text-5xl font-display font-bold text-white mb-4">
-              Why Choose <NeonText variant="green" glow>GreenLine365</NeonText>?
+            <h2 className="font-display font-bold text-white mb-3" style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)' }}>
+              Why Choose <span className="text-neon-green-500">GreenLine365</span>?
             </h2>
-            <p className="text-xl text-white/60 max-w-2xl mx-auto">
-              Built for modern businesses who demand results
-            </p>
+            <p className="text-white/60 max-w-xl mx-auto">Built for modern businesses who demand results</p>
           </motion.div>
           
-          <div className="grid md:grid-cols-3 gap-6">
-            <GlassCard variant="default" hover className="p-8 group">
-              <motion.div 
-                className="w-14 h-14 bg-neon-green-500/20 rounded-xl flex items-center justify-center mb-6 group-hover:shadow-neon-green transition-shadow duration-300"
-                whileHover={{ scale: 1.05, rotate: 5 }}
+          {/* 3-Column Feature Grid */}
+          <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
+            {[
+              { icon: '💡', title: 'AI-Powered Insights', desc: 'Get intelligent recommendations based on your business goals and market trends.' },
+              { icon: '📅', title: 'Smart Scheduling', desc: 'Seamlessly integrate with your calendar. Book demos, meetings, and follow-ups.' },
+              { icon: '⚡', title: 'Accountability System', desc: 'Stay on track with daily check-ins and progress tracking.' }
+            ].map((feature, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="glass rounded-2xl p-5 border border-white/10 hover:border-neon-green-500/30 transition-colors"
+                style={{ maxWidth: '400px', justifySelf: 'center', width: '100%' }}
               >
-                <svg className="w-7 h-7 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                </svg>
+                <div className="w-11 h-11 bg-neon-green-500/20 rounded-xl flex items-center justify-center mb-4 text-xl">
+                  {feature.icon}
+                </div>
+                <h3 className="text-lg font-display font-bold text-white mb-2">{feature.title}</h3>
+                <p className="text-white/60 text-sm leading-relaxed">{feature.desc}</p>
               </motion.div>
-              <h3 className="text-2xl font-display font-bold text-white mb-3">AI-Powered Insights</h3>
-              <p className="text-white/70 leading-relaxed">
-                Get intelligent recommendations based on your business goals and market trends.
-              </p>
-            </GlassCard>
-            
-            <GlassCard variant="default" hover className="p-8 group">
-              <motion.div 
-                className="w-14 h-14 bg-neon-amber-500/20 rounded-xl flex items-center justify-center mb-6 group-hover:shadow-neon-amber transition-shadow duration-300"
-                whileHover={{ scale: 1.05, rotate: -5 }}
-              >
-                <svg className="w-7 h-7 text-neon-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </motion.div>
-              <h3 className="text-2xl font-display font-bold text-white mb-3">Smart Scheduling</h3>
-              <p className="text-white/70 leading-relaxed">
-                Seamlessly integrate with your calendar. Book demos, meetings, and follow-ups effortlessly.
-              </p>
-            </GlassCard>
-            
-            <GlassCard variant="default" hover className="p-8 group">
-              <motion.div 
-                className="w-14 h-14 bg-neon-green-500/20 rounded-xl flex items-center justify-center mb-6 group-hover:shadow-neon-green transition-shadow duration-300"
-                whileHover={{ scale: 1.05, rotate: 5 }}
-              >
-                <svg className="w-7 h-7 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </motion.div>
-              <h3 className="text-2xl font-display font-bold text-white mb-3">Accountability System</h3>
-              <p className="text-white/70 leading-relaxed">
-                Stay on track with daily check-ins and progress tracking that keeps you accountable.
-              </p>
-            </GlassCard>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Sticky Process Section - How It Works */}
-      <StickyProcessSection />
-
-      {/* ========== TESTIMONIAL SECTION (Moved from floating) ========== */}
-      <section className="py-16 px-4 relative">
-        <div className="max-w-4xl mx-auto">
+      {/* ========== HOW IT WORKS - Numbered Cards ========== */}
+      <section className="py-16 relative" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="glass-strong rounded-3xl p-8 md:p-12 border border-neon-green-500/20 text-center"
+            className="text-center mb-10"
           >
-            {/* Quote Mark */}
-            <div className="text-6xl text-neon-green-500/30 font-serif mb-4">"</div>
-            
-            {/* Rating */}
-            <div className="flex gap-1 justify-center mb-6">
-              {[...Array(5)].map((_, i) => (
-                <svg key={i} className="w-6 h-6 text-neon-green-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-              ))}
-            </div>
-            
-            {/* Quote */}
-            <p className="text-xl md:text-2xl text-white/90 leading-relaxed mb-8 max-w-2xl mx-auto">
-              GreenLine365 transformed our lead generation. We went from 10 qualified leads per month to over 50. The AI finds prospects we didn&apos;t even know existed.
-            </p>
-            
-            {/* Author */}
-            <div className="flex items-center justify-center gap-4">
-              <div className="w-14 h-14 rounded-full bg-neon-green-500/20 flex items-center justify-center border border-neon-green-500/30">
-                <span className="text-neon-green-500 font-bold text-lg">MK</span>
-              </div>
-              <div className="text-left">
-                <div className="text-white font-semibold text-lg">Michael K.</div>
-                <div className="text-white/50 text-sm">CEO, TechFlow Solutions</div>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ========== NEW: DISTRESSED OWNERS - THE PROBLEM ========== */}
-      <section className="py-20 lg:py-32 px-4 relative">
-        <div className="max-w-6xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-12"
-          >
-            <span className="text-neon-green-500 text-sm font-bold tracking-widest uppercase mb-4 block">
-              Sound Familiar?
-            </span>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold text-white mb-6">
-              Running a Business Shouldn&apos;t Mean{' '}
-              <span className="text-red-400">Running on Empty</span>
+            <h2 className="font-display font-bold text-white mb-3" style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)' }}>
+              How the <span className="text-neon-green-500">System</span> Works
             </h2>
+            <p className="text-white/60 max-w-xl mx-auto">Four seamless phases that transform your business</p>
           </motion.div>
+          
+          <div className="space-y-4 max-w-3xl mx-auto">
+            {[
+              { num: '01', title: 'Discovery & Setup', desc: 'We analyze your business, identify ideal customers, and configure your AI-powered system.' },
+              { num: '02', title: 'AI Signal Detection', desc: 'Our AI continuously scans social media, forums, and communities for buying signals.' },
+              { num: '03', title: 'Smart Engagement', desc: 'Automated, personalized outreach at the perfect moment when intent is highest.' },
+              { num: '04', title: 'Growth & Optimization', desc: 'Continuous learning and optimization to maximize your conversion rates.' }
+            ].map((step, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="glass-strong rounded-2xl p-5 border border-neon-green-500/20 flex gap-5 items-start"
+              >
+                <div className="flex-shrink-0">
+                  <div className="text-3xl font-display font-bold text-neon-green-500/30">{step.num}</div>
+                  <div className="w-8 h-8 rounded-lg bg-neon-green-500/20 flex items-center justify-center mt-2">
+                    <svg className="w-4 h-4 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-lg font-display font-bold text-white mb-1">{step.title}</h3>
+                  <p className="text-white/60 text-sm leading-relaxed">{step.desc}</p>
+                  <div className="h-1 bg-gradient-to-r from-neon-green-500 to-transparent rounded-full mt-3 w-2/3" />
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-          {/* Distressed Owners Image */}
+      {/* ========== TESTIMONIAL - Compact Card ========== */}
+      <section className="py-12" style={{ paddingBlock: 'clamp(2rem, 6vh, 4rem)' }}>
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="relative rounded-2xl overflow-hidden border border-white/10"
-          >
-            <Image
-              src="/images/distressed-owners.jpg"
-              alt="Stressed business owners juggling work and life"
-              width={1200}
-              height={600}
-              className="w-full h-auto object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-os-dark via-transparent to-transparent" />
-          </motion.div>
-
-          {/* Pain Points */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="mt-12 grid md:grid-cols-3 gap-6"
+            className="glass-strong rounded-2xl p-6 md:p-8 border border-neon-green-500/20 max-w-3xl mx-auto"
           >
-            <div className="glass p-6 rounded-2xl border border-red-500/20 text-center">
-              <div className="text-4xl mb-4">😰</div>
-              <h3 className="text-xl font-bold text-white mb-2">Overwhelmed</h3>
-              <p className="text-white/60">Drowning in to-do lists while competitors steal your customers</p>
-            </div>
-            <div className="glass p-6 rounded-2xl border border-red-500/20 text-center">
-              <div className="text-4xl mb-4">📱</div>
-              <h3 className="text-xl font-bold text-white mb-2">Always On-Call</h3>
-              <p className="text-white/60">Sacrificing family time just to keep the business running</p>
-            </div>
-            <div className="glass p-6 rounded-2xl border border-red-500/20 text-center">
-              <div className="text-4xl mb-4">😓</div>
-              <h3 className="text-xl font-bold text-white mb-2">No Marketing Time</h3>
-              <p className="text-white/60">Great at your craft, but who has time for social media?</p>
+            <div className="flex flex-col md:flex-row gap-6 items-center">
+              <div className="flex-shrink-0">
+                <div className="w-16 h-16 rounded-full bg-neon-green-500/20 flex items-center justify-center border border-neon-green-500/30">
+                  <span className="text-neon-green-500 font-bold text-xl">MK</span>
+                </div>
+              </div>
+              <div className="text-center md:text-left">
+                <div className="flex gap-1 justify-center md:justify-start mb-3">
+                  {[...Array(5)].map((_, i) => (
+                    <svg key={i} className="w-5 h-5 text-neon-green-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+                <p className="text-white/90 text-base leading-relaxed mb-3">
+                  &ldquo;GreenLine365 transformed our lead generation. We went from 10 qualified leads per month to over 50.&rdquo;
+                </p>
+                <div className="text-sm">
+                  <span className="text-white font-semibold">Michael K.</span>
+                  <span className="text-white/50"> · CEO, TechFlow Solutions</span>
+                </div>
+              </div>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* ========== NEW: THE SOLUTION - BARBER TAKING PHOTO ========== */}
-      <section className="py-20 lg:py-32 px-4 relative bg-gradient-to-b from-os-dark to-os-dark-800">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+      {/* ========== DISTRESSED OWNERS - 50/50 Split ========== */}
+      <section className="py-16" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
+          <div className="grid lg:grid-cols-2 gap-8 items-center">
             {/* Left - Image */}
             <motion.div
-              initial={{ opacity: 0, x: -40 }}
+              initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="relative"
+              className="order-2 lg:order-1"
             >
-              <div className="relative rounded-2xl overflow-hidden border border-neon-green-500/30">
+              <div className="relative rounded-2xl overflow-hidden border border-white/10">
                 <Image
-                  src="/images/barber-selfie.jpg"
-                  alt="Client capturing their fresh haircut with smartphone"
+                  src="/images/distressed-owners.jpg"
+                  alt="Stressed business owners"
                   width={600}
-                  height={600}
+                  height={400}
                   className="w-full h-auto object-cover"
                 />
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.5 }}
-                  className="absolute bottom-4 left-4 glass-green px-4 py-2 rounded-full border border-neon-green-500/40"
-                >
-                  <span className="text-neon-green-400 font-semibold text-sm">📸 Content = Customers</span>
-                </motion.div>
+                <div className="absolute inset-0 bg-gradient-to-t from-os-dark/80 via-transparent to-transparent" />
               </div>
-              <div className="absolute -inset-4 bg-neon-green-500/10 rounded-3xl blur-3xl -z-10" />
             </motion.div>
-
+            
             {/* Right - Content */}
             <motion.div
-              initial={{ opacity: 0, x: 40 }}
+              initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
+              className="order-1 lg:order-2"
             >
-              <span className="text-neon-green-500 text-sm font-bold tracking-widest uppercase mb-4 block">
-                The Solution
-              </span>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold text-white mb-6">
-                Your Phone is Already a{' '}
-                <span className="text-neon-green-500">Marketing Machine</span>
+              <span className="text-neon-green-500 text-xs font-bold tracking-widest uppercase mb-3 block">Sound Familiar?</span>
+              <h2 className="font-display font-bold text-white mb-4" style={{ fontSize: 'clamp(1.5rem, 4vw, 2.25rem)' }}>
+                Running a Business Shouldn&apos;t Mean <span className="text-red-400">Running on Empty</span>
               </h2>
-              <p className="text-lg text-white/70 mb-8 leading-relaxed">
-                Every photo you take is a potential post. Every satisfied customer is a story waiting to be told. GreenLine365 transforms your daily snapshots into a content engine that runs itself.
-              </p>
-
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {[
-                  { title: 'AI-Powered Captions', desc: 'Upload a photo, get perfect captions in seconds' },
-                  { title: 'Smart Hashtags', desc: 'Local + trending tags that actually get discovered' },
-                  { title: 'One-Click Scheduling', desc: 'Post to all platforms without leaving your chair' },
-                ].map((item, i) => (
-                  <div key={i} className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-full bg-neon-green-500/20 flex items-center justify-center flex-shrink-0">
-                      <svg className="w-5 h-5 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
+                  { emoji: '😰', title: 'Overwhelmed', desc: 'Drowning in to-do lists while competitors steal customers' },
+                  { emoji: '📱', title: 'Always On-Call', desc: 'Sacrificing family time to keep the business running' },
+                  { emoji: '😓', title: 'No Marketing Time', desc: 'Great at your craft, but who has time for social media?' }
+                ].map((pain, i) => (
+                  <div key={i} className="glass rounded-xl p-4 border border-red-500/20 flex gap-3 items-start">
+                    <span className="text-2xl">{pain.emoji}</span>
                     <div>
-                      <h4 className="text-white font-semibold mb-1">{item.title}</h4>
-                      <p className="text-white/60 text-sm">{item.desc}</p>
+                      <h4 className="text-white font-semibold text-sm">{pain.title}</h4>
+                      <p className="text-white/60 text-xs">{pain.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -641,237 +341,274 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ========== NEW: LIVE DEMO - TREND HUNTER ========== */}
-      <section id="trend-demo" className="py-20 lg:py-32 px-4 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-os-dark-800 via-os-dark to-os-dark" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-neon-green-500/5 rounded-full blur-3xl" />
-
-        <div className="max-w-6xl mx-auto relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-12"
-          >
-            <span className="text-neon-green-500 text-sm font-bold tracking-widest uppercase mb-4 block">
-              Try It Now - FREE
-            </span>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold text-white mb-6">
-              See What&apos;s Trending in{' '}
-              <span className="text-neon-green-500">Your Area</span>
-            </h2>
-            <p className="text-lg text-white/60 max-w-2xl mx-auto">
-              Enter your ZIP code and discover local events, trends, and opportunities you can turn into content and customers.
-            </p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="glass-strong rounded-3xl p-6 md:p-10 border border-neon-green-500/20"
-          >
-            <DailyTrendHunter trendType="manual" />
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Q&A Flip Card Section */}
-      <section className="py-24 px-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-os-dark to-os-dark-900" />
-        <div className="absolute top-0 left-1/2 w-[1000px] h-[1000px] -translate-x-1/2 bg-radial-green opacity-10 blur-3xl" />
-        
-        <div className="max-w-7xl mx-auto relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-display font-bold text-white mb-4">
-              Frequently Asked <NeonText variant="green" glow>Questions</NeonText>
-            </h2>
-            <p className="text-xl text-white/60 max-w-2xl mx-auto">
-              Click or hover on any card to reveal the answer
-            </p>
-          </motion.div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              { question: "How does GreenLine365 work?", answer: "GreenLine365 is an AI-powered operating system that connects your business with the local economy through automated scheduling, reputation management, and smart marketing tools." },
-              { question: "What makes you different?", answer: "Unlike generic CRMs, we're built specifically for local businesses. Our AI understands local markets and optimizes for real-world foot traffic and community engagement." },
-              { question: "How quickly can I get started?", answer: "Most businesses are fully onboarded within 24 hours. Our AI handles the heavy lifting - you just need to connect your calendar and social accounts." },
-              { question: "Do you integrate with my tools?", answer: "Yes! We integrate with Google Calendar, Facebook, Instagram, Yelp, and 50+ other platforms. If you use it, we connect to it." },
-              { question: "What's the ROI?", answer: "Our customers see an average 40% increase in lead conversion within the first 60 days. Most pay back their investment in the first month." },
-              { question: "Is there a contract?", answer: "No long-term contracts. Pay monthly and cancel anytime. We're confident you'll love it, so we don't lock you in." }
-            ].map((faq, index) => {
-              const features = [
-                ["AI-powered insights", "24/7 automation", "Lead tracking"],
-                ["Built for local markets", "Community-focused", "Foot traffic optimization"],
-                ["Quick onboarding", "Simple setup", "Instant results"],
-                ["50+ integrations", "Universal compatibility", "One-click sync"],
-                ["40% conversion boost", "60-day ROI", "First month payback"],
-                ["Monthly billing", "Cancel anytime", "No commitments"]
-              ];
-              
-              return (
+      {/* ========== SOLUTION - 50/50 Split ========== */}
+      <section className="py-16 bg-gradient-to-b from-os-dark to-os-dark-800" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
+          <div className="grid lg:grid-cols-2 gap-8 items-center">
+            {/* Left - Image */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="relative"
+            >
+              <div className="relative rounded-2xl overflow-hidden border border-neon-green-500/30">
+                <Image
+                  src="/images/barber-selfie.jpg"
+                  alt="Client capturing content"
+                  width={500}
+                  height={500}
+                  className="w-full h-auto object-cover"
+                />
                 <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className="flip-card-container h-80"
-                  style={{ perspective: '1000px' }}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.3 }}
+                  className="absolute bottom-3 left-3 glass-green px-3 py-1.5 rounded-full border border-neon-green-500/40"
                 >
-                  <motion.div
-                    className="flip-card relative w-full h-full cursor-pointer"
-                    whileHover={{ rotateY: 180 }}
-                    transition={{ duration: 0.6 }}
-                    style={{ transformStyle: 'preserve-3d' }}
-                  >
-                    <div 
-                      className="flip-card-front absolute inset-0 glass-strong rounded-2xl p-8 border border-neon-green-500/20"
-                      style={{ backfaceVisibility: 'hidden' }}
-                    >
-                      <div className="flex flex-col h-full">
-                        <div className="w-12 h-12 bg-neon-green-500/20 rounded-full flex items-center justify-center mb-6">
-                          <svg className="w-6 h-6 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                        </div>
-                        <h3 className="text-xl font-display font-bold text-white mb-4">{faq.question}</h3>
-                        <div className="space-y-2 flex-1">
-                          {features[index].map((feature, i) => (
-                            <div key={i} className="flex items-center gap-2 text-white/70 text-sm">
-                              <div className="w-1.5 h-1.5 bg-neon-green-500 rounded-full" />
-                              <span>{feature}</span>
-                            </div>
-                          ))}
-                        </div>
-                        <p className="text-xs text-white/40 mt-4 text-center">Hover to learn more</p>
-                      </div>
-                    </div>
-                    
-                    <div 
-                      className="flip-card-back absolute inset-0 glass-green rounded-2xl p-8 border border-neon-green-500/30"
-                      style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
-                    >
-                      <div className="flex flex-col h-full">
-                        <h3 className="text-lg font-display font-bold text-white mb-4">{faq.question}</h3>
-                        <p className="text-white/80 leading-relaxed text-sm flex-1">{faq.answer}</p>
-                        <div className="mt-4 pt-4 border-t border-white/10">
-                          <p className="text-xs text-neon-green-400 font-semibold">✓ Included in all plans</p>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
+                  <span className="text-neon-green-400 font-semibold text-xs">📸 Content = Customers</span>
                 </motion.div>
-              );
-            })}
+              </div>
+              <div className="absolute -inset-4 bg-neon-green-500/5 rounded-3xl blur-2xl -z-10" />
+            </motion.div>
+            
+            {/* Right - Content */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+            >
+              <span className="text-neon-green-500 text-xs font-bold tracking-widest uppercase mb-3 block">The Solution</span>
+              <h2 className="font-display font-bold text-white mb-4" style={{ fontSize: 'clamp(1.5rem, 4vw, 2.25rem)' }}>
+                Your Phone is Already a <span className="text-neon-green-500">Marketing Machine</span>
+              </h2>
+              <p className="text-white/70 mb-5 text-sm leading-relaxed">
+                Every photo you take is a potential post. GreenLine365 transforms your daily snapshots into a content engine.
+              </p>
+              <div className="space-y-3">
+                {[
+                  { title: 'AI-Powered Captions', desc: 'Upload a photo, get perfect captions in seconds' },
+                  { title: 'Smart Hashtags', desc: 'Local + trending tags that get discovered' },
+                  { title: 'One-Click Scheduling', desc: 'Post to all platforms without leaving your chair' }
+                ].map((feature, i) => (
+                  <div key={i} className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-neon-green-500/20 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-4 h-4 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 className="text-white font-semibold text-sm">{feature.title}</h4>
+                      <p className="text-white/60 text-xs">{feature.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Booking Calendar Section */}
-      <section className="py-24 px-6 relative overflow-hidden" id="booking">
-        <div className="absolute inset-0 bg-gradient-to-b from-os-dark via-os-dark-800 to-os-dark" />
-        <div className="absolute top-1/4 left-0 w-96 h-96 bg-radial-green opacity-10 blur-3xl" />
-        <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-gradient-radial from-neon-amber-500/10 to-transparent blur-3xl" />
-        
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="grid lg:grid-cols-5 gap-8 items-stretch">
-            <div className="lg:col-span-2 glass-strong rounded-2xl p-8 md:p-10 flex flex-col justify-between">
+      {/* ========== TREND HUNTER DEMO - 50/50 Split ========== */}
+      <section id="trend-demo" className="py-16 relative" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-neon-green-500/5 rounded-full blur-3xl" />
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-8 items-center">
+            {/* Left - Content */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+            >
+              <span className="text-neon-green-500 text-xs font-bold tracking-widest uppercase mb-3 block">Try It Now - FREE</span>
+              <h2 className="font-display font-bold text-white mb-4" style={{ fontSize: 'clamp(1.5rem, 4vw, 2.25rem)' }}>
+                See What&apos;s Trending in <span className="text-neon-green-500">Your Area</span>
+              </h2>
+              <p className="text-white/60 mb-6 text-sm leading-relaxed">
+                Enter your ZIP code and discover local events, trends, and opportunities you can turn into content and customers.
+              </p>
+              <div className="space-y-2 mb-6">
+                {['Real-time local insights', 'Weather-based opportunities', 'Event-driven marketing'].map((item, i) => (
+                  <div key={i} className="flex items-center gap-2 text-white/70 text-sm">
+                    <div className="w-1.5 h-1.5 bg-neon-green-500 rounded-full" />
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+            
+            {/* Right - Widget */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="glass-strong rounded-2xl p-5 border border-neon-green-500/20"
+            >
+              <DailyTrendHunter trendType="manual" />
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* ========== FAQ - 3 Column Grid ========== */}
+      <section className="py-16" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-10"
+          >
+            <h2 className="font-display font-bold text-white mb-3" style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)' }}>
+              Frequently Asked <span className="text-neon-green-500">Questions</span>
+            </h2>
+          </motion.div>
+          
+          <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))' }}>
+            {[
+              { q: "How does GreenLine365 work?", a: "An AI-powered OS that connects your business with the local economy through automated scheduling and smart marketing.", bullets: ['AI-powered insights', '24/7 automation', 'Lead tracking'] },
+              { q: "What makes you different?", a: "Built specifically for local businesses. Our AI understands local markets and optimizes for real-world foot traffic.", bullets: ['Built for local', 'Community-focused', 'Foot traffic optimization'] },
+              { q: "How quickly can I start?", a: "Most businesses are fully onboarded within 24 hours. Our AI handles the heavy lifting.", bullets: ['Quick onboarding', 'Simple setup', 'Instant results'] },
+              { q: "Do you integrate with my tools?", a: "Yes! We integrate with Google Calendar, Facebook, Instagram, Yelp, and 50+ other platforms.", bullets: ['50+ integrations', 'Universal compatibility', 'One-click sync'] },
+              { q: "What's the ROI?", a: "Customers see an average 40% increase in lead conversion within the first 60 days.", bullets: ['40% conversion boost', '60-day ROI', 'First month payback'] },
+              { q: "Is there a contract?", a: "No long-term contracts. Pay monthly and cancel anytime. We don't lock you in.", bullets: ['Monthly billing', 'Cancel anytime', 'No commitments'] }
+            ].map((faq, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.05 }}
+                className="glass rounded-2xl p-5 border border-white/10 hover:border-neon-green-500/30 transition-colors"
+                style={{ maxWidth: '400px', justifySelf: 'center', width: '100%' }}
+              >
+                <div className="w-9 h-9 bg-neon-green-500/20 rounded-full flex items-center justify-center mb-4">
+                  <span className="text-neon-green-500 text-sm">?</span>
+                </div>
+                <h3 className="text-base font-display font-bold text-white mb-2">{faq.q}</h3>
+                <p className="text-white/60 text-xs leading-relaxed mb-3">{faq.a}</p>
+                <div className="space-y-1">
+                  {faq.bullets.map((b, j) => (
+                    <div key={j} className="flex items-center gap-2 text-white/50 text-xs">
+                      <div className="w-1 h-1 bg-neon-green-500 rounded-full" />
+                      <span>{b}</span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ========== BOOKING - 50/50 Split ========== */}
+      <section className="py-16" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }} id="booking">
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
+          <div className="grid lg:grid-cols-2 gap-6">
+            {/* Left - Value Prop */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="glass-strong rounded-2xl p-6 flex flex-col justify-between"
+            >
               <div>
-                <div className="flex items-center gap-3 mb-8">
-                  <div className="w-10 h-10 rounded-lg bg-neon-green-500/20 border border-neon-green-500/50 flex items-center justify-center">
-                    <svg className="w-5 h-5 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="flex items-center gap-2 mb-6">
+                  <div className="w-8 h-8 rounded-lg bg-neon-green-500/20 border border-neon-green-500/50 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
                   </div>
                   <div>
-                    <div className="font-display font-bold text-white">
-                      <span className="text-white">GreenLine</span>
-                      <span className="text-neon-green-500">365</span>
-                    </div>
-                    <div className="text-xs text-white/40 uppercase tracking-wider">Business OS</div>
+                    <div className="font-display font-bold text-white text-sm">GreenLine<span className="text-neon-green-500">365</span></div>
+                    <div className="text-[10px] text-white/40 uppercase tracking-wider">Business OS</div>
                   </div>
                 </div>
                 
-                <div className="mb-6">
-                  <span className="text-xs text-neon-green-500 font-semibold tracking-wider uppercase">Automated Sales</span>
-                </div>
-                
-                <h2 className="text-4xl md:text-5xl font-display font-bold mb-6 leading-tight">
+                <h2 className="font-display font-bold mb-4" style={{ fontSize: 'clamp(1.5rem, 4vw, 2.25rem)' }}>
                   <span className="text-white block">Stop Losing</span>
-                  <NeonText variant="green" glow className="block">Revenue.</NeonText>
+                  <span className="text-neon-green-500">Revenue.</span>
                 </h2>
                 
-                <p className="text-white/70 text-lg mb-8 leading-relaxed">
-                  Turn missed calls into closed deals with AI-powered scheduling that works 24/7. Never lose another customer to a busy signal.
+                <p className="text-white/70 text-sm mb-6 leading-relaxed">
+                  Turn missed calls into closed deals with AI-powered scheduling that works 24/7.
                 </p>
                 
-                <div className="space-y-4 mb-8">
+                <div className="space-y-2 mb-6">
                   {['Increase lead conversion by 40%', 'Zero missed calls, 24/7/365', 'Integrates with your calendar'].map((text, i) => (
-                    <div key={i} className="flex items-start gap-3">
-                      <div className="w-5 h-5 rounded-full bg-neon-green-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <svg className="w-3 h-3 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div key={i} className="flex items-center gap-2">
+                      <div className="w-4 h-4 rounded-full bg-neon-green-500/20 flex items-center justify-center">
+                        <svg className="w-2.5 h-2.5 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                         </svg>
                       </div>
-                      <span className="text-white/80">{text}</span>
+                      <span className="text-white/80 text-sm">{text}</span>
                     </div>
                   ))}
                 </div>
               </div>
               
-              <div className="pt-8 border-t border-white/10">
-                <div className="flex items-center gap-2 mb-2">
+              <div className="pt-4 border-t border-white/10">
+                <div className="flex items-center gap-1 mb-1">
                   {[...Array(5)].map((_, i) => (
-                    <svg key={i} className="w-5 h-5 text-neon-green-500" fill="currentColor" viewBox="0 0 20 20">
+                    <svg key={i} className="w-4 h-4 text-neon-green-500" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
                   ))}
                 </div>
-                <p className="text-white/60 text-sm">Trusted by 500+ businesses</p>
+                <p className="text-white/50 text-xs">Trusted by 500+ businesses</p>
               </div>
-            </div>
+            </motion.div>
             
-            <div className="lg:col-span-3 glass rounded-2xl p-8 md:p-10">
-              <div className="mb-8">
-                <h3 className="text-2xl md:text-3xl font-display font-bold text-white mb-3">Book Your Strategy Session</h3>
-                <p className="text-white/60">Complete our quick form and we&apos;ll schedule a personalized demo for your business.</p>
-              </div>
+            {/* Right - Form */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="glass rounded-2xl p-6"
+            >
+              <h3 className="text-lg font-display font-bold text-white mb-2">Book Your Strategy Session</h3>
+              <p className="text-white/60 text-sm mb-4">Complete our quick form and we&apos;ll schedule a demo.</p>
               <MultiStepBookingForm />
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Products Section */}
-      <section className="py-20 px-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-white mb-4">Our Products</h2>
-            <p className="text-gray-300">White-label solutions you can integrate into your own business</p>
-          </div>
+      {/* ========== PRODUCTS - 50/50 Splits ========== */}
+      <section className="py-16" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-10"
+          >
+            <h2 className="font-display font-bold text-white mb-3" style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)' }}>
+              Our <span className="text-neon-green-500">Products</span>
+            </h2>
+            <p className="text-white/60">White-label solutions you can integrate</p>
+          </motion.div>
 
-          <div className="grid md:grid-cols-2 gap-12 items-center mb-20">
-            <div>
+          {/* Product 1 - Booking Widget */}
+          <div className="grid lg:grid-cols-2 gap-6 mb-8">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+            >
               <div className="inline-flex items-center gap-2 px-3 py-1 glass-green border border-neon-green-500/30 rounded-full mb-4">
-                <span className="text-xs text-neon-green-500 font-semibold tracking-wider uppercase">Product #1</span>
+                <span className="text-xs text-neon-green-500 font-semibold uppercase">Product #1</span>
               </div>
-              <h3 className="text-3xl font-display font-bold text-white mb-4">Universal Booking Widget</h3>
-              <p className="text-white/70 mb-6 leading-relaxed">
-                Our embeddable booking widget can be added to any website. Perfect for businesses that want to offer seamless scheduling to their customers.
+              <h3 className="text-xl font-display font-bold text-white mb-3">Universal Booking Widget</h3>
+              <p className="text-white/70 text-sm mb-4 leading-relaxed">
+                Embeddable booking widget for any website. Perfect for seamless scheduling.
               </p>
-              <ul className="space-y-3 mb-8">
-                {['Customizable colors to match your brand', 'Integrates with Google Calendar, Cal.com, and more', 'Track bookings from multiple sources', 'White-label solution for agencies'].map((text, i) => (
-                  <li key={i} className="flex items-center gap-3 text-white/80">
-                    <svg className="w-5 h-5 text-neon-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <ul className="space-y-2 mb-4">
+                {['Customizable colors', 'Calendar integrations', 'White-label for agencies'].map((text, i) => (
+                  <li key={i} className="flex items-center gap-2 text-white/80 text-sm">
+                    <svg className="w-4 h-4 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     {text}
@@ -879,72 +616,73 @@ export default function HomePage() {
                 ))}
               </ul>
               <Button variant="primary" onClick={() => setShowWidget(true)}>Try the Widget</Button>
-            </div>
+            </motion.div>
             
-            <GlassCard variant="strong" className="p-8">
-              <h4 className="text-xl font-display font-bold text-white mb-6 text-center">Quick Book Demo</h4>
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="glass-strong rounded-2xl p-5 border border-neon-green-500/20"
+            >
+              <h4 className="text-base font-display font-bold text-white mb-4 text-center">Quick Book Demo</h4>
               <BookingWidget source="landing-page-demo" />
-            </GlassCard>
+            </motion.div>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="order-2 md:order-1">
-              <div className="bg-gray-900/80 backdrop-blur-xl border border-gray-700 rounded-2xl p-6 shadow-xl">
-                <div className="p-5 border-b border-emerald-500/10 bg-black/30 rounded-t-xl">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <div className="text-[10px] tracking-[0.35em] uppercase font-semibold text-emerald-300/80">PROTOCOL: ACTIVE ASSISTANT</div>
-                      <div className="mt-1 text-xl font-black text-white">Command Center</div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400/90" />
-                      <span className="w-2 h-2 rounded-full bg-emerald-400/50" />
-                      <span className="w-2 h-2 rounded-full bg-emerald-400/25" />
-                    </div>
-                  </div>
+          {/* Product 2 - AI Chat */}
+          <div className="grid lg:grid-cols-2 gap-6">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="glass-strong rounded-2xl p-5 order-2 lg:order-1"
+            >
+              <div className="p-4 border-b border-neon-green-500/10 bg-black/30 rounded-t-xl">
+                <div className="text-[10px] tracking-widest uppercase text-neon-green-400/80">PROTOCOL: ACTIVE ASSISTANT</div>
+                <div className="text-lg font-bold text-white">Command Center</div>
+              </div>
+              <div className="p-4 space-y-3">
+                <div className="rounded-xl p-3 bg-white/5 border border-white/10 text-sm text-white/90">
+                  <div className="font-semibold text-xs">System Online.</div>
+                  <div className="text-xs text-white/70">How can I help you today?</div>
                 </div>
-                <div className="p-5 space-y-4">
-                  <div className="rounded-2xl p-4 bg-white/5 border border-white/10 text-white/90">
-                    <div className="text-sm font-semibold">System Online.</div>
-                    <div className="text-sm text-white/80 mt-1">How can I help you today?</div>
-                  </div>
-                  <div className="flex justify-end">
-                    <div className="max-w-[78%] rounded-2xl rounded-br-md px-4 py-3 text-sm text-black bg-emerald-400">Tell me about your services</div>
-                  </div>
-                  <div className="max-w-[78%] rounded-2xl rounded-bl-md px-4 py-3 text-sm text-white/90 bg-white/5 border border-white/10">
-                    We offer AI-powered planning, booking solutions, and 24/7 customer support...
-                  </div>
+                <div className="flex justify-end">
+                  <div className="rounded-xl px-3 py-2 text-xs text-black bg-neon-green-500">Tell me about your services</div>
                 </div>
               </div>
-            </div>
+            </motion.div>
             
-            <div className="order-1 md:order-2">
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="order-1 lg:order-2"
+            >
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-500/20 border border-purple-500/30 rounded-full mb-4">
-                <span className="text-xs text-purple-300 font-semibold">PRODUCT #2</span>
+                <span className="text-xs text-purple-300 font-semibold uppercase">Product #2</span>
               </div>
-              <h3 className="text-3xl font-bold text-white mb-4">AI Chat Widget</h3>
-              <p className="text-gray-300 mb-6">
-                Intelligent conversational AI that can be embedded on any website. Provide instant support and capture leads while you sleep.
+              <h3 className="text-xl font-display font-bold text-white mb-3">AI Chat Widget</h3>
+              <p className="text-white/70 text-sm mb-4 leading-relaxed">
+                Intelligent conversational AI that can be embedded on any website.
               </p>
-              <ul className="space-y-3 mb-8">
-                {['Powered by advanced AI (GPT-4, Claude, etc.)', 'Train on your own content and FAQs', 'Lead capture and CRM integration', '24/7 automated customer support'].map((text, i) => (
-                  <li key={i} className="flex items-center gap-3 text-gray-200">
-                    <svg className="w-5 h-5 text-emerald-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <ul className="space-y-2 mb-4">
+                {['Powered by advanced AI', 'Train on your content', '24/7 automated support'].map((text, i) => (
+                  <li key={i} className="flex items-center gap-2 text-white/80 text-sm">
+                    <svg className="w-4 h-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     {text}
                   </li>
                 ))}
               </ul>
-              <p className="text-emerald-400 text-sm font-medium">Try it now → Click the chat bubble in the bottom right corner</p>
-            </div>
+              <p className="text-neon-green-400 text-xs">Try it → Click the chat bubble in the bottom right</p>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* ========== SUCCESS STORY - FROM EMPTY TABLES TO PACKED HOUSE (Before Footer) ========== */}
-      <section className="relative min-h-[80vh] flex flex-col overflow-hidden">
-        {/* Background Image - Clean version without overlays */}
+      {/* ========== SUCCESS STORY - Full Width Image at Bottom ========== */}
+      <section className="relative min-h-[60vh] flex flex-col overflow-hidden">
         <div className="absolute inset-0">
           <Image
             src="/images/packed-house-clean.jpg"
@@ -954,93 +692,69 @@ export default function HomePage() {
             quality={100}
             priority
           />
-          {/* Gradient overlay only at top for text readability */}
-          <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-os-dark/90 via-os-dark/50 to-transparent" />
+          <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-os-dark via-os-dark/60 to-transparent" />
         </div>
 
-        {/* Content - Positioned at TOP */}
-        <div className="relative z-10 pt-16 pb-8 px-4">
-          <div className="max-w-5xl mx-auto text-center">
+        <div className="relative z-10 pt-12 pb-6 px-4">
+          <div className="max-w-[1280px] mx-auto text-center">
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
             >
               <motion.div 
-                className="inline-flex items-center gap-2 px-4 py-2 glass-green rounded-full border border-neon-green-500/40 mb-4"
+                className="inline-flex items-center gap-2 px-3 py-1.5 glass-green rounded-full border border-neon-green-500/40 mb-3"
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
-                transition={{ delay: 0.2 }}
               >
                 <span className="w-2 h-2 bg-neon-green-500 rounded-full animate-pulse" />
-                <span className="text-sm text-neon-green-400 font-semibold">THE GREENLINE EFFECT</span>
+                <span className="text-xs text-neon-green-400 font-semibold">THE GREENLINE EFFECT</span>
               </motion.div>
 
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold text-white mb-4 leading-tight drop-shadow-lg">
-                From Empty Tables to a{' '}
-                <span className="text-neon-green-500">Packed House</span>
+              <h2 className="font-display font-bold text-white mb-3 drop-shadow-lg" style={{ fontSize: 'clamp(1.5rem, 4vw, 2.5rem)' }}>
+                From Empty Tables to a <span className="text-neon-green-500">Packed House</span>
               </h2>
 
-              <p className="text-base sm:text-lg text-white/90 mb-6 max-w-2xl mx-auto leading-relaxed drop-shadow-md">
-                GreenLine365 turns your camera roll into a marketing engine that fills your seats and grows your business.
+              <p className="text-white/90 text-sm mb-4 max-w-xl mx-auto drop-shadow-md">
+                GreenLine365 turns your camera roll into a marketing engine that fills your seats.
               </p>
 
-              <Button
-                variant="primary"
-                size="lg"
-                onClick={() => setShowFullForm(true)}
-                data-testid="success-story-cta-btn"
-                className="text-lg px-8 py-4 shadow-lg"
-              >
+              <Button variant="primary" size="lg" onClick={() => setShowFullForm(true)} data-testid="success-cta-btn" className="shadow-lg">
                 Start Your Success Story
               </Button>
             </motion.div>
           </div>
         </div>
 
-        {/* Bottom gradient for transition to footer */}
-        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-os-dark to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-os-dark to-transparent" />
       </section>
 
-      {/* Full Form Modal */}
+      {/* Modals */}
       {showFullForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-gray-900/95 border border-gray-700 rounded-3xl p-8">
-            <button
-              onClick={() => setShowFullForm(false)}
-              className="absolute top-4 right-4 w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-gray-700 transition"
-            >
-              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="relative w-full max-w-xl max-h-[85vh] overflow-y-auto glass-strong border border-white/10 rounded-2xl p-6">
+            <button onClick={() => setShowFullForm(false)} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition">
+              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-            <h2 className="text-2xl font-bold text-white mb-6 text-center">Schedule Your Demo</h2>
+            <h2 className="text-lg font-bold text-white mb-4 text-center">Schedule Your Demo</h2>
             <MultiStepBookingForm />
           </div>
         </div>
       )}
 
-      {/* Widget Modal */}
       {showWidget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="relative w-full max-w-md bg-white rounded-2xl p-6 shadow-xl">
-            <button
-              onClick={() => setShowWidget(false)}
-              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition"
-            >
-              <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="relative w-full max-w-sm bg-white rounded-xl p-5 shadow-xl">
+            <button onClick={() => setShowWidget(false)} className="absolute top-3 right-3 w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition">
+              <svg className="w-3.5 h-3.5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-            <h3 className="text-lg font-bold text-gray-900 mb-4 text-center">Quick Book</h3>
-            <BookingWidget 
-              source="quick-book-modal" 
-              onBookingComplete={() => {
-                setTimeout(() => setShowWidget(false), 2000);
-              }}
-            />
+            <h3 className="text-base font-bold text-gray-900 mb-3 text-center">Quick Book</h3>
+            <BookingWidget source="quick-book-modal" onBookingComplete={() => setTimeout(() => setShowWidget(false), 2000)} />
           </div>
         </div>
       )}
