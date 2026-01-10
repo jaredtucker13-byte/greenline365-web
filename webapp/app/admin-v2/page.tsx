@@ -27,6 +27,7 @@ import WeeklyTrendBatch from './components/WeeklyTrendBatch';
 import LiveLocalPulse from './components/LiveLocalPulse';
 import AnalyticsWidgets from './components/AnalyticsWidgets';
 import DemoController from './components/DemoController';
+import DraftsPanel from './components/DraftsPanel';
 import type { CalendarEvent, LocalTrend, ActivityItem, TeamMetrics, PipelineStage, BookingTrend } from './lib/types';
 
 // ============================================
