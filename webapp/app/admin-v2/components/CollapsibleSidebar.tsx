@@ -78,6 +78,8 @@ export default function CollapsibleSidebar({
   onToggleCollapse,
   isMobileOpen,
   onMobileToggle,
+  isPreviewMode,
+  onPreviewModeToggle,
 }: SidebarProps) {
   // Triple-click handler for hidden Demo Controller
   const [clickCount, setClickCount] = useState(0);
