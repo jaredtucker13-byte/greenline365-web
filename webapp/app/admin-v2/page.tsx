@@ -175,6 +175,19 @@ export default function TacticalCommandCenter() {
 
   return (
     <div className="min-h-screen bg-[#121212] flex">
+      {/* Preview Mode Banner */}
+      {isPreviewMode && (
+        <div className="fixed top-0 left-0 right-0 z-[60] bg-gradient-to-r from-yellow-500 to-orange-500 text-black text-center py-2 px-4 flex items-center justify-center gap-4">
+          <span className="font-semibold">👁️ PREVIEW MODE - Viewing as Customer</span>
+          <button
+            onClick={() => setIsPreviewMode(false)}
+            className="px-3 py-1 bg-black/20 hover:bg-black/30 rounded-lg text-sm font-medium transition"
+          >
+            Exit Preview
+          </button>
+        </div>
+      )}
+
       {/* Collapsible Sidebar */}
       <CollapsibleSidebar
         activeItem="schedule"
@@ -189,6 +202,8 @@ export default function TacticalCommandCenter() {
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
         isMobileOpen={mobileMenuOpen}
         onMobileToggle={() => setMobileMenuOpen(!mobileMenuOpen)}
+        isPreviewMode={isPreviewMode}
+        onPreviewModeToggle={() => setIsPreviewMode(!isPreviewMode)}
       />
 
       {/* Main Content */}
