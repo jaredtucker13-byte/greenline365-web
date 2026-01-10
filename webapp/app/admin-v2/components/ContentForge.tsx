@@ -1,22 +1,21 @@
 'use client';
 
 /**
- * ContentForge Modal Component - ENHANCED
+ * ContentForge Modal Component - V2 REDESIGN
  * GreenLine365 Admin V2 - Tactical Multi-Command Center
  * 
- * Features:
- * - Live Preview Panel
- * - AI Caption Generator
- * - AI Keywords Generator  
- * - AI Product Description (for products)
- * - Smart Hashtag System (2 Standard + 3 Optional)
- * - Blog Content Creation
- * - Full user control over all AI suggestions
- * - Photo upload with drag & drop
+ * Improvements:
+ * - Columnar layout with better spacing
+ * - Clickable AI-generated hashtag suggestions
+ * - Calendar popup for date selection
+ * - Feedback thumbs up/down on AI content
+ * - Image analysis workflow preparation
  */
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
+import { DayPicker } from 'react-day-picker';
+import 'react-day-picker/dist/style.css';
 
 interface ContentForgeProps {
   isOpen: boolean;
@@ -64,7 +63,8 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
   // Hashtag System
   const [brandHashtag, setBrandHashtag] = useState('#GreenLine365');
   const [localHashtag, setLocalHashtag] = useState('#TampaBusiness');
-  const [optionalHashtags, setOptionalHashtags] = useState<string[]>(['', '', '']);
+  const [optionalHashtags, setOptionalHashtags] = useState<string[]>([]);
+  const [suggestedHashtags, setSuggestedHashtags] = useState<string[]>([]);
   
   // Blog Content
   const [blogTitle, setBlogTitle] = useState('');
@@ -79,16 +79,24 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
   const [isGeneratingKeywords, setIsGeneratingKeywords] = useState(false);
   const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
   const [isGeneratingBlog, setIsGeneratingBlog] = useState(false);
+  const [isGeneratingHashtags, setIsGeneratingHashtags] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const [activeTab, setActiveTab] = useState<'content' | 'hashtags' | 'blog'>('content');
   
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  // Calendar State
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [scheduledDate, setScheduledDate] = useState<Date>(selectedDate || new Date());
+  const [scheduledTime, setScheduledTime] = useState('08:00');
   
-  const [scheduledDateTime, setScheduledDateTime] = useState(
-    selectedDate ? selectedDate.toISOString().slice(0, 16) : new Date().toISOString().slice(0, 16)
-  );
+  // Feedback State
+  const [captionFeedback, setCaptionFeedback] = useState<'up' | 'down' | null>(null);
+  const [keywordsFeedback, setKeywordsFeedback] = useState<'up' | 'down' | null>(null);
+  const [descriptionFeedback, setDescriptionFeedback] = useState<'up' | 'down' | null>(null);
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const calendarRef = useRef<HTMLDivElement>(null);
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -102,12 +110,23 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
     };
   }, [isOpen]);
 
-  // Update datetime when selectedDate changes
+  // Update date when selectedDate changes
   useEffect(() => {
     if (selectedDate) {
-      setScheduledDateTime(selectedDate.toISOString().slice(0, 16));
+      setScheduledDate(selectedDate);
     }
   }, [selectedDate]);
+
+  // Close calendar when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) {
+        setShowCalendar(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const togglePlatform = (platform: 'instagram' | 'twitter' | 'facebook') => {
     setPlatforms(prev => 
@@ -117,10 +136,19 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
     );
   };
 
-  // AI Generation Functions - Real API calls via OpenRouter
+  // Get formatted datetime for submission
+  const getScheduledDateTime = () => {
+    const date = new Date(scheduledDate);
+    const [hours, minutes] = scheduledTime.split(':');
+    date.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+    return date.toISOString();
+  };
+
+  // AI Generation Functions
   const generateCaption = async () => {
     if (!title.trim() && !imagePreview) return;
     setIsGeneratingCaption(true);
+    setCaptionFeedback(null);
     
     try {
       const response = await fetch('/api/content-forge', {
@@ -142,7 +170,6 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
       }
     } catch (error) {
       console.error('Caption generation error:', error);
-      // Fallback to sample caption
       setCaption(`✨ ${title || 'Check this out!'}\n\nYour success story starts here. Let's make it happen together! 🚀`);
     }
     
@@ -152,6 +179,7 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
   const generateKeywords = async () => {
     if (!title.trim() && !caption.trim()) return;
     setIsGeneratingKeywords(true);
+    setKeywordsFeedback(null);
     
     try {
       const response = await fetch('/api/content-forge', {
@@ -181,6 +209,7 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
   const generateProductDescription = async () => {
     if (!title.trim()) return;
     setIsGeneratingDescription(true);
+    setDescriptionFeedback(null);
     
     try {
       const response = await fetch('/api/content-forge', {
@@ -235,8 +264,9 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
     setIsGeneratingBlog(false);
   };
 
-  // Generate smart hashtags using AI
+  // Generate smart hashtags - now stores them as suggestions
   const generateSmartHashtags = async () => {
+    setIsGeneratingHashtags(true);
     try {
       const response = await fetch('/api/content-forge', {
         method: 'POST',
@@ -252,23 +282,31 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
       
       const data = await response.json();
       if (data.success && data.data) {
-        // Update standard hashtags if we got them
-        if (data.data.standard && data.data.standard.length > 0) {
-          setLocalHashtag(data.data.standard[1] || '#TampaBusiness');
-        }
-        // Update optional hashtags
-        if (data.data.optional && data.data.optional.length > 0) {
-          const newOptional = data.data.optional.slice(0, 3);
-          setOptionalHashtags([
-            newOptional[0] || '',
-            newOptional[1] || '',
-            newOptional[2] || ''
-          ]);
-        }
+        // Combine standard and optional into suggestions that user can click to add
+        const allSuggestions = [
+          ...(data.data.standard || []),
+          ...(data.data.optional || [])
+        ].filter(h => h && !optionalHashtags.includes(h) && h !== brandHashtag && h !== localHashtag);
+        setSuggestedHashtags(allSuggestions.slice(0, 8));
       }
     } catch (error) {
       console.error('Hashtag generation error:', error);
+      setSuggestedHashtags(['#SmallBusiness', '#LocalBiz', '#TampaLife', '#Entrepreneur', '#BusinessGrowth']);
     }
+    setIsGeneratingHashtags(false);
+  };
+
+  // Add a suggested hashtag to the optional list
+  const addSuggestedHashtag = (hashtag: string) => {
+    if (optionalHashtags.length < 5 && !optionalHashtags.includes(hashtag)) {
+      setOptionalHashtags([...optionalHashtags, hashtag]);
+      setSuggestedHashtags(suggestedHashtags.filter(h => h !== hashtag));
+    }
+  };
+
+  // Remove an optional hashtag
+  const removeOptionalHashtag = (hashtag: string) => {
+    setOptionalHashtags(optionalHashtags.filter(h => h !== hashtag));
   };
 
   const handleSchedule = () => {
@@ -287,10 +325,10 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
       hashtags: {
         brand: brandHashtag,
         local: localHashtag,
-        optional: optionalHashtags.filter(h => h.trim()),
+        optional: optionalHashtags,
       },
       platforms,
-      scheduledDate: scheduledDateTime,
+      scheduledDate: getScheduledDateTime(),
     });
     resetForm();
     onClose();
@@ -306,8 +344,12 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
     setBlogTitle('');
     setBlogBody('');
     setBlogSeoDescription('');
-    setOptionalHashtags(['', '', '']);
+    setOptionalHashtags([]);
+    setSuggestedHashtags([]);
     setPlatforms(['instagram']);
+    setCaptionFeedback(null);
+    setKeywordsFeedback(null);
+    setDescriptionFeedback(null);
   };
 
   // File handling
@@ -361,17 +403,49 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
     setKeywords(keywords.filter(k => k !== keyword));
   };
 
-  const updateOptionalHashtag = (index: number, value: string) => {
-    const newHashtags = [...optionalHashtags];
-    newHashtags[index] = value.startsWith('#') ? value : (value ? `#${value}` : '');
-    setOptionalHashtags(newHashtags);
-  };
-
   // Get all active hashtags for preview
   const getAllHashtags = () => {
     const all = [brandHashtag, localHashtag, ...optionalHashtags.filter(h => h.trim())];
     return all.join(' ');
   };
+
+  // Feedback component
+  const FeedbackButtons = ({ 
+    feedback, 
+    onFeedback 
+  }: { 
+    feedback: 'up' | 'down' | null; 
+    onFeedback: (val: 'up' | 'down') => void;
+  }) => (
+    <div className="flex items-center gap-1 ml-2">
+      <button
+        onClick={() => onFeedback('up')}
+        className={`p-1 rounded transition ${
+          feedback === 'up' 
+            ? 'text-[#39FF14] bg-[#39FF14]/20' 
+            : 'text-gray-500 hover:text-[#39FF14] hover:bg-[#39FF14]/10'
+        }`}
+        title="Good result"
+      >
+        <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
+        </svg>
+      </button>
+      <button
+        onClick={() => onFeedback('down')}
+        className={`p-1 rounded transition ${
+          feedback === 'down' 
+            ? 'text-red-400 bg-red-400/20' 
+            : 'text-gray-500 hover:text-red-400 hover:bg-red-400/10'
+        }`}
+        title="Needs improvement"
+      >
+        <svg className="w-3.5 h-3.5 rotate-180" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
+        </svg>
+      </button>
+    </div>
+  );
 
   return (
     <AnimatePresence>
@@ -414,7 +488,7 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
               </div>
               <div className="flex items-center gap-3">
                 <span className="text-xs text-gray-400">
-                  {selectedDate?.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                  {scheduledDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
                 </span>
                 <button
                   onClick={onClose}
@@ -430,355 +504,455 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
             {/* Main Content - Two Column Layout */}
             <div className="flex-1 flex overflow-hidden">
               {/* Left Panel - Form */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-4 border-r border-[#1E262E]">
+              <div className="flex-1 overflow-y-auto p-4 border-r border-[#1E262E]">
                 
                 {activeTab === 'content' && (
-                  <>
-                    {/* Content Type */}
-                    <div>
-                      <label className="block text-xs font-medium text-gray-400 mb-2">Content Type</label>
-                      <div className="flex gap-2">
-                        {(['photo', 'product', 'blog'] as const).map((type) => (
-                          <button
-                            key={type}
-                            onClick={() => setContentType(type)}
-                            className={`flex-1 py-2 px-3 rounded-lg border text-sm font-medium transition ${
-                              contentType === type
-                                ? 'border-[#39FF14] bg-[#39FF14]/10 text-[#39FF14]'
-                                : 'border-[#2D3748] bg-[#1A1A1A] text-gray-400 hover:border-gray-600'
-                            }`}
-                          >
-                            {type === 'photo' ? '📸 Photo' : type === 'product' ? '🛍️ Product' : '📝 Blog'}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Title */}
-                    <div>
-                      <label className="block text-xs font-medium text-gray-400 mb-2">Title / Campaign Name</label>
-                      <input
-                        type="text"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        placeholder="Enter a title..."
-                        className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm placeholder:text-gray-500 focus:border-[#39FF14]/50 outline-none"
-                      />
-                    </div>
-
-                    {/* Image Upload */}
-                    {contentType !== 'blog' && (
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Left Column - Image & Basic Info */}
+                    <div className="space-y-4">
+                      {/* Content Type */}
                       <div>
-                        <label className="block text-xs font-medium text-gray-400 mb-2">
-                          {contentType === 'product' ? 'Product Image' : 'Upload Image'}
-                        </label>
-                        {imagePreview ? (
-                          <div className="relative rounded-lg overflow-hidden border border-[#39FF14]/30 h-32">
-                            <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                        <label className="block text-xs font-medium text-gray-400 mb-2">Content Type</label>
+                        <div className="flex gap-2">
+                          {(['photo', 'product', 'blog'] as const).map((type) => (
                             <button
-                              onClick={() => { setImagePreview(null); setImageUrl(''); }}
-                              className="absolute top-2 right-2 w-6 h-6 rounded bg-red-500/80 hover:bg-red-500 text-white flex items-center justify-center"
+                              key={type}
+                              onClick={() => setContentType(type)}
+                              className={`flex-1 py-2 px-2 rounded-lg border text-xs font-medium transition ${
+                                contentType === type
+                                  ? 'border-[#39FF14] bg-[#39FF14]/10 text-[#39FF14]'
+                                  : 'border-[#2D3748] bg-[#1A1A1A] text-gray-400 hover:border-gray-600'
+                              }`}
                             >
-                              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              {type === 'photo' ? '📸 Photo' : type === 'product' ? '🛍️ Product' : '📝 Blog'}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Image Upload */}
+                      {contentType !== 'blog' && (
+                        <div>
+                          <label className="block text-xs font-medium text-gray-400 mb-2">Upload Image</label>
+                          {imagePreview ? (
+                            <div className="relative rounded-lg overflow-hidden border border-[#39FF14]/30 aspect-video">
+                              <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                              <button
+                                onClick={() => { setImagePreview(null); setImageUrl(''); }}
+                                className="absolute top-2 right-2 w-6 h-6 rounded bg-red-500/80 hover:bg-red-500 text-white flex items-center justify-center"
+                              >
+                                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                              </button>
+                            </div>
+                          ) : (
+                            <div
+                              onDragOver={handleDragOver}
+                              onDragLeave={handleDragLeave}
+                              onDrop={handleDrop}
+                              onClick={() => fileInputRef.current?.click()}
+                              className={`aspect-video rounded-lg border-2 border-dashed flex items-center justify-center cursor-pointer transition ${
+                                isDragging ? 'border-[#39FF14] bg-[#39FF14]/5' : 'border-[#2D3748] hover:border-[#39FF14]/50'
+                              }`}
+                            >
+                              <input ref={fileInputRef} type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0])} className="hidden" />
+                              {isUploading ? (
+                                <div className="text-center">
+                                  <div className="text-sm text-gray-400">Uploading... {uploadProgress}%</div>
+                                </div>
+                              ) : (
+                                <div className="text-center">
+                                  <span className="text-3xl">📤</span>
+                                  <p className="text-xs text-gray-400 mt-2">Click or drag to upload</p>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Title */}
+                      <div>
+                        <label className="block text-xs font-medium text-gray-400 mb-2">Title / Campaign Name</label>
+                        <input
+                          type="text"
+                          value={title}
+                          onChange={(e) => setTitle(e.target.value)}
+                          placeholder="Enter a title..."
+                          className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm placeholder:text-gray-500 focus:border-[#39FF14]/50 outline-none"
+                        />
+                      </div>
+
+                      {/* Scheduling Section */}
+                      <div className="p-3 rounded-lg bg-[#0D0D0D] border border-[#2D3748]">
+                        <label className="block text-xs font-medium text-gray-400 mb-3">📅 Schedule</label>
+                        
+                        <div className="grid grid-cols-2 gap-3">
+                          {/* Date Picker */}
+                          <div className="relative" ref={calendarRef}>
+                            <button
+                              onClick={() => setShowCalendar(!showCalendar)}
+                              className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-xs text-left hover:border-[#39FF14]/50 transition flex items-center justify-between"
+                            >
+                              <span>{scheduledDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                              <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                               </svg>
                             </button>
-                          </div>
-                        ) : (
-                          <div
-                            onDragOver={handleDragOver}
-                            onDragLeave={handleDragLeave}
-                            onDrop={handleDrop}
-                            onClick={() => fileInputRef.current?.click()}
-                            className={`h-24 rounded-lg border-2 border-dashed flex items-center justify-center cursor-pointer transition ${
-                              isDragging ? 'border-[#39FF14] bg-[#39FF14]/5' : 'border-[#2D3748] hover:border-[#39FF14]/50'
-                            }`}
-                          >
-                            <input ref={fileInputRef} type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0])} className="hidden" />
-                            {isUploading ? (
-                              <div className="text-center">
-                                <div className="text-sm text-gray-400">Uploading... {uploadProgress}%</div>
-                              </div>
-                            ) : (
-                              <div className="text-center">
-                                <span className="text-2xl">📤</span>
-                                <p className="text-xs text-gray-400 mt-1">Click or drag to upload</p>
+                            
+                            {showCalendar && (
+                              <div className="absolute top-full left-0 mt-2 z-50 bg-[#1A1A1A] border border-[#39FF14]/30 rounded-lg shadow-xl">
+                                <style>{`
+                                  .rdp {
+                                    --rdp-cell-size: 32px;
+                                    --rdp-accent-color: #39FF14;
+                                    --rdp-background-color: #39FF14;
+                                    margin: 0;
+                                    padding: 12px;
+                                  }
+                                  .rdp-months { background: transparent; }
+                                  .rdp-month { background: transparent; }
+                                  .rdp-caption { color: white; font-size: 12px; }
+                                  .rdp-head_cell { color: #6B7280; font-size: 10px; }
+                                  .rdp-cell { color: white; }
+                                  .rdp-day { color: white; font-size: 11px; border-radius: 6px; }
+                                  .rdp-day:hover { background: #39FF14/20; }
+                                  .rdp-day_selected { background: #39FF14 !important; color: black !important; }
+                                  .rdp-day_today { border: 1px solid #39FF14; }
+                                  .rdp-nav_button { color: #39FF14; }
+                                  .rdp-nav_button:hover { background: #39FF14/20; }
+                                `}</style>
+                                <DayPicker
+                                  mode="single"
+                                  selected={scheduledDate}
+                                  onSelect={(date) => {
+                                    if (date) {
+                                      setScheduledDate(date);
+                                      setShowCalendar(false);
+                                    }
+                                  }}
+                                />
                               </div>
                             )}
                           </div>
-                        )}
-                      </div>
-                    )}
 
-                    {/* AI Caption Generator */}
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <label className="text-xs font-medium text-gray-400">AI Caption</label>
-                        <button
-                          onClick={generateCaption}
-                          disabled={isGeneratingCaption}
-                          className="px-2 py-1 rounded bg-gradient-to-r from-[#8A2BE2] to-[#39FF14] text-black text-xs font-semibold disabled:opacity-50"
-                        >
-                          {isGeneratingCaption ? '⏳ Generating...' : '🧠 Generate'}
-                        </button>
-                      </div>
-                      <textarea
-                        value={caption}
-                        onChange={(e) => setCaption(e.target.value)}
-                        rows={3}
-                        placeholder="Write or generate a caption..."
-                        className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm placeholder:text-gray-500 focus:border-[#39FF14]/50 outline-none resize-none"
-                      />
-                    </div>
+                          {/* Time Picker */}
+                          <input
+                            type="time"
+                            value={scheduledTime}
+                            onChange={(e) => setScheduledTime(e.target.value)}
+                            className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-xs focus:border-[#39FF14]/50 outline-none"
+                          />
+                        </div>
 
-                    {/* AI Keywords */}
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <label className="text-xs font-medium text-gray-400">Keywords</label>
-                        <button
-                          onClick={generateKeywords}
-                          disabled={isGeneratingKeywords}
-                          className="px-2 py-1 rounded bg-gradient-to-r from-[#8A2BE2] to-[#39FF14] text-black text-xs font-semibold disabled:opacity-50"
-                        >
-                          {isGeneratingKeywords ? '⏳...' : '🧠 Generate'}
-                        </button>
-                      </div>
-                      <div className="flex gap-2 mb-2">
-                        <input
-                          type="text"
-                          value={keywordInput}
-                          onChange={(e) => setKeywordInput(e.target.value)}
-                          onKeyDown={(e) => e.key === 'Enter' && addKeyword()}
-                          placeholder="Add keyword..."
-                          className="flex-1 px-3 py-1.5 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm placeholder:text-gray-500 focus:border-[#39FF14]/50 outline-none"
-                        />
-                        <button onClick={addKeyword} className="px-3 py-1.5 rounded-lg bg-[#39FF14]/20 text-[#39FF14] text-sm font-medium">+</button>
-                      </div>
-                      <div className="flex flex-wrap gap-1.5">
-                        {keywords.map((kw) => (
-                          <span key={kw} className="px-2 py-0.5 rounded-full bg-[#39FF14]/10 text-[#39FF14] text-xs flex items-center gap-1">
-                            {kw}
-                            <button onClick={() => removeKeyword(kw)} className="hover:text-red-400">×</button>
-                          </span>
-                        ))}
+                        {/* Platform Selection */}
+                        <div className="mt-3">
+                          <label className="block text-xs text-gray-500 mb-2">Platforms</label>
+                          <div className="flex gap-2">
+                            {(['instagram', 'twitter', 'facebook'] as const).map((platform) => (
+                              <button
+                                key={platform}
+                                onClick={() => togglePlatform(platform)}
+                                className={`flex-1 py-1.5 rounded-lg border text-xs font-medium transition ${
+                                  platforms.includes(platform)
+                                    ? platform === 'instagram' ? 'border-[#E4405F] bg-[#E4405F]/20 text-white'
+                                    : platform === 'twitter' ? 'border-white bg-white/20 text-white'
+                                    : 'border-[#1877F2] bg-[#1877F2]/20 text-white'
+                                    : 'border-[#2D3748] bg-[#1A1A1A] text-gray-500'
+                                }`}
+                              >
+                                {platform === 'instagram' ? 'IG' : platform === 'twitter' ? 'X' : 'FB'}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
                       </div>
                     </div>
 
-                    {/* Product Description (for products only) */}
-                    {contentType === 'product' && (
-                      <div>
+                    {/* Right Column - AI Generation */}
+                    <div className="space-y-4">
+                      {/* AI Caption Generator */}
+                      <div className="p-3 rounded-lg bg-[#0D0D0D] border border-[#2D3748]">
                         <div className="flex items-center justify-between mb-2">
-                          <label className="text-xs font-medium text-gray-400">Product Description</label>
+                          <label className="text-xs font-medium text-gray-400 flex items-center">
+                            AI Caption
+                            {caption && <FeedbackButtons feedback={captionFeedback} onFeedback={setCaptionFeedback} />}
+                          </label>
                           <button
-                            onClick={generateProductDescription}
-                            disabled={isGeneratingDescription}
+                            onClick={generateCaption}
+                            disabled={isGeneratingCaption}
                             className="px-2 py-1 rounded bg-gradient-to-r from-[#8A2BE2] to-[#39FF14] text-black text-xs font-semibold disabled:opacity-50"
                           >
-                            {isGeneratingDescription ? '⏳...' : '🧠 Generate'}
+                            {isGeneratingCaption ? '⏳...' : '🧠 Generate'}
                           </button>
                         </div>
                         <textarea
-                          value={productDescription}
-                          onChange={(e) => setProductDescription(e.target.value)}
-                          rows={3}
-                          placeholder="Describe your product..."
+                          value={caption}
+                          onChange={(e) => setCaption(e.target.value)}
+                          rows={4}
+                          placeholder="Write or generate a caption..."
                           className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm placeholder:text-gray-500 focus:border-[#39FF14]/50 outline-none resize-none"
                         />
                       </div>
-                    )}
-                  </>
+
+                      {/* AI Keywords */}
+                      <div className="p-3 rounded-lg bg-[#0D0D0D] border border-[#2D3748]">
+                        <div className="flex items-center justify-between mb-2">
+                          <label className="text-xs font-medium text-gray-400 flex items-center">
+                            Keywords
+                            {keywords.length > 0 && <FeedbackButtons feedback={keywordsFeedback} onFeedback={setKeywordsFeedback} />}
+                          </label>
+                          <button
+                            onClick={generateKeywords}
+                            disabled={isGeneratingKeywords}
+                            className="px-2 py-1 rounded bg-gradient-to-r from-[#8A2BE2] to-[#39FF14] text-black text-xs font-semibold disabled:opacity-50"
+                          >
+                            {isGeneratingKeywords ? '⏳...' : '🧠 Generate'}
+                          </button>
+                        </div>
+                        <div className="flex gap-2 mb-2">
+                          <input
+                            type="text"
+                            value={keywordInput}
+                            onChange={(e) => setKeywordInput(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && addKeyword()}
+                            placeholder="Add keyword..."
+                            className="flex-1 px-3 py-1.5 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-xs placeholder:text-gray-500 focus:border-[#39FF14]/50 outline-none"
+                          />
+                          <button onClick={addKeyword} className="px-3 py-1.5 rounded-lg bg-[#39FF14]/20 text-[#39FF14] text-xs font-medium hover:bg-[#39FF14]/30 transition">+</button>
+                        </div>
+                        <div className="flex flex-wrap gap-1.5">
+                          {keywords.map((kw) => (
+                            <span key={kw} className="px-2 py-0.5 rounded-full bg-[#39FF14]/10 text-[#39FF14] text-xs flex items-center gap-1 cursor-pointer hover:bg-[#39FF14]/20">
+                              {kw}
+                              <button onClick={() => removeKeyword(kw)} className="hover:text-red-400">×</button>
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Product Description (for products only) */}
+                      {contentType === 'product' && (
+                        <div className="p-3 rounded-lg bg-[#0D0D0D] border border-[#2D3748]">
+                          <div className="flex items-center justify-between mb-2">
+                            <label className="text-xs font-medium text-gray-400 flex items-center">
+                              Product Description
+                              {productDescription && <FeedbackButtons feedback={descriptionFeedback} onFeedback={setDescriptionFeedback} />}
+                            </label>
+                            <button
+                              onClick={generateProductDescription}
+                              disabled={isGeneratingDescription}
+                              className="px-2 py-1 rounded bg-gradient-to-r from-[#8A2BE2] to-[#39FF14] text-black text-xs font-semibold disabled:opacity-50"
+                            >
+                              {isGeneratingDescription ? '⏳...' : '🧠 Generate'}
+                            </button>
+                          </div>
+                          <textarea
+                            value={productDescription}
+                            onChange={(e) => setProductDescription(e.target.value)}
+                            rows={3}
+                            placeholder="Describe your product..."
+                            className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm placeholder:text-gray-500 focus:border-[#39FF14]/50 outline-none resize-none"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 )}
 
                 {activeTab === 'hashtags' && (
-                  <>
+                  <div className="space-y-4">
                     {/* AI Generate Button */}
                     <button
                       onClick={generateSmartHashtags}
-                      className="w-full mb-3 px-4 py-2 rounded-lg bg-gradient-to-r from-[#39FF14]/20 to-[#39FF14]/10 border border-[#39FF14]/30 text-[#39FF14] text-sm font-medium hover:from-[#39FF14]/30 hover:to-[#39FF14]/20 transition-all flex items-center justify-center gap-2"
+                      disabled={isGeneratingHashtags}
+                      className="w-full px-4 py-3 rounded-lg bg-gradient-to-r from-[#39FF14]/20 to-[#39FF14]/10 border border-[#39FF14]/30 text-[#39FF14] text-sm font-medium hover:from-[#39FF14]/30 hover:to-[#39FF14]/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                     >
-                      <span>✨</span> Generate Smart Hashtags with AI
+                      {isGeneratingHashtags ? (
+                        <>⏳ Generating...</>
+                      ) : (
+                        <>✨ Generate Smart Hashtags with AI</>
+                      )}
                     </button>
 
-                    {/* Standard Hashtags */}
-                    <div className="p-3 rounded-lg bg-[#39FF14]/5 border border-[#39FF14]/20">
-                      <h3 className="text-sm font-semibold text-[#39FF14] mb-3">📌 Standard Hashtags (Always Included)</h3>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-xs text-gray-400 mb-1">Brand Hashtag</label>
-                          <input
-                            type="text"
-                            value={brandHashtag}
-                            onChange={(e) => setBrandHashtag(e.target.value.startsWith('#') ? e.target.value : `#${e.target.value}`)}
-                            className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#39FF14]/30 text-[#39FF14] text-sm focus:border-[#39FF14] outline-none"
-                          />
+                    <div className="grid grid-cols-2 gap-4">
+                      {/* Left - Standard Hashtags */}
+                      <div className="space-y-4">
+                        <div className="p-3 rounded-lg bg-[#39FF14]/5 border border-[#39FF14]/20">
+                          <h3 className="text-sm font-semibold text-[#39FF14] mb-3">📌 Standard Hashtags</h3>
+                          <div className="space-y-3">
+                            <div>
+                              <label className="block text-xs text-gray-400 mb-1">Brand</label>
+                              <input
+                                type="text"
+                                value={brandHashtag}
+                                onChange={(e) => setBrandHashtag(e.target.value.startsWith('#') ? e.target.value : `#${e.target.value}`)}
+                                className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#39FF14]/30 text-[#39FF14] text-sm focus:border-[#39FF14] outline-none"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs text-gray-400 mb-1">Local</label>
+                              <input
+                                type="text"
+                                value={localHashtag}
+                                onChange={(e) => setLocalHashtag(e.target.value.startsWith('#') ? e.target.value : `#${e.target.value}`)}
+                                className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#39FF14]/30 text-[#39FF14] text-sm focus:border-[#39FF14] outline-none"
+                              />
+                            </div>
+                          </div>
                         </div>
-                        <div>
-                          <label className="block text-xs text-gray-400 mb-1">Hyper-Local Hashtag</label>
-                          <input
-                            type="text"
-                            value={localHashtag}
-                            onChange={(e) => setLocalHashtag(e.target.value.startsWith('#') ? e.target.value : `#${e.target.value}`)}
-                            className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#39FF14]/30 text-[#39FF14] text-sm focus:border-[#39FF14] outline-none"
-                          />
+
+                        {/* Active Optional Hashtags */}
+                        <div className="p-3 rounded-lg bg-[#1A1A1A] border border-[#2D3748]">
+                          <h3 className="text-sm font-semibold text-white mb-2">🎯 Your Hashtags</h3>
+                          <p className="text-xs text-gray-500 mb-3">Click suggestions to add (max 5)</p>
+                          <div className="flex flex-wrap gap-2 min-h-[40px]">
+                            {optionalHashtags.length === 0 ? (
+                              <span className="text-xs text-gray-600">Click suggestions to add →</span>
+                            ) : (
+                              optionalHashtags.map((hashtag) => (
+                                <span 
+                                  key={hashtag}
+                                  className="px-2 py-1 rounded-full bg-[#39FF14]/20 text-[#39FF14] text-xs flex items-center gap-1"
+                                >
+                                  {hashtag}
+                                  <button 
+                                    onClick={() => removeOptionalHashtag(hashtag)}
+                                    className="hover:text-red-400 ml-1"
+                                  >
+                                    ×
+                                  </button>
+                                </span>
+                              ))
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Optional Hashtags */}
-                    <div className="p-3 rounded-lg bg-[#1A1A1A] border border-[#2D3748]">
-                      <h3 className="text-sm font-semibold text-white mb-3">🎯 Optional Hashtags (Customize per post)</h3>
-                      <p className="text-xs text-gray-500 mb-3">Add up to 3 additional hashtags. Mix & match across platforms as needed.</p>
-                      <div className="space-y-2">
-                        {optionalHashtags.map((hashtag, index) => (
-                          <div key={index} className="flex items-center gap-2">
-                            <span className="text-xs text-gray-500 w-4">{index + 1}.</span>
-                            <input
-                              type="text"
-                              value={hashtag}
-                              onChange={(e) => updateOptionalHashtag(index, e.target.value)}
-                              placeholder={`Optional hashtag ${index + 1}...`}
-                              className="flex-1 px-3 py-2 rounded-lg bg-[#0D0D0D] border border-[#2D3748] text-white text-sm placeholder:text-gray-600 focus:border-[#39FF14]/50 outline-none"
-                            />
-                          </div>
-                        ))}
+                      {/* Right - AI Suggestions */}
+                      <div className="p-3 rounded-lg bg-[#0D0D0D] border border-[#8A2BE2]/30">
+                        <h3 className="text-sm font-semibold text-[#8A2BE2] mb-2">🤖 AI Suggestions</h3>
+                        <p className="text-xs text-gray-500 mb-3">Click to add to your hashtags</p>
+                        <div className="flex flex-wrap gap-2 min-h-[100px]">
+                          {suggestedHashtags.length === 0 ? (
+                            <span className="text-xs text-gray-600">Generate hashtags to see suggestions</span>
+                          ) : (
+                            suggestedHashtags.map((hashtag) => (
+                              <button
+                                key={hashtag}
+                                onClick={() => addSuggestedHashtag(hashtag)}
+                                disabled={optionalHashtags.length >= 5}
+                                className="px-2 py-1 rounded-full bg-[#8A2BE2]/10 text-[#8A2BE2] text-xs hover:bg-[#8A2BE2]/20 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                + {hashtag}
+                              </button>
+                            ))
+                          )}
+                        </div>
                       </div>
                     </div>
 
                     {/* Hashtag Preview */}
                     <div className="p-3 rounded-lg bg-[#0D0D0D] border border-[#2D3748]">
-                      <h3 className="text-xs font-medium text-gray-400 mb-2">Preview (3-5 hashtags)</h3>
+                      <h3 className="text-xs font-medium text-gray-400 mb-2">Preview</h3>
                       <p className="text-sm text-[#39FF14]">{getAllHashtags() || 'Add hashtags above...'}</p>
                     </div>
-                  </>
+                  </div>
                 )}
 
                 {activeTab === 'blog' && (
-                  <>
-                    {/* Blog Title */}
-                    <div>
-                      <label className="block text-xs font-medium text-gray-400 mb-2">Blog Title</label>
-                      <input
-                        type="text"
-                        value={blogTitle}
-                        onChange={(e) => setBlogTitle(e.target.value)}
-                        placeholder="Enter blog title..."
-                        className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm placeholder:text-gray-500 focus:border-[#39FF14]/50 outline-none"
-                      />
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Left - Blog Settings */}
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-400 mb-2">Blog Title</label>
+                        <input
+                          type="text"
+                          value={blogTitle}
+                          onChange={(e) => setBlogTitle(e.target.value)}
+                          placeholder="Enter blog title..."
+                          className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm placeholder:text-gray-500 focus:border-[#39FF14]/50 outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-medium text-gray-400 mb-2">SEO Description</label>
+                        <textarea
+                          value={blogSeoDescription}
+                          onChange={(e) => setBlogSeoDescription(e.target.value)}
+                          rows={3}
+                          placeholder="Meta description for search engines..."
+                          className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm placeholder:text-gray-500 focus:border-[#39FF14]/50 outline-none resize-none"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">{blogSeoDescription.length}/160 characters</p>
+                      </div>
+
+                      <button
+                        onClick={generateBlogContent}
+                        disabled={isGeneratingBlog || !blogTitle.trim()}
+                        className="w-full px-4 py-3 rounded-lg bg-gradient-to-r from-[#8A2BE2] to-[#39FF14] text-black font-semibold disabled:opacity-50 flex items-center justify-center gap-2"
+                      >
+                        {isGeneratingBlog ? '⏳ Generating...' : '🧠 Generate Blog Content'}
+                      </button>
                     </div>
 
-                    {/* Blog Content Generator */}
+                    {/* Right - Blog Content */}
                     <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <label className="text-xs font-medium text-gray-400">Blog Content</label>
-                        <button
-                          onClick={generateBlogContent}
-                          disabled={isGeneratingBlog || !blogTitle.trim()}
-                          className="px-2 py-1 rounded bg-gradient-to-r from-[#8A2BE2] to-[#39FF14] text-black text-xs font-semibold disabled:opacity-50"
-                        >
-                          {isGeneratingBlog ? '⏳ Generating...' : '🧠 Generate Blog'}
-                        </button>
-                      </div>
+                      <label className="block text-xs font-medium text-gray-400 mb-2">Blog Content</label>
                       <textarea
                         value={blogBody}
                         onChange={(e) => setBlogBody(e.target.value)}
-                        rows={10}
+                        rows={14}
                         placeholder="Write your blog content here... (Markdown supported)"
                         className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm placeholder:text-gray-500 focus:border-[#39FF14]/50 outline-none resize-none font-mono"
                       />
                     </div>
-
-                    {/* SEO Description */}
-                    <div>
-                      <label className="block text-xs font-medium text-gray-400 mb-2">SEO Description</label>
-                      <textarea
-                        value={blogSeoDescription}
-                        onChange={(e) => setBlogSeoDescription(e.target.value)}
-                        rows={2}
-                        placeholder="Meta description for search engines..."
-                        className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm placeholder:text-gray-500 focus:border-[#39FF14]/50 outline-none resize-none"
-                      />
-                      <p className="text-xs text-gray-500 mt-1">{blogSeoDescription.length}/160 characters</p>
-                    </div>
-                  </>
-                )}
-
-                {/* Platform Selection & Schedule - Always visible */}
-                <div className="pt-3 border-t border-[#1E262E]">
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-medium text-gray-400 mb-2">Publish To</label>
-                      <div className="flex gap-1">
-                        {(['instagram', 'twitter', 'facebook'] as const).map((platform) => (
-                          <button
-                            key={platform}
-                            onClick={() => togglePlatform(platform)}
-                            className={`flex-1 py-2 rounded-lg border text-xs font-medium transition ${
-                              platforms.includes(platform)
-                                ? platform === 'instagram' ? 'border-[#E4405F] bg-[#E4405F]/20 text-white'
-                                : platform === 'twitter' ? 'border-white bg-white/20 text-white'
-                                : 'border-[#1877F2] bg-[#1877F2]/20 text-white'
-                                : 'border-[#2D3748] bg-[#1A1A1A] text-gray-500'
-                            }`}
-                          >
-                            {platform === 'instagram' ? 'IG' : platform === 'twitter' ? 'X' : 'FB'}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-gray-400 mb-2">Schedule</label>
-                      <input
-                        type="datetime-local"
-                        value={scheduledDateTime}
-                        onChange={(e) => setScheduledDateTime(e.target.value)}
-                        className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-xs focus:border-[#39FF14]/50 outline-none"
-                      />
-                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* Right Panel - Preview */}
-              <div className="w-[380px] bg-[#0D0D0D] p-4 overflow-y-auto">
+              <div className="w-[320px] bg-[#0D0D0D] p-4 overflow-y-auto">
                 <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">📱 Live Preview</h3>
                 
                 {/* Phone Frame */}
-                <div className="bg-[#1A1A1A] rounded-3xl p-3 border border-[#2D3748] shadow-xl">
+                <div className="bg-[#1A1A1A] rounded-2xl p-3 border border-[#2D3748] shadow-xl">
                   {/* Phone Header */}
-                  <div className="flex items-center justify-between mb-3 px-2">
+                  <div className="flex items-center justify-between mb-2 px-1">
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#39FF14] to-[#0CE293] flex items-center justify-center text-black font-bold text-xs">G</div>
+                      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#39FF14] to-[#0CE293] flex items-center justify-center text-black font-bold text-xs">G</div>
                       <div>
                         <p className="text-white text-xs font-semibold">GreenLine365</p>
                         <p className="text-gray-500 text-[10px]">Tampa, FL</p>
                       </div>
                     </div>
-                    <span className="text-gray-500 text-lg">•••</span>
+                    <span className="text-gray-500">•••</span>
                   </div>
 
                   {/* Image Preview */}
-                  <div className="aspect-square bg-[#0D0D0D] rounded-lg mb-3 overflow-hidden flex items-center justify-center">
+                  <div className="aspect-square bg-[#0D0D0D] rounded-lg mb-2 overflow-hidden flex items-center justify-center">
                     {imagePreview ? (
                       <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
                     ) : (
                       <div className="text-center text-gray-600">
-                        <span className="text-4xl">🖼️</span>
-                        <p className="text-xs mt-2">Image Preview</p>
+                        <span className="text-3xl">🖼️</span>
+                        <p className="text-xs mt-1">Image Preview</p>
                       </div>
                     )}
                   </div>
 
                   {/* Engagement Bar */}
-                  <div className="flex items-center gap-4 px-2 mb-3">
-                    <span className="text-xl">❤️</span>
-                    <span className="text-xl">💬</span>
-                    <span className="text-xl">📤</span>
-                    <span className="text-xl ml-auto">🔖</span>
+                  <div className="flex items-center gap-3 px-1 mb-2">
+                    <span className="text-lg">❤️</span>
+                    <span className="text-lg">💬</span>
+                    <span className="text-lg">📤</span>
+                    <span className="text-lg ml-auto">🔖</span>
                   </div>
 
                   {/* Caption Preview */}
-                  <div className="px-2 space-y-2">
-                    <p className="text-white text-xs">
+                  <div className="px-1 space-y-1.5">
+                    <p className="text-white text-xs leading-relaxed">
                       <span className="font-semibold">greenline365</span>{' '}
                       {caption || title || 'Your caption will appear here...'}
                     </p>
@@ -794,25 +968,18 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                         ))}
                       </div>
                     )}
-
-                    {/* Product Description */}
-                    {contentType === 'product' && productDescription && (
-                      <div className="p-2 rounded-lg bg-[#0D0D0D] border border-[#2D3748]">
-                        <p className="text-gray-400 text-xs">{productDescription.slice(0, 100)}...</p>
-                      </div>
-                    )}
                   </div>
 
                   {/* Timestamp */}
-                  <p className="px-2 mt-3 text-gray-600 text-[10px]">
-                    Scheduled for {new Date(scheduledDateTime).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
+                  <p className="px-1 mt-2 text-gray-600 text-[10px]">
+                    Scheduled for {scheduledDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} at {scheduledTime}
                   </p>
                 </div>
 
                 {/* Platform Badges */}
-                <div className="mt-4 flex gap-2 justify-center">
+                <div className="mt-3 flex gap-2 justify-center">
                   {platforms.map((p) => (
-                    <span key={p} className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    <span key={p} className={`px-2 py-1 rounded-full text-xs font-medium ${
                       p === 'instagram' ? 'bg-[#E4405F]/20 text-[#E4405F]'
                       : p === 'twitter' ? 'bg-white/20 text-white'
                       : 'bg-[#1877F2]/20 text-[#1877F2]'
@@ -828,14 +995,14 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
             <div className="flex-shrink-0 px-4 py-3 border-t border-[#39FF14]/20 bg-[#0D0D0D] flex items-center justify-between">
               <button
                 onClick={() => { resetForm(); onClose(); }}
-                className="px-6 py-2 rounded-lg border border-[#2D3748] text-gray-400 hover:text-white hover:border-gray-600 transition text-sm font-medium"
+                className="px-4 py-2 rounded-lg border border-[#2D3748] text-gray-400 hover:text-white hover:border-gray-600 transition text-sm font-medium"
               >
                 Cancel
               </button>
-              <div className="flex gap-3">
+              <div className="flex gap-2">
                 <button
                   onClick={() => { /* Save as draft */ }}
-                  className="px-6 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm font-medium hover:bg-[#2D3748] transition"
+                  className="px-4 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm font-medium hover:bg-[#2D3748] transition"
                 >
                   💾 Save Draft
                 </button>
@@ -843,8 +1010,8 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={handleSchedule}
-                  disabled={!title.trim() && !blogTitle.trim() || platforms.length === 0}
-                  className="px-6 py-2 rounded-lg bg-[#39FF14] text-black font-bold text-sm hover:bg-[#39FF14]/90 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  disabled={(!title.trim() && !blogTitle.trim()) || platforms.length === 0}
+                  className="px-5 py-2 rounded-lg bg-[#39FF14] text-black font-bold text-sm hover:bg-[#39FF14]/90 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
                   🚀 SCHEDULE BLAST
                 </motion.button>
