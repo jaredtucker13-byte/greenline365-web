@@ -69,53 +69,325 @@ export default function HomePage() {
     return () => ctx.revert();
   }, []);
   
-  // Scroll-triggered animations
+  // Comprehensive scroll-triggered animations for all sections
   useEffect(() => {
-    // Feature cards stagger
-    if (featuresRef.current) {
-      const ctx = gsap.context(() => {
-        gsap.from('[data-feature-card]', {
-          scrollTrigger: {
-            trigger: featuresRef.current,
-            start: 'top 75%',
-          },
-          y: 80,
-          opacity: 0,
-          duration: 0.7,
-          stagger: 0.15,
-          ease: 'power2.out',
-        });
-      }, featuresRef);
-      
-      return () => ctx.revert();
-    }
-  }, []);
-  
-  // Stats counter animation
-  useEffect(() => {
-    if (!statsRef.current) return;
-    
     const ctx = gsap.context(() => {
-      const counters = statsRef.current?.querySelectorAll('[data-counter]');
-      
-      counters?.forEach((counter) => {
-        const target = parseInt(counter.getAttribute('data-target') || '0');
-        const counterObj = { value: 0 };
-        
-        gsap.to(counterObj, {
+      // Section headers animation
+      gsap.utils.toArray('[data-section-header]').forEach((el) => {
+        gsap.from(el as Element, {
           scrollTrigger: {
-            trigger: counter,
-            start: 'top 85%',
+            trigger: el as Element,
+            start: 'top 80%',
           },
-          value: target,
-          duration: 2,
-          ease: 'power2.out',
-          onUpdate: () => {
-            counter.textContent = Math.round(counterObj.value).toLocaleString();
-          },
+          y: 50,
+          opacity: 0,
+          duration: 0.8,
+          ease: 'power3.out',
         });
       });
-    }, statsRef);
+
+      // Feature cards stagger
+      gsap.from('[data-feature-card]', {
+        scrollTrigger: {
+          trigger: featuresRef.current,
+          start: 'top 75%',
+        },
+        y: 80,
+        opacity: 0,
+        duration: 0.7,
+        stagger: 0.15,
+        ease: 'power2.out',
+      });
+
+      // Step cards stagger
+      gsap.from('[data-step-card]', {
+        scrollTrigger: {
+          trigger: '[data-step-card]',
+          start: 'top 80%',
+        },
+        x: -60,
+        opacity: 0,
+        duration: 0.7,
+        stagger: 0.15,
+        ease: 'power2.out',
+      });
+
+      // Progress bars grow animation
+      gsap.from('.gsap-progress-bar', {
+        scrollTrigger: {
+          trigger: '.gsap-progress-bar',
+          start: 'top 85%',
+        },
+        scaleX: 0,
+        transformOrigin: 'left',
+        duration: 1,
+        stagger: 0.2,
+        ease: 'power2.out',
+      });
+
+      // Testimonial card
+      gsap.from('[data-testimonial]', {
+        scrollTrigger: {
+          trigger: '[data-testimonial]',
+          start: 'top 80%',
+        },
+        y: 60,
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power3.out',
+      });
+
+      // Pain cards stagger
+      gsap.from('[data-pain-card]', {
+        scrollTrigger: {
+          trigger: '[data-pain-card]',
+          start: 'top 80%',
+        },
+        y: 40,
+        opacity: 0,
+        duration: 0.6,
+        stagger: 0.12,
+        ease: 'power2.out',
+      });
+
+      // Scroll images and content
+      gsap.from('[data-scroll-image]', {
+        scrollTrigger: {
+          trigger: '[data-scroll-image]',
+          start: 'top 75%',
+        },
+        x: -80,
+        opacity: 0,
+        duration: 0.9,
+        ease: 'power2.out',
+      });
+
+      gsap.from('[data-scroll-content]', {
+        scrollTrigger: {
+          trigger: '[data-scroll-content]',
+          start: 'top 75%',
+        },
+        x: 80,
+        opacity: 0,
+        duration: 0.9,
+        ease: 'power2.out',
+      });
+
+      // Solution section
+      gsap.from('[data-solution-image]', {
+        scrollTrigger: {
+          trigger: '[data-solution-image]',
+          start: 'top 75%',
+        },
+        x: -60,
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power2.out',
+      });
+
+      gsap.from('[data-solution-content]', {
+        scrollTrigger: {
+          trigger: '[data-solution-content]',
+          start: 'top 75%',
+        },
+        x: 60,
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power2.out',
+      });
+
+      gsap.from('[data-solution-feature]', {
+        scrollTrigger: {
+          trigger: '[data-solution-feature]',
+          start: 'top 85%',
+        },
+        y: 30,
+        opacity: 0,
+        duration: 0.5,
+        stagger: 0.1,
+        ease: 'power2.out',
+      });
+
+      gsap.from('[data-floating-badge]', {
+        scrollTrigger: {
+          trigger: '[data-floating-badge]',
+          start: 'top 75%',
+        },
+        scale: 0.8,
+        opacity: 0,
+        duration: 0.6,
+        delay: 0.3,
+        ease: 'back.out(1.7)',
+      });
+
+      // Trend Hunter section
+      gsap.from('[data-trend-content]', {
+        scrollTrigger: {
+          trigger: '[data-trend-content]',
+          start: 'top 75%',
+        },
+        x: -50,
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power2.out',
+      });
+
+      gsap.from('[data-trend-widget]', {
+        scrollTrigger: {
+          trigger: '[data-trend-widget]',
+          start: 'top 75%',
+        },
+        x: 50,
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power2.out',
+      });
+
+      // FAQ cards stagger
+      gsap.from('[data-faq-card]', {
+        scrollTrigger: {
+          trigger: '[data-faq-card]',
+          start: 'top 80%',
+        },
+        y: 60,
+        opacity: 0,
+        duration: 0.6,
+        stagger: 0.08,
+        ease: 'power2.out',
+      });
+
+      // Booking section
+      gsap.from('[data-booking-left]', {
+        scrollTrigger: {
+          trigger: '[data-booking-left]',
+          start: 'top 75%',
+        },
+        x: -60,
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power2.out',
+      });
+
+      gsap.from('[data-booking-right]', {
+        scrollTrigger: {
+          trigger: '[data-booking-right]',
+          start: 'top 75%',
+        },
+        x: 60,
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power2.out',
+      });
+
+      // Products section
+      gsap.from('[data-product-left]', {
+        scrollTrigger: {
+          trigger: '[data-product-left]',
+          start: 'top 75%',
+        },
+        x: -50,
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power2.out',
+      });
+
+      gsap.from('[data-product-right]', {
+        scrollTrigger: {
+          trigger: '[data-product-right]',
+          start: 'top 75%',
+        },
+        x: 50,
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power2.out',
+      });
+
+      gsap.from('[data-product-demo]', {
+        scrollTrigger: {
+          trigger: '[data-product-demo]',
+          start: 'top 80%',
+        },
+        x: -50,
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power2.out',
+      });
+
+      gsap.from('[data-product-info]', {
+        scrollTrigger: {
+          trigger: '[data-product-info]',
+          start: 'top 80%',
+        },
+        x: 50,
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power2.out',
+      });
+
+      // Success section
+      gsap.from('[data-success-section]', {
+        scrollTrigger: {
+          trigger: '[data-success-section]',
+          start: 'top 80%',
+        },
+        y: 50,
+        opacity: 0,
+        duration: 0.9,
+        ease: 'power3.out',
+      });
+
+      gsap.from('[data-success-badge]', {
+        scrollTrigger: {
+          trigger: '[data-success-badge]',
+          start: 'top 80%',
+        },
+        scale: 0.9,
+        opacity: 0,
+        duration: 0.6,
+        ease: 'back.out(1.7)',
+      });
+
+      // Background glow animations
+      gsap.to('.gsap-glow', {
+        scale: 1.2,
+        opacity: 0.5,
+        duration: 20,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+      });
+
+      gsap.to('.gsap-glow-2', {
+        scale: 1.3,
+        x: -50,
+        duration: 15,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+      });
+
+      // Floating phone animation
+      gsap.to('.gsap-float', {
+        y: -15,
+        duration: 5,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+      });
+
+      // Parallax effect for background elements
+      gsap.to('.gsap-parallax', {
+        scrollTrigger: {
+          trigger: '.gsap-parallax',
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: true,
+        },
+        y: -100,
+        ease: 'none',
+      });
+
+    });
     
     return () => ctx.revert();
   }, []);
