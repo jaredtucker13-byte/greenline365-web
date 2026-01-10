@@ -146,6 +146,47 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Handle suggestions from Chat Widget
+  const handleChatSuggestion = useCallback((suggestion: { type: string; content: string; applied?: boolean }) => {
+    if (!suggestion.applied) return; // Only handle when "Apply" is clicked
+    
+    switch (suggestion.type) {
+      case 'caption':
+        setCaption(suggestion.content);
+        setSaveMessage({ type: 'success', text: '✨ Caption applied!' });
+        break;
+      case 'title':
+        if (activeTab === 'blog') {
+          setBlogTitle(suggestion.content);
+        } else {
+          setTitle(suggestion.content);
+        }
+        setSaveMessage({ type: 'success', text: '✨ Title applied!' });
+        break;
+      case 'keywords':
+        const newKeywords = suggestion.content.split(',').map(k => k.trim()).filter(k => k);
+        setSuggestedKeywords(prev => [...new Set([...prev, ...newKeywords])]);
+        setSaveMessage({ type: 'success', text: '✨ Keywords added to suggestions!' });
+        break;
+      case 'hashtags':
+        const newHashtags = suggestion.content.split(' ').filter(h => h.startsWith('#'));
+        setSuggestedHashtags(prev => [...new Set([...prev, ...newHashtags])]);
+        setSaveMessage({ type: 'success', text: '✨ Hashtags added to suggestions!' });
+        break;
+      case 'description':
+        setProductDescription(suggestion.content);
+        setSaveMessage({ type: 'success', text: '✨ Description applied!' });
+        break;
+      case 'blog':
+        setBlogBody(suggestion.content);
+        setSaveMessage({ type: 'success', text: '✨ Blog content applied!' });
+        break;
+      default:
+        break;
+    }
+    setTimeout(() => setSaveMessage(null), 2000);
+  }, [activeTab]);
+
   const togglePlatform = (platform: 'instagram' | 'twitter' | 'facebook') => {
     setPlatforms(prev => 
       prev.includes(platform) 
