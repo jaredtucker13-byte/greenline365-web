@@ -290,10 +290,8 @@ export default function HomePage() {
       {/* ========== HOW IT WORKS - Numbered Cards ========== */}
       <section className="py-16 relative" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+          <div
+            data-section-header
             className="text-center mb-10"
           >
             <h2 className="font-display font-bold text-white mb-3" style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)' }}>
