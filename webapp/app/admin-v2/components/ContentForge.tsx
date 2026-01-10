@@ -95,6 +95,10 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
   const [keywordsFeedback, setKeywordsFeedback] = useState<'up' | 'down' | null>(null);
   const [descriptionFeedback, setDescriptionFeedback] = useState<'up' | 'down' | null>(null);
   
+  // Save State
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
 
