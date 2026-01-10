@@ -53,72 +53,33 @@ const defaultDemoConfig: DemoConfig = {
 // Empty initial state - will be populated from Supabase or user actions
 const initialEvents: CalendarEvent[] = [];
 
-const mockTrends: LocalTrend[] = [
-  {
-    id: '1',
-    title: 'Hillsborough High Big Game Friday!',
-    description: 'Major high school football rivalry game. Expect increased local traffic and community engagement.',
-    location: 'Tampa, FL',
-    event_date: new Date(Date.now() + 86400000 * 4).toISOString(),
-    expected_traffic: 'high',
-    category: 'sports',
-    suggested_action: 'Should I Forge a "Big Game" BOGO Muffin special for this Friday?',
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: '2',
-    title: 'Tampa Bay Lightning Home Game',
-    description: 'NHL game at Amalie Arena. Great opportunity for sports-themed promotions.',
-    location: 'Tampa, FL',
-    event_date: new Date(Date.now() + 86400000 * 6).toISOString(),
-    expected_traffic: 'medium',
-    category: 'sports',
-    suggested_action: 'Create a "Lightning Strikes" themed social post with game day specials?',
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: '3',
-    title: 'Gasparilla Festival Week',
-    description: 'Annual Tampa pirate festival brings massive crowds to the city.',
-    location: 'Tampa, FL',
-    event_date: new Date(Date.now() + 86400000 * 14).toISOString(),
-    expected_traffic: 'high',
-    category: 'community',
-    suggested_action: 'Launch a pirate-themed content series for Gasparilla week?',
-    created_at: new Date().toISOString(),
-  },
+// Mock trends removed - using live data from LiveLocalPulse and WeeklyTrendBatch components
+
+// Empty initial states for analytics widgets (will connect to real data later)
+const emptyActivities: ActivityItem[] = [];
+
+const emptyTeamMetrics: TeamMetrics[] = [
+  { label: 'Mon', value: 0, percentage: 0 },
+  { label: 'Tue', value: 0, percentage: 0 },
+  { label: 'Wed', value: 0, percentage: 0 },
+  { label: 'Thu', value: 0, percentage: 0 },
+  { label: 'Fri', value: 0, percentage: 0 },
 ];
 
-const mockActivities: ActivityItem[] = [
-  { id: '1', action: 'New booking confirmed', user: 'GreenLine365', timestamp: '2 minutes ago', metric: 37 },
-  { id: '2', action: 'Content published to IG', user: 'System', timestamp: '15 minutes ago' },
-  { id: '3', action: 'Lead captured via chat', user: 'AI Concierge', timestamp: '32 minutes ago' },
-  { id: '4', action: 'Campaign scheduled', user: 'Marketing', timestamp: '1 hour ago' },
-  { id: '5', action: 'Review completed', user: 'Admin', timestamp: '2 hours ago', metric: 5 },
+const emptyPipeline: PipelineStage[] = [
+  { name: 'Content Creation', count: 0, percentage: 0 },
+  { name: 'Review Stage', count: 0, percentage: 0 },
+  { name: 'Launch Pipeline', count: 0, percentage: 0 },
 ];
 
-const mockTeamMetrics: TeamMetrics[] = [
-  { label: 'Mon', value: 45, percentage: 75 },
-  { label: 'Tue', value: 62, percentage: 88 },
-  { label: 'Wed', value: 38, percentage: 62 },
-  { label: 'Thu', value: 71, percentage: 95 },
-  { label: 'Fri', value: 55, percentage: 78 },
-];
-
-const mockPipeline: PipelineStage[] = [
-  { name: 'Content Creation', count: 12, percentage: 78 },
-  { name: 'Review Stage', count: 5, percentage: 45 },
-  { name: 'Launch Pipeline', count: 8, percentage: 62 },
-];
-
-const mockBookingTrends: BookingTrend[] = [
-  { day: 'Mon', current: 12, previous: 8 },
-  { day: 'Tue', current: 15, previous: 10 },
-  { day: 'Wed', current: 18, previous: 14 },
-  { day: 'Thu', current: 22, previous: 16 },
-  { day: 'Fri', current: 28, previous: 20 },
-  { day: 'Sat', current: 35, previous: 25 },
-  { day: 'Sun', current: 20, previous: 15 },
+const emptyBookingTrends: BookingTrend[] = [
+  { day: 'Mon', current: 0, previous: 0 },
+  { day: 'Tue', current: 0, previous: 0 },
+  { day: 'Wed', current: 0, previous: 0 },
+  { day: 'Thu', current: 0, previous: 0 },
+  { day: 'Fri', current: 0, previous: 0 },
+  { day: 'Sat', current: 0, previous: 0 },
+  { day: 'Sun', current: 0, previous: 0 },
 ];
 
 // ============================================
@@ -131,7 +92,7 @@ export default function TacticalCommandCenter() {
   const [viewMode, setViewMode] = useState<'month' | 'week'>('month');
   const [showContentForge, setShowContentForge] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
-  const [events, setEvents] = useState<CalendarEvent[]>(mockEvents);
+  const [events, setEvents] = useState<CalendarEvent[]>(initialEvents);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   
   // Demo Controller State
