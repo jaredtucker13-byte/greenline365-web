@@ -744,10 +744,10 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
               </div>
             </div>
 
-            {/* Main Content - Two Column Layout */}
+            {/* Main Content - Three Column Layout with AI Assistant */}
             <div className="flex-1 flex overflow-hidden">
               {/* Left Panel - Form */}
-              <div className="flex-1 overflow-y-auto p-4 border-r border-[#1E262E]">
+              <div className={`flex-1 overflow-y-auto p-4 border-r border-[#1E262E] transition-all ${showAssistant ? 'max-w-[50%]' : ''}`}>
                 
                 {activeTab === 'content' && (
                   <div className="grid grid-cols-2 gap-4">
