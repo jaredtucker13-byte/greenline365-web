@@ -1,6 +1,20 @@
+'use client';
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export default function Footer() {
+  const pathname = usePathname();
+  
+  // Hide footer on dashboard routes
+  const isDashboardRoute = pathname?.startsWith('/admin-v2') || 
+                           pathname?.startsWith('/dashboard') || 
+                           pathname?.startsWith('/god-mode');
+
+  if (isDashboardRoute) {
+    return null;
+  }
+
   return (
     <footer className="border-t border-white/10 bg-black/30">
       <div className="max-w-7xl mx-auto px-6 py-12">
