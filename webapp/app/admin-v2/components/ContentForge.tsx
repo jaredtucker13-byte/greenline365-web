@@ -106,6 +106,9 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   
+  // AI Assistant Panel State
+  const [showAssistant, setShowAssistant] = useState(false);
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
   const timePickerRef = useRef<HTMLDivElement>(null);
