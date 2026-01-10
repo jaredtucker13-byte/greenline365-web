@@ -901,85 +901,66 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ========== NEW: SUCCESS STORY - FROM EMPTY TABLES TO PACKED HOUSE (Before Footer) ========== */}
-      <section className="relative py-20 lg:py-32 px-4 overflow-hidden">
-        {/* Hero Background Image */}
+      {/* ========== SUCCESS STORY - FROM EMPTY TABLES TO PACKED HOUSE (Before Footer) ========== */}
+      <section className="relative min-h-[80vh] flex flex-col overflow-hidden">
+        {/* Background Image - Clean version without overlays */}
         <div className="absolute inset-0">
           <Image
-            src="/images/hero-packed-house.jpg"
-            alt="From empty tables to a packed house - The GreenLine Effect"
+            src="/images/packed-house-clean.jpg"
+            alt="Packed restaurant - The GreenLine Effect"
             fill
-            className="object-cover"
+            className="object-cover object-center"
+            quality={100}
+            priority
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-os-dark/80 via-os-dark/60 to-os-dark" />
+          {/* Gradient overlay only at top for text readability */}
+          <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-os-dark/90 via-os-dark/50 to-transparent" />
         </div>
 
-        <div className="relative z-10 max-w-5xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <motion.div 
-              className="inline-flex items-center gap-2 px-4 py-2 glass-green rounded-full border border-neon-green-500/40 mb-6"
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-            >
-              <span className="w-2 h-2 bg-neon-green-500 rounded-full animate-pulse" />
-              <span className="text-sm text-neon-green-400 font-semibold">THE GREENLINE EFFECT</span>
-            </motion.div>
-
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-display font-bold text-white mb-6 leading-tight">
-              From Empty Tables to a{' '}
-              <span className="text-neon-green-500">Packed House</span>
-            </h2>
-
-            <p className="text-lg sm:text-xl text-white/80 mb-8 max-w-3xl mx-auto leading-relaxed">
-              GreenLine365 turns your camera roll into a marketing engine that fills your seats and grows your business.
-            </p>
-
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-4 max-w-xl mx-auto mb-10">
-              <div className="text-center glass p-4 rounded-xl border border-neon-green-500/20">
-                <div className="text-2xl sm:text-3xl font-bold text-neon-green-500 mb-1">+180%</div>
-                <div className="text-sm text-white/60">Reservations</div>
-              </div>
-              <div className="text-center glass p-4 rounded-xl border border-neon-green-500/20">
-                <div className="text-2xl sm:text-3xl font-bold text-neon-green-500 mb-1">#1</div>
-                <div className="text-sm text-white/60">Local Spot</div>
-              </div>
-              <div className="text-center glass p-4 rounded-xl border border-neon-green-500/20">
-                <div className="text-2xl sm:text-3xl font-bold text-neon-green-500 mb-1">45+</div>
-                <div className="text-sm text-white/60">Waitlist</div>
-              </div>
-            </div>
-
-            <Button
-              variant="primary"
-              size="lg"
-              onClick={() => setShowFullForm(true)}
-              data-testid="success-story-cta-btn"
-              className="text-lg px-8 py-4"
-            >
-              Start Your Success Story
-            </Button>
-
+        {/* Content - Positioned at TOP */}
+        <div className="relative z-10 pt-16 pb-8 px-4">
+          <div className="max-w-5xl mx-auto text-center">
             <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.5 }}
-              className="mt-8 flex items-center justify-center gap-6 text-white/40 text-sm"
+              transition={{ duration: 0.8 }}
             >
-              <span>✓ No credit card required</span>
-              <span>✓ Cancel anytime</span>
-              <span>✓ 24/7 support</span>
+              <motion.div 
+                className="inline-flex items-center gap-2 px-4 py-2 glass-green rounded-full border border-neon-green-500/40 mb-4"
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2 }}
+              >
+                <span className="w-2 h-2 bg-neon-green-500 rounded-full animate-pulse" />
+                <span className="text-sm text-neon-green-400 font-semibold">THE GREENLINE EFFECT</span>
+              </motion.div>
+
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold text-white mb-4 leading-tight drop-shadow-lg">
+                From Empty Tables to a{' '}
+                <span className="text-neon-green-500">Packed House</span>
+              </h2>
+
+              <p className="text-base sm:text-lg text-white/90 mb-6 max-w-2xl mx-auto leading-relaxed drop-shadow-md">
+                GreenLine365 turns your camera roll into a marketing engine that fills your seats and grows your business.
+              </p>
+
+              <Button
+                variant="primary"
+                size="lg"
+                onClick={() => setShowFullForm(true)}
+                data-testid="success-story-cta-btn"
+                className="text-lg px-8 py-4 shadow-lg"
+              >
+                Start Your Success Story
+              </Button>
             </motion.div>
-          </motion.div>
+          </div>
         </div>
+
+        {/* Bottom gradient for transition to footer */}
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-os-dark to-transparent" />
       </section>
 
       {/* Full Form Modal */}
