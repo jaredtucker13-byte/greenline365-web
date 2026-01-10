@@ -507,7 +507,10 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
         if (analysis.title) setTitle(analysis.title);
         if (analysis.caption) setCaption(analysis.caption);
         if (analysis.productDescription) setProductDescription(analysis.productDescription);
-        if (analysis.keywords?.length > 0) setKeywords(analysis.keywords);
+        // Store keywords as suggestions so user can pick which ones to add
+        if (analysis.keywords?.length > 0) {
+          setSuggestedKeywords(analysis.keywords);
+        }
         if (analysis.hashtags?.brand) setBrandHashtag(analysis.hashtags.brand);
         if (analysis.hashtags?.local) setLocalHashtag(analysis.hashtags.local);
         if (analysis.hashtags?.suggested?.length > 0) {
