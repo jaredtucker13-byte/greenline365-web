@@ -717,12 +717,39 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                       {/* Image Upload */}
                       {contentType !== 'blog' && (
                         <div>
-                          <label className="block text-xs font-medium text-gray-400 mb-2">Upload Image</label>
+                          <div className="flex items-center justify-between mb-2">
+                            <label className="block text-xs font-medium text-gray-400">Upload Image</label>
+                            {imagePreview && !isAnalyzingImage && (
+                              <button
+                                onClick={() => analyzeImage(imagePreview)}
+                                className="text-xs px-2 py-1 rounded bg-[#8A2BE2]/20 text-[#8A2BE2] hover:bg-[#8A2BE2]/30 transition flex items-center gap-1"
+                              >
+                                🔄 Re-analyze
+                              </button>
+                            )}
+                          </div>
                           {imagePreview ? (
                             <div className="relative rounded-lg overflow-hidden border border-[#39FF14]/30 aspect-video">
                               <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                              
+                              {/* Analysis overlay */}
+                              {isAnalyzingImage && (
+                                <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center">
+                                  <div className="w-10 h-10 border-2 border-[#39FF14] border-t-transparent rounded-full animate-spin mb-3"></div>
+                                  <p className="text-[#39FF14] text-sm font-medium">Analyzing image...</p>
+                                  <p className="text-gray-400 text-xs mt-1">AI is generating content</p>
+                                </div>
+                              )}
+                              
+                              {/* Success badge */}
+                              {analysisComplete && !isAnalyzingImage && (
+                                <div className="absolute top-2 left-2 px-2 py-1 rounded-full bg-[#39FF14] text-black text-xs font-semibold flex items-center gap-1">
+                                  ✓ AI Analyzed
+                                </div>
+                              )}
+                              
                               <button
-                                onClick={() => { setImagePreview(null); setImageUrl(''); }}
+                                onClick={() => { setImagePreview(null); setImageUrl(''); setAnalysisComplete(false); }}
                                 className="absolute top-2 right-2 w-6 h-6 rounded bg-red-500/80 hover:bg-red-500 text-white flex items-center justify-center"
                               >
                                 <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -749,6 +776,7 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                                 <div className="text-center">
                                   <span className="text-3xl">📤</span>
                                   <p className="text-xs text-gray-400 mt-2">Click or drag to upload</p>
+                                  <p className="text-xs text-[#8A2BE2] mt-1">🤖 AI will auto-analyze</p>
                                 </div>
                               )}
                             </div>
