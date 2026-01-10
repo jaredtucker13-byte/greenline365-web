@@ -342,7 +342,7 @@ export default function AboutPage() {
                 </Button>
               </Link>
               <Link href="/#trend-demo">
-                <Button variant="outline" size="lg">
+                <Button variant="secondary" size="lg">
                   Try the Demo
                 </Button>
               </Link>
