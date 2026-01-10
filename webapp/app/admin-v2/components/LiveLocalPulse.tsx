@@ -209,7 +209,7 @@ export default function LiveLocalPulse() {
 
                 <div className="flex items-start gap-3">
                   <div className="text-3xl flex-shrink-0">
-                    {getCategoryIcon(trend.category)}
+                    {getSmartIcon(trend.category, trend.title, trend.description)}
                   </div>
                   <div className="flex-1 min-w-0">
                     <h4 className="font-bold text-white text-base mb-2">
