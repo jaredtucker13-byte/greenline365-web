@@ -126,51 +126,39 @@ export default function HomePage() {
       <section ref={heroRef} className="relative min-h-[90vh] flex items-center overflow-hidden pt-20">
         {/* Background Effects */}
         <div className="absolute inset-0 bg-os-dark" />
-        <motion.div 
-          className="absolute top-0 left-1/4 w-[800px] h-[800px] rounded-full bg-gradient-to-br from-neon-green-500/5 to-transparent blur-3xl"
-          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
-          transition={{ duration: 20, repeat: Infinity }}
+        <div 
+          className="absolute top-0 left-1/4 w-[800px] h-[800px] rounded-full bg-gradient-to-br from-neon-green-500/5 to-transparent blur-3xl gsap-glow"
         />
-        <motion.div 
-          className="absolute bottom-1/4 right-0 w-[500px] h-[500px] bg-gradient-radial from-neon-green-500/10 to-transparent blur-3xl"
-          animate={{ scale: [1, 1.3, 1], x: [0, -50, 0] }}
-          transition={{ duration: 15, repeat: Infinity }}
+        <div 
+          className="absolute bottom-1/4 right-0 w-[500px] h-[500px] bg-gradient-radial from-neon-green-500/10 to-transparent blur-3xl gsap-glow-2"
         />
         
         <div className="relative z-10 w-full max-w-[1280px] mx-auto px-4 sm:px-6">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             {/* Left Column - Text Content */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <motion.div 
+            <div>
+              <div 
+                data-hero-badge
                 className="mb-6 inline-flex items-center gap-2 px-3 py-1.5 glass-green rounded-full border border-neon-green-500/30"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
               >
-                <motion.span 
-                  className="w-2 h-2 bg-neon-green-500 rounded-full"
-                  animate={{ opacity: [1, 0.5, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
+                <span 
+                  className="w-2 h-2 bg-neon-green-500 rounded-full animate-pulse"
                 />
                 <span className="text-xs text-neon-green-400 font-semibold tracking-wide">STATUS: ONLINE</span>
-              </motion.div>
+              </div>
               
-              <h1 className="font-display font-bold mb-4 leading-tight" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)' }}>
+              <h1 data-hero-title className="font-display font-bold mb-4 leading-tight overflow-hidden" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)' }}>
                 <span className="text-white block">The Operating System</span>
                 <span className="text-white block">for the</span>
                 <span className="text-neon-green-500 block">Local Economy</span>
               </h1>
               
-              <p className="text-white/70 mb-6 leading-relaxed max-w-xl" style={{ fontSize: 'clamp(1rem, 2vw, 1.25rem)' }}>
+              <p data-hero-subtitle className="text-white/70 mb-6 leading-relaxed max-w-xl" style={{ fontSize: 'clamp(1rem, 2vw, 1.25rem)' }}>
                 Stop competing with algorithms. Start winning. Start running infrastructure that 
                 connects <span className="text-neon-green-500 font-semibold">local life</span> with local commerce.
               </p>
               
-              <div className="flex flex-wrap gap-3 mb-8">
+              <div data-hero-cta className="flex flex-wrap gap-3 mb-8">
                 <Button variant="primary" size="lg" onClick={() => setShowFullForm(true)} data-testid="hero-start-btn">
                   Start Your Engine
                 </Button>
@@ -179,7 +167,7 @@ export default function HomePage() {
                 </Button>
               </div>
               
-              <div className="grid grid-cols-3 gap-4">
+              <div data-hero-stats className="grid grid-cols-3 gap-4">
                 {[
                   { value: '500+', label: 'Businesses' },
                   { value: '40%', label: 'More Leads' },
@@ -191,20 +179,16 @@ export default function HomePage() {
                   </div>
                 ))}
               </div>
-            </motion.div>
+            </div>
             
             {/* Right Column - Phone Mockup */}
-            <motion.div
+            <div
+              data-hero-image
               className="relative hidden lg:flex justify-center"
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
             >
               <div className="absolute inset-0 bg-neon-green-500/10 blur-3xl rounded-full scale-75" />
-              <motion.div
-                className="relative z-10"
-                animate={{ y: [0, -15, 0] }}
-                transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+              <div
+                className="relative z-10 gsap-float"
               >
                 <div className="relative w-[280px] h-[560px] bg-os-dark-900 rounded-[2.5rem] p-2 border-4 border-white/10">
                   <div className="w-full h-full bg-gradient-to-b from-os-dark to-os-dark-800 rounded-[2rem] overflow-hidden">
