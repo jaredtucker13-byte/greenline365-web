@@ -99,6 +99,9 @@ export default function TacticalCommandCenter() {
   const [showDemoController, setShowDemoController] = useState(false);
   const [demoConfig, setDemoConfig] = useState<DemoConfig>(defaultDemoConfig);
 
+  // Preview Mode - See what customers will see
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
+
   // Sidebar State
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
