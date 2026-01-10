@@ -47,61 +47,11 @@ const defaultDemoConfig: DemoConfig = {
 };
 
 // ============================================
-// MOCK DATA (Replace with Supabase in production)
+// CALENDAR EVENTS - Start empty (connect to Supabase)
 // ============================================
 
-const mockEvents: CalendarEvent[] = [
-  {
-    id: '1',
-    title: 'Client Strategy Call',
-    start: new Date().toISOString(),
-    type: 'booking',
-    status: 'confirmed',
-    color: '#10B981',
-    glowColor: 'rgba(16,185,129,0.4)',
-    data: {} as any,
-  },
-  {
-    id: '2',
-    title: 'Instagram Campaign',
-    start: new Date(Date.now() + 86400000).toISOString(),
-    type: 'content',
-    status: 'scheduled',
-    color: '#0CE293',
-    glowColor: 'rgba(12,226,147,0.4)',
-    data: {} as any,
-  },
-  {
-    id: '3',
-    title: 'Product Launch Review',
-    start: new Date(Date.now() + 86400000 * 2).toISOString(),
-    type: 'review',
-    status: 'pending',
-    color: '#FFC800',
-    glowColor: 'rgba(255,200,0,0.4)',
-    data: {} as any,
-  },
-  {
-    id: '4',
-    title: 'Website Launch',
-    start: new Date(Date.now() + 86400000 * 3).toISOString(),
-    type: 'launch',
-    status: 'scheduled',
-    color: '#8A2BE2',
-    glowColor: 'rgba(138,43,226,0.4)',
-    data: {} as any,
-  },
-  {
-    id: '5',
-    title: 'Demo Call - TechCorp',
-    start: new Date(Date.now() + 86400000 * 5).toISOString(),
-    type: 'booking',
-    status: 'confirmed',
-    color: '#10B981',
-    glowColor: 'rgba(16,185,129,0.4)',
-    data: {} as any,
-  },
-];
+// Empty initial state - will be populated from Supabase or user actions
+const initialEvents: CalendarEvent[] = [];
 
 const mockTrends: LocalTrend[] = [
   {
