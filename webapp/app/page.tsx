@@ -11,16 +11,12 @@ import { NeonText } from '@/components/ui/os';
 import { GlassCard } from '@/components/ui/os';
 import StickyProcessSection from '@/components/StickyProcessSection';
 import LogoTicker from '@/components/LogoTicker';
-import FloatingTestimonial from '@/components/FloatingTestimonial';
-
 export default function HomePage() {
   const [showFullForm, setShowFullForm] = useState(false);
   const [showWidget, setShowWidget] = useState(false);
 
   return (
     <main className="min-h-screen">
-      {/* Floating Testimonial */}
-      <FloatingTestimonial />
       
       {/* Hero Section - Enhanced with MASSIVE Depth */}
       <section className="relative min-h-screen flex items-center overflow-hidden pt-20">
