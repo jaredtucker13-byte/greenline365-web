@@ -119,6 +119,16 @@ textarea:focus {
   }
 }
 
+/* GSAP hover lift effect */
+.gsap-hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.gsap-hover-lift:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 255, 0, 0.1);
+}
+
 @keyframes pulse-ring {
   0% {
     transform: scale(0.9);
