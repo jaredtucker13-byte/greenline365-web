@@ -92,6 +92,7 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
   
   // Calendar State
   const [showCalendar, setShowCalendar] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
   const [scheduledDate, setScheduledDate] = useState<Date>(selectedDate || new Date());
   const [scheduledTime, setScheduledTime] = useState('08:00');
   
