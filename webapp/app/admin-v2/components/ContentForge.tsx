@@ -13,9 +13,10 @@
  */
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
+import ChatWidget from '../../components/ChatWidget';
 
 interface ContentForgeProps {
   isOpen: boolean;
