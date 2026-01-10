@@ -57,6 +57,7 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
   // AI-Generated Fields (all editable)
   const [caption, setCaption] = useState('');
   const [keywords, setKeywords] = useState<string[]>([]);
+  const [suggestedKeywords, setSuggestedKeywords] = useState<string[]>([]);
   const [keywordInput, setKeywordInput] = useState('');
   const [productDescription, setProductDescription] = useState('');
   
