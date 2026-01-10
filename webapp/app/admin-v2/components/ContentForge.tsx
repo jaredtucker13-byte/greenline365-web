@@ -1346,6 +1346,27 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                   ))}
                 </div>
               </div>
+
+              {/* AI Assistant Panel */}
+              <AnimatePresence>
+                {showAssistant && (
+                  <motion.div
+                    initial={{ width: 0, opacity: 0 }}
+                    animate={{ width: 380, opacity: 1 }}
+                    exit={{ width: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="bg-[#0A0A0A] border-l border-[#8A2BE2]/30 overflow-hidden flex flex-col"
+                  >
+                    <div className="h-full">
+                      <ChatWidget 
+                        embedded={true}
+                        forceMode="creative"
+                        onContentSuggestion={handleChatSuggestion}
+                      />
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             {/* Footer */}
