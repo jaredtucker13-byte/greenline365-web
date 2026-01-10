@@ -190,9 +190,9 @@ export default function DraftsPanel({ userId = 'demo-user', onEditDraft }: Draft
                   <div className="flex items-start gap-3">
                     {/* Thumbnail or icon */}
                     <div className="w-12 h-12 rounded-lg bg-[#2D3748] flex items-center justify-center flex-shrink-0 overflow-hidden">
-                      {item.content_data?.imageUrl ? (
+                      {item.image_url ? (
                         <img 
-                          src={item.content_data.imageUrl} 
+                          src={item.image_url} 
                           alt="" 
                           className="w-full h-full object-cover"
                         />
@@ -209,7 +209,7 @@ export default function DraftsPanel({ userId = 'demo-user', onEditDraft }: Draft
                             {item.title || 'Untitled'}
                           </h4>
                           <p className="text-gray-500 text-xs mt-0.5 line-clamp-1">
-                            {item.content_data?.caption || 'No caption'}
+                            {item.description || 'No caption'}
                           </p>
                         </div>
                         
@@ -247,15 +247,15 @@ export default function DraftsPanel({ userId = 'demo-user', onEditDraft }: Draft
                         
                         {/* Date */}
                         <span className="text-gray-500 text-xs">
-                          {activeTab === 'scheduled' && item.scheduled_at
-                            ? `📅 ${formatDate(item.scheduled_at)}`
+                          {activeTab === 'scheduled' && item.scheduled_date
+                            ? `📅 ${formatDate(item.scheduled_date)}`
                             : formatDate(item.created_at)}
                         </span>
                         
                         {/* Keywords count */}
-                        {item.content_data?.keywords && item.content_data.keywords.length > 0 && (
+                        {item.metadata?.keywords && item.metadata.keywords.length > 0 && (
                           <span className="text-gray-500 text-xs">
-                            🏷️ {item.content_data.keywords.length}
+                            🏷️ {item.metadata.keywords.length}
                           </span>
                         )}
                       </div>
