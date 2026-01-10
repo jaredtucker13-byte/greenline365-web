@@ -378,11 +378,11 @@ export default function ChatWidget({
     const suggestions: ContentSuggestion[] = [];
     
     const patterns: Array<{ regex: RegExp; type: ContentSuggestion['type'] }> = [
-      { regex: /\[CAPTION\]:?\s*(.+?)(?=\[|$)/gis, type: 'caption' },
-      { regex: /\[TITLE\]:?\s*(.+?)(?=\[|$)/gis, type: 'title' },
-      { regex: /\[KEYWORDS\]:?\s*(.+?)(?=\[|$)/gis, type: 'keywords' },
-      { regex: /\[HASHTAGS\]:?\s*(.+?)(?=\[|$)/gis, type: 'hashtags' },
-      { regex: /\[DESCRIPTION\]:?\s*(.+?)(?=\[|$)/gis, type: 'description' },
+      { regex: /\[CAPTION\]:?\s*([\s\S]+?)(?=\[|$)/gi, type: 'caption' },
+      { regex: /\[TITLE\]:?\s*([\s\S]+?)(?=\[|$)/gi, type: 'title' },
+      { regex: /\[KEYWORDS\]:?\s*([\s\S]+?)(?=\[|$)/gi, type: 'keywords' },
+      { regex: /\[HASHTAGS\]:?\s*([\s\S]+?)(?=\[|$)/gi, type: 'hashtags' },
+      { regex: /\[DESCRIPTION\]:?\s*([\s\S]+?)(?=\[|$)/gi, type: 'description' },
     ];
     
     for (const { regex, type } of patterns) {
