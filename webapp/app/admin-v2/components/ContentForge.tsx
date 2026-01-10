@@ -863,13 +863,54 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                             )}
                           </div>
 
-                          {/* Time Picker */}
-                          <input
-                            type="time"
-                            value={scheduledTime}
-                            onChange={(e) => setScheduledTime(e.target.value)}
-                            className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-xs focus:border-[#39FF14]/50 outline-none"
-                          />
+                          {/* Time Picker Dropdown */}
+                          <div className="relative" ref={timePickerRef}>
+                            <button
+                              onClick={() => setShowTimePicker(!showTimePicker)}
+                              className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-xs text-left hover:border-[#39FF14]/50 transition flex items-center justify-between"
+                            >
+                              <span>{scheduledTime.replace(/^(\d{2}):(\d{2})$/, (_, h, m) => {
+                                const hour = parseInt(h);
+                                const ampm = hour >= 12 ? 'PM' : 'AM';
+                                const hour12 = hour % 12 || 12;
+                                return `${hour12}:${m} ${ampm}`;
+                              })}</span>
+                              <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                            </button>
+                            
+                            {showTimePicker && (
+                              <div className="absolute top-full left-0 right-0 mt-2 z-50 bg-[#1A1A1A] border border-[#39FF14]/30 rounded-lg shadow-xl max-h-48 overflow-y-auto">
+                                {/* Generate time options */}
+                                {Array.from({ length: 24 }, (_, h) => {
+                                  const times = ['00', '30'].map(m => {
+                                    const hour24 = h.toString().padStart(2, '0');
+                                    const ampm = h >= 12 ? 'PM' : 'AM';
+                                    const hour12 = h % 12 || 12;
+                                    return {
+                                      value: `${hour24}:${m}`,
+                                      label: `${hour12}:${m} ${ampm}`
+                                    };
+                                  });
+                                  return times;
+                                }).flat().map(({ value, label }) => (
+                                  <button
+                                    key={value}
+                                    onClick={() => {
+                                      setScheduledTime(value);
+                                      setShowTimePicker(false);
+                                    }}
+                                    className={`w-full px-3 py-2 text-left text-xs hover:bg-[#39FF14]/10 transition ${
+                                      scheduledTime === value ? 'bg-[#39FF14]/20 text-[#39FF14]' : 'text-white'
+                                    }`}
+                                  >
+                                    {label}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </div>
                         </div>
 
                         {/* Platform Selection */}
