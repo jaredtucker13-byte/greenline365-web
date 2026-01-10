@@ -168,7 +168,7 @@ export default function WeeklyTrendBatch() {
             >
               <div className="flex items-start gap-3">
                 <div className="text-2xl flex-shrink-0">
-                  {getCategoryIcon(trend.category)}
+                  {getSmartIcon(trend.category, trend.title, trend.description)}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-2">
