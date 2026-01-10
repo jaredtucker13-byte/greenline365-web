@@ -1111,21 +1111,36 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
               >
                 Cancel
               </button>
-              <div className="flex gap-2">
+              <div className="flex items-center gap-2">
+                {/* Save Message */}
+                {saveMessage && (
+                  <span className={`text-sm px-3 py-1 rounded-lg ${
+                    saveMessage.type === 'success' 
+                      ? 'bg-[#39FF14]/10 text-[#39FF14]' 
+                      : 'bg-red-500/10 text-red-400'
+                  }`}>
+                    {saveMessage.text}
+                  </span>
+                )}
                 <button
-                  onClick={() => { /* Save as draft */ }}
-                  className="px-4 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm font-medium hover:bg-[#2D3748] transition"
+                  onClick={handleSaveDraft}
+                  disabled={isSaving || (!title.trim() && !blogTitle.trim() && !caption.trim())}
+                  className="px-4 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm font-medium hover:bg-[#2D3748] transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
-                  💾 Save Draft
+                  {isSaving ? (
+                    <>⏳ Saving...</>
+                  ) : (
+                    <>💾 Save Draft</>
+                  )}
                 </button>
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={handleSchedule}
-                  disabled={(!title.trim() && !blogTitle.trim()) || platforms.length === 0}
+                  onClick={handleScheduleBlast}
+                  disabled={isSaving || (!title.trim() && !blogTitle.trim()) || platforms.length === 0}
                   className="px-5 py-2 rounded-lg bg-[#39FF14] text-black font-bold text-sm hover:bg-[#39FF14]/90 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
-                  🚀 SCHEDULE BLAST
+                  {isSaving ? '⏳...' : '🚀 SCHEDULE BLAST'}
                 </motion.button>
               </div>
             </div>
