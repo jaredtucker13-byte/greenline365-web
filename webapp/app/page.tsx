@@ -100,23 +100,32 @@ export default function HomePage() {
           }}
         />
         
-        {/* LAYER 6 - Floating Particles */}
-        {[...Array(8)].map((_, i) => (
+        {/* LAYER 6 - Floating Particles (static positions to avoid hydration mismatch) */}
+        {[
+          { left: 10, top: 20, duration: 9, delay: 1 },
+          { left: 25, top: 60, duration: 10, delay: 2 },
+          { left: 40, top: 35, duration: 8, delay: 0.5 },
+          { left: 55, top: 75, duration: 11, delay: 3 },
+          { left: 70, top: 15, duration: 9, delay: 1.5 },
+          { left: 85, top: 50, duration: 10, delay: 4 },
+          { left: 15, top: 80, duration: 8, delay: 2.5 },
+          { left: 90, top: 40, duration: 12, delay: 0 },
+        ].map((particle, i) => (
           <motion.div
             key={i}
             className="absolute w-2 h-2 bg-neon-green-500/30 rounded-full"
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
+              left: `${particle.left}%`,
+              top: `${particle.top}%`,
             }}
             animate={{
               y: [0, -100, 0],
               opacity: [0, 1, 0],
             }}
             transition={{
-              duration: 8 + Math.random() * 4,
+              duration: particle.duration,
               repeat: Infinity,
-              delay: Math.random() * 5,
+              delay: particle.delay,
             }}
           />
         ))}
