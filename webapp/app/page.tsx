@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import MultiStepBookingForm from './components/MultiStepBookingForm';
 import BookingWidget from './components/BookingWidget';
 import DailyTrendHunter from './components/DailyTrendHunter';
@@ -10,14 +12,118 @@ import { Button } from '@/components/ui/os';
 import { NeonText } from '@/components/ui/os';
 import { GlassCard } from '@/components/ui/os';
 
+// Register GSAP plugins
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
+
 export default function HomePage() {
   const [showFullForm, setShowFullForm] = useState(false);
   const [showWidget, setShowWidget] = useState(false);
+  
+  // GSAP Refs
+  const heroRef = useRef<HTMLElement>(null);
+  const featuresRef = useRef<HTMLElement>(null);
+  const statsRef = useRef<HTMLElement>(null);
+  
+  // Hero GSAP Animation
+  useEffect(() => {
+    if (!heroRef.current) return;
+    
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+      
+      // Hero entrance sequence
+      tl.from('[data-hero-badge]', {
+        y: -40,
+        opacity: 0,
+        duration: 0.8,
+        delay: 0.2,
+      })
+      .from('[data-hero-title] span', {
+        y: 80,
+        opacity: 0,
+        duration: 0.9,
+        stagger: 0.1,
+      }, '-=0.4')
+      .from('[data-hero-subtitle]', {
+        y: 30,
+        opacity: 0,
+        duration: 0.7,
+      }, '-=0.5')
+      .from('[data-hero-cta]', {
+        y: 20,
+        opacity: 0,
+        scale: 0.9,
+        duration: 0.5,
+      }, '-=0.3')
+      .from('[data-hero-image]', {
+        x: 100,
+        opacity: 0,
+        duration: 1,
+        ease: 'power2.out',
+      }, '-=0.7');
+      
+    }, heroRef);
+    
+    return () => ctx.revert();
+  }, []);
+  
+  // Scroll-triggered animations
+  useEffect(() => {
+    // Feature cards stagger
+    if (featuresRef.current) {
+      const ctx = gsap.context(() => {
+        gsap.from('[data-feature-card]', {
+          scrollTrigger: {
+            trigger: featuresRef.current,
+            start: 'top 75%',
+          },
+          y: 80,
+          opacity: 0,
+          duration: 0.7,
+          stagger: 0.15,
+          ease: 'power2.out',
+        });
+      }, featuresRef);
+      
+      return () => ctx.revert();
+    }
+  }, []);
+  
+  // Stats counter animation
+  useEffect(() => {
+    if (!statsRef.current) return;
+    
+    const ctx = gsap.context(() => {
+      const counters = statsRef.current?.querySelectorAll('[data-counter]');
+      
+      counters?.forEach((counter) => {
+        const target = parseInt(counter.getAttribute('data-target') || '0');
+        const counterObj = { value: 0 };
+        
+        gsap.to(counterObj, {
+          scrollTrigger: {
+            trigger: counter,
+            start: 'top 85%',
+          },
+          value: target,
+          duration: 2,
+          ease: 'power2.out',
+          onUpdate: () => {
+            counter.textContent = Math.round(counterObj.value).toLocaleString();
+          },
+        });
+      });
+    }, statsRef);
+    
+    return () => ctx.revert();
+  }, []);
 
   return (
     <main className="min-h-screen bg-os-dark">
       {/* ========== HERO SECTION - 50/50 Split ========== */}
-      <section className="relative min-h-[90vh] flex items-center overflow-hidden pt-20">
+      <section ref={heroRef} className="relative min-h-[90vh] flex items-center overflow-hidden pt-20">
         {/* Background Effects */}
         <div className="absolute inset-0 bg-os-dark" />
         <motion.div 
