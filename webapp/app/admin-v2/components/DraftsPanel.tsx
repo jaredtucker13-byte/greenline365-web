@@ -11,21 +11,24 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface Draft {
   id: string;
   title: string;
+  description: string;
   content_type: 'photo' | 'product' | 'blog';
-  content_data: {
-    caption?: string;
-    imageUrl?: string;
+  event_type: string;
+  scheduled_date: string;
+  platforms: string[];
+  hashtags: string[];
+  image_url: string | null;
+  status: 'draft' | 'scheduled' | 'published';
+  color: string;
+  metadata: {
     keywords?: string[];
-    hashtags?: {
-      brand: string;
-      local: string;
-      optional: string[];
+    fullContentData?: {
+      caption?: string;
+      imageUrl?: string;
     };
   };
-  status: 'draft' | 'scheduled' | 'published';
-  scheduled_at: string | null;
-  platforms: string[];
   created_at: string;
+  updated_at: string;
 }
 
 interface DraftsPanelProps {
