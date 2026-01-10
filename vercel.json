@@ -1,13 +1,6 @@
 {
-  "buildCommand": "cd webapp && yarn build",
-  "outputDirectory": "webapp/.next",
-  "devCommand": "cd webapp && yarn dev",
-  "installCommand": "cd webapp && yarn install",
   "framework": "nextjs",
-  "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "/api/:path*"
-    }
-  ]
+  "buildCommand": "yarn build",
+  "installCommand": "yarn install",
+  "outputDirectory": ".next"
 }
