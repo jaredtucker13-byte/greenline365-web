@@ -6,8 +6,28 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-// Retell MCP Tool Definitions
+// MCP Tool Definitions - These are returned to Retell for the AI to use
 const TOOLS = {
+  // ===== TENANT/BUSINESS INFO =====
+  get_business_info: {
+    description: 'Get information about this business including name, greeting, and AI personality',
+    parameters: {}
+  },
+  get_business_hours: {
+    description: 'Get business operating hours',
+    parameters: {}
+  },
+  get_services: {
+    description: 'Get list of available services and pricing',
+    parameters: {
+      category: { type: 'string', description: 'Service category filter (optional)' }
+    }
+  },
+  get_location: {
+    description: 'Get business location and directions',
+    parameters: {}
+  },
+
   // ===== BOOKING TOOLS =====
   check_availability: {
     description: 'Check available time slots for booking appointments',
@@ -65,37 +85,62 @@ const TOOLS = {
     }
   },
   lookup_customer: {
-    description: 'Look up customer information by phone or email',
+    description: 'Look up customer information by phone - checks if returning customer',
     parameters: {
-      phone: { type: 'string', description: 'Customer phone number' },
-      email: { type: 'string', description: 'Customer email' }
+      phone: { type: 'string', description: 'Customer phone number' }
     }
   },
 
-  // ===== BUSINESS INFO TOOLS =====
-  get_business_hours: {
-    description: 'Get business operating hours',
-    parameters: {}
-  },
-  get_services: {
-    description: 'Get list of available services and pricing',
+  // ===== CALL CONTROL =====
+  transfer_to_human: {
+    description: 'Transfer the call to a human representative',
     parameters: {
-      category: { type: 'string', description: 'Service category filter (optional)' }
+      reason: { type: 'string', description: 'Reason for transfer' }
     }
   },
-  get_location: {
-    description: 'Get business location and directions',
-    parameters: {}
+  end_call: {
+    description: 'End the call politely',
+    parameters: {
+      summary: { type: 'string', description: 'Brief summary of what was accomplished' }
+    }
   }
 };
 
-// Generate available time slots
-function generateTimeSlots(date: string): string[] {
-  const slots = [];
-  const startHour = 9; // 9 AM
-  const endHour = 17; // 5 PM
+// Look up tenant by phone number (the Twilio number that was called)
+async function getTenantByPhone(phoneNumber: string) {
+  const { data: tenant } = await supabase
+    .from('tenants')
+    .select('*')
+    .eq('twilio_phone_number', phoneNumber)
+    .eq('is_active', true)
+    .single();
   
-  for (let hour = startHour; hour < endHour; hour++) {
+  return tenant;
+}
+
+// Get default tenant (GreenLine365)
+async function getDefaultTenant() {
+  const { data: tenant } = await supabase
+    .from('tenants')
+    .select('*')
+    .eq('business_name', 'GreenLine365')
+    .single();
+  
+  return tenant;
+}
+
+// Generate available time slots based on business hours
+function generateTimeSlots(date: string, businessHours: any): string[] {
+  const dayOfWeek = new Date(date).toLocaleDateString('en-US', { weekday: 'lowercase' });
+  const hours = businessHours?.[dayOfWeek] || '9:00 AM - 5:00 PM';
+  
+  if (hours.toLowerCase() === 'closed') {
+    return [];
+  }
+  
+  const slots = [];
+  // Simple slot generation - 9 AM to 5 PM in 30 min increments
+  for (let hour = 9; hour < 17; hour++) {
     slots.push(`${hour.toString().padStart(2, '0')}:00`);
     slots.push(`${hour.toString().padStart(2, '0')}:30`);
   }
@@ -109,11 +154,76 @@ function generateConfirmationNumber(): string {
 }
 
 // Tool execution handlers
-async function executeTool(toolName: string, args: Record<string, any>) {
+async function executeTool(toolName: string, args: Record<string, any>, tenant: any) {
   switch (toolName) {
+    // ===== TENANT/BUSINESS INFO HANDLERS =====
+    case 'get_business_info': {
+      return {
+        success: true,
+        business_name: tenant?.business_name || 'GreenLine365',
+        ai_agent_name: tenant?.ai_agent_name || 'Alex',
+        greeting: tenant?.greeting_message || `Hi! Thanks for calling ${tenant?.business_name || 'GreenLine365'}. How can I help you today?`,
+        personality: tenant?.ai_personality || 'friendly and professional',
+        website: tenant?.website_url,
+        message: tenant?.greeting_message || `Hi! Thanks for calling ${tenant?.business_name || 'GreenLine365'}. How can I help you today?`
+      };
+    }
+
+    case 'get_business_hours': {
+      const hours = tenant?.business_hours || {
+        monday: '9:00 AM - 5:00 PM',
+        tuesday: '9:00 AM - 5:00 PM',
+        wednesday: '9:00 AM - 5:00 PM',
+        thursday: '9:00 AM - 5:00 PM',
+        friday: '9:00 AM - 5:00 PM',
+        saturday: '10:00 AM - 3:00 PM',
+        sunday: 'Closed'
+      };
+      
+      return {
+        success: true,
+        hours,
+        message: `We're open Monday through Friday from 9 AM to 5 PM, Saturday from 10 AM to 3 PM, and closed on Sundays. Our AI assistant is available 24/7 to help with bookings!`
+      };
+    }
+
+    case 'get_services': {
+      const services = tenant?.services || [
+        { name: 'Consultation', duration: '30 min', price: 'Free' },
+        { name: 'Strategy Session', duration: '60 min', price: '$99' },
+        { name: 'Full Service Package', duration: '2 hours', price: '$299' }
+      ];
+      
+      const serviceList = services.map((s: any) => `${s.name} (${s.duration}, ${s.price})`).join(', ');
+      
+      return {
+        success: true,
+        services,
+        message: `We offer: ${serviceList}. Which one interests you?`
+      };
+    }
+
+    case 'get_location': {
+      const address = tenant?.address 
+        ? `${tenant.address}, ${tenant.city}, ${tenant.state} ${tenant.zip_code}`
+        : 'Available virtually - we can meet over video call!';
+      
+      return {
+        success: true,
+        address: tenant?.address,
+        city: tenant?.city,
+        state: tenant?.state,
+        zip_code: tenant?.zip_code,
+        full_address: address,
+        message: tenant?.address 
+          ? `We're located at ${address}. Would you like me to text you the directions?`
+          : `We're available virtually! We can set up a video call at your convenience.`
+      };
+    }
+
     // ===== BOOKING HANDLERS =====
     case 'check_availability': {
-      const { date, service_type } = args;
+      const { date } = args;
       
       // Get existing bookings for the date
       const { data: existingBookings } = await supabase
@@ -123,7 +233,7 @@ async function executeTool(toolName: string, args: Record<string, any>) {
         .neq('status', 'cancelled');
       
       const bookedTimes = existingBookings?.map(b => b.preferred_time) || [];
-      const allSlots = generateTimeSlots(date);
+      const allSlots = generateTimeSlots(date, tenant?.business_hours);
       const availableSlots = allSlots.filter(slot => !bookedTimes.includes(slot));
       
       return {
@@ -131,7 +241,7 @@ async function executeTool(toolName: string, args: Record<string, any>) {
         date,
         available_slots: availableSlots,
         message: availableSlots.length > 0 
-          ? `We have ${availableSlots.length} available time slots on ${date}. Available times: ${availableSlots.slice(0, 5).join(', ')}${availableSlots.length > 5 ? ' and more' : ''}`
+          ? `On ${date}, I have these times available: ${availableSlots.slice(0, 5).join(', ')}${availableSlots.length > 5 ? ' and more' : ''}. Which works best for you?`
           : `Sorry, we're fully booked on ${date}. Would you like to check another date?`
       };
     }
@@ -159,9 +269,10 @@ async function executeTool(toolName: string, args: Record<string, any>) {
         .single();
       
       if (error) {
+        console.error('Booking error:', error);
         return {
           success: false,
-          message: `Sorry, I couldn't complete the booking. ${error.message}`
+          message: `I'm having trouble completing the booking. Let me transfer you to someone who can help.`
         };
       }
       
@@ -169,7 +280,7 @@ async function executeTool(toolName: string, args: Record<string, any>) {
         success: true,
         booking_id: data.id,
         confirmation_number,
-        message: `Great! I've booked your ${service_type} appointment for ${preferred_date} at ${preferred_time}. Your confirmation number is ${confirmation_number}. You'll receive a confirmation text shortly.`
+        message: `Perfect! I've booked your ${service_type} for ${preferred_date} at ${preferred_time}. Your confirmation number is ${confirmation_number}. You'll receive a text confirmation shortly. Is there anything else I can help you with?`
       };
     }
 
@@ -184,12 +295,12 @@ async function executeTool(toolName: string, args: Record<string, any>) {
         query = query.eq('customer_phone', phone);
       }
       
-      const { data, error } = await query.order('preferred_date', { ascending: false }).limit(5);
+      const { data } = await query.order('preferred_date', { ascending: false }).limit(5);
       
-      if (error || !data || data.length === 0) {
+      if (!data || data.length === 0) {
         return {
           success: false,
-          message: "I couldn't find any bookings with that information. Can you verify the phone number or confirmation number?"
+          message: "I couldn't find any bookings with that information. Would you like to create a new booking?"
         };
       }
       
@@ -204,61 +315,57 @@ async function executeTool(toolName: string, args: Record<string, any>) {
           time: booking.preferred_time,
           status: booking.status
         },
-        message: `I found your booking. You have a ${booking.service_type} appointment scheduled for ${booking.preferred_date} at ${booking.preferred_time}. Your confirmation number is ${booking.confirmation_number}. Status: ${booking.status}.`
+        message: `I found your booking! You have a ${booking.service_type} scheduled for ${booking.preferred_date} at ${booking.preferred_time}. Confirmation number: ${booking.confirmation_number}. Would you like to make any changes?`
       };
     }
 
     case 'cancel_booking': {
       const { booking_id, reason } = args;
       
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('bookings')
         .update({ 
           status: 'cancelled',
           cancellation_reason: reason,
           cancelled_at: new Date().toISOString()
         })
-        .eq('id', booking_id)
-        .select()
-        .single();
+        .eq('id', booking_id);
       
       if (error) {
         return {
           success: false,
-          message: "I couldn't cancel that booking. Please verify the booking information."
+          message: "I couldn't cancel that booking. Let me transfer you to someone who can help."
         };
       }
       
       return {
         success: true,
-        message: `Your booking has been cancelled. If you'd like to reschedule, just let me know.`
+        message: `I've cancelled your booking. Would you like to reschedule for another time?`
       };
     }
 
     case 'reschedule_booking': {
       const { booking_id, new_date, new_time } = args;
       
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('bookings')
         .update({ 
           preferred_date: new_date,
           preferred_time: new_time,
           updated_at: new Date().toISOString()
         })
-        .eq('id', booking_id)
-        .select()
-        .single();
+        .eq('id', booking_id);
       
       if (error) {
         return {
           success: false,
-          message: "I couldn't reschedule that booking. Please verify the information."
+          message: "I couldn't reschedule that booking. Let me transfer you to someone who can help."
         };
       }
       
       return {
         success: true,
-        message: `I've rescheduled your appointment to ${new_date} at ${new_time}. You'll receive an updated confirmation.`
+        message: `Done! I've rescheduled your appointment to ${new_date} at ${new_time}. You'll receive an updated confirmation. Anything else?`
       };
     }
 
@@ -282,101 +389,71 @@ async function executeTool(toolName: string, args: Record<string, any>) {
         .select()
         .single();
       
-      if (error) {
-        // If leads table doesn't exist, save to a general contacts approach
-        console.error('Lead save error:', error);
-        return {
-          success: true, // Don't break the call flow
-          message: `Thank you ${name}! I've noted your interest and someone will follow up with you soon.`
-        };
-      }
-      
       return {
         success: true,
-        lead_id: data.id,
-        message: `Thank you ${name}! I've saved your information and someone from our team will reach out to you ${follow_up_date ? `on ${follow_up_date}` : 'soon'}.`
+        lead_id: data?.id,
+        message: `Thank you ${name}! I've saved your information. Someone from our team will reach out ${follow_up_date ? `on ${follow_up_date}` : 'within 24 hours'}.`
       };
     }
 
     case 'lookup_customer': {
-      const { phone, email } = args;
+      const { phone } = args;
       
-      let query = supabase.from('bookings').select('*');
-      
-      if (phone) {
-        query = query.eq('customer_phone', phone);
-      } else if (email) {
-        query = query.eq('customer_email', email);
-      }
-      
-      const { data: bookings } = await query.order('created_at', { ascending: false }).limit(10);
+      const { data: bookings } = await supabase
+        .from('bookings')
+        .select('*')
+        .eq('customer_phone', phone)
+        .order('created_at', { ascending: false })
+        .limit(10);
       
       if (!bookings || bookings.length === 0) {
         return {
           success: true,
-          is_new_customer: true,
-          message: "I don't see any previous bookings with us. Welcome! How can I help you today?"
+          is_returning: false,
+          message: "Welcome! I don't see any previous visits. Is this your first time with us?"
         };
       }
       
       const customer = bookings[0];
       return {
         success: true,
-        is_new_customer: false,
+        is_returning: true,
         customer_name: customer.customer_name,
-        total_bookings: bookings.length,
-        last_visit: bookings[0].preferred_date,
-        message: `Welcome back ${customer.customer_name}! I see you've been with us ${bookings.length} time${bookings.length > 1 ? 's' : ''}. Your last appointment was on ${bookings[0].preferred_date}.`
+        total_visits: bookings.length,
+        last_visit: customer.preferred_date,
+        message: `Welcome back ${customer.customer_name}! Great to hear from you again. You've been with us ${bookings.length} time${bookings.length > 1 ? 's' : ''}. How can I help you today?`
       };
     }
 
-    // ===== BUSINESS INFO HANDLERS =====
-    case 'get_business_hours': {
-      return {
-        success: true,
-        hours: {
-          monday: '9:00 AM - 5:00 PM',
-          tuesday: '9:00 AM - 5:00 PM',
-          wednesday: '9:00 AM - 5:00 PM',
-          thursday: '9:00 AM - 5:00 PM',
-          friday: '9:00 AM - 5:00 PM',
-          saturday: '10:00 AM - 3:00 PM',
-          sunday: 'Closed'
-        },
-        message: "We're open Monday through Friday from 9 AM to 5 PM, Saturday from 10 AM to 3 PM, and closed on Sundays."
-      };
-    }
-
-    case 'get_services': {
-      const { category } = args;
-      
-      // You can customize this based on your actual services
-      const services = [
-        { name: 'Consultation', duration: '30 min', price: 'Free' },
-        { name: 'Strategy Session', duration: '60 min', price: '$99' },
-        { name: 'Full Service Package', duration: '2 hours', price: '$299' },
-        { name: 'Follow-up Call', duration: '15 min', price: 'Free' }
-      ];
+    // ===== CALL CONTROL HANDLERS =====
+    case 'transfer_to_human': {
+      const { reason } = args;
+      const transferNumber = tenant?.transfer_phone_number;
       
       return {
         success: true,
-        services,
-        message: "We offer consultations, strategy sessions, full service packages, and follow-up calls. Our consultations are free, strategy sessions are $99, and full service packages are $299. What sounds interesting to you?"
+        action: 'transfer',
+        transfer_number: transferNumber,
+        message: transferNumber 
+          ? `Absolutely, let me connect you with ${tenant?.owner_name || 'a team member'} right now.`
+          : `I'll have someone call you back within the hour. Is this the best number to reach you?`
       };
     }
 
-    case 'get_location': {
+    case 'end_call': {
+      const { summary } = args;
+      
       return {
         success: true,
-        address: "123 Business St, Suite 100, Your City, ST 12345",
-        message: "We're located at 123 Business Street, Suite 100. There's parking available in the back. Would you like me to text you the directions?"
+        action: 'end',
+        message: `Thanks for calling ${tenant?.business_name || 'GreenLine365'}! ${summary ? `To recap: ${summary}. ` : ''}Have a great day!`
       };
     }
 
     default:
       return {
         success: false,
-        message: `Unknown tool: ${toolName}`
+        message: `I'm not sure how to help with that. Would you like to speak with a team member?`
       };
   }
 }
@@ -386,22 +463,38 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     
-    // Retell sends tool calls in this format
-    const { tool_name, arguments: toolArgs } = body;
+    // Retell sends: tool_name, arguments, and call metadata
+    const { tool_name, arguments: toolArgs, call } = body;
+    
+    // Get tenant based on the phone number that was called
+    let tenant = null;
+    if (call?.to_number) {
+      tenant = await getTenantByPhone(call.to_number);
+    }
+    
+    // Fall back to default tenant
+    if (!tenant) {
+      tenant = await getDefaultTenant();
+    }
     
     if (!tool_name) {
-      // If no tool_name, return available tools (for MCP discovery)
+      // Return available tools for MCP discovery
       return NextResponse.json({
         tools: Object.entries(TOOLS).map(([name, config]) => ({
           name,
           description: config.description,
           parameters: config.parameters
-        }))
+        })),
+        tenant: tenant ? {
+          business_name: tenant.business_name,
+          ai_agent_name: tenant.ai_agent_name,
+          greeting: tenant.greeting_message
+        } : null
       });
     }
     
-    // Execute the requested tool
-    const result = await executeTool(tool_name, toolArgs || {});
+    // Execute the requested tool with tenant context
+    const result = await executeTool(tool_name, toolArgs || {}, tenant);
     
     return NextResponse.json(result);
     
@@ -409,21 +502,31 @@ export async function POST(request: NextRequest) {
     console.error('MCP Error:', error);
     return NextResponse.json({
       success: false,
-      message: "I'm having trouble accessing our system right now. Let me take your information and have someone call you back."
+      message: "I'm having a technical issue. Let me transfer you to someone who can help."
     }, { status: 500 });
   }
 }
 
-// GET endpoint for MCP server info and tool discovery
+// GET endpoint for MCP server info
 export async function GET() {
+  const tenant = await getDefaultTenant();
+  
   return NextResponse.json({
-    name: 'GreenLine365 Booking System',
-    version: '1.0.0',
-    description: 'MCP server for handling bookings, leads, and customer inquiries via voice AI',
+    name: 'GreenLine365 Multi-Tenant Voice AI',
+    version: '2.0.0',
+    description: 'Production-ready MCP server for multi-tenant voice AI booking system',
+    features: [
+      'Multi-tenant support via phone number lookup',
+      'Full booking lifecycle (create, lookup, cancel, reschedule)',
+      'Lead capture and customer lookup',
+      'Human transfer capability',
+      'Tenant-specific business info, hours, and services'
+    ],
     tools: Object.entries(TOOLS).map(([name, config]) => ({
       name,
       description: config.description,
       parameters: config.parameters
-    }))
+    })),
+    default_tenant: tenant?.business_name
   });
 }
