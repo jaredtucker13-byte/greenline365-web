@@ -300,7 +300,7 @@ export default function HomePage() {
               How the <span className="text-neon-green-500">System</span> Works
             </h2>
             <p className="text-white/60 max-w-xl mx-auto">Four seamless phases that transform your business</p>
-          </motion.div>
+          </div>
           
           <div className="space-y-4 max-w-3xl mx-auto">
             {[
@@ -309,13 +309,10 @@ export default function HomePage() {
               { num: '03', title: 'Smart Engagement', desc: 'Automated, personalized outreach at the perfect moment when intent is highest.' },
               { num: '04', title: 'Growth & Optimization', desc: 'Continuous learning and optimization to maximize your conversion rates.' }
             ].map((step, i) => (
-              <motion.div
+              <div
                 key={i}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="glass-strong rounded-2xl p-5 border border-neon-green-500/20 flex gap-5 items-start"
+                data-step-card
+                className="glass-strong rounded-2xl p-5 border border-neon-green-500/20 flex gap-5 items-start gsap-hover-lift"
               >
                 <div className="flex-shrink-0">
                   <div className="text-3xl font-display font-bold text-neon-green-500/30">{step.num}</div>
@@ -328,9 +325,9 @@ export default function HomePage() {
                 <div>
                   <h3 className="text-lg font-display font-bold text-white mb-1">{step.title}</h3>
                   <p className="text-white/60 text-sm leading-relaxed">{step.desc}</p>
-                  <div className="h-1 bg-gradient-to-r from-neon-green-500 to-transparent rounded-full mt-3 w-2/3" />
+                  <div className="h-1 bg-gradient-to-r from-neon-green-500 to-transparent rounded-full mt-3 w-2/3 gsap-progress-bar" />
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -339,10 +336,8 @@ export default function HomePage() {
       {/* ========== TESTIMONIAL - Compact Card ========== */}
       <section className="py-12" style={{ paddingBlock: 'clamp(2rem, 6vh, 4rem)' }}>
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+          <div
+            data-testimonial
             className="glass-strong rounded-2xl p-6 md:p-8 border border-neon-green-500/20 max-w-3xl mx-auto"
           >
             <div className="flex flex-col md:flex-row gap-6 items-center">
@@ -368,7 +363,7 @@ export default function HomePage() {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -377,10 +372,8 @@ export default function HomePage() {
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
           <div className="grid lg:grid-cols-2 gap-8 items-center">
             {/* Left - Image */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
+            <div
+              data-scroll-image
               className="order-2 lg:order-1"
             >
               <div className="relative rounded-2xl overflow-hidden border border-white/10">
@@ -393,11 +386,11 @@ export default function HomePage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-os-dark/80 via-transparent to-transparent" />
               </div>
-            </motion.div>
+            </div>
             
             {/* Right - Content */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
+            <div
+              data-scroll-content
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               className="order-1 lg:order-2"
