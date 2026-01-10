@@ -107,6 +107,7 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
+  const timePickerRef = useRef<HTMLDivElement>(null);
 
   // Lock body scroll when modal is open
   useEffect(() => {
