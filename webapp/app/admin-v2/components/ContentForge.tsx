@@ -466,16 +466,75 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
     setCaptionFeedback(null);
     setKeywordsFeedback(null);
     setDescriptionFeedback(null);
+    setAnalysisComplete(false);
   };
 
-  // File handling
-  const handleFileSelect = (file: File) => {
+  // ============================================
+  // IMAGE ANALYSIS - AUTOPILOT MODE
+  // ============================================
+  const analyzeImage = async (imageDataUrl: string) => {
+    setIsAnalyzingImage(true);
+    setAnalysisComplete(false);
+    
+    try {
+      const response = await fetch('/api/analyze-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          imageData: imageDataUrl,
+          contentType,
+          businessType: 'local business',
+          location: 'Tampa, FL',
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.analysis) {
+        const { analysis } = data;
+        
+        // Auto-populate all fields
+        if (analysis.title) setTitle(analysis.title);
+        if (analysis.caption) setCaption(analysis.caption);
+        if (analysis.productDescription) setProductDescription(analysis.productDescription);
+        if (analysis.keywords?.length > 0) setKeywords(analysis.keywords);
+        if (analysis.hashtags?.brand) setBrandHashtag(analysis.hashtags.brand);
+        if (analysis.hashtags?.local) setLocalHashtag(analysis.hashtags.local);
+        if (analysis.hashtags?.suggested?.length > 0) {
+          setSuggestedHashtags(analysis.hashtags.suggested);
+        }
+        if (analysis.suggestedPlatforms?.length > 0) {
+          const validPlatforms = analysis.suggestedPlatforms.filter(
+            (p: string) => ['instagram', 'twitter', 'facebook'].includes(p)
+          ) as ('instagram' | 'twitter' | 'facebook')[];
+          if (validPlatforms.length > 0) setPlatforms(validPlatforms);
+        }
+        
+        setAnalysisComplete(true);
+        setSaveMessage({ type: 'success', text: '✨ AI analysis complete!' });
+        setTimeout(() => setSaveMessage(null), 3000);
+      } else {
+        throw new Error(data.error || 'Analysis failed');
+      }
+    } catch (error) {
+      console.error('Image analysis error:', error);
+      setSaveMessage({ type: 'error', text: 'Analysis failed - try manual entry' });
+      setTimeout(() => setSaveMessage(null), 3000);
+    } finally {
+      setIsAnalyzingImage(false);
+    }
+  };
+
+  // File handling - now with auto-analysis option
+  const handleFileSelect = (file: File, autoAnalyze = true) => {
     if (!file.type.startsWith('image/')) {
       alert('Please select an image file');
       return;
     }
     setIsUploading(true);
     setUploadProgress(0);
+    setAnalysisComplete(false);
+    
     const interval = setInterval(() => {
       setUploadProgress(prev => {
         if (prev >= 100) {
@@ -486,8 +545,17 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
         return prev + 10;
       });
     }, 100);
+    
     const reader = new FileReader();
-    reader.onload = (e) => setImagePreview(e.target?.result as string);
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result as string;
+      setImagePreview(dataUrl);
+      
+      // Auto-analyze after upload completes
+      if (autoAnalyze) {
+        setTimeout(() => analyzeImage(dataUrl), 1200);
+      }
+    };
     reader.readAsDataURL(file);
   };
 
