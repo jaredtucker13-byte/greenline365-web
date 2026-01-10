@@ -723,7 +723,7 @@ export default function HomePage() {
                 ))}
               </ul>
               <p className="text-neon-green-400 text-xs">Try it → Click the chat bubble in the bottom right</p>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
@@ -744,20 +744,14 @@ export default function HomePage() {
 
         <div className="relative z-10 pt-12 pb-6 px-4">
           <div className="max-w-[1280px] mx-auto text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-            >
-              <motion.div 
+            <div data-success-section>
+              <div 
+                data-success-badge
                 className="inline-flex items-center gap-2 px-3 py-1.5 glass-green rounded-full border border-neon-green-500/40 mb-3"
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
               >
                 <span className="w-2 h-2 bg-neon-green-500 rounded-full animate-pulse" />
                 <span className="text-xs text-neon-green-400 font-semibold">THE GREENLINE EFFECT</span>
-              </motion.div>
+              </div>
 
               <h2 className="font-display font-bold text-white mb-3 drop-shadow-lg" style={{ fontSize: 'clamp(1.5rem, 4vw, 2.5rem)' }}>
                 From Empty Tables to a <span className="text-neon-green-500">Packed House</span>
@@ -770,7 +764,7 @@ export default function HomePage() {
               <Button variant="primary" size="lg" onClick={() => setShowFullForm(true)} data-testid="success-cta-btn" className="shadow-lg">
                 Start Your Success Story
               </Button>
-            </motion.div>
+            </div>
           </div>
         </div>
 
