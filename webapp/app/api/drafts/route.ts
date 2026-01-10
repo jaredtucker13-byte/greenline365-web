@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 
 // Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
@@ -16,20 +16,24 @@ export async function GET(req: NextRequest) {
     const userId = searchParams.get('userId');
     const status = searchParams.get('status') || 'draft'; // 'draft', 'scheduled', 'published'
     
-    if (!userId) {
-      return NextResponse.json({ error: 'userId is required' }, { status: 400 });
-    }
-
-    const { data, error } = await supabase
+    // Build query - don't require userId since we're demoing
+    let query = supabase
       .from('scheduled_content')
       .select('*')
-      .eq('user_id', userId)
       .eq('status', status)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(20);
+
+    // Add userId filter if provided and not demo
+    if (userId && userId !== 'demo-user') {
+      query = query.eq('user_id', userId);
+    }
+
+    const { data, error } = await query;
 
     if (error) {
       console.error('Supabase fetch error:', error);
-      return NextResponse.json({ error: 'Failed to fetch drafts' }, { status: 500 });
+      return NextResponse.json({ error: 'Failed to fetch drafts', details: error.message }, { status: 500 });
     }
 
     return NextResponse.json({ 
@@ -61,24 +65,31 @@ export async function POST(req: NextRequest) {
       platforms = ['instagram'],
     } = body;
 
-    if (!userId) {
-      return NextResponse.json({ error: 'userId is required' }, { status: 400 });
-    }
-
     if (!title && !contentData?.caption) {
       return NextResponse.json({ error: 'Title or content is required' }, { status: 400 });
     }
 
-    const insertData = {
-      user_id: userId,
+    // Map to the actual table schema
+    const insertData: Record<string, unknown> = {
+      user_id: userId !== 'demo-user' ? userId : null,
       title: title || contentData?.title || 'Untitled Draft',
+      description: contentData?.caption || contentData?.productDescription || '',
       content_type: contentType || 'photo',
-      content_data: contentData,
+      event_type: 'content',
+      scheduled_date: scheduledAt ? new Date(scheduledAt).toISOString() : new Date().toISOString(),
+      platforms: platforms || [],
+      hashtags: contentData?.hashtags 
+        ? [contentData.hashtags.brand, contentData.hashtags.local, ...(contentData.hashtags.optional || [])].filter(Boolean)
+        : [],
+      image_url: contentData?.imageUrl || null,
       status,
-      scheduled_at: scheduledAt ? new Date(scheduledAt).toISOString() : null,
-      platforms,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+      color: contentType === 'blog' ? '#8B5CF6' : contentType === 'product' ? '#F59E0B' : '#0CE293',
+      metadata: {
+        keywords: contentData?.keywords || [],
+        blogContent: contentData?.blogContent || null,
+        productDescription: contentData?.productDescription || null,
+        fullContentData: contentData,
+      },
     };
 
     const { data, error } = await supabase
@@ -89,7 +100,7 @@ export async function POST(req: NextRequest) {
 
     if (error) {
       console.error('Supabase insert error:', error);
-      return NextResponse.json({ error: 'Failed to save draft' }, { status: 500 });
+      return NextResponse.json({ error: 'Failed to save draft', details: error.message }, { status: 500 });
     }
 
     return NextResponse.json({ 
@@ -122,8 +133,8 @@ export async function PUT(req: NextRequest) {
       platforms,
     } = body;
 
-    if (!id || !userId) {
-      return NextResponse.json({ error: 'id and userId are required' }, { status: 400 });
+    if (!id) {
+      return NextResponse.json({ error: 'id is required' }, { status: 400 });
     }
 
     const updateData: Record<string, unknown> = {
@@ -132,22 +143,39 @@ export async function PUT(req: NextRequest) {
 
     if (title !== undefined) updateData.title = title;
     if (contentType !== undefined) updateData.content_type = contentType;
-    if (contentData !== undefined) updateData.content_data = contentData;
     if (status !== undefined) updateData.status = status;
-    if (scheduledAt !== undefined) updateData.scheduled_at = scheduledAt ? new Date(scheduledAt).toISOString() : null;
+    if (scheduledAt !== undefined) updateData.scheduled_date = scheduledAt ? new Date(scheduledAt).toISOString() : null;
     if (platforms !== undefined) updateData.platforms = platforms;
+    
+    if (contentData !== undefined) {
+      updateData.description = contentData?.caption || contentData?.productDescription || '';
+      updateData.image_url = contentData?.imageUrl || null;
+      updateData.hashtags = contentData?.hashtags 
+        ? [contentData.hashtags.brand, contentData.hashtags.local, ...(contentData.hashtags.optional || [])].filter(Boolean)
+        : [];
+      updateData.metadata = {
+        keywords: contentData?.keywords || [],
+        blogContent: contentData?.blogContent || null,
+        productDescription: contentData?.productDescription || null,
+        fullContentData: contentData,
+      };
+    }
 
-    const { data, error } = await supabase
+    let query = supabase
       .from('scheduled_content')
       .update(updateData)
-      .eq('id', id)
-      .eq('user_id', userId)
-      .select()
-      .single();
+      .eq('id', id);
+    
+    // Add userId filter if provided and not demo
+    if (userId && userId !== 'demo-user') {
+      query = query.eq('user_id', userId);
+    }
+
+    const { data, error } = await query.select().single();
 
     if (error) {
       console.error('Supabase update error:', error);
-      return NextResponse.json({ error: 'Failed to update draft' }, { status: 500 });
+      return NextResponse.json({ error: 'Failed to update draft', details: error.message }, { status: 500 });
     }
 
     return NextResponse.json({ 
@@ -171,19 +199,25 @@ export async function DELETE(req: NextRequest) {
     const id = searchParams.get('id');
     const userId = searchParams.get('userId');
 
-    if (!id || !userId) {
-      return NextResponse.json({ error: 'id and userId are required' }, { status: 400 });
+    if (!id) {
+      return NextResponse.json({ error: 'id is required' }, { status: 400 });
     }
 
-    const { error } = await supabase
+    let query = supabase
       .from('scheduled_content')
       .delete()
-      .eq('id', id)
-      .eq('user_id', userId);
+      .eq('id', id);
+    
+    // Add userId filter if provided and not demo
+    if (userId && userId !== 'demo-user') {
+      query = query.eq('user_id', userId);
+    }
+
+    const { error } = await query;
 
     if (error) {
       console.error('Supabase delete error:', error);
-      return NextResponse.json({ error: 'Failed to delete draft' }, { status: 500 });
+      return NextResponse.json({ error: 'Failed to delete draft', details: error.message }, { status: 500 });
     }
 
     return NextResponse.json({ 
