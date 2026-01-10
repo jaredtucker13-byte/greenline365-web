@@ -27,6 +27,8 @@ interface SidebarProps {
   onToggleCollapse: () => void;
   isMobileOpen: boolean;
   onMobileToggle: () => void;
+  isPreviewMode?: boolean;
+  onPreviewModeToggle?: () => void;
 }
 
 const navItems = [
