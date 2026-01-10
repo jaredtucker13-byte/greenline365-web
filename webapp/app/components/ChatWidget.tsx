@@ -635,10 +635,10 @@ export default function ChatWidget({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className={`fixed z-40 rounded-3xl overflow-hidden bg-[#0a0f0d] border backdrop-blur-xl shadow-2xl ${
+            className={`fixed z-[60] rounded-3xl overflow-hidden bg-[#0a0f0d] border backdrop-blur-xl shadow-2xl ${
               isExpanded 
-                ? 'bottom-6 right-6 left-6 top-24 md:left-auto md:w-[600px]' 
-                : 'bottom-24 right-6 w-[380px] sm:w-[420px] max-w-[calc(100vw-3rem)]'
+                ? 'bottom-6 right-6 left-6 top-24 md:left-auto md:w-[550px] md:max-h-[calc(100vh-120px)]' 
+                : 'bottom-24 right-6 w-[360px] sm:w-[380px] max-w-[calc(100vw-3rem)] max-h-[70vh]'
             }`}
             style={{
               borderColor: `${styles.accent}30`,
