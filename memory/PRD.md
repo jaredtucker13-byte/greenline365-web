@@ -62,7 +62,7 @@ Build a comprehensive AI-powered business operating system for local businesses 
    - Hover lift effects on interactive cards
 
 ### 🔄 In Progress
-- Blog section refinement within Content Forge
+- Wire up AI Assistant suggestions to Content Forge fields ("Apply" buttons)
 
 ### 📋 Upcoming (P0-P1)
 1. **Image Analysis Workflow**
