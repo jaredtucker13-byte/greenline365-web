@@ -38,14 +38,80 @@ export default function WeeklyTrendBatch() {
     fetchWeeklyTrends();
   }, []);
 
-  const getCategoryIcon = (category: string) => {
+  // Smart icon detection based on title/description content
+  const getSmartIcon = (category: string, title: string, description: string = '') => {
+    const content = `${title} ${description}`.toLowerCase();
+    
+    // Sports - detect specific sport type
+    if (category === 'sports') {
+      // American Football (NFL, Super Bowl, etc.)
+      if (content.includes('super bowl') || 
+          content.includes('nfl') || 
+          content.includes('touchdown') ||
+          content.includes('quarterback') ||
+          content.includes('buccaneers') || 
+          content.includes('dolphins') ||
+          content.includes('jaguars') ||
+          content.includes('american football')) {
+        return '🏈';
+      }
+      // Hockey (NHL, Lightning, etc.)
+      if (content.includes('lightning') || 
+          content.includes('nhl') || 
+          content.includes('hockey') ||
+          content.includes('panthers hockey') ||
+          content.includes('stanley cup') ||
+          content.includes('puck')) {
+        return '🏒';
+      }
+      // Basketball (NBA)
+      if (content.includes('nba') || 
+          content.includes('basketball') ||
+          content.includes('heat') && content.includes('game') ||
+          content.includes('magic') && content.includes('game') ||
+          content.includes('lakers') ||
+          content.includes('celtics')) {
+        return '🏀';
+      }
+      // Baseball (MLB)
+      if (content.includes('mlb') || 
+          content.includes('baseball') ||
+          content.includes('rays') && content.includes('game') ||
+          content.includes('marlins') ||
+          content.includes('world series')) {
+        return '⚾';
+      }
+      // Soccer (International Football, MLS)
+      if (content.includes('soccer') || 
+          content.includes('mls') ||
+          content.includes('fifa') ||
+          content.includes('world cup') ||
+          content.includes('premier league') ||
+          content.includes('la liga') ||
+          content.includes('champions league')) {
+        return '⚽';
+      }
+      // Golf
+      if (content.includes('golf') || content.includes('pga')) {
+        return '⛳';
+      }
+      // Tennis
+      if (content.includes('tennis') || content.includes('wimbledon')) {
+        return '🎾';
+      }
+      // Default sports icon
+      return '🏆';
+    }
+    
+    // Non-sports categories
     const icons: Record<string, string> = {
-      sports: '⚽',
       community: '🏘️',
       business: '💼',
       entertainment: '🎭',
       weather: '🌤️',
-      education: '📚'
+      education: '📚',
+      event: '🎉',
+      alert: '⚠️'
     };
     return icons[category] || '📌';
   };
