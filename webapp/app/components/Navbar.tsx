@@ -344,22 +344,6 @@ export default function Navbar() {
                     )}
                   </motion.div>
                 )}
-                
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.7 }}
-                  className="pt-4"
-                >
-                  <Button 
-                    variant="primary" 
-                    size="lg" 
-                    fullWidth
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Book Demo
-                  </Button>
-                </motion.div>
               </div>
               
               {/* Decorative Elements */}
