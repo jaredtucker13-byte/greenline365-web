@@ -292,7 +292,7 @@ export default function TacticalCommandCenter() {
 
         {/* Main Grid */}
         <main className="p-6 space-y-6">
-          {/* Top Row: Calendar + Local Pulse */}
+          {/* Top Row: Calendar + Real-Time Trends */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Calendar - 2/3 width */}
             <div className="lg:col-span-2">
@@ -305,14 +305,15 @@ export default function TacticalCommandCenter() {
               />
             </div>
 
-            {/* Local Pulse - 1/3 width */}
+            {/* Live Local Pulse - 1/3 width */}
             <div>
-              <LocalPulse
-                location={demoConfig.city}
-                trends={mockTrends}
-                onForgeContent={handleForgeFromTrend}
-              />
+              <LiveLocalPulse />
             </div>
+          </div>
+
+          {/* Weekly Trends Section */}
+          <div className="grid grid-cols-1">
+            <WeeklyTrendBatch />
           </div>
 
           {/* Quick Actions Row */}
