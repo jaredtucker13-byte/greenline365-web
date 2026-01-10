@@ -2,18 +2,25 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/supabase/client';
 import type { User } from '@supabase/supabase-js';
 import { Button } from '@/components/ui/os';
 
 export default function Navbar() {
+  const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [scrolled, setScrolled] = useState(false);
+
+  // Hide navbar on dashboard routes
+  const isDashboardRoute = pathname?.startsWith('/admin-v2') || 
+                           pathname?.startsWith('/dashboard') || 
+                           pathname?.startsWith('/god-mode');
 
   // Scroll detection for nav blur effect
   useEffect(() => {
