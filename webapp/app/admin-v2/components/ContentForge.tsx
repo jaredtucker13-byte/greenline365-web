@@ -210,11 +210,15 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
       
       const data = await response.json();
       if (data.success && data.data.keywords) {
-        setKeywords(data.data.keywords.slice(0, 8));
+        // Store as suggestions, not directly as keywords
+        const newSuggestions = data.data.keywords
+          .slice(0, 8)
+          .filter((kw: string) => !keywords.includes(kw));
+        setSuggestedKeywords(newSuggestions);
       }
     } catch (error) {
       console.error('Keywords generation error:', error);
-      setKeywords(['business growth', 'local business', 'tampa', 'small business', 'entrepreneur']);
+      setSuggestedKeywords(['business growth', 'local business', 'tampa', 'small business', 'entrepreneur']);
     }
     
     setIsGeneratingKeywords(false);
