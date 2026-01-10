@@ -172,9 +172,9 @@ Include # symbol with each hashtag.`;
 
   const response = await callOpenRouter(MODELS['blog-content'], systemPrompt, userPrompt);
   
-  // Parse the response
-  const standardMatch = response.match(/STANDARD:\s*(.+?)(?:\n|OPTIONAL:)/s);
-  const optionalMatch = response.match(/OPTIONAL:\s*(.+)/s);
+  // Parse the response (using [\s\S] instead of /s flag for ES compatibility)
+  const standardMatch = response.match(/STANDARD:\s*([\s\S]+?)(?:\n|OPTIONAL:)/);
+  const optionalMatch = response.match(/OPTIONAL:\s*([\s\S]+)/);
   
   const parseHashtags = (text: string | undefined): string[] => {
     if (!text) return [];
@@ -201,9 +201,9 @@ SUGGESTIONS: [List 2-3 content ideas based on these trends, one per line]`;
 
   const response = await callOpenRouter(MODELS['web-search'], systemPrompt, userPrompt);
   
-  // Parse the response
-  const trendsMatch = response.match(/TRENDS:\s*(.+?)(?:\n\n|SUGGESTIONS:)/s);
-  const suggestionsMatch = response.match(/SUGGESTIONS:\s*(.+)/s);
+  // Parse the response (using [\s\S] instead of /s flag for ES compatibility)
+  const trendsMatch = response.match(/TRENDS:\s*([\s\S]+?)(?:\n\n|SUGGESTIONS:)/);
+  const suggestionsMatch = response.match(/SUGGESTIONS:\s*([\s\S]+)/);
   
   const parseList = (text: string | undefined): string[] => {
     if (!text) return [];
