@@ -128,11 +128,14 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
     }
   }, [selectedDate]);
 
-  // Close calendar when clicking outside
+  // Close calendar/time picker when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) {
         setShowCalendar(false);
+      }
+      if (timePickerRef.current && !timePickerRef.current.contains(event.target as Node)) {
+        setShowTimePicker(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
