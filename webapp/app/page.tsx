@@ -661,7 +661,6 @@ export default function HomePage() {
             {/* Right - Content */}
             <div
               data-scroll-content
-              whileInView={{ opacity: 1, x: 0 }}
               className="order-1 lg:order-2"
             >
               <span className="text-neon-green-500 text-xs font-bold tracking-widest uppercase mb-3 block">Sound Familiar?</span>
