@@ -102,6 +102,11 @@ export default function Navbar() {
     { href: '/support', label: 'Support' },
   ];
 
+  // Don't render navbar on dashboard routes
+  if (isDashboardRoute) {
+    return null;
+  }
+
   return (
     <>
       <nav 
