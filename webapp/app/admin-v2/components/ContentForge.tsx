@@ -937,6 +937,8 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                             {isGeneratingKeywords ? '⏳...' : '🧠 Generate'}
                           </button>
                         </div>
+                        
+                        {/* Manual input */}
                         <div className="flex gap-2 mb-2">
                           <input
                             type="text"
@@ -948,14 +950,43 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                           />
                           <button onClick={addKeyword} className="px-3 py-1.5 rounded-lg bg-[#39FF14]/20 text-[#39FF14] text-xs font-medium hover:bg-[#39FF14]/30 transition">+</button>
                         </div>
-                        <div className="flex flex-wrap gap-1.5">
-                          {keywords.map((kw) => (
-                            <span key={kw} className="px-2 py-0.5 rounded-full bg-[#39FF14]/10 text-[#39FF14] text-xs flex items-center gap-1 cursor-pointer hover:bg-[#39FF14]/20">
-                              {kw}
-                              <button onClick={() => removeKeyword(kw)} className="hover:text-red-400">×</button>
-                            </span>
-                          ))}
+                        
+                        {/* Selected keywords */}
+                        <div className="flex flex-wrap gap-1.5 mb-2 min-h-[24px]">
+                          {keywords.length === 0 ? (
+                            <span className="text-xs text-gray-600">Click suggestions below to add ↓</span>
+                          ) : (
+                            keywords.map((kw) => (
+                              <span key={kw} className="px-2 py-0.5 rounded-full bg-[#39FF14]/20 text-[#39FF14] text-xs flex items-center gap-1">
+                                {kw}
+                                <button onClick={() => removeKeyword(kw)} className="hover:text-red-400 ml-0.5">×</button>
+                              </span>
+                            ))
+                          )}
                         </div>
+                        
+                        {/* AI Suggested keywords - clickable to add */}
+                        {suggestedKeywords.length > 0 && (
+                          <div className="pt-2 border-t border-[#2D3748]">
+                            <p className="text-[10px] text-gray-500 mb-1.5">🤖 AI Suggestions (click to add)</p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {suggestedKeywords.map((kw) => (
+                                <button
+                                  key={kw}
+                                  onClick={() => {
+                                    if (!keywords.includes(kw)) {
+                                      setKeywords([...keywords, kw]);
+                                      setSuggestedKeywords(suggestedKeywords.filter(s => s !== kw));
+                                    }
+                                  }}
+                                  className="px-2 py-0.5 rounded-full bg-[#8A2BE2]/10 text-[#8A2BE2] text-xs hover:bg-[#8A2BE2]/20 transition flex items-center gap-1"
+                                >
+                                  + {kw}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
 
                       {/* Product Description (for products only) */}
