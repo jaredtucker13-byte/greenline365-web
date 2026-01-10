@@ -140,9 +140,9 @@ CONTENT: [Your blog content here]`;
 
   const response = await callOpenRouter(MODELS['blog-content'], systemPrompt, userPrompt);
   
-  // Parse the response
-  const titleMatch = response.match(/TITLE:\s*(.+?)(?:\n|CONTENT:)/s);
-  const contentMatch = response.match(/CONTENT:\s*(.+)/s);
+  // Parse the response (using [\s\S] instead of /s flag for ES compatibility)
+  const titleMatch = response.match(/TITLE:\s*([\s\S]+?)(?:\n|CONTENT:)/);
+  const contentMatch = response.match(/CONTENT:\s*([\s\S]+)/);
   
   return {
     title: titleMatch?.[1]?.trim() || 'Untitled Blog Post',
