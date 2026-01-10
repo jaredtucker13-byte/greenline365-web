@@ -618,19 +618,17 @@ export default function HomePage() {
                 </div>
                 <p className="text-white/50 text-xs">Trusted by 500+ businesses</p>
               </div>
-            </motion.div>
+            </div>
             
             {/* Right - Form */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
+            <div
+              data-booking-right
               className="glass rounded-2xl p-6"
             >
               <h3 className="text-lg font-display font-bold text-white mb-2">Book Your Strategy Session</h3>
               <p className="text-white/60 text-sm mb-4">Complete our quick form and we&apos;ll schedule a demo.</p>
               <MultiStepBookingForm />
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
@@ -638,24 +636,20 @@ export default function HomePage() {
       {/* ========== PRODUCTS - 50/50 Splits ========== */}
       <section className="py-16" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+          <div
+            data-section-header
             className="text-center mb-10"
           >
             <h2 className="font-display font-bold text-white mb-3" style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)' }}>
               Our <span className="text-neon-green-500">Products</span>
             </h2>
             <p className="text-white/60">White-label solutions you can integrate</p>
-          </motion.div>
+          </div>
 
           {/* Product 1 - Booking Widget */}
           <div className="grid lg:grid-cols-2 gap-6 mb-8">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
+            <div
+              data-product-left
             >
               <div className="inline-flex items-center gap-2 px-3 py-1 glass-green border border-neon-green-500/30 rounded-full mb-4">
                 <span className="text-xs text-neon-green-500 font-semibold uppercase">Product #1</span>
@@ -675,25 +669,21 @@ export default function HomePage() {
                 ))}
               </ul>
               <Button variant="primary" onClick={() => setShowWidget(true)}>Try the Widget</Button>
-            </motion.div>
+            </div>
             
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
+            <div
+              data-product-right
               className="glass-strong rounded-2xl p-5 border border-neon-green-500/20"
             >
               <h4 className="text-base font-display font-bold text-white mb-4 text-center">Quick Book Demo</h4>
               <BookingWidget source="landing-page-demo" />
-            </motion.div>
+            </div>
           </div>
 
           {/* Product 2 - AI Chat */}
           <div className="grid lg:grid-cols-2 gap-6">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
+            <div
+              data-product-demo
               className="glass-strong rounded-2xl p-5 order-2 lg:order-1"
             >
               <div className="p-4 border-b border-neon-green-500/10 bg-black/30 rounded-t-xl">
@@ -709,12 +699,10 @@ export default function HomePage() {
                   <div className="rounded-xl px-3 py-2 text-xs text-black bg-neon-green-500">Tell me about your services</div>
                 </div>
               </div>
-            </motion.div>
+            </div>
             
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
+            <div
+              data-product-info
               className="order-1 lg:order-2"
             >
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-500/20 border border-purple-500/30 rounded-full mb-4">
