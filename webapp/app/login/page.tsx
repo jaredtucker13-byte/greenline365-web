@@ -1,20 +1,35 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { signIn, signInWithGoogle } from '@/lib/supabase/client';
+import { signIn, signInWithGoogle, supabase } from '@/lib/supabase/client';
 
 export default function LoginPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [checkingSession, setCheckingSession] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
+
+  // Check for existing session on page load
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        // User is already logged in, redirect to dashboard
+        router.push('/admin-v2');
+      } else {
+        setCheckingSession(false);
+      }
+    };
+    checkSession();
+  }, [router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -35,7 +50,7 @@ export default function LoginPage() {
     }
 
     if (data.session) {
-      router.push('/dashboard');
+      router.push('/admin-v2');
     }
 
     setLoading(false);
@@ -49,6 +64,18 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
+
+  // Show loading while checking session
+  if (checkingSession) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-white/60">Checking session...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="py-12">
