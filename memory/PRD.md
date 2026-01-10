@@ -28,53 +28,50 @@ Build a comprehensive AI-assisted business operating system for small businesses
 
 ## What's Been Implemented
 
-### Completed (January 10, 2026)
-- [x] **Login System Fixed:** User can now log in with `jared.tucker13@gmail.com` / `GreenLine365!`
-- [x] **Super Admin ID Mismatch Fixed:** Corrected `super_admins` table user_id to match auth.users
-- [x] **Live Local Pulse Feature:** Fully functional with real-time data display
-  - Shows trends that expire in 3 hours
-  - Countdown timer to next update
-  - "Create Special Now" action buttons
-  - Fetches from `/api/receive-trends?type=live_pulse`
-- [x] **Weekly Trend Hunter Feature:** Fully functional with weekly content ideas
-  - Shows up to 5 trends for content planning
-  - Traffic indicators (HIGH/MEDIUM/LOW)
-  - "Create Content" action buttons
-  - Fetches from `/api/receive-trends?type=weekly_batch`
-- [x] **API Endpoint `/api/receive-trends`:**
-  - POST: Receives trends from N8N workflows, stores in `local_trends` table
-  - GET: Returns trends filtered by type (live_pulse or weekly_batch)
-  - Properly handles JSONB `trend_data` column structure
-- [x] **Database:** RLS enabled on ~96 tables, 250+ performance indexes added
+### Completed (January 10, 2026 - Session 2)
+- [x] **Landing Page Redesign Complete:**
+  - Original hero section preserved (phone mockup, "The Operating System for the Local Economy")
+  - NEW: Distressed owners section with triptych image ("Running on Empty")
+  - NEW: Solution section with barber selfie ("Your Phone is Already a Marketing Machine")
+  - NEW: Daily Trend Hunter live demo integrated
+  - NEW: Success story section with clean packed restaurant image (before footer)
+  - Testimonial moved from floating element to static section
+  - All 4 user-provided images integrated: hero-packed-house.jpg, distressed-owners.jpg, barber-selfie.jpg, barber-result.jpg, packed-house-clean.jpg
+- [x] **Floating Testimonial Removed:** Replaced with static testimonial section after "How It Works"
+- [x] **Database Ready:** `scheduled_content` table exists in Supabase (confirmed via policy error)
 
-### Previously Completed
-- [x] Supabase database cleanup and production readiness
-- [x] `super_admins` workaround table for admin access
-- [x] Vercel configuration fixed (`vercel.json`)
-- [x] Navbar updated with Sign In/Sign Up and God Mode links
-- [x] Dashboard scaffolding (`/admin-v2` page)
-- [x] `trend_history` table for auto-journaling
+### Previously Completed (January 10, 2026 - Session 1)
+- [x] **Login System Fixed:** User can now log in with `jared.tucker13@gmail.com` / `GreenLine365!`
+- [x] **Live Local Pulse Feature:** Fully functional with real-time data display
+- [x] **Weekly Trend Hunter Feature:** Fully functional with weekly content ideas
+- [x] **API Endpoint `/api/receive-trends`:** POST/GET for N8N workflows
+- [x] **Database:** RLS enabled on ~96 tables, 250+ performance indexes added
+- [x] **SEO Implementation:** Meta tags, sitemap, robots.txt complete
+- [x] **Content Forge UI:** Full-screen modal with AI generator buttons, hashtag system, file upload UI
+- [x] **Session Persistence:** Auto-redirect for logged-in users
+- [x] **Preview Mode Toggle:** Admin can preview customer view
 
 ## Prioritized Backlog
 
-### P0 (Critical)
-- [ ] **Landing Page Redesign:** Implement the "distressed business owner" storyline with:
-  - Specific imagery (barber shop before/after)
-  - Daily Trend Hunter live demo integration
-  - 40% smaller booking calendar
-  - Remove redundant funnels/buttons
+### P0 (Critical) - COMPLETED
+- [x] **Landing Page Redesign:** ✅ DONE
 
 ### P1 (High Priority)
-- [ ] **God Mode CMS:** Create `/god-mode` page for site-wide editing (colors, content, layout)
-- [ ] **OTP Verification System:** Implement N8N/Twilio spec with `verification_events` audit table
+- [ ] **Content Forge Backend:** Wire up AI generators
+  - GPT-5.2 for smart thinking
+  - Claude Sonnet 4.5 for blogs/hashtags
+  - Perplexity for live web search
+  - Nano Banana Pro for image generation
+  - Supabase Storage for image uploads
 - [ ] **UI Fixes:**
   - Booking widget invisible text
-  - Components resize (75% smaller)
-  - Admin sidebar collapse fix
+  - Components resize (40-75% smaller as requested by user)
+- [ ] **God Mode CMS:** Create `/god-mode` page for site-wide editing
+- [ ] **OTP Verification System:** Implement N8N/Twilio spec
 
 ### P2 (Medium Priority)
-- [ ] **Content Forge Integration:** Wire "Create Content" buttons to ContentForge modal
-- [ ] **N8N Webhook Setup Documentation:** Guide for user to configure N8N workflows
+- [ ] **Admin sidebar collapse fix**
+- [ ] **N8N Webhook Setup Documentation**
 
 ### Future/Backlog
 - [ ] Build remaining 30+ dashboard features
@@ -82,9 +79,14 @@ Build a comprehensive AI-assisted business operating system for small businesses
 - [ ] Google Calendar Sync integration
 - [ ] Full user profile system (fix `profiles` table FK issue)
 
-## Known Issues
-1. **`profiles` table FK broken:** Workaround via `super_admins` table
-2. **Landing page is old version:** Major user dissatisfaction - needs redesign
+## LLM Integration Stack (User Specified)
+| Use Case | Provider |
+|----------|----------|
+| Video Analysis | Gemini 3 |
+| Image Generation | Nano Banana Pro |
+| Smart Thinking/Core AI | GPT-5.2 |
+| Blog, Hashtags, Content | Claude Sonnet 4.5 |
+| Live Web Search | Perplexity |
 
 ## Key API Endpoints
 | Endpoint | Method | Description |
@@ -96,18 +98,26 @@ Build a comprehensive AI-assisted business operating system for small businesses
 
 ## Database Schema (Key Tables)
 - `local_trends`: `{id, city_name, trend_data (JSONB), source, expires_at, user_id, zip_code, created_at}`
+- `scheduled_content`: `{id, user_id, title, description, content_type, scheduled_date, platforms, hashtags, image_url, status, metadata}`
 - `trend_history`: Auto-journaling of all trend requests
 - `super_admins`: `{user_id, email, full_name}` - Admin access workaround
-- `business_services`: User's services for context-aware suggestions
 
 ## Credentials
 - **Admin Login:** `jared.tucker13@gmail.com` / `GreenLine365!`
 - **User ID:** `677b536d-6521-4ac8-a0a5-98278b35f4cc`
 
 ## Files Reference
+- `/app/webapp/app/page.tsx` - Landing page (UPDATED)
 - `/app/webapp/app/admin-v2/page.tsx` - Main dashboard
+- `/app/webapp/app/admin-v2/components/ContentForge.tsx` - Content creation modal
 - `/app/webapp/app/admin-v2/components/LiveLocalPulse.tsx` - Live trends component
 - `/app/webapp/app/admin-v2/components/WeeklyTrendBatch.tsx` - Weekly trends component
 - `/app/webapp/app/api/receive-trends/route.ts` - Trends API endpoint
-- `/app/webapp/app/page.tsx` - Landing page (needs redesign)
-- `/app/webapp/lib/supabase/client.ts` - Supabase client config
+- `/app/webapp/public/images/` - User-provided images
+
+## Image Assets
+- `hero-packed-house.jpg` - Original packed house with overlays
+- `packed-house-clean.jpg` - Clean version for success story section
+- `distressed-owners.jpg` - Triptych of stressed business owners
+- `barber-selfie.jpg` - Client taking selfie with haircut
+- `barber-result.jpg` - Professional haircut result
