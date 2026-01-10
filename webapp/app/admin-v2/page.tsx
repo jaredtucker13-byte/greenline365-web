@@ -267,18 +267,20 @@ export default function TacticalCommandCenter() {
               </div>
               <div className="text-left">
                 <p className="text-white font-semibold">Review Suggested Posts</p>
-                <p className="text-xs text-gray-400">3 posts ready for review</p>
+                <p className="text-xs text-gray-400">{pendingCount} posts ready for review</p>
               </div>
-              <span className="absolute top-3 right-3 w-5 h-5 bg-[#FFC800] rounded-full text-black text-xs font-bold flex items-center justify-center">3</span>
+              {pendingCount > 0 && (
+                <span className="absolute top-3 right-3 w-5 h-5 bg-[#FFC800] rounded-full text-black text-xs font-bold flex items-center justify-center">{pendingCount}</span>
+              )}
             </motion.button>
           </div>
 
           {/* Analytics Widgets Row */}
           <AnalyticsWidgets
-            activities={mockActivities}
-            teamMetrics={mockTeamMetrics}
-            pipeline={mockPipeline}
-            bookingTrends={mockBookingTrends}
+            activities={emptyActivities}
+            teamMetrics={emptyTeamMetrics}
+            pipeline={emptyPipeline}
+            bookingTrends={emptyBookingTrends}
           />
         </main>
       </div>
