@@ -3,9 +3,9 @@ import Link from 'next/link';
 import { createServerClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy | GreenLine365 - Data Protection & Privacy',
-  description: 'GreenLine365 Privacy Policy. Learn how we collect, use, protect, and manage your personal data in compliance with GDPR, CCPA, and privacy regulations.',
-  keywords: 'GreenLine365 privacy, data protection, GDPR, CCPA, privacy policy, personal data, user privacy',
+  title: 'Privacy Policy | GreenLine365 - Data Protection & SMS Privacy',
+  description: 'GreenLine365 Privacy Policy. Learn how we collect, use, protect, and manage your personal data including SMS verification, in compliance with privacy regulations.',
+  keywords: 'GreenLine365 privacy, data protection, SMS privacy, OTP verification, personal data, user privacy, TCPA compliance',
   openGraph: {
     title: 'Privacy Policy | GreenLine365',
     description: 'How GreenLine365 protects your personal data and respects your privacy rights.',
@@ -19,16 +19,11 @@ export const metadata: Metadata = {
 };
 
 const sections = [
-  { id: 'introduction', title: '1. Introduction' },
-  { id: 'data-collection', title: '2. Information We Collect' },
+  { id: 'overview', title: '1. Overview' },
+  { id: 'data-collection', title: '2. Data We Collect' },
   { id: 'data-usage', title: '3. How We Use Your Data' },
-  { id: 'data-sharing', title: '4. Data Sharing & Third Parties' },
-  { id: 'data-security', title: '5. Data Security' },
-  { id: 'your-rights', title: '6. Your Rights' },
-  { id: 'cookies', title: '7. Cookies & Tracking' },
-  { id: 'children', title: '8. Children\'s Privacy' },
-  { id: 'changes', title: '9. Changes to This Policy' },
-  { id: 'contact', title: '10. Contact Us' },
+  { id: 'sharing-storage', title: '4. Sharing, Storage & Retention' },
+  { id: 'your-choices', title: '5. Your Choices & Contact' },
 ];
 
 async function getPrivacyContent() {
@@ -65,13 +60,13 @@ export default async function PrivacyPage() {
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              Last Updated: January 6, 2026
+              Last Updated: January 10, 2026
             </span>
             <span className="flex items-center gap-2">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              ~7 min read
+              ~5 min read
             </span>
           </div>
         </header>
@@ -107,276 +102,229 @@ export default async function PrivacyPage() {
               />
             ) : (
               <>
-                {/* Introduction Card */}
-                <div className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-500/20 rounded-xl p-6">
-                  <p className="text-white/80 leading-relaxed">
-                    GreenLine365 (&quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) is committed to protecting your privacy. 
-                    This Privacy Policy explains how we collect, use, disclose, and safeguard your information 
-                    when you use our AI-powered business automation platform.
-                  </p>
-                </div>
-
-                {/* Section 1 */}
-                <section id="introduction" className="scroll-mt-24">
+                {/* Section 1 - Overview */}
+                <section id="overview" className="scroll-mt-24">
                   <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
                     <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">1</span>
-                    Introduction
+                    Overview
                   </h2>
-                  <p className="text-white/70 leading-relaxed mb-4">
-                    By accessing or using GreenLine365, you agree to the collection and use of information 
-                    in accordance with this Privacy Policy. If you do not agree with our policies and practices, 
-                    please do not use our Service.
-                  </p>
-                  <p className="text-white/70 leading-relaxed">
-                    This policy applies to information we collect through the Service, via email, text, and 
-                    other electronic communications, and through mobile applications.
+                  <div className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-500/20 rounded-xl p-6">
+                    <p className="text-white/80 leading-relaxed">
+                      This Privacy Policy explains how GreenLine365 (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;) collects, uses, and 
+                      protects personal information when you visit our website or use our services, including SMS‑based verification.
+                    </p>
+                  </div>
+                  <p className="text-white/70 leading-relaxed mt-4">
+                    By providing your information (including your mobile phone number) and using our services, you agree 
+                    to the practices described here, subject to any additional consent screens shown in the product.
                   </p>
                 </section>
 
-                {/* Section 2 */}
+                {/* Section 2 - Data We Collect */}
                 <section id="data-collection" className="scroll-mt-24">
                   <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
                     <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">2</span>
-                    Information We Collect
+                    Data We Collect
                   </h2>
                   <p className="text-white/70 leading-relaxed mb-5">
-                    We collect several types of information from and about users of our Service:
+                    We collect the following types of information to provide and improve our services:
                   </p>
-                  <div className="grid grid-cols-1 gap-4">
-                    <div className="bg-white/5 border border-white/10 rounded-lg p-4">
-                      <h3 className="font-semibold text-white mb-2">Personal Information</h3>
+                  <div className="space-y-4">
+                    <div className="bg-white/5 border border-white/10 rounded-lg p-5">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center">
+                          <svg className="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                        </div>
+                        <h3 className="font-semibold text-white">Contact Details</h3>
+                      </div>
                       <p className="text-white/60 text-sm">
-                        Name, email address, phone number, business name, billing information, and other identifiers.
+                        Such as name, email address, and mobile phone number when you join the waitlist, 
+                        sign up for the newsletter, or create an account.
                       </p>
                     </div>
-                    <div className="bg-white/5 border border-white/10 rounded-lg p-4">
-                      <h3 className="font-semibold text-white mb-2">Usage Data</h3>
+
+                    <div className="bg-white/5 border border-white/10 rounded-lg p-5">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                          <svg className="w-5 h-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                          </svg>
+                        </div>
+                        <h3 className="font-semibold text-white">Technical Data</h3>
+                      </div>
                       <p className="text-white/60 text-sm">
-                        Information about your interactions with the Service, including features used, pages visited, and time spent.
+                        Such as IP address, device/browser information, and basic usage logs generated 
+                        automatically by our hosting and analytics providers.
                       </p>
                     </div>
-                    <div className="bg-white/5 border border-white/10 rounded-lg p-4">
-                      <h3 className="font-semibold text-white mb-2">Technical Data</h3>
+
+                    <div className="bg-white/5 border border-white/10 rounded-lg p-5">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-10 h-10 bg-amber-500/20 rounded-lg flex items-center justify-center">
+                          <svg className="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                          </svg>
+                        </div>
+                        <h3 className="font-semibold text-white">Verification & Journaling Data</h3>
+                      </div>
                       <p className="text-white/60 text-sm">
-                        IP address, browser type, device information, operating system, and unique device identifiers.
-                      </p>
-                    </div>
-                    <div className="bg-white/5 border border-white/10 rounded-lg p-4">
-                      <h3 className="font-semibold text-white mb-2">Business Content</h3>
-                      <p className="text-white/60 text-sm">
-                        Customer data, marketing materials, calendars, and other content you upload or create through the Service.
+                        Including one‑time passcodes (OTPs), verification status, and audit logs of when codes 
+                        were generated, sent, verified, or expired. <strong className="text-white">Codes are stored only in hashed 
+                        or tokenized form.</strong>
                       </p>
                     </div>
                   </div>
                 </section>
 
-                {/* Section 3 */}
+                {/* Section 3 - How We Use Your Data */}
                 <section id="data-usage" className="scroll-mt-24">
                   <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
                     <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">3</span>
                     How We Use Your Data
                   </h2>
                   <p className="text-white/70 leading-relaxed mb-4">
-                    We use the information we collect to:
+                    We use the information we collect for the following purposes:
                   </p>
-                  <ul className="space-y-3">
-                    <li className="flex items-start gap-3 text-white/70">
-                      <svg className="w-5 h-5 text-emerald-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <ul className="space-y-4">
+                    <li className="flex items-start gap-4 text-white/70 bg-white/5 border border-white/10 rounded-lg p-4">
+                      <svg className="w-6 h-6 text-emerald-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      <span>Provide, operate, and maintain the Service</span>
+                      <span>
+                        <strong className="text-white">Account Management:</strong> To create and manage your GreenLine365 account, 
+                        place you on our waitlist or newsletter, and communicate important updates about the service.
+                      </span>
                     </li>
-                    <li className="flex items-start gap-3 text-white/70">
-                      <svg className="w-5 h-5 text-emerald-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <li className="flex items-start gap-4 text-white/70 bg-white/5 border border-white/10 rounded-lg p-4">
+                      <svg className="w-6 h-6 text-emerald-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      <span>Process transactions and send related information</span>
+                      <span>
+                        <strong className="text-white">SMS Verification:</strong> To send transactional SMS messages, such as 
+                        one‑time verification codes, using your phone number <strong className="text-amber-400">only for security and 
+                        account‑related purposes</strong> unless you separately opt into marketing messages.
+                      </span>
                     </li>
-                    <li className="flex items-start gap-3 text-white/70">
-                      <svg className="w-5 h-5 text-emerald-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <li className="flex items-start gap-4 text-white/70 bg-white/5 border border-white/10 rounded-lg p-4">
+                      <svg className="w-6 h-6 text-emerald-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      <span>Improve, personalize, and expand our Service</span>
-                    </li>
-                    <li className="flex items-start gap-3 text-white/70">
-                      <svg className="w-5 h-5 text-emerald-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span>Communicate with you about updates, security alerts, and support</span>
-                    </li>
-                    <li className="flex items-start gap-3 text-white/70">
-                      <svg className="w-5 h-5 text-emerald-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span>Develop new products, services, and features</span>
-                    </li>
-                    <li className="flex items-start gap-3 text-white/70">
-                      <svg className="w-5 h-5 text-emerald-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span>Prevent fraud, enforce terms, and comply with legal obligations</span>
+                      <span>
+                        <strong className="text-white">Security & Compliance:</strong> To maintain security and reliability of the service, 
+                        including fraud prevention, journaling of verification events, debugging, and compliance with 
+                        applicable laws and carrier rules for SMS programs.
+                      </span>
                     </li>
                   </ul>
                 </section>
 
-                {/* Section 4 */}
-                <section id="data-sharing" className="scroll-mt-24">
+                {/* Section 4 - Sharing, Storage & Retention */}
+                <section id="sharing-storage" className="scroll-mt-24">
                   <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
                     <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">4</span>
-                    Data Sharing & Third Parties
+                    Sharing, Storage & Retention
                   </h2>
-                  <p className="text-white/70 leading-relaxed mb-4">
-                    We do not sell your personal information. We may share your information with:
-                  </p>
                   <div className="space-y-4">
-                    <div className="bg-white/5 border border-white/10 rounded-lg p-4">
-                      <h3 className="font-semibold text-white mb-2">Service Providers</h3>
+                    <div className="bg-white/5 border border-white/10 rounded-lg p-5">
+                      <h3 className="font-semibold text-white mb-3 flex items-center gap-2">
+                        <svg className="w-5 h-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                        Trusted Third-Party Providers
+                      </h3>
                       <p className="text-white/60 text-sm">
-                        Third-party vendors who perform services on our behalf (hosting, analytics, payment processing). 
-                        See our <Link href="/trust" className="text-emerald-400 hover:text-emerald-300">Trust & Security Whitepaper</Link> for details.
+                        We use trusted third‑party service providers to host and process data, such as 
+                        <strong className="text-white"> Supabase</strong> for database and backend hosting, 
+                        <strong className="text-white"> Twilio</strong> (or similar) for SMS delivery, and workflow tools 
+                        (e.g., <strong className="text-white">n8n</strong>) to orchestrate message sending. These providers 
+                        process data only on our behalf and under contract.
                       </p>
                     </div>
-                    <div className="bg-white/5 border border-white/10 rounded-lg p-4">
-                      <h3 className="font-semibold text-white mb-2">Legal Compliance</h3>
-                      <p className="text-white/60 text-sm">
-                        When required by law, to respond to legal processes, or to protect rights and safety.
+
+                    <div className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-500/20 rounded-lg p-5">
+                      <h3 className="font-semibold text-emerald-400 mb-3 flex items-center gap-2">
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                        We Do Not Sell Your Data
+                      </h3>
+                      <p className="text-white/70 text-sm">
+                        We do not sell your personal information and do not share your phone number or email 
+                        with unrelated third parties for their own marketing without your separate consent.
                       </p>
                     </div>
-                    <div className="bg-white/5 border border-white/10 rounded-lg p-4">
-                      <h3 className="font-semibold text-white mb-2">Business Transfers</h3>
+
+                    <div className="bg-white/5 border border-white/10 rounded-lg p-5">
+                      <h3 className="font-semibold text-white mb-3 flex items-center gap-2">
+                        <svg className="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Data Retention
+                      </h3>
                       <p className="text-white/60 text-sm">
-                        In connection with a merger, acquisition, or sale of assets (users will be notified).
+                        We retain personal data for as long as needed to provide the service and meet legal or 
+                        accounting obligations. OTP codes and related logs are kept only as long as reasonably 
+                        necessary for security and audit purposes, after which they are deleted or anonymized.
                       </p>
                     </div>
                   </div>
                 </section>
 
-                {/* Section 5 */}
-                <section id="data-security" className="scroll-mt-24">
+                {/* Section 5 - Your Choices & Contact */}
+                <section id="your-choices" className="scroll-mt-24">
                   <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
                     <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">5</span>
-                    Data Security
+                    Your Choices & Contact
                   </h2>
-                  <div className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 border border-blue-500/20 rounded-xl p-6">
-                    <p className="text-white/70 leading-relaxed mb-4">
-                      We implement industry-standard security measures including:
-                    </p>
-                    <ul className="space-y-2 text-white/70">
-                      <li className="flex items-start gap-2">
-                        <span className="text-blue-400">•</span>
-                        <span>TLS 1.3 encryption for data in transit</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="text-blue-400">•</span>
-                        <span>AES-256 encryption for data at rest</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="text-blue-400">•</span>
-                        <span>Multi-tenant logical isolation with Row-Level Security</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="text-blue-400">•</span>
-                        <span>Regular security audits and penetration testing</span>
-                      </li>
-                    </ul>
-                    <p className="text-white/60 text-sm mt-4">
-                      For detailed security information, review our <Link href="/trust" className="text-blue-400 hover:text-blue-300">Trust & Security Whitepaper</Link>.
-                    </p>
-                  </div>
-                </section>
+                  <div className="space-y-4">
+                    <div className="bg-white/5 border border-white/10 rounded-lg p-5">
+                      <h3 className="font-semibold text-white mb-3 flex items-center gap-2">
+                        <svg className="w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                        </svg>
+                        SMS Opt-Out
+                      </h3>
+                      <p className="text-white/60 text-sm">
+                        You may opt out of SMS messages at any time by following the opt‑out instructions in 
+                        the message (for example, replying <strong className="text-white">STOP</strong>) or by contacting us. 
+                        <span className="text-amber-400"> Note: Opting out of verification messages may limit your ability 
+                        to use features that require a verified phone number.</span>
+                      </p>
+                    </div>
 
-                {/* Section 6 */}
-                <section id="your-rights" className="scroll-mt-24">
-                  <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                    <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">6</span>
-                    Your Privacy Rights
-                  </h2>
-                  <p className="text-white/70 leading-relaxed mb-4">
-                    Depending on your location, you may have the following rights:
-                  </p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="bg-white/5 border border-white/10 rounded-lg p-4">
-                      <h3 className="font-semibold text-white mb-2">Access</h3>
-                      <p className="text-white/60 text-sm">Request a copy of your personal data</p>
+                    <div className="bg-white/5 border border-white/10 rounded-lg p-5">
+                      <h3 className="font-semibold text-white mb-3 flex items-center gap-2">
+                        <svg className="w-5 h-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        Access, Correction & Deletion
+                      </h3>
+                      <p className="text-white/60 text-sm">
+                        You may request access to, correction of, or deletion of your personal information, 
+                        subject to legal and operational limits, by emailing our support team using the 
+                        contact details provided on the GreenLine365 website.
+                      </p>
                     </div>
-                    <div className="bg-white/5 border border-white/10 rounded-lg p-4">
-                      <h3 className="font-semibold text-white mb-2">Correction</h3>
-                      <p className="text-white/60 text-sm">Update inaccurate or incomplete data</p>
-                    </div>
-                    <div className="bg-white/5 border border-white/10 rounded-lg p-4">
-                      <h3 className="font-semibold text-white mb-2">Deletion</h3>
-                      <p className="text-white/60 text-sm">Request deletion of your personal data</p>
-                    </div>
-                    <div className="bg-white/5 border border-white/10 rounded-lg p-4">
-                      <h3 className="font-semibold text-white mb-2">Portability</h3>
-                      <p className="text-white/60 text-sm">Export your data in a machine-readable format</p>
-                    </div>
-                    <div className="bg-white/5 border border-white/10 rounded-lg p-4">
-                      <h3 className="font-semibold text-white mb-2">Objection</h3>
-                      <p className="text-white/60 text-sm">Object to processing of your data</p>
-                    </div>
-                    <div className="bg-white/5 border border-white/10 rounded-lg p-4">
-                      <h3 className="font-semibold text-white mb-2">Opt-Out</h3>
-                      <p className="text-white/60 text-sm">Unsubscribe from marketing communications</p>
+
+                    <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-5">
+                      <h3 className="font-semibold text-amber-400 mb-3 flex items-center gap-2">
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        Policy Updates
+                      </h3>
+                      <p className="text-white/60 text-sm">
+                        We may update this Privacy Policy from time to time. When we do, we will change 
+                        the &quot;Last updated&quot; date and, where required, provide additional notice or obtain your consent.
+                      </p>
                     </div>
                   </div>
-                  <p className="text-white/60 text-sm mt-4">
-                    To exercise these rights, contact us at <a href="mailto:privacy@greenline365.com" className="text-emerald-400 hover:text-emerald-300">privacy@greenline365.com</a>.
-                  </p>
-                </section>
 
-                {/* Section 7 */}
-                <section id="cookies" className="scroll-mt-24">
-                  <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                    <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">7</span>
-                    Cookies & Tracking Technologies
-                  </h2>
-                  <p className="text-white/70 leading-relaxed mb-4">
-                    We use cookies and similar tracking technologies to improve user experience, analyze usage, 
-                    and deliver personalized content. You can control cookies through your browser settings.
-                  </p>
-                  <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4">
-                    <h3 className="font-semibold text-amber-400 mb-2">Cookie Types</h3>
-                    <p className="text-white/60 text-sm">
-                      Essential cookies (required for functionality), performance cookies (analytics), 
-                      and functional cookies (preferences). We do not use advertising cookies.
-                    </p>
-                  </div>
-                </section>
-
-                {/* Section 8 */}
-                <section id="children" className="scroll-mt-24">
-                  <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                    <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">8</span>
-                    Children's Privacy
-                  </h2>
-                  <p className="text-white/70 leading-relaxed">
-                    Our Service is not intended for individuals under the age of 18. We do not knowingly 
-                    collect personal information from children. If you believe we have collected information 
-                    from a child, please contact us immediately.
-                  </p>
-                </section>
-
-                {/* Section 9 */}
-                <section id="changes" className="scroll-mt-24">
-                  <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                    <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">9</span>
-                    Changes to This Policy
-                  </h2>
-                  <p className="text-white/70 leading-relaxed">
-                    We may update this Privacy Policy from time to time. We will notify you of significant 
-                    changes via email or a prominent notice on our Service. Your continued use after such 
-                    changes constitutes acceptance of the updated policy.
-                  </p>
-                </section>
-
-                {/* Section 10 - Contact */}
-                <section id="contact" className="scroll-mt-24">
-                  <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                    <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">10</span>
-                    Contact Us
-                  </h2>
-                  <div className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-500/20 rounded-xl p-6">
+                  {/* Contact Card */}
+                  <div className="mt-8 bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-500/20 rounded-xl p-6">
+                    <h3 className="font-semibold text-white mb-4">Contact Us About Privacy</h3>
                     <p className="text-white/70 leading-relaxed mb-4">
                       If you have questions or concerns about this Privacy Policy, please contact us:
                     </p>
