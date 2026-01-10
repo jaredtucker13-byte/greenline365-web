@@ -392,7 +392,6 @@ export default function HomePage() {
             <div
               data-scroll-content
               whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
               className="order-1 lg:order-2"
             >
               <span className="text-neon-green-500 text-xs font-bold tracking-widest uppercase mb-3 block">Sound Familiar?</span>
@@ -405,7 +404,7 @@ export default function HomePage() {
                   { emoji: '📱', title: 'Always On-Call', desc: 'Sacrificing family time to keep the business running' },
                   { emoji: '😓', title: 'No Marketing Time', desc: 'Great at your craft, but who has time for social media?' }
                 ].map((pain, i) => (
-                  <div key={i} className="glass rounded-xl p-4 border border-red-500/20 flex gap-3 items-start">
+                  <div key={i} data-pain-card className="glass rounded-xl p-4 border border-red-500/20 flex gap-3 items-start">
                     <span className="text-2xl">{pain.emoji}</span>
                     <div>
                       <h4 className="text-white font-semibold text-sm">{pain.title}</h4>
@@ -414,7 +413,7 @@ export default function HomePage() {
                   </div>
                 ))}
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
@@ -424,10 +423,8 @@ export default function HomePage() {
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
           <div className="grid lg:grid-cols-2 gap-8 items-center">
             {/* Left - Image */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
+            <div
+              data-solution-image
               className="relative"
             >
               <div className="relative rounded-2xl overflow-hidden border border-neon-green-500/30">
@@ -438,24 +435,19 @@ export default function HomePage() {
                   height={500}
                   className="w-full h-auto object-cover"
                 />
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.3 }}
+                <div
+                  data-floating-badge
                   className="absolute bottom-3 left-3 glass-green px-3 py-1.5 rounded-full border border-neon-green-500/40"
                 >
                   <span className="text-neon-green-400 font-semibold text-xs">📸 Content = Customers</span>
-                </motion.div>
+                </div>
               </div>
               <div className="absolute -inset-4 bg-neon-green-500/5 rounded-3xl blur-2xl -z-10" />
-            </motion.div>
+            </div>
             
             {/* Right - Content */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
+            <div
+              data-solution-content
             >
               <span className="text-neon-green-500 text-xs font-bold tracking-widest uppercase mb-3 block">The Solution</span>
               <h2 className="font-display font-bold text-white mb-4" style={{ fontSize: 'clamp(1.5rem, 4vw, 2.25rem)' }}>
@@ -470,7 +462,7 @@ export default function HomePage() {
                   { title: 'Smart Hashtags', desc: 'Local + trending tags that get discovered' },
                   { title: 'One-Click Scheduling', desc: 'Post to all platforms without leaving your chair' }
                 ].map((feature, i) => (
-                  <div key={i} className="flex items-start gap-3">
+                  <div key={i} data-solution-feature className="flex items-start gap-3">
                     <div className="w-8 h-8 rounded-full bg-neon-green-500/20 flex items-center justify-center flex-shrink-0">
                       <svg className="w-4 h-4 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -483,21 +475,19 @@ export default function HomePage() {
                   </div>
                 ))}
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* ========== TREND HUNTER DEMO - 50/50 Split ========== */}
       <section id="trend-demo" className="py-16 relative" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-neon-green-500/5 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-neon-green-500/5 rounded-full blur-3xl gsap-parallax" />
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 relative z-10">
           <div className="grid lg:grid-cols-2 gap-8 items-center">
             {/* Left - Content */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
+            <div
+              data-trend-content
             >
               <span className="text-neon-green-500 text-xs font-bold tracking-widest uppercase mb-3 block">Try It Now - FREE</span>
               <h2 className="font-display font-bold text-white mb-4" style={{ fontSize: 'clamp(1.5rem, 4vw, 2.25rem)' }}>
