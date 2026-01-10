@@ -308,6 +308,15 @@ export default function Navbar() {
                   >
                     {user ? (
                       <>
+                        {isSuperAdmin && (
+                          <Link
+                            href="/god-mode"
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="block w-full p-4 text-center text-xl font-semibold text-red-400 rounded-xl glass-green"
+                          >
+                            God Mode
+                          </Link>
+                        )}
                         {isAdmin && (
                           <Link
                             href="/dashboard"
@@ -328,9 +337,9 @@ export default function Navbar() {
                       <Link
                         href="/login"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="block w-full p-4 text-center text-xl font-semibold text-white/70 rounded-xl glass"
+                        className="block w-full p-4 text-center text-xl font-semibold glass-green border border-neon-green-500/30 rounded-xl"
                       >
-                        Login
+                        Sign In / Sign Up
                       </Link>
                     )}
                   </motion.div>
