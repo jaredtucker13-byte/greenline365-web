@@ -117,63 +117,158 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
     );
   };
 
-  // AI Generation Functions
+  // AI Generation Functions - Real API calls via OpenRouter
   const generateCaption = async () => {
     if (!title.trim() && !imagePreview) return;
     setIsGeneratingCaption(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
     
-    const sampleCaptions = [
-      `✨ ${title || 'Check this out!'}\n\nYour success story starts here. Let's make it happen together! 🚀`,
-      `🎯 ${title || 'Big things coming!'}\n\nStay tuned for something amazing. The best is yet to come! 💪`,
-      `💡 ${title || 'Fresh content alert!'}\n\nWe're here to help you grow. Let's connect and create magic! ⭐`,
-    ];
-    setCaption(sampleCaptions[Math.floor(Math.random() * sampleCaptions.length)]);
+    try {
+      const response = await fetch('/api/content-forge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'caption',
+          businessType: 'local business',
+          location: 'Tampa, FL',
+          contentType: contentType,
+          imageDescription: title || 'business content',
+          additionalContext: caption || undefined
+        })
+      });
+      
+      const data = await response.json();
+      if (data.success && data.data.caption) {
+        setCaption(data.data.caption);
+      }
+    } catch (error) {
+      console.error('Caption generation error:', error);
+      // Fallback to sample caption
+      setCaption(`✨ ${title || 'Check this out!'}\n\nYour success story starts here. Let's make it happen together! 🚀`);
+    }
+    
     setIsGeneratingCaption(false);
   };
 
   const generateKeywords = async () => {
     if (!title.trim() && !caption.trim()) return;
     setIsGeneratingKeywords(true);
-    await new Promise(resolve => setTimeout(resolve, 1200));
     
-    const sampleKeywords = [
-      'business growth', 'local business', 'tampa', 'small business',
-      'entrepreneur', 'success', 'digital marketing', 'social media'
-    ];
-    setKeywords(sampleKeywords.slice(0, 5));
+    try {
+      const response = await fetch('/api/content-forge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'keywords',
+          businessType: 'local business',
+          location: 'Tampa, FL',
+          contentType: contentType,
+          productName: title || undefined
+        })
+      });
+      
+      const data = await response.json();
+      if (data.success && data.data.keywords) {
+        setKeywords(data.data.keywords.slice(0, 8));
+      }
+    } catch (error) {
+      console.error('Keywords generation error:', error);
+      setKeywords(['business growth', 'local business', 'tampa', 'small business', 'entrepreneur']);
+    }
+    
     setIsGeneratingKeywords(false);
   };
 
   const generateProductDescription = async () => {
     if (!title.trim()) return;
     setIsGeneratingDescription(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
     
-    setProductDescription(
-      `Introducing ${title || 'our latest product'} - crafted with care and designed to exceed your expectations. ` +
-      `Perfect for customers who value quality and reliability. Order now and experience the difference!`
-    );
+    try {
+      const response = await fetch('/api/content-forge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'description',
+          businessType: 'local business',
+          productName: title,
+          additionalContext: caption || undefined
+        })
+      });
+      
+      const data = await response.json();
+      if (data.success && data.data.description) {
+        setProductDescription(data.data.description);
+      }
+    } catch (error) {
+      console.error('Description generation error:', error);
+      setProductDescription(`Introducing ${title} - crafted with care and designed to exceed your expectations.`);
+    }
+    
     setIsGeneratingDescription(false);
   };
 
   const generateBlogContent = async () => {
     if (!blogTitle.trim()) return;
     setIsGeneratingBlog(true);
-    await new Promise(resolve => setTimeout(resolve, 2000));
     
-    setBlogBody(
-      `## Introduction\n\n` +
-      `${blogTitle} is a topic that matters to every business owner. In this post, we'll explore the key insights and actionable strategies you can implement today.\n\n` +
-      `## Key Points\n\n` +
-      `1. **Understanding the Basics** - Start with a solid foundation\n` +
-      `2. **Implementation Strategies** - Put knowledge into action\n` +
-      `3. **Measuring Success** - Track your progress and adjust\n\n` +
-      `## Conclusion\n\n` +
-      `Ready to take your business to the next level? Contact us today to learn more about how we can help you succeed.`
-    );
-    setBlogSeoDescription(`Learn about ${blogTitle.toLowerCase()} and discover actionable strategies for your business. Expert insights from GreenLine365.`);
+    try {
+      const response = await fetch('/api/content-forge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'blog',
+          businessType: 'local business',
+          location: 'Tampa, FL',
+          additionalContext: blogTitle
+        })
+      });
+      
+      const data = await response.json();
+      if (data.success && data.data) {
+        setBlogBody(data.data.content);
+        setBlogSeoDescription(`Learn about ${blogTitle.toLowerCase()} and discover actionable strategies. Expert insights from GreenLine365.`);
+      }
+    } catch (error) {
+      console.error('Blog generation error:', error);
+      setBlogBody(`## Introduction\n\n${blogTitle} is a topic that matters to every business owner.\n\n## Key Points\n\n1. Start with a solid foundation\n2. Implement proven strategies\n3. Measure and adjust\n\n## Conclusion\n\nReady to take your business to the next level?`);
+    }
+    
     setIsGeneratingBlog(false);
+  };
+
+  // Generate smart hashtags using AI
+  const generateSmartHashtags = async () => {
+    try {
+      const response = await fetch('/api/content-forge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'hashtags',
+          businessType: 'local business',
+          location: 'Tampa, FL',
+          brandHashtag: brandHashtag,
+          contentType: contentType
+        })
+      });
+      
+      const data = await response.json();
+      if (data.success && data.data) {
+        // Update standard hashtags if we got them
+        if (data.data.standard && data.data.standard.length > 0) {
+          setLocalHashtag(data.data.standard[1] || '#TampaBusiness');
+        }
+        // Update optional hashtags
+        if (data.data.optional && data.data.optional.length > 0) {
+          const newOptional = data.data.optional.slice(0, 3);
+          setOptionalHashtags([
+            newOptional[0] || '',
+            newOptional[1] || '',
+            newOptional[2] || ''
+          ]);
+        }
+      }
+    } catch (error) {
+      console.error('Hashtag generation error:', error);
+    }
   };
 
   const handleSchedule = () => {
