@@ -242,8 +242,14 @@ export default function TacticalCommandCenter() {
           </div>
 
           {/* Weekly Trends Section */}
-          <div className="grid grid-cols-1">
-            <WeeklyTrendBatch />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <WeeklyTrendBatch />
+            </div>
+            {/* Drafts Panel */}
+            <div>
+              <DraftsPanel userId="demo-user" />
+            </div>
           </div>
 
           {/* Quick Actions Row */}
