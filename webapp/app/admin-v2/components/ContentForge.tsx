@@ -193,17 +193,17 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md"
+          className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center p-4"
           onClick={onClose}
         >
-          {/* Modal Container - Centered with max dimensions */}
+          {/* Modal Container - Centered with better sizing */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             onClick={(e) => e.stopPropagation()}
-            className="absolute inset-4 md:inset-8 lg:inset-12 bg-[#0D0D0D] border border-[#39FF14]/30 rounded-2xl overflow-hidden shadow-[0_0_80px_rgba(57,255,20,0.2)] flex flex-col"
+            className="w-full max-w-2xl max-h-[90vh] bg-[#0D0D0D] border border-[#39FF14]/30 rounded-2xl overflow-hidden shadow-[0_0_80px_rgba(57,255,20,0.2)] flex flex-col"
           >
             {/* Header - Fixed */}
             <div className="flex-shrink-0 p-4 md:p-5 border-b border-[#39FF14]/20 flex items-center justify-between bg-[#0D0D0D]">
