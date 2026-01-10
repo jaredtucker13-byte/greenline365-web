@@ -338,6 +338,114 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
     onClose();
   };
 
+  // Save as draft to Supabase
+  const handleSaveDraft = async () => {
+    setIsSaving(true);
+    setSaveMessage(null);
+    
+    try {
+      const contentData = {
+        type: contentType,
+        imageUrl: imagePreview || imageUrl,
+        caption,
+        keywords,
+        productDescription: contentType === 'product' ? productDescription : undefined,
+        blogContent: contentType === 'blog' ? {
+          title: blogTitle,
+          body: blogBody,
+          seoDescription: blogSeoDescription,
+        } : undefined,
+        hashtags: {
+          brand: brandHashtag,
+          local: localHashtag,
+          optional: optionalHashtags,
+        },
+      };
+
+      const response = await fetch('/api/drafts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: 'demo-user', // TODO: Replace with actual user ID from auth
+          title: title || blogTitle || 'Untitled Draft',
+          contentType,
+          contentData,
+          status: 'draft',
+          platforms,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setSaveMessage({ type: 'success', text: '✓ Draft saved!' });
+        // Auto-hide message after 3 seconds
+        setTimeout(() => setSaveMessage(null), 3000);
+      } else {
+        throw new Error(data.error || 'Failed to save');
+      }
+    } catch (error) {
+      console.error('Save draft error:', error);
+      setSaveMessage({ type: 'error', text: 'Failed to save draft' });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Schedule and save to Supabase
+  const handleScheduleBlast = async () => {
+    setIsSaving(true);
+    setSaveMessage(null);
+    
+    try {
+      const contentData = {
+        type: contentType,
+        imageUrl: imagePreview || imageUrl,
+        caption,
+        keywords,
+        productDescription: contentType === 'product' ? productDescription : undefined,
+        blogContent: contentType === 'blog' ? {
+          title: blogTitle,
+          body: blogBody,
+          seoDescription: blogSeoDescription,
+        } : undefined,
+        hashtags: {
+          brand: brandHashtag,
+          local: localHashtag,
+          optional: optionalHashtags,
+        },
+      };
+
+      const response = await fetch('/api/drafts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: 'demo-user', // TODO: Replace with actual user ID from auth
+          title: title || blogTitle || 'Scheduled Content',
+          contentType,
+          contentData,
+          status: 'scheduled',
+          scheduledAt: getScheduledDateTime(),
+          platforms,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Also call the original onSchedule for calendar display
+        handleSchedule();
+        setSaveMessage({ type: 'success', text: '🚀 Scheduled!' });
+      } else {
+        throw new Error(data.error || 'Failed to schedule');
+      }
+    } catch (error) {
+      console.error('Schedule error:', error);
+      setSaveMessage({ type: 'error', text: 'Failed to schedule content' });
+      setIsSaving(false);
+    }
+  };
+
   const resetForm = () => {
     setTitle('');
     setImageUrl('');
