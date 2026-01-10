@@ -1,7 +1,7 @@
 import './globals.css';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import ChatWidget from './components/chatwidget';
+import ChatWidget from './components/ChatWidget';
 import type { Metadata } from 'next';
 
 // ===========================================
