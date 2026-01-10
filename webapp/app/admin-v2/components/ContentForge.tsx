@@ -1,16 +1,18 @@
 'use client';
 
 /**
- * ContentForge Modal Component
+ * ContentForge Modal Component - ENHANCED
  * GreenLine365 Admin V2 - Tactical Multi-Command Center
  * 
  * Features:
- * - Full-screen modal with locked background scroll
- * - Photo upload capability
- * - Photo vs Product toggle
- * - AI Hashtag Generator
- * - Social platform selection
- * - Schedule functionality
+ * - Live Preview Panel
+ * - AI Caption Generator
+ * - AI Keywords Generator  
+ * - AI Product Description (for products)
+ * - Smart Hashtag System (2 Standard + 3 Optional)
+ * - Blog Content Creation
+ * - Full user control over all AI suggestions
+ * - Photo upload with drag & drop
  */
 
 import { motion, AnimatePresence } from 'framer-motion';
@@ -24,27 +26,64 @@ interface ContentForgeProps {
 }
 
 interface ContentData {
-  type: 'photo' | 'product';
+  type: 'photo' | 'product' | 'blog';
   title: string;
   imageUrl: string;
-  description: string;
-  hashtags: string[];
+  caption: string;
+  keywords: string[];
+  productDescription?: string;
+  blogContent?: {
+    title: string;
+    body: string;
+    seoDescription: string;
+  };
+  hashtags: {
+    brand: string;
+    local: string;
+    optional: string[];
+  };
   platforms: ('instagram' | 'twitter' | 'facebook')[];
   scheduledDate: string;
 }
 
 export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule }: ContentForgeProps) {
-  const [contentType, setContentType] = useState<'photo' | 'product'>('photo');
+  // Content Type
+  const [contentType, setContentType] = useState<'photo' | 'product' | 'blog'>('photo');
+  
+  // Basic Info
   const [title, setTitle] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [description, setDescription] = useState('');
-  const [hashtags, setHashtags] = useState<string[]>([]);
+  
+  // AI-Generated Fields (all editable)
+  const [caption, setCaption] = useState('');
+  const [keywords, setKeywords] = useState<string[]>([]);
+  const [keywordInput, setKeywordInput] = useState('');
+  const [productDescription, setProductDescription] = useState('');
+  
+  // Hashtag System
+  const [brandHashtag, setBrandHashtag] = useState('#GreenLine365');
+  const [localHashtag, setLocalHashtag] = useState('#TampaBusiness');
+  const [optionalHashtags, setOptionalHashtags] = useState<string[]>(['', '', '']);
+  
+  // Blog Content
+  const [blogTitle, setBlogTitle] = useState('');
+  const [blogBody, setBlogBody] = useState('');
+  const [blogSeoDescription, setBlogSeoDescription] = useState('');
+  
+  // Platform Selection
   const [platforms, setPlatforms] = useState<('instagram' | 'twitter' | 'facebook')[]>(['instagram']);
-  const [isGeneratingHashtags, setIsGeneratingHashtags] = useState(false);
+  
+  // UI State
+  const [isGeneratingCaption, setIsGeneratingCaption] = useState(false);
+  const [isGeneratingKeywords, setIsGeneratingKeywords] = useState(false);
+  const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
+  const [isGeneratingBlog, setIsGeneratingBlog] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
+  const [activeTab, setActiveTab] = useState<'content' | 'hashtags' | 'blog'>('content');
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [scheduledDateTime, setScheduledDateTime] = useState(
@@ -78,24 +117,63 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
     );
   };
 
-  const generateHashtags = async () => {
-    if (!description.trim()) return;
-    
-    setIsGeneratingHashtags(true);
-    // Simulate AI hashtag generation
+  // AI Generation Functions
+  const generateCaption = async () => {
+    if (!title.trim() && !imagePreview) return;
+    setIsGeneratingCaption(true);
     await new Promise(resolve => setTimeout(resolve, 1500));
     
-    const suggestedHashtags = [
-      '#GreenLine365',
-      '#BusinessGrowth',
-      '#AIAutomation',
-      '#DigitalMarketing',
-      '#SmallBusiness',
-      '#ContentCreation',
+    const sampleCaptions = [
+      `✨ ${title || 'Check this out!'}\n\nYour success story starts here. Let's make it happen together! 🚀`,
+      `🎯 ${title || 'Big things coming!'}\n\nStay tuned for something amazing. The best is yet to come! 💪`,
+      `💡 ${title || 'Fresh content alert!'}\n\nWe're here to help you grow. Let's connect and create magic! ⭐`,
     ];
+    setCaption(sampleCaptions[Math.floor(Math.random() * sampleCaptions.length)]);
+    setIsGeneratingCaption(false);
+  };
+
+  const generateKeywords = async () => {
+    if (!title.trim() && !caption.trim()) return;
+    setIsGeneratingKeywords(true);
+    await new Promise(resolve => setTimeout(resolve, 1200));
     
-    setHashtags(suggestedHashtags);
-    setIsGeneratingHashtags(false);
+    const sampleKeywords = [
+      'business growth', 'local business', 'tampa', 'small business',
+      'entrepreneur', 'success', 'digital marketing', 'social media'
+    ];
+    setKeywords(sampleKeywords.slice(0, 5));
+    setIsGeneratingKeywords(false);
+  };
+
+  const generateProductDescription = async () => {
+    if (!title.trim()) return;
+    setIsGeneratingDescription(true);
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    setProductDescription(
+      `Introducing ${title || 'our latest product'} - crafted with care and designed to exceed your expectations. ` +
+      `Perfect for customers who value quality and reliability. Order now and experience the difference!`
+    );
+    setIsGeneratingDescription(false);
+  };
+
+  const generateBlogContent = async () => {
+    if (!blogTitle.trim()) return;
+    setIsGeneratingBlog(true);
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    setBlogBody(
+      `## Introduction\n\n` +
+      `${blogTitle} is a topic that matters to every business owner. In this post, we'll explore the key insights and actionable strategies you can implement today.\n\n` +
+      `## Key Points\n\n` +
+      `1. **Understanding the Basics** - Start with a solid foundation\n` +
+      `2. **Implementation Strategies** - Put knowledge into action\n` +
+      `3. **Measuring Success** - Track your progress and adjust\n\n` +
+      `## Conclusion\n\n` +
+      `Ready to take your business to the next level? Contact us today to learn more about how we can help you succeed.`
+    );
+    setBlogSeoDescription(`Learn about ${blogTitle.toLowerCase()} and discover actionable strategies for your business. Expert insights from GreenLine365.`);
+    setIsGeneratingBlog(false);
   };
 
   const handleSchedule = () => {
@@ -103,8 +181,19 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
       type: contentType,
       title,
       imageUrl: imagePreview || imageUrl,
-      description,
-      hashtags,
+      caption,
+      keywords,
+      productDescription: contentType === 'product' ? productDescription : undefined,
+      blogContent: contentType === 'blog' ? {
+        title: blogTitle,
+        body: blogBody,
+        seoDescription: blogSeoDescription,
+      } : undefined,
+      hashtags: {
+        brand: brandHashtag,
+        local: localHashtag,
+        optional: optionalHashtags.filter(h => h.trim()),
+      },
       platforms,
       scheduledDate: scheduledDateTime,
     });
@@ -116,26 +205,24 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
     setTitle('');
     setImageUrl('');
     setImagePreview(null);
-    setDescription('');
-    setHashtags([]);
+    setCaption('');
+    setKeywords([]);
+    setProductDescription('');
+    setBlogTitle('');
+    setBlogBody('');
+    setBlogSeoDescription('');
+    setOptionalHashtags(['', '', '']);
     setPlatforms(['instagram']);
   };
 
-  const removeHashtag = (tag: string) => {
-    setHashtags(prev => prev.filter(t => t !== tag));
-  };
-
-  // Handle file selection
+  // File handling
   const handleFileSelect = (file: File) => {
     if (!file.type.startsWith('image/')) {
       alert('Please select an image file');
       return;
     }
-
     setIsUploading(true);
     setUploadProgress(0);
-
-    // Simulate upload progress
     const interval = setInterval(() => {
       setUploadProgress(prev => {
         if (prev >= 100) {
@@ -146,16 +233,11 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
         return prev + 10;
       });
     }, 100);
-
-    // Create preview
     const reader = new FileReader();
-    reader.onload = (e) => {
-      setImagePreview(e.target?.result as string);
-    };
+    reader.onload = (e) => setImagePreview(e.target?.result as string);
     reader.readAsDataURL(file);
   };
 
-  // Handle drag and drop
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(true);
@@ -173,17 +255,27 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
     if (file) handleFileSelect(file);
   };
 
-  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) handleFileSelect(file);
+  const addKeyword = () => {
+    if (keywordInput.trim() && !keywords.includes(keywordInput.trim())) {
+      setKeywords([...keywords, keywordInput.trim()]);
+      setKeywordInput('');
+    }
   };
 
-  const removeImage = () => {
-    setImagePreview(null);
-    setImageUrl('');
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
+  const removeKeyword = (keyword: string) => {
+    setKeywords(keywords.filter(k => k !== keyword));
+  };
+
+  const updateOptionalHashtag = (index: number, value: string) => {
+    const newHashtags = [...optionalHashtags];
+    newHashtags[index] = value.startsWith('#') ? value : (value ? `#${value}` : '');
+    setOptionalHashtags(newHashtags);
+  };
+
+  // Get all active hashtags for preview
+  const getAllHashtags = () => {
+    const all = [brandHashtag, localHashtag, ...optionalHashtags.filter(h => h.trim())];
+    return all.join(' ');
   };
 
   return (
@@ -193,317 +285,467 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center p-4"
+          className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-md"
           onClick={onClose}
         >
-          {/* Modal Container - Centered with better sizing */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-2xl max-h-[90vh] bg-[#0D0D0D] border border-[#39FF14]/30 rounded-2xl overflow-hidden shadow-[0_0_80px_rgba(57,255,20,0.2)] flex flex-col"
+            className="absolute inset-2 md:inset-4 bg-[#0A0A0A] border border-[#39FF14]/20 rounded-2xl overflow-hidden flex flex-col"
           >
-            {/* Header - Fixed */}
-            <div className="flex-shrink-0 p-4 md:p-5 border-b border-[#39FF14]/20 flex items-center justify-between bg-[#0D0D0D]">
-              <div>
-                <h2 className="text-lg md:text-xl font-bold text-white flex items-center gap-2">
+            {/* Header */}
+            <div className="flex-shrink-0 px-4 py-3 border-b border-[#39FF14]/20 flex items-center justify-between bg-[#0D0D0D]">
+              <div className="flex items-center gap-4">
+                <h2 className="text-lg font-bold text-white flex items-center gap-2">
                   <span className="text-[#39FF14]">⚡</span> Content Forge
                 </h2>
-                <p className="text-xs md:text-sm text-gray-400 mt-1">
-                  Drafting for {selectedDate?.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
-                </p>
-              </div>
-              <button
-                onClick={onClose}
-                className="w-10 h-10 rounded-xl bg-[#1A1A1A] border border-[#2D3748] hover:border-red-500/50 hover:bg-red-500/10 flex items-center justify-center text-gray-400 hover:text-red-400 transition"
-              >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto p-4 md:p-5 space-y-5">
-              {/* Content Type Toggle */}
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Content Type</label>
-                <div className="flex gap-3">
-                  <motion.button
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => setContentType('photo')}
-                    className={`flex-1 py-3 px-4 rounded-xl border-2 transition-all ${
-                      contentType === 'photo'
-                        ? 'border-[#8A2BE2] bg-[#8A2BE2]/20 text-white'
-                        : 'border-[#2D3748] bg-[#1A1A1A] text-gray-400 hover:border-gray-600'
-                    }`}
-                  >
-                    <span className="text-lg mr-2">📸</span> Photo
-                  </motion.button>
-                  <motion.button
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => setContentType('product')}
-                    className={`flex-1 py-3 px-4 rounded-xl border-2 transition-all ${
-                      contentType === 'product'
-                        ? 'border-[#8A2BE2] bg-[#8A2BE2]/20 text-white'
-                        : 'border-[#2D3748] bg-[#1A1A1A] text-gray-400 hover:border-gray-600'
-                    }`}
-                  >
-                    <span className="text-lg mr-2">🛍️</span> Product
-                  </motion.button>
+                <div className="flex gap-1 bg-[#1A1A1A] rounded-lg p-1">
+                  {(['content', 'hashtags', 'blog'] as const).map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => setActiveTab(tab)}
+                      className={`px-3 py-1.5 rounded-md text-xs font-medium transition ${
+                        activeTab === tab
+                          ? 'bg-[#39FF14] text-black'
+                          : 'text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      {tab === 'content' ? '📸 Content' : tab === 'hashtags' ? '#️⃣ Hashtags' : '📝 Blog'}
+                    </button>
+                  ))}
                 </div>
               </div>
-
-              {/* Campaign Title */}
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Campaign Title</label>
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Enter campaign title..."
-                  className="w-full px-4 py-3 rounded-xl bg-[#1A1A1A] border border-[#2D3748] text-white placeholder:text-gray-500 focus:border-[#39FF14]/50 focus:ring-1 focus:ring-[#39FF14]/50 outline-none transition"
-                />
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-gray-400">
+                  {selectedDate?.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                </span>
+                <button
+                  onClick={onClose}
+                  className="w-8 h-8 rounded-lg bg-[#1A1A1A] border border-[#2D3748] hover:border-red-500/50 hover:bg-red-500/10 flex items-center justify-center text-gray-400 hover:text-red-400 transition"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
               </div>
+            </div>
 
-              {/* Image Upload Section */}
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Upload Image</label>
+            {/* Main Content - Two Column Layout */}
+            <div className="flex-1 flex overflow-hidden">
+              {/* Left Panel - Form */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-4 border-r border-[#1E262E]">
                 
-                {imagePreview ? (
-                  // Image Preview
-                  <div className="relative rounded-xl overflow-hidden border border-[#39FF14]/30 bg-[#1A1A1A]">
-                    <img 
-                      src={imagePreview} 
-                      alt="Preview" 
-                      className="w-full h-48 object-cover"
-                    />
-                    <button
-                      onClick={removeImage}
-                      className="absolute top-2 right-2 w-8 h-8 rounded-lg bg-red-500/80 hover:bg-red-500 text-white flex items-center justify-center transition"
-                    >
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3">
-                      <p className="text-white text-sm truncate">Image uploaded successfully</p>
+                {activeTab === 'content' && (
+                  <>
+                    {/* Content Type */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-400 mb-2">Content Type</label>
+                      <div className="flex gap-2">
+                        {(['photo', 'product', 'blog'] as const).map((type) => (
+                          <button
+                            key={type}
+                            onClick={() => setContentType(type)}
+                            className={`flex-1 py-2 px-3 rounded-lg border text-sm font-medium transition ${
+                              contentType === type
+                                ? 'border-[#39FF14] bg-[#39FF14]/10 text-[#39FF14]'
+                                : 'border-[#2D3748] bg-[#1A1A1A] text-gray-400 hover:border-gray-600'
+                            }`}
+                          >
+                            {type === 'photo' ? '📸 Photo' : type === 'product' ? '🛍️ Product' : '📝 Blog'}
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  // Upload Zone
-                  <div
-                    onDragOver={handleDragOver}
-                    onDragLeave={handleDragLeave}
-                    onDrop={handleDrop}
-                    onClick={() => fileInputRef.current?.click()}
-                    className={`relative rounded-xl border-2 border-dashed transition-all cursor-pointer ${
-                      isDragging
-                        ? 'border-[#39FF14] bg-[#39FF14]/10'
-                        : 'border-[#2D3748] bg-[#1A1A1A] hover:border-[#39FF14]/50 hover:bg-[#1A1A1A]/80'
-                    }`}
-                  >
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileInputChange}
-                      className="hidden"
-                    />
-                    
-                    <div className="p-8 text-center">
-                      {isUploading ? (
-                        <div className="space-y-3">
-                          <div className="w-12 h-12 mx-auto rounded-full border-4 border-[#39FF14]/30 border-t-[#39FF14] animate-spin" />
-                          <p className="text-gray-400">Uploading... {uploadProgress}%</p>
-                          <div className="w-full h-2 bg-[#2D3748] rounded-full overflow-hidden">
-                            <div 
-                              className="h-full bg-[#39FF14] transition-all duration-300"
-                              style={{ width: `${uploadProgress}%` }}
-                            />
+
+                    {/* Title */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-400 mb-2">Title / Campaign Name</label>
+                      <input
+                        type="text"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        placeholder="Enter a title..."
+                        className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm placeholder:text-gray-500 focus:border-[#39FF14]/50 outline-none"
+                      />
+                    </div>
+
+                    {/* Image Upload */}
+                    {contentType !== 'blog' && (
+                      <div>
+                        <label className="block text-xs font-medium text-gray-400 mb-2">
+                          {contentType === 'product' ? 'Product Image' : 'Upload Image'}
+                        </label>
+                        {imagePreview ? (
+                          <div className="relative rounded-lg overflow-hidden border border-[#39FF14]/30 h-32">
+                            <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                            <button
+                              onClick={() => { setImagePreview(null); setImageUrl(''); }}
+                              className="absolute top-2 right-2 w-6 h-6 rounded bg-red-500/80 hover:bg-red-500 text-white flex items-center justify-center"
+                            >
+                              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
                           </div>
+                        ) : (
+                          <div
+                            onDragOver={handleDragOver}
+                            onDragLeave={handleDragLeave}
+                            onDrop={handleDrop}
+                            onClick={() => fileInputRef.current?.click()}
+                            className={`h-24 rounded-lg border-2 border-dashed flex items-center justify-center cursor-pointer transition ${
+                              isDragging ? 'border-[#39FF14] bg-[#39FF14]/5' : 'border-[#2D3748] hover:border-[#39FF14]/50'
+                            }`}
+                          >
+                            <input ref={fileInputRef} type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0])} className="hidden" />
+                            {isUploading ? (
+                              <div className="text-center">
+                                <div className="text-sm text-gray-400">Uploading... {uploadProgress}%</div>
+                              </div>
+                            ) : (
+                              <div className="text-center">
+                                <span className="text-2xl">📤</span>
+                                <p className="text-xs text-gray-400 mt-1">Click or drag to upload</p>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* AI Caption Generator */}
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="text-xs font-medium text-gray-400">AI Caption</label>
+                        <button
+                          onClick={generateCaption}
+                          disabled={isGeneratingCaption}
+                          className="px-2 py-1 rounded bg-gradient-to-r from-[#8A2BE2] to-[#39FF14] text-black text-xs font-semibold disabled:opacity-50"
+                        >
+                          {isGeneratingCaption ? '⏳ Generating...' : '🧠 Generate'}
+                        </button>
+                      </div>
+                      <textarea
+                        value={caption}
+                        onChange={(e) => setCaption(e.target.value)}
+                        rows={3}
+                        placeholder="Write or generate a caption..."
+                        className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm placeholder:text-gray-500 focus:border-[#39FF14]/50 outline-none resize-none"
+                      />
+                    </div>
+
+                    {/* AI Keywords */}
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="text-xs font-medium text-gray-400">Keywords</label>
+                        <button
+                          onClick={generateKeywords}
+                          disabled={isGeneratingKeywords}
+                          className="px-2 py-1 rounded bg-gradient-to-r from-[#8A2BE2] to-[#39FF14] text-black text-xs font-semibold disabled:opacity-50"
+                        >
+                          {isGeneratingKeywords ? '⏳...' : '🧠 Generate'}
+                        </button>
+                      </div>
+                      <div className="flex gap-2 mb-2">
+                        <input
+                          type="text"
+                          value={keywordInput}
+                          onChange={(e) => setKeywordInput(e.target.value)}
+                          onKeyDown={(e) => e.key === 'Enter' && addKeyword()}
+                          placeholder="Add keyword..."
+                          className="flex-1 px-3 py-1.5 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm placeholder:text-gray-500 focus:border-[#39FF14]/50 outline-none"
+                        />
+                        <button onClick={addKeyword} className="px-3 py-1.5 rounded-lg bg-[#39FF14]/20 text-[#39FF14] text-sm font-medium">+</button>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {keywords.map((kw) => (
+                          <span key={kw} className="px-2 py-0.5 rounded-full bg-[#39FF14]/10 text-[#39FF14] text-xs flex items-center gap-1">
+                            {kw}
+                            <button onClick={() => removeKeyword(kw)} className="hover:text-red-400">×</button>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Product Description (for products only) */}
+                    {contentType === 'product' && (
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <label className="text-xs font-medium text-gray-400">Product Description</label>
+                          <button
+                            onClick={generateProductDescription}
+                            disabled={isGeneratingDescription}
+                            className="px-2 py-1 rounded bg-gradient-to-r from-[#8A2BE2] to-[#39FF14] text-black text-xs font-semibold disabled:opacity-50"
+                          >
+                            {isGeneratingDescription ? '⏳...' : '🧠 Generate'}
+                          </button>
                         </div>
-                      ) : (
-                        <>
-                          <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-[#39FF14]/10 border border-[#39FF14]/30 flex items-center justify-center">
-                            <svg className="w-8 h-8 text-[#39FF14]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                          </div>
-                          <p className="text-white font-medium mb-1">
-                            {isDragging ? 'Drop your image here' : 'Click to upload or drag and drop'}
-                          </p>
-                          <p className="text-gray-500 text-sm">PNG, JPG, GIF up to 10MB</p>
-                        </>
-                      )}
-                    </div>
-                  </div>
+                        <textarea
+                          value={productDescription}
+                          onChange={(e) => setProductDescription(e.target.value)}
+                          rows={3}
+                          placeholder="Describe your product..."
+                          className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm placeholder:text-gray-500 focus:border-[#39FF14]/50 outline-none resize-none"
+                        />
+                      </div>
+                    )}
+                  </>
                 )}
 
-                {/* Or paste URL */}
-                <div className="mt-3">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="flex-1 h-px bg-[#2D3748]" />
-                    <span className="text-xs text-gray-500">or paste image URL</span>
-                    <div className="flex-1 h-px bg-[#2D3748]" />
-                  </div>
-                  <input
-                    type="url"
-                    value={imageUrl}
-                    onChange={(e) => {
-                      setImageUrl(e.target.value);
-                      if (e.target.value) setImagePreview(e.target.value);
-                    }}
-                    placeholder="https://example.com/image.jpg"
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#1A1A1A] border border-[#2D3748] text-white text-sm placeholder:text-gray-500 focus:border-[#39FF14]/50 focus:ring-1 focus:ring-[#39FF14]/50 outline-none transition"
-                  />
-                </div>
-              </div>
-
-              {/* Post Description */}
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Post Description</label>
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  rows={3}
-                  placeholder="Write your post caption..."
-                  className="w-full px-4 py-3 rounded-xl bg-[#1A1A1A] border border-[#2D3748] text-white placeholder:text-gray-500 focus:border-[#39FF14]/50 focus:ring-1 focus:ring-[#39FF14]/50 outline-none transition resize-none"
-                />
-              </div>
-
-              {/* AI Hashtag Generator */}
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="text-sm font-medium text-gray-300">AI Hashtag Generator</label>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={generateHashtags}
-                    disabled={isGeneratingHashtags || !description.trim()}
-                    className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-[#8A2BE2] to-[#39FF14] text-black text-sm font-semibold hover:opacity-90 transition disabled:opacity-50 flex items-center gap-2"
-                  >
-                    {isGeneratingHashtags ? (
-                      <>
-                        <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                        </svg>
-                        Generating...
-                      </>
-                    ) : (
-                      <>
-                        <span>🧠</span> Generate
-                      </>
-                    )}
-                  </motion.button>
-                </div>
-                <div className="min-h-[50px] p-3 rounded-xl bg-[#1A1A1A] border border-[#2D3748]">
-                  {hashtags.length > 0 ? (
-                    <div className="flex flex-wrap gap-2">
-                      {hashtags.map((tag) => (
-                        <motion.span
-                          key={tag}
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          className="px-2 py-1 rounded-full bg-[#39FF14]/20 text-[#39FF14] text-xs flex items-center gap-1 cursor-pointer hover:bg-[#39FF14]/30 transition"
-                          onClick={() => removeHashtag(tag)}
-                        >
-                          {tag}
-                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                          </svg>
-                        </motion.span>
-                      ))}
+                {activeTab === 'hashtags' && (
+                  <>
+                    {/* Standard Hashtags */}
+                    <div className="p-3 rounded-lg bg-[#39FF14]/5 border border-[#39FF14]/20">
+                      <h3 className="text-sm font-semibold text-[#39FF14] mb-3">📌 Standard Hashtags (Always Included)</h3>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs text-gray-400 mb-1">Brand Hashtag</label>
+                          <input
+                            type="text"
+                            value={brandHashtag}
+                            onChange={(e) => setBrandHashtag(e.target.value.startsWith('#') ? e.target.value : `#${e.target.value}`)}
+                            className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#39FF14]/30 text-[#39FF14] text-sm focus:border-[#39FF14] outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-400 mb-1">Hyper-Local Hashtag</label>
+                          <input
+                            type="text"
+                            value={localHashtag}
+                            onChange={(e) => setLocalHashtag(e.target.value.startsWith('#') ? e.target.value : `#${e.target.value}`)}
+                            className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#39FF14]/30 text-[#39FF14] text-sm focus:border-[#39FF14] outline-none"
+                          />
+                        </div>
+                      </div>
                     </div>
-                  ) : (
-                    <p className="text-gray-500 text-sm">Generated hashtags will appear here...</p>
-                  )}
+
+                    {/* Optional Hashtags */}
+                    <div className="p-3 rounded-lg bg-[#1A1A1A] border border-[#2D3748]">
+                      <h3 className="text-sm font-semibold text-white mb-3">🎯 Optional Hashtags (Customize per post)</h3>
+                      <p className="text-xs text-gray-500 mb-3">Add up to 3 additional hashtags. Mix & match across platforms as needed.</p>
+                      <div className="space-y-2">
+                        {optionalHashtags.map((hashtag, index) => (
+                          <div key={index} className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500 w-4">{index + 1}.</span>
+                            <input
+                              type="text"
+                              value={hashtag}
+                              onChange={(e) => updateOptionalHashtag(index, e.target.value)}
+                              placeholder={`Optional hashtag ${index + 1}...`}
+                              className="flex-1 px-3 py-2 rounded-lg bg-[#0D0D0D] border border-[#2D3748] text-white text-sm placeholder:text-gray-600 focus:border-[#39FF14]/50 outline-none"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Hashtag Preview */}
+                    <div className="p-3 rounded-lg bg-[#0D0D0D] border border-[#2D3748]">
+                      <h3 className="text-xs font-medium text-gray-400 mb-2">Preview (3-5 hashtags)</h3>
+                      <p className="text-sm text-[#39FF14]">{getAllHashtags() || 'Add hashtags above...'}</p>
+                    </div>
+                  </>
+                )}
+
+                {activeTab === 'blog' && (
+                  <>
+                    {/* Blog Title */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-400 mb-2">Blog Title</label>
+                      <input
+                        type="text"
+                        value={blogTitle}
+                        onChange={(e) => setBlogTitle(e.target.value)}
+                        placeholder="Enter blog title..."
+                        className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm placeholder:text-gray-500 focus:border-[#39FF14]/50 outline-none"
+                      />
+                    </div>
+
+                    {/* Blog Content Generator */}
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="text-xs font-medium text-gray-400">Blog Content</label>
+                        <button
+                          onClick={generateBlogContent}
+                          disabled={isGeneratingBlog || !blogTitle.trim()}
+                          className="px-2 py-1 rounded bg-gradient-to-r from-[#8A2BE2] to-[#39FF14] text-black text-xs font-semibold disabled:opacity-50"
+                        >
+                          {isGeneratingBlog ? '⏳ Generating...' : '🧠 Generate Blog'}
+                        </button>
+                      </div>
+                      <textarea
+                        value={blogBody}
+                        onChange={(e) => setBlogBody(e.target.value)}
+                        rows={10}
+                        placeholder="Write your blog content here... (Markdown supported)"
+                        className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm placeholder:text-gray-500 focus:border-[#39FF14]/50 outline-none resize-none font-mono"
+                      />
+                    </div>
+
+                    {/* SEO Description */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-400 mb-2">SEO Description</label>
+                      <textarea
+                        value={blogSeoDescription}
+                        onChange={(e) => setBlogSeoDescription(e.target.value)}
+                        rows={2}
+                        placeholder="Meta description for search engines..."
+                        className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm placeholder:text-gray-500 focus:border-[#39FF14]/50 outline-none resize-none"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">{blogSeoDescription.length}/160 characters</p>
+                    </div>
+                  </>
+                )}
+
+                {/* Platform Selection & Schedule - Always visible */}
+                <div className="pt-3 border-t border-[#1E262E]">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-400 mb-2">Publish To</label>
+                      <div className="flex gap-1">
+                        {(['instagram', 'twitter', 'facebook'] as const).map((platform) => (
+                          <button
+                            key={platform}
+                            onClick={() => togglePlatform(platform)}
+                            className={`flex-1 py-2 rounded-lg border text-xs font-medium transition ${
+                              platforms.includes(platform)
+                                ? platform === 'instagram' ? 'border-[#E4405F] bg-[#E4405F]/20 text-white'
+                                : platform === 'twitter' ? 'border-white bg-white/20 text-white'
+                                : 'border-[#1877F2] bg-[#1877F2]/20 text-white'
+                                : 'border-[#2D3748] bg-[#1A1A1A] text-gray-500'
+                            }`}
+                          >
+                            {platform === 'instagram' ? 'IG' : platform === 'twitter' ? 'X' : 'FB'}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-400 mb-2">Schedule</label>
+                      <input
+                        type="datetime-local"
+                        value={scheduledDateTime}
+                        onChange={(e) => setScheduledDateTime(e.target.value)}
+                        className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-xs focus:border-[#39FF14]/50 outline-none"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* Schedule DateTime */}
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Schedule Date & Time</label>
-                <input
-                  type="datetime-local"
-                  value={scheduledDateTime}
-                  onChange={(e) => setScheduledDateTime(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-[#1A1A1A] border border-[#2D3748] text-white focus:border-[#39FF14]/50 focus:ring-1 focus:ring-[#39FF14]/50 outline-none transition"
-                />
-              </div>
+              {/* Right Panel - Preview */}
+              <div className="w-[380px] bg-[#0D0D0D] p-4 overflow-y-auto">
+                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">📱 Live Preview</h3>
+                
+                {/* Phone Frame */}
+                <div className="bg-[#1A1A1A] rounded-3xl p-3 border border-[#2D3748] shadow-xl">
+                  {/* Phone Header */}
+                  <div className="flex items-center justify-between mb-3 px-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#39FF14] to-[#0CE293] flex items-center justify-center text-black font-bold text-xs">G</div>
+                      <div>
+                        <p className="text-white text-xs font-semibold">GreenLine365</p>
+                        <p className="text-gray-500 text-[10px]">Tampa, FL</p>
+                      </div>
+                    </div>
+                    <span className="text-gray-500 text-lg">•••</span>
+                  </div>
 
-              {/* Platform Selection */}
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Publish To</label>
-                <div className="flex gap-2 md:gap-3">
-                  <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => togglePlatform('instagram')}
-                    className={`flex-1 py-2.5 md:py-3 rounded-xl border transition-all flex items-center justify-center gap-1.5 md:gap-2 text-sm ${
-                      platforms.includes('instagram')
-                        ? 'border-[#E4405F] bg-[#E4405F]/20 text-white'
-                        : 'border-[#2D3748] bg-[#1A1A1A] text-gray-400'
-                    }`}
-                  >
-                    <svg className="w-4 h-4 md:w-5 md:h-5" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                    </svg>
-                    <span className="hidden md:inline">Instagram</span>
-                    <span className="md:hidden">IG</span>
-                  </motion.button>
-                  <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => togglePlatform('twitter')}
-                    className={`flex-1 py-2.5 md:py-3 rounded-xl border transition-all flex items-center justify-center gap-1.5 md:gap-2 text-sm ${
-                      platforms.includes('twitter')
-                        ? 'border-white bg-white/20 text-white'
-                        : 'border-[#2D3748] bg-[#1A1A1A] text-gray-400'
-                    }`}
-                  >
-                    <svg className="w-4 h-4 md:w-5 md:h-5" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                    </svg>
-                    X
-                  </motion.button>
-                  <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => togglePlatform('facebook')}
-                    className={`flex-1 py-2.5 md:py-3 rounded-xl border transition-all flex items-center justify-center gap-1.5 md:gap-2 text-sm ${
-                      platforms.includes('facebook')
-                        ? 'border-[#1877F2] bg-[#1877F2]/20 text-white'
-                        : 'border-[#2D3748] bg-[#1A1A1A] text-gray-400'
-                    }`}
-                  >
-                    <svg className="w-4 h-4 md:w-5 md:h-5" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                    </svg>
-                    <span className="hidden md:inline">Facebook</span>
-                    <span className="md:hidden">FB</span>
-                  </motion.button>
+                  {/* Image Preview */}
+                  <div className="aspect-square bg-[#0D0D0D] rounded-lg mb-3 overflow-hidden flex items-center justify-center">
+                    {imagePreview ? (
+                      <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="text-center text-gray-600">
+                        <span className="text-4xl">🖼️</span>
+                        <p className="text-xs mt-2">Image Preview</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Engagement Bar */}
+                  <div className="flex items-center gap-4 px-2 mb-3">
+                    <span className="text-xl">❤️</span>
+                    <span className="text-xl">💬</span>
+                    <span className="text-xl">📤</span>
+                    <span className="text-xl ml-auto">🔖</span>
+                  </div>
+
+                  {/* Caption Preview */}
+                  <div className="px-2 space-y-2">
+                    <p className="text-white text-xs">
+                      <span className="font-semibold">greenline365</span>{' '}
+                      {caption || title || 'Your caption will appear here...'}
+                    </p>
+                    
+                    {/* Hashtags */}
+                    <p className="text-[#39FF14] text-xs">{getAllHashtags()}</p>
+                    
+                    {/* Keywords */}
+                    {keywords.length > 0 && (
+                      <div className="flex flex-wrap gap-1">
+                        {keywords.slice(0, 3).map((kw) => (
+                          <span key={kw} className="px-1.5 py-0.5 rounded bg-[#2D3748] text-gray-400 text-[10px]">{kw}</span>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Product Description */}
+                    {contentType === 'product' && productDescription && (
+                      <div className="p-2 rounded-lg bg-[#0D0D0D] border border-[#2D3748]">
+                        <p className="text-gray-400 text-xs">{productDescription.slice(0, 100)}...</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Timestamp */}
+                  <p className="px-2 mt-3 text-gray-600 text-[10px]">
+                    Scheduled for {new Date(scheduledDateTime).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
+                  </p>
+                </div>
+
+                {/* Platform Badges */}
+                <div className="mt-4 flex gap-2 justify-center">
+                  {platforms.map((p) => (
+                    <span key={p} className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      p === 'instagram' ? 'bg-[#E4405F]/20 text-[#E4405F]'
+                      : p === 'twitter' ? 'bg-white/20 text-white'
+                      : 'bg-[#1877F2]/20 text-[#1877F2]'
+                    }`}>
+                      {p === 'instagram' ? 'Instagram' : p === 'twitter' ? 'X' : 'Facebook'}
+                    </span>
+                  ))}
                 </div>
               </div>
             </div>
 
-            {/* Footer Actions - Fixed */}
-            <div className="flex-shrink-0 p-4 md:p-5 border-t border-[#39FF14]/20 bg-[#0D0D0D] flex gap-3">
+            {/* Footer */}
+            <div className="flex-shrink-0 px-4 py-3 border-t border-[#39FF14]/20 bg-[#0D0D0D] flex items-center justify-between">
               <button
                 onClick={() => { resetForm(); onClose(); }}
-                className="flex-1 py-3 px-4 md:px-6 rounded-xl border border-[#2D3748] text-gray-400 hover:text-white hover:border-gray-600 transition font-medium"
+                className="px-6 py-2 rounded-lg border border-[#2D3748] text-gray-400 hover:text-white hover:border-gray-600 transition text-sm font-medium"
               >
                 Cancel
               </button>
-              <motion.button
-                whileHover={{ scale: 1.02, boxShadow: '0 0 30px rgba(57, 255, 20, 0.4)' }}
-                whileTap={{ scale: 0.98 }}
-                onClick={handleSchedule}
-                disabled={!title.trim() || platforms.length === 0}
-                className="flex-1 py-3 px-4 md:px-6 rounded-xl bg-[#39FF14] text-black font-bold hover:bg-[#39FF14]/90 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                <span>🚀</span> SCHEDULE BLAST
-              </motion.button>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => { /* Save as draft */ }}
+                  className="px-6 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm font-medium hover:bg-[#2D3748] transition"
+                >
+                  💾 Save Draft
+                </button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleSchedule}
+                  disabled={!title.trim() && !blogTitle.trim() || platforms.length === 0}
+                  className="px-6 py-2 rounded-lg bg-[#39FF14] text-black font-bold text-sm hover:bg-[#39FF14]/90 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  🚀 SCHEDULE BLAST
+                </motion.button>
+              </div>
             </div>
           </motion.div>
         </motion.div>
