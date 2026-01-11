@@ -439,11 +439,11 @@ export default function HomePage() {
               </p>
               
               <div data-hero-cta className="flex flex-wrap gap-3 mb-8">
-                <Button variant="primary" size="lg" onClick={() => setShowFullForm(true)} data-testid="hero-start-btn">
-                  Start Your Engine
+                <Button variant="primary" size="lg" onClick={() => window.location.href = '/waitlist'} data-testid="hero-waitlist-btn">
+                  Join the Waitlist
                 </Button>
-                <Button variant="secondary" size="lg" onClick={() => setShowWidget(true)} data-testid="hero-network-btn">
-                  See the Network →
+                <Button variant="secondary" size="lg" onClick={() => setShowFullForm(true)} data-testid="hero-start-btn">
+                  Book a Demo →
                 </Button>
               </div>
               
