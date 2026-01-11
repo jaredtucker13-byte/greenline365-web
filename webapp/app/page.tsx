@@ -875,14 +875,14 @@ export default function HomePage() {
               </div>
             </div>
             
-            {/* Right - Form */}
+            {/* Right - Form (Compact) */}
             <div
               data-booking-right
-              className="glass rounded-2xl p-6"
+              className="glass rounded-xl p-5"
             >
-              <h3 className="text-lg font-display font-bold text-white mb-2">Book Your Strategy Session</h3>
-              <p className="text-white/60 text-sm mb-4">Complete our quick form and we&apos;ll schedule a demo.</p>
-              <MultiStepBookingForm />
+              <h3 className="text-base font-display font-bold text-white mb-1">Book Your Strategy Session</h3>
+              <p className="text-white/60 text-xs mb-3">Quick form - takes 30 seconds</p>
+              <MultiStepBookingForm compact={true} />
             </div>
           </div>
         </div>
