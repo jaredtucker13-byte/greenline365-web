@@ -94,12 +94,29 @@ export default function Navbar() {
     setMobileMenuOpen(false);
   };
 
+  const [featuresOpen, setFeaturesOpen] = useState(false);
+  const [industriesOpen, setIndustriesOpen] = useState(false);
+
   const navLinks = [
     { href: '/', label: 'Home' },
-    { href: '/about', label: 'About' },
-    { href: '/how-it-works', label: 'How It Works' },
+    { 
+      label: 'Features', 
+      dropdown: [
+        { href: '/features/ai-content-creation', label: 'AI Content Creation' },
+        { href: '/features/automated-scheduling', label: 'Automated Scheduling' },
+        { href: '/features/local-trend-tracking', label: 'Local Trend Tracking' },
+      ]
+    },
+    { 
+      label: 'Industries', 
+      dropdown: [
+        { href: '/industries/restaurants', label: 'Restaurants' },
+        { href: '/industries/retail', label: 'Retail' },
+        { href: '/industries/professional-services', label: 'Professional Services' },
+        { href: '/industries/healthcare', label: 'Healthcare' },
+      ]
+    },
     { href: '/pricing', label: 'Pricing' },
-    { href: '/support', label: 'Support' },
   ];
 
   // Don't render navbar on dashboard routes
@@ -188,18 +205,64 @@ export default function Navbar() {
             <div className="hidden md:flex items-center gap-1">
               {navLinks.map((link, index) => (
                 <motion.div
-                  key={link.href}
+                  key={link.href || link.label}
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
+                  className="relative"
+                  onMouseEnter={() => {
+                    if (link.label === 'Features') setFeaturesOpen(true);
+                    if (link.label === 'Industries') setIndustriesOpen(true);
+                  }}
+                  onMouseLeave={() => {
+                    if (link.label === 'Features') setFeaturesOpen(false);
+                    if (link.label === 'Industries') setIndustriesOpen(false);
+                  }}
                 >
-                  <Link
-                    href={link.href}
-                    className="px-4 py-2 text-sm font-medium text-white/70 hover:text-neon-green-500 transition-all duration-300 relative group"
-                  >
-                    {link.label}
-                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-neon-green-500 group-hover:w-full transition-all duration-300" />
-                  </Link>
+                  {link.dropdown ? (
+                    <>
+                      <button
+                        className="px-4 py-2 text-sm font-medium text-white/70 hover:text-neon-green-500 transition-all duration-300 relative group flex items-center gap-1"
+                      >
+                        {link.label}
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                        <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-neon-green-500 group-hover:w-full transition-all duration-300" />
+                      </button>
+                      
+                      {/* Dropdown Menu */}
+                      <AnimatePresence>
+                        {((link.label === 'Features' && featuresOpen) || (link.label === 'Industries' && industriesOpen)) && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            transition={{ duration: 0.2 }}
+                            className="absolute top-full left-0 mt-2 w-56 os-card border border-neon-green-500/20 rounded-lg shadow-xl overflow-hidden"
+                          >
+                            {link.dropdown.map((item, i) => (
+                              <Link
+                                key={item.href}
+                                href={item.href}
+                                className="block px-4 py-3 text-sm text-white/80 hover:text-neon-green-500 hover:bg-white/5 transition-all duration-200"
+                              >
+                                {item.label}
+                              </Link>
+                            ))}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </>
+                  ) : (
+                    <Link
+                      href={link.href}
+                      className="px-4 py-2 text-sm font-medium text-white/70 hover:text-neon-green-500 transition-all duration-300 relative group"
+                    >
+                      {link.label}
+                      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-neon-green-500 group-hover:w-full transition-all duration-300" />
+                    </Link>
+                  )}
                 </motion.div>
               ))}
               
@@ -295,18 +358,36 @@ export default function Navbar() {
               <div className="w-full max-w-md space-y-2">
                 {navLinks.map((link, index) => (
                   <motion.div
-                    key={link.href}
+                    key={link.href || link.label}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1 + 0.2 }}
                   >
-                    <Link
-                      href={link.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="block w-full p-4 text-center text-2xl font-display font-bold text-white hover:text-neon-green-500 transition-all duration-300 rounded-xl hover:glass-green"
-                    >
-                      {link.label}
-                    </Link>
+                    {link.dropdown ? (
+                      <div>
+                        <div className="block w-full p-4 text-center text-2xl font-display font-bold text-neon-green-500">
+                          {link.label}
+                        </div>
+                        {link.dropdown.map((item) => (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="block w-full p-3 text-center text-lg text-white/80 hover:text-neon-green-500 transition-all duration-300 rounded-xl hover:glass-green"
+                          >
+                            {item.label}
+                          </Link>
+                        ))}
+                      </div>
+                    ) : (
+                      <Link
+                        href={link.href}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="block w-full p-4 text-center text-2xl font-display font-bold text-white hover:text-neon-green-500 transition-all duration-300 rounded-xl hover:glass-green"
+                      >
+                        {link.label}
+                      </Link>
+                    )}
                   </motion.div>
                 ))}
                 
