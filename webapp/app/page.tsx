@@ -547,7 +547,7 @@ export default function HomePage() {
           </div>
           
           {/* Fixed 3-Column Feature Grid with CSS Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-20">
             {[
               { icon: '💡', title: 'AI-Powered Insights', desc: 'Get intelligent recommendations based on your business goals and market trends.' },
               { icon: '📅', title: 'Smart Scheduling', desc: 'Seamlessly integrate with your calendar. Book demos, meetings, and follow-ups.' },
@@ -556,19 +556,19 @@ export default function HomePage() {
               <div
                 key={i}
                 data-feature-card
-                className="rounded-2xl p-10 transition-all duration-300 border hover:border-neon-green-500/40"
+                className="rounded-2xl p-10 transition-all duration-300 border hover:border-neon-green-500/50 hover:-translate-y-1"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(35,40,45,1) 0%, rgba(18,23,20,1) 100%)',
-                  borderColor: 'rgba(0,255,136,0.25)',
-                  boxShadow: '0 0 30px rgba(0,255,136,0.08), 0 8px 32px rgba(0,0,0,0.5)',
+                  background: 'linear-gradient(135deg, #1e2830 0%, #121714 100%)',
+                  borderColor: 'rgba(0,255,136,0.3)',
+                  boxShadow: '0 0 30px rgba(0,255,136,0.1), 0 8px 32px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08)',
                   minHeight: '220px'
                 }}
               >
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-5 text-2xl" style={{ background: 'linear-gradient(135deg, rgba(0,255,136,0.15) 0%, rgba(0,255,136,0.05) 100%)', border: '1px solid rgba(0,255,136,0.2)' }}>
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-5 text-2xl" style={{ background: 'linear-gradient(135deg, rgba(0,255,136,0.2) 0%, rgba(0,255,136,0.05) 100%)', border: '1px solid rgba(0,255,136,0.25)', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}>
                   {feature.icon}
                 </div>
                 <h3 className="font-display font-bold text-white mb-3" style={{ fontSize: '1.5rem' }}>{feature.title}</h3>
-                <p className="text-white/60 leading-relaxed" style={{ fontSize: '1rem', lineHeight: '1.6' }}>{feature.desc}</p>
+                <p className="text-white/70 leading-relaxed" style={{ fontSize: '1rem', lineHeight: '1.6' }}>{feature.desc}</p>
               </div>
             ))}
           </div>
