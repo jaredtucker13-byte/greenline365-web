@@ -169,7 +169,23 @@ export default function TacticalCommandCenter() {
 
   const handleForgeFromTrend = (trend: LocalTrend) => {
     setSelectedDate(new Date(trend.event_date));
+    setForgeInitialTitle(trend.title);
+    setForgeInitialContext(trend.suggested_action || trend.description);
     setShowContentForge(true);
+  };
+
+  // Handler for Weekly Trend Batch
+  const handleForgeFromWeeklyTrend = (trend: { title: string; description: string; suggested_action: string }) => {
+    setForgeInitialTitle(trend.title);
+    setForgeInitialContext(trend.suggested_action || trend.description);
+    setShowContentForge(true);
+  };
+
+  // Reset initial data when Content Forge closes
+  const handleCloseContentForge = () => {
+    setShowContentForge(false);
+    setForgeInitialTitle(undefined);
+    setForgeInitialContext(undefined);
   };
 
   // Calculate pending count
