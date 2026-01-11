@@ -531,14 +531,11 @@ export default function HomePage() {
       </section>
 
       {/* ========== FEATURES - 3 Column Grid (Fixed Alignment) ========== */}
-      <section ref={featuresRef} className="py-16 relative z-10" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
-        {/* Aurora Background */}
-        <div className="aurora-bg" />
-        
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 relative z-10">
+      <section ref={featuresRef} className="py-20 relative" style={{ paddingBlock: 'clamp(4rem, 10vh, 6rem)' }}>
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
           <div
             data-section-header
-            className="text-center mb-12"
+            className="text-center mb-16"
           >
             <h2 className="font-display font-bold text-white mb-3" style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)' }}>
               Why Choose <span className="text-neon-green-500">GreenLine365</span>?
@@ -547,7 +544,7 @@ export default function HomePage() {
           </div>
           
           {/* Fixed 3-Column Feature Grid with CSS Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-20">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               { icon: '💡', title: 'AI-Powered Insights', desc: 'Get intelligent recommendations based on your business goals and market trends.' },
               { icon: '📅', title: 'Smart Scheduling', desc: 'Seamlessly integrate with your calendar. Book demos, meetings, and follow-ups.' },
@@ -556,15 +553,10 @@ export default function HomePage() {
               <div
                 key={i}
                 data-feature-card
-                className="rounded-2xl p-10 transition-all duration-300 border hover:border-neon-green-500/50 hover:-translate-y-1"
-                style={{
-                  background: 'linear-gradient(135deg, #1e2830 0%, #121714 100%)',
-                  borderColor: 'rgba(0,255,136,0.3)',
-                  boxShadow: '0 0 30px rgba(0,255,136,0.1), 0 8px 32px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08)',
-                  minHeight: '220px'
-                }}
+                className="glass-strong rounded-2xl p-10 border border-neon-green-500/20 hover:border-neon-green-500/50 transition-all duration-300 hover:-translate-y-1"
+                style={{ minHeight: '220px' }}
               >
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-5 text-2xl" style={{ background: 'linear-gradient(135deg, rgba(0,255,136,0.2) 0%, rgba(0,255,136,0.05) 100%)', border: '1px solid rgba(0,255,136,0.25)', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}>
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-5 text-2xl bg-neon-green-500/10 border border-neon-green-500/20">
                   {feature.icon}
                 </div>
                 <h3 className="font-display font-bold text-white mb-3" style={{ fontSize: '1.5rem' }}>{feature.title}</h3>
@@ -576,14 +568,11 @@ export default function HomePage() {
       </section>
 
       {/* ========== HOW IT WORKS - Numbered Cards ========== */}
-      <section className="py-16 relative" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
-        {/* Aurora Background */}
-        <div className="aurora-bg" />
-        
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 relative z-10">
+      <section className="py-20 relative" style={{ paddingBlock: 'clamp(4rem, 10vh, 6rem)' }}>
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
           <div
             data-section-header
-            className="text-center mb-12"
+            className="text-center mb-16"
           >
             <h2 className="font-display font-bold text-white mb-3" style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)' }}>
               How the <span className="text-neon-green-500">System</span> Works
@@ -592,7 +581,7 @@ export default function HomePage() {
           </div>
           
           {/* 2x2 CSS Grid - Centered with consistent gaps */}
-          <div className="grid md:grid-cols-2 gap-8 relative z-20">
+          <div className="grid md:grid-cols-2 gap-8">
             {[
               { num: '01', title: 'Discovery & Setup', desc: 'We analyze your business, identify ideal customers, and configure your AI-powered system.', icon: '🔍' },
               { num: '02', title: 'AI Signal Detection', desc: 'Our AI continuously scans social media, forums, and communities for buying signals.', icon: '📡' },
@@ -602,16 +591,11 @@ export default function HomePage() {
               <div
                 key={i}
                 data-step-card
-                className="rounded-2xl p-10 transition-all duration-300 border hover:border-neon-green-500/50 hover:-translate-y-1"
-                style={{
-                  background: 'linear-gradient(135deg, #1e2830 0%, #121714 100%)',
-                  borderColor: 'rgba(0,255,136,0.3)',
-                  boxShadow: '0 0 30px rgba(0,255,136,0.1), 0 8px 32px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08)',
-                  minHeight: '180px'
-                }}
+                className="glass-strong rounded-2xl p-10 border border-neon-green-500/20 hover:border-neon-green-500/50 transition-all duration-300 hover:-translate-y-1"
+                style={{ minHeight: '180px' }}
               >
                 <div className="flex items-start gap-5">
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 text-2xl" style={{ background: 'linear-gradient(135deg, rgba(0,255,136,0.2) 0%, rgba(0,255,136,0.05) 100%)', border: '1px solid rgba(0,255,136,0.25)', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}>
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 text-2xl bg-neon-green-500/10 border border-neon-green-500/20">
                     {step.icon}
                   </div>
                   <div className="flex-1 min-w-0">
