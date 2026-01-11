@@ -436,13 +436,22 @@ export default function Navbar() {
                         </button>
                       </>
                     ) : (
-                      <Link
-                        href="/login"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="block w-full p-4 text-center text-xl font-semibold glass-green border border-neon-green-500/30 rounded-xl"
-                      >
-                        Sign In / Sign Up
-                      </Link>
+                      <>
+                        <Link
+                          href="/waitlist"
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="block w-full p-4 text-center text-xl font-bold bg-neon-green-500 text-black rounded-xl"
+                        >
+                          Join Waitlist
+                        </Link>
+                        <Link
+                          href="/login"
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="block w-full p-4 text-center text-xl font-semibold text-white/70 rounded-xl glass"
+                        >
+                          Sign In
+                        </Link>
+                      </>
                     )}
                   </motion.div>
                 )}
