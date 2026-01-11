@@ -603,7 +603,7 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
   };
 
   // File handling - now with auto-analysis option
-  const handleFileSelect = (file: File, autoAnalyze = true) => {
+  const handleFileSelect = (file: File) => {
     if (!file.type.startsWith('image/')) {
       alert('Please select an image file');
       return;
@@ -628,8 +628,8 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
       const dataUrl = e.target?.result as string;
       setImagePreview(dataUrl);
       
-      // Auto-analyze after upload completes
-      if (autoAnalyze) {
+      // Auto-analyze after upload completes (only if enabled)
+      if (autoAnalyzeEnabled) {
         setTimeout(() => analyzeImage(dataUrl), 1200);
       }
     };
