@@ -60,6 +60,19 @@ Build a comprehensive AI-powered business operating system for local businesses 
    - Floating phone mockup animation
    - Background glow pulsing effects
    - Hover lift effects on interactive cards
+10. **Landing Page Duplicate Section Fix** - Jan 11, 2026
+    - Removed duplicate "Distressed Owners" section
+    - Page now flows correctly: Hero → Problem → Features → How It Works → Testimonial → Solution
+11. **Weekly Trend Hunter - Content Forge Integration** - Jan 11, 2026
+    - "Create Content →" buttons now open Content Forge with pre-filled title and context
+    - Trend data (title, suggested action) populates the form automatically
+12. **Content Forge - Auto-Analyze Toggle** - Jan 11, 2026
+    - Added toggle to enable/disable auto-image-analysis
+    - Users can choose "Manual Mode" to write their own content
+    - Shows "✍️ Manual Mode" or "🤖 AI will auto-analyze" based on toggle state
+13. **Chat Widget Scroll Fix** - Jan 11, 2026
+    - Fixed scroll behavior in chat messages container
+    - Added min-h-0 and proper flex constraints for overflow handling
 
 ### 🔄 In Progress
 - Wire up AI Assistant suggestions to Content Forge fields ("Apply" buttons)
