@@ -532,7 +532,7 @@ export default function HomePage() {
 
       {/* ========== FEATURES - 3 Column Grid (Fixed Alignment) ========== */}
       <section ref={featuresRef} className="py-16 relative z-10" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
+        <div className="max-w-[1100px] mx-auto px-4 sm:px-6">
           <div
             data-section-header
             className="text-center mb-12"
@@ -544,7 +544,7 @@ export default function HomePage() {
           </div>
           
           {/* Fixed 3-Column Feature Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 justify-items-center">
             {[
               { icon: '💡', title: 'AI-Powered Insights', desc: 'Get intelligent recommendations based on your business goals and market trends.' },
               { icon: '📅', title: 'Smart Scheduling', desc: 'Seamlessly integrate with your calendar. Book demos, meetings, and follow-ups.' },
@@ -553,9 +553,9 @@ export default function HomePage() {
               <div
                 key={i}
                 data-feature-card
-                className="glass rounded-2xl p-6 border border-white/10 hover:border-neon-green-500/30 transition-all duration-300 gsap-hover-lift h-full flex flex-col"
+                className="glass rounded-2xl p-6 border border-white/10 hover:border-neon-green-500/30 transition-all duration-300 gsap-hover-lift h-full flex flex-col text-center max-w-sm w-full"
               >
-                <div className="w-12 h-12 bg-neon-green-500/20 rounded-xl flex items-center justify-center mb-4 text-2xl">
+                <div className="w-14 h-14 bg-neon-green-500/20 rounded-xl flex items-center justify-center mb-4 text-2xl mx-auto">
                   {feature.icon}
                 </div>
                 <h3 className="text-lg font-display font-bold text-white mb-2">{feature.title}</h3>
