@@ -14,7 +14,7 @@ export default function FloatingShapes() {
   const rotate2 = useTransform(scrollY, [0, 3000], [0, -120]);
 
   return (
-    <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+    <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{ zIndex: -10 }}>
       {/* Large Gradient Orb - Top Right */}
       <motion.div
         style={{ y: y1 }}
