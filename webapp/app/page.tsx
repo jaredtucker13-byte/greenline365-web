@@ -711,22 +711,23 @@ export default function HomePage() {
       {/* ========== TREND HUNTER DEMO - 50/50 Split ========== */}
       <section id="trend-demo" className="py-16 relative" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-neon-green-500/5 rounded-full blur-3xl gsap-parallax" />
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-8 items-center">
+        <div className="max-w-[1100px] mx-auto px-4 sm:px-6 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             {/* Left - Content */}
             <div
               data-trend-content
+              className="text-center lg:text-left"
             >
               <span className="text-neon-green-500 text-xs font-bold tracking-widest uppercase mb-3 block">Try It Now - FREE</span>
               <h2 className="font-display font-bold text-white mb-4" style={{ fontSize: 'clamp(1.5rem, 4vw, 2.25rem)' }}>
                 See What&apos;s Trending in <span className="text-neon-green-500">Your Area</span>
               </h2>
-              <p className="text-white/60 mb-6 text-sm leading-relaxed">
+              <p className="text-white/60 mb-6 text-sm leading-relaxed max-w-md mx-auto lg:mx-0">
                 Enter your ZIP code and discover local events, trends, and opportunities you can turn into content and customers.
               </p>
-              <div className="space-y-2 mb-6">
+              <div className="space-y-2 mb-6 max-w-md mx-auto lg:mx-0">
                 {['Real-time local insights', 'Weather-based opportunities', 'Event-driven marketing'].map((item, i) => (
-                  <div key={i} className="flex items-center gap-2 text-white/70 text-sm">
+                  <div key={i} className="flex items-center gap-2 text-white/70 text-sm justify-center lg:justify-start">
                     <div className="w-1.5 h-1.5 bg-neon-green-500 rounded-full" />
                     <span>{item}</span>
                   </div>
@@ -737,7 +738,7 @@ export default function HomePage() {
             {/* Right - Widget */}
             <div
               data-trend-widget
-              className="glass-strong rounded-2xl p-5 border border-neon-green-500/20"
+              className="glass-strong rounded-2xl p-5 border border-neon-green-500/20 max-w-md mx-auto lg:mx-0 w-full"
             >
               <DailyTrendHunter trendType="manual" />
             </div>
