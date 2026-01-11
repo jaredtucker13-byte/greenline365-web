@@ -294,7 +294,7 @@ textarea:focus {
 /* Base OS Card with layered gradient */
 .os-card {
   position: relative;
-  background: linear-gradient(135deg, rgba(35,40,45,0.7) 0%, rgba(18,23,20,0.7) 100%);
+  background: linear-gradient(135deg, rgba(55,60,65,0.95) 0%, rgba(30,35,40,0.95) 100%);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(0,255,136,0.25);
