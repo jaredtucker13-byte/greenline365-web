@@ -962,7 +962,7 @@ export default function HomePage() {
             
             <div
               data-product-info
-              className="order-1 lg:order-2"
+              className="order-1 lg:order-2 text-center lg:text-left"
             >
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-500/20 border border-purple-500/30 rounded-full mb-4">
                 <span className="text-xs text-purple-300 font-semibold uppercase">Product #2</span>
