@@ -134,6 +134,21 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
     }
   }, [selectedDate]);
 
+  // Set initial title/context when modal opens with pre-filled data
+  useEffect(() => {
+    if (isOpen && initialTitle) {
+      setTitle(initialTitle);
+      // If there's context, set it as caption or blog title based on content type
+      if (initialContext) {
+        setCaption(initialContext);
+        if (contentType === 'blog') {
+          setBlogTitle(initialTitle);
+          setBlogSeoDescription(initialContext.slice(0, 160));
+        }
+      }
+    }
+  }, [isOpen, initialTitle, initialContext, contentType]);
+
   // Close calendar/time picker when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
