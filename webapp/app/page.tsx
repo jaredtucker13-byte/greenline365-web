@@ -765,7 +765,7 @@ export default function HomePage() {
             </h2>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 justify-items-center">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               { q: "How does GreenLine365 work?", a: "An AI-powered OS that connects your business with the local economy through automated scheduling and smart marketing.", bullets: ['AI-powered insights', '24/7 automation', 'Lead tracking'] },
               { q: "What makes you different?", a: "Built specifically for local businesses. Our AI understands local markets and optimizes for real-world foot traffic.", bullets: ['Built for local', 'Community-focused', 'Foot traffic optimization'] },
@@ -777,17 +777,17 @@ export default function HomePage() {
               <div
                 key={i}
                 data-faq-card
-                className="glass rounded-xl p-5 border border-white/10 hover:border-neon-green-500/30 transition-colors gsap-hover-lift w-full max-w-xs"
+                className="os-card card-uniform p-10 transition-all duration-300"
               >
-                <div className="w-9 h-9 bg-neon-green-500/20 rounded-full flex items-center justify-center mb-4 mx-auto">
-                  <span className="text-neon-green-500 text-sm font-bold">?</span>
+                <div className="icon-glass mb-5 mx-auto">
+                  <span className="text-neon-green-500 text-lg font-bold">?</span>
                 </div>
-                <h3 className="text-sm font-display font-bold text-white mb-2 text-center">{faq.q}</h3>
-                <p className="text-white/60 text-xs leading-relaxed mb-3 text-center">{faq.a}</p>
-                <div className="space-y-1">
+                <h3 className="font-display font-bold text-white mb-3 text-center" style={{ fontSize: '1.125rem' }}>{faq.q}</h3>
+                <p className="text-white/60 mb-4 text-center" style={{ fontSize: '0.875rem', lineHeight: '1.6' }}>{faq.a}</p>
+                <div className="space-y-2">
                   {faq.bullets.map((b, j) => (
-                    <div key={j} className="flex items-center justify-center gap-2 text-white/50 text-xs">
-                      <div className="w-1 h-1 bg-neon-green-500 rounded-full" />
+                    <div key={j} className="flex items-center justify-center gap-2 text-white/50" style={{ fontSize: '0.8125rem' }}>
+                      <div className="w-1.5 h-1.5 bg-neon-green-500 rounded-full" />
                       <span>{b}</span>
                     </div>
                   ))}
@@ -799,24 +799,27 @@ export default function HomePage() {
       </section>
 
       {/* ========== BOOKING - 50/50 Split ========== */}
-      <section className="py-16" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }} id="booking">
-        <div className="max-w-[1000px] mx-auto px-4 sm:px-6">
+      <section className="py-16 relative" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }} id="booking">
+        {/* Aurora Background */}
+        <div className="aurora-bg" />
+        
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 relative z-10">
           <div className="grid lg:grid-cols-2 gap-8 items-stretch">
             {/* Left - Value Prop */}
             <div
               data-booking-left
-              className="glass-strong rounded-2xl p-6 flex flex-col justify-between"
+              className="os-card p-10 flex flex-col justify-between"
             >
               <div>
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-8 h-8 rounded-lg bg-neon-green-500/20 border border-neon-green-500/50 flex items-center justify-center">
-                    <svg className="w-4 h-4 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="icon-glass">
+                    <svg className="w-5 h-5 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
                   </div>
                   <div>
-                    <div className="font-display font-bold text-white text-sm">GreenLine<span className="text-neon-green-500">365</span></div>
-                    <div className="text-[10px] text-white/40 uppercase tracking-wider">Business OS</div>
+                    <div className="font-display font-bold text-white">GreenLine<span className="text-neon-green-500">365</span></div>
+                    <div className="text-xs text-white/40 uppercase tracking-wider">Business OS</div>
                   </div>
                 </div>
                 
