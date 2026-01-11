@@ -53,7 +53,11 @@ const needsOptions = [
   { value: 'consulting', label: 'Consulting' },
 ];
 
-export default function MultiStepBookingForm() {
+interface MultiStepBookingFormProps {
+  compact?: boolean;
+}
+
+export default function MultiStepBookingForm({ compact = false }: MultiStepBookingFormProps) {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<FormData>({
     fullName: '',
