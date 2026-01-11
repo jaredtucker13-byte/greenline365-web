@@ -932,7 +932,7 @@ export default function HomePage() {
             
             <div
               data-product-right
-              className="glass-strong rounded-2xl p-5 border border-neon-green-500/20"
+              className="glass-strong rounded-2xl p-5 border border-neon-green-500/20 max-w-md mx-auto lg:mx-0 w-full"
             >
               <h4 className="text-base font-display font-bold text-white mb-4 text-center">Quick Book Demo</h4>
               <BookingWidget source="landing-page-demo" />
@@ -940,10 +940,10 @@ export default function HomePage() {
           </div>
 
           {/* Product 2 - AI Chat */}
-          <div className="grid lg:grid-cols-2 gap-6">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             <div
               data-product-demo
-              className="glass-strong rounded-2xl p-5 order-2 lg:order-1"
+              className="glass-strong rounded-2xl p-5 order-2 lg:order-1 max-w-md mx-auto lg:mx-0 w-full"
             >
               <div className="p-4 border-b border-neon-green-500/10 bg-black/30 rounded-t-xl">
                 <div className="text-[10px] tracking-widest uppercase text-neon-green-400/80">PROTOCOL: ACTIVE ASSISTANT</div>
