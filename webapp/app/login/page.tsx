@@ -22,8 +22,9 @@ export default function LoginPage() {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        // User is already logged in, redirect to dashboard
-        router.push('/admin-v2');
+        // User is already logged in, redirect to HOME (not dashboard)
+        // Users should explore the website, not go straight to admin
+        router.push('/');
       } else {
         setCheckingSession(false);
       }
@@ -50,7 +51,8 @@ export default function LoginPage() {
     }
 
     if (data.session) {
-      router.push('/admin-v2');
+      // Redirect to HOME after login (not dashboard)
+      router.push('/');
     }
 
     setLoading(false);
