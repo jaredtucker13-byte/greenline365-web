@@ -728,7 +728,7 @@ function ChatContent({
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full min-h-0">
       {/* Header */}
       <div 
         className="flex-shrink-0 p-4 border-b bg-black/50"
