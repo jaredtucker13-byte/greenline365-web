@@ -444,15 +444,15 @@ export default function HomePage() {
                 </Button>
               </div>
               
-              <div data-hero-stats className="grid grid-cols-3 gap-4">
+              <div data-hero-stats className="grid grid-cols-3 gap-6 max-w-md">
                 {[
                   { value: '500+', label: 'Businesses' },
                   { value: '40%', label: 'More Leads' },
                   { value: '24/7', label: 'Always On' }
                 ].map((stat, i) => (
-                  <div key={i} className="text-center">
+                  <div key={i} className="text-center px-2">
                     <div className="text-2xl font-display font-bold text-neon-green-500">{stat.value}</div>
-                    <div className="text-xs text-white/50">{stat.label}</div>
+                    <div className="text-xs text-white/50 mt-1">{stat.label}</div>
                   </div>
                 ))}
               </div>
