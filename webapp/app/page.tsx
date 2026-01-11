@@ -568,10 +568,10 @@ export default function HomePage() {
 
       {/* ========== HOW IT WORKS - Numbered Cards ========== */}
       <section className="py-16 relative" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
+        <div className="max-w-[1100px] mx-auto px-4 sm:px-6">
           <div
             data-section-header
-            className="text-center mb-10"
+            className="text-center mb-12"
           >
             <h2 className="font-display font-bold text-white mb-3" style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)' }}>
               How the <span className="text-neon-green-500">System</span> Works
@@ -579,7 +579,7 @@ export default function HomePage() {
             <p className="text-white/60 max-w-xl mx-auto">Four seamless phases that transform your business</p>
           </div>
           
-          <div className="grid md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-5 max-w-3xl mx-auto">
             {[
               { num: '01', title: 'Discovery & Setup', desc: 'We analyze your business, identify ideal customers, and configure your AI-powered system.', icon: '🔍' },
               { num: '02', title: 'AI Signal Detection', desc: 'Our AI continuously scans social media, forums, and communities for buying signals.', icon: '📡' },
@@ -597,9 +597,9 @@ export default function HomePage() {
                       <span className="text-2xl">{step.icon}</span>
                     </div>
                   </div>
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs font-bold text-neon-green-500/50">{step.num}</span>
+                      <span className="text-xs font-bold text-neon-green-500/60 bg-neon-green-500/10 px-2 py-0.5 rounded">{step.num}</span>
                     </div>
                     <h3 className="text-base font-display font-bold text-white mb-1">{step.title}</h3>
                     <p className="text-white/60 text-sm leading-relaxed">{step.desc}</p>
