@@ -577,30 +577,31 @@ export default function HomePage() {
             <p className="text-white/60 max-w-xl mx-auto">Four seamless phases that transform your business</p>
           </div>
           
-          <div className="space-y-4 max-w-3xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-4 max-w-4xl mx-auto">
             {[
-              { num: '01', title: 'Discovery & Setup', desc: 'We analyze your business, identify ideal customers, and configure your AI-powered system.' },
-              { num: '02', title: 'AI Signal Detection', desc: 'Our AI continuously scans social media, forums, and communities for buying signals.' },
-              { num: '03', title: 'Smart Engagement', desc: 'Automated, personalized outreach at the perfect moment when intent is highest.' },
-              { num: '04', title: 'Growth & Optimization', desc: 'Continuous learning and optimization to maximize your conversion rates.' }
+              { num: '01', title: 'Discovery & Setup', desc: 'We analyze your business, identify ideal customers, and configure your AI-powered system.', icon: '🔍' },
+              { num: '02', title: 'AI Signal Detection', desc: 'Our AI continuously scans social media, forums, and communities for buying signals.', icon: '📡' },
+              { num: '03', title: 'Smart Engagement', desc: 'Automated, personalized outreach at the perfect moment when intent is highest.', icon: '🎯' },
+              { num: '04', title: 'Growth & Optimization', desc: 'Continuous learning and optimization to maximize your conversion rates.', icon: '📈' }
             ].map((step, i) => (
               <div
                 key={i}
                 data-step-card
-                className="glass-strong rounded-2xl p-5 border border-neon-green-500/20 flex gap-5 items-start gsap-hover-lift"
+                className="glass-strong rounded-xl p-5 border border-neon-green-500/20 gsap-hover-lift"
               >
-                <div className="flex-shrink-0">
-                  <div className="text-3xl font-display font-bold text-neon-green-500/30">{step.num}</div>
-                  <div className="w-8 h-8 rounded-lg bg-neon-green-500/20 flex items-center justify-center mt-2">
-                    <svg className="w-4 h-4 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0">
+                    <div className="w-12 h-12 rounded-xl bg-neon-green-500/10 border border-neon-green-500/30 flex items-center justify-center">
+                      <span className="text-2xl">{step.icon}</span>
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <h3 className="text-lg font-display font-bold text-white mb-1">{step.title}</h3>
-                  <p className="text-white/60 text-sm leading-relaxed">{step.desc}</p>
-                  <div className="h-1 bg-gradient-to-r from-neon-green-500 to-transparent rounded-full mt-3 w-2/3 gsap-progress-bar" />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xs font-bold text-neon-green-500/50">{step.num}</span>
+                    </div>
+                    <h3 className="text-base font-display font-bold text-white mb-1">{step.title}</h3>
+                    <p className="text-white/60 text-sm leading-relaxed">{step.desc}</p>
+                  </div>
                 </div>
               </div>
             ))}
