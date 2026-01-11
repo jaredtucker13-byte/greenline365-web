@@ -351,7 +351,7 @@ textarea:focus {
   inset: 0;
   overflow: hidden;
   pointer-events: none;
-  z-index: 0;
+  z-index: -1;
 }
 
 .aurora-bg::before {
@@ -361,7 +361,7 @@ textarea:focus {
   left: 10%;
   width: 500px;
   height: 500px;
-  background: radial-gradient(ellipse, rgba(0,255,136,0.15) 0%, transparent 70%);
+  background: radial-gradient(ellipse, rgba(0,255,136,0.12) 0%, transparent 70%);
   border-radius: 50%;
   filter: blur(80px);
   animation: aurora-drift 15s ease-in-out infinite;
@@ -374,7 +374,7 @@ textarea:focus {
   right: 10%;
   width: 400px;
   height: 400px;
-  background: radial-gradient(ellipse, rgba(0,255,255,0.1) 0%, transparent 70%);
+  background: radial-gradient(ellipse, rgba(0,255,255,0.08) 0%, transparent 70%);
   border-radius: 50%;
   filter: blur(80px);
   animation: aurora-drift 12s ease-in-out infinite reverse;
