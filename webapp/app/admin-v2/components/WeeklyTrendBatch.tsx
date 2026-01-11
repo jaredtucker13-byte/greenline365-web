@@ -13,7 +13,11 @@ interface Trend {
   created_at: string;
 }
 
-export default function WeeklyTrendBatch() {
+interface WeeklyTrendBatchProps {
+  onCreateContent?: (trend: Trend) => void;
+}
+
+export default function WeeklyTrendBatch({ onCreateContent }: WeeklyTrendBatchProps) {
   const [trends, setTrends] = useState<Trend[]>([]);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
@@ -193,7 +197,10 @@ export default function WeeklyTrendBatch() {
               </div>
               
               {/* Action Button */}
-              <button className="mt-3 w-full py-2 text-xs font-medium bg-[#00e676]/10 hover:bg-[#00e676]/20 text-[#00e676] rounded-lg transition-all">
+              <button 
+                onClick={() => onCreateContent?.(trend)}
+                className="mt-3 w-full py-2 text-xs font-medium bg-[#00e676]/10 hover:bg-[#00e676]/20 text-[#00e676] rounded-lg transition-all"
+              >
                 Create Content →
               </button>
             </motion.div>
