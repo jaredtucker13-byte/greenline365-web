@@ -99,6 +99,7 @@ export default function HomePage() {
         duration: 0.7,
         stagger: 0.15,
         ease: 'power2.out',
+        immediateRender: false,
       });
 
       // Step cards stagger
@@ -112,6 +113,7 @@ export default function HomePage() {
         duration: 0.7,
         stagger: 0.15,
         ease: 'power2.out',
+        immediateRender: false,
       });
 
       // Progress bars grow animation
