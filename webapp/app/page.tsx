@@ -458,69 +458,70 @@ export default function HomePage() {
               </div>
             </div>
             
-            {/* Right Column - Phone Mockup */}
+            {/* Right Column - Interactive Phone Mockup */}
             <div
               data-hero-image
-              className="relative hidden lg:flex justify-center"
+              className="relative hidden lg:flex justify-center items-center"
             >
               <div className="absolute inset-0 bg-neon-green-500/10 blur-3xl rounded-full scale-75" />
-              <div
-                className="relative z-10 gsap-float"
-              >
-                <div className="relative w-[280px] h-[560px] bg-os-dark-900 rounded-[2.5rem] p-2 border-4 border-white/10">
-                  <div className="w-full h-full bg-gradient-to-b from-os-dark to-os-dark-800 rounded-[2rem] overflow-hidden">
-                    <div className="px-4 py-2 flex justify-between text-xs text-white/50">
-                      <span>9:41</span>
-                      <div className="flex gap-1">
-                        <div className="w-3 h-3 border border-white/30 rounded-sm" />
-                        <div className="w-3 h-3 border border-white/30 rounded-sm" />
-                      </div>
-                    </div>
-                    <div className="px-3 py-4 space-y-3">
-                      <div className="glass-strong rounded-xl p-3 border border-neon-green-500/20">
-                        <div className="flex items-center gap-2 mb-2">
-                          <div className="w-8 h-8 rounded-full bg-neon-green-500/20 flex items-center justify-center">
-                            <svg className="w-4 h-4 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                            </svg>
-                          </div>
-                          <div>
-                            <div className="text-white font-semibold text-xs">GreenLine360</div>
-                            <div className="text-white/40 text-[10px]">Synced 2 min ago</div>
-                          </div>
-                        </div>
-                      </div>
-                      {['Page Reliability', 'Auto Response', 'Local Reach', 'Fundraiser Status'].map((item, i) => (
-                        <div key={i} className="glass rounded-lg p-2.5 flex items-center justify-between border border-white/10">
-                          <div className="flex items-center gap-2">
-                            <div className={`w-6 h-6 rounded-md bg-neon-green-500/20 flex items-center justify-center`}>
-                              <div className="w-1.5 h-1.5 bg-neon-green-500 rounded-full" />
-                            </div>
-                            <span className="text-white text-xs">{item}</span>
-                          </div>
-                          <svg className="w-3 h-3 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
-                        </div>
-                      ))}
-                      <div className="glass-strong rounded-xl p-3 border border-white/10 mt-4">
-                        <div className="grid grid-cols-4 gap-1 text-center">
-                          {[
-                            { label: 'Posts', value: '1.5K' },
-                            { label: 'Leads', value: '847', green: true },
-                            { label: 'Reach', value: '2.3M' },
-                            { label: 'ROI', value: '340%', green: true }
-                          ].map((s, i) => (
-                            <div key={i}>
-                              <div className="text-white/40 text-[9px]">{s.label}</div>
-                              <div className={`text-xs font-semibold ${s.green ? 'text-neon-green-500' : 'text-white'}`}>{s.value}</div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
+              <div className="relative z-10 gsap-float">
+                <PhoneMockup />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ========== DISTRESSED OWNERS - Right After Hero ========== */}
+      <section className="py-16 relative z-10" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            {/* Left - Image */}
+            <div data-scroll-image className="order-2 lg:order-1">
+              <div className="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
+                <Image
+                  src="/images/distressed-owners.jpg"
+                  alt="Stressed business owners"
+                  width={600}
+                  height={400}
+                  className="w-full h-auto object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-os-dark/80 via-transparent to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4">
+                  <div className="glass rounded-xl p-3 border border-red-500/30">
+                    <div className="flex items-center gap-2">
+                      <span className="text-red-400 text-lg">😰</span>
+                      <span className="text-white/90 text-sm">Sound familiar?</span>
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+            
+            {/* Right - Content */}
+            <div data-scroll-content className="order-1 lg:order-2">
+              <span className="text-red-400 text-xs font-bold tracking-widest uppercase mb-3 block">The Problem</span>
+              <h2 className="font-display font-bold text-white mb-4" style={{ fontSize: 'clamp(1.5rem, 4vw, 2.25rem)' }}>
+                Running a Business Shouldn&apos;t Mean <span className="text-red-400">Running on Empty</span>
+              </h2>
+              <p className="text-white/60 mb-6 text-sm leading-relaxed">
+                You didn&apos;t start your business to become a full-time social media manager. Yet here you are, drowning in tasks that steal your time and energy.
+              </p>
+              <div className="space-y-3">
+                {[
+                  { emoji: '😰', title: 'Overwhelmed', desc: 'Drowning in to-do lists while competitors steal customers' },
+                  { emoji: '📱', title: 'Always On-Call', desc: 'Sacrificing family time to keep the business running' },
+                  { emoji: '😓', title: 'No Marketing Time', desc: 'Great at your craft, but who has time for social media?' },
+                  { emoji: '💸', title: 'Wasted Ad Spend', desc: 'Throwing money at ads that don\'t convert to real customers' }
+                ].map((pain, i) => (
+                  <div key={i} data-pain-card className="glass rounded-xl p-4 border border-red-500/20 flex gap-3 items-start hover:border-red-500/40 transition-colors">
+                    <span className="text-2xl">{pain.emoji}</span>
+                    <div>
+                      <h4 className="text-white font-semibold text-sm">{pain.title}</h4>
+                      <p className="text-white/60 text-xs">{pain.desc}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
