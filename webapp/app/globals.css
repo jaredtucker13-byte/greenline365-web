@@ -294,15 +294,17 @@ textarea:focus {
 /* Base OS Card with layered gradient */
 .os-card {
   position: relative;
-  background: linear-gradient(135deg, rgba(26,27,38,0.9) 0%, rgba(10,15,13,0.95) 100%);
+  background: linear-gradient(135deg, rgba(30,35,40,0.95) 0%, rgba(15,20,18,0.98) 100%);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(0,255,136,0.15);
+  border: 1px solid rgba(0,255,136,0.2);
   border-radius: 1rem;
   box-shadow: 
-    0 0 20px rgba(0,255,136,0.05),
-    0 8px 32px rgba(0,0,0,0.4);
+    0 0 30px rgba(0,255,136,0.08),
+    0 8px 32px rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.05);
   overflow: hidden;
+  transition: all 0.3s ease;
 }
 
 /* Noise/scanline texture overlay */
