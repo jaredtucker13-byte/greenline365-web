@@ -893,10 +893,10 @@ export default function HomePage() {
 
       {/* ========== PRODUCTS - 50/50 Splits ========== */}
       <section className="py-16" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
+        <div className="max-w-[1100px] mx-auto px-4 sm:px-6">
           <div
             data-section-header
-            className="text-center mb-10"
+            className="text-center mb-12"
           >
             <h2 className="font-display font-bold text-white mb-3" style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)' }}>
               Our <span className="text-neon-green-500">Products</span>
@@ -905,9 +905,10 @@ export default function HomePage() {
           </div>
 
           {/* Product 1 - Booking Widget */}
-          <div className="grid lg:grid-cols-2 gap-6 mb-8">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 mb-12 items-center">
             <div
               data-product-left
+              className="text-center lg:text-left"
             >
               <div className="inline-flex items-center gap-2 px-3 py-1 glass-green border border-neon-green-500/30 rounded-full mb-4">
                 <span className="text-xs text-neon-green-500 font-semibold uppercase">Product #1</span>
