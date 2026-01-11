@@ -96,6 +96,10 @@ export default function TacticalCommandCenter() {
   const [events, setEvents] = useState<CalendarEvent[]>(initialEvents);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   
+  // Content Forge initial data (for pre-filling from trends)
+  const [forgeInitialTitle, setForgeInitialTitle] = useState<string | undefined>();
+  const [forgeInitialContext, setForgeInitialContext] = useState<string | undefined>();
+  
   // Demo Controller State
   const [showDemoController, setShowDemoController] = useState(false);
   const [demoConfig, setDemoConfig] = useState<DemoConfig>(defaultDemoConfig);
