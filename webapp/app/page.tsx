@@ -642,56 +642,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ========== DISTRESSED OWNERS - 50/50 Split ========== */}
-      <section className="py-16" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
-          <div className="grid lg:grid-cols-2 gap-8 items-center">
-            {/* Left - Image */}
-            <div
-              data-scroll-image
-              className="order-2 lg:order-1"
-            >
-              <div className="relative rounded-2xl overflow-hidden border border-white/10">
-                <Image
-                  src="/images/distressed-owners.jpg"
-                  alt="Stressed business owners"
-                  width={600}
-                  height={400}
-                  className="w-full h-auto object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-os-dark/80 via-transparent to-transparent" />
-              </div>
-            </div>
-            
-            {/* Right - Content */}
-            <div
-              data-scroll-content
-              className="order-1 lg:order-2"
-            >
-              <span className="text-neon-green-500 text-xs font-bold tracking-widest uppercase mb-3 block">Sound Familiar?</span>
-              <h2 className="font-display font-bold text-white mb-4" style={{ fontSize: 'clamp(1.5rem, 4vw, 2.25rem)' }}>
-                Running a Business Shouldn&apos;t Mean <span className="text-red-400">Running on Empty</span>
-              </h2>
-              <div className="space-y-3">
-                {[
-                  { emoji: '😰', title: 'Overwhelmed', desc: 'Drowning in to-do lists while competitors steal customers' },
-                  { emoji: '📱', title: 'Always On-Call', desc: 'Sacrificing family time to keep the business running' },
-                  { emoji: '😓', title: 'No Marketing Time', desc: 'Great at your craft, but who has time for social media?' }
-                ].map((pain, i) => (
-                  <div key={i} data-pain-card className="glass rounded-xl p-4 border border-red-500/20 flex gap-3 items-start">
-                    <span className="text-2xl">{pain.emoji}</span>
-                    <div>
-                      <h4 className="text-white font-semibold text-sm">{pain.title}</h4>
-                      <p className="text-white/60 text-xs">{pain.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* ========== SOLUTION - 50/50 Split ========== */}
       <section className="py-16 bg-gradient-to-b from-os-dark to-os-dark-800" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
