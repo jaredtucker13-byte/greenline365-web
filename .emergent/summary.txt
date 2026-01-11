@@ -1,111 +1,101 @@
-<analysis>**original_problem_statement:** The user wants to continue building their GreenLine365 application. The initial focus was on fixing a Vercel build error and completing the Content Forge backend. However, the scope rapidly expanded based on detailed user feedback and vision documents.
-
-The primary objectives that emerged during this session were:
-1.  **Fix All Build and Runtime Errors:** Resolve a series of Vercel build failures and runtime errors to ensure the application is deployable and functional.
-2.  **Complete and Polish Content Forge:** Overhaul the Content Forge UI/UX based on specific feedback, including implementing a better layout, clickable keyword/hashtag suggestions, a proper calendar/time picker, and a Save Draft feature with a drafts panel.
-3.  **Implement Image Analysis Autopilot:** Create a feature where uploading an image automatically triggers an AI analysis to generate a title, caption, keywords, and description, auto-populating the Content Forge form.
-4.  **Build a Production-Ready AI Chat Widget:** Create a new, powerful, context-aware AI chat widget that acts as a brainstorming partner or concierge depending on the page. This was a user-directed priority shift.
-5.  **Embed the AI Assistant:** Integrate the new chat widget directly into the Content Forge UI as a collapsible side panel to assist with content creation.
-6.  **Enhance the Blog Editor:** Transform the blog creation tab into a comprehensive editor with SEO previews, formatting tools, and a content distribution plan preview.
-7.  **Add Premium Animations:** Incorporate the GSAP library to add premium, high-end animations to the landing page to match the user's vision for a top-tier site.
+<analysis>**original_problem_statement:** The user wants to continue building their GreenLine365 application. The initial task was to add GSAP animations to the landing page. The scope then expanded significantly to include:
+1.  **Implement a Multi-Agent Voice AI System:** Integrate Retell AI with Supabase via a Model Context Protocol (MCP) server. This system should handle inbound and outbound calls for booking and sales, support multi-tenancy, and feature two distinct AI agents: Susan (booking) and Aiden (a sophisticated sales agent with a specific persona).
+2.  **Build Content Forge 2.0:** Based on a detailed user document, create a futuristic content creation module. This involves creating Content Blueprints (templates for different blog formats), generating a 4-week content calendar, and building a new UI in the admin dashboard to manage this system.
+3.  **Refactor the Landing Page:** Overhaul the landing page UI by:
+    *   Making the hero section's phone mockup interactive with live notifications.
+    *   Adding 3D floating shapes to the background that move on scroll.
+    *   Fixing component alignment issues.
+    *   Reordering sections to improve the narrative flow.
 
 **User's preferred language**: English
 
 **what currently exists?**
-The project is a Next.js application located in .
--   **Landing Page ():** The page is being refactored to include GSAP animations for a more premium feel. The hero section has been updated, but the work is in progress. The Daily Trend Hunter live demo is now functional, using an AI-powered fallback.
--   **Admin Dashboard ():** This page features a Command Center layout. It now includes a  component that correctly displays saved and scheduled content from the  modal.
--   **Content Forge ():** This component has been massively overhauled into a content creation powerhouse. It now features:
-    -   A three-column layout: Form | Live Preview | Embedded AI Assistant.
-    -   **Image Analysis Autopilot:** Uploading an image automatically generates a title, caption, keywords, and description.
-    -   **Save Draft functionality:** The Save Draft button correctly persists content to the Supabase  table.
-    -   **Polished UI:** Clickable keyword/hashtag suggestions and custom pop-up calendar and time-picker dropdowns.
-    -   **Enhanced Blog Editor:** A dedicated tab for blog writing with an SEO preview, formatting toolbar, and content distribution strategy display.
--   **AI Chat Widget ():** A new, production-ready, context-aware chat widget has been built. It floats on all pages and switches between Concierge mode (on landing page) and Creative Co-Pilot mode (in the admin area). It is also embedded directly within the Content Forge component.
--   **Backend APIs:** Functional Next.js API routes exist for AI content generation, chat, saving drafts, and image analysis. The  endpoint now has a robust AI fallback.
+The project is a Next.js application with a Supabase backend.
+-   **Landing Page ():** GSAP animations were successfully added. A major refactor is currently in progress to incorporate a new interactive  component, a  component for background effects, fix layout alignments, and reorder content sections as per user request.
+-   **Voice AI System (Retell Integration):**
+    -   A multi-tenant, multi-agent architecture is in place.
+    -   API routes for the MCP server (), scheduling calls (), and receiving call-end webhooks () have been created.
+    -   Supabase tables for , , , , and  have been defined in migration files, which the user has successfully run.
+    -   The user has configured the Susan and Aiden agents in their Retell dashboard, and their IDs are linked in the  database table.
+-   **Content Forge 2.0:**
+    -   The backend structure is defined via a Supabase migration () which creates  and related tables. The user has successfully run this migration.
+    -   A new API endpoint exists at .
+    -   A new UI has been created at  featuring a blueprint selector and tabs for content creation and a 4-week calendar. The UI is currently a frontend shell.
 
 **Last working item**:
--   **Last item agent was working:** Integrating the GSAP animation library to add premium animations to the landing page (). The agent installed GSAP, created a helper file (), refactored the hero section, and was in the process of adding  attributes to other elements for GSAP to target.
+-   **Last item agent was working:** Refactoring the landing page (). The agent created new components (, ), reordered the page sections, fixed feature card alignment, and was in the process of editing  to remove the old, now-redundant Distressed Owners section from its original position after moving it.
 -   **Status:** IN PROGRESS
 -   **Agent Testing Done:** N
--   **Which testing method agent to use?** manual testing by yarn run v1.22.22
-info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command. and then using the  on  to verify the animations.
+-   **Which testing method agent to use?** Frontend testing agent. Alternatively, run yarn run v1.22.22
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command. and then use the  on  to verify the new layout, animations, and component integrations.
 -   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
--   **Issue 1:** UI components are too large and need resizing (P2)
--   **Issue 2:** Booking widget input text is invisible (P2)
--   **Issue 3:**  table foreign key constraint is broken (P3)
+-   Issue 1: Retell agent Aiden is hallucinating (P1)
+-   Issue 2: UI components are too large (P2)
+-   Issue 3: Booking widget input text is invisible (P2)
+-   Issue 4:  table foreign key is broken (P3)
 
 Issues Detail:
 -   **Issue 1:**
-    -   **Description:** The user has previously mentioned that some UI sections are too large. While many components were refactored, a general audit for component sizing has not been performed.
-    -   **Next debug checklist:** Ask the user to pinpoint specific components that still feel oversized and adjust their Tailwind CSS classes.
-    -   **Why fix this issue and what will be achieved with the fix?** To align the UI with the user's aesthetic preferences.
-    -   **Status:** NOT STARTED
-    -   **Is recurring issue?** Y
-    -   **Should Test frontend/backend/both after fix?** Frontend
+    -   **Description:** During a test call, the Aiden sales agent provided incorrect, fabricated information about the GreenLine365 business, indicating it is not using its tools to fetch real data.
+    -   **Attempted fixes:** The agent diagnosed that the  tool was not being called. It provided a revised, more forceful system prompt for the user to update in the Retell dashboard. The  endpoint was manually tested and confirmed to be returning the correct data.
+    -   **Next debug checklist:**
+        1.  Ask the user to confirm they have updated Aiden's system prompt in the Retell dashboard with the provided text.
+        2.  Request the user to run another test call with Aiden.
+        3.  If the issue persists, investigate the  logs to see if a request for  is being received when the call starts.
+    -   **Why fix this issue and what will be achieved with the fix?** The voice AI sales agent is a critical feature and must provide accurate company information to be effective and trustworthy.
+    -   **Status:** USER VERIFICATION PENDING
+    -   **Is recurring issue?** N
+    -   **Should Test frontend/backend/both after fix?** Backend (manual testing via Retell dashboard)
     -   **Blocked on other issue:** None
 -   **Issue 2:**
-    -   **Description:** From the initial handoff, text in the booking widget was reportedly invisible. This has not been addressed.
-    -   **Next debug checklist:** Locate the booking widget, inspect its CSS, and correct the input text color.
-    -   **Why fix this issue and what will be achieved with the fix?** To ensure the booking feature is usable.
-    -   **Status:** NOT STARTED
-    -   **Is recurring issue?** N
-    -   **Should Test frontend/backend/both after fix?** Frontend
-    -   **Blocked on other issue:** None
--   **Issue 3:**
-    -   **Description:** A known technical debt item where the  table has a broken foreign key constraint, which led to the creation of a  table as a workaround for login.
-    -   **Next debug checklist:** This is a low-priority backend task. The fix involves correcting the foreign key on the  table to reference  properly and migrating away from the  table.
-    -   **Why fix this issue and what will be achieved with the fix?** To remove technical debt and normalize the user management schema.
+    -   **Description:** User has previously noted that some UI sections are too large. A global review and resizing pass has not been completed.
     -   **Status:** NOT STARTED
     -   **Is recurring issue?** Y
-    -   **Should Test frontend/backend/both after fix?** Backend
-    -   **Blocked on other issue:** None
+-   **Issue 3:**
+    -   **Description:** An issue from the initial handoff where text in a booking widget was invisible. This has not been addressed.
+    -   **Status:** NOT STARTED
+    -   **Is recurring issue?** N
+-   **Issue 4:**
+    -   **Description:** A known technical debt item where the  table has a broken foreign key constraint. A  table was created as a workaround.
+    -   **Status:** NOT STARTED
+    -   **Is recurring issue?** Y
 
 **In progress Task List**:
--   **Task 1:** Complete GSAP Animation on Landing Page (P0)
-    -   **Where to resume:** Continue adding  attributes to elements in  and then use the  helper to animate them on scroll.
-    -   **What will be achieved with this?** A premium, visually engaging landing page that matches the user's high-end aesthetic goals.
+-   **Task 1:** Complete Landing Page Refactor (P0)
+    -   **Where to resume:** The agent was editing . The final step in the file modification is to find and remove the original Distressed Owners section's code block, as its content has been moved to a new position higher up the page. After that, build and test the page.
+    -   **What will be achieved with this?** A more dynamic, visually engaging, and correctly structured landing page that aligns with the user's latest feedback and vision.
     -   **Status:** IN PROGRESS
     -   **Should Test frontend/backend/both after fix?** Frontend
     -   **Blocked on something:** None
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks:**
-    -   (P1) **Wire up Chat Widget Suggestions:** Implement the  function in  so that when a user clicks an Apply button in the embedded AI assistant, the suggested text (e.g., a caption or title) is populated into the corresponding form field.
-    -   (P1) **Build Newsletter Feature:** Add a Newsletter tab to the Content Forge, similar to the Blog section, for creating and formatting email newsletters.
-    -   (P2) **Build Content Distribution Logic:** The UI for content distribution exists in the Blog tab. The next step is to build the backend logic that takes a single blog post and reformats it into different structures (Twitter thread, Instagram carousel text, etc.).
+    -   (P1) **Build out Content Forge 2.0 Functionality:** Wire up the UI to the backend. This includes implementing the Generate Content, Real-time quality scoring, One-click repurpose, and 4-week calendar generator features.
+    -   (P1) **Test and Finalize Retell AI Agents:** Once the hallucination issue is fixed, perform a full end-to-end test of the voice system, including inbound calls being routed to Susan, transfers to Aiden, and outbound calls triggered from the UI.
+    -   (P1) **Wire up Chat Widget Suggestions:** Implement the  function in  so AI suggestions can be applied to the form.
+    -   (P2) **Build Content Distribution Logic:** Implement the backend logic to reformat a single blog post into different structures for various social media platforms.
 -   **Future Tasks:**
-    -   (P2) **Build God Mode CMS:** Create a separate  admin panel for site-wide content management.
-    -   (P2) **Build Product Mockups Generator:** A feature where users can see their designs on products.
-    -   (P3) **Implement Feature-Locking System:** Build a tier-based system to lock/unlock features for different subscription levels.
-    -   (P3) **Build OTP Verification System:** Implement a secure OTP login flow using Twilio.
-    -   (P3) **Tax Reporting & POS Integrations:** Long-term goals mentioned by the user.
-    -   (P3) **Enhance User-Provided Photos:** A deferred task from a previous session.
+    -   (P2) Build God Mode CMS for site-wide content management.
+    -   (P2) Build Product Mockups Generator feature.
+    -   (P2) Build a dedicated Newsletter feature in Content Forge.
+    -   (P3) Implement a feature-locking system for different subscription tiers.
+    -   (P3) Implement OTP verification using Twilio.
+    -   (P3) Tax Reporting & POS Integrations.
 
 **Completed work in this session**
--   **Vercel Build Fixes:** Resolved multiple build-breaking errors, including an ES target issue with regex ( flag) and various TypeScript type errors.
--   **Content Forge Major UI/UX Overhaul:**
-    -   Implemented a cleaner, multi-column layout.
-    -   Added a custom popup calendar () and a time-picker dropdown.
-    -   Implemented clickable AI suggestions for both hashtags and keywords.
--   **AI Chat Widget Implementation:**
-    -   Built a new, production-ready, context-aware chat widget from the ground up.
-    -   The widget switches between Concierge and Creative Co-Pilot modes based on the URL.
--   **Save Draft & Drafts Panel:**
-    -   Successfully implemented the Save Draft functionality in Content Forge.
-    -   Debugged and fixed a Supabase schema mismatch to get it working.
-    -   Created and integrated a new  on the admin page to display saved content.
--   **Daily Trend Hunter Fix:** Reworked the failing  API to include a robust AI-powered fallback, making the feature reliable.
--   **Image Analysis Autopilot:** Created the  endpoint and integrated it into  to auto-populate all content fields from a single image upload.
--   **Embedded AI Assistant:** Integrated the AI Chat Widget directly into the  UI as a collapsible side panel, creating a three-column content creation cockpit.
--   **Enhanced Blog Editor:** Massively upgraded the Blog tab in  with SEO tools, a formatting toolbar, and a content distribution preview.
--   **GSAP Installation:** Installed GSAP and set up the initial structure for animating the landing page.
+-   **GSAP Animation Integration:** Finished integrating the GSAP library into the landing page (), adding a variety of scroll-triggered animations and resolving build issues.
+-   **Voice AI System Implementation (Retell AI):**
+    -   Designed and built the core architecture for a multi-tenant, multi-agent voice AI system.
+    -   Created API endpoints for the MCP server, outbound call scheduling, and call completion webhooks.
+    -   Created Supabase migrations for all necessary tables (, , , , ).
+    -   Successfully guided the user through setting up the Susan and Aiden agents in the Retell dashboard and linking them to the database.
+-   **Content Forge 2.0 Scaffolding:**
+    -   Established the database schema for Content Blueprints via a Supabase migration.
+    -   Built the initial UI for the new Content Forge 2.0 at , including the blueprint selector and tabs.
 
 **Earlier issues found/mentioned but not fixed**
--   **Downscale Components:** User request to make UI components smaller. While layouts were changed, a specific downscaling pass was not done.
--   **Invisible Booking Text:** An issue from the previous handoff that was not addressed.
 -   **Enhance Photos:** A user request from a previous session to enhance all provided photos has not been actioned.
 
 **Known issue recurrence from previous fork**
@@ -115,66 +105,103 @@ Issues Detail:
 
 
 **Key Technical Concepts**
--   **Frontend:** Next.js (App Router), React, TypeScript, Tailwind CSS, Framer Motion, **GSAP (new)**
+-   **Frontend:** Next.js (App Router), React, TypeScript, Tailwind CSS, GSAP
 -   **Backend:** Next.js API Routes
 -   **Database:** Supabase (PostgreSQL)
--   **Integrations:** Vercel, OpenRouter, **GSAP**
+-   **Integrations:** Vercel, OpenRouter, GSAP, **Retell AI (new)**
+-   **Architectural Patterns:** Multi-tenancy, Multi-agent system, Model Context Protocol (MCP)
 
 **key DB schema**
--   **** (actual schema discovered): 
+-   ****: 
+-   ****: 
+-   ****: 
+-   ****: 
+-   ****: 
+-   ****: 
+
+**changes in tech stack**
+-   **Retell AI:** Added for advanced, programmable voice AI capabilities.
 
 **All files of reference**
--   **/app/webapp/app/admin-v2/components/ContentForge.tsx**: The core of the application's functionality. Massively updated.
--   **/app/webapp/app/components/ChatWidget.tsx**: The new, context-aware chat assistant.
--   **/app/webapp/app/page.tsx**: The landing page, currently being updated with GSAP animations.
--   **/app/webapp/app/admin-v2/page.tsx**: The main admin dashboard.
--   **/app/webapp/app/admin-v2/components/DraftsPanel.tsx**: New component to show drafts.
--   **/app/webapp/lib/gsap-animations.tsx**: New utility for GSAP.
--   **/app/webapp/app/api/analyze-image/route.ts**: New API for the autopilot feature.
--   **/app/webapp/app/api/drafts/route.ts**: New API for saving drafts.
--   **/app/webapp/app/api/daily-trend-hunter/route.ts**: Reworked API with AI fallback.
+-   **/app/webapp/app/page.tsx**: Landing page currently being refactored.
+-   **/app/webapp/app/api/mcp/route.ts**: Core MCP server for the voice AI.
+-   **/app/webapp/app/admin-v2/components/ContentForge2.tsx**: The new UI for content generation.
+-   **/app/webapp/app/admin-v2/content-forge/page.tsx**: The page housing the new Content Forge UI.
+-   **/app/webapp/app/components/PhoneMockup.tsx**: New interactive hero component.
+-   **/app/webapp/app/components/FloatingShapes.tsx**: New background visual effect component.
+-   **/app/webapp/supabase/migrations/**: All new SQL files ( through ).
+-   **/app/memory/PRD.md**: Contains updated product requirements and vision.
+
+**Areas that need refactoring**
+-   The landing page () is currently being refactored. The agent must ensure old code (like the static phone mockup) is fully removed after the new components are integrated.
+
+**key api endpoints**
+-   : Provides tools and context to the Retell AI agent during a call.
+-   : Triggers an outbound call to a lead.
+-   : Receives call transcripts and metadata from Retell after a call ends.
+-   : The endpoint for generating content using the new Content Blueprints.
 
 **Critical Info for New Agent**
--   **Finish the GSAP Animations:** Your immediate priority is to complete the GSAP animation work on . Use the  helper and target elements with  attributes.
--   **User Vision is Ambitious:** The user provides very detailed, long-term vision documents. It's crucial to acknowledge them, break them down into actionable phases, and confirm priorities with the user. The user has explicitly favored building features production-ready from day one over MVPs.
--   **Verify Supabase Schema:** The agent discovered that the actual Supabase table schema for  differed from the initial assumption. If database operations fail, the first step should be to inspect the Supabase logs and the table schema directly.
--   **Component-Driven Development:** The application is highly componentized. Most work will involve creating new components (like ) or heavily modifying existing ones (like ).
+-   **PRIORITY 1:** Your immediate task is to complete the landing page refactor in . This involves finalizing the code edits to remove the old content section and then testing the page to ensure the new components and layout work correctly.
+-   **PRIORITY 2:** Address the Aiden voice agent hallucination issue. You will need to interact with the user to verify if the suggested prompt fix worked.
+-   **User-Driven Pivots:** The user provides detailed, ambitious vision documents and frequently shifts priorities (e.g., from Content Forge to the landing page). Be prepared to acknowledge new requests, break them down, confirm priorities, and pivot development focus accordingly, while maintaining a backlog of all tasks.
+-   **Clear Instructions for User:** When providing SQL or configuration steps, be extremely clear and explicit, as the user has previously encountered errors by running steps out of order.
 
 **documents and test reports created in this job**
--   /app/memory/PRD.md (Updated multiple times with new features and roadmap items)
+-   /app/memory/PRD.md (Updated)
+-   /app/webapp/supabase/migrations/002_voice_ai_tables.sql
+-   /app/webapp/supabase/migrations/003_multi_tenant.sql
+-   /app/webapp/supabase/migrations/004_multi_agent_system.sql
+-   /app/webapp/supabase/migrations/005_content_forge_2.sql
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User:** Asked to start working on the Image Analysis Autopilot. (*Status: Completed*)
-2.  **User:** Provided a screenshot of the Content Forge UI, pointing out that keywords were not clickable and the time picker was a native input. (*Status: Completed*)
-3.  **User:** Confirmed the next steps: Embed the chat widget in Content Forge and refine the blog section. (*Status: Completed*)
-4.  **User:** Provided a new vision document about product mockups, feature-locking, and a newsletter feature, then asked about incorporating GSAP. (*Status: GSAP question answered, other items added to backlog*)
-5.  **User:** Confirmed the request to add GSAP and provided another vision document about building a high-converting website. (*Status: In Progress - GSAP is being added*)
-6.  **User:** Acknowledged the agent's plan for the chat widget and blog. (*Status: Completed*)
-7.  **User:** Expressed a desire to go back to the command center and polish working pieces, pointed out the chat widget is cut off in a screenshot and isn't inside the blog creator. (*Status: Completed - chat widget fixed and embedded*)
-8.  **User:** Reported that Save Draft isn't working, there's no place to see saved drafts, and the landing page trend hunter has a broken ZIP code input. Provided a screenshot. (*Status: Completed - all three issues were fixed*)
-9.  **User:** Asked the agent to proceed with the plan to fix the reported bugs. (*Status: Completed*)
-10. **User:** Asked to go back to the command center and get features working, mentioning the chat widget is cut off and not in the blog creation center. (*Status: Completed*)
+1.  **User:** Provided a detailed document outlining a sophisticated blogging strategy and philosophy. (*Status: Analyzed and implemented as Content Forge 2.0*)
+2.  **User:** Confirmed to start building Format Templates from the blogging document, but with a futuristic time traveler theme. (*Status: Completed - Content Forge 2.0 blueprints created*)
+3.  **User:** Confirmed a SQL error when creating the content blueprints. (*Status: Resolved*)
+4.  **User:** Confirmed the corrected SQL worked. (*Status: Completed*)
+5.  **User:** Requested to build the full Content Forge 2.0 UI in the command center. (*Status: Completed - UI shell is built*)
+6.  **User:** Pivoted focus to the landing page, providing detailed feedback to refactor the hero section, fix alignment, and reorder content blocks. (*Status: In Progress*)
+7.  **User:** Asked for the                                                                                 
+ Usage: mcp [OPTIONS] COMMAND [ARGS]...                                         
+                                                                                
+ MCP development tools                                                          
+                                                                                
+╭─ Options ────────────────────────────────────────────────────────────────────╮
+│ --help          Show this message and exit.                                  │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ Commands ───────────────────────────────────────────────────────────────────╮
+│ version   Show the MCP version.                                              │
+│ dev       Run an MCP server with the MCP Inspector.                          │
+│ run       Run an MCP server.                                                 │
+│ install   Install an MCP server in the Claude desktop app.                   │
+╰──────────────────────────────────────────────────────────────────────────────╯ name for Susan and Aiden to program them in Retell. (*Status: Completed*)
+8.  **User:** Provided publish details for the Susan agent. (*Status: Completed*)
+9.  **User:** Provided the Retell agent IDs for Susan and Aiden. (*Status: Completed - Agent provided SQL to link them*)
+10. **User:** Ran the SQL to link agent IDs and confirmed it was perfect. (*Status: Completed*)
+-   **Pending Human Message:** There is no pending message from the user; the agent was in the middle of implementation when the session ended.
 
 **Project Health Check:**
 -   **Broken:**
-    -   The  table foreign key constraint remains a known technical debt issue.
+    -   The  table foreign key constraint remains a known technical debt.
+    -   The Retell AI agent Aiden is known to be hallucinating and providing incorrect information. The fix is pending user verification.
 -   **Mocked:**
-    -   The Apply Suggestion functionality in the embedded AI assistant is designed but the final  logic is not fully implemented or tested.
-    -   The content distribution feature in the blog editor is currently a UI preview only; the backend logic to reformat content does not exist.
+    -   The **Content Forge 2.0 UI** () is a frontend shell. None of the buttons (, ) are wired to the backend API yet.
+    -   The content distribution feature from the initial handoff remains a UI preview only.
+    -   The Apply Suggestion functionality in the original  is not implemented.
 
 **3rd Party Integrations**
 -   **Supabase:** Primary database, auth, and file storage.
 -   **Vercel:** Hosting and deployment.
 -   **OpenRouter:** Used for all LLM access.
--   **GSAP:** Newly added for premium animations.
--   **Twilio:** Planned for OTP verification.
--   **N8N:** Used for workflow automations (but now has a fallback).
+-   **GSAP:** Used for premium animations on the frontend.
+-   **Retell AI:** **New integration** for the voice AI sales and booking system.
+-   **Twilio:** Planned for providing phone numbers to the Retell system.
 
 **Testing status**
 -   **Testing agent used after significant changes:** NO
 -   **Troubleshoot agent used after agent stuck in loop:** NO
 -   **Test files created:** None
--   **Known regressions:** None.
+-   **Known regressions:** None identified.
 
 **What agent forgot to execute**
--   The initial handoff mentioned enhancing user-provided photos, downsizing UI components, and fixing invisible text in a booking widget. These items were superseded by the user's new, higher-priority requests throughout the session and remain pending.</analysis>
+-   The tasks from the previous handoff (downscaling UI components, fixing invisible booking text, enhancing photos) were not addressed as they were superseded by new, higher-priority user requests like the voice AI system and landing page refactor. They remain in the backlog.</analysis>
