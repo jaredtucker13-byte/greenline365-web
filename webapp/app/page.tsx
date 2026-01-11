@@ -395,7 +395,10 @@ export default function HomePage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-os-dark">
+    <main className="min-h-screen bg-os-dark relative">
+      {/* Floating 3D Shapes Background */}
+      <FloatingShapes />
+      
       {/* ========== HERO SECTION - 50/50 Split ========== */}
       <section ref={heroRef} className="relative min-h-[90vh] flex items-center overflow-hidden pt-20">
         {/* Background Effects */}
