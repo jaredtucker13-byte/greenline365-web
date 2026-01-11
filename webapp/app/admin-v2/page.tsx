@@ -333,9 +333,11 @@ export default function TacticalCommandCenter() {
       {/* Content Forge Modal */}
       <ContentForge
         isOpen={showContentForge}
-        onClose={() => setShowContentForge(false)}
+        onClose={handleCloseContentForge}
         selectedDate={selectedDate}
         onSchedule={handleScheduleContent}
+        initialTitle={forgeInitialTitle}
+        initialContext={forgeInitialContext}
       />
 
       {/* Demo Controller Modal - Hidden, activated by triple-click on version */}
