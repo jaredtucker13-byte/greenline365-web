@@ -48,7 +48,7 @@ interface ContentData {
   scheduledDate: string;
 }
 
-export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule }: ContentForgeProps) {
+export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule, initialTitle, initialContext }: ContentForgeProps) {
   // Content Type
   const [contentType, setContentType] = useState<'photo' | 'product' | 'blog'>('photo');
   
