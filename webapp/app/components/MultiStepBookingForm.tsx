@@ -230,15 +230,15 @@ export default function MultiStepBookingForm({ compact = false }: MultiStepBooki
 
   if (isComplete) {
     return (
-      <div className="text-center py-12">
-        <div className="w-20 h-20 mx-auto mb-6 bg-emerald-500/20 rounded-full flex items-center justify-center">
-          <svg className="w-10 h-10 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div className={`text-center ${compact ? 'py-6' : 'py-12'}`}>
+        <div className={`${compact ? 'w-14 h-14 mb-4' : 'w-20 h-20 mb-6'} mx-auto bg-emerald-500/20 rounded-full flex items-center justify-center`}>
+          <svg className={`${compact ? 'w-7 h-7' : 'w-10 h-10'} text-emerald-400`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h2 className="text-2xl font-bold text-white mb-3">Booking Confirmed!</h2>
-        <p className="text-gray-300 mb-2">Thank you, {formData.fullName.split(' ')[0]}!</p>
-        <p className="text-gray-400 text-sm">We&apos;ll send confirmation details to {formData.email}</p>
+        <h2 className={`${compact ? 'text-lg' : 'text-2xl'} font-bold text-white mb-2`}>Booking Confirmed!</h2>
+        <p className={`${compact ? 'text-sm' : ''} text-gray-300 mb-1`}>Thank you, {formData.fullName.split(' ')[0]}!</p>
+        <p className={`${compact ? 'text-xs' : 'text-sm'} text-gray-400`}>We&apos;ll send confirmation details to {formData.email}</p>
       </div>
     );
   }
@@ -246,12 +246,12 @@ export default function MultiStepBookingForm({ compact = false }: MultiStepBooki
   return (
     <div className="w-full">
       {/* Progress Bar */}
-      <div className="mb-8">
+      <div className={compact ? 'mb-4' : 'mb-8'}>
         <div className="flex justify-between mb-2">
           {['Contact', 'Business', 'Services & Time', 'Confirm'].map((label, i) => (
             <div key={label} className="flex flex-col items-center flex-1">
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all ${
+                className={`${compact ? 'w-6 h-6 text-xs' : 'w-8 h-8 text-sm'} rounded-full flex items-center justify-center font-medium transition-all ${
                   i + 1 < step
                     ? 'bg-emerald-500 text-black'
                     : i + 1 === step
@@ -260,16 +260,18 @@ export default function MultiStepBookingForm({ compact = false }: MultiStepBooki
                 }`}
               >
                 {i + 1 < step ? (
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className={`${compact ? 'w-3 h-3' : 'w-4 h-4'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 ) : (
                   i + 1
                 )}
               </div>
-              <span className={`mt-2 text-xs hidden sm:block ${i + 1 <= step ? 'text-emerald-400' : 'text-gray-500'}`}>
-                {label}
-              </span>
+              {!compact && (
+                <span className={`mt-2 text-xs hidden sm:block ${i + 1 <= step ? 'text-emerald-400' : 'text-gray-500'}`}>
+                  {label}
+                </span>
+              )}
             </div>
           ))}
         </div>
