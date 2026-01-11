@@ -798,7 +798,7 @@ export default function HomePage() {
               className="glass-strong rounded-2xl p-6 flex flex-col justify-between"
             >
               <div>
-                <div className="flex items-center gap-2 mb-6">
+                <div className="flex items-center gap-2 mb-4">
                   <div className="w-8 h-8 rounded-lg bg-neon-green-500/20 border border-neon-green-500/50 flex items-center justify-center">
                     <svg className="w-4 h-4 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -810,16 +810,16 @@ export default function HomePage() {
                   </div>
                 </div>
                 
-                <h2 className="font-display font-bold mb-4" style={{ fontSize: 'clamp(1.5rem, 4vw, 2.25rem)' }}>
+                <h2 className="font-display font-bold mb-3" style={{ fontSize: 'clamp(1.25rem, 3vw, 1.75rem)' }}>
                   <span className="text-white block">Stop Losing</span>
                   <span className="text-neon-green-500">Revenue.</span>
                 </h2>
                 
-                <p className="text-white/70 text-sm mb-6 leading-relaxed">
+                <p className="text-white/70 text-sm mb-4 leading-relaxed">
                   Turn missed calls into closed deals with AI-powered scheduling that works 24/7.
                 </p>
                 
-                <div className="space-y-2 mb-6">
+                <div className="space-y-2 mb-4">
                   {['Increase lead conversion by 40%', 'Zero missed calls, 24/7/365', 'Integrates with your calendar'].map((text, i) => (
                     <div key={i} className="flex items-center gap-2">
                       <div className="w-4 h-4 rounded-full bg-neon-green-500/20 flex items-center justify-center">
@@ -831,15 +831,45 @@ export default function HomePage() {
                     </div>
                   ))}
                 </div>
+                
+                {/* Stats Row */}
+                <div className="grid grid-cols-3 gap-3 mb-4 py-3 border-t border-b border-white/10">
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-neon-green-500">40%</div>
+                    <div className="text-[10px] text-white/50 uppercase">More Leads</div>
+                  </div>
+                  <div className="text-center border-x border-white/10">
+                    <div className="text-lg font-bold text-neon-green-500">24/7</div>
+                    <div className="text-[10px] text-white/50 uppercase">Availability</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-neon-green-500">2min</div>
+                    <div className="text-[10px] text-white/50 uppercase">Setup Time</div>
+                  </div>
+                </div>
+                
+                {/* Quick Benefits */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-xs text-white/60">
+                    <span className="text-neon-green-500">✓</span> No credit card required
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-white/60">
+                    <span className="text-neon-green-500">✓</span> Free 15-min strategy call
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-white/60">
+                    <span className="text-neon-green-500">✓</span> Cancel anytime
+                  </div>
+                </div>
               </div>
               
-              <div className="pt-4 border-t border-white/10">
+              <div className="pt-3 border-t border-white/10 mt-4">
                 <div className="flex items-center gap-1 mb-1">
                   {[...Array(5)].map((_, i) => (
-                    <svg key={i} className="w-4 h-4 text-neon-green-500" fill="currentColor" viewBox="0 0 20 20">
+                    <svg key={i} className="w-3 h-3 text-neon-green-500" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
                   ))}
+                  <span className="text-white/50 text-xs ml-1">4.9/5</span>
                 </div>
                 <p className="text-white/50 text-xs">Trusted by 500+ businesses</p>
               </div>
