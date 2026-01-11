@@ -8,6 +8,8 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import MultiStepBookingForm from './components/MultiStepBookingForm';
 import BookingWidget from './components/BookingWidget';
 import DailyTrendHunter from './components/DailyTrendHunter';
+import PhoneMockup from './components/PhoneMockup';
+import FloatingShapes from './components/FloatingShapes';
 import { Button } from '@/components/ui/os';
 import { NeonText } from '@/components/ui/os';
 import { GlassCard } from '@/components/ui/os';
