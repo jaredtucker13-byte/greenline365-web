@@ -814,7 +814,7 @@ function ChatContent({
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 scroll-smooth" style={{ scrollBehavior: 'smooth', overflowY: 'auto', minHeight: 0 }}>
         {messages.length === 0 && (
           <div>
             {/* Welcome Message */}

@@ -19,12 +19,14 @@ interface DailyTrendHunterProps {
   userId?: string;
   trendType?: 'live_pulse' | 'weekly_batch' | 'manual';
   onTrendsLoaded?: (trends: Trend[]) => void;
+  onCreateContent?: (trend: Trend) => void;
 }
 
 export default function DailyTrendHunter({ 
   userId, 
   trendType = 'manual',
-  onTrendsLoaded 
+  onTrendsLoaded,
+  onCreateContent 
 }: DailyTrendHunterProps) {
   const [zipCode, setZipCode] = useState('');
   const [loading, setLoading] = useState(false);
@@ -175,7 +177,10 @@ export default function DailyTrendHunter({
                   </div>
                 )}
 
-                <button className="mt-4 w-full py-2 bg-[#00e676]/10 hover:bg-[#00e676]/20 border border-[#00e676]/30 text-[#00e676] font-medium rounded-lg transition-all text-sm">
+                <button 
+                  onClick={() => onCreateContent?.(trend)}
+                  className="mt-4 w-full py-2 bg-[#00e676]/10 hover:bg-[#00e676]/20 border border-[#00e676]/30 text-[#00e676] font-medium rounded-lg transition-all text-sm"
+                >
                   Forge Content →
                 </button>
               </motion.div>
