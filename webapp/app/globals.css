@@ -286,3 +286,139 @@ textarea:focus {
 .flip-card-back {
   transform: rotateY(180deg);
 }
+
+/* ============================================
+   ENHANCED GLASSMORPHISM CARDS - "Late Night DJ" Style
+   ============================================ */
+
+/* Base OS Card with layered gradient */
+.os-card {
+  position: relative;
+  background: linear-gradient(135deg, rgba(26,27,38,0.9) 0%, rgba(10,15,13,0.95) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0,255,136,0.15);
+  border-radius: 1rem;
+  box-shadow: 
+    0 0 20px rgba(0,255,136,0.05),
+    0 8px 32px rgba(0,0,0,0.4);
+  overflow: hidden;
+}
+
+/* Noise/scanline texture overlay */
+.os-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Top neon line accent */
+.os-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,255,136,0.4), transparent);
+  z-index: 2;
+}
+
+/* Card content layer */
+.os-card > * {
+  position: relative;
+  z-index: 3;
+}
+
+/* OS Card hover state */
+.os-card:hover {
+  border-color: rgba(0,255,136,0.3);
+  box-shadow: 
+    0 0 30px rgba(0,255,136,0.1),
+    0 12px 40px rgba(0,0,0,0.5);
+  transform: translateY(-4px);
+}
+
+/* Aurora background effect - floating behind cards */
+.aurora-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.aurora-bg::before {
+  content: '';
+  position: absolute;
+  top: 20%;
+  left: 10%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(ellipse, rgba(0,255,136,0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(80px);
+  animation: aurora-drift 15s ease-in-out infinite;
+}
+
+.aurora-bg::after {
+  content: '';
+  position: absolute;
+  bottom: 20%;
+  right: 10%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(ellipse, rgba(0,255,255,0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(80px);
+  animation: aurora-drift 12s ease-in-out infinite reverse;
+}
+
+@keyframes aurora-drift {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.6;
+  }
+  25% {
+    transform: translate(30px, -20px) scale(1.05);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translate(-20px, 30px) scale(0.95);
+    opacity: 0.5;
+  }
+  75% {
+    transform: translate(-30px, -10px) scale(1.02);
+    opacity: 0.7;
+  }
+}
+
+/* Icon glass circle */
+.icon-glass {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, rgba(0,255,136,0.15) 0%, rgba(0,255,136,0.05) 100%);
+  border: 1px solid rgba(0,255,136,0.2);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* Consistent card min-height for alignment */
+.card-uniform {
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Image aspect ratio fix */
+.aspect-16-9 {
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
