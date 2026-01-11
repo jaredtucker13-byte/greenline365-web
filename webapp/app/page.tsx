@@ -553,7 +553,7 @@ export default function HomePage() {
               <div
                 key={i}
                 data-feature-card
-                className="glass-strong rounded-2xl p-10 border border-neon-green-500/20 hover:border-neon-green-500/50 transition-all duration-300 hover:-translate-y-1"
+                className="os-card rounded-2xl p-10 border border-neon-green-500/20 hover:border-neon-green-500/50 transition-all duration-300 hover:-translate-y-1"
                 style={{ minHeight: '220px' }}
               >
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-5 text-2xl bg-neon-green-500/10 border border-neon-green-500/20">
@@ -591,7 +591,7 @@ export default function HomePage() {
               <div
                 key={i}
                 data-step-card
-                className="glass-strong rounded-2xl p-10 border border-neon-green-500/20 hover:border-neon-green-500/50 transition-all duration-300 hover:-translate-y-1"
+                className="os-card rounded-2xl p-10 border border-neon-green-500/20 hover:border-neon-green-500/50 transition-all duration-300 hover:-translate-y-1"
                 style={{ minHeight: '180px' }}
               >
                 <div className="flex items-start gap-5">
