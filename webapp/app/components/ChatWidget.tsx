@@ -520,7 +520,7 @@ export default function ChatWidget({
   // Don't render the floating button if embedded
   if (embedded) {
     return (
-      <div className="h-full flex flex-col bg-[#0a0f0d] rounded-2xl overflow-hidden border border-white/10">
+      <div className="h-full flex flex-col bg-[#0a0f0d] rounded-2xl overflow-hidden border border-white/10 min-h-0">
         <ChatContent
           messages={messages}
           isLoading={isLoading}
