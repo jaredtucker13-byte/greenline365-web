@@ -747,17 +747,17 @@ export default function HomePage() {
 
       {/* ========== FAQ - 3 Column Grid ========== */}
       <section className="py-16" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
+        <div className="max-w-[1100px] mx-auto px-4 sm:px-6">
           <div
             data-section-header
-            className="text-center mb-10"
+            className="text-center mb-12"
           >
             <h2 className="font-display font-bold text-white mb-3" style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)' }}>
               Frequently Asked <span className="text-neon-green-500">Questions</span>
             </h2>
           </div>
           
-          <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))' }}>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 justify-items-center">
             {[
               { q: "How does GreenLine365 work?", a: "An AI-powered OS that connects your business with the local economy through automated scheduling and smart marketing.", bullets: ['AI-powered insights', '24/7 automation', 'Lead tracking'] },
               { q: "What makes you different?", a: "Built specifically for local businesses. Our AI understands local markets and optimizes for real-world foot traffic.", bullets: ['Built for local', 'Community-focused', 'Foot traffic optimization'] },
@@ -769,17 +769,16 @@ export default function HomePage() {
               <div
                 key={i}
                 data-faq-card
-                className="glass rounded-2xl p-5 border border-white/10 hover:border-neon-green-500/30 transition-colors gsap-hover-lift"
-                style={{ maxWidth: '400px', justifySelf: 'center', width: '100%' }}
+                className="glass rounded-xl p-5 border border-white/10 hover:border-neon-green-500/30 transition-colors gsap-hover-lift w-full max-w-xs"
               >
-                <div className="w-9 h-9 bg-neon-green-500/20 rounded-full flex items-center justify-center mb-4">
-                  <span className="text-neon-green-500 text-sm">?</span>
+                <div className="w-9 h-9 bg-neon-green-500/20 rounded-full flex items-center justify-center mb-4 mx-auto">
+                  <span className="text-neon-green-500 text-sm font-bold">?</span>
                 </div>
-                <h3 className="text-base font-display font-bold text-white mb-2">{faq.q}</h3>
-                <p className="text-white/60 text-xs leading-relaxed mb-3">{faq.a}</p>
+                <h3 className="text-sm font-display font-bold text-white mb-2 text-center">{faq.q}</h3>
+                <p className="text-white/60 text-xs leading-relaxed mb-3 text-center">{faq.a}</p>
                 <div className="space-y-1">
                   {faq.bullets.map((b, j) => (
-                    <div key={j} className="flex items-center gap-2 text-white/50 text-xs">
+                    <div key={j} className="flex items-center justify-center gap-2 text-white/50 text-xs">
                       <div className="w-1 h-1 bg-neon-green-500 rounded-full" />
                       <span>{b}</span>
                     </div>
