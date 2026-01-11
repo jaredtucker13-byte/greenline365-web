@@ -295,12 +295,21 @@ export default function Navbar() {
                       </button>
                     </div>
                   ) : (
-                    <Link
-                      href="/login"
-                      className="px-4 py-2 text-sm font-medium glass-green hover:glass-strong border border-neon-green-500/30 rounded-lg transition-all"
-                    >
-                      Sign In / Sign Up
-                    </Link>
+                    <div className="flex items-center gap-2 ml-2">
+                      <Link
+                        href="/login"
+                        className="px-4 py-2 text-sm font-medium text-white/70 hover:text-white transition-colors"
+                      >
+                        Sign In
+                      </Link>
+                      <Link
+                        href="/waitlist"
+                        data-testid="nav-waitlist-btn"
+                        className="px-5 py-2.5 text-sm font-bold bg-neon-green-500 text-black rounded-lg hover:bg-neon-green-400 transition-all shadow-neon-green"
+                      >
+                        Join Waitlist
+                      </Link>
+                    </div>
                   )}
                 </>
               )}
