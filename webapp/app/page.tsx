@@ -474,11 +474,11 @@ export default function HomePage() {
 
       {/* ========== DISTRESSED OWNERS - Right After Hero ========== */}
       <section className="py-16 relative z-10" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+        <div className="max-w-[1100px] mx-auto px-4 sm:px-6">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             {/* Left - Image */}
-            <div data-scroll-image className="order-2 lg:order-1">
-              <div className="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
+            <div data-scroll-image className="order-2 lg:order-1 flex justify-center">
+              <div className="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl max-w-md w-full">
                 <Image
                   src="/images/distressed-owners.jpg"
                   alt="Stressed business owners"
@@ -489,7 +489,7 @@ export default function HomePage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-os-dark/80 via-transparent to-transparent" />
                 <div className="absolute bottom-4 left-4 right-4">
                   <div className="glass rounded-xl p-3 border border-red-500/30">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-center gap-2">
                       <span className="text-red-400 text-lg">😰</span>
                       <span className="text-white/90 text-sm">Sound familiar?</span>
                     </div>
@@ -499,24 +499,26 @@ export default function HomePage() {
             </div>
             
             {/* Right - Content */}
-            <div data-scroll-content className="order-1 lg:order-2">
+            <div data-scroll-content className="order-1 lg:order-2 text-center lg:text-left">
               <span className="text-red-400 text-xs font-bold tracking-widest uppercase mb-3 block">The Problem</span>
               <h2 className="font-display font-bold text-white mb-4" style={{ fontSize: 'clamp(1.5rem, 4vw, 2.25rem)' }}>
                 Running a Business Shouldn&apos;t Mean <span className="text-red-400">Running on Empty</span>
               </h2>
-              <p className="text-white/60 mb-6 text-sm leading-relaxed">
+              <p className="text-white/60 mb-6 text-sm leading-relaxed max-w-lg mx-auto lg:mx-0">
                 You didn&apos;t start your business to become a full-time social media manager. Yet here you are, drowning in tasks that steal your time and energy.
               </p>
-              <div className="space-y-3">
+              <div className="space-y-3 max-w-lg mx-auto lg:mx-0">
                 {[
                   { emoji: '😰', title: 'Overwhelmed', desc: 'Drowning in to-do lists while competitors steal customers' },
                   { emoji: '📱', title: 'Always On-Call', desc: 'Sacrificing family time to keep the business running' },
                   { emoji: '😓', title: 'No Marketing Time', desc: 'Great at your craft, but who has time for social media?' },
                   { emoji: '💸', title: 'Wasted Ad Spend', desc: 'Throwing money at ads that don\'t convert to real customers' }
                 ].map((pain, i) => (
-                  <div key={i} data-pain-card className="glass rounded-xl p-4 border border-red-500/20 flex gap-3 items-start hover:border-red-500/40 transition-colors">
-                    <span className="text-2xl">{pain.emoji}</span>
-                    <div>
+                  <div key={i} data-pain-card className="glass rounded-xl p-4 border border-red-500/20 flex gap-4 items-center hover:border-red-500/40 transition-colors text-left">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center">
+                      <span className="text-xl">{pain.emoji}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
                       <h4 className="text-white font-semibold text-sm">{pain.title}</h4>
                       <p className="text-white/60 text-xs">{pain.desc}</p>
                     </div>
