@@ -23,6 +23,8 @@ interface ContentForgeProps {
   onClose: () => void;
   selectedDate?: Date;
   onSchedule: (content: ContentData) => void;
+  initialTitle?: string;
+  initialContext?: string;
 }
 
 interface ContentData {
