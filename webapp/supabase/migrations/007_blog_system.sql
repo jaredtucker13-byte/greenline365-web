@@ -6,7 +6,16 @@ DROP TABLE IF EXISTS blog_analytics CASCADE;
 DROP TABLE IF EXISTS blog_posts CASCADE;
 DROP TABLE IF EXISTS blog_categories CASCADE;
 
--- Blog Categories (create first since blog_posts may reference it)
+-- Create the update_updated_at function if it doesn't exist
+CREATE OR REPLACE FUNCTION update_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Blog Categories
 CREATE TABLE blog_categories (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT UNIQUE NOT NULL,
