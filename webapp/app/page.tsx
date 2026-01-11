@@ -613,26 +613,26 @@ export default function HomePage() {
 
       {/* ========== TESTIMONIAL - Compact Card ========== */}
       <section className="py-12" style={{ paddingBlock: 'clamp(2rem, 6vh, 4rem)' }}>
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
+        <div className="max-w-[1100px] mx-auto px-4 sm:px-6">
           <div
             data-testimonial
-            className="glass-strong rounded-2xl p-6 md:p-8 border border-neon-green-500/20 max-w-3xl mx-auto"
+            className="glass-strong rounded-2xl p-6 md:p-8 border border-neon-green-500/20 max-w-2xl mx-auto text-center"
           >
-            <div className="flex flex-col md:flex-row gap-6 items-center">
+            <div className="flex flex-col items-center gap-4">
               <div className="flex-shrink-0">
                 <div className="w-16 h-16 rounded-full bg-neon-green-500/20 flex items-center justify-center border border-neon-green-500/30">
                   <span className="text-neon-green-500 font-bold text-xl">MK</span>
                 </div>
               </div>
-              <div className="text-center md:text-left">
-                <div className="flex gap-1 justify-center md:justify-start mb-3">
+              <div>
+                <div className="flex gap-1 justify-center mb-3">
                   {[...Array(5)].map((_, i) => (
                     <svg key={i} className="w-5 h-5 text-neon-green-500" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
                   ))}
                 </div>
-                <p className="text-white/90 text-base leading-relaxed mb-3">
+                <p className="text-white/90 text-base leading-relaxed mb-3 max-w-lg mx-auto">
                   &ldquo;GreenLine365 transformed our lead generation. We went from 10 qualified leads per month to over 50.&rdquo;
                 </p>
                 <div className="text-sm">
@@ -647,14 +647,14 @@ export default function HomePage() {
 
       {/* ========== SOLUTION - 50/50 Split ========== */}
       <section className="py-16 bg-gradient-to-b from-os-dark to-os-dark-800" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
-          <div className="grid lg:grid-cols-2 gap-8 items-center">
+        <div className="max-w-[1100px] mx-auto px-4 sm:px-6">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             {/* Left - Image */}
             <div
               data-solution-image
-              className="relative"
+              className="relative flex justify-center"
             >
-              <div className="relative rounded-2xl overflow-hidden border border-neon-green-500/30">
+              <div className="relative rounded-2xl overflow-hidden border border-neon-green-500/30 max-w-md w-full">
                 <Image
                   src="/images/barber-selfie.jpg"
                   alt="Client capturing content"
@@ -664,7 +664,7 @@ export default function HomePage() {
                 />
                 <div
                   data-floating-badge
-                  className="absolute bottom-3 left-3 glass-green px-3 py-1.5 rounded-full border border-neon-green-500/40"
+                  className="absolute bottom-3 left-3 right-3 glass-green px-3 py-1.5 rounded-full border border-neon-green-500/40 text-center"
                 >
                   <span className="text-neon-green-400 font-semibold text-xs">📸 Content = Customers</span>
                 </div>
@@ -675,21 +675,22 @@ export default function HomePage() {
             {/* Right - Content */}
             <div
               data-solution-content
+              className="text-center lg:text-left"
             >
               <span className="text-neon-green-500 text-xs font-bold tracking-widest uppercase mb-3 block">The Solution</span>
               <h2 className="font-display font-bold text-white mb-4" style={{ fontSize: 'clamp(1.5rem, 4vw, 2.25rem)' }}>
                 Your Phone is Already a <span className="text-neon-green-500">Marketing Machine</span>
               </h2>
-              <p className="text-white/70 mb-5 text-sm leading-relaxed">
+              <p className="text-white/70 mb-5 text-sm leading-relaxed max-w-lg mx-auto lg:mx-0">
                 Every photo you take is a potential post. GreenLine365 transforms your daily snapshots into a content engine.
               </p>
-              <div className="space-y-3">
+              <div className="space-y-3 max-w-lg mx-auto lg:mx-0">
                 {[
                   { title: 'AI-Powered Captions', desc: 'Upload a photo, get perfect captions in seconds' },
                   { title: 'Smart Hashtags', desc: 'Local + trending tags that get discovered' },
                   { title: 'One-Click Scheduling', desc: 'Post to all platforms without leaving your chair' }
                 ].map((feature, i) => (
-                  <div key={i} data-solution-feature className="flex items-start gap-3">
+                  <div key={i} data-solution-feature className="flex items-center gap-3 text-left">
                     <div className="w-8 h-8 rounded-full bg-neon-green-500/20 flex items-center justify-center flex-shrink-0">
                       <svg className="w-4 h-4 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
