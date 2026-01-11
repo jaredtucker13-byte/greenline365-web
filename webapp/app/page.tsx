@@ -556,13 +556,19 @@ export default function HomePage() {
               <div
                 key={i}
                 data-feature-card
-                className="os-card card-uniform p-10 transition-all duration-300"
+                className="rounded-2xl p-10 transition-all duration-300 border hover:border-neon-green-500/40"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(35,40,45,1) 0%, rgba(18,23,20,1) 100%)',
+                  borderColor: 'rgba(0,255,136,0.25)',
+                  boxShadow: '0 0 30px rgba(0,255,136,0.08), 0 8px 32px rgba(0,0,0,0.5)',
+                  minHeight: '220px'
+                }}
               >
-                <div className="icon-glass mb-5">
-                  <span className="text-2xl">{feature.icon}</span>
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-5 text-2xl" style={{ background: 'linear-gradient(135deg, rgba(0,255,136,0.15) 0%, rgba(0,255,136,0.05) 100%)', border: '1px solid rgba(0,255,136,0.2)' }}>
+                  {feature.icon}
                 </div>
-                <h3 className="text-xl font-display font-bold text-white mb-3" style={{ fontSize: '1.5rem' }}>{feature.title}</h3>
-                <p className="text-white/60 leading-relaxed flex-1" style={{ fontSize: '1rem', lineHeight: '1.6' }}>{feature.desc}</p>
+                <h3 className="font-display font-bold text-white mb-3" style={{ fontSize: '1.5rem' }}>{feature.title}</h3>
+                <p className="text-white/60 leading-relaxed" style={{ fontSize: '1rem', lineHeight: '1.6' }}>{feature.desc}</p>
               </div>
             ))}
           </div>
