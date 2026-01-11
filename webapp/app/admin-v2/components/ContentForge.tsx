@@ -92,6 +92,7 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
   // Image Analysis State (Autopilot)
   const [isAnalyzingImage, setIsAnalyzingImage] = useState(false);
   const [analysisComplete, setAnalysisComplete] = useState(false);
+  const [autoAnalyzeEnabled, setAutoAnalyzeEnabled] = useState(true); // User can toggle this
   
   // Calendar State
   const [showCalendar, setShowCalendar] = useState(false);
