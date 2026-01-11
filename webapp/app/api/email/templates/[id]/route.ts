@@ -7,17 +7,17 @@ const supabase = createClient(
 );
 
 // GET /api/email/templates/[id] - Get single template
-// PUT /api/email/templates/[id] - Update template
-// DELETE /api/email/templates/[id] - Delete template
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
+    
     const { data, error } = await supabase
       .from('email_templates')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
     
     if (error) throw error;
@@ -35,11 +35,13 @@ export async function GET(
   }
 }
 
+// PUT /api/email/templates/[id] - Update template
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
     const { name, description, category, subject, preview_text, html_content, plain_content, variables, is_active } = body;
     
@@ -61,7 +63,7 @@ export async function PUT(
     const { data, error } = await supabase
       .from('email_templates')
       .update(updateData)
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single();
     
@@ -77,15 +79,18 @@ export async function PUT(
   }
 }
 
+// DELETE /api/email/templates/[id] - Delete template
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
+    
     const { error } = await supabase
       .from('email_templates')
       .delete()
-      .eq('id', params.id);
+      .eq('id', id);
     
     if (error) throw error;
     
