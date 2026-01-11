@@ -258,6 +258,7 @@ export default function HomePage() {
         duration: 0.6,
         stagger: 0.08,
         ease: 'power2.out',
+        immediateRender: false,
       });
 
       // Booking section
