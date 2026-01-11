@@ -1,8 +1,22 @@
--- Blog System for GreenLine365
+-- Blog System for GreenLine365 (Clean Install)
 -- Run this in Supabase SQL Editor
 
+-- First, drop existing tables if they exist (to start fresh)
+DROP TABLE IF EXISTS blog_analytics CASCADE;
+DROP TABLE IF EXISTS blog_posts CASCADE;
+DROP TABLE IF EXISTS blog_categories CASCADE;
+
+-- Blog Categories (create first since blog_posts may reference it)
+CREATE TABLE blog_categories (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT UNIQUE NOT NULL,
+  slug TEXT UNIQUE NOT NULL,
+  description TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- Blog Posts Table
-CREATE TABLE IF NOT EXISTS blog_posts (
+CREATE TABLE blog_posts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
   
@@ -29,7 +43,7 @@ CREATE TABLE IF NOT EXISTS blog_posts (
   meta_description TEXT,
   meta_keywords TEXT[],
   
-  -- Author (store as text, no foreign key)
+  -- Author
   author_name TEXT DEFAULT 'Jared Tucker',
   author_email TEXT,
   
@@ -43,17 +57,8 @@ CREATE TABLE IF NOT EXISTS blog_posts (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Blog Categories
-CREATE TABLE IF NOT EXISTS blog_categories (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name TEXT UNIQUE NOT NULL,
-  slug TEXT UNIQUE NOT NULL,
-  description TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
 -- Blog Analytics
-CREATE TABLE IF NOT EXISTS blog_analytics (
+CREATE TABLE blog_analytics (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   post_id UUID REFERENCES blog_posts(id) ON DELETE CASCADE,
   views INTEGER DEFAULT 0,
@@ -64,12 +69,12 @@ CREATE TABLE IF NOT EXISTS blog_analytics (
 );
 
 -- Indexes for performance
-CREATE INDEX IF NOT EXISTS idx_blog_posts_tenant_id ON blog_posts(tenant_id);
-CREATE INDEX IF NOT EXISTS idx_blog_posts_status ON blog_posts(status);
-CREATE INDEX IF NOT EXISTS idx_blog_posts_published_at ON blog_posts(published_at DESC);
-CREATE INDEX IF NOT EXISTS idx_blog_posts_slug ON blog_posts(slug);
-CREATE INDEX IF NOT EXISTS idx_blog_posts_category ON blog_posts(category);
-CREATE INDEX IF NOT EXISTS idx_blog_posts_tags ON blog_posts USING GIN(tags);
+CREATE INDEX idx_blog_posts_tenant_id ON blog_posts(tenant_id);
+CREATE INDEX idx_blog_posts_status ON blog_posts(status);
+CREATE INDEX idx_blog_posts_published_at ON blog_posts(published_at DESC);
+CREATE INDEX idx_blog_posts_slug ON blog_posts(slug);
+CREATE INDEX idx_blog_posts_category ON blog_posts(category);
+CREATE INDEX idx_blog_posts_tags ON blog_posts USING GIN(tags);
 
 -- Default categories
 INSERT INTO blog_categories (name, slug, description) VALUES
@@ -77,15 +82,14 @@ INSERT INTO blog_categories (name, slug, description) VALUES
   ('Marketing Automation', 'marketing-automation', 'Automating your marketing for maximum impact'),
   ('Local Business Tips', 'local-business-tips', 'Tips for succeeding in your local market'),
   ('AI & Technology', 'ai-technology', 'Latest in AI and technology for business'),
-  ('Industry Insights', 'industry-insights', 'Deep dives into specific industries')
-ON CONFLICT (slug) DO NOTHING;
+  ('Industry Insights', 'industry-insights', 'Deep dives into specific industries');
 
 -- Enable RLS
 ALTER TABLE blog_posts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE blog_categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE blog_analytics ENABLE ROW LEVEL SECURITY;
 
--- RLS Policies (allow all for now, can be tightened later)
+-- RLS Policies
 CREATE POLICY "Allow all access to blog_posts" ON blog_posts FOR ALL USING (true);
 CREATE POLICY "Allow all access to blog_categories" ON blog_categories FOR ALL USING (true);
 CREATE POLICY "Allow all access to blog_analytics" ON blog_analytics FOR ALL USING (true);
