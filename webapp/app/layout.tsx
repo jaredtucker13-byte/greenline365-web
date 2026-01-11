@@ -11,27 +11,35 @@ import type { Metadata } from 'next';
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com';
 
 export const metadata: Metadata = {
-  // Basic Meta Tags
+  // Basic Meta Tags - AEO Optimized
   title: {
-    default: 'GreenLine365 - AI Business Operating System for Small Businesses',
+    default: 'GreenLine365 - AI Business Automation Platform for Local Businesses',
     template: '%s | GreenLine365',
   },
-  description: 'Transform your small business with AI-powered automation. Get real-time local trends, automated content creation, smart scheduling, and 24/7 AI assistance. Stop guessing, start growing.',
+  description: 'AI-powered business automation platform that connects local businesses with their community. Automated scheduling, AI content creation, and 24/7 smart booking. Built for real-world results.',
   keywords: [
-    'AI business automation',
-    'small business software',
-    'content automation',
-    'local marketing',
-    'business operating system',
-    'AI marketing assistant',
-    'Tampa small business',
-    'social media automation',
-    'business growth tools',
-    'AI scheduling',
-    'local trends',
-    'content calendar',
-    'business AI',
-    'marketing automation',
+    // Core AEO Keywords
+    'AI business booking tool',
+    'answer engine optimization',
+    'AI automation platform',
+    // AI Content & Automation
+    'AI-powered content creation at scale',
+    'automated blog generation for B2B',
+    'AI content scheduling automation',
+    // Business & Booking
+    'all-in-one AI business automation',
+    'automated client onboarding system',
+    'AI scheduling software',
+    'intelligent business task management',
+    // Local Business Focus
+    'local business AI tools',
+    'AI for small businesses',
+    'local economy automation',
+    'foot traffic optimization',
+    // Long-tail variations
+    'best AI booking tool for US small businesses',
+    'remote business automation platform',
+    'unified AI operations platform',
   ],
   authors: [{ name: 'GreenLine365', url: siteUrl }],
   creator: 'GreenLine365',
@@ -50,14 +58,14 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: siteUrl,
     siteName: 'GreenLine365',
-    title: 'GreenLine365 - AI Business Operating System',
-    description: 'Transform your small business with AI-powered automation. Real-time local trends, content creation, smart scheduling & 24/7 AI assistance.',
+    title: 'GreenLine365 - AI Business Automation Platform for Local Businesses',
+    description: 'AI-powered business automation that connects local businesses with their community. Automated scheduling, content creation, and smart booking built for real-world results.',
     images: [
       {
         url: `${siteUrl}/og-image.png`,
         width: 1200,
         height: 630,
-        alt: 'GreenLine365 - AI Business Operating System',
+        alt: 'GreenLine365 - AI Business Automation Platform',
       },
     ],
   },
@@ -65,8 +73,8 @@ export const metadata: Metadata = {
   // Twitter Card
   twitter: {
     card: 'summary_large_image',
-    title: 'GreenLine365 - AI Business Operating System',
-    description: 'Transform your small business with AI-powered automation. Stop guessing, start growing.',
+    title: 'GreenLine365 - AI Business Automation for Local Businesses',
+    description: 'AI automation platform connecting local businesses with their community. Automated scheduling, content creation, and smart booking.',
     images: [`${siteUrl}/og-image.png`],
     creator: '@greenline365',
   },
