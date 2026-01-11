@@ -285,28 +285,28 @@ export default function MultiStepBookingForm({ compact = false }: MultiStepBooki
 
       {/* Step 1: Contact Information */}
       {step === 1 && (
-        <div className="space-y-5">
+        <div className={compact ? 'space-y-3' : 'space-y-5'}>
           <div>
-            <h2 className="text-2xl font-bold text-white mb-1">Contact Information</h2>
-            <p className="text-gray-400">We&apos;ll use this to send your booking confirmation.</p>
+            <h2 className={`${compact ? 'text-lg' : 'text-2xl'} font-bold text-white mb-1`}>Contact Information</h2>
+            {!compact && <p className="text-gray-400">We&apos;ll use this to send your booking confirmation.</p>}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Full Name *</label>
+            <label className={`block ${compact ? 'text-xs' : 'text-sm'} font-medium text-gray-300 mb-1`}>Full Name *</label>
             <input
               type="text"
               value={formData.fullName}
               onChange={(e) => updateField('fullName', e.target.value)}
               placeholder="John Smith"
-              className={`w-full p-4 rounded-xl bg-gray-800/50 border text-white placeholder:text-gray-500 focus:ring-2 focus:ring-emerald-500 outline-none transition ${
+              className={`w-full ${compact ? 'p-2.5 text-sm rounded-lg' : 'p-4 rounded-xl'} bg-gray-800/50 border text-white placeholder:text-gray-500 focus:ring-2 focus:ring-emerald-500 outline-none transition ${
                 errors.fullName ? 'border-red-500' : 'border-gray-700 focus:border-emerald-500'
               }`}
             />
-            {errors.fullName && <p className="mt-1 text-sm text-red-400">{errors.fullName}</p>}
+            {errors.fullName && <p className="mt-1 text-xs text-red-400">{errors.fullName}</p>}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Email Address *</label>
+            <label className={`block ${compact ? 'text-xs' : 'text-sm'} font-medium text-gray-300 mb-1`}>Email Address *</label>
             <div className="flex gap-2">
               <input
                 type="email"
@@ -318,7 +318,7 @@ export default function MultiStepBookingForm({ compact = false }: MultiStepBooki
                 }}
                 placeholder="john@company.com"
                 disabled={emailVerified}
-                className={`flex-1 p-4 rounded-xl bg-gray-800/50 border text-white placeholder:text-gray-500 focus:ring-2 focus:ring-emerald-500 outline-none transition disabled:opacity-60 ${
+                className={`flex-1 ${compact ? 'p-2.5 text-sm rounded-lg' : 'p-4 rounded-xl'} bg-gray-800/50 border text-white placeholder:text-gray-500 focus:ring-2 focus:ring-emerald-500 outline-none transition disabled:opacity-60 ${
                   errors.email ? 'border-red-500' : emailVerified ? 'border-emerald-500' : 'border-gray-700 focus:border-emerald-500'
                 }`}
               />
@@ -327,24 +327,24 @@ export default function MultiStepBookingForm({ compact = false }: MultiStepBooki
                   type="button"
                   onClick={sendVerificationCode}
                   disabled={sendingCode || !formData.email}
-                  className="px-4 py-2 bg-emerald-500/20 text-emerald-400 rounded-xl hover:bg-emerald-500/30 transition disabled:opacity-50 text-sm font-medium whitespace-nowrap"
+                  className={`${compact ? 'px-3 py-1.5 text-xs rounded-lg' : 'px-4 py-2 text-sm rounded-xl'} bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 transition disabled:opacity-50 font-medium whitespace-nowrap`}
                 >
                   {sendingCode ? 'Sending...' : codeSent ? 'Resend' : 'Verify'}
                 </button>
               )}
               {emailVerified && (
-                <div className="flex items-center px-4 text-emerald-400">
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className={`flex items-center ${compact ? 'px-2' : 'px-4'} text-emerald-400`}>
+                  <svg className={compact ? 'w-4 h-4' : 'w-5 h-5'} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
               )}
             </div>
-            {errors.email && <p className="mt-1 text-sm text-red-400">{errors.email}</p>}
+            {errors.email && <p className="mt-1 text-xs text-red-400">{errors.email}</p>}
 
             {codeSent && !emailVerified && (
-              <div className="mt-3 p-4 bg-gray-800/50 rounded-xl border border-gray-700">
-                <p className="text-sm text-gray-300 mb-3">Enter the 6-digit code sent to your email:</p>
+              <div className={`mt-2 ${compact ? 'p-2.5 rounded-lg' : 'p-4 rounded-xl'} bg-gray-800/50 border border-gray-700`}>
+                <p className={`${compact ? 'text-xs mb-2' : 'text-sm mb-3'} text-gray-300`}>Enter the 6-digit code sent to your email:</p>
                 <div className="flex gap-2">
                   <input
                     type="text"
