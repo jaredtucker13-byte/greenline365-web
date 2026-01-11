@@ -301,12 +301,33 @@
 ## 🚀 Coming Soon
 
 ### Planned Features
+
+#### High Priority
+- ⏳ **Blog Auto-Polish** - AI-powered blog content + image processing system
+  - Automated image analysis, cropping, and enhancement using Gemini 3 on Nano Banana Pro
+  - Multimodal content matching (text + images)
+  - Auto-layout engine with responsive templates
+  - Image overlay generation (gradients, text, CTAs)
+  - Quality checks & human-in-the-loop review
+  - SEO optimization & structured data generation
+  - HIPAA-compliant processing for healthcare content
+  - Export to web, CMS, PDF, and social formats
+  - See `/app/webapp/BLOG_AUTO_POLISH_SPEC.md` for full technical specification
+
 - ⏳ **Voice AI Integration** - Retell AI for inbound/outbound calls
+  - Multi-agent architecture (Susan for booking, Aiden for sales)
+  - 24/7 phone call handling
+  - Integration with booking system
+  - Call analytics and recording
+
+#### Medium Priority
 - ⏳ **God Mode CMS** - Advanced content management system
 - ⏳ **Product Mockups Generator** - AI-generated product images
 - ⏳ **Newsletter Feature** - Dedicated email newsletter builder
 - ⏳ **Feature Locking** - Subscription tier management
 - ⏳ **OTP Verification** - Twilio SMS verification
+
+#### Lower Priority
 - ⏳ **Tax Reporting** - Financial reporting tools
 - ⏳ **POS Integrations** - Additional point-of-sale systems
 
