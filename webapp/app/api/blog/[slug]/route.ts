@@ -1,15 +1,17 @@
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
-import { NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
+import { NextRequest, NextResponse } from 'next/server';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 // GET /api/blog/[slug] - Get single blog post
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { slug: string } }
 ) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
-    
     const { data, error } = await supabase
       .from('blog_posts')
       .select('*, blog_analytics(*)')
@@ -34,17 +36,10 @@ export async function GET(
 
 // PATCH /api/blog/[slug] - Update blog post
 export async function PATCH(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { slug: string } }
 ) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    
     const body = await request.json();
     
     const { data, error } = await supabase
@@ -54,7 +49,6 @@ export async function PATCH(
         updated_at: new Date().toISOString(),
       })
       .eq('slug', params.slug)
-      .eq('user_id', user.id)
       .select()
       .single();
     
@@ -68,22 +62,14 @@ export async function PATCH(
 
 // DELETE /api/blog/[slug] - Delete blog post
 export async function DELETE(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { slug: string } }
 ) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    
     const { error } = await supabase
       .from('blog_posts')
       .delete()
-      .eq('slug', params.slug)
-      .eq('user_id', user.id);
+      .eq('slug', params.slug);
     
     if (error) throw error;
     

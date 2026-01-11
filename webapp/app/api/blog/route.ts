@@ -1,6 +1,10 @@
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
-import { NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
+import { NextRequest, NextResponse } from 'next/server';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 // Utility function to generate slug
 function generateSlug(title: string): string {
@@ -41,9 +45,8 @@ function analyzeSEO(content: string, title: string) {
 }
 
 // GET /api/blog - List all blog posts
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
     const { searchParams } = new URL(request.url);
     
     const status = searchParams.get('status') || 'published';
@@ -73,17 +76,14 @@ export async function GET(request: Request) {
 }
 
 // POST /api/blog - Create new blog post
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    
     const body = await request.json();
-    const { title, content, category, tags, images, status, scheduled_for } = body;
+    const { title, content, category, tags, images, status, scheduled_for, tenant_id } = body;
+    
+    if (!title || !content) {
+      return NextResponse.json({ error: 'Title and content are required' }, { status: 400 });
+    }
     
     // Generate slug
     const slug = generateSlug(title);
@@ -98,7 +98,7 @@ export async function POST(request: Request) {
     const { data, error } = await supabase
       .from('blog_posts')
       .insert({
-        user_id: user.id,
+        tenant_id: tenant_id || null,
         title,
         slug,
         content,
