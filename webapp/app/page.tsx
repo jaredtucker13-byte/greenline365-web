@@ -532,7 +532,10 @@ export default function HomePage() {
 
       {/* ========== FEATURES - 3 Column Grid (Fixed Alignment) ========== */}
       <section ref={featuresRef} className="py-16 relative z-10" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
-        <div className="max-w-[1100px] mx-auto px-4 sm:px-6">
+        {/* Aurora Background */}
+        <div className="aurora-bg" />
+        
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 relative z-10">
           <div
             data-section-header
             className="text-center mb-12"
@@ -543,8 +546,8 @@ export default function HomePage() {
             <p className="text-white/60 max-w-xl mx-auto">Built for modern businesses who demand results</p>
           </div>
           
-          {/* Fixed 3-Column Feature Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 justify-items-center">
+          {/* Fixed 3-Column Feature Grid with CSS Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               { icon: '💡', title: 'AI-Powered Insights', desc: 'Get intelligent recommendations based on your business goals and market trends.' },
               { icon: '📅', title: 'Smart Scheduling', desc: 'Seamlessly integrate with your calendar. Book demos, meetings, and follow-ups.' },
@@ -553,13 +556,13 @@ export default function HomePage() {
               <div
                 key={i}
                 data-feature-card
-                className="glass rounded-2xl p-6 border border-white/10 hover:border-neon-green-500/30 transition-all duration-300 gsap-hover-lift h-full flex flex-col text-center max-w-sm w-full"
+                className="os-card card-uniform p-10 transition-all duration-300"
               >
-                <div className="w-14 h-14 bg-neon-green-500/20 rounded-xl flex items-center justify-center mb-4 text-2xl mx-auto">
-                  {feature.icon}
+                <div className="icon-glass mb-5">
+                  <span className="text-2xl">{feature.icon}</span>
                 </div>
-                <h3 className="text-lg font-display font-bold text-white mb-2">{feature.title}</h3>
-                <p className="text-white/60 text-sm leading-relaxed flex-1">{feature.desc}</p>
+                <h3 className="text-xl font-display font-bold text-white mb-3" style={{ fontSize: '1.5rem' }}>{feature.title}</h3>
+                <p className="text-white/60 leading-relaxed flex-1" style={{ fontSize: '1rem', lineHeight: '1.6' }}>{feature.desc}</p>
               </div>
             ))}
           </div>
@@ -568,7 +571,10 @@ export default function HomePage() {
 
       {/* ========== HOW IT WORKS - Numbered Cards ========== */}
       <section className="py-16 relative" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
-        <div className="max-w-[1100px] mx-auto px-4 sm:px-6">
+        {/* Aurora Background */}
+        <div className="aurora-bg" />
+        
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 relative z-10">
           <div
             data-section-header
             className="text-center mb-12"
@@ -579,8 +585,8 @@ export default function HomePage() {
             <p className="text-white/60 max-w-xl mx-auto">Four seamless phases that transform your business</p>
           </div>
           
-          {/* 2x2 Grid - Same width as feature cards above */}
-          <div className="grid md:grid-cols-2 gap-6">
+          {/* 2x2 CSS Grid - Centered with consistent gaps */}
+          <div className="grid md:grid-cols-2 gap-8">
             {[
               { num: '01', title: 'Discovery & Setup', desc: 'We analyze your business, identify ideal customers, and configure your AI-powered system.', icon: '🔍' },
               { num: '02', title: 'AI Signal Detection', desc: 'Our AI continuously scans social media, forums, and communities for buying signals.', icon: '📡' },
@@ -590,20 +596,18 @@ export default function HomePage() {
               <div
                 key={i}
                 data-step-card
-                className="glass-strong rounded-xl p-5 border border-neon-green-500/20 gsap-hover-lift"
+                className="os-card card-uniform p-10 transition-all duration-300"
               >
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0">
-                    <div className="w-12 h-12 rounded-xl bg-neon-green-500/10 border border-neon-green-500/30 flex items-center justify-center">
-                      <span className="text-2xl">{step.icon}</span>
-                    </div>
+                <div className="flex items-start gap-5">
+                  <div className="icon-glass flex-shrink-0">
+                    <span className="text-2xl">{step.icon}</span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs font-bold text-neon-green-500/60 bg-neon-green-500/10 px-2 py-0.5 rounded">{step.num}</span>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xs font-bold text-neon-green-500 bg-neon-green-500/10 px-2.5 py-1 rounded-full border border-neon-green-500/20">{step.num}</span>
                     </div>
-                    <h3 className="text-base font-display font-bold text-white mb-1">{step.title}</h3>
-                    <p className="text-white/60 text-sm leading-relaxed">{step.desc}</p>
+                    <h3 className="font-display font-bold text-white mb-2" style={{ fontSize: '1.5rem' }}>{step.title}</h3>
+                    <p className="text-white/60 leading-relaxed" style={{ fontSize: '1rem', lineHeight: '1.6' }}>{step.desc}</p>
                   </div>
                 </div>
               </div>
