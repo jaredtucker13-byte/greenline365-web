@@ -1,7 +1,10 @@
+-- Blog System for GreenLine365
+-- Run this in Supabase SQL Editor
+
 -- Blog Posts Table
 CREATE TABLE IF NOT EXISTS blog_posts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
   
   -- Content
   title TEXT NOT NULL,
@@ -25,6 +28,10 @@ CREATE TABLE IF NOT EXISTS blog_posts (
   -- SEO
   meta_description TEXT,
   meta_keywords TEXT[],
+  
+  -- Author (store as text, no foreign key)
+  author_name TEXT DEFAULT 'Jared Tucker',
+  author_email TEXT,
   
   -- Publishing
   status TEXT DEFAULT 'draft' CHECK (status IN ('draft', 'scheduled', 'published', 'archived')),
@@ -51,13 +58,13 @@ CREATE TABLE IF NOT EXISTS blog_analytics (
   post_id UUID REFERENCES blog_posts(id) ON DELETE CASCADE,
   views INTEGER DEFAULT 0,
   shares INTEGER DEFAULT 0,
-  read_time_avg INTEGER, -- in seconds
+  read_time_avg INTEGER,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Indexes for performance
-CREATE INDEX IF NOT EXISTS idx_blog_posts_user_id ON blog_posts(user_id);
+CREATE INDEX IF NOT EXISTS idx_blog_posts_tenant_id ON blog_posts(tenant_id);
 CREATE INDEX IF NOT EXISTS idx_blog_posts_status ON blog_posts(status);
 CREATE INDEX IF NOT EXISTS idx_blog_posts_published_at ON blog_posts(published_at DESC);
 CREATE INDEX IF NOT EXISTS idx_blog_posts_slug ON blog_posts(slug);
@@ -72,3 +79,23 @@ INSERT INTO blog_categories (name, slug, description) VALUES
   ('AI & Technology', 'ai-technology', 'Latest in AI and technology for business'),
   ('Industry Insights', 'industry-insights', 'Deep dives into specific industries')
 ON CONFLICT (slug) DO NOTHING;
+
+-- Enable RLS
+ALTER TABLE blog_posts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE blog_categories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE blog_analytics ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policies (allow all for now, can be tightened later)
+CREATE POLICY "Allow all access to blog_posts" ON blog_posts FOR ALL USING (true);
+CREATE POLICY "Allow all access to blog_categories" ON blog_categories FOR ALL USING (true);
+CREATE POLICY "Allow all access to blog_analytics" ON blog_analytics FOR ALL USING (true);
+
+-- Auto-update timestamps trigger
+DROP TRIGGER IF EXISTS blog_posts_updated_at ON blog_posts;
+CREATE TRIGGER blog_posts_updated_at
+  BEFORE UPDATE ON blog_posts
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+-- Verify creation
+SELECT 'Blog tables created successfully!' as status;
+SELECT count(*) as categories_count FROM blog_categories;
