@@ -651,21 +651,24 @@ export default function HomePage() {
       </section>
 
       {/* ========== SOLUTION - 50/50 Split ========== */}
-      <section className="py-16 bg-gradient-to-b from-os-dark to-os-dark-800" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
-        <div className="max-w-[1100px] mx-auto px-4 sm:px-6">
-          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-            {/* Left - Image */}
+      <section className="py-16 relative" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
+        {/* Aurora Background */}
+        <div className="aurora-bg" />
+        
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-8 items-center">
+            {/* Left - Image (50% width with 16:9 aspect ratio) */}
             <div
               data-solution-image
-              className="relative flex justify-center"
+              className="relative"
             >
-              <div className="relative rounded-2xl overflow-hidden border border-neon-green-500/30 max-w-md w-full">
+              <div className="relative rounded-2xl overflow-hidden border border-neon-green-500/30">
                 <Image
                   src="/images/barber-selfie.jpg"
                   alt="Client capturing content"
-                  width={500}
-                  height={500}
-                  className="w-full h-auto object-cover"
+                  width={600}
+                  height={338}
+                  className="w-full aspect-16-9 object-cover"
                 />
                 <div
                   data-floating-badge
@@ -677,33 +680,32 @@ export default function HomePage() {
               <div className="absolute -inset-4 bg-neon-green-500/5 rounded-3xl blur-2xl -z-10" />
             </div>
             
-            {/* Right - Content */}
+            {/* Right - Content (50% width) */}
             <div
               data-solution-content
-              className="text-center lg:text-left"
             >
               <span className="text-neon-green-500 text-xs font-bold tracking-widest uppercase mb-3 block">The Solution</span>
               <h2 className="font-display font-bold text-white mb-4" style={{ fontSize: 'clamp(1.5rem, 4vw, 2.25rem)' }}>
                 Your Phone is Already a <span className="text-neon-green-500">Marketing Machine</span>
               </h2>
-              <p className="text-white/70 mb-5 text-sm leading-relaxed max-w-lg mx-auto lg:mx-0">
+              <p className="text-white/70 mb-6 leading-relaxed" style={{ fontSize: '1rem', lineHeight: '1.6' }}>
                 Every photo you take is a potential post. GreenLine365 transforms your daily snapshots into a content engine.
               </p>
-              <div className="space-y-3 max-w-lg mx-auto lg:mx-0">
+              <div className="space-y-4">
                 {[
                   { title: 'AI-Powered Captions', desc: 'Upload a photo, get perfect captions in seconds' },
                   { title: 'Smart Hashtags', desc: 'Local + trending tags that get discovered' },
                   { title: 'One-Click Scheduling', desc: 'Post to all platforms without leaving your chair' }
                 ].map((feature, i) => (
-                  <div key={i} data-solution-feature className="flex items-center gap-3 text-left">
-                    <div className="w-8 h-8 rounded-full bg-neon-green-500/20 flex items-center justify-center flex-shrink-0">
-                      <svg className="w-4 h-4 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div key={i} data-solution-feature className="os-card p-4 flex items-center gap-4 transition-all duration-300">
+                    <div className="icon-glass flex-shrink-0">
+                      <svg className="w-5 h-5 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                     </div>
                     <div>
-                      <h4 className="text-white font-semibold text-sm">{feature.title}</h4>
-                      <p className="text-white/60 text-xs">{feature.desc}</p>
+                      <h4 className="text-white font-semibold" style={{ fontSize: '1rem' }}>{feature.title}</h4>
+                      <p className="text-white/60" style={{ fontSize: '0.875rem', lineHeight: '1.5' }}>{feature.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -716,8 +718,8 @@ export default function HomePage() {
       {/* ========== TREND HUNTER DEMO - 50/50 Split ========== */}
       <section id="trend-demo" className="py-16 relative" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-neon-green-500/5 rounded-full blur-3xl gsap-parallax" />
-        <div className="max-w-[1100px] mx-auto px-4 sm:px-6 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-8 items-center">
             {/* Left - Content */}
             <div
               data-trend-content
