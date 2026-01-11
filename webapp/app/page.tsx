@@ -592,7 +592,7 @@ export default function HomePage() {
           </div>
           
           {/* 2x2 CSS Grid - Centered with consistent gaps */}
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-2 gap-8 relative z-20">
             {[
               { num: '01', title: 'Discovery & Setup', desc: 'We analyze your business, identify ideal customers, and configure your AI-powered system.', icon: '🔍' },
               { num: '02', title: 'AI Signal Detection', desc: 'Our AI continuously scans social media, forums, and communities for buying signals.', icon: '📡' },
@@ -602,24 +602,24 @@ export default function HomePage() {
               <div
                 key={i}
                 data-step-card
-                className="rounded-2xl p-10 transition-all duration-300 border hover:border-neon-green-500/40"
+                className="rounded-2xl p-10 transition-all duration-300 border hover:border-neon-green-500/50 hover:-translate-y-1"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(35,40,45,1) 0%, rgba(18,23,20,1) 100%)',
-                  borderColor: 'rgba(0,255,136,0.25)',
-                  boxShadow: '0 0 30px rgba(0,255,136,0.08), 0 8px 32px rgba(0,0,0,0.5)',
+                  background: 'linear-gradient(135deg, #1e2830 0%, #121714 100%)',
+                  borderColor: 'rgba(0,255,136,0.3)',
+                  boxShadow: '0 0 30px rgba(0,255,136,0.1), 0 8px 32px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08)',
                   minHeight: '180px'
                 }}
               >
                 <div className="flex items-start gap-5">
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 text-2xl" style={{ background: 'linear-gradient(135deg, rgba(0,255,136,0.15) 0%, rgba(0,255,136,0.05) 100%)', border: '1px solid rgba(0,255,136,0.2)' }}>
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 text-2xl" style={{ background: 'linear-gradient(135deg, rgba(0,255,136,0.2) 0%, rgba(0,255,136,0.05) 100%)', border: '1px solid rgba(0,255,136,0.25)', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}>
                     {step.icon}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xs font-bold text-neon-green-500 bg-neon-green-500/10 px-2.5 py-1 rounded-full border border-neon-green-500/20">{step.num}</span>
+                      <span className="text-xs font-bold text-neon-green-500 bg-neon-green-500/15 px-2.5 py-1 rounded-full border border-neon-green-500/25">{step.num}</span>
                     </div>
                     <h3 className="font-display font-bold text-white mb-2" style={{ fontSize: '1.5rem' }}>{step.title}</h3>
-                    <p className="text-white/60 leading-relaxed" style={{ fontSize: '1rem', lineHeight: '1.6' }}>{step.desc}</p>
+                    <p className="text-white/70 leading-relaxed" style={{ fontSize: '1rem', lineHeight: '1.6' }}>{step.desc}</p>
                   </div>
                 </div>
               </div>
