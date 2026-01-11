@@ -617,7 +617,7 @@ export default function HomePage() {
         <div className="max-w-[1100px] mx-auto px-4 sm:px-6">
           <div
             data-testimonial
-            className="glass-strong rounded-2xl p-6 md:p-8 border border-neon-green-500/20 max-w-2xl mx-auto text-center"
+            className="os-card rounded-2xl p-6 md:p-8 border border-neon-green-500/20 max-w-2xl mx-auto text-center"
           >
             <div className="flex flex-col items-center gap-4">
               <div className="flex-shrink-0">
@@ -741,7 +741,7 @@ export default function HomePage() {
             {/* Right - Widget */}
             <div
               data-trend-widget
-              className="glass-strong rounded-2xl p-5 border border-neon-green-500/20 max-w-md mx-auto lg:mx-0 w-full"
+              className="os-card rounded-2xl p-5 border border-neon-green-500/20 max-w-md mx-auto lg:mx-0 w-full"
             >
               <DailyTrendHunter trendType="manual" />
             </div>
@@ -938,7 +938,7 @@ export default function HomePage() {
             
             <div
               data-product-right
-              className="glass-strong rounded-2xl p-5 border border-neon-green-500/20 max-w-md mx-auto lg:mx-0 w-full"
+              className="os-card rounded-2xl p-5 border border-neon-green-500/20 max-w-md mx-auto lg:mx-0 w-full"
             >
               <h4 className="text-base font-display font-bold text-white mb-4 text-center">Quick Book Demo</h4>
               <BookingWidget source="landing-page-demo" />
@@ -949,7 +949,7 @@ export default function HomePage() {
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             <div
               data-product-demo
-              className="glass-strong rounded-2xl p-5 order-2 lg:order-1 max-w-md mx-auto lg:mx-0 w-full"
+              className="os-card rounded-2xl p-5 order-2 lg:order-1 max-w-md mx-auto lg:mx-0 w-full"
             >
               <div className="p-4 border-b border-neon-green-500/10 bg-black/30 rounded-t-xl">
                 <div className="text-[10px] tracking-widest uppercase text-neon-green-400/80">PROTOCOL: ACTIVE ASSISTANT</div>
@@ -1039,7 +1039,7 @@ export default function HomePage() {
       {/* Modals */}
       {showFullForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="relative w-full max-w-xl max-h-[85vh] overflow-y-auto glass-strong border border-white/10 rounded-2xl p-6">
+          <div className="relative w-full max-w-xl max-h-[85vh] overflow-y-auto os-card border border-white/10 rounded-2xl p-6">
             <button onClick={() => setShowFullForm(false)} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition">
               <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
