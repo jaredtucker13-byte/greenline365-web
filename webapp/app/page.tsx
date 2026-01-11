@@ -528,12 +528,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ========== FEATURES - 3 Column Grid ========== */}
-      <section ref={featuresRef} className="py-16" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
+      {/* ========== FEATURES - 3 Column Grid (Fixed Alignment) ========== */}
+      <section ref={featuresRef} className="py-16 relative z-10" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
           <div
             data-section-header
-            className="text-center mb-10"
+            className="text-center mb-12"
           >
             <h2 className="font-display font-bold text-white mb-3" style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)' }}>
               Why Choose <span className="text-neon-green-500">GreenLine365</span>?
@@ -541,8 +541,8 @@ export default function HomePage() {
             <p className="text-white/60 max-w-xl mx-auto">Built for modern businesses who demand results</p>
           </div>
           
-          {/* 3-Column Feature Grid */}
-          <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
+          {/* Fixed 3-Column Feature Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               { icon: '💡', title: 'AI-Powered Insights', desc: 'Get intelligent recommendations based on your business goals and market trends.' },
               { icon: '📅', title: 'Smart Scheduling', desc: 'Seamlessly integrate with your calendar. Book demos, meetings, and follow-ups.' },
@@ -551,14 +551,13 @@ export default function HomePage() {
               <div
                 key={i}
                 data-feature-card
-                className="glass rounded-2xl p-5 border border-white/10 hover:border-neon-green-500/30 transition-colors gsap-hover-lift"
-                style={{ maxWidth: '400px', justifySelf: 'center', width: '100%' }}
+                className="glass rounded-2xl p-6 border border-white/10 hover:border-neon-green-500/30 transition-all duration-300 gsap-hover-lift h-full flex flex-col"
               >
-                <div className="w-11 h-11 bg-neon-green-500/20 rounded-xl flex items-center justify-center mb-4 text-xl">
+                <div className="w-12 h-12 bg-neon-green-500/20 rounded-xl flex items-center justify-center mb-4 text-2xl">
                   {feature.icon}
                 </div>
                 <h3 className="text-lg font-display font-bold text-white mb-2">{feature.title}</h3>
-                <p className="text-white/60 text-sm leading-relaxed">{feature.desc}</p>
+                <p className="text-white/60 text-sm leading-relaxed flex-1">{feature.desc}</p>
               </div>
             ))}
           </div>
