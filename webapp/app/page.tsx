@@ -793,8 +793,8 @@ export default function HomePage() {
 
       {/* ========== BOOKING - 50/50 Split ========== */}
       <section className="py-16" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }} id="booking">
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
-          <div className="grid lg:grid-cols-2 gap-6">
+        <div className="max-w-[1000px] mx-auto px-4 sm:px-6">
+          <div className="grid lg:grid-cols-2 gap-8 items-stretch">
             {/* Left - Value Prop */}
             <div
               data-booking-left
