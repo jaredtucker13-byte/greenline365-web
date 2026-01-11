@@ -579,7 +579,8 @@ export default function HomePage() {
             <p className="text-white/60 max-w-xl mx-auto">Four seamless phases that transform your business</p>
           </div>
           
-          <div className="grid md:grid-cols-2 gap-5 max-w-3xl mx-auto">
+          {/* 2x2 Grid - Same width as feature cards above */}
+          <div className="grid md:grid-cols-2 gap-6">
             {[
               { num: '01', title: 'Discovery & Setup', desc: 'We analyze your business, identify ideal customers, and configure your AI-powered system.', icon: '🔍' },
               { num: '02', title: 'AI Signal Detection', desc: 'Our AI continuously scans social media, forums, and communities for buying signals.', icon: '📡' },
