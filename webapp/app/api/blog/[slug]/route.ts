@@ -9,13 +9,15 @@ const supabase = createClient(
 // GET /api/blog/[slug] - Get single blog post
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    const { slug } = await params;
+    
     const { data, error } = await supabase
       .from('blog_posts')
       .select('*, blog_analytics(*)')
-      .eq('slug', params.slug)
+      .eq('slug', slug)
       .single();
     
     if (error) throw error;
@@ -37,9 +39,10 @@ export async function GET(
 // PATCH /api/blog/[slug] - Update blog post
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    const { slug } = await params;
     const body = await request.json();
     
     const { data, error } = await supabase
@@ -48,7 +51,7 @@ export async function PATCH(
         ...body,
         updated_at: new Date().toISOString(),
       })
-      .eq('slug', params.slug)
+      .eq('slug', slug)
       .select()
       .single();
     
@@ -63,13 +66,15 @@ export async function PATCH(
 // DELETE /api/blog/[slug] - Delete blog post
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    const { slug } = await params;
+    
     const { error } = await supabase
       .from('blog_posts')
       .delete()
-      .eq('slug', params.slug);
+      .eq('slug', slug);
     
     if (error) throw error;
     
