@@ -35,6 +35,7 @@ interface StyleAnalyzeRequest {
   title: string;
   content: string;
   category?: string;
+  moodHint?: string; // Optional mood variation hint for regeneration
 }
 
 export async function POST(request: NextRequest) {
