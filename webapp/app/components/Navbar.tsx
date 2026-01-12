@@ -267,51 +267,63 @@ export default function Navbar() {
               ))}
               
               {/* Auth Section */}
-              {!loading && (
-                <>
-                  {user ? (
-                    <div className="flex items-center gap-2 ml-2">
-                      {isSuperAdmin && (
-                        <Link
-                          href="/god-mode"
-                          className="px-4 py-2 text-sm font-medium text-red-400 hover:text-red-300 transition-colors"
-                        >
-                          God Mode
-                        </Link>
-                      )}
-                      {isAdmin && (
-                        <Link
-                          href="/dashboard"
-                          className="px-4 py-2 text-sm font-medium text-neon-green-500 hover:text-neon-green-400 transition-colors"
-                        >
-                          Dashboard
-                        </Link>
-                      )}
-                      <button
-                        onClick={handleSignOut}
-                        className="px-4 py-2 text-sm font-medium text-white/70 hover:text-white transition-colors"
-                      >
-                        Sign Out
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2 ml-2">
-                      <Link
-                        href="/login"
-                        className="px-4 py-2 text-sm font-medium text-white/70 hover:text-white transition-colors"
-                      >
-                        Sign In
-                      </Link>
-                      <Link
-                        href="/waitlist"
-                        data-testid="nav-waitlist-btn"
-                        className="px-5 py-2.5 text-sm font-bold bg-neon-green-500 text-black rounded-lg hover:bg-neon-green-400 transition-all shadow-neon-green"
-                      >
-                        Join Waitlist
-                      </Link>
-                    </div>
+              {loading ? (
+                <div className="flex items-center gap-2 ml-2">
+                  <Link
+                    href="/login"
+                    className="px-4 py-2 text-sm font-medium text-white/70 hover:text-white transition-colors"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    href="/waitlist"
+                    data-testid="nav-waitlist-btn"
+                    className="px-5 py-2.5 text-sm font-bold bg-neon-green-500 text-black rounded-lg hover:bg-neon-green-400 transition-all shadow-neon-green"
+                  >
+                    Join Waitlist
+                  </Link>
+                </div>
+              ) : user ? (
+                <div className="flex items-center gap-2 ml-2">
+                  {isSuperAdmin && (
+                    <Link
+                      href="/god-mode"
+                      className="px-4 py-2 text-sm font-medium text-red-400 hover:text-red-300 transition-colors"
+                    >
+                      God Mode
+                    </Link>
                   )}
-                </>
+                  {isAdmin && (
+                    <Link
+                      href="/dashboard"
+                      className="px-4 py-2 text-sm font-medium text-neon-green-500 hover:text-neon-green-400 transition-colors"
+                    >
+                      Dashboard
+                    </Link>
+                  )}
+                  <button
+                    onClick={handleSignOut}
+                    className="px-4 py-2 text-sm font-medium text-white/70 hover:text-white transition-colors"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 ml-2">
+                  <Link
+                    href="/login"
+                    className="px-4 py-2 text-sm font-medium text-white/70 hover:text-white transition-colors"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    href="/waitlist"
+                    data-testid="nav-waitlist-btn"
+                    className="px-5 py-2.5 text-sm font-bold bg-neon-green-500 text-black rounded-lg hover:bg-neon-green-400 transition-all shadow-neon-green"
+                  >
+                    Join Waitlist
+                  </Link>
+                </div>
               )}
             </div>
 
