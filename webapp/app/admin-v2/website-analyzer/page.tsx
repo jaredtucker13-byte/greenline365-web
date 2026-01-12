@@ -29,12 +29,25 @@ interface DesignProposal {
 }
 
 export default function WebsiteAnalyzerPage() {
-  const [url, setUrl] = useState('');
+  // Mode selection
+  const [mode, setMode] = useState<AnalysisMode>('analyze');
+  
+  // Analyze mode states
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageBase64, setImageBase64] = useState<string | null>(null);
+  const [visionModel, setVisionModel] = useState<VisionModel>('gemini-3-pro');
   const [analysisType, setAnalysisType] = useState<'full' | 'hero' | 'conversion' | 'visual'>('full');
+  
+  // Scratch mode states
+  const [description, setDescription] = useState('');
+  const [brandColors, setBrandColors] = useState('');
+  const [stylePreference, setStylePreference] = useState('');
+  const [targetAudience, setTargetAudience] = useState('');
+  
+  // Workflow states
+  const [currentStep, setCurrentStep] = useState<'input' | 'analyzing' | 'generating' | 'preview' | 'code'>('input');
+  const [proposal, setProposal] = useState<DesignProposal | null>(null);
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
