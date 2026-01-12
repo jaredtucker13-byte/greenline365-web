@@ -2111,6 +2111,81 @@ export default function BlogPolishPage() {
               </div>
             </div>
 
+            {/* Tags - Moved to Sidebar */}
+            <div className="backdrop-blur-2xl bg-white/[0.08] rounded-2xl border border-white/[0.15] p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]">
+              <h3 className="text-white font-medium mb-4 flex items-center gap-2">
+                <span>🏷️</span> Tags
+              </h3>
+              <div className="flex gap-2 mb-3">
+                <input
+                  type="text"
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                  placeholder="Add tag..."
+                  className="flex-1 bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-[#84A98C]/50 focus:outline-none transition"
+                />
+                <button
+                  onClick={addTag}
+                  className="px-3 py-2 bg-[#84A98C]/20 border border-[#84A98C]/30 rounded-lg text-[#A7C957] text-sm hover:bg-[#84A98C]/30 active:scale-95 transition-all"
+                >
+                  +
+                </button>
+              </div>
+              {post.tags.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {post.tags.map(tag => (
+                    <span
+                      key={tag}
+                      className="px-2 py-1 bg-white/[0.08] border border-white/10 rounded-full text-white/70 text-xs flex items-center gap-1"
+                    >
+                      #{tag}
+                      <button onClick={() => removeTag(tag)} className="text-white/40 hover:text-red-400 transition">×</button>
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-white/30 text-xs">No tags yet</p>
+              )}
+            </div>
+
+            {/* Image Upload - Moved to Sidebar */}
+            <div className="backdrop-blur-2xl bg-white/[0.08] rounded-2xl border border-white/[0.15] p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]">
+              <h3 className="text-white font-medium mb-4 flex items-center gap-2">
+                <span>📸</span> Images
+              </h3>
+              <div className="border-2 border-dashed border-white/20 rounded-xl p-4 text-center hover:border-[#84A98C]/50 transition-colors cursor-pointer">
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleImageUpload}
+                  className="hidden"
+                  id="sidebar-image-upload"
+                />
+                <label htmlFor="sidebar-image-upload" className="cursor-pointer block">
+                  <div className="text-2xl mb-2">📁</div>
+                  <p className="text-white/70 text-sm font-medium">Upload Images</p>
+                  <p className="text-white/30 text-xs mt-1">{imagePreviews.length}/5 uploaded</p>
+                </label>
+              </div>
+              {imagePreviews.length > 0 && (
+                <div className="grid grid-cols-3 gap-2 mt-3">
+                  {imagePreviews.map((img, idx) => (
+                    <div key={idx} className="relative group aspect-square rounded-lg overflow-hidden bg-white/5">
+                      <img src={img} alt={`Upload ${idx + 1}`} className="w-full h-full object-cover" />
+                      <button
+                        onClick={() => removeImage(idx)}
+                        className="absolute top-1 right-1 w-5 h-5 bg-red-500/80 rounded-full text-white text-xs opacity-0 group-hover:opacity-100 transition flex items-center justify-center"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {/* Quick Tips */}
             <div className="backdrop-blur-2xl bg-white/[0.08] rounded-2xl border border-white/[0.15] p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]">
               <h3 className="text-white font-medium mb-4 flex items-center gap-2">
@@ -2119,23 +2194,19 @@ export default function BlogPolishPage() {
               <ul className="space-y-2 text-sm text-white/60">
                 <li className="flex items-start gap-2">
                   <span className="text-[#84A98C]">•</span>
-                  Title: 50-60 characters for best results
+                  Title: 50-60 characters
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-[#84A98C]">•</span>
-                  Content: 1000-2000 words is ideal
+                  Content: 1000-2000 words
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-[#84A98C]">•</span>
-                  Use headings (## or ###) to structure
+                  Use ## headings
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-[#84A98C]">•</span>
-                  Include your focus keyword 3-5 times
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-[#84A98C]">•</span>
-                  Add alt text to all images
+                  3-5 keyword mentions
                 </li>
               </ul>
             </div>
