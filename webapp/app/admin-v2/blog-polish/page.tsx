@@ -1440,9 +1440,48 @@ export default function BlogPolishPage() {
                 className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-4 py-3 text-white text-lg font-medium placeholder:text-white/30 focus:border-[#84A98C]/50 focus:outline-none transition"
                 data-testid="blog-title-input"
               />
-              <p className="text-xs text-white/40 mt-2">
-                {post.title.length}/60 characters (50-60 optimal for SEO)
-              </p>
+              <div className="flex items-center justify-between mt-2">
+                <p className="text-xs text-white/40">
+                  {post.title.length}/60 characters (50-60 optimal for SEO)
+                </p>
+                {/* Quick Actions */}
+                <div className="flex items-center gap-2">
+                  <CopyButton text={post.title} label="" className="!px-2 !py-1 !text-xs" />
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Actions Toolbar */}
+            <div className="flex items-center justify-between px-2">
+              <div className="flex items-center gap-2">
+                <FocusModeButton targetRef={editorRef} className="!text-xs !px-2.5 !py-1" />
+                <button
+                  onClick={() => setShowCamera(true)}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-white/10 text-white/70 hover:text-white hover:bg-white/20 border border-white/10 transition"
+                >
+                  📷 Camera
+                </button>
+                <button
+                  onClick={() => setShowQRModal(true)}
+                  disabled={!post.slug}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-white/10 text-white/70 hover:text-white hover:bg-white/20 border border-white/10 transition disabled:opacity-40"
+                  title={post.slug ? 'Generate QR code for this post' : 'Save post first to generate QR'}
+                >
+                  📱 QR Code
+                </button>
+                <ShareButton 
+                  title={post.title}
+                  text={`Check out: ${post.title}`}
+                  url={post.slug ? `https://greenline365.com/blog/${post.slug}` : undefined}
+                  className="!text-xs !px-2.5 !py-1"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <NotificationButton className="!text-xs !px-2.5 !py-1" />
+                {post.content && (
+                  <CopyButton text={post.content} label="Copy All" className="!text-xs !px-2.5 !py-1" />
+                )}
+              </div>
             </div>
 
             {/* Tabs + AI Tools */}
