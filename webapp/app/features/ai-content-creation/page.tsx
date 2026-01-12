@@ -277,7 +277,7 @@ export default function AIContentCreationPage() {
                 Start Creating Content <span className="text-neon-green-500">10x Faster</span>
               </h2>
               <p className="text-white/70 text-lg mb-8 max-w-2xl mx-auto">
-                Join 500+ businesses using AI to scale their content production without sacrificing quality.
+                Be an early adopter and scale your content production with AI without sacrificing quality.
               </p>
               <Link href="/#booking">
                 <Button variant="primary" size="lg">
