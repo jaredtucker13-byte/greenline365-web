@@ -172,8 +172,8 @@ async function generateImages(body: GenerateRequest) {
 
   const generateSingleImage = async (variationPrompt: string, index: number): Promise<{ id: string; url: string } | null> => {
     try {
-      // Submit generation request to Kie.ai
-      const response = await fetch('https://api.kie.ai/v1/images/generations', {
+      // Submit generation request to Kie.ai - CORRECT ENDPOINT
+      const response = await fetch('https://api.kie.ai/api/v1/jobs/createTask', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${apiKey}`,
@@ -181,72 +181,66 @@ async function generateImages(body: GenerateRequest) {
         },
         body: JSON.stringify({
           model: 'google/nano-banana',
-          prompt: variationPrompt,
-          image_size: '16:9', // Good for blog images
-          output_format: 'png',
+          input: {
+            prompt: variationPrompt,
+            image_size: '16:9', // Good for blog images
+            output_format: 'png',
+          },
         }),
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error(`[Blog Images] Kie.ai error for image ${index + 1}:`, errorText);
+      const data = await response.json();
+      console.log(`[Blog Images] Kie.ai createTask response:`, JSON.stringify(data).slice(0, 300));
+
+      if (!response.ok || data.code !== 200) {
+        console.error(`[Blog Images] Kie.ai error for image ${index + 1}:`, data.msg || data);
         return null;
       }
 
-      const data = await response.json();
-      console.log(`[Blog Images] Kie.ai response for image ${index + 1}:`, JSON.stringify(data).slice(0, 200));
+      const taskId = data.data?.taskId;
+      if (!taskId) {
+        console.error(`[Blog Images] No taskId in response`);
+        return null;
+      }
 
-      // Handle async response - may need to poll for result
-      if (data.task_id || data.id) {
-        const taskId = data.task_id || data.id;
+      // Poll for result (max 90 seconds)
+      console.log(`[Blog Images] Polling for task ${taskId}...`);
+      for (let attempt = 0; attempt < 45; attempt++) {
+        await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
         
-        // Poll for result (max 60 seconds)
-        for (let attempt = 0; attempt < 30; attempt++) {
-          await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
-          
-          const statusResponse = await fetch(`https://api.kie.ai/v1/tasks/${taskId}`, {
-            headers: {
-              'Authorization': `Bearer ${apiKey}`,
-            },
-          });
+        const statusResponse = await fetch(`https://api.kie.ai/api/v1/jobs/getTaskDetails?taskId=${taskId}`, {
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+          },
+        });
 
-          if (statusResponse.ok) {
-            const statusData = await statusResponse.json();
-            console.log(`[Blog Images] Task ${taskId} status:`, statusData.status || statusData.state);
+        if (statusResponse.ok) {
+          const statusData = await statusResponse.json();
+          const taskStatus = statusData.data?.status;
+          console.log(`[Blog Images] Task ${taskId} status: ${taskStatus}`);
+          
+          if (taskStatus === 'SUCCESS' || taskStatus === 'completed') {
+            // Get image URL from response
+            const output = statusData.data?.output;
+            const imageUrl = output?.images?.[0] || output?.image || output?.url;
             
-            if (statusData.status === 'completed' || statusData.state === 'completed' || statusData.images) {
-              const imageUrl = statusData.images?.[0]?.url || statusData.output?.images?.[0]?.url || statusData.result?.url;
-              if (imageUrl) {
-                console.log(`[Blog Images] Generated image ${index + 1} successfully`);
-                return {
-                  id: `img-${Date.now()}-${index}`,
-                  url: imageUrl,
-                };
-              }
-            }
-            
-            if (statusData.status === 'failed' || statusData.state === 'failed') {
-              console.error(`[Blog Images] Task ${taskId} failed:`, statusData.error);
-              return null;
+            if (imageUrl) {
+              console.log(`[Blog Images] Generated image ${index + 1} successfully: ${imageUrl.slice(0, 50)}...`);
+              return {
+                id: `img-${Date.now()}-${index}`,
+                url: imageUrl,
+              };
             }
           }
+          
+          if (taskStatus === 'FAILED' || taskStatus === 'failed') {
+            console.error(`[Blog Images] Task ${taskId} failed:`, statusData.data?.error || statusData);
+            return null;
+          }
         }
-        
-        console.log(`[Blog Images] Timeout waiting for task ${taskId}`);
-        return null;
       }
-
-      // Direct response with image URL
-      if (data.images?.[0]?.url || data.data?.[0]?.url || data.output?.url) {
-        const imageUrl = data.images?.[0]?.url || data.data?.[0]?.url || data.output?.url;
-        console.log(`[Blog Images] Generated image ${index + 1} directly`);
-        return {
-          id: `img-${Date.now()}-${index}`,
-          url: imageUrl,
-        };
-      }
-
-      console.log(`[Blog Images] Unexpected response format for image ${index + 1}`);
+      
+      console.log(`[Blog Images] Timeout waiting for task ${taskId}`);
       return null;
 
     } catch (error) {
@@ -274,8 +268,7 @@ async function generateImages(body: GenerateRequest) {
       images: images.map(img => ({
         id: img.id,
         url: img.url,
-        // For compatibility with existing frontend that expects base64
-        data: img.url, // URL instead of base64
+        data: img.url, // For compatibility with frontend
         mime_type: 'image/png',
       })),
       message: `Generated ${images.length} image(s) with Nano Banana`,
