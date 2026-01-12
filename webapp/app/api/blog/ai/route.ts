@@ -225,8 +225,8 @@ ${title ? `The blog title context is: "${title}"` : ''}`;
           { role: 'user', content: userMessage },
         ],
         stream: false,
-        temperature: action === 'enhance_content' ? 0.7 : 0.5,
-        max_tokens: action === 'enhance_content' ? 2000 : 1000,
+        temperature: action === 'enhance_content' || action === 'enhance_content_with_title' ? 0.7 : 0.5,
+        max_tokens: action === 'enhance_content' || action === 'enhance_content_with_title' ? 2500 : 1000,
       }),
     });
 
@@ -245,7 +245,7 @@ ${title ? `The blog title context is: "${title}"` : ''}`;
     // Parse JSON responses for certain actions
     let result: any = { raw: aiResponse };
 
-    if (['generate_meta', 'suggest_headlines', 'suggest_tags', 'improve_seo'].includes(action)) {
+    if (['generate_meta', 'suggest_headlines', 'suggest_tags', 'improve_seo', 'enhance_content_with_title'].includes(action)) {
       try {
         // Extract JSON from response (may be wrapped in markdown code blocks)
         const jsonMatch = aiResponse.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
