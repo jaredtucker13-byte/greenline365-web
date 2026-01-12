@@ -167,20 +167,37 @@ export default function BlogPolishPage() {
   // Image Generation state
   interface ImageSuggestion {
     id: string;
-    placement: 'header' | 'inline' | 'section-break';
+    placement: 'header' | 'inline' | 'section-break' | 'right-float' | 'left-float' | 'full-width';
     context: string;
     prompt: string;
+    enrichedPrompt?: string;
     position: number;
     sectionTitle?: string;
-    generatedImages?: { id: string; data?: string; url?: string; mime_type?: string }[];
+    generatedImages?: { id: string; data?: string; url?: string; mime_type?: string; aspectRatio?: string }[];
     selectedImage?: string;
     generating?: boolean;
+    isChart?: boolean;
+    suggestedRatio?: '16:9' | '9:16' | '1:1' | '21:9';
   }
   const [imageSuggestions, setImageSuggestions] = useState<ImageSuggestion[]>([]);
   const [analyzingImages, setAnalyzingImages] = useState(false);
   const [showImagePanel, setShowImagePanel] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<'classic' | 'magazine' | 'minimal' | 'cards'>('classic');
   const [showCopyrightPanel, setShowCopyrightPanel] = useState(false);
+  
+  // Image Preview Modal state
+  const [previewImage, setPreviewImage] = useState<{ url: string; id: string } | null>(null);
+  
+  // Custom Image Chat state
+  const [showCustomImageChat, setShowCustomImageChat] = useState(false);
+  const [customImagePrompt, setCustomImagePrompt] = useState('');
+  const [customImageRatio, setCustomImageRatio] = useState<'16:9' | '9:16' | '1:1' | '21:9'>('16:9');
+  const [generatingCustomImage, setGeneratingCustomImage] = useState(false);
+  const [customGeneratedImages, setCustomGeneratedImages] = useState<{ id: string; url: string; aspectRatio?: string }[]>([]);
+  
+  // Image Layout state for applying to blog
+  const [applyingImageId, setApplyingImageId] = useState<string | null>(null);
+  const [selectedLayout, setSelectedLayout] = useState<'left' | 'right' | 'center' | 'full-width'>('center');
   
   // Browser Features state
   const [showQRModal, setShowQRModal] = useState(false);
