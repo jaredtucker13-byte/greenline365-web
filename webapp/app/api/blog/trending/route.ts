@@ -80,7 +80,7 @@ Return ONLY a valid JSON array with this exact format, no other text:
         'X-Title': 'GreenLine365 Trending Research',
       },
       body: JSON.stringify({
-        model: 'perplexity/llama-3.1-sonar-small-128k-online', // Perplexity online model via OpenRouter
+        model: 'perplexity/sonar', // Perplexity Sonar with online search via OpenRouter
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: prompts[type] || prompts.trending },
