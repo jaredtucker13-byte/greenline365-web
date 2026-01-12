@@ -190,7 +190,7 @@ async def main():
         session_id='blog-image-${index}',
         system_message='You are an image generation assistant.'
     )
-    chat.with_model('gemini', 'gemini-2.5-flash-image')
+    chat.with_model('gemini', 'gemini-2.5-flash-image-preview')
     chat.with_params(modalities=['image', 'text'])
     
     message = UserMessage(text='${escapedPrompt}')
