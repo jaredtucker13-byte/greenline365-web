@@ -627,7 +627,7 @@ export default function ChatWidget({
         )}
       </motion.button>
 
-      {/* Chat Window */}
+      {/* Chat Window - Premium Design with Independent Scroll */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -635,14 +635,24 @@ export default function ChatWidget({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className={`fixed z-[60] rounded-3xl overflow-hidden bg-[#0a0f0d] border backdrop-blur-xl shadow-2xl ${
+            className={`fixed z-[100] rounded-3xl overflow-hidden bg-[#0a0f0d] border backdrop-blur-xl shadow-2xl ${
               isExpanded 
                 ? 'bottom-6 right-6 left-6 top-24 md:left-auto md:w-[550px] md:max-h-[calc(100vh-120px)]' 
-                : 'bottom-24 right-6 w-[360px] sm:w-[380px] max-w-[calc(100vw-3rem)] max-h-[70vh]'
+                : 'bottom-24 right-6 w-[380px] sm:w-[400px] max-w-[calc(100vw-3rem)]'
             }`}
             style={{
               borderColor: `${styles.accent}30`,
-              boxShadow: `0 0 60px ${styles.accent}15`,
+              boxShadow: `0 0 60px ${styles.accent}15, 0 25px 50px -12px rgba(0, 0, 0, 0.5)`,
+              height: isExpanded ? undefined : 'min(600px, 75vh)',
+              touchAction: 'none',
+            }}
+            onMouseEnter={() => {
+              // Prevent background scroll when hovering over chat
+              document.body.style.overflow = 'hidden';
+            }}
+            onMouseLeave={() => {
+              // Re-enable background scroll when leaving chat
+              document.body.style.overflow = '';
             }}
           >
             <ChatContent
