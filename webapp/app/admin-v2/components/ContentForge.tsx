@@ -822,17 +822,16 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                       {contentType !== 'blog' && (
                         <div>
                           <div className="flex items-center justify-between mb-2">
-                            <label className="block text-xs font-medium text-gray-400">Upload Image</label>
+                            <label className="block text-xs font-medium" style={{ color: 'var(--theme-text-muted)' }}>Upload Image</label>
                             <div className="flex items-center gap-3">
                               {/* Auto-analyze toggle */}
                               <label className="flex items-center gap-2 cursor-pointer">
-                                <span className="text-xs text-gray-500">Auto-analyze</span>
+                                <span className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>Auto-analyze</span>
                                 <button
                                   type="button"
                                   onClick={() => setAutoAnalyzeEnabled(!autoAnalyzeEnabled)}
-                                  className={`relative w-8 h-4 rounded-full transition-colors ${
-                                    autoAnalyzeEnabled ? 'bg-[#8A2BE2]' : 'bg-gray-600'
-                                  }`}
+                                  className="relative w-8 h-4 rounded-full transition-colors"
+                                  style={{ background: autoAnalyzeEnabled ? 'var(--theme-primary)' : 'var(--theme-bg-elevated)' }}
                                 >
                                   <span
                                     className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-transform ${
@@ -844,7 +843,8 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                               {imagePreview && !isAnalyzingImage && (
                                 <button
                                   onClick={() => analyzeImage(imagePreview)}
-                                  className="text-xs px-2 py-1 rounded bg-[#8A2BE2]/20 text-[#8A2BE2] hover:bg-[#8A2BE2]/30 transition flex items-center gap-1"
+                                  className="text-xs px-2 py-1 rounded transition flex items-center gap-1"
+                                  style={{ background: 'color-mix(in srgb, var(--theme-primary) 20%, transparent)', color: 'var(--theme-primary)' }}
                                 >
                                   🔄 Re-analyze
                                 </button>
@@ -852,28 +852,28 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                             </div>
                           </div>
                           {imagePreview ? (
-                            <div className="relative rounded-lg overflow-hidden border border-[#39FF14]/30 aspect-video">
+                            <div className="relative rounded-lg overflow-hidden aspect-video" style={{ border: '1px solid var(--theme-glass-border)' }}>
                               <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
                               
                               {/* Analysis overlay */}
                               {isAnalyzingImage && (
                                 <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center">
-                                  <div className="w-10 h-10 border-2 border-[#39FF14] border-t-transparent rounded-full animate-spin mb-3"></div>
-                                  <p className="text-[#39FF14] text-sm font-medium">Analyzing image...</p>
-                                  <p className="text-gray-400 text-xs mt-1">AI is generating content</p>
+                                  <div className="w-10 h-10 border-2 border-t-transparent rounded-full animate-spin mb-3" style={{ borderColor: 'var(--theme-primary)', borderTopColor: 'transparent' }}></div>
+                                  <p className="text-sm font-medium" style={{ color: 'var(--theme-primary)' }}>Analyzing image...</p>
+                                  <p className="text-xs mt-1" style={{ color: 'var(--theme-text-muted)' }}>AI is generating content</p>
                                 </div>
                               )}
                               
                               {/* Success badge */}
                               {analysisComplete && !isAnalyzingImage && (
-                                <div className="absolute top-2 left-2 px-2 py-1 rounded-full bg-[#39FF14] text-black text-xs font-semibold flex items-center gap-1">
+                                <div className="absolute top-2 left-2 px-2 py-1 rounded-full text-black text-xs font-semibold flex items-center gap-1" style={{ background: 'var(--theme-primary)' }}>
                                   ✓ AI Analyzed
                                 </div>
                               )}
                               
                               {/* Manual mode badge */}
                               {!autoAnalyzeEnabled && !analysisComplete && !isAnalyzingImage && (
-                                <div className="absolute top-2 left-2 px-2 py-1 rounded-full bg-gray-700 text-white text-xs font-semibold flex items-center gap-1">
+                                <div className="absolute top-2 left-2 px-2 py-1 rounded-full text-white text-xs font-semibold flex items-center gap-1" style={{ background: 'var(--theme-bg-elevated)' }}>
                                   ✍️ Manual Mode
                                 </div>
                               )}
