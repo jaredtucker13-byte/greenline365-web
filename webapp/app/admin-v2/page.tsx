@@ -90,6 +90,19 @@ const emptyBookingTrends: BookingTrend[] = [
 // ============================================
 
 export default function TacticalCommandCenter() {
+  const router = useRouter();
+  
+  // Auth check - redirect to login if not authenticated
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        router.push('/login?redirectTo=/admin-v2');
+      }
+    };
+    checkAuth();
+  }, [router]);
+  
   // State
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<'month' | 'week'>('month');
