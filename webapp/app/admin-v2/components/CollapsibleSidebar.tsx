@@ -119,20 +119,21 @@ export default function CollapsibleSidebar({
   const sidebarContent = (
     <div className="flex flex-col h-full">
       {/* Header / Logo */}
-      <div className={`p-4 border-b border-white/10 ${isCollapsed ? 'px-2' : ''}`}>
+      <div className={`p-4 ${isCollapsed ? 'px-2' : ''}`} style={{ borderBottom: '1px solid var(--theme-glass-border)' }}>
         <div className="flex items-center justify-between">
           <Link href="/" className={`flex items-center gap-2 ${isCollapsed ? 'justify-center w-full' : ''}`}>
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#84A98C] to-[#52796F] flex items-center justify-center shadow-[0_0_15px_rgba(132,169,140,0.3)]">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, var(--theme-primary), var(--theme-secondary))', boxShadow: '0 0 15px var(--theme-glow)' }}>
               <span className="text-white font-bold text-sm">G</span>
             </div>
             {!isCollapsed && (
-              <span className="text-white font-medium">GreenLine365</span>
+              <span style={{ color: 'var(--theme-text-primary)' }} className="font-medium">GreenLine365</span>
             )}
           </Link>
           {/* Desktop collapse toggle */}
           <button
             onClick={onToggleCollapse}
-            className={`hidden lg:flex w-6 h-6 rounded items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition ${isCollapsed ? 'absolute right-2 top-4' : ''}`}
+            className={`hidden lg:flex w-6 h-6 rounded items-center justify-center transition ${isCollapsed ? 'absolute right-2 top-4' : ''}`}
+            style={{ color: 'var(--theme-text-muted)' }}
           >
             <svg className={`w-4 h-4 transition-transform ${isCollapsed ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
@@ -147,14 +148,17 @@ export default function CollapsibleSidebar({
           <Link
             key={item.id}
             href={item.href}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 group ${
-              activeItem === item.id
-                ? 'bg-[#84A98C]/20 text-[#A7C957] border border-[#84A98C]/30'
-                : 'text-white/60 hover:text-white hover:bg-white/[0.08]'
-            } ${isCollapsed ? 'justify-center px-2' : ''}`}
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 group ${isCollapsed ? 'justify-center px-2' : ''}`}
+            style={activeItem === item.id ? {
+              background: 'color-mix(in srgb, var(--theme-primary) 20%, transparent)',
+              color: 'var(--theme-accent)',
+              border: '1px solid color-mix(in srgb, var(--theme-primary) 30%, transparent)',
+            } : {
+              color: 'var(--theme-text-secondary)',
+            }}
             title={isCollapsed ? item.label : undefined}
           >
-            <span className={activeItem === item.id ? 'text-[#A7C957]' : 'text-white/50 group-hover:text-white/80'}>
+            <span style={{ color: activeItem === item.id ? 'var(--theme-accent)' : 'var(--theme-text-muted)' }}>
               {icons[item.icon]}
             </span>
             {!isCollapsed && (
@@ -166,10 +170,11 @@ export default function CollapsibleSidebar({
 
       {/* Action Buttons */}
       {!isCollapsed && (
-        <div className="p-4 border-t border-white/10 space-y-2">
+        <div className="p-4 space-y-2" style={{ borderTop: '1px solid var(--theme-glass-border)' }}>
           <button
             onClick={onNewBooking}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#84A98C] to-[#52796F] text-white rounded-xl font-medium text-sm hover:opacity-90 transition shadow-[0_0_20px_rgba(132,169,140,0.3)]"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-white rounded-xl font-medium text-sm hover:opacity-90 transition"
+            style={{ background: 'linear-gradient(135deg, var(--theme-primary), var(--theme-secondary))', boxShadow: '0 0 20px var(--theme-glow)' }}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
