@@ -139,6 +139,9 @@ Build "GreenLine365," a comprehensive marketing OS for local businesses. The pla
 - `/app/webapp/app/waitlist/page.tsx` - Waitlist signup
 - `/app/webapp/app/login/page.tsx` - Login page
 - `/app/webapp/app/auth/callback/route.ts` - Auth callback
+- `/app/webapp/app/admin-v2/page.tsx` - Main dashboard
+- `/app/webapp/app/admin-v2/settings/page.tsx` - Settings & Theme selector
+- `/app/webapp/app/admin-v2/lib/ThemeContext.tsx` - Global theme system
 - `/app/webapp/app/admin-v2/email/page.tsx` - Email Command Center
 - `/app/webapp/app/api/email/*` - Email API routes
 - `/app/webapp/app/components/Navbar.tsx` - Navigation
