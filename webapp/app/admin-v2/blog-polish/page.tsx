@@ -370,6 +370,88 @@ export default function BlogPolishPage() {
     }
   };
 
+  // Image Analysis & Generation functions
+  const analyzeForImages = async () => {
+    if (!post.content || post.content.length < 100) {
+      setMessage({ type: 'error', text: 'Add more content before analyzing for images' });
+      return;
+    }
+
+    setAnalyzingImages(true);
+    try {
+      const response = await fetch('/api/blog/images', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'analyze',
+          title: post.title,
+          content: post.content,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok && data.suggestions) {
+        setImageSuggestions(data.suggestions);
+        setShowImagePanel(true);
+        setMessage({ type: 'success', text: `Found ${data.suggestions.length} image opportunities!` });
+      } else {
+        setMessage({ type: 'error', text: data.error || 'Analysis failed' });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Failed to analyze content' });
+    }
+    setAnalyzingImages(false);
+  };
+
+  const generateImagesForSuggestion = async (suggestionId: string) => {
+    const suggestion = imageSuggestions.find(s => s.id === suggestionId);
+    if (!suggestion) return;
+
+    // Mark as generating
+    setImageSuggestions(prev => prev.map(s => 
+      s.id === suggestionId ? { ...s, generating: true } : s
+    ));
+
+    try {
+      const response = await fetch('/api/blog/images', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'generate',
+          prompt: suggestion.prompt,
+          style: 'professional',
+          count: 4,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok && data.images?.length > 0) {
+        setImageSuggestions(prev => prev.map(s => 
+          s.id === suggestionId 
+            ? { ...s, generatedImages: data.images, generating: false }
+            : s
+        ));
+        setMessage({ type: 'success', text: `Generated ${data.images.length} images!` });
+      } else {
+        setImageSuggestions(prev => prev.map(s => 
+          s.id === suggestionId ? { ...s, generating: false } : s
+        ));
+        setMessage({ type: 'error', text: data.message || 'Generation failed' });
+      }
+    } catch (error) {
+      setImageSuggestions(prev => prev.map(s => 
+        s.id === suggestionId ? { ...s, generating: false } : s
+      ));
+      setMessage({ type: 'error', text: 'Failed to generate images' });
+    }
+  };
+
+  const selectImage = (suggestionId: string, imageId: string) => {
+    setImageSuggestions(prev => prev.map(s => 
+      s.id === suggestionId ? { ...s, selectedImage: imageId } : s
+    ));
+  };
+
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-emerald-400';
     if (score >= 60) return 'text-amber-400';
