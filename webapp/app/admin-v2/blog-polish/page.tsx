@@ -278,6 +278,97 @@ export default function BlogPolishPage() {
     }
   }, [post.content, post.title]);
 
+  // Load from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedDraft = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (savedDraft) {
+        const parsed = JSON.parse(savedDraft);
+        if (parsed.post && (parsed.post.title || parsed.post.content)) {
+          setPost(parsed.post);
+          setLastAutoSave(parsed.savedAt ? new Date(parsed.savedAt) : null);
+          setMessage({ type: 'info', text: '📝 Restored unsaved draft from your last session' });
+        }
+      }
+    } catch (e) {
+      console.error('Failed to load draft from localStorage:', e);
+    }
+  }, []);
+
+  // Auto-save to localStorage when content changes (debounced)
+  useEffect(() => {
+    // Only auto-save if there's meaningful content
+    if (!post.title && !post.content) return;
+    
+    setHasUnsavedChanges(true);
+    
+    // Clear existing timer
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+    }
+    
+    // Set new timer for auto-save (3 seconds after last change)
+    autoSaveTimerRef.current = setTimeout(() => {
+      saveToLocalStorage();
+    }, 3000);
+    
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+    };
+  }, [post.title, post.content, post.category, post.tags]);
+
+  // Warn before leaving with unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges && (post.title || post.content)) {
+        e.preventDefault();
+        e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+        return e.returnValue;
+      }
+    };
+    
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges, post.title, post.content]);
+
+  // Save to localStorage
+  const saveToLocalStorage = () => {
+    try {
+      setIsAutoSaving(true);
+      const draftData = {
+        post: {
+          title: post.title,
+          content: post.content,
+          category: post.category,
+          tags: post.tags,
+          images: post.images,
+          status: post.status,
+        },
+        savedAt: new Date().toISOString(),
+      };
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(draftData));
+      setLastAutoSave(new Date());
+      setHasUnsavedChanges(false);
+      setIsAutoSaving(false);
+    } catch (e) {
+      console.error('Failed to save to localStorage:', e);
+      setIsAutoSaving(false);
+    }
+  };
+
+  // Clear localStorage after successful save to database
+  const clearLocalStorageDraft = () => {
+    try {
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
+      setHasUnsavedChanges(false);
+      setLastAutoSave(null);
+    } catch (e) {
+      console.error('Failed to clear localStorage:', e);
+    }
+  };
+
   const analyzeSEO = async () => {
     if (!post.content || !post.title) return;
     
