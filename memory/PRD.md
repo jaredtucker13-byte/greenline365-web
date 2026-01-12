@@ -133,20 +133,26 @@ Build a comprehensive marketing OS for local businesses called "GreenLine365".
 ## Prioritized Backlog
 
 ### P0 (Critical)
+- ✅ ~~Image Generation Workflow~~ - FIXED in Session 8
 - ⚠️ Database Migration Required: `012_design_proposals.sql` must be run in Supabase for AI Website Analyzer
-- Test Auto Images feature end-to-end (requires login)
+- ⚠️ Verify image generation end-to-end with user login
 
 ### P1 (High)
-- Auto-save with localStorage backup
-- "Unsaved changes" warning on navigate-away
-- Real analytics data integration
+- Add voice input (STT) to Chat Widget
+- Implement Perplexity verification for AI-generated outlines
+- Verify AI Website Analyzer end-to-end
 
 ### P2 (Medium)
 - Image analytics depth (recognition tags, face detection)
 - Keyboard shortcuts throughout app
 - Schedule reports via email
+- Real analytics data integration
 
 ### P3 (Future)
+- Full voice navigation system
 - Multi-author support
 - Campaign tracking
 - A/B testing for content
+- Social media auto-sharing for blog posts
+- Resume Retell AI agent "Aiden"
+- "God Mode" CMS
