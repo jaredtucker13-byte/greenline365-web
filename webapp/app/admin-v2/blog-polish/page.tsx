@@ -2155,6 +2155,17 @@ export default function BlogPolishPage() {
                           </span>
                         </div>
                       )}
+                      {/* Generate All Button */}
+                      {!generatingAllImages && imageSuggestions.some(s => !s.generatedImages || s.generatedImages.length === 0) && (
+                        <button
+                          onClick={generateAllImages}
+                          className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-black text-xs font-semibold hover:opacity-90 transition flex items-center gap-1.5"
+                          data-testid="generate-all-images-btn"
+                          title="Generate all pending images - this may take a moment"
+                        >
+                          ⚡ Generate All ({imageSuggestions.filter(s => !s.generatedImages || s.generatedImages.length === 0).length})
+                        </button>
+                      )}
                       {/* Template Selector */}
                       <select
                         value={selectedTemplate}
