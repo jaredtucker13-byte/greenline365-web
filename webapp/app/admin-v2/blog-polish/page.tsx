@@ -727,46 +727,124 @@ export default function BlogPolishPage() {
     setMessage({ type: 'info', text: 'Suggestion copied to prompt input. Edit and generate!' });
   };
 
-  // Voice Recording - Start/Stop
+  // Voice Recording - Start/Stop (Using Web Speech API)
   const toggleVoiceRecording = async () => {
+    // Check if browser supports speech recognition
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    
+    if (!SpeechRecognition) {
+      setMessage({ type: 'error', text: 'Speech recognition not supported in this browser. Try Chrome or Edge.' });
+      return;
+    }
+
     if (isRecording) {
       // Stop recording
-      mediaRecorderRef.current?.stop();
+      if (mediaRecorderRef.current) {
+        (mediaRecorderRef.current as any).stop();
+      }
       setIsRecording(false);
     } else {
-      // Start recording
+      // Start recording with Web Speech API
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-        mediaRecorderRef.current = mediaRecorder;
-        audioChunksRef.current = [];
-
-        mediaRecorder.ondataavailable = (event) => {
-          if (event.data.size > 0) {
-            audioChunksRef.current.push(event.data);
+        const recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = 'en-US';
+        
+        let finalTranscript = '';
+        
+        recognition.onresult = (event: any) => {
+          let interimTranscript = '';
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+              finalTranscript += transcript + ' ';
+            } else {
+              interimTranscript += transcript;
+            }
+          }
+          
+          // Show interim results
+          if (interimTranscript) {
+            setMessage({ type: 'info', text: `🎤 Hearing: "${interimTranscript}"` });
           }
         };
 
-        mediaRecorder.onstop = async () => {
-          // Stop all tracks
-          stream.getTracks().forEach(track => track.stop());
-          
-          // Create audio blob and transcribe
-          const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-          await transcribeAudio(audioBlob);
+        recognition.onend = () => {
+          setIsRecording(false);
+          if (finalTranscript.trim()) {
+            setPost(prev => ({
+              ...prev,
+              content: prev.content ? `${prev.content}\n\n${finalTranscript.trim()}` : finalTranscript.trim(),
+            }));
+            setMessage({ type: 'success', text: `🎤 Added: "${finalTranscript.trim().slice(0, 50)}..."` });
+          }
         };
 
-        mediaRecorder.start();
+        recognition.onerror = (event: any) => {
+          console.error('Speech recognition error:', event.error);
+          setIsRecording(false);
+          if (event.error === 'not-allowed') {
+            setMessage({ type: 'error', text: 'Microphone access denied. Please allow microphone permission.' });
+          } else {
+            setMessage({ type: 'error', text: `Speech error: ${event.error}` });
+          }
+        };
+
+        mediaRecorderRef.current = recognition as any;
+        recognition.start();
         setIsRecording(true);
-        setMessage({ type: 'info', text: '🎤 Recording... Click again to stop' });
+        setMessage({ type: 'info', text: '🎤 Listening... Speak now! Click again to stop.' });
+        
       } catch (error: any) {
-        console.error('Microphone error:', error);
-        setMessage({ type: 'error', text: 'Could not access microphone. Please allow permission.' });
+        console.error('Speech recognition error:', error);
+        setMessage({ type: 'error', text: 'Could not start speech recognition.' });
       }
     }
   };
 
-  // Transcribe audio using OpenRouter GPT-4o Audio
+  // Text-to-Speech - Read content aloud
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  
+  const speakText = (text: string) => {
+    if (!('speechSynthesis' in window)) {
+      setMessage({ type: 'error', text: 'Text-to-speech not supported in this browser.' });
+      return;
+    }
+
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      return;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    
+    // Try to use a good voice
+    const voices = window.speechSynthesis.getVoices();
+    const preferredVoice = voices.find(v => v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Alex'));
+    if (preferredVoice) {
+      utterance.voice = preferredVoice;
+    }
+
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+
+    setIsSpeaking(true);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const readContent = () => {
+    if (!post.content) {
+      setMessage({ type: 'error', text: 'No content to read' });
+      return;
+    }
+    speakText(post.content.slice(0, 5000)); // Limit to prevent very long reads
+  };
+
+  // Transcribe audio using OpenRouter GPT-4o Audio (fallback)
   const transcribeAudio = async (audioBlob: Blob) => {
     setIsTranscribing(true);
     setMessage({ type: 'info', text: '✨ Transcribing your voice...' });
