@@ -251,6 +251,7 @@ export default function BlogPolishPage() {
         body: JSON.stringify({
           ...post,
           status: 'draft',
+          style_guide: styleApplied && pageStyle ? pageStyle : null,
         }),
       });
 
