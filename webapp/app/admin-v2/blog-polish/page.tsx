@@ -735,6 +735,14 @@ export default function BlogPolishPage() {
                 >
                   {analyzingImages ? '⏳' : '🖼️'} Images
                 </button>
+                <button
+                  onClick={analyzePageStyle}
+                  disabled={analyzingStyle || post.content.length < 100}
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium transition bg-pink-500/20 border border-pink-500/30 text-pink-300 hover:bg-pink-500/30 disabled:opacity-50"
+                  title="Suggest page colors, textures & styling"
+                >
+                  {analyzingStyle ? '⏳' : '🎨'} Style
+                </button>
               </div>
             </div>
 
