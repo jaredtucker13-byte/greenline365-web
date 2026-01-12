@@ -227,13 +227,13 @@ export default function WebsiteAnalyzerPage() {
               </Link>
               <div>
                 <h1 className="text-xl font-bold flex items-center gap-2">
-                  <span className="text-2xl">🔬</span>
-                  Website Analyzer
+                  <span className="text-2xl">🎨</span>
+                  AI Website Builder
                   <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-xs font-medium border border-amber-500/30">
                     Premium
                   </span>
                 </h1>
-                <p className="text-sm text-white/50">GPT-5.2 Vision + Gemini Flash Analysis</p>
+                <p className="text-sm text-white/50">Claude Opus 4.5 • Gemini 3 Pro • Nano Banana Pro</p>
               </div>
             </div>
             <div className="flex items-center gap-2 text-xs text-white/30">
@@ -247,6 +247,35 @@ export default function WebsiteAnalyzerPage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Mode Selection */}
+        {currentStep === 'input' && (
+          <div className="mb-8">
+            <div className="flex gap-3 p-1.5 rounded-xl bg-white/5 border border-white/10 max-w-md">
+              <button
+                onClick={() => setMode('analyze')}
+                className={`flex-1 py-3 px-4 rounded-lg font-medium transition ${
+                  mode === 'analyze'
+                    ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white'
+                    : 'text-white/60 hover:text-white/80'
+                }`}
+              >
+                📸 Analyze Existing
+              </button>
+              <button
+                onClick={() => setMode('scratch')}
+                className={`flex-1 py-3 px-4 rounded-lg font-medium transition ${
+                  mode === 'scratch'
+                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
+                    : 'text-white/60 hover:text-white/80'
+                }`}
+              >
+                ✨ Build From Scratch
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className="grid lg:grid-cols-2 gap-8">
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Upload Section */}
           <div className="space-y-6">
