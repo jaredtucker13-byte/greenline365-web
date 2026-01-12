@@ -65,7 +65,7 @@ except Exception as e:
 
     await writeFile(scriptPath, pythonCode);
 
-    const { stdout, stderr } = await execAsync(`cd /app/webapp && python3 ${scriptPath}`, {
+    const { stdout, stderr } = await execAsync(`cd /app/webapp && /root/.venv/bin/python3 ${scriptPath}`, {
       timeout: 90000,
       maxBuffer: 50 * 1024 * 1024,
     });
