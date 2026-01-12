@@ -249,20 +249,31 @@ async function analyzePageStyle(body: StyleAnalyzeRequest) {
           role: 'user',
           content: `Return a JSON object for styling a blog titled "${title}". ${moodHint ? `Make it feel ${moodHint}.` : ''}
 
-Required fields:
-- themeName: creative name (string)
-- description: brief description under 40 chars (string)  
-- colors: object with primary, secondary, accent, background, text, headings, links (all hex strings like "#FFFFFF")
-- texture: object with type ("none"|"grain"|"dots"), opacity (0-1 number)
-- typography: object with headingStyle ("bold"|"light"), headingSize ("large"|"medium"|"small")
-- layout: object with contentWidth ("narrow"|"medium"|"wide"), spacing ("compact"|"balanced"|"airy")
-- mood: emotional description under 30 chars (string)
+Required JSON structure (fill ALL fields):
+{
+  "themeName": "creative name",
+  "description": "brief desc under 40 chars",
+  "colors": {
+    "primary": "#hex",
+    "secondary": "#hex", 
+    "accent": "#hex",
+    "background": "#hex",
+    "text": "#hex",
+    "headings": "#hex",
+    "links": "#hex"
+  },
+  "texture": {"type": "none", "opacity": 0},
+  "typography": {"headingStyle": "bold", "headingSize": "medium"},
+  "layout": {"contentWidth": "medium", "spacing": "balanced"},
+  "mood": "under 30 chars"
+}
 
-Return ONLY the raw JSON object, no markdown, no code blocks, no explanation.`
+Return ONLY the JSON, nothing else.`
         }
       ],
-      temperature: 0.7,
-      max_tokens: 500,
+      temperature: 0.8,
+      max_tokens: 400,
+      seed: Date.now(),
     }),
   });
 
