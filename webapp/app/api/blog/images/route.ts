@@ -156,37 +156,59 @@ async function generateImages(body: GenerateRequest) {
 
   const enhancedPrompt = `${prompt}. Style: ${styleGuides[style]}. High resolution, suitable for web blog post.`;
 
-  // Call Python backend for Nano Banana generation
-  // For now, we'll use a simulated response until Python service is set up
-  // In production, this would call our Python service
+  // Generate images using emergentintegrations
+  const images: { id: string; data: string; mime_type: string }[] = [];
   
   try {
-    // Try to call the Python image generation service
-    const pythonResponse = await fetch('http://localhost:8001/api/generate-image', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        prompt: enhancedPrompt,
-        count: Math.min(count, 5),
-      }),
-    });
+    // Dynamic import for the Python bridge
+    const generateCount = Math.min(count, 4);
+    
+    // Call internal API endpoint for image generation
+    for (let i = 0; i < generateCount; i++) {
+      const variationPrompt = i === 0 
+        ? enhancedPrompt 
+        : `${enhancedPrompt} Alternative composition ${i + 1}.`;
+      
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/generate-nano-banana`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: variationPrompt }),
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.image) {
+            images.push({
+              id: `img-${Date.now()}-${i}`,
+              data: data.image,
+              mime_type: 'image/png',
+            });
+          }
+        }
+      } catch (e) {
+        console.log(`[Blog Images] Failed to generate image ${i + 1}:`, e);
+      }
+    }
 
-    if (pythonResponse.ok) {
-      const result = await pythonResponse.json();
-      return NextResponse.json(result);
+    if (images.length > 0) {
+      return NextResponse.json({
+        success: true,
+        images,
+        message: `Generated ${images.length} images`,
+      });
     }
   } catch (e) {
-    console.log('[Blog Images] Python service not available, using placeholder');
+    console.error('[Blog Images] Generation error:', e);
   }
 
-  // Fallback: Return placeholder data structure
-  // This will be replaced with actual Nano Banana generation
+  // Return message if no images generated
   return NextResponse.json({
-    message: 'Image generation service initializing...',
+    success: false,
+    message: 'Image generation service is being set up. Images will be available soon.',
     prompt: enhancedPrompt,
     style,
     count,
-    images: [], // Will contain base64 images when service is ready
-    status: 'pending',
+    images: [],
   });
 }
