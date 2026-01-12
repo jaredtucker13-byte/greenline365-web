@@ -217,6 +217,12 @@ Build "GreenLine365," a comprehensive marketing OS for local businesses. The pla
 2. Booking widget input text invisible
 3. UI components too large
 4. `profiles` table foreign key broken
+5. **Twilio SMS**: BLOCKED due to A2P 10DLC brand registration failure (user needs to resolve with Twilio support)
+
+---
+
+## Blocked Items
+- **SMS Command Center**: Cannot send SMS due to Twilio A2P 10DLC brand registration failure. User has been provided support ticket templates to send to Twilio.
 
 ---
 
