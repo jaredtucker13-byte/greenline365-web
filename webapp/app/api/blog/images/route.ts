@@ -168,43 +168,40 @@ async function generateImages(body: GenerateRequest) {
   const apiKey = process.env.EMERGENT_LLM_KEY || 'sk-emergent-c87DeA8638fD64f7d3';
   const generateCount = Math.min(count, 3); // Max 3 images
   
-  console.log('[Blog Images] Generating', generateCount, 'images using Python...');
+  console.log('[Blog Images] Generating', generateCount, 'images using OpenAI GPT Image 1...');
 
-  // Use Python with emergentintegrations for image generation
+  // Use Python with emergentintegrations OpenAI Image Generation
   const { spawn } = require('child_process');
   
   const generateSingleImage = (variationPrompt: string, index: number): Promise<{ id: string; data: string; mime_type: string } | null> => {
     return new Promise((resolve) => {
-      const escapedPrompt = variationPrompt.replace(/'/g, "\\'").replace(/\n/g, ' ');
+      const escapedPrompt = variationPrompt.replace(/'/g, "\\'").replace(/\n/g, ' ').replace(/"/g, '\\"');
       
       const pythonScript = `
 import asyncio
 import json
+import base64
 import sys
 
 async def main():
-    from emergentintegrations.llm.chat import LlmChat, UserMessage
+    from emergentintegrations.llm.openai.image_generation import OpenAIImageGeneration
     
-    chat = LlmChat(
-        api_key='${apiKey}',
-        session_id='blog-image-${index}',
-        system_message='You are an image generation assistant.'
-    )
-    chat.with_model('gemini', 'gemini-2.5-flash-image-preview')
-    chat.with_params(modalities=['image', 'text'])
-    
-    message = UserMessage(text='${escapedPrompt}')
+    image_gen = OpenAIImageGeneration(api_key='${apiKey}')
     
     try:
-        text, images = await chat.send_message_multimodal_response(message)
+        images = await image_gen.generate_images(
+            prompt='${escapedPrompt}',
+            model='gpt-image-1',
+            number_of_images=1
+        )
         
         if images and len(images) > 0:
-            img = images[0]
+            image_base64 = base64.b64encode(images[0]).decode('utf-8')
             print(json.dumps({
                 'success': True,
                 'id': 'img-${Date.now()}-${index}',
-                'data': img['data'],
-                'mime_type': img['mime_type']
+                'data': image_base64,
+                'mime_type': 'image/png'
             }))
         else:
             print(json.dumps({'success': False, 'error': 'No image generated'}))
@@ -238,19 +235,21 @@ except Exception as e:
           if (stdout) {
             const result = JSON.parse(stdout.trim());
             if (result.success) {
-              console.log(`[Blog Images] Generated image ${index + 1}/${generateCount}`);
+              console.log(`[Blog Images] Generated image ${index + 1}/${generateCount} with OpenAI`);
               resolve({
                 id: result.id,
                 data: result.data,
                 mime_type: result.mime_type || 'image/png',
               });
               return;
+            } else {
+              console.log(`[Blog Images] Generation failed:`, result.error);
             }
           }
         } catch (e) {
           console.log(`[Blog Images] Parse error for image ${index + 1}:`, e);
         }
-        console.log(`[Blog Images] Failed image ${index + 1}:`, stderr || 'Unknown error');
+        console.log(`[Blog Images] Failed image ${index + 1}:`, stderr || stdout || 'Unknown error');
         resolve(null);
       });
 
@@ -259,31 +258,33 @@ except Exception as e:
         resolve(null);
       });
 
-      // Timeout after 60 seconds
+      // Timeout after 90 seconds (OpenAI can take longer)
       setTimeout(() => {
         pythonProcess.kill();
+        console.log(`[Blog Images] Timeout for image ${index + 1}`);
         resolve(null);
-      }, 60000);
+      }, 90000);
     });
   };
 
-  // Generate images in parallel
-  const generatePromises = Array.from({ length: generateCount }, (_, i) => {
+  // Generate images sequentially to avoid rate limits
+  const images: { id: string; data: string; mime_type: string }[] = [];
+  
+  for (let i = 0; i < generateCount; i++) {
     const variationPrompt = i === 0 
       ? enhancedPrompt 
       : `${enhancedPrompt} Alternative composition ${i + 1}.`;
-    return generateSingleImage(variationPrompt, i);
-  });
-
-  // Wait for all images in parallel
-  const results = await Promise.all(generatePromises);
-  const images = results.filter((img): img is { id: string; data: string; mime_type: string } => img !== null);
+    const result = await generateSingleImage(variationPrompt, i);
+    if (result) {
+      images.push(result);
+    }
+  }
 
   if (images.length > 0) {
     return NextResponse.json({
       success: true,
       images,
-      message: `Generated ${images.length} images`,
+      message: `Generated ${images.length} image(s) with OpenAI`,
     });
   }
 
