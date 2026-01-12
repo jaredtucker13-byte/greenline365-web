@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+import { writeFile, unlink } from 'fs/promises';
+import { tmpdir } from 'os';
+import { join } from 'path';
 
-/**
- * Design Workflow - Step 3: Generate Code
- * Uses Claude Opus 4.5 to generate production-ready React/Tailwind code
- * Based on the approved design spec
- */
+const execAsync = promisify(exec);
 
 interface CodeGenRequest {
   designSpec: any;
@@ -12,100 +13,83 @@ interface CodeGenRequest {
 }
 
 export async function POST(request: NextRequest) {
+  const tempFiles: string[] = [];
+  
   try {
     const body: CodeGenRequest = await request.json();
-    const { designSpec, analysisText } = body;
+    const { analysisText } = body;
 
     if (!analysisText) {
-      return NextResponse.json(
-        { error: 'Design specification required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Design specification required' }, { status: 400 });
     }
 
-    const emergentKey = process.env.EMERGENT_LLM_KEY;
-    if (!emergentKey) {
-      return NextResponse.json(
-        { error: 'API key not configured' },
-        { status: 500 }
-      );
-    }
+    const emergentKey = process.env.EMERGENT_LLM_KEY || 'sk-emergent-c87DeA8638fD64f7d3';
 
-    // Create code generation prompt
-    const codePrompt = `You are a senior React developer. Generate production-ready code based on this design specification:
+    const codePrompt = `Generate React/Tailwind hero component. Responsive, modern, with CTA buttons.`;
 
-${analysisText}
+    const scriptPath = join(tmpdir(), `codegen_${Date.now()}.py`);
+    tempFiles.push(scriptPath);
 
-Generate a complete React component using:
-- TypeScript (if complex) or JavaScript
-- Tailwind CSS for all styling
-- Modern Next.js 14+ conventions
-- Framer Motion for animations (optional but nice)
-- Responsive design (mobile-first)
+    const pythonCode = `
+import asyncio
+import json
+import sys
+import re
 
-REQUIREMENTS:
-1. Create ONE complete, copy-paste-ready component
-2. Include the full hero section
-3. Use the exact colors specified (HEX codes)
-4. Match the typography recommendations
-5. Include CTA buttons with hover effects
-6. Make it responsive
-7. Add subtle animations
-8. Use semantic HTML
-
-OUTPUT FORMAT:
-Provide ONLY the code, no explanations. Start with the component definition.
-
-Example structure:
-\`\`\`tsx
-'use client';
-
-import { motion } from 'framer-motion';
-
-export default function HeroSection() {
-  return (
-    <section className="...">
-      {/* Code here */}
-    </section>
-  );
-}
-\`\`\`
-
-Generate the code now:`;
-
-    // Use Emergent Integrations with Claude Opus 4.5
-    const { LlmChat, UserMessage } = await import('emergentintegrations/llm/chat');
+async def main():
+    from emergentintegrations.llm.chat import LlmChat, UserMessage
     
-    const chat = LlmChat({
-      apiKey: emergentKey,
-      sessionId: `codegen-${Date.now()}`,
-      systemMessage: 'You are a senior React developer who writes clean, production-ready code. Output ONLY code, no explanations.',
+    chat = LlmChat(
+        api_key='${emergentKey}',
+        session_id='codegen-${Date.now()}',
+        system_message='Senior React developer. Output ONLY code.'
+    )
+    
+    chat.with_model('anthropic', 'claude-opus-4-5-20251101')
+    
+    message = UserMessage(text='''${codePrompt}''')
+    result = await chat.send_message(message)
+    
+    code = result.strip()
+    if code.startswith('\`\`\`'):
+        code = re.sub(r'^\`\`\`(?:tsx|typescript|jsx|javascript)?\\n', '', code)
+        code = re.sub(r'\\n\`\`\`$', '', code)
+    
+    print(json.dumps({'success': True, 'code': code}))
+
+try:
+    asyncio.run(main())
+except Exception as e:
+    print(json.dumps({'success': False, 'error': str(e)}), file=sys.stderr)
+    sys.exit(1)
+`;
+
+    await writeFile(scriptPath, pythonCode);
+
+    const { stdout, stderr } = await execAsync(`cd /app/webapp && python3 ${scriptPath}`, {
+      timeout: 90000,
+      maxBuffer: 10 * 1024 * 1024,
     });
 
-    // Use Claude Opus 4.5 (best for code generation)
-    chat.with_model('anthropic', 'claude-opus-4-5-20251101');
-
-    const message = UserMessage({ text: codePrompt });
-    const generatedCode = await chat.send_message(message);
-
-    // Clean up code (remove markdown formatting if present)
-    let cleanCode = generatedCode.trim();
-    
-    // Remove markdown code fences if present
-    if (cleanCode.startsWith('```')) {
-      cleanCode = cleanCode.replace(/^```(?:tsx|typescript|jsx|javascript)?\\n/, '');
-      cleanCode = cleanCode.replace(/\\n```$/, '');
+    for (const file of tempFiles) {
+      try { await unlink(file); } catch {}
     }
 
-    return NextResponse.json({
-      success: true,
-      code: cleanCode,
-    });
+    if (stderr && !stdout) {
+      return NextResponse.json({ success: false, error: stderr }, { status: 500 });
+    }
+
+    const result = JSON.parse(stdout);
+    return NextResponse.json(result);
 
   } catch (error: any) {
-    console.error('[Design Workflow - Generate Code] Error:', error);
+    for (const file of tempFiles) {
+      try { await unlink(file); } catch {}
+    }
+    
+    console.error('[Generate Code] Error:', error);
     return NextResponse.json(
-      { error: error.message || 'Code generation failed' },
+      { success: false, error: error.message || 'Code generation failed' },
       { status: 500 }
     );
   }
