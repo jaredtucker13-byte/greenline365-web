@@ -224,7 +224,7 @@ async function generateImages(body: GenerateRequest) {
 }
 
 async function analyzePageStyle(body: StyleAnalyzeRequest) {
-  const { title, content, category } = body;
+  const { title, content, category, moodHint } = body;
 
   if (!title || !content) {
     return NextResponse.json(
@@ -232,6 +232,11 @@ async function analyzePageStyle(body: StyleAnalyzeRequest) {
       { status: 400 }
     );
   }
+
+  // Build mood instruction if provided
+  const moodInstruction = moodHint 
+    ? `\n\nIMPORTANT: Create a style that feels ${moodHint}. Use colors, typography, and textures that convey this mood strongly.`
+    : '';
 
   // Use AI to analyze content and suggest page styling
   const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -254,7 +259,7 @@ Consider:
 - Target audience
 - Industry/topic context
 - Emotional impact desired
-- Readability and accessibility
+- Readability and accessibility${moodInstruction}
 
 IMPORTANT: Return ONLY valid JSON with NO markdown formatting, NO code blocks, NO backticks. Use only standard double quotes (") for strings.
 
