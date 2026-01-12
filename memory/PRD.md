@@ -118,6 +118,16 @@ Build "GreenLine365," a comprehensive marketing OS for local businesses. The pla
   - **style_guide saved to database** as JSONB column in blog_posts table
   - Preview shows styled content with applied colors, typography, textures
   - Style badge shows theme name on preview (e.g., "🎨 Growth Catalyst")
+- [x] **Style Library (NEW - Jan 12, 2026):**
+  - **"❤️ My Library" button** in AI tools toolbar for quick access
+  - **Save Current Style** - one-click save with custom name and tags
+  - **Beautiful style cards** showing color palette preview, theme name, mood
+  - **Search & Filter** - search by name/tags, filter by All/Default/Recent
+  - **Usage tracking** - tracks how many times each style is used
+  - **Set as Default** - star a style to auto-suggest for new posts
+  - **Quick Apply** - one-click apply any saved style
+  - **Delete** - remove styles from library
+  - **Database migration**: `011_style_presets.sql` (requires manual execution)
 - [x] Added "Blog" link to admin sidebar
 - [x] **Testing**: All backend tests pass, full workflow verified (test_blog_polish_api.py)
 
