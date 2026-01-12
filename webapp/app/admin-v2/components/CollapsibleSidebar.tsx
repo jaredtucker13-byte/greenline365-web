@@ -251,18 +251,18 @@ export default function CollapsibleSidebar({
       )}
 
       {/* Status Footer */}
-      <div className={`p-4 border-t border-white/10 ${isCollapsed ? 'p-2' : ''}`}>
+      <div className={`p-4 ${isCollapsed ? 'p-2' : ''}`} style={{ borderTop: '1px solid var(--theme-glass-border)' }}>
         {!isCollapsed && (
           <>
             <div className="flex items-center gap-2 mb-3">
-              <span className="w-2 h-2 rounded-full bg-[#84A98C] animate-pulse shadow-[0_0_8px_rgba(132,169,140,0.5)]" />
-              <span className="text-[10px] text-[#A7C957] font-medium uppercase tracking-wider">System Online</span>
+              <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: 'var(--theme-primary)', boxShadow: '0 0 8px var(--theme-glow)' }} />
+              <span className="text-[10px] font-medium uppercase tracking-wider" style={{ color: 'var(--theme-accent)' }}>System Online</span>
             </div>
             <div className="flex items-center gap-2">
-              <svg className="w-3 h-3 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-3 h-3" style={{ color: 'var(--theme-text-muted)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
-              <span className="text-[10px] text-white/30 font-medium">AES-256 ENCRYPTED</span>
+              <span className="text-[10px] font-medium" style={{ color: 'var(--theme-text-muted)' }}>AES-256 ENCRYPTED</span>
             </div>
           </>
         )}
@@ -270,8 +270,8 @@ export default function CollapsibleSidebar({
         {/* Version - Triple click to open Demo Controller */}
         <motion.p 
           onClick={handleVersionClick}
-          whileHover={{ color: '#A7C957' }}
-          className={`text-[10px] text-white/30 font-medium text-center cursor-pointer select-none transition-colors mt-3 ${isCollapsed ? 'mt-2' : ''}`}
+          className={`text-[10px] font-medium text-center cursor-pointer select-none transition-colors mt-3 ${isCollapsed ? 'mt-2' : ''}`}
+          style={{ color: 'var(--theme-text-muted)' }}
           title="Triple-click for Demo Mode"
         >
           {isCollapsed ? 'V2.0' : 'COMMAND CENTER V2.0'}
@@ -285,7 +285,8 @@ export default function CollapsibleSidebar({
       {/* Mobile Hamburger Button */}
       <button
         onClick={onMobileToggle}
-        className="lg:hidden fixed top-4 left-4 z-50 w-10 h-10 rounded-lg bg-[#1A1A1A] border border-[#39FF14]/30 flex items-center justify-center text-white"
+        className="lg:hidden fixed top-4 left-4 z-50 w-10 h-10 rounded-lg flex items-center justify-center"
+        style={{ background: 'var(--theme-bg-secondary)', border: '1px solid var(--theme-glass-border)', color: 'var(--theme-text-primary)' }}
       >
         {isMobileOpen ? (
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -319,7 +320,8 @@ export default function CollapsibleSidebar({
             animate={{ x: 0 }}
             exit={{ x: -280 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="lg:hidden fixed left-0 top-0 bottom-0 w-[280px] backdrop-blur-2xl bg-black/60 border-r border-white/10 z-50"
+            className="lg:hidden fixed left-0 top-0 bottom-0 w-[280px] backdrop-blur-2xl z-50"
+            style={{ background: 'var(--theme-bg-primary)', borderRight: '1px solid var(--theme-glass-border)' }}
           >
             {sidebarContent}
           </motion.aside>
