@@ -38,7 +38,7 @@ const navItems = [
   { id: 'website-builder', label: 'Website Builder', icon: 'paint', href: '/admin-v2/website-analyzer' },
   { id: 'email', label: 'Email', icon: 'mail', href: '/admin-v2/email' },
   { id: 'sms', label: 'SMS', icon: 'phone', href: '/admin-v2/sms' },
-  { id: 'analytics', label: 'Analytics', icon: 'chart', href: '/admin-v2?view=analytics' },
+  { id: 'analytics', label: 'Analytics', icon: 'chart', href: '/admin-v2/analytics' },
   { id: 'settings', label: 'Settings', icon: 'cog', href: '/admin-v2/settings' },
 ];
 
