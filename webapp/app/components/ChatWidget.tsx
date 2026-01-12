@@ -585,6 +585,8 @@ export default function ChatWidget({
           messagesEndRef={messagesEndRef}
           inputRef={inputRef}
           onContentSuggestion={onContentSuggestion}
+          isListening={isListening}
+          toggleVoiceInput={toggleVoiceInput}
         />
       </div>
     );
