@@ -1079,6 +1079,25 @@ export default function BlogPolishPage() {
                       <p className="text-xs text-white/50 mt-1">{pageStyle.description}</p>
                     </div>
                     <div className="flex items-center gap-2">
+                      {/* Regenerate Button */}
+                      <button
+                        onClick={regenerateStyle}
+                        disabled={analyzingStyle}
+                        className="px-3 py-1.5 rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs font-medium hover:bg-purple-500/30 transition disabled:opacity-50 flex items-center gap-1"
+                        title={`Try ${moodVariations[(styleVariation + 1) % moodVariations.length]} style`}
+                      >
+                        {analyzingStyle ? (
+                          <svg className="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                          </svg>
+                        ) : (
+                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                          </svg>
+                        )}
+                        Regenerate
+                      </button>
                       {!styleApplied ? (
                         <button
                           onClick={applyPageStyle}
@@ -1106,18 +1125,78 @@ export default function BlogPolishPage() {
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
-                    {/* Colors */}
+                    {/* Colors with Edit Toggle */}
                     <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-                      <h4 className="text-xs font-semibold text-white/70 mb-3 flex items-center gap-1">
-                        <span>🎨</span> Color Palette
-                      </h4>
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="text-xs font-semibold text-white/70 flex items-center gap-1">
+                          <span>🎨</span> Color Palette
+                        </h4>
+                        <button
+                          onClick={() => setShowColorEditor(!showColorEditor)}
+                          className={`px-2 py-0.5 rounded text-[10px] transition ${
+                            showColorEditor 
+                              ? 'bg-pink-500/30 text-pink-300' 
+                              : 'bg-white/10 text-white/50 hover:text-white'
+                          }`}
+                        >
+                          {showColorEditor ? '✓ Editing' : '✏️ Edit'}
+                        </button>
+                      </div>
+                      
+                      {/* Color Swatches */}
+                      <div className={`${showColorEditor ? 'space-y-2' : 'flex flex-wrap gap-2'}`}>
                         {Object.entries(pageStyle.colors).map(([name, color]) => (
                           color && !name.includes('Gradient') && (
-                            <div key={name} className="flex items-center gap-1.5">
-                              <div 
-                                className="w-6 h-6 rounded-full border border-white/20 shadow-sm"
-                                style={{ backgroundColor: color }}
+                            showColorEditor ? (
+                              /* Editable Color Row */
+                              <div key={name} className="flex items-center gap-2 p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition">
+                                <label className="relative cursor-pointer">
+                                  <input
+                                    type="color"
+                                    value={color}
+                                    onChange={(e) => updateStyleColor(name, e.target.value)}
+                                    className="absolute inset-0 opacity-0 cursor-pointer w-8 h-8"
+                                  />
+                                  <div 
+                                    className="w-8 h-8 rounded-lg border-2 border-white/30 shadow-sm cursor-pointer hover:scale-105 transition"
+                                    style={{ backgroundColor: color }}
+                                  />
+                                </label>
+                                <div className="flex-1 min-w-0">
+                                  <span className="text-[10px] text-white/70 capitalize block">{name}</span>
+                                  <input
+                                    type="text"
+                                    value={color}
+                                    onChange={(e) => {
+                                      const val = e.target.value;
+                                      if (/^#[0-9A-Fa-f]{0,6}$/.test(val) || val === '') {
+                                        updateStyleColor(name, val);
+                                      }
+                                    }}
+                                    className="text-[10px] text-white/50 bg-transparent border-none outline-none w-20 font-mono"
+                                    placeholder="#000000"
+                                  />
+                                </div>
+                              </div>
+                            ) : (
+                              /* Simple Color Swatch */
+                              <div key={name} className="flex items-center gap-1.5" title={`${name}: ${color}`}>
+                                <div 
+                                  className="w-6 h-6 rounded-full border border-white/20 shadow-sm"
+                                  style={{ backgroundColor: color }}
+                                />
+                                <span className="text-[10px] text-white/50 capitalize">{name}</span>
+                              </div>
+                            )
+                          )
+                        ))}
+                      </div>
+                      
+                      {pageStyle.colors.backgroundGradient && (
+                        <div className="mt-2 p-2 rounded-lg text-xs text-white/50 bg-white/5">
+                          <span className="font-medium">Gradient:</span> {pageStyle.colors.backgroundGradient}
+                        </div>
+                      )}
                                 title={`${name}: ${color}`}
                               />
                               <span className="text-[10px] text-white/50 capitalize">{name}</span>
