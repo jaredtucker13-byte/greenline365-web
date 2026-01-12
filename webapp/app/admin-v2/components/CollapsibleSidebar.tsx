@@ -303,7 +303,7 @@ export default function CollapsibleSidebar({
             animate={{ x: 0 }}
             exit={{ x: -280 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="lg:hidden fixed left-0 top-0 bottom-0 w-[280px] bg-[#0D0D0D] border-r border-[#39FF14]/10 z-50"
+            className="lg:hidden fixed left-0 top-0 bottom-0 w-[280px] backdrop-blur-2xl bg-black/60 border-r border-white/10 z-50"
           >
             {sidebarContent}
           </motion.aside>
@@ -315,7 +315,7 @@ export default function CollapsibleSidebar({
         initial={false}
         animate={{ width: isCollapsed ? 72 : 280 }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        className="hidden lg:flex flex-col bg-[#0D0D0D] border-r border-[#39FF14]/10 h-screen sticky top-0"
+        className="hidden lg:flex flex-col backdrop-blur-2xl bg-black/40 border-r border-white/10 h-screen sticky top-0"
       >
         {sidebarContent}
       </motion.aside>
