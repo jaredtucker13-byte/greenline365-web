@@ -2229,9 +2229,14 @@ export default function BlogPolishPage() {
                             <p className="text-xs text-white/40 italic">"{suggestion.prompt.slice(0, 100)}..."</p>
                           </div>
                           <button
-                            onClick={() => generateImagesForSuggestion(suggestion.id)}
-                            disabled={suggestion.generating}
-                            className="px-3 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-black text-xs font-semibold hover:opacity-90 transition disabled:opacity-50"
+                            onClick={() => generateSingleImage(suggestion.id)}
+                            disabled={suggestion.generating || (suggestion.generatedImages && suggestion.generatedImages.length > 0)}
+                            className={`px-3 py-2 rounded-lg text-xs font-semibold transition disabled:opacity-50 ${
+                              suggestion.generatedImages && suggestion.generatedImages.length > 0
+                                ? 'bg-green-500/20 text-green-300 border border-green-500/30'
+                                : 'bg-gradient-to-r from-amber-500 to-orange-500 text-black hover:opacity-90'
+                            }`}
+                            data-testid={`generate-image-btn-${idx}`}
                           >
                             {suggestion.generating ? (
                               <span className="flex items-center gap-1">
@@ -2241,6 +2246,8 @@ export default function BlogPolishPage() {
                                 </svg>
                                 Generating...
                               </span>
+                            ) : suggestion.generatedImages && suggestion.generatedImages.length > 0 ? (
+                              '✓ Generated'
                             ) : (
                               '🎨 Generate'
                             )}
