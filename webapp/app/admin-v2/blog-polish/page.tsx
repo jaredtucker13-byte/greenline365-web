@@ -640,6 +640,15 @@ export default function BlogPolishPage() {
                 >
                   {aiLoading === 'generate_meta' ? '⏳' : '🔎'} Meta
                 </button>
+                <div className="w-px h-6 bg-white/20 mx-1" />
+                <button
+                  onClick={analyzeForImages}
+                  disabled={analyzingImages || post.content.length < 100}
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium transition bg-amber-500/20 border border-amber-500/30 text-amber-300 hover:bg-amber-500/30 disabled:opacity-50"
+                  title="Analyze content for image opportunities"
+                >
+                  {analyzingImages ? '⏳' : '🖼️'} Images
+                </button>
               </div>
             </div>
 
