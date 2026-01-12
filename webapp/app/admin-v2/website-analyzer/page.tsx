@@ -1,20 +1,30 @@
 'use client';
 
 /**
- * Website Analyzer - Premium Feature (Locked)
- * Uses GPT-5.2 Vision + Gemini Flash for comprehensive website analysis
+ * Website Analyzer & Builder - Premium Feature
+ * Two Modes:
+ * 1. Analyze Existing: Screenshot → AI Analysis → Mockup → Code
+ * 2. Build From Scratch: Description → Design → Mockup → Code
  * 
- * Access: Requires special permissions
+ * Uses best-in-class models: Claude Opus 4.5, Gemini 3 Pro Vision, Nano Banana Pro
  */
 
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 
-interface AnalysisResult {
-  gpt52Analysis: string;
-  geminiCreativeSuggestions: string;
-  analysisType: string;
+type AnalysisMode = 'analyze' | 'scratch';
+type VisionModel = 'gemini-3-pro' | 'gemini-2.0-pro' | 'gpt-4o';
+
+interface DesignProposal {
+  id: string;
+  mode: AnalysisMode;
+  visionModel?: VisionModel;
+  analysisText: string;
+  designSpec: any;
+  mockupImageUrl?: string;
+  generatedCode?: string;
+  status: 'pending' | 'approved' | 'rejected';
   timestamp: string;
 }
 
