@@ -284,49 +284,49 @@ export default function TacticalCommandCenter() {
           </div>
 
           {/* Quick Actions Row */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-6">
             <motion.button
-              whileHover={{ scale: 1.02, boxShadow: '0 0 30px rgba(57, 255, 20, 0.3)' }}
+              whileHover={{ scale: 1.02, y: -2 }}
               whileTap={{ scale: 0.98 }}
-              className="p-4 bg-[#1A1A1A] rounded-xl border border-[#39FF14]/20 flex items-center gap-4 hover:border-[#39FF14]/40 transition"
+              className="p-6 backdrop-blur-2xl bg-white/[0.08] rounded-2xl border border-white/[0.15] flex items-center gap-5 hover:bg-white/[0.12] transition-all duration-300 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]"
             >
-              <div className="w-12 h-12 rounded-xl bg-[#39FF14]/10 border border-[#39FF14]/30 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center">
                 <span className="text-2xl">📞</span>
               </div>
               <div className="text-left">
-                <p className="text-white font-semibold">Make Phone Call</p>
-                <p className="text-xs text-gray-400">Quick dial contacts</p>
+                <p className="text-white font-medium text-lg">Make Phone Call</p>
+                <p className="text-sm text-white/50">Quick dial contacts</p>
               </div>
             </motion.button>
 
             <motion.button
-              whileHover={{ scale: 1.02, boxShadow: '0 0 30px rgba(12, 226, 147, 0.3)' }}
+              whileHover={{ scale: 1.02, y: -2 }}
               whileTap={{ scale: 0.98 }}
-              className="p-4 bg-[#1A1A1A] rounded-xl border border-[#0CE293]/20 flex items-center gap-4 hover:border-[#0CE293]/40 transition"
+              className="p-6 backdrop-blur-2xl bg-white/[0.08] rounded-2xl border border-white/[0.15] flex items-center gap-5 hover:bg-white/[0.12] transition-all duration-300 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]"
             >
-              <div className="w-12 h-12 rounded-xl bg-[#0CE293]/10 border border-[#0CE293]/30 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-2xl bg-sky-500/20 border border-sky-500/30 flex items-center justify-center">
                 <span className="text-2xl">📊</span>
               </div>
               <div className="text-left">
-                <p className="text-white font-semibold">Analytics Dashboard</p>
-                <p className="text-xs text-gray-400">ROI +25% • View Details</p>
+                <p className="text-white font-medium text-lg">Analytics Dashboard</p>
+                <p className="text-sm text-white/50">ROI +25% • View Details</p>
               </div>
             </motion.button>
 
             <motion.button
-              whileHover={{ scale: 1.02, boxShadow: '0 0 30px rgba(255, 200, 0, 0.3)' }}
+              whileHover={{ scale: 1.02, y: -2 }}
               whileTap={{ scale: 0.98 }}
-              className="p-4 bg-[#1A1A1A] rounded-xl border border-[#FFC800]/20 flex items-center gap-4 hover:border-[#FFC800]/40 transition relative"
+              className="p-6 backdrop-blur-2xl bg-white/[0.08] rounded-2xl border border-white/[0.15] flex items-center gap-5 hover:bg-white/[0.12] transition-all duration-300 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)] relative"
             >
-              <div className="w-12 h-12 rounded-xl bg-[#FFC800]/10 border border-[#FFC800]/30 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center">
                 <span className="text-2xl">📝</span>
               </div>
               <div className="text-left">
-                <p className="text-white font-semibold">Review Suggested Posts</p>
-                <p className="text-xs text-gray-400">{pendingCount} posts ready for review</p>
+                <p className="text-white font-medium text-lg">Review Suggested Posts</p>
+                <p className="text-sm text-white/50">{pendingCount} posts ready for review</p>
               </div>
               {pendingCount > 0 && (
-                <span className="absolute top-3 right-3 w-5 h-5 bg-[#FFC800] rounded-full text-black text-xs font-bold flex items-center justify-center">{pendingCount}</span>
+                <span className="absolute top-4 right-4 w-6 h-6 bg-amber-500 rounded-full text-black text-xs font-bold flex items-center justify-center shadow-[0_0_15px_rgba(245,158,11,0.5)]">{pendingCount}</span>
               )}
             </motion.button>
           </div>
