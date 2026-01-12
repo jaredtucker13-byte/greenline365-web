@@ -96,6 +96,23 @@ export default function BlogPolishPage() {
     enhanced?: string;
   }>({});
 
+  // Image Generation state
+  interface ImageSuggestion {
+    id: string;
+    placement: 'header' | 'inline' | 'section-break';
+    context: string;
+    prompt: string;
+    position: number;
+    sectionTitle?: string;
+    generatedImages?: { id: string; data: string; mime_type: string }[];
+    selectedImage?: string;
+    generating?: boolean;
+  }
+  const [imageSuggestions, setImageSuggestions] = useState<ImageSuggestion[]>([]);
+  const [analyzingImages, setAnalyzingImages] = useState(false);
+  const [showImagePanel, setShowImagePanel] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<'classic' | 'magazine' | 'minimal' | 'cards'>('classic');
+
   // Calculate stats
   const wordCount = post.content.split(/\s+/).filter(w => w).length;
   const readTime = Math.ceil(wordCount / 200);
