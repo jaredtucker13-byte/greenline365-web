@@ -1085,12 +1085,17 @@ export default function BlogPolishPage() {
                   </button>
                   <div className="w-px h-4 bg-white/10 mx-1" />
                   <button
-                    onClick={analyzeForImages}
-                    disabled={analyzingImages || post.content.length < 100}
-                    className="px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all bg-amber-500/10 hover:bg-amber-500/20 text-amber-300/80 hover:text-amber-200 active:scale-95 disabled:opacity-40"
-                    title="AI image suggestions"
+                    onClick={analyzeAndGenerateAllImages}
+                    disabled={generatingAllImages || analyzingImages || post.content.length < 100}
+                    className="px-3 py-1 rounded-lg text-[11px] font-medium transition-all bg-gradient-to-r from-amber-500/20 to-orange-500/20 hover:from-amber-500/30 hover:to-orange-500/30 text-amber-300 hover:text-amber-200 active:scale-95 disabled:opacity-40 flex items-center gap-1"
+                    title="Analyze blog and auto-generate all images"
+                    data-testid="auto-generate-images-btn"
                   >
-                    {analyzingImages ? <span className="animate-pulse">•••</span> : '🖼️'}
+                    {generatingAllImages || analyzingImages ? (
+                      <span className="animate-pulse">Generating...</span>
+                    ) : (
+                      <>🖼️ Auto Images</>
+                    )}
                   </button>
                   <button
                     onClick={() => analyzePageStyle()}
