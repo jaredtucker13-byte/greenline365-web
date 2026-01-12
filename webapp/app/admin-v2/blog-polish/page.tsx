@@ -857,16 +857,48 @@ export default function BlogPolishPage() {
 
   // Text-to-Speech - Read content aloud
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [selectedVoice, setSelectedVoice] = useState<SpeechSynthesisVoice | null>(null);
+  const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
   
+  // Load available voices
+  useEffect(() => {
+    const loadVoices = () => {
+      const voices = window.speechSynthesis?.getVoices() || [];
+      // Filter to English voices and sort by quality
+      const englishVoices = voices.filter(v => v.lang.startsWith('en'));
+      setAvailableVoices(englishVoices);
+      
+      // Set default voice (prefer Google or premium voices)
+      if (!selectedVoice && englishVoices.length > 0) {
+        const preferred = englishVoices.find(v => 
+          v.name.includes('Google') || 
+          v.name.includes('Samantha') || 
+          v.name.includes('Microsoft') ||
+          v.name.includes('Natural')
+        ) || englishVoices[0];
+        setSelectedVoice(preferred);
+      }
+    };
+    
+    loadVoices();
+    window.speechSynthesis?.addEventListener('voiceschanged', loadVoices);
+    return () => window.speechSynthesis?.removeEventListener('voiceschanged', loadVoices);
+  }, []);
+  
+  const stopSpeaking = () => {
+    window.speechSynthesis?.cancel();
+    setIsSpeaking(false);
+  };
+
   const speakText = (text: string) => {
     if (!('speechSynthesis' in window)) {
       setMessage({ type: 'error', text: 'Text-to-speech not supported in this browser.' });
       return;
     }
 
+    // If already speaking, stop
     if (isSpeaking) {
-      window.speechSynthesis.cancel();
-      setIsSpeaking(false);
+      stopSpeaking();
       return;
     }
 
@@ -874,11 +906,9 @@ export default function BlogPolishPage() {
     utterance.rate = 1.0;
     utterance.pitch = 1.0;
     
-    // Try to use a good voice
-    const voices = window.speechSynthesis.getVoices();
-    const preferredVoice = voices.find(v => v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Alex'));
-    if (preferredVoice) {
-      utterance.voice = preferredVoice;
+    // Use selected voice or fallback
+    if (selectedVoice) {
+      utterance.voice = selectedVoice;
     }
 
     utterance.onend = () => setIsSpeaking(false);
@@ -888,7 +918,15 @@ export default function BlogPolishPage() {
     window.speechSynthesis.speak(utterance);
   };
 
-  const readContent = () => {
+  const toggleReadContent = () => {
+    // If speaking, stop
+    if (isSpeaking) {
+      stopSpeaking();
+      setMessage({ type: 'info', text: '🔇 Stopped reading' });
+      return;
+    }
+    
+    // Otherwise start reading
     if (!post.content) {
       setMessage({ type: 'error', text: 'No content to read' });
       return;
