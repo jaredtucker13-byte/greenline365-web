@@ -298,7 +298,7 @@ export default async function TrustPage() {
                 AI utility does not compromise data confidentiality.
               </p>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="bg-white/5 border border-white/10 rounded-xl p-5">
                   <div className="w-10 h-10 bg-amber-500/20 rounded-lg flex items-center justify-center mb-3">
                     <svg className="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -322,6 +322,19 @@ export default async function TrustPage() {
                   <p className="text-white/60 text-sm">
                     Your Knowledge Base is stored in a <strong className="text-white">dedicated Vector Index</strong>. 
                     AI cannot use one client's data to answer another's questions.
+                  </p>
+                </div>
+
+                <div className="bg-white/5 border border-white/10 rounded-xl p-5">
+                  <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center mb-3">
+                    <svg className="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                  <h3 className="font-semibold text-white mb-2">CRM Isolation</h3>
+                  <p className="text-white/60 text-sm">
+                    Your leads, customers, and revenue data are <strong className="text-white">completely isolated</strong>. 
+                    Each tenant's CRM is a separate "vault" with RLS-enforced boundaries.
                   </p>
                 </div>
 
