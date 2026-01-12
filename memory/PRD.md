@@ -74,6 +74,7 @@ Build "GreenLine365," a comprehensive marketing OS for local businesses. The pla
   - `GET /api/blog/[slug]` - Get single post (increments views)
   - `PATCH /api/blog/[slug]` - Update post
   - `DELETE /api/blog/[slug]` - Delete post
+  - **`POST /api/blog/ai` - AI content enhancements (NEW)**
 - [x] Admin editor UI at `/admin-v2/blog-polish`:
   - Title input with character count (50-60 optimal)
   - Markdown content editor with word count & read time
@@ -87,6 +88,13 @@ Build "GreenLine365," a comprehensive marketing OS for local businesses. The pla
     - Top keywords extraction
   - Save Draft / Schedule / Publish Now actions
   - Schedule modal with date/time picker
+- [x] **AI-Powered Features (OpenRouter integration):**
+  - 📋 Generate Outline - Creates full blog structure from title (Claude)
+  - ✨ Enhance Content - Improves readability and engagement (Claude)
+  - 💡 Suggest Headlines - 5 alternative title options (GPT-4o)
+  - 🏷️ Suggest Tags - Auto-generate relevant tags (GPT-4o-mini)
+  - 🔎 Generate Meta - SEO description & keywords (GPT-4o-mini)
+  - AI Suggestions Panel with one-click apply
 - [x] Added "Blog" link to admin sidebar
 
 ### December 2025
