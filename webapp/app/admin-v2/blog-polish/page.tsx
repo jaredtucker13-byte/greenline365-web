@@ -920,103 +920,95 @@ export default function BlogPolishPage() {
                 </button>
               </div>
 
-              {/* AI Tools - Improved with better feedback */}
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-xs text-white/40 mr-1">AI:</span>
-                <button
-                  onClick={generateOutline}
-                  disabled={aiLoading !== null || !post.title}
-                  className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-purple-500/20 border border-purple-500/30 text-purple-300 hover:bg-purple-500/30 hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
-                  title="Generate outline from title"
-                >
-                  {aiLoading === 'generate_outline' ? (
-                    <span className="flex items-center gap-1"><span className="animate-spin">⏳</span> Working...</span>
-                  ) : '📋 Outline'}
-                </button>
-                <button
-                  onClick={enhanceContent}
-                  disabled={aiLoading !== null || post.content.length < 50}
-                  className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-purple-500/20 border border-purple-500/30 text-purple-300 hover:bg-purple-500/30 hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
-                  title="Enhance content with AI"
-                >
-                  {aiLoading === 'enhance_content' ? (
-                    <span className="flex items-center gap-1"><span className="animate-spin">⏳</span> Enhancing...</span>
-                  ) : '✨ Enhance'}
-                </button>
-                <button
-                  onClick={suggestHeadlines}
-                  disabled={aiLoading !== null || !post.title}
-                  className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-purple-500/20 border border-purple-500/30 text-purple-300 hover:bg-purple-500/30 hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
-                  title="Get headline suggestions"
-                >
-                  {aiLoading === 'suggest_headlines' ? (
-                    <span className="flex items-center gap-1"><span className="animate-spin">⏳</span> Thinking...</span>
-                  ) : '💡 Headlines'}
-                </button>
-                <button
-                  onClick={suggestTags}
-                  disabled={aiLoading !== null}
-                  className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-purple-500/20 border border-purple-500/30 text-purple-300 hover:bg-purple-500/30 hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
-                  title="Suggest tags"
-                >
-                  {aiLoading === 'suggest_tags' ? (
-                    <span className="flex items-center gap-1"><span className="animate-spin">⏳</span></span>
-                  ) : '🏷️ Tags'}
-                </button>
-                <button
-                  onClick={generateMeta}
-                  disabled={aiLoading !== null || !post.title || !post.content}
-                  className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-purple-500/20 border border-purple-500/30 text-purple-300 hover:bg-purple-500/30 hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
-                  title="Generate SEO meta"
-                >
-                  {aiLoading === 'generate_meta' ? (
-                    <span className="flex items-center gap-1"><span className="animate-spin">⏳</span></span>
-                  ) : '🔎 Meta'}
-                </button>
-                <div className="w-px h-5 bg-white/20" />
-                <button
-                  onClick={analyzeForImages}
-                  disabled={analyzingImages || post.content.length < 100}
-                  className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-amber-500/20 border border-amber-500/30 text-amber-300 hover:bg-amber-500/30 hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
-                  title="Analyze content for image opportunities"
-                >
-                  {analyzingImages ? (
-                    <span className="flex items-center gap-1"><span className="animate-spin">⏳</span> Analyzing...</span>
-                  ) : '🖼️ Images'}
-                </button>
-                <button
-                  onClick={() => analyzePageStyle()}
-                  disabled={analyzingStyle || post.content.length < 100}
-                  className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-pink-500/20 border border-pink-500/30 text-pink-300 hover:bg-pink-500/30 hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
-                  title="Suggest page colors, textures & styling"
-                >
-                  {analyzingStyle ? (
-                    <span className="flex items-center gap-1"><span className="animate-spin">⏳</span></span>
-                  ) : '🎨 Style'}
-                </button>
-                <button
-                  onClick={() => setShowStyleLibrary(true)}
-                  className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-gradient-to-r from-amber-500/20 to-pink-500/20 border border-amber-500/30 text-amber-200 hover:from-amber-500/30 hover:to-pink-500/30 hover:scale-[1.02] active:scale-95"
-                  title="Browse and apply saved styles"
-                >
-                  ❤️ Library
-                </button>
-                <div className="w-px h-5 bg-white/20" />
-                <button
-                  onClick={() => setShowTrendingPanel(!showTrendingPanel)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border flex items-center gap-1 hover:scale-[1.02] active:scale-95 ${
-                    showTrendingPanel 
-                      ? 'bg-cyan-500/30 border-cyan-500/50 text-cyan-200' 
-                      : 'bg-cyan-500/20 border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/30'
-                  }`}
-                  title="Research trending topics with Perplexity AI"
-                >
-                  🔍 Research
-                </button>
-                <button
-                  onClick={() => setShowCopyrightPanel(!showCopyrightPanel)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border flex items-center gap-1 hover:scale-[1.02] active:scale-95 ${
-                    showCopyrightPanel 
+              {/* AI Tools - Premium Toolbar Design */}
+              <div className="flex flex-col gap-2">
+                {/* Primary AI Tools Row */}
+                <div className="flex items-center gap-1.5 bg-black/30 rounded-xl px-3 py-2 border border-white/5">
+                  <span className="text-[10px] text-white/30 font-medium uppercase tracking-wider mr-2">AI</span>
+                  <button
+                    onClick={generateOutline}
+                    disabled={aiLoading !== null || !post.title}
+                    className="px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all bg-white/5 hover:bg-white/10 text-white/70 hover:text-white active:scale-95 disabled:opacity-40 disabled:hover:bg-white/5"
+                    title="Generate outline"
+                  >
+                    {aiLoading === 'generate_outline' ? <span className="animate-pulse">•••</span> : '📋'}
+                  </button>
+                  <button
+                    onClick={enhanceContent}
+                    disabled={aiLoading !== null || post.content.length < 50}
+                    className="px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all bg-white/5 hover:bg-white/10 text-white/70 hover:text-white active:scale-95 disabled:opacity-40"
+                    title="Enhance content"
+                  >
+                    {aiLoading === 'enhance_content' ? <span className="animate-pulse">•••</span> : '✨'}
+                  </button>
+                  <button
+                    onClick={suggestHeadlines}
+                    disabled={aiLoading !== null || !post.title}
+                    className="px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all bg-white/5 hover:bg-white/10 text-white/70 hover:text-white active:scale-95 disabled:opacity-40"
+                    title="Headline suggestions"
+                  >
+                    {aiLoading === 'suggest_headlines' ? <span className="animate-pulse">•••</span> : '💡'}
+                  </button>
+                  <button
+                    onClick={suggestTags}
+                    disabled={aiLoading !== null}
+                    className="px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all bg-white/5 hover:bg-white/10 text-white/70 hover:text-white active:scale-95 disabled:opacity-40"
+                    title="Suggest tags"
+                  >
+                    {aiLoading === 'suggest_tags' ? <span className="animate-pulse">•••</span> : '🏷️'}
+                  </button>
+                  <button
+                    onClick={generateMeta}
+                    disabled={aiLoading !== null || !post.title || !post.content}
+                    className="px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all bg-white/5 hover:bg-white/10 text-white/70 hover:text-white active:scale-95 disabled:opacity-40"
+                    title="SEO meta"
+                  >
+                    {aiLoading === 'generate_meta' ? <span className="animate-pulse">•••</span> : '🔎'}
+                  </button>
+                  <div className="w-px h-4 bg-white/10 mx-1" />
+                  <button
+                    onClick={analyzeForImages}
+                    disabled={analyzingImages || post.content.length < 100}
+                    className="px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all bg-amber-500/10 hover:bg-amber-500/20 text-amber-300/80 hover:text-amber-200 active:scale-95 disabled:opacity-40"
+                    title="AI image suggestions"
+                  >
+                    {analyzingImages ? <span className="animate-pulse">•••</span> : '🖼️'}
+                  </button>
+                  <button
+                    onClick={() => analyzePageStyle()}
+                    disabled={analyzingStyle || post.content.length < 100}
+                    className="px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all bg-pink-500/10 hover:bg-pink-500/20 text-pink-300/80 hover:text-pink-200 active:scale-95 disabled:opacity-40"
+                    title="Style suggestions"
+                  >
+                    {analyzingStyle ? <span className="animate-pulse">•••</span> : '🎨'}
+                  </button>
+                  <button
+                    onClick={() => setShowStyleLibrary(true)}
+                    className="px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all bg-gradient-to-r from-amber-500/10 to-pink-500/10 hover:from-amber-500/20 hover:to-pink-500/20 text-amber-200/80 hover:text-amber-100 active:scale-95"
+                    title="Style library"
+                  >
+                    ❤️
+                  </button>
+                </div>
+                
+                {/* Secondary Tools Row */}
+                <div className="flex items-center gap-1.5 bg-black/20 rounded-xl px-3 py-1.5 border border-white/5">
+                  <span className="text-[10px] text-white/30 font-medium uppercase tracking-wider mr-2">Tools</span>
+                  <button
+                    onClick={() => setShowTrendingPanel(!showTrendingPanel)}
+                    className={`px-3 py-1 rounded-lg text-[11px] font-medium transition-all active:scale-95 flex items-center gap-1.5 ${
+                      showTrendingPanel 
+                        ? 'bg-cyan-500/20 text-cyan-200 ring-1 ring-cyan-500/30' 
+                        : 'bg-white/5 hover:bg-white/10 text-white/60 hover:text-white'
+                    }`}
+                    title="Research trending topics"
+                  >
+                    🔍 <span className="hidden sm:inline">Research</span>
+                  </button>
+                  <button
+                    onClick={() => setShowCopyrightPanel(!showCopyrightPanel)}
+                    className={`px-3 py-1 rounded-lg text-[11px] font-medium transition-all active:scale-95 flex items-center gap-1.5 ${
+                      showCopyrightPanel 
                       ? 'bg-blue-500/30 border-blue-500/50 text-blue-200' 
                       : 'bg-blue-500/20 border-blue-500/30 text-blue-300 hover:bg-blue-500/30'
                   }`}
