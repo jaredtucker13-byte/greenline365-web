@@ -1009,13 +1009,14 @@ export default function BlogPolishPage() {
                     onClick={() => setShowCopyrightPanel(!showCopyrightPanel)}
                     className={`px-3 py-1 rounded-lg text-[11px] font-medium transition-all active:scale-95 flex items-center gap-1.5 ${
                       showCopyrightPanel 
-                      ? 'bg-blue-500/30 border-blue-500/50 text-blue-200' 
-                      : 'bg-blue-500/20 border-blue-500/30 text-blue-300 hover:bg-blue-500/30'
-                  }`}
-                  title="Copyright tools: check content, licenses, attribution"
-                >
-                  ⚖️ Copyright
-                </button>
+                        ? 'bg-blue-500/20 text-blue-200 ring-1 ring-blue-500/30' 
+                        : 'bg-white/5 hover:bg-white/10 text-white/60 hover:text-white'
+                    }`}
+                    title="Copyright tools"
+                  >
+                    ⚖️ <span className="hidden sm:inline">Copyright</span>
+                  </button>
+                </div>
               </div>
             </div>
 
