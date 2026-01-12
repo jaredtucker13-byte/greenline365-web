@@ -471,6 +471,43 @@ export default function BlogPolishPage() {
     e.target.value = '';
   };
 
+  // Handle camera capture
+  const handleCameraCapture = async (imageData: string) => {
+    setShowCamera(false);
+    vibrate([50, 30, 50]);
+    
+    // Convert base64 to blob and upload
+    try {
+      const response = await fetch(imageData);
+      const blob = await response.blob();
+      const file = new File([blob], `camera-${Date.now()}.jpg`, { type: 'image/jpeg' });
+      
+      // Upload to cloud storage
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('folder', 'blog-posts');
+      
+      const uploadResponse = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      const data = await uploadResponse.json();
+      
+      if (uploadResponse.ok && data.url) {
+        setImagePreviews(prev => [...prev, data.url]);
+        setPost(prev => ({ ...prev, images: [...prev.images, data.url] }));
+        setMessage({ type: 'success', text: '📸 Photo captured and uploaded!' });
+        sendNotification('Photo Uploaded!', { body: 'Your camera photo has been added to the blog.' });
+      } else {
+        setMessage({ type: 'error', text: 'Failed to upload photo' });
+      }
+    } catch (error) {
+      console.error('Camera upload error:', error);
+      setMessage({ type: 'error', text: 'Failed to process photo' });
+    }
+  };
+
   const removeImage = async (index: number) => {
     const imageUrl = imagePreviews[index];
     
