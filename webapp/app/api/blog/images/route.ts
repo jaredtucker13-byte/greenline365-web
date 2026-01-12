@@ -255,6 +255,8 @@ Consider:
 - Emotional impact desired
 - Readability and accessibility
 
+IMPORTANT: Return ONLY valid JSON with NO markdown formatting, NO code blocks, NO backticks. Use only standard double quotes (") for strings.
+
 Return a comprehensive styling suggestion as JSON:
 {
   "themeName": "Descriptive name for this style",
