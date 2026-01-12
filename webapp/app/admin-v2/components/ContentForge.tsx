@@ -723,24 +723,27 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             onClick={(e) => e.stopPropagation()}
-            className="absolute inset-2 md:inset-4 bg-[#0A0A0A] border border-[#39FF14]/20 rounded-2xl overflow-hidden flex flex-col"
+            className="absolute inset-2 md:inset-4 rounded-2xl overflow-hidden flex flex-col"
+            style={{ background: 'var(--theme-bg-primary)', border: '1px solid var(--theme-glass-border)' }}
           >
             {/* Header */}
-            <div className="flex-shrink-0 px-4 py-3 border-b border-[#39FF14]/20 flex items-center justify-between bg-[#0D0D0D]">
+            <div className="flex-shrink-0 px-4 py-3 flex items-center justify-between" style={{ borderBottom: '1px solid var(--theme-glass-border)', background: 'var(--theme-bg-secondary)' }}>
               <div className="flex items-center gap-4">
-                <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                  <span className="text-[#39FF14]">⚡</span> Content Forge
+                <h2 className="text-lg font-bold flex items-center gap-2" style={{ color: 'var(--theme-text-primary)' }}>
+                  <span style={{ color: 'var(--theme-primary)' }}>⚡</span> Content Forge
                 </h2>
-                <div className="flex gap-1 bg-[#1A1A1A] rounded-lg p-1">
+                <div className="flex gap-1 rounded-lg p-1" style={{ background: 'var(--theme-bg-glass)' }}>
                   {(['content', 'hashtags', 'blog'] as const).map((tab) => (
                     <button
                       key={tab}
                       onClick={() => setActiveTab(tab)}
-                      className={`px-3 py-1.5 rounded-md text-xs font-medium transition ${
-                        activeTab === tab
-                          ? 'bg-[#39FF14] text-black'
-                          : 'text-gray-400 hover:text-white'
-                      }`}
+                      className="px-3 py-1.5 rounded-md text-xs font-medium transition"
+                      style={activeTab === tab ? {
+                        background: 'var(--theme-primary)',
+                        color: '#000',
+                      } : {
+                        color: 'var(--theme-text-muted)',
+                      }}
                     >
                       {tab === 'content' ? '📸 Content' : tab === 'hashtags' ? '#️⃣ Hashtags' : '📝 Blog'}
                     </button>
@@ -751,23 +754,28 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                 {/* AI Assistant Toggle */}
                 <button
                   onClick={() => setShowAssistant(!showAssistant)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 ${
-                    showAssistant
-                      ? 'bg-[#8A2BE2] text-white'
-                      : 'bg-[#1A1A1A] border border-[#2D3748] text-gray-400 hover:text-[#8A2BE2] hover:border-[#8A2BE2]/50'
-                  }`}
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5"
+                  style={showAssistant ? {
+                    background: '#8A2BE2',
+                    color: '#fff',
+                  } : {
+                    background: 'var(--theme-bg-glass)',
+                    border: '1px solid var(--theme-glass-border)',
+                    color: 'var(--theme-text-muted)',
+                  }}
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
                   {showAssistant ? 'Hide Assistant' : 'AI Assistant'}
                 </button>
-                <span className="text-xs text-gray-400">
+                <span className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>
                   {scheduledDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
                 </span>
                 <button
                   onClick={onClose}
-                  className="w-8 h-8 rounded-lg bg-[#1A1A1A] border border-[#2D3748] hover:border-red-500/50 hover:bg-red-500/10 flex items-center justify-center text-gray-400 hover:text-red-400 transition"
+                  className="w-8 h-8 rounded-lg flex items-center justify-center transition hover:bg-red-500/10"
+                  style={{ background: 'var(--theme-bg-glass)', border: '1px solid var(--theme-glass-border)', color: 'var(--theme-text-muted)' }}
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -779,7 +787,7 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
             {/* Main Content - Three Column Layout with AI Assistant */}
             <div className="flex-1 flex overflow-hidden">
               {/* Left Panel - Form */}
-              <div className={`flex-1 overflow-y-auto p-4 border-r border-[#1E262E] transition-all ${showAssistant ? 'max-w-[50%]' : ''}`}>
+              <div className={`flex-1 overflow-y-auto p-4 transition-all ${showAssistant ? 'max-w-[50%]' : ''}`} style={{ borderRight: '1px solid var(--theme-glass-border)' }}>
                 
                 {activeTab === 'content' && (
                   <div className="grid grid-cols-2 gap-4">
@@ -787,17 +795,22 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                     <div className="space-y-4">
                       {/* Content Type */}
                       <div>
-                        <label className="block text-xs font-medium text-gray-400 mb-2">Content Type</label>
+                        <label className="block text-xs font-medium mb-2" style={{ color: 'var(--theme-text-muted)' }}>Content Type</label>
                         <div className="flex gap-2">
                           {(['photo', 'product', 'blog'] as const).map((type) => (
                             <button
                               key={type}
                               onClick={() => setContentType(type)}
-                              className={`flex-1 py-2 px-2 rounded-lg border text-xs font-medium transition ${
-                                contentType === type
-                                  ? 'border-[#39FF14] bg-[#39FF14]/10 text-[#39FF14]'
-                                  : 'border-[#2D3748] bg-[#1A1A1A] text-gray-400 hover:border-gray-600'
-                              }`}
+                              className="flex-1 py-2 px-2 rounded-lg border text-xs font-medium transition"
+                              style={contentType === type ? {
+                                border: '1px solid var(--theme-primary)',
+                                background: 'color-mix(in srgb, var(--theme-primary) 10%, transparent)',
+                                color: 'var(--theme-primary)',
+                              } : {
+                                border: '1px solid var(--theme-glass-border)',
+                                background: 'var(--theme-bg-glass)',
+                                color: 'var(--theme-text-muted)',
+                              }}
                             >
                               {type === 'photo' ? '📸 Photo' : type === 'product' ? '🛍️ Product' : '📝 Blog'}
                             </button>
