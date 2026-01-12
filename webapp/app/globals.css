@@ -424,3 +424,67 @@ textarea:focus {
   aspect-ratio: 16 / 9;
   object-fit: cover;
 }
+
+/* Fix select dropdown options for dark theme */
+select option {
+  background-color: #1a1a2e;
+  color: #ffffff;
+  padding: 8px 12px;
+}
+
+select option:hover,
+select option:focus,
+select option:checked {
+  background-color: #2d2d44;
+  color: #ffffff;
+}
+
+/* Ensure select text is visible */
+select {
+  color-scheme: dark;
+}
+
+/* Full-screen modal backdrop */
+.fullscreen-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(8px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Full-screen modal content */
+.fullscreen-modal-content {
+  width: 95vw;
+  height: 90vh;
+  background: rgba(20, 20, 30, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Expand button */
+.expand-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 6px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 6px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.expand-btn:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+*:hover > .expand-btn {
+  opacity: 1;
+}
