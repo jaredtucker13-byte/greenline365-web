@@ -893,23 +893,27 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                               onDragLeave={handleDragLeave}
                               onDrop={handleDrop}
                               onClick={() => fileInputRef.current?.click()}
-                              className={`aspect-video rounded-lg border-2 border-dashed flex items-center justify-center cursor-pointer transition ${
-                                isDragging ? 'border-[#39FF14] bg-[#39FF14]/5' : 'border-[#2D3748] hover:border-[#39FF14]/50'
-                              }`}
+                              className="aspect-video rounded-lg border-2 border-dashed flex items-center justify-center cursor-pointer transition"
+                              style={isDragging ? {
+                                borderColor: 'var(--theme-primary)',
+                                background: 'color-mix(in srgb, var(--theme-primary) 5%, transparent)',
+                              } : {
+                                borderColor: 'var(--theme-glass-border)',
+                              }}
                             >
                               <input ref={fileInputRef} type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0])} className="hidden" />
                               {isUploading ? (
                                 <div className="text-center">
-                                  <div className="text-sm text-gray-400">Uploading... {uploadProgress}%</div>
+                                  <div className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>Uploading... {uploadProgress}%</div>
                                 </div>
                               ) : (
                                 <div className="text-center">
                                   <span className="text-3xl">📤</span>
-                                  <p className="text-xs text-gray-400 mt-2">Click or drag to upload</p>
+                                  <p className="text-xs mt-2" style={{ color: 'var(--theme-text-muted)' }}>Click or drag to upload</p>
                                   {autoAnalyzeEnabled ? (
-                                    <p className="text-xs text-[#8A2BE2] mt-1">🤖 AI will auto-analyze</p>
+                                    <p className="text-xs mt-1" style={{ color: 'var(--theme-primary)' }}>🤖 AI will auto-analyze</p>
                                   ) : (
-                                    <p className="text-xs text-gray-500 mt-1">✍️ Manual mode - you write the content</p>
+                                    <p className="text-xs mt-1" style={{ color: 'var(--theme-text-muted)' }}>✍️ Manual mode - you write the content</p>
                                   )}
                                 </div>
                               )}
@@ -920,54 +924,56 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
 
                       {/* Title */}
                       <div>
-                        <label className="block text-xs font-medium text-gray-400 mb-2">Title / Campaign Name</label>
+                        <label className="block text-xs font-medium mb-2" style={{ color: 'var(--theme-text-muted)' }}>Title / Campaign Name</label>
                         <input
                           type="text"
                           value={title}
                           onChange={(e) => setTitle(e.target.value)}
                           placeholder="Enter a title..."
-                          className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm placeholder:text-gray-500 focus:border-[#39FF14]/50 outline-none"
+                          className="w-full px-3 py-2 rounded-lg text-sm outline-none transition"
+                          style={{ background: 'var(--theme-bg-glass)', border: '1px solid var(--theme-glass-border)', color: 'var(--theme-text-primary)' }}
                         />
                       </div>
 
                       {/* Scheduling Section */}
-                      <div className="p-3 rounded-lg bg-[#0D0D0D] border border-[#2D3748]">
-                        <label className="block text-xs font-medium text-gray-400 mb-3">📅 Schedule</label>
+                      <div className="p-3 rounded-lg" style={{ background: 'var(--theme-bg-secondary)', border: '1px solid var(--theme-glass-border)' }}>
+                        <label className="block text-xs font-medium mb-3" style={{ color: 'var(--theme-text-muted)' }}>📅 Schedule</label>
                         
                         <div className="grid grid-cols-2 gap-3">
                           {/* Date Picker */}
                           <div className="relative" ref={calendarRef}>
                             <button
                               onClick={() => setShowCalendar(!showCalendar)}
-                              className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-xs text-left hover:border-[#39FF14]/50 transition flex items-center justify-between"
+                              className="w-full px-3 py-2 rounded-lg text-xs text-left transition flex items-center justify-between"
+                              style={{ background: 'var(--theme-bg-glass)', border: '1px solid var(--theme-glass-border)', color: 'var(--theme-text-primary)' }}
                             >
                               <span>{scheduledDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                              <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <svg className="w-4 h-4" style={{ color: 'var(--theme-text-muted)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                               </svg>
                             </button>
                             
                             {showCalendar && (
-                              <div className="absolute top-full left-0 mt-2 z-50 bg-[#1A1A1A] border border-[#39FF14]/30 rounded-lg shadow-xl">
+                              <div className="absolute top-full left-0 mt-2 z-50 rounded-lg shadow-xl" style={{ background: 'var(--theme-bg-secondary)', border: '1px solid var(--theme-glass-border)' }}>
                                 <style>{`
                                   .rdp {
                                     --rdp-cell-size: 32px;
-                                    --rdp-accent-color: #39FF14;
-                                    --rdp-background-color: #39FF14;
+                                    --rdp-accent-color: var(--theme-primary);
+                                    --rdp-background-color: var(--theme-primary);
                                     margin: 0;
                                     padding: 12px;
                                   }
                                   .rdp-months { background: transparent; }
                                   .rdp-month { background: transparent; }
-                                  .rdp-caption { color: white; font-size: 12px; }
-                                  .rdp-head_cell { color: #6B7280; font-size: 10px; }
-                                  .rdp-cell { color: white; }
-                                  .rdp-day { color: white; font-size: 11px; border-radius: 6px; }
-                                  .rdp-day:hover { background: #39FF14/20; }
-                                  .rdp-day_selected { background: #39FF14 !important; color: black !important; }
-                                  .rdp-day_today { border: 1px solid #39FF14; }
-                                  .rdp-nav_button { color: #39FF14; }
-                                  .rdp-nav_button:hover { background: #39FF14/20; }
+                                  .rdp-caption { color: var(--theme-text-primary); font-size: 12px; }
+                                  .rdp-head_cell { color: var(--theme-text-muted); font-size: 10px; }
+                                  .rdp-cell { color: var(--theme-text-primary); }
+                                  .rdp-day { color: var(--theme-text-primary); font-size: 11px; border-radius: 6px; }
+                                  .rdp-day:hover { background: color-mix(in srgb, var(--theme-primary) 20%, transparent); }
+                                  .rdp-day_selected { background: var(--theme-primary) !important; color: black !important; }
+                                  .rdp-day_today { border: 1px solid var(--theme-primary); }
+                                  .rdp-nav_button { color: var(--theme-primary); }
+                                  .rdp-nav_button:hover { background: color-mix(in srgb, var(--theme-primary) 20%, transparent); }
                                 `}</style>
                                 <DayPicker
                                   mode="single"
