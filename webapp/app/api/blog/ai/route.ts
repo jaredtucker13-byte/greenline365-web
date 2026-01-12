@@ -103,7 +103,7 @@ Return as JSON: {"suggestions": [...], "priority": "high/medium/low", "estimated
 export async function POST(request: NextRequest) {
   try {
     const body: AIRequest = await request.json();
-    const { action, title, content, category, keywords } = body;
+    const { action, title, content, category, keywords, customPrompt } = body;
 
     if (!action) {
       return NextResponse.json(
@@ -113,11 +113,26 @@ export async function POST(request: NextRequest) {
     }
 
     const model = getModel(action);
-    const systemPrompt = getSystemPrompt(action);
+    let systemPrompt = getSystemPrompt(action);
 
     // Build user message based on action
     let userMessage = '';
     switch (action) {
+      case 'custom_generate':
+        if (!customPrompt) {
+          return NextResponse.json({ error: 'Custom prompt is required' }, { status: 400 });
+        }
+        systemPrompt = `You are a professional blog content writer. Create engaging, well-structured content based on the user's prompt. 
+Write in a professional yet approachable tone. Use markdown formatting with proper headings, bullet points, and paragraphs.
+Focus on providing valuable, actionable information that readers can use.
+${category ? `The content is for the ${category} category.` : ''}
+${title ? `The blog title context is: "${title}"` : ''}`;
+        userMessage = customPrompt;
+        if (content) {
+          userMessage += `\n\nExisting content context:\n${content.substring(0, 500)}...`;
+        }
+        break;
+
       case 'generate_outline':
         if (!title) {
           return NextResponse.json({ error: 'Title is required for outline generation' }, { status: 400 });
