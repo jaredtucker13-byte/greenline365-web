@@ -1896,11 +1896,10 @@ export default function BlogPolishPage() {
               )}
             </div>
 
-            {/* Category & Tags */}
+            {/* Category Selection Only - Tags moved to sidebar */}
             <div className="backdrop-blur-2xl bg-white/[0.08] rounded-2xl border border-white/[0.15] p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]">
-              <div className="grid md:grid-cols-2 gap-6">
-                {/* Category */}
-                <div>
+              <div className="flex items-center gap-4">
+                <div className="flex-1">
                   <label className="text-white/60 text-sm mb-2 block font-medium">Category</label>
                   <select
                     value={post.category}
@@ -1914,39 +1913,10 @@ export default function BlogPolishPage() {
                     ))}
                   </select>
                 </div>
-
-                {/* Tags */}
-                <div>
-                  <label className="text-white/60 text-sm mb-2 block font-medium">Tags</label>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={tagInput}
-                      onChange={(e) => setTagInput(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
-                      placeholder="Add a tag..."
-                      className="flex-1 bg-white/[0.05] border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:border-[#84A98C]/50 focus:outline-none transition"
-                    />
-                    <button
-                      onClick={addTag}
-                      className="px-4 py-3 bg-[#84A98C]/20 border border-[#84A98C]/30 rounded-xl text-[#A7C957] hover:bg-[#84A98C]/30 transition"
-                    >
-                      Add
-                    </button>
-                  </div>
-                  {post.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-3">
-                      {post.tags.map(tag => (
-                        <span
-                          key={tag}
-                          className="px-3 py-1 bg-white/[0.08] border border-white/10 rounded-full text-white/70 text-sm flex items-center gap-2"
-                        >
-                          #{tag}
-                          <button onClick={() => removeTag(tag)} className="text-white/40 hover:text-white">×</button>
-                        </span>
-                      ))}
-                    </div>
-                  )}
+                <div className="flex items-center gap-2 pt-6">
+                  <span className="text-white/40 text-sm">Tags: {post.tags.length}</span>
+                  <span className="text-white/40 text-sm">|</span>
+                  <span className="text-white/40 text-sm">Images: {imagePreviews.length}/5</span>
                 </div>
               </div>
             </div>
