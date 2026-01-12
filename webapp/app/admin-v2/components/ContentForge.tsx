@@ -1367,7 +1367,7 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                         </button>
 
                         {/* Quick tips */}
-                        <div className="text-[10px] text-gray-500">
+                        <div className="text-[10px]" style={{ color: 'var(--theme-text-muted)' }}>
                           💡 Tip: Use the AI Assistant for brainstorming topics and outlines
                         </div>
                       </div>
@@ -1376,15 +1376,15 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                     {/* Blog Content Editor */}
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <label className="block text-xs font-medium text-gray-400">Blog Content</label>
-                        <div className="flex items-center gap-3 text-xs text-gray-500">
+                        <label className="block text-xs font-medium" style={{ color: 'var(--theme-text-muted)' }}>Blog Content</label>
+                        <div className="flex items-center gap-3 text-xs" style={{ color: 'var(--theme-text-muted)' }}>
                           <span>{blogBody.split(/\s+/).filter(w => w).length} words</span>
                           <span>~{Math.ceil(blogBody.split(/\s+/).filter(w => w).length / 200)} min read</span>
                         </div>
                       </div>
                       
                       {/* Formatting Toolbar */}
-                      <div className="flex gap-1 p-1 rounded-lg bg-[#1A1A1A] border border-[#2D3748]">
+                      <div className="flex gap-1 p-1 rounded-lg" style={{ background: 'var(--theme-bg-glass)', border: '1px solid var(--theme-glass-border)' }}>
                         {[
                           { icon: 'H1', action: () => setBlogBody(prev => `## ${prev}`) },
                           { icon: 'H2', action: () => setBlogBody(prev => `### ${prev}`) },
@@ -1398,13 +1398,14 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                           <button
                             key={i}
                             onClick={tool.action}
-                            className={`px-2 py-1 rounded text-xs hover:bg-[#2D3748] transition ${tool.bold ? 'font-bold' : ''} ${tool.italic ? 'italic' : ''} text-gray-400 hover:text-white`}
+                            className={`px-2 py-1 rounded text-xs transition ${tool.bold ? 'font-bold' : ''} ${tool.italic ? 'italic' : ''}`}
+                            style={{ color: 'var(--theme-text-muted)' }}
                           >
                             {tool.icon}
                           </button>
                         ))}
                         <div className="flex-1" />
-                        <span className="text-[10px] text-gray-600 px-2 py-1">Markdown supported</span>
+                        <span className="text-[10px] px-2 py-1" style={{ color: 'var(--theme-text-muted)' }}>Markdown supported</span>
                       </div>
 
                       <textarea
