@@ -221,3 +221,118 @@ async function generateImages(body: GenerateRequest) {
     images: [],
   });
 }
+
+async function analyzePageStyle(body: StyleAnalyzeRequest) {
+  const { title, content, category } = body;
+
+  if (!title || !content) {
+    return NextResponse.json(
+      { error: 'Title and content are required' },
+      { status: 400 }
+    );
+  }
+
+  // Use AI to analyze content and suggest page styling
+  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+      'Content-Type': 'application/json',
+      'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com',
+      'X-Title': 'GreenLine365 Blog Styling',
+    },
+    body: JSON.stringify({
+      model: 'openai/gpt-4o',
+      messages: [
+        {
+          role: 'system',
+          content: `You are an expert web designer and brand strategist. Analyze blog content and suggest a complete page styling theme that enhances the content's message and emotional impact.
+
+Consider:
+- Content tone (professional, casual, urgent, educational, inspiring)
+- Target audience
+- Industry/topic context
+- Emotional impact desired
+- Readability and accessibility
+
+Return a comprehensive styling suggestion as JSON:
+{
+  "themeName": "Descriptive name for this style",
+  "description": "Brief explanation of why this style fits the content",
+  "colors": {
+    "primary": "#hex - main accent color",
+    "secondary": "#hex - supporting color",
+    "accent": "#hex - highlight/CTA color",
+    "background": "#hex - page background",
+    "backgroundGradient": "CSS gradient string or null",
+    "text": "#hex - main text color",
+    "textMuted": "#hex - secondary text",
+    "headings": "#hex - heading color",
+    "links": "#hex - link color"
+  },
+  "texture": {
+    "type": "none|grain|dots|lines|geometric|organic",
+    "opacity": 0.0-1.0,
+    "description": "What texture adds to the design"
+  },
+  "typography": {
+    "headingStyle": "bold|light|italic|uppercase",
+    "headingSize": "large|medium|compact",
+    "bodyLineHeight": "relaxed|normal|tight",
+    "emphasis": "How to style key points"
+  },
+  "layout": {
+    "contentWidth": "narrow|medium|wide",
+    "imageStyle": "rounded|sharp|polaroid|shadow",
+    "spacing": "airy|balanced|compact",
+    "headerStyle": "minimal|bold|gradient|image"
+  },
+  "mood": "The overall feeling this design creates"
+}`
+        },
+        {
+          role: 'user',
+          content: `Analyze this blog post and suggest the perfect page styling:
+
+Title: ${title}
+Category: ${category || 'General'}
+
+Content:
+${content.slice(0, 2000)}${content.length > 2000 ? '...' : ''}`
+        }
+      ],
+      temperature: 0.7,
+      max_tokens: 1000,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    console.error('[Blog Style] OpenRouter error:', error);
+    return NextResponse.json({ error: 'Style analysis failed' }, { status: 500 });
+  }
+
+  const data = await response.json();
+  const aiResponse = data.choices?.[0]?.message?.content || '{}';
+
+  // Parse JSON response
+  try {
+    const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      const styleGuide = JSON.parse(jsonMatch[0]);
+      return NextResponse.json({ 
+        success: true,
+        styleGuide,
+        raw: aiResponse,
+      });
+    }
+  } catch (e) {
+    console.error('[Blog Style] JSON parse error:', e);
+  }
+
+  return NextResponse.json({ 
+    success: false,
+    error: 'Could not parse style suggestions',
+    raw: aiResponse,
+  });
+}
