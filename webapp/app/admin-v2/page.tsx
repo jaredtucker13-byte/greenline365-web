@@ -239,7 +239,7 @@ export default function TacticalCommandCenter() {
       />
 
       {/* Main Content */}
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 relative z-10">
         {/* Header */}
         <TacticalHeader
           title="COMMAND CENTER"
@@ -252,7 +252,7 @@ export default function TacticalCommandCenter() {
         />
 
         {/* Main Grid */}
-        <main className="p-6 space-y-6">
+        <main className="p-8 space-y-8">
           {/* Top Row: Calendar + Real-Time Trends */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Calendar - 2/3 width */}
