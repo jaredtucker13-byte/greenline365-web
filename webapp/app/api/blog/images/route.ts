@@ -233,11 +233,6 @@ async function analyzePageStyle(body: StyleAnalyzeRequest) {
     );
   }
 
-  // Build mood instruction if provided
-  const moodInstruction = moodHint 
-    ? `\n\nIMPORTANT: Create a style that feels ${moodHint}. Use colors, typography, and textures that convey this mood strongly.`
-    : '';
-
   // Use AI to analyze content and suggest page styling
   const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
