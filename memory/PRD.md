@@ -5,7 +5,7 @@ Build a comprehensive marketing OS for local businesses called "GreenLine365".
 
 ## What's Been Implemented
 
-### January 2026 - Session 10 (Living Canvas Phase 1)
+### January 2026 - Session 10 (Living Canvas Phase 1 + Memory Bucket System)
 - ✅ **Living Canvas Component Library**: Complete component system for dynamic, templated layouts
 - ✅ **CSS Shapes System**: 25+ shape presets (L-shapes, circles, hexagons, organic blobs) for text wrapping
 - ✅ **Color Extraction Engine**: Auto-extracts palette from images, applies as CSS custom properties
@@ -18,6 +18,15 @@ Build a comprehensive marketing OS for local businesses called "GreenLine365".
 - ✅ **Frame Assets Table**: Stores photorealistic frame definitions (wood, metal, museum, shadow-box, minimal)
 - ✅ **"Visual Director" Agent**: Upgraded analyzer to know ALL Living Canvas options (shapes, modes, templates, frames)
 - ✅ **AI Gold Rush Memory**: Created `/app/memory/THE_AI_GOLD_RUSH.md` documenting this historical moment
+
+**Dynamic Memory Bucket System** (The "Brain" of GreenLine365):
+- ✅ **Layer 1: Core** - `memory_core_profiles` table - User identity, brand voice, personality, biography
+- ✅ **Layer 2: Warehouse** - `memory_knowledge_chunks` table - RAG knowledge base with pgvector for semantic search
+- ✅ **Layer 3: Journal** - `memory_event_journal` table - Timeline of all events (blogs, leads, SMS, images)
+- ✅ **Layer 4: Buffer** - `memory_context_buffer` table - Real-time conversation/task context (24hr TTL)
+- ✅ **Priority Fetch Order**: Buffer → Core → Warehouse → Journal (prevents hallucinations)
+- ✅ **TypeScript Service**: `/app/webapp/lib/memory-bucket-service.ts` - Complete API for all 4 layers
+- ✅ **Architecture Doc**: `/app/memory/DYNAMIC_MEMORY_BUCKET_SYSTEM.md` - Full system documentation
 
 ### January 2026 - Session 9 (Advanced Image Generation & Preview)
 - ✅ **Enriched Cinematic Prompts**: Backend now generates detailed artistic prompts with lighting, composition, camera angles - user sees clean description, API gets full artistic direction
