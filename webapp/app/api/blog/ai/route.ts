@@ -11,6 +11,7 @@ import { NextRequest, NextResponse } from 'next/server';
 type AIAction = 
   | 'generate_outline'
   | 'enhance_content'
+  | 'enhance_content_with_title'
   | 'generate_meta'
   | 'suggest_headlines'
   | 'suggest_tags'
