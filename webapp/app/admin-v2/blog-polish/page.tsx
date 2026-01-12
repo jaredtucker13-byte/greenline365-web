@@ -1427,7 +1427,7 @@ export default function BlogPolishPage() {
         <div className="max-w-7xl mx-auto grid lg:grid-cols-3 gap-6">
           
           {/* Editor Panel (2/3) */}
-          <div className="lg:col-span-2 space-y-6">
+          <div ref={editorRef} className="lg:col-span-2 space-y-6">
             
             {/* Title */}
             <div className="backdrop-blur-2xl bg-white/[0.08] rounded-2xl border border-white/[0.15] p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]">
