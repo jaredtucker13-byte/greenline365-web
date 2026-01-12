@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { title, content, category, tags, images, status, scheduled_for, tenant_id } = body;
+    const { title, content, category, tags, images, status, scheduled_for, tenant_id, style_guide } = body;
     
     if (!title || !content) {
       return NextResponse.json({ error: 'Title and content are required' }, { status: 400 });
@@ -111,6 +111,7 @@ export async function POST(request: NextRequest) {
         scheduled_for: scheduled_for || null,
         published_at: status === 'published' ? new Date().toISOString() : null,
         seo_score: seoAnalysis.score,
+        style_guide: style_guide || null,
       })
       .select()
       .single();
