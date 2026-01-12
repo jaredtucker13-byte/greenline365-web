@@ -993,7 +993,8 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                           <div className="relative" ref={timePickerRef}>
                             <button
                               onClick={() => setShowTimePicker(!showTimePicker)}
-                              className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-xs text-left hover:border-[#39FF14]/50 transition flex items-center justify-between"
+                              className="w-full px-3 py-2 rounded-lg text-xs text-left transition flex items-center justify-between"
+                              style={{ background: 'var(--theme-bg-glass)', border: '1px solid var(--theme-glass-border)', color: 'var(--theme-text-primary)' }}
                             >
                               <span>{scheduledTime.replace(/^(\d{2}):(\d{2})$/, (_, h, m) => {
                                 const hour = parseInt(h);
@@ -1001,13 +1002,13 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                                 const hour12 = hour % 12 || 12;
                                 return `${hour12}:${m} ${ampm}`;
                               })}</span>
-                              <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <svg className="w-4 h-4" style={{ color: 'var(--theme-text-muted)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                               </svg>
                             </button>
                             
                             {showTimePicker && (
-                              <div className="absolute top-full left-0 right-0 mt-2 z-50 bg-[#1A1A1A] border border-[#39FF14]/30 rounded-lg shadow-xl max-h-48 overflow-y-auto">
+                              <div className="absolute top-full left-0 right-0 mt-2 z-50 rounded-lg shadow-xl max-h-48 overflow-y-auto" style={{ background: 'var(--theme-bg-secondary)', border: '1px solid var(--theme-glass-border)' }}>
                                 {/* Generate time options */}
                                 {Array.from({ length: 24 }, (_, h) => {
                                   const times = ['00', '30'].map(m => {
@@ -1027,9 +1028,13 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                                       setScheduledTime(value);
                                       setShowTimePicker(false);
                                     }}
-                                    className={`w-full px-3 py-2 text-left text-xs hover:bg-[#39FF14]/10 transition ${
-                                      scheduledTime === value ? 'bg-[#39FF14]/20 text-[#39FF14]' : 'text-white'
-                                    }`}
+                                    className="w-full px-3 py-2 text-left text-xs transition"
+                                    style={scheduledTime === value ? {
+                                      background: 'color-mix(in srgb, var(--theme-primary) 20%, transparent)',
+                                      color: 'var(--theme-primary)',
+                                    } : {
+                                      color: 'var(--theme-text-primary)',
+                                    }}
                                   >
                                     {label}
                                   </button>
@@ -1041,19 +1046,22 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
 
                         {/* Platform Selection */}
                         <div className="mt-3">
-                          <label className="block text-xs text-gray-500 mb-2">Platforms</label>
+                          <label className="block text-xs mb-2" style={{ color: 'var(--theme-text-muted)' }}>Platforms</label>
                           <div className="flex gap-2">
                             {(['instagram', 'twitter', 'facebook'] as const).map((platform) => (
                               <button
                                 key={platform}
                                 onClick={() => togglePlatform(platform)}
-                                className={`flex-1 py-1.5 rounded-lg border text-xs font-medium transition ${
-                                  platforms.includes(platform)
-                                    ? platform === 'instagram' ? 'border-[#E4405F] bg-[#E4405F]/20 text-white'
-                                    : platform === 'twitter' ? 'border-white bg-white/20 text-white'
-                                    : 'border-[#1877F2] bg-[#1877F2]/20 text-white'
-                                    : 'border-[#2D3748] bg-[#1A1A1A] text-gray-500'
-                                }`}
+                                className="flex-1 py-1.5 rounded-lg border text-xs font-medium transition"
+                                style={platforms.includes(platform) ? {
+                                  border: platform === 'instagram' ? '1px solid #E4405F' : platform === 'twitter' ? '1px solid var(--theme-text-primary)' : '1px solid #1877F2',
+                                  background: platform === 'instagram' ? 'rgba(228, 64, 95, 0.2)' : platform === 'twitter' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(24, 119, 242, 0.2)',
+                                  color: 'var(--theme-text-primary)',
+                                } : {
+                                  border: '1px solid var(--theme-glass-border)',
+                                  background: 'var(--theme-bg-glass)',
+                                  color: 'var(--theme-text-muted)',
+                                }}
                               >
                                 {platform === 'instagram' ? 'IG' : platform === 'twitter' ? 'X' : 'FB'}
                               </button>
@@ -1066,7 +1074,7 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                     {/* Right Column - AI Generation */}
                     <div className="space-y-4">
                       {/* AI Caption Generator */}
-                      <div className="p-3 rounded-lg bg-[#0D0D0D] border border-[#2D3748]">
+                      <div className="p-3 rounded-lg" style={{ background: 'var(--theme-bg-secondary)', border: '1px solid var(--theme-glass-border)' }}>
                         <div className="flex items-center justify-between mb-2">
                           <label className="text-xs font-medium text-gray-400 flex items-center">
                             AI Caption
