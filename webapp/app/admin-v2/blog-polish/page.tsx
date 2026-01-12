@@ -824,12 +824,19 @@ export default function BlogPolishPage() {
                   {analyzingImages ? '⏳' : '🖼️'} Images
                 </button>
                 <button
-                  onClick={analyzePageStyle}
+                  onClick={() => analyzePageStyle()}
                   disabled={analyzingStyle || post.content.length < 100}
                   className="px-3 py-1.5 rounded-lg text-xs font-medium transition bg-pink-500/20 border border-pink-500/30 text-pink-300 hover:bg-pink-500/30 disabled:opacity-50"
                   title="Suggest page colors, textures & styling"
                 >
                   {analyzingStyle ? '⏳' : '🎨'} Style
+                </button>
+                <button
+                  onClick={() => setShowStyleLibrary(true)}
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium transition bg-gradient-to-r from-amber-500/20 to-pink-500/20 border border-amber-500/30 text-amber-200 hover:from-amber-500/30 hover:to-pink-500/30"
+                  title="Browse and apply saved styles"
+                >
+                  ❤️ My Library
                 </button>
               </div>
             </div>
