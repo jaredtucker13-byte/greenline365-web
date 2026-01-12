@@ -12,7 +12,7 @@ import json
 import os
 
 # Use localhost for testing since external URL has routing issues
-BASE_URL = os.environ.get('base_url', 'http://localhost:3000')
+BASE_URL = 'http://localhost:3000'
 
 class TestDoubleBookingPrevention:
     """CRITICAL: Test double-booking prevention - same datetime slot twice"""
