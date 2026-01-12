@@ -261,56 +261,18 @@ Consider:
 - Emotional impact desired
 - Readability and accessibility${moodInstruction}
 
-IMPORTANT: Return ONLY valid JSON with NO markdown formatting, NO code blocks, NO backticks. Use only standard double quotes (") for strings.
+CRITICAL: Return ONLY compact JSON, no extra spaces or newlines. Keep descriptions SHORT (under 50 chars). Return COMPLETE JSON.
 
-Return a comprehensive styling suggestion as JSON:
-{
-  "themeName": "Descriptive name for this style",
-  "description": "Brief explanation of why this style fits the content",
-  "colors": {
-    "primary": "#hex - main accent color",
-    "secondary": "#hex - supporting color",
-    "accent": "#hex - highlight/CTA color",
-    "background": "#hex - page background",
-    "backgroundGradient": "CSS gradient string or null",
-    "text": "#hex - main text color",
-    "textMuted": "#hex - secondary text",
-    "headings": "#hex - heading color",
-    "links": "#hex - link color"
-  },
-  "texture": {
-    "type": "none|grain|dots|lines|geometric|organic",
-    "opacity": 0.0-1.0,
-    "description": "What texture adds to the design"
-  },
-  "typography": {
-    "headingStyle": "bold|light|italic|uppercase",
-    "headingSize": "large|medium|compact",
-    "bodyLineHeight": "relaxed|normal|tight",
-    "emphasis": "How to style key points"
-  },
-  "layout": {
-    "contentWidth": "narrow|medium|wide",
-    "imageStyle": "rounded|sharp|polaroid|shadow",
-    "spacing": "airy|balanced|compact",
-    "headerStyle": "minimal|bold|gradient|image"
-  },
-  "mood": "The overall feeling this design creates"
-}`
+JSON format (keep it compact):
+{"themeName":"name","description":"short desc","colors":{"primary":"#hex","secondary":"#hex","accent":"#hex","background":"#hex","backgroundGradient":null,"text":"#hex","textMuted":"#hex","headings":"#hex","links":"#hex"},"texture":{"type":"none","opacity":0,"description":"short"},"typography":{"headingStyle":"bold","headingSize":"medium","bodyLineHeight":"normal","emphasis":"bold"},"layout":{"contentWidth":"medium","imageStyle":"rounded","spacing":"balanced","headerStyle":"minimal"},"mood":"short mood"}`
         },
         {
           role: 'user',
-          content: `Analyze this blog post and suggest the perfect page styling:
-
-Title: ${title}
-Category: ${category || 'General'}
-
-Content:
-${content.slice(0, 2000)}${content.length > 2000 ? '...' : ''}`
+          content: `Suggest page styling for: "${title}" (${category || 'General'}) - ${content.slice(0, 500)}`
         }
       ],
-      temperature: 0.7,
-      max_tokens: 2000,
+      temperature: 0.6,
+      max_tokens: 800,
     }),
   });
 
