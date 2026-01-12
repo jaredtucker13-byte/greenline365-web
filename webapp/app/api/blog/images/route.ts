@@ -310,7 +310,7 @@ ${content.slice(0, 2000)}${content.length > 2000 ? '...' : ''}`
         }
       ],
       temperature: 0.7,
-      max_tokens: 1500,
+      max_tokens: 2000,
     }),
   });
 
