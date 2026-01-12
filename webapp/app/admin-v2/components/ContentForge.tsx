@@ -1413,16 +1413,17 @@ Start with a hook that grabs attention.
 
 ## Conclusion
 End with a call to action."
-                        className="w-full px-4 py-3 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm placeholder:text-gray-600 focus:border-[#39FF14]/50 outline-none resize-none font-mono leading-relaxed"
+                        className="w-full px-4 py-3 rounded-lg text-sm outline-none resize-none font-mono leading-relaxed"
+                        style={{ background: 'var(--theme-bg-glass)', border: '1px solid var(--theme-glass-border)', color: 'var(--theme-text-primary)' }}
                       />
                     </div>
 
                     {/* Blog Distribution Preview */}
-                    <div className="p-3 rounded-lg bg-[#0D0D0D] border border-[#2D3748]">
-                      <p className="text-xs text-gray-400 mb-2">📤 This blog will be reformatted for:</p>
+                    <div className="p-3 rounded-lg" style={{ background: 'var(--theme-bg-secondary)', border: '1px solid var(--theme-glass-border)' }}>
+                      <p className="text-xs mb-2" style={{ color: 'var(--theme-text-muted)' }}>📤 This blog will be reformatted for:</p>
                       <div className="flex flex-wrap gap-2">
                         {['Full Blog Post', 'Instagram Carousel', 'Twitter Thread', 'LinkedIn Article', 'Email Newsletter'].map(format => (
-                          <span key={format} className="px-2 py-1 rounded-full bg-[#39FF14]/10 text-[#39FF14] text-xs">
+                          <span key={format} className="px-2 py-1 rounded-full text-xs" style={{ background: 'color-mix(in srgb, var(--theme-primary) 10%, transparent)', color: 'var(--theme-primary)' }}>
                             {format}
                           </span>
                         ))}
@@ -1433,29 +1434,29 @@ End with a call to action."
               </div>
 
               {/* Right Panel - Preview */}
-              <div className="w-[320px] bg-[#0D0D0D] p-4 overflow-y-auto">
-                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">📱 Live Preview</h3>
+              <div className="w-[320px] p-4 overflow-y-auto" style={{ background: 'var(--theme-bg-secondary)' }}>
+                <h3 className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--theme-text-muted)' }}>📱 Live Preview</h3>
                 
                 {/* Phone Frame */}
-                <div className="bg-[#1A1A1A] rounded-2xl p-3 border border-[#2D3748] shadow-xl">
+                <div className="rounded-2xl p-3 shadow-xl" style={{ background: 'var(--theme-bg-glass)', border: '1px solid var(--theme-glass-border)' }}>
                   {/* Phone Header */}
                   <div className="flex items-center justify-between mb-2 px-1">
                     <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#39FF14] to-[#0CE293] flex items-center justify-center text-black font-bold text-xs">G</div>
+                      <div className="w-7 h-7 rounded-full flex items-center justify-center text-black font-bold text-xs" style={{ background: 'linear-gradient(to bottom right, var(--theme-primary), var(--theme-secondary))' }}>G</div>
                       <div>
-                        <p className="text-white text-xs font-semibold">GreenLine365</p>
-                        <p className="text-gray-500 text-[10px]">Tampa, FL</p>
+                        <p className="text-xs font-semibold" style={{ color: 'var(--theme-text-primary)' }}>GreenLine365</p>
+                        <p className="text-[10px]" style={{ color: 'var(--theme-text-muted)' }}>Tampa, FL</p>
                       </div>
                     </div>
-                    <span className="text-gray-500">•••</span>
+                    <span style={{ color: 'var(--theme-text-muted)' }}>•••</span>
                   </div>
 
                   {/* Image Preview */}
-                  <div className="aspect-square bg-[#0D0D0D] rounded-lg mb-2 overflow-hidden flex items-center justify-center">
+                  <div className="aspect-square rounded-lg mb-2 overflow-hidden flex items-center justify-center" style={{ background: 'var(--theme-bg-primary)' }}>
                     {imagePreview ? (
                       <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
                     ) : (
-                      <div className="text-center text-gray-600">
+                      <div className="text-center" style={{ color: 'var(--theme-text-muted)' }}>
                         <span className="text-3xl">🖼️</span>
                         <p className="text-xs mt-1">Image Preview</p>
                       </div>
@@ -1472,19 +1473,19 @@ End with a call to action."
 
                   {/* Caption Preview */}
                   <div className="px-1 space-y-1.5">
-                    <p className="text-white text-xs leading-relaxed">
+                    <p className="text-xs leading-relaxed" style={{ color: 'var(--theme-text-primary)' }}>
                       <span className="font-semibold">greenline365</span>{' '}
                       {caption || title || 'Your caption will appear here...'}
                     </p>
                     
                     {/* Hashtags */}
-                    <p className="text-[#39FF14] text-xs">{getAllHashtags()}</p>
+                    <p className="text-xs" style={{ color: 'var(--theme-primary)' }}>{getAllHashtags()}</p>
                     
                     {/* Keywords */}
                     {keywords.length > 0 && (
                       <div className="flex flex-wrap gap-1">
                         {keywords.slice(0, 3).map((kw) => (
-                          <span key={kw} className="px-1.5 py-0.5 rounded bg-[#2D3748] text-gray-400 text-[10px]">{kw}</span>
+                          <span key={kw} className="px-1.5 py-0.5 rounded text-[10px]" style={{ background: 'var(--theme-bg-elevated)', color: 'var(--theme-text-muted)' }}>{kw}</span>
                         ))}
                       </div>
                     )}
