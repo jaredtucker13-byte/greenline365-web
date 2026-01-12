@@ -1,27 +1,39 @@
 # GreenLine365 - Product Requirements Document
 
 ## Original Problem Statement
-Build a comprehensive marketing OS for local businesses called "GreenLine365". The immediate focus is on:
-1. Building an "AI Website Analyzer" tool that can analyze existing websites or generate designs from scratch
-2. Securing the admin dashboard behind Supabase authentication
-3. Using the analyzer to redesign the GreenLine365 landing page
+Build a comprehensive marketing OS for local businesses called "GreenLine365". Key features include:
+1. **AI Website Analyzer** - Tool to analyze existing websites or generate designs from scratch
+2. **Blog Auto-Polish** - AI-powered blog writing and enhancement tool
+3. **Admin Dashboard** - Secured behind Supabase authentication
 
 ## Core Features
 
-### AI Website Analyzer (Premium Feature)
-- **Two Modes:**
-  - Analyze Existing: Screenshot/URL → AI Analysis → Mockup → Code
-  - Build From Scratch: Description → Design → Mockup → Code
-- **AI Models Used:**
-  - Vision Analysis: Gemini 3 Pro, Gemini 2.0 Pro, GPT-4o
-  - Mockup Generation: Nano Banana Pro
-  - Code Generation: Claude Opus 4.5
-- **Human-in-the-Loop:** Users review and approve designs before code generation
-
-### Authentication System
-- Supabase-based authentication
+### Authentication System ✅
+- Supabase-based SSR authentication using `@supabase/ssr`
 - Protected routes for `/admin-v2/*` and `/admin/*`
 - Email/password and Google OAuth sign-in
+- Middleware-based route protection
+
+### Blog Auto-Polish ✅ (Partially)
+- **Write/Preview Modes** - Toggle between editing and preview
+- **AI Tools:**
+  - 📋 Outline generation
+  - ✨ Content enhancement
+  - 💡 Headline suggestions
+  - 🏷️ Tag suggestions
+  - 🔎 SEO meta generation
+  - 🖼️ Image analysis & generation
+  - 🎨 Style/theme suggestions
+  - 🔍 Trending research (Perplexity)
+- **Custom Prompt Input** - Use AI suggestions to generate new content
+- **Style Library** - Save and reuse design themes
+- **Publishing** - Draft, schedule, or publish directly
+
+### AI Website Analyzer (In Progress)
+- URL screenshot capture using Playwright
+- Multi-model vision analysis (Gemini, GPT-4o)
+- Mockup generation (Nano Banana)
+- Code generation (Claude)
 
 ## Tech Stack
 - **Frontend:** Next.js 16.0.10 (App Router)
@@ -32,51 +44,85 @@ Build a comprehensive marketing OS for local businesses called "GreenLine365". T
 
 ## What's Been Implemented
 
+### January 2026
+- ✅ Fixed Supabase SSR authentication middleware
+- ✅ Fixed select dropdown visibility (dark theme CSS)
+- ✅ Added custom prompt input for AI suggestions
+- ✅ Added "Use This" buttons on AI suggestions
+- ✅ Rewrote image generation to use Python subprocess
+- ✅ Added expand button to AI Suggestions panel
+- ✅ Fixed login button UI
+
 ### December 2025
 - ✅ AI Website Analyzer UI at `/admin-v2/website-analyzer`
-- ✅ URL screenshot capture using Playwright
-- ✅ Multi-model vision analysis API
-- ✅ Mockup generation API (Nano Banana)
-- ✅ Supabase SSR authentication with middleware
-- ✅ Login page with email/password and Google OAuth
-- ✅ Auth callback route for OAuth flow
-
-### January 2026
-- ✅ Fixed authentication middleware (was causing login loop)
-- ✅ Fixed "spawn E2BIG" error in image analysis
-- ✅ Fixed Playwright browser installation
-- ✅ Build passes on Vercel
+- ✅ Blog Auto-Polish UI at `/admin-v2/blog-polish`
+- ✅ Multi-model AI orchestration APIs
+- ✅ Style Library component
 
 ## Pending Database Migration
 - `012_design_proposals.sql` - Table for storing design proposals
 
 ## API Endpoints
+### Blog APIs
+- `POST /api/blog/ai` - AI content generation (outline, enhance, meta, tags, custom)
+- `POST /api/blog/images` - Image analysis and generation
+- `POST /api/blog/trending` - Trending topic research
+- `POST /api/blog/analyze` - SEO analysis
+
+### Website Analyzer APIs
 - `POST /api/capture-screenshot` - Capture website screenshot from URL
-- `POST /api/design-workflow/analyze` - Analyze screenshot or generate design spec
+- `POST /api/design-workflow/analyze` - Analyze screenshot with vision AI
 - `POST /api/design-workflow/generate-mockup` - Generate visual mockup
-- `POST /api/design-workflow/generate-code` - Generate React/Tailwind code
+- `POST /api/design-workflow/generate-code` - Generate React code
 
 ## Known Issues
-- Twilio A2P 10DLC Brand Registration blocked (external issue)
-- Booking widget input text invisible
+- Website Analyzer has Python path issues in deployed environment
+- Twilio A2P 10DLC Brand Registration blocked (external)
 - Retell AI agent "Aiden" paused due to hallucinations
+- AI content can be irrelevant without business context
 
 ## Prioritized Backlog
 
 ### P0 (Critical)
+- Test blog features after logging in
 - Run database migration `012_design_proposals.sql`
-- Test full login flow end-to-end
-- Test AI Website Analyzer with real inputs
 
 ### P1 (High)
-- Implement landing page redesign using analyzer
-- Add role-based access control for premium features
+- Add Brand Profile for AI context
+- Implement full-screen expandable panels
+- Fix Website Analyzer for production deployment
 
 ### P2 (Medium)
-- Refactor large components (`website-analyzer/page.tsx`)
-- Blog analytics dashboard
-- Social media auto-sharing
+- Implement landing page redesign using analyzer
+- Add role-based access control
+- Refactor large components
 
 ### P3 (Future)
-- Resume Retell AI agent development
-- "God Mode" CMS for site administration
+- Blog analytics dashboard
+- Social media auto-sharing
+- Resume Retell AI agent
+- "God Mode" CMS
+
+## File Structure
+```
+/app/webapp/
+├── app/
+│   ├── admin-v2/
+│   │   ├── blog-polish/page.tsx    # Blog writing tool
+│   │   ├── website-analyzer/page.tsx
+│   │   └── components/
+│   ├── api/
+│   │   ├── blog/
+│   │   │   ├── ai/route.ts         # AI content generation
+│   │   │   ├── images/route.ts     # Image generation
+│   │   │   └── trending/route.ts
+│   │   ├── capture-screenshot/route.ts
+│   │   └── design-workflow/
+│   ├── login/page.tsx
+│   └── globals.css                 # Added dark theme select styles
+├── lib/supabase/
+│   ├── client.ts                   # Browser client
+│   ├── server.ts                   # Server client
+│   └── middleware.ts               # Session management
+└── middleware.ts                   # Route protection
+```
