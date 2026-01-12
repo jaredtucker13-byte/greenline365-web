@@ -33,5 +33,5 @@ export function useServiceWorker() {
 
 export function ServiceWorkerProvider({ children }: { children: React.ReactNode }) {
   useServiceWorker();
-  return <>{children}</>;
+  return children;
 }
