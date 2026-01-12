@@ -170,7 +170,10 @@ export function FramedImageContainer({
   const [loaded, setLoaded] = useState(false);
   
   // Determine which frame asset to use based on aspect ratio
-  const frameAsset = frame?.assets?.[aspectRatio] || frame?.assets?.landscape;
+  const validAspectRatios = ['landscape', 'portrait', 'square'] as const;
+  type ValidAspectRatio = typeof validAspectRatios[number];
+  const assetKey: ValidAspectRatio = aspectRatio === 'auto' ? 'landscape' : aspectRatio as ValidAspectRatio;
+  const frameAsset = frame?.assets?.[assetKey] || frame?.assets?.landscape;
   const shadow = frame?.shadowSettings;
 
   const shadowStyle = shadow 
