@@ -2318,33 +2318,54 @@ export default function BlogPolishPage() {
                         </span>
                       )}
                     </div>
-                    <button
-                      onClick={toggleVoiceRecording}
-                      disabled={isTranscribing}
-                      className={`px-4 py-2 rounded-lg font-medium transition flex items-center gap-2 ${
-                        isRecording 
-                          ? 'bg-red-500/20 border border-red-500/50 text-red-400 animate-pulse' 
-                          : 'bg-white/[0.08] border border-white/10 text-white/70 hover:text-white hover:bg-white/[0.15]'
-                      } disabled:opacity-50`}
-                      data-testid="voice-record-btn"
-                    >
-                      {isTranscribing ? (
-                        <>
-                          <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                          </svg>
-                          Transcribing...
-                        </>
-                      ) : isRecording ? (
-                        <>
-                          <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-                          Stop Recording
-                        </>
-                      ) : (
-                        <>🎤 Voice Input</>
-                      )}
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={toggleVoiceRecording}
+                        disabled={isTranscribing}
+                        className={`px-4 py-2 rounded-lg font-medium transition flex items-center gap-2 ${
+                          isRecording 
+                            ? 'bg-red-500/20 border border-red-500/50 text-red-400 animate-pulse' 
+                            : 'bg-white/[0.08] border border-white/10 text-white/70 hover:text-white hover:bg-white/[0.15]'
+                        } disabled:opacity-50`}
+                        data-testid="voice-record-btn"
+                      >
+                        {isTranscribing ? (
+                          <>
+                            <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                            </svg>
+                            Transcribing...
+                          </>
+                        ) : isRecording ? (
+                          <>
+                            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                            Stop
+                          </>
+                        ) : (
+                          <>🎤 Voice</>
+                        )}
+                      </button>
+                      <button
+                        onClick={readContent}
+                        disabled={!post.content || isSpeaking}
+                        className={`px-4 py-2 rounded-lg font-medium transition flex items-center gap-2 ${
+                          isSpeaking 
+                            ? 'bg-green-500/20 border border-green-500/50 text-green-400' 
+                            : 'bg-white/[0.08] border border-white/10 text-white/70 hover:text-white hover:bg-white/[0.15]'
+                        } disabled:opacity-50`}
+                        data-testid="read-aloud-btn"
+                      >
+                        {isSpeaking ? (
+                          <>
+                            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                            Stop
+                          </>
+                        ) : (
+                          <>🔊 Read</>
+                        )}
+                      </button>
+                    </div>
                   </div>
                 </>
               ) : (
