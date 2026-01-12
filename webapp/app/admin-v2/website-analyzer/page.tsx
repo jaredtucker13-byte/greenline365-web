@@ -55,18 +55,15 @@ export default function WebsiteAnalyzerPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
     if (!file.type.startsWith('image/')) {
       setError('Please upload an image file');
       return;
     }
 
-    // Create preview and base64
     const reader = new FileReader();
     reader.onload = (event) => {
       const dataUrl = event.target?.result as string;
       setImagePreview(dataUrl);
-      // Extract base64 from data URL
       const base64 = dataUrl.split(',')[1];
       setImageBase64(base64);
       setError(null);
@@ -74,38 +71,138 @@ export default function WebsiteAnalyzerPage() {
     reader.readAsDataURL(file);
   };
 
-  const analyzeWebsite = async () => {
-    if (!imageBase64) {
+  const startWorkflow = async () => {
+    // Validate inputs based on mode
+    if (mode === 'analyze' && !imageBase64) {
       setError('Please upload a screenshot first');
+      return;
+    }
+    
+    if (mode === 'scratch' && !description.trim()) {
+      setError('Please provide a description of the website you want to build');
       return;
     }
 
     setLoading(true);
     setError(null);
-    setResult(null);
+    setCurrentStep('analyzing');
 
     try {
-      const response = await fetch('/api/analyze-website', {
+      // Step 1: Analyze or Generate Design Spec
+      const response = await fetch('/api/design-workflow/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          imageBase64,
-          analysisType,
+          mode,
+          // Analyze mode data
+          imageBase64: mode === 'analyze' ? imageBase64 : undefined,
+          visionModel: mode === 'analyze' ? visionModel : undefined,
+          analysisType: mode === 'analyze' ? analysisType : undefined,
+          // Scratch mode data
+          description: mode === 'scratch' ? description : undefined,
+          brandColors: mode === 'scratch' ? brandColors : undefined,
+          stylePreference: mode === 'scratch' ? stylePreference : undefined,
+          targetAudience: mode === 'scratch' ? targetAudience : undefined,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        setError(data.error || 'Analysis failed');
+        setLoading(false);
+        setCurrentStep('input');
+        return;
+      }
+
+      // Step 2: Generate Mockup with Nano Banana Pro
+      setCurrentStep('generating');
+      
+      const mockupResponse = await fetch('/api/design-workflow/generate-mockup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          designSpec: data.designSpec,
+          analysisText: data.analysisText,
+        }),
+      });
+
+      const mockupData = await mockupResponse.json();
+
+      if (!mockupData.success) {
+        setError(mockupData.error || 'Mockup generation failed');
+        setLoading(false);
+        setCurrentStep('input');
+        return;
+      }
+
+      // Create proposal object
+      const newProposal: DesignProposal = {
+        id: Date.now().toString(),
+        mode,
+        visionModel: mode === 'analyze' ? visionModel : undefined,
+        analysisText: data.analysisText,
+        designSpec: data.designSpec,
+        mockupImageUrl: mockupData.mockupImageUrl,
+        status: 'pending',
+        timestamp: new Date().toISOString(),
+      };
+
+      setProposal(newProposal);
+      setCurrentStep('preview');
+      setLoading(false);
+
+    } catch (err: any) {
+      setError(err.message || 'Workflow failed');
+      setLoading(false);
+      setCurrentStep('input');
+    }
+  };
+
+  const generateCode = async () => {
+    if (!proposal) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/design-workflow/generate-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          designSpec: proposal.designSpec,
+          analysisText: proposal.analysisText,
         }),
       });
 
       const data = await response.json();
 
       if (data.success) {
-        setResult(data.analysis);
+        setProposal({
+          ...proposal,
+          generatedCode: data.code,
+        });
+        setCurrentStep('code');
       } else {
-        setError(data.error || 'Analysis failed');
+        setError(data.error || 'Code generation failed');
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to analyze website');
+      setError(err.message || 'Code generation failed');
     }
 
     setLoading(false);
+  };
+
+  const resetWorkflow = () => {
+    setCurrentStep('input');
+    setProposal(null);
+    setImagePreview(null);
+    setImageBase64(null);
+    setDescription('');
+    setBrandColors('');
+    setStylePreference('');
+    setTargetAudience('');
+    setError(null);
   };
 
   const formatAnalysis = (text: string) => {
