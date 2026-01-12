@@ -1,60 +1,9 @@
--- Living Canvas Templates Migration
--- Stores reusable layout templates for the Living Canvas publishing system
+-- Living Canvas Templates Migration (FIXED ORDER)
+-- Creates tables in correct dependency order: frames → templates → compositions
 
--- Template definitions table
-CREATE TABLE IF NOT EXISTS living_canvas_templates (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name TEXT NOT NULL,
-  slug TEXT UNIQUE NOT NULL,
-  description TEXT,
-  category TEXT NOT NULL DEFAULT 'general', -- 'general', 'magazine', 'gallery', 'organic', 'framed'
-  
-  -- Template structure (JSON schema)
-  structure JSONB NOT NULL DEFAULT '{}',
-  -- {
-  --   "type": "s-flow" | "gallery-grid" | "drop-cap" | "winding-path" | "feature-block",
-  --   "slots": [
-  --     { "id": "slot-1", "type": "image", "shape": "l-shape" | "circle" | "hexagon" | "organic", "position": {...} },
-  --     { "id": "slot-2", "type": "text", "wrapAround": "slot-1", "position": {...} }
-  --   ],
-  --   "gridConfig": { "columns": 3, "rows": 2, "gap": "20px" },
-  --   "flowDirection": "s-pattern" | "linear" | "radial"
-  -- }
-  
-  -- Visual settings
-  visual_mode TEXT NOT NULL DEFAULT 'organic', -- 'organic' (borderless) or 'framed' (realistic frames)
-  frame_asset_id UUID REFERENCES living_canvas_frames(id),
-  
-  -- CSS Shape definitions for text wrapping
-  css_shapes JSONB DEFAULT '{}',
-  -- {
-  --   "slot-1": {
-  --     "shapeOutside": "polygon(0 0, 100% 0, 100% 50%, 50% 100%, 0 100%)",
-  --     "clipPath": "polygon(...)",
-  --     "float": "left"
-  --   }
-  -- }
-  
-  -- Color extraction settings
-  color_settings JSONB DEFAULT '{}',
-  -- {
-  --   "extractFrom": "primary-image",
-  --   "applyTo": ["background", "typography-accent", "ui-elements"],
-  --   "fallbackPalette": ["#1a1a2e", "#16213e", "#0f3460", "#e94560"]
-  -- }
-  
-  -- Thumbnail preview
-  thumbnail_url TEXT,
-  
-  -- Metadata
-  is_system BOOLEAN DEFAULT false, -- System templates can't be deleted
-  is_public BOOLEAN DEFAULT true,
-  created_by UUID REFERENCES auth.users(id),
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Frame assets for "Mode B" realistic framing
+-- ================================================
+-- STEP 1: Create frame assets table FIRST
+-- ================================================
 CREATE TABLE IF NOT EXISTS living_canvas_frames (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
@@ -83,11 +32,68 @@ CREATE TABLE IF NOT EXISTS living_canvas_frames (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- User's saved canvas compositions
+-- ================================================
+-- STEP 2: Create template definitions table
+-- ================================================
+CREATE TABLE IF NOT EXISTS living_canvas_templates (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  slug TEXT UNIQUE NOT NULL,
+  description TEXT,
+  category TEXT NOT NULL DEFAULT 'general', -- 'general', 'magazine', 'gallery', 'organic', 'framed'
+  
+  -- Template structure (JSON schema)
+  structure JSONB NOT NULL DEFAULT '{}',
+  -- {
+  --   "type": "s-flow" | "gallery-grid" | "drop-cap" | "winding-path" | "feature-block",
+  --   "slots": [
+  --     { "id": "slot-1", "type": "image", "shape": "l-shape" | "circle" | "hexagon" | "organic", "position": {...} },
+  --     { "id": "slot-2", "type": "text", "wrapAround": "slot-1", "position": {...} }
+  --   ],
+  --   "gridConfig": { "columns": 3, "rows": 2, "gap": "20px" },
+  --   "flowDirection": "s-pattern" | "linear" | "radial"
+  -- }
+  
+  -- Visual settings
+  visual_mode TEXT NOT NULL DEFAULT 'organic', -- 'organic' (borderless) or 'framed' (realistic frames)
+  frame_asset_id UUID REFERENCES living_canvas_frames(id) ON DELETE SET NULL,
+  
+  -- CSS Shape definitions for text wrapping
+  css_shapes JSONB DEFAULT '{}',
+  -- {
+  --   "slot-1": {
+  --     "shapeOutside": "polygon(0 0, 100% 0, 100% 50%, 50% 100%, 0 100%)",
+  --     "clipPath": "polygon(...)",
+  --     "float": "left"
+  --   }
+  -- }
+  
+  -- Color extraction settings
+  color_settings JSONB DEFAULT '{}',
+  -- {
+  --   "extractFrom": "primary-image",
+  --   "applyTo": ["background", "typography-accent", "ui-elements"],
+  --   "fallbackPalette": ["#1a1a2e", "#16213e", "#0f3460", "#e94560"]
+  -- }
+  
+  -- Thumbnail preview
+  thumbnail_url TEXT,
+  
+  -- Metadata
+  is_system BOOLEAN DEFAULT false, -- System templates can't be deleted
+  is_public BOOLEAN DEFAULT true,
+  created_by UUID,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ================================================
+-- STEP 3: Create user compositions table
+-- ================================================
 CREATE TABLE IF NOT EXISTS living_canvas_compositions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-  template_id UUID REFERENCES living_canvas_templates(id),
+  user_id UUID,
+  template_id UUID REFERENCES living_canvas_templates(id) ON DELETE SET NULL,
   
   title TEXT NOT NULL,
   slug TEXT,
@@ -112,59 +118,129 @@ CREATE TABLE IF NOT EXISTS living_canvas_compositions (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Indexes
+-- ================================================
+-- STEP 4: Create indexes
+-- ================================================
+CREATE INDEX IF NOT EXISTS idx_frames_style ON living_canvas_frames(style);
 CREATE INDEX IF NOT EXISTS idx_templates_category ON living_canvas_templates(category);
 CREATE INDEX IF NOT EXISTS idx_templates_slug ON living_canvas_templates(slug);
 CREATE INDEX IF NOT EXISTS idx_compositions_user ON living_canvas_compositions(user_id);
 CREATE INDEX IF NOT EXISTS idx_compositions_status ON living_canvas_compositions(status);
 
--- Enable RLS
+-- ================================================
+-- STEP 5: Enable RLS
+-- ================================================
 ALTER TABLE living_canvas_templates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE living_canvas_frames ENABLE ROW LEVEL SECURITY;
 ALTER TABLE living_canvas_compositions ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for templates (public read, admin write)
+DROP POLICY IF EXISTS "Templates are viewable by everyone" ON living_canvas_templates;
 CREATE POLICY "Templates are viewable by everyone" 
   ON living_canvas_templates FOR SELECT 
   USING (is_public = true);
 
+DROP POLICY IF EXISTS "Authenticated users can create templates" ON living_canvas_templates;
 CREATE POLICY "Authenticated users can create templates" 
   ON living_canvas_templates FOR INSERT 
   TO authenticated 
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Users can update own templates" ON living_canvas_templates;
 CREATE POLICY "Users can update own templates" 
   ON living_canvas_templates FOR UPDATE 
   TO authenticated 
   USING (created_by = auth.uid() OR is_system = false);
 
 -- RLS Policies for frames (public read)
+DROP POLICY IF EXISTS "Frames are viewable by everyone" ON living_canvas_frames;
 CREATE POLICY "Frames are viewable by everyone" 
   ON living_canvas_frames FOR SELECT 
   USING (true);
 
 -- RLS Policies for compositions (user-owned)
+DROP POLICY IF EXISTS "Users can view own compositions" ON living_canvas_compositions;
 CREATE POLICY "Users can view own compositions" 
   ON living_canvas_compositions FOR SELECT 
   TO authenticated 
   USING (user_id = auth.uid());
 
+DROP POLICY IF EXISTS "Users can create own compositions" ON living_canvas_compositions;
 CREATE POLICY "Users can create own compositions" 
   ON living_canvas_compositions FOR INSERT 
   TO authenticated 
   WITH CHECK (user_id = auth.uid());
 
+DROP POLICY IF EXISTS "Users can update own compositions" ON living_canvas_compositions;
 CREATE POLICY "Users can update own compositions" 
   ON living_canvas_compositions FOR UPDATE 
   TO authenticated 
   USING (user_id = auth.uid());
 
+DROP POLICY IF EXISTS "Users can delete own compositions" ON living_canvas_compositions;
 CREATE POLICY "Users can delete own compositions" 
   ON living_canvas_compositions FOR DELETE 
   TO authenticated 
   USING (user_id = auth.uid());
 
--- Insert system templates
+-- ================================================
+-- STEP 6: Insert frame assets FIRST
+-- ================================================
+INSERT INTO living_canvas_frames (name, style, assets, shadow_settings) VALUES
+(
+  'Classic Wood',
+  'wood',
+  '{
+    "landscape": {"url": "/frames/wood-landscape.png", "innerBounds": {"top": 24, "right": 24, "bottom": 24, "left": 24}},
+    "portrait": {"url": "/frames/wood-portrait.png", "innerBounds": {"top": 24, "right": 24, "bottom": 24, "left": 24}},
+    "square": {"url": "/frames/wood-square.png", "innerBounds": {"top": 24, "right": 24, "bottom": 24, "left": 24}}
+  }',
+  '{"offsetX": 8, "offsetY": 12, "blur": 24, "spread": 0, "color": "rgba(0,0,0,0.35)"}'
+),
+(
+  'Brushed Metal',
+  'metal',
+  '{
+    "landscape": {"url": "/frames/metal-landscape.png", "innerBounds": {"top": 16, "right": 16, "bottom": 16, "left": 16}},
+    "portrait": {"url": "/frames/metal-portrait.png", "innerBounds": {"top": 16, "right": 16, "bottom": 16, "left": 16}},
+    "square": {"url": "/frames/metal-square.png", "innerBounds": {"top": 16, "right": 16, "bottom": 16, "left": 16}}
+  }',
+  '{"offsetX": 4, "offsetY": 8, "blur": 16, "spread": 0, "color": "rgba(0,0,0,0.25)"}'
+),
+(
+  'Museum Glass',
+  'museum',
+  '{
+    "landscape": {"url": "/frames/museum-landscape.png", "innerBounds": {"top": 40, "right": 40, "bottom": 40, "left": 40}},
+    "portrait": {"url": "/frames/museum-portrait.png", "innerBounds": {"top": 40, "right": 40, "bottom": 40, "left": 40}},
+    "square": {"url": "/frames/museum-square.png", "innerBounds": {"top": 40, "right": 40, "bottom": 40, "left": 40}}
+  }',
+  '{"offsetX": 12, "offsetY": 18, "blur": 36, "spread": 4, "color": "rgba(0,0,0,0.4)"}'
+),
+(
+  'Shadow Box',
+  'shadow-box',
+  '{
+    "landscape": {"url": "/frames/shadowbox-landscape.png", "innerBounds": {"top": 32, "right": 32, "bottom": 32, "left": 32}},
+    "portrait": {"url": "/frames/shadowbox-portrait.png", "innerBounds": {"top": 32, "right": 32, "bottom": 32, "left": 32}},
+    "square": {"url": "/frames/shadowbox-square.png", "innerBounds": {"top": 32, "right": 32, "bottom": 32, "left": 32}}
+  }',
+  '{"offsetX": 0, "offsetY": 20, "blur": 40, "spread": -8, "color": "rgba(0,0,0,0.5)"}'
+),
+(
+  'Minimal White',
+  'minimal',
+  '{
+    "landscape": {"url": "/frames/minimal-landscape.png", "innerBounds": {"top": 8, "right": 8, "bottom": 8, "left": 8}},
+    "portrait": {"url": "/frames/minimal-portrait.png", "innerBounds": {"top": 8, "right": 8, "bottom": 8, "left": 8}},
+    "square": {"url": "/frames/minimal-square.png", "innerBounds": {"top": 8, "right": 8, "bottom": 8, "left": 8}}
+  }',
+  '{"offsetX": 2, "offsetY": 4, "blur": 12, "spread": 0, "color": "rgba(0,0,0,0.15)"}'
+);
+
+-- ================================================
+-- STEP 7: Insert system templates
+-- ================================================
 INSERT INTO living_canvas_templates (name, slug, description, category, structure, visual_mode, css_shapes, is_system) VALUES
 (
   'Winding Path (S-Flow)',
@@ -185,9 +261,9 @@ INSERT INTO living_canvas_templates (name, slug, description, category, structur
   }',
   'organic',
   '{
-    "image-1": {"shapeOutside": "polygon(0 0, 100% 0, 100% 60%, 60% 100%, 0 100%)", "float": "left"},
-    "image-2": {"shapeOutside": "polygon(0 0, 100% 0, 100% 100%, 40% 100%, 0 60%)", "float": "right"},
-    "image-3": {"shapeOutside": "polygon(0 0, 100% 0, 100% 60%, 60% 100%, 0 100%)", "float": "left"}
+    "image-1": {"shapeOutside": "polygon(0 0, 100% 0, 100% 60%, 60% 60%, 60% 100%, 0 100%)", "float": "left"},
+    "image-2": {"shapeOutside": "polygon(0 0, 100% 0, 100% 100%, 40% 100%, 40% 60%, 0 60%)", "float": "right"},
+    "image-3": {"shapeOutside": "polygon(0 0, 100% 0, 100% 60%, 60% 60%, 60% 100%, 0 100%)", "float": "left"}
   }',
   true
 ),
@@ -289,57 +365,4 @@ INSERT INTO living_canvas_templates (name, slug, description, category, structur
     "hex-*": {"clipPath": "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)"}
   }',
   true
-);
-
--- Insert frame assets
-INSERT INTO living_canvas_frames (name, style, assets, shadow_settings) VALUES
-(
-  'Classic Wood',
-  'wood',
-  '{
-    "landscape": {"url": "/frames/wood-landscape.png", "innerBounds": {"top": 24, "right": 24, "bottom": 24, "left": 24}},
-    "portrait": {"url": "/frames/wood-portrait.png", "innerBounds": {"top": 24, "right": 24, "bottom": 24, "left": 24}},
-    "square": {"url": "/frames/wood-square.png", "innerBounds": {"top": 24, "right": 24, "bottom": 24, "left": 24}}
-  }',
-  '{"offsetX": 8, "offsetY": 12, "blur": 24, "spread": 0, "color": "rgba(0,0,0,0.35)"}'
-),
-(
-  'Brushed Metal',
-  'metal',
-  '{
-    "landscape": {"url": "/frames/metal-landscape.png", "innerBounds": {"top": 16, "right": 16, "bottom": 16, "left": 16}},
-    "portrait": {"url": "/frames/metal-portrait.png", "innerBounds": {"top": 16, "right": 16, "bottom": 16, "left": 16}},
-    "square": {"url": "/frames/metal-square.png", "innerBounds": {"top": 16, "right": 16, "bottom": 16, "left": 16}}
-  }',
-  '{"offsetX": 4, "offsetY": 8, "blur": 16, "spread": 0, "color": "rgba(0,0,0,0.25)"}'
-),
-(
-  'Museum Glass',
-  'museum',
-  '{
-    "landscape": {"url": "/frames/museum-landscape.png", "innerBounds": {"top": 40, "right": 40, "bottom": 40, "left": 40}},
-    "portrait": {"url": "/frames/museum-portrait.png", "innerBounds": {"top": 40, "right": 40, "bottom": 40, "left": 40}},
-    "square": {"url": "/frames/museum-square.png", "innerBounds": {"top": 40, "right": 40, "bottom": 40, "left": 40}}
-  }',
-  '{"offsetX": 12, "offsetY": 18, "blur": 36, "spread": 4, "color": "rgba(0,0,0,0.4)"}'
-),
-(
-  'Shadow Box',
-  'shadow-box',
-  '{
-    "landscape": {"url": "/frames/shadowbox-landscape.png", "innerBounds": {"top": 32, "right": 32, "bottom": 32, "left": 32}},
-    "portrait": {"url": "/frames/shadowbox-portrait.png", "innerBounds": {"top": 32, "right": 32, "bottom": 32, "left": 32}},
-    "square": {"url": "/frames/shadowbox-square.png", "innerBounds": {"top": 32, "right": 32, "bottom": 32, "left": 32}}
-  }',
-  '{"offsetX": 0, "offsetY": 20, "blur": 40, "spread": -8, "color": "rgba(0,0,0,0.5)"}'
-),
-(
-  'Minimal White',
-  'minimal',
-  '{
-    "landscape": {"url": "/frames/minimal-landscape.png", "innerBounds": {"top": 8, "right": 8, "bottom": 8, "left": 8}},
-    "portrait": {"url": "/frames/minimal-portrait.png", "innerBounds": {"top": 8, "right": 8, "bottom": 8, "left": 8}},
-    "square": {"url": "/frames/minimal-square.png", "innerBounds": {"top": 8, "right": 8, "bottom": 8, "left": 8}}
-  }',
-  '{"offsetX": 2, "offsetY": 4, "blur": 12, "spread": 0, "color": "rgba(0,0,0,0.15)"}'
 );
