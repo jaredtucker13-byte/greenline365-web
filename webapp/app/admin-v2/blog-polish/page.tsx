@@ -1678,16 +1678,16 @@ export default function BlogPolishPage() {
                   </button>
                   <div className="w-px h-4 bg-white/10 mx-1" />
                   <button
-                    onClick={analyzeAndGenerateAllImages}
-                    disabled={generatingAllImages || analyzingImages || post.content.length < 100}
+                    onClick={analyzeForImageSuggestions}
+                    disabled={analyzingImages || post.content.length < 100}
                     className="px-3 py-1 rounded-lg text-[11px] font-medium transition-all bg-gradient-to-r from-amber-500/20 to-orange-500/20 hover:from-amber-500/30 hover:to-orange-500/30 text-amber-300 hover:text-amber-200 active:scale-95 disabled:opacity-40 flex items-center gap-1"
-                    title="Analyze blog and auto-generate all images"
-                    data-testid="auto-generate-images-btn"
+                    title="Analyze blog for image opportunities"
+                    data-testid="analyze-images-btn"
                   >
-                    {generatingAllImages || analyzingImages ? (
-                      <span className="animate-pulse">Generating...</span>
+                    {analyzingImages ? (
+                      <span className="animate-pulse">Analyzing...</span>
                     ) : (
-                      <>🖼️ Auto Images</>
+                      <>🖼️ Analyze Images</>
                     )}
                   </button>
                   <button
