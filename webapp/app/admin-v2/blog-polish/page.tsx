@@ -99,9 +99,16 @@ export default function BlogPolishPage() {
     meta?: { description: string; keywords: string[] };
     outline?: string;
     enhanced?: string;
+    enhancedTitle?: string; // NEW: Title suggestion when enhancing content
   }>({});
   const [customPromptInput, setCustomPromptInput] = useState('');
   const [expandedPanel, setExpandedPanel] = useState<string | null>(null); // For full-screen panels
+
+  // Voice Recording state
+  const [isRecording, setIsRecording] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
 
   // Trending Research state
   interface TrendingTopic {
