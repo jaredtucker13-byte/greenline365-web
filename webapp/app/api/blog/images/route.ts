@@ -27,7 +27,14 @@ interface GenerateRequest {
   action: 'generate';
   prompt: string;
   style?: 'professional' | 'illustration' | 'minimalist' | 'creative';
-  count?: number; // How many variations (1-5)
+  count?: number; // How many variations (1-3)
+}
+
+interface StyleAnalyzeRequest {
+  action: 'analyze-style';
+  title: string;
+  content: string;
+  category?: string;
 }
 
 export async function POST(request: NextRequest) {
@@ -39,6 +46,8 @@ export async function POST(request: NextRequest) {
       return analyzeContent(body as AnalyzeRequest);
     } else if (action === 'generate') {
       return generateImages(body as GenerateRequest);
+    } else if (action === 'analyze-style') {
+      return analyzePageStyle(body as StyleAnalyzeRequest);
     } else {
       return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
     }
