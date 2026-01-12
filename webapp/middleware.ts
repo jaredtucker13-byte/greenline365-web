@@ -57,10 +57,10 @@ export async function middleware(request: NextRequest) {
   const { data: { session } } = await supabase.auth.getSession();
 
   // Protected routes - require authentication
-  if (request.nextUrl.pathname.startsWith('/admin-v2')) {
+  if (request.nextUrl.pathname.startsWith('/admin-v2') || request.nextUrl.pathname.startsWith('/admin')) {
     if (!session) {
-      // Redirect to sign in page
-      const redirectUrl = new URL('/sign-in', request.url);
+      // Redirect to login page
+      const redirectUrl = new URL('/login', request.url);
       redirectUrl.searchParams.set('redirectTo', request.nextUrl.pathname);
       return NextResponse.redirect(redirectUrl);
     }
