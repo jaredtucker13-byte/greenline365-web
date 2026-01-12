@@ -5,6 +5,17 @@ Build a comprehensive marketing OS for local businesses called "GreenLine365".
 
 ## What's Been Implemented
 
+### January 2026 - Session 8 (Image Generation UX Overhaul)
+- ✅ **Image Generation Workflow Refactored**: Changed from auto-generate to analyze-first approach
+- ✅ **Analyze Images Button**: New "🖼️ Analyze Images" button shows suggestions without auto-generating
+- ✅ **Individual Generate Buttons**: Each image suggestion has its own "Generate" button
+- ✅ **Generate All Button**: Added "⚡ Generate All (N)" button with confirmation warning dialog
+- ✅ **Warning Dialog**: Confirmation prompt warns user about time requirement before batch generation
+- ✅ **Completion Sound**: New melodic sound notification (C-E-G-C arpeggio) plays when batch generation completes
+- ✅ **Visual Status**: Generate buttons show "✓ Generated" status after image is created
+- ✅ **Fixed Image Display**: Images now display correctly from URL (was broken due to URL vs base64 mismatch)
+- ✅ **Mobile Vibration**: Added vibration pattern on batch completion for mobile devices
+
 ### January 2026 - Session 7 (Auto-save & Cloud Storage)
 - ✅ **Auto-save with localStorage**: Debounced (3s) auto-save to browser storage
 - ✅ **Restore on page load**: Automatically restores unsaved drafts from last session
