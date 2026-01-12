@@ -208,7 +208,7 @@ async function generateImages(body: GenerateRequest) {
       for (let attempt = 0; attempt < 45; attempt++) {
         await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
         
-        const statusResponse = await fetch(`https://api.kie.ai/api/v1/jobs/getTaskDetails?taskId=${taskId}`, {
+        const statusResponse = await fetch(`https://api.kie.ai/api/v1/jobs/recordInfo?taskId=${taskId}`, {
           headers: {
             'Authorization': `Bearer ${apiKey}`,
           },
@@ -216,25 +216,29 @@ async function generateImages(body: GenerateRequest) {
 
         if (statusResponse.ok) {
           const statusData = await statusResponse.json();
-          const taskStatus = statusData.data?.status;
-          console.log(`[Blog Images] Task ${taskId} status: ${taskStatus}`);
+          const taskState = statusData.data?.state;
+          console.log(`[Blog Images] Task ${taskId} state: ${taskState}`);
           
-          if (taskStatus === 'SUCCESS' || taskStatus === 'completed') {
-            // Get image URL from response
-            const output = statusData.data?.output;
-            const imageUrl = output?.images?.[0] || output?.image || output?.url;
-            
-            if (imageUrl) {
-              console.log(`[Blog Images] Generated image ${index + 1} successfully: ${imageUrl.slice(0, 50)}...`);
-              return {
-                id: `img-${Date.now()}-${index}`,
-                url: imageUrl,
-              };
+          if (taskState === 'success') {
+            // Parse resultJson to get image URLs
+            try {
+              const resultJson = JSON.parse(statusData.data?.resultJson || '{}');
+              const imageUrl = resultJson.resultUrls?.[0] || resultJson.images?.[0];
+              
+              if (imageUrl) {
+                console.log(`[Blog Images] Generated image ${index + 1} successfully: ${imageUrl.slice(0, 80)}...`);
+                return {
+                  id: `img-${Date.now()}-${index}`,
+                  url: imageUrl,
+                };
+              }
+            } catch (e) {
+              console.error(`[Blog Images] Failed to parse resultJson:`, e);
             }
           }
           
-          if (taskStatus === 'FAILED' || taskStatus === 'failed') {
-            console.error(`[Blog Images] Task ${taskId} failed:`, statusData.data?.error || statusData);
+          if (taskState === 'fail') {
+            console.error(`[Blog Images] Task ${taskId} failed:`, statusData.data?.failMsg || statusData);
             return null;
           }
         }
