@@ -2484,14 +2484,121 @@ export default function BlogPolishPage() {
                         <p className="text-xs text-white/50">
                           {imageSuggestions.filter(s => s.selectedImage).length} image(s) selected
                         </p>
-                        <button
-                          className="px-4 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-black text-sm font-semibold hover:opacity-90 transition"
-                        >
-                          Apply to Blog Post
-                        </button>
                       </div>
                     </div>
                   )}
+                  
+                  {/* Custom Image Chat Section */}
+                  <div className="mt-4 pt-4 border-t border-white/10">
+                    <button
+                      onClick={() => setShowCustomImageChat(!showCustomImageChat)}
+                      className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 hover:border-purple-500/40 transition"
+                    >
+                      <span className="flex items-center gap-2 text-sm font-medium text-purple-300">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
+                        Create Custom Image with AI
+                      </span>
+                      <svg className={`w-4 h-4 text-purple-300 transition ${showCustomImageChat ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    
+                    {showCustomImageChat && (
+                      <div className="mt-3 p-4 rounded-xl bg-purple-500/5 border border-purple-500/20">
+                        <p className="text-xs text-white/60 mb-3">
+                          Describe the image you want to create. Be as detailed as possible - mention subjects, style, mood, colors, and composition.
+                        </p>
+                        <textarea
+                          value={customImagePrompt}
+                          onChange={(e) => setCustomImagePrompt(e.target.value)}
+                          placeholder="E.g., A serene mountain lake at sunset with snow-capped peaks reflected in the water, golden hour lighting, cinematic wide shot..."
+                          className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/30 text-sm resize-none focus:outline-none focus:border-purple-500/50"
+                          rows={3}
+                        />
+                        <div className="flex items-center gap-3 mt-3">
+                          <div className="flex-1">
+                            <label className="text-xs text-white/50 mb-1 block">Aspect Ratio</label>
+                            <select
+                              value={customImageRatio}
+                              onChange={(e) => setCustomImageRatio(e.target.value as any)}
+                              className="w-full px-2 py-1.5 rounded-lg bg-white/10 border border-white/20 text-white text-xs"
+                            >
+                              <option value="16:9">Landscape (16:9)</option>
+                              <option value="9:16">Portrait (9:16)</option>
+                              <option value="1:1">Square (1:1)</option>
+                              <option value="21:9">Cinematic (21:9)</option>
+                            </select>
+                          </div>
+                          <button
+                            onClick={generateCustomImage}
+                            disabled={generatingCustomImage || !customImagePrompt.trim()}
+                            className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-semibold hover:opacity-90 transition disabled:opacity-50 flex items-center gap-2"
+                          >
+                            {generatingCustomImage ? (
+                              <>
+                                <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                                </svg>
+                                Creating...
+                              </>
+                            ) : (
+                              <>
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                                </svg>
+                                Create Image
+                              </>
+                            )}
+                          </button>
+                        </div>
+                        
+                        {/* Custom Generated Images */}
+                        {customGeneratedImages.length > 0 && (
+                          <div className="mt-4 pt-4 border-t border-white/10">
+                            <p className="text-xs text-white/50 mb-2">Your custom images (click to preview):</p>
+                            <div className="grid grid-cols-3 gap-2">
+                              {customGeneratedImages.map((img) => (
+                                <div key={img.id} className="relative group">
+                                  <button
+                                    onClick={() => setPreviewImage({ url: img.url, id: img.id })}
+                                    className="aspect-video w-full rounded-lg overflow-hidden border border-white/10 hover:border-purple-500/50 transition"
+                                  >
+                                    <img src={img.url} alt="Custom generated" className="w-full h-full object-cover" />
+                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                                      <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                                      </svg>
+                                    </div>
+                                  </button>
+                                  <div className="mt-1 flex gap-1">
+                                    <select
+                                      value={selectedLayout}
+                                      onChange={(e) => setSelectedLayout(e.target.value as any)}
+                                      className="flex-1 px-1 py-0.5 rounded text-[10px] bg-white/10 border border-white/20 text-white"
+                                    >
+                                      <option value="center">Center</option>
+                                      <option value="left">Left</option>
+                                      <option value="right">Right</option>
+                                      <option value="full-width">Full</option>
+                                    </select>
+                                    <button
+                                      onClick={() => applyImageToBlog(img.url, selectedLayout)}
+                                      className="px-1.5 py-0.5 rounded bg-green-500/20 text-green-300 text-[10px] font-medium hover:bg-green-500/30 transition"
+                                    >
+                                      Add
+                                    </button>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
