@@ -14,7 +14,8 @@ type AIAction =
   | 'generate_meta'
   | 'suggest_headlines'
   | 'suggest_tags'
-  | 'improve_seo';
+  | 'improve_seo'
+  | 'custom_generate';
 
 interface AIRequest {
   action: AIAction;
@@ -22,6 +23,7 @@ interface AIRequest {
   content?: string;
   category?: string;
   keywords?: string[];
+  customPrompt?: string;
 }
 
 // Model selection based on task
