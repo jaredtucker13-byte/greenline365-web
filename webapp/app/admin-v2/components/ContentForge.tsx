@@ -1076,14 +1076,15 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                       {/* AI Caption Generator */}
                       <div className="p-3 rounded-lg" style={{ background: 'var(--theme-bg-secondary)', border: '1px solid var(--theme-glass-border)' }}>
                         <div className="flex items-center justify-between mb-2">
-                          <label className="text-xs font-medium text-gray-400 flex items-center">
+                          <label className="text-xs font-medium flex items-center" style={{ color: 'var(--theme-text-muted)' }}>
                             AI Caption
                             {caption && <FeedbackButtons feedback={captionFeedback} onFeedback={setCaptionFeedback} />}
                           </label>
                           <button
                             onClick={generateCaption}
                             disabled={isGeneratingCaption}
-                            className="px-2 py-1 rounded bg-gradient-to-r from-[#8A2BE2] to-[#39FF14] text-black text-xs font-semibold disabled:opacity-50"
+                            className="px-2 py-1 rounded text-black text-xs font-semibold disabled:opacity-50"
+                            style={{ background: 'linear-gradient(to right, #8A2BE2, var(--theme-primary))' }}
                           >
                             {isGeneratingCaption ? '⏳...' : '🧠 Generate'}
                           </button>
@@ -1093,21 +1094,23 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                           onChange={(e) => setCaption(e.target.value)}
                           rows={4}
                           placeholder="Write or generate a caption..."
-                          className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm placeholder:text-gray-500 focus:border-[#39FF14]/50 outline-none resize-none"
+                          className="w-full px-3 py-2 rounded-lg text-sm outline-none resize-none"
+                          style={{ background: 'var(--theme-bg-glass)', border: '1px solid var(--theme-glass-border)', color: 'var(--theme-text-primary)' }}
                         />
                       </div>
 
                       {/* AI Keywords */}
-                      <div className="p-3 rounded-lg bg-[#0D0D0D] border border-[#2D3748]">
+                      <div className="p-3 rounded-lg" style={{ background: 'var(--theme-bg-secondary)', border: '1px solid var(--theme-glass-border)' }}>
                         <div className="flex items-center justify-between mb-2">
-                          <label className="text-xs font-medium text-gray-400 flex items-center">
+                          <label className="text-xs font-medium flex items-center" style={{ color: 'var(--theme-text-muted)' }}>
                             Keywords
                             {keywords.length > 0 && <FeedbackButtons feedback={keywordsFeedback} onFeedback={setKeywordsFeedback} />}
                           </label>
                           <button
                             onClick={generateKeywords}
                             disabled={isGeneratingKeywords}
-                            className="px-2 py-1 rounded bg-gradient-to-r from-[#8A2BE2] to-[#39FF14] text-black text-xs font-semibold disabled:opacity-50"
+                            className="px-2 py-1 rounded text-black text-xs font-semibold disabled:opacity-50"
+                            style={{ background: 'linear-gradient(to right, #8A2BE2, var(--theme-primary))' }}
                           >
                             {isGeneratingKeywords ? '⏳...' : '🧠 Generate'}
                           </button>
@@ -1121,18 +1124,19 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                             onChange={(e) => setKeywordInput(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && addKeyword()}
                             placeholder="Add keyword..."
-                            className="flex-1 px-3 py-1.5 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-xs placeholder:text-gray-500 focus:border-[#39FF14]/50 outline-none"
+                            className="flex-1 px-3 py-1.5 rounded-lg text-xs outline-none"
+                            style={{ background: 'var(--theme-bg-glass)', border: '1px solid var(--theme-glass-border)', color: 'var(--theme-text-primary)' }}
                           />
-                          <button onClick={addKeyword} className="px-3 py-1.5 rounded-lg bg-[#39FF14]/20 text-[#39FF14] text-xs font-medium hover:bg-[#39FF14]/30 transition">+</button>
+                          <button onClick={addKeyword} className="px-3 py-1.5 rounded-lg text-xs font-medium transition" style={{ background: 'color-mix(in srgb, var(--theme-primary) 20%, transparent)', color: 'var(--theme-primary)' }}>+</button>
                         </div>
                         
                         {/* Selected keywords */}
                         <div className="flex flex-wrap gap-1.5 mb-2 min-h-[24px]">
                           {keywords.length === 0 ? (
-                            <span className="text-xs text-gray-600">Click suggestions below to add ↓</span>
+                            <span className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>Click suggestions below to add ↓</span>
                           ) : (
                             keywords.map((kw) => (
-                              <span key={kw} className="px-2 py-0.5 rounded-full bg-[#39FF14]/20 text-[#39FF14] text-xs flex items-center gap-1">
+                              <span key={kw} className="px-2 py-0.5 rounded-full text-xs flex items-center gap-1" style={{ background: 'color-mix(in srgb, var(--theme-primary) 20%, transparent)', color: 'var(--theme-primary)' }}>
                                 {kw}
                                 <button onClick={() => removeKeyword(kw)} className="hover:text-red-400 ml-0.5">×</button>
                               </span>
@@ -1142,8 +1146,8 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                         
                         {/* AI Suggested keywords - clickable to add */}
                         {suggestedKeywords.length > 0 && (
-                          <div className="pt-2 border-t border-[#2D3748]">
-                            <p className="text-[10px] text-gray-500 mb-1.5">🤖 AI Suggestions (click to add)</p>
+                          <div className="pt-2" style={{ borderTop: '1px solid var(--theme-glass-border)' }}>
+                            <p className="text-[10px] mb-1.5" style={{ color: 'var(--theme-text-muted)' }}>🤖 AI Suggestions (click to add)</p>
                             <div className="flex flex-wrap gap-1.5">
                               {suggestedKeywords.map((kw) => (
                                 <button
@@ -1154,7 +1158,8 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                                       setSuggestedKeywords(suggestedKeywords.filter(s => s !== kw));
                                     }
                                   }}
-                                  className="px-2 py-0.5 rounded-full bg-[#8A2BE2]/10 text-[#8A2BE2] text-xs hover:bg-[#8A2BE2]/20 transition flex items-center gap-1"
+                                  className="px-2 py-0.5 rounded-full text-xs transition flex items-center gap-1"
+                                  style={{ background: 'rgba(138, 43, 226, 0.1)', color: '#8A2BE2' }}
                                 >
                                   + {kw}
                                 </button>
