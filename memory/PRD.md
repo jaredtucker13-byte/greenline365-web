@@ -31,8 +31,9 @@ Build "GreenLine365," a comprehensive marketing OS for local businesses. The pla
   - Sidebar (CollapsibleSidebar)
   - Calendar (HybridCalendar)
   - Quick Action buttons
+  - **Content Forge modal** (all tabs, inputs, buttons, preview)
   - All text and accent colors
-- [x] Theme changes apply instantly across all pages
+- [x] Theme changes apply instantly across all pages and components
 
 #### Auth Redirect Fix (COMPLETE - Jan 12, 2026)
 - [x] Sign-in now redirects to `/admin-v2` (dashboard) instead of home
