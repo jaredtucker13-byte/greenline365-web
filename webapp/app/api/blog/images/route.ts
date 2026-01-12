@@ -168,40 +168,111 @@ async function generateImages(body: GenerateRequest) {
   const apiKey = process.env.EMERGENT_LLM_KEY || 'sk-emergent-c87DeA8638fD64f7d3';
   const generateCount = Math.min(count, 3); // Max 3 images
   
-  console.log('[Blog Images] Generating', generateCount, 'images in parallel...');
+  console.log('[Blog Images] Generating', generateCount, 'images using Python...');
+
+  // Use Python with emergentintegrations for image generation
+  const { spawn } = require('child_process');
   
-  // PARALLEL generation for speed
+  const generateSingleImage = (variationPrompt: string, index: number): Promise<{ id: string; data: string; mime_type: string } | null> => {
+    return new Promise((resolve) => {
+      const escapedPrompt = variationPrompt.replace(/'/g, "\\'").replace(/\n/g, ' ');
+      
+      const pythonScript = `
+import asyncio
+import json
+import sys
+
+async def main():
+    from emergentintegrations.llm.chat import LlmChat, UserMessage
+    
+    chat = LlmChat(
+        api_key='${apiKey}',
+        session_id='blog-image-${index}',
+        system_message='You are an image generation assistant.'
+    )
+    chat.with_model('gemini', 'gemini-2.5-flash-image')
+    chat.with_params(modalities=['image', 'text'])
+    
+    message = UserMessage(text='${escapedPrompt}')
+    
+    try:
+        text, images = await chat.send_message_multimodal_response(message)
+        
+        if images and len(images) > 0:
+            img = images[0]
+            print(json.dumps({
+                'success': True,
+                'id': 'img-${Date.now()}-${index}',
+                'data': img['data'],
+                'mime_type': img['mime_type']
+            }))
+        else:
+            print(json.dumps({'success': False, 'error': 'No image generated'}))
+    except Exception as e:
+        print(json.dumps({'success': False, 'error': str(e)}))
+
+try:
+    asyncio.run(main())
+except Exception as e:
+    print(json.dumps({'success': False, 'error': str(e)}))
+`;
+
+      const pythonProcess = spawn('/root/.venv/bin/python3', ['-c', pythonScript], {
+        cwd: '/app/webapp',
+        env: { ...process.env },
+      });
+
+      let stdout = '';
+      let stderr = '';
+
+      pythonProcess.stdout.on('data', (data: Buffer) => {
+        stdout += data.toString();
+      });
+
+      pythonProcess.stderr.on('data', (data: Buffer) => {
+        stderr += data.toString();
+      });
+
+      pythonProcess.on('close', (code: number) => {
+        try {
+          if (stdout) {
+            const result = JSON.parse(stdout.trim());
+            if (result.success) {
+              console.log(`[Blog Images] Generated image ${index + 1}/${generateCount}`);
+              resolve({
+                id: result.id,
+                data: result.data,
+                mime_type: result.mime_type || 'image/png',
+              });
+              return;
+            }
+          }
+        } catch (e) {
+          console.log(`[Blog Images] Parse error for image ${index + 1}:`, e);
+        }
+        console.log(`[Blog Images] Failed image ${index + 1}:`, stderr || 'Unknown error');
+        resolve(null);
+      });
+
+      pythonProcess.on('error', (err: Error) => {
+        console.log(`[Blog Images] Process error for image ${index + 1}:`, err);
+        resolve(null);
+      });
+
+      // Timeout after 60 seconds
+      setTimeout(() => {
+        pythonProcess.kill();
+        resolve(null);
+      }, 60000);
+    });
+  };
+
+  // Generate images in parallel
   const generatePromises = Array.from({ length: generateCount }, (_, i) => {
     const variationPrompt = i === 0 
       ? enhancedPrompt 
-      : `${enhancedPrompt} Alternative style ${i + 1}.`;
-    
-    return fetch('http://localhost:8002/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        prompt: variationPrompt,
-        api_key: apiKey,
-      }),
-    })
-    .then(async (response) => {
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.image) {
-          console.log(`[Blog Images] Generated image ${i + 1}/${generateCount}`);
-          return {
-            id: `img-${Date.now()}-${i}`,
-            data: data.image,
-            mime_type: data.mime_type || 'image/png',
-          };
-        }
-      }
-      return null;
-    })
-    .catch((e) => {
-      console.log(`[Blog Images] Failed image ${i + 1}:`, e);
-      return null;
-    });
+      : `${enhancedPrompt} Alternative composition ${i + 1}.`;
+    return generateSingleImage(variationPrompt, i);
   });
 
   // Wait for all images in parallel
