@@ -12,10 +12,12 @@ Build a comprehensive marketing OS for local businesses called "GreenLine365".
 - ✅ **Two Visual Modes**: Organic (borderless with atmospheric glow) and Framed (photorealistic frames with shadows)
 - ✅ **Template Renderer**: Renders 6 template types from database structure
 - ✅ **System Templates**: Winding Path (S-Flow), Gallery Grid, Drop Cap, Hero Feature, Circular Focus, Hexagonal Grid
-- ✅ **Database Schema**: `living_canvas_templates`, `living_canvas_frames`, `living_canvas_compositions` tables
+- ✅ **Database Schema**: `living_canvas_templates`, `living_canvas_frames`, `living_canvas_compositions` tables (FIXED migration order)
 - ✅ **Living Canvas Page**: `/admin-v2/living-canvas` - Template editor with live preview
 - ✅ **Dynamic Theming**: Backgrounds, accents, text colors all derived from primary image
 - ✅ **Frame Assets Table**: Stores photorealistic frame definitions (wood, metal, museum, shadow-box, minimal)
+- ✅ **"Visual Director" Agent**: Upgraded analyzer to know ALL Living Canvas options (shapes, modes, templates, frames)
+- ✅ **AI Gold Rush Memory**: Created `/app/memory/THE_AI_GOLD_RUSH.md` documenting this historical moment
 
 ### January 2026 - Session 9 (Advanced Image Generation & Preview)
 - ✅ **Enriched Cinematic Prompts**: Backend now generates detailed artistic prompts with lighting, composition, camera angles - user sees clean description, API gets full artistic direction
