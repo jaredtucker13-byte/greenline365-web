@@ -1920,45 +1920,6 @@ export default function BlogPolishPage() {
                 </div>
               </div>
             </div>
-
-            {/* Image Upload */}
-            <div className="backdrop-blur-2xl bg-white/[0.08] rounded-2xl border border-white/[0.15] p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]">
-              <label className="text-white/60 text-sm mb-4 block font-medium">Images (up to 5)</label>
-              <div className="border-2 border-dashed border-white/20 rounded-xl p-8 text-center hover:border-[#84A98C]/50 transition-colors cursor-pointer">
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handleImageUpload}
-                  className="hidden"
-                  id="image-upload"
-                />
-                <label htmlFor="image-upload" className="cursor-pointer">
-                  <div className="text-4xl mb-3">📸</div>
-                  <p className="text-white/70 font-medium">Click or drag images here</p>
-                  <p className="text-white/40 text-sm mt-1">PNG, JPG, WebP (max 10MB each)</p>
-                </label>
-              </div>
-
-              {imagePreviews.length > 0 && (
-                <div className="mt-4 grid grid-cols-5 gap-3">
-                  {imagePreviews.map((preview, i) => (
-                    <div key={i} className="relative aspect-square rounded-lg overflow-hidden group">
-                      <img src={preview} alt={`Preview ${i + 1}`} className="w-full h-full object-cover" />
-                      <button
-                        onClick={() => removeImage(i)}
-                        className="absolute top-1 right-1 w-6 h-6 bg-black/60 rounded-full text-white opacity-0 group-hover:opacity-100 transition flex items-center justify-center"
-                      >
-                        ×
-                      </button>
-                      {i === 0 && (
-                        <span className="absolute bottom-1 left-1 px-2 py-0.5 bg-[#84A98C] text-white text-xs rounded">Featured</span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
           </div>
 
           {/* Sidebar (1/3) */}
