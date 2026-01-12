@@ -107,11 +107,6 @@ Build "GreenLine365," a comprehensive marketing OS for local businesses. The pla
   - `/industries/retail`
   - `/industries/professional-services`
   - `/industries/healthcare`
-
-#### Blog Auto-Polish (IN PROGRESS)
-- [x] Database schema: `007_blog_system.sql`
-- [ ] Backend API routes (`/api/blog/*`)
-- [ ] Admin editor UI (`/admin-v2/blog-polish`)
 - [ ] Public blog pages (`/blog`, `/blog/[slug]`)
 - [ ] AI content analysis integration
 
