@@ -302,6 +302,10 @@ export default function ChatWidget({
   const [sessionId] = useState(() => generateId());
   const [currentMode, setCurrentMode] = useState<AssistantMode>('concierge');
   
+  // Voice input state
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
+  
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
