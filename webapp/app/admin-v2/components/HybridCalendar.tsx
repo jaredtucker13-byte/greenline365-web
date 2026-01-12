@@ -255,7 +255,7 @@ export default function HybridCalendar({
                   })}
                 </AnimatePresence>
                 {dayEvents.length > 3 && (
-                  <div className="text-[10px] text-white/40 text-center font-medium">
+                  <div className="text-[10px] text-center font-medium" style={{ color: 'var(--theme-text-muted)' }}>
                     +{dayEvents.length - 3} more
                   </div>
                 )}
@@ -268,8 +268,8 @@ export default function HybridCalendar({
                   animate={{ opacity: 1 }}
                   className="absolute bottom-2 right-2"
                 >
-                  <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center">
-                    <span className="text-white/60 text-xs">+</span>
+                  <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ background: 'var(--theme-bg-secondary)' }}>
+                    <span className="text-xs" style={{ color: 'var(--theme-text-secondary)' }}>+</span>
                   </div>
                 </motion.div>
               )}
