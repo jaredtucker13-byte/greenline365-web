@@ -5,6 +5,18 @@ Build a comprehensive marketing OS for local businesses called "GreenLine365".
 
 ## What's Been Implemented
 
+### January 2026 - Session 7 (Auto-save & Cloud Storage)
+- ✅ **Auto-save with localStorage**: Debounced (3s) auto-save to browser storage
+- ✅ **Restore on page load**: Automatically restores unsaved drafts from last session
+- ✅ **Unsaved changes warning**: Browser prompt before leaving with unsaved work
+- ✅ **Visual indicators**: Shows "Saving...", "Unsaved", "Saved locally" status
+- ✅ **Clear on save**: localStorage cleared after successful save to database
+- ✅ **Cloud Image Upload**: Images uploaded to Supabase Storage
+- ✅ **Upload Progress**: Visual progress bar during multi-image uploads
+- ✅ **Cloud indicator**: Shows "Cloud" badge on uploaded images
+- ✅ **Delete from cloud**: Removes images from storage when deleted from post
+- ✅ API: `/api/upload` - POST (upload), DELETE (remove), GET (list)
+
 ### January 2026 - Session 6 (Security & Stress Testing Fixes)
 - ✅ **CRITICAL: Double-Booking Prevention** - API now checks for existing bookings before inserting
 - ✅ **CRITICAL: Race Condition Protection** - Returns 409 Conflict for duplicate slots
