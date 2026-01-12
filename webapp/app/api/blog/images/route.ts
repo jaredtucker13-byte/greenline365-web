@@ -150,7 +150,7 @@ ${content}`
 }
 
 async function generateImages(body: GenerateRequest) {
-  const { prompt, style = 'professional', count = 2 } = body; // Default to 2 images for speed
+  const { prompt, style = 'professional', count = 2 } = body;
 
   if (!prompt) {
     return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
@@ -165,110 +165,98 @@ async function generateImages(body: GenerateRequest) {
   };
 
   const enhancedPrompt = `${prompt}. Style: ${styleGuides[style]}. High resolution, suitable for web blog post.`;
-  const apiKey = process.env.EMERGENT_LLM_KEY || 'sk-emergent-c87DeA8638fD64f7d3';
+  const apiKey = process.env.KIE_API_KEY || '1f1d2d3eed99f294339cb1f17b5bc743';
   const generateCount = Math.min(count, 3); // Max 3 images
   
-  console.log('[Blog Images] Generating', generateCount, 'images using OpenAI GPT Image 1...');
+  console.log('[Blog Images] Generating', generateCount, 'images using Kie.ai Nano Banana...');
 
-  // Use Python with emergentintegrations OpenAI Image Generation
-  const { spawn } = require('child_process');
-  
-  const generateSingleImage = (variationPrompt: string, index: number): Promise<{ id: string; data: string; mime_type: string } | null> => {
-    return new Promise((resolve) => {
-      const escapedPrompt = variationPrompt.replace(/'/g, "\\'").replace(/\n/g, ' ').replace(/"/g, '\\"');
-      
-      const pythonScript = `
-import asyncio
-import json
-import base64
-import sys
+  const generateSingleImage = async (variationPrompt: string, index: number): Promise<{ id: string; url: string } | null> => {
+    try {
+      // Submit generation request to Kie.ai
+      const response = await fetch('https://api.kie.ai/v1/images/generations', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'google/nano-banana',
+          prompt: variationPrompt,
+          image_size: '16:9', // Good for blog images
+          output_format: 'png',
+        }),
+      });
 
-async def main():
-    from emergentintegrations.llm.openai.image_generation import OpenAIImageGeneration
-    
-    image_gen = OpenAIImageGeneration(api_key='${apiKey}')
-    
-    try:
-        images = await image_gen.generate_images(
-            prompt='${escapedPrompt}',
-            model='gpt-image-1',
-            number_of_images=1
-        )
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`[Blog Images] Kie.ai error for image ${index + 1}:`, errorText);
+        return null;
+      }
+
+      const data = await response.json();
+      console.log(`[Blog Images] Kie.ai response for image ${index + 1}:`, JSON.stringify(data).slice(0, 200));
+
+      // Handle async response - may need to poll for result
+      if (data.task_id || data.id) {
+        const taskId = data.task_id || data.id;
         
-        if images and len(images) > 0:
-            image_base64 = base64.b64encode(images[0]).decode('utf-8')
-            print(json.dumps({
-                'success': True,
-                'id': 'img-${Date.now()}-${index}',
-                'data': image_base64,
-                'mime_type': 'image/png'
-            }))
-        else:
-            print(json.dumps({'success': False, 'error': 'No image generated'}))
-    except Exception as e:
-        print(json.dumps({'success': False, 'error': str(e)}))
+        // Poll for result (max 60 seconds)
+        for (let attempt = 0; attempt < 30; attempt++) {
+          await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
+          
+          const statusResponse = await fetch(`https://api.kie.ai/v1/tasks/${taskId}`, {
+            headers: {
+              'Authorization': `Bearer ${apiKey}`,
+            },
+          });
 
-try:
-    asyncio.run(main())
-except Exception as e:
-    print(json.dumps({'success': False, 'error': str(e)}))
-`;
-
-      const pythonProcess = spawn('/root/.venv/bin/python3', ['-c', pythonScript], {
-        cwd: '/app/webapp',
-        env: { ...process.env },
-      });
-
-      let stdout = '';
-      let stderr = '';
-
-      pythonProcess.stdout.on('data', (data: Buffer) => {
-        stdout += data.toString();
-      });
-
-      pythonProcess.stderr.on('data', (data: Buffer) => {
-        stderr += data.toString();
-      });
-
-      pythonProcess.on('close', (code: number) => {
-        try {
-          if (stdout) {
-            const result = JSON.parse(stdout.trim());
-            if (result.success) {
-              console.log(`[Blog Images] Generated image ${index + 1}/${generateCount} with OpenAI`);
-              resolve({
-                id: result.id,
-                data: result.data,
-                mime_type: result.mime_type || 'image/png',
-              });
-              return;
-            } else {
-              console.log(`[Blog Images] Generation failed:`, result.error);
+          if (statusResponse.ok) {
+            const statusData = await statusResponse.json();
+            console.log(`[Blog Images] Task ${taskId} status:`, statusData.status || statusData.state);
+            
+            if (statusData.status === 'completed' || statusData.state === 'completed' || statusData.images) {
+              const imageUrl = statusData.images?.[0]?.url || statusData.output?.images?.[0]?.url || statusData.result?.url;
+              if (imageUrl) {
+                console.log(`[Blog Images] Generated image ${index + 1} successfully`);
+                return {
+                  id: `img-${Date.now()}-${index}`,
+                  url: imageUrl,
+                };
+              }
+            }
+            
+            if (statusData.status === 'failed' || statusData.state === 'failed') {
+              console.error(`[Blog Images] Task ${taskId} failed:`, statusData.error);
+              return null;
             }
           }
-        } catch (e) {
-          console.log(`[Blog Images] Parse error for image ${index + 1}:`, e);
         }
-        console.log(`[Blog Images] Failed image ${index + 1}:`, stderr || stdout || 'Unknown error');
-        resolve(null);
-      });
+        
+        console.log(`[Blog Images] Timeout waiting for task ${taskId}`);
+        return null;
+      }
 
-      pythonProcess.on('error', (err: Error) => {
-        console.log(`[Blog Images] Process error for image ${index + 1}:`, err);
-        resolve(null);
-      });
+      // Direct response with image URL
+      if (data.images?.[0]?.url || data.data?.[0]?.url || data.output?.url) {
+        const imageUrl = data.images?.[0]?.url || data.data?.[0]?.url || data.output?.url;
+        console.log(`[Blog Images] Generated image ${index + 1} directly`);
+        return {
+          id: `img-${Date.now()}-${index}`,
+          url: imageUrl,
+        };
+      }
 
-      // Timeout after 90 seconds (OpenAI can take longer)
-      setTimeout(() => {
-        pythonProcess.kill();
-        console.log(`[Blog Images] Timeout for image ${index + 1}`);
-        resolve(null);
-      }, 90000);
-    });
+      console.log(`[Blog Images] Unexpected response format for image ${index + 1}`);
+      return null;
+
+    } catch (error) {
+      console.error(`[Blog Images] Error generating image ${index + 1}:`, error);
+      return null;
+    }
   };
 
   // Generate images sequentially to avoid rate limits
-  const images: { id: string; data: string; mime_type: string }[] = [];
+  const images: { id: string; url: string }[] = [];
   
   for (let i = 0; i < generateCount; i++) {
     const variationPrompt = i === 0 
@@ -283,8 +271,14 @@ except Exception as e:
   if (images.length > 0) {
     return NextResponse.json({
       success: true,
-      images,
-      message: `Generated ${images.length} image(s) with OpenAI`,
+      images: images.map(img => ({
+        id: img.id,
+        url: img.url,
+        // For compatibility with existing frontend that expects base64
+        data: img.url, // URL instead of base64
+        mime_type: 'image/png',
+      })),
+      message: `Generated ${images.length} image(s) with Nano Banana`,
     });
   }
 
