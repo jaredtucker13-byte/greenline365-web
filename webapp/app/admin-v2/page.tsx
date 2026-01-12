@@ -288,45 +288,48 @@ export default function TacticalCommandCenter() {
             <motion.button
               whileHover={{ scale: 1.02, y: -2 }}
               whileTap={{ scale: 0.98 }}
-              className="p-6 backdrop-blur-2xl bg-white/[0.08] rounded-2xl border border-white/[0.15] flex items-center gap-5 hover:bg-white/[0.12] transition-all duration-300 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]"
+              className="p-6 backdrop-blur-2xl rounded-2xl flex items-center gap-5 transition-all duration-300"
+              style={{ background: 'var(--theme-bg-glass)', border: '1px solid var(--theme-glass-border)', boxShadow: '0 8px 32px 0 var(--theme-shadow)' }}
             >
-              <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: 'color-mix(in srgb, var(--theme-success) 20%, transparent)', border: '1px solid color-mix(in srgb, var(--theme-success) 30%, transparent)' }}>
                 <span className="text-2xl">📞</span>
               </div>
               <div className="text-left">
-                <p className="text-white font-medium text-lg">Make Phone Call</p>
-                <p className="text-sm text-white/50">Quick dial contacts</p>
+                <p className="font-medium text-lg" style={{ color: 'var(--theme-text-primary)' }}>Make Phone Call</p>
+                <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>Quick dial contacts</p>
               </div>
             </motion.button>
 
             <motion.button
               whileHover={{ scale: 1.02, y: -2 }}
               whileTap={{ scale: 0.98 }}
-              className="p-6 backdrop-blur-2xl bg-white/[0.08] rounded-2xl border border-white/[0.15] flex items-center gap-5 hover:bg-white/[0.12] transition-all duration-300 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]"
+              className="p-6 backdrop-blur-2xl rounded-2xl flex items-center gap-5 transition-all duration-300"
+              style={{ background: 'var(--theme-bg-glass)', border: '1px solid var(--theme-glass-border)', boxShadow: '0 8px 32px 0 var(--theme-shadow)' }}
             >
-              <div className="w-14 h-14 rounded-2xl bg-sky-500/20 border border-sky-500/30 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: 'color-mix(in srgb, var(--theme-info) 20%, transparent)', border: '1px solid color-mix(in srgb, var(--theme-info) 30%, transparent)' }}>
                 <span className="text-2xl">📊</span>
               </div>
               <div className="text-left">
-                <p className="text-white font-medium text-lg">Analytics Dashboard</p>
-                <p className="text-sm text-white/50">ROI +25% • View Details</p>
+                <p className="font-medium text-lg" style={{ color: 'var(--theme-text-primary)' }}>Analytics Dashboard</p>
+                <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>ROI +25% • View Details</p>
               </div>
             </motion.button>
 
             <motion.button
               whileHover={{ scale: 1.02, y: -2 }}
               whileTap={{ scale: 0.98 }}
-              className="p-6 backdrop-blur-2xl bg-white/[0.08] rounded-2xl border border-white/[0.15] flex items-center gap-5 hover:bg-white/[0.12] transition-all duration-300 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)] relative"
+              className="p-6 backdrop-blur-2xl rounded-2xl flex items-center gap-5 transition-all duration-300 relative"
+              style={{ background: 'var(--theme-bg-glass)', border: '1px solid var(--theme-glass-border)', boxShadow: '0 8px 32px 0 var(--theme-shadow)' }}
             >
-              <div className="w-14 h-14 rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: 'color-mix(in srgb, var(--theme-warning) 20%, transparent)', border: '1px solid color-mix(in srgb, var(--theme-warning) 30%, transparent)' }}>
                 <span className="text-2xl">📝</span>
               </div>
               <div className="text-left">
-                <p className="text-white font-medium text-lg">Review Suggested Posts</p>
-                <p className="text-sm text-white/50">{pendingCount} posts ready for review</p>
+                <p className="font-medium text-lg" style={{ color: 'var(--theme-text-primary)' }}>Review Suggested Posts</p>
+                <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>{pendingCount} posts ready for review</p>
               </div>
               {pendingCount > 0 && (
-                <span className="absolute top-4 right-4 w-6 h-6 bg-amber-500 rounded-full text-black text-xs font-bold flex items-center justify-center shadow-[0_0_15px_rgba(245,158,11,0.5)]">{pendingCount}</span>
+                <span className="absolute top-4 right-4 w-6 h-6 rounded-full text-black text-xs font-bold flex items-center justify-center" style={{ background: 'var(--theme-warning)', boxShadow: '0 0 15px var(--theme-glow)' }}>{pendingCount}</span>
               )}
             </motion.button>
           </div>
