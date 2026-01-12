@@ -444,6 +444,7 @@ export default function BlogPolishPage() {
       if (response.ok) {
         setMessage({ type: 'success', text: 'Draft saved successfully!' });
         setPost(prev => ({ ...prev, id: data.post.id, slug: data.post.slug }));
+        clearLocalStorageDraft(); // Clear localStorage after successful save
       } else {
         setMessage({ type: 'error', text: data.error || 'Failed to save draft' });
       }
