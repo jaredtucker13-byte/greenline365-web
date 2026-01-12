@@ -74,6 +74,37 @@ export default function WebsiteAnalyzerPage() {
     reader.readAsDataURL(file);
   };
 
+  const captureUrlScreenshot = async () => {
+    if (!websiteUrl.trim()) {
+      setError('Please enter a website URL');
+      return;
+    }
+
+    setCapturingUrl(true);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/capture-screenshot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: websiteUrl }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setImageBase64(data.screenshot);
+        setImagePreview(`data:image/png;base64,${data.screenshot}`);
+      } else {
+        setError(data.error || 'Failed to capture screenshot');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to capture screenshot');
+    }
+
+    setCapturingUrl(false);
+  };
+
   const startWorkflow = async () => {
     // Validate inputs based on mode
     if (mode === 'analyze' && !imageBase64) {
