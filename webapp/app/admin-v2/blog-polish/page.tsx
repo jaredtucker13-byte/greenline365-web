@@ -449,12 +449,40 @@ export default function BlogPolishPage() {
       setMessage({ type: 'error', text: 'Add more content before enhancing' });
       return;
     }
-    const result = await callAI('enhance_content');
-    if (result) {
-      // Show in panel for review before applying
-      setAiSuggestions(prev => ({ ...prev, enhanced: result }));
-      setShowAiPanel(true);
+    setAiLoading('enhance_content');
+    try {
+      const response = await fetch('/api/blog/ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'enhance_content_with_title',
+          title: post.title,
+          content: post.content,
+          category: post.category,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok && data.result) {
+        // Parse result for both enhanced content and suggested title
+        const result = data.result;
+        if (typeof result === 'object' && result.content) {
+          setAiSuggestions(prev => ({ 
+            ...prev, 
+            enhanced: result.content,
+            enhancedTitle: result.title || undefined,
+          }));
+        } else {
+          setAiSuggestions(prev => ({ ...prev, enhanced: result }));
+        }
+        setShowAiPanel(true);
+      } else {
+        setMessage({ type: 'error', text: data.error || 'Enhancement failed' });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Failed to enhance content' });
     }
+    setAiLoading(null);
   };
 
   const suggestHeadlines = async () => {
