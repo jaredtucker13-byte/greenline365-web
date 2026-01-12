@@ -20,6 +20,16 @@ import Link from 'next/link';
 import StyleLibrary from '../components/StyleLibrary';
 import CopyrightTools from '../components/CopyrightTools';
 import AIContentDisclaimer from '../components/AIContentDisclaimer';
+import { 
+  CopyButton, 
+  ShareButton, 
+  FocusModeButton, 
+  NetworkStatus,
+  NotificationButton,
+  QRCodeModal,
+  CameraCapture,
+} from '@/app/components/BrowserFeatures';
+import { sendNotification, vibrate } from '@/lib/browser-apis';
 
 interface SEOFeedback {
   type: 'success' | 'warning' | 'info' | 'error';
