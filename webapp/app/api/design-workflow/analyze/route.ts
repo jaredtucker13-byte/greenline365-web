@@ -17,24 +17,23 @@ interface AnalyzeRequest {
 
 async function runPythonScript(scriptContent: string): Promise<{ stdout: string; stderr: string }> {
   return new Promise((resolve, reject) => {
-    const process = spawn('/root/.venv/bin/python3', ['-c', scriptContent], {
+    const pythonProcess = spawn('/root/.venv/bin/python3', ['-c', scriptContent], {
       cwd: '/app/webapp',
-      env: { ...process.env },
-      maxBuffer: 10 * 1024 * 1024,
+      env: { ...globalThis.process.env },
     });
 
     let stdout = '';
     let stderr = '';
 
-    process.stdout.on('data', (data) => {
+    pythonProcess.stdout.on('data', (data) => {
       stdout += data.toString();
     });
 
-    process.stderr.on('data', (data) => {
+    pythonProcess.stderr.on('data', (data) => {
       stderr += data.toString();
     });
 
-    process.on('close', (code) => {
+    pythonProcess.on('close', (code) => {
       if (code === 0 || stdout) {
         resolve({ stdout, stderr });
       } else {
@@ -42,13 +41,13 @@ async function runPythonScript(scriptContent: string): Promise<{ stdout: string;
       }
     });
 
-    process.on('error', (err) => {
+    pythonProcess.on('error', (err) => {
       reject(err);
     });
 
     // Timeout after 2 minutes
     setTimeout(() => {
-      process.kill();
+      pythonProcess.kill();
       reject(new Error('Script timeout'));
     }, 120000);
   });
