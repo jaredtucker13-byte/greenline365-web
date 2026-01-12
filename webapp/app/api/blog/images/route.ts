@@ -315,19 +315,56 @@ ${content.slice(0, 2000)}${content.length > 2000 ? '...' : ''}`
   const data = await response.json();
   const aiResponse = data.choices?.[0]?.message?.content || '{}';
 
-  // Parse JSON response
+  // Parse JSON response with robust cleaning
   try {
     const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
-      const styleGuide = JSON.parse(jsonMatch[0]);
+      // Clean the JSON string - fix common AI response issues
+      let cleanedJson = jsonMatch[0]
+        // Replace smart quotes with regular quotes
+        .replace(/[\u2018\u2019]/g, "'")
+        .replace(/[\u201C\u201D]/g, '"')
+        // Remove any trailing commas before closing braces/brackets
+        .replace(/,(\s*[}\]])/g, '$1')
+        // Handle line breaks in string values
+        .replace(/\n/g, '\\n')
+        // Fix unescaped quotes in string values (basic)
+        .replace(/"([^"]*)":\s*"([^"]*)"/g, (match, key, value) => {
+          const cleanValue = value.replace(/(?<!\\)"/g, '\\"');
+          return `"${key}": "${cleanValue}"`;
+        });
+      
+      const styleGuide = JSON.parse(cleanedJson);
       return NextResponse.json({ 
         success: true,
         styleGuide,
         raw: aiResponse,
       });
     }
-  } catch (e) {
-    console.error('[Blog Style] JSON parse error:', e);
+  } catch (e: any) {
+    console.error('[Blog Style] JSON parse error:', e.message);
+    console.error('[Blog Style] Raw response:', aiResponse.slice(0, 500));
+    
+    // Try a more aggressive cleanup approach
+    try {
+      const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        // Remove all line breaks and extra spaces
+        const aggressive = jsonMatch[0]
+          .replace(/[\r\n]+/g, ' ')
+          .replace(/\s+/g, ' ')
+          .replace(/,\s*}/g, '}')
+          .replace(/,\s*]/g, ']');
+        const styleGuide = JSON.parse(aggressive);
+        return NextResponse.json({ 
+          success: true,
+          styleGuide,
+          raw: aiResponse,
+        });
+      }
+    } catch (e2) {
+      console.error('[Blog Style] Aggressive parse also failed');
+    }
   }
 
   return NextResponse.json({ 
