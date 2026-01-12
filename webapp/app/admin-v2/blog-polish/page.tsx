@@ -937,8 +937,182 @@ export default function BlogPolishPage() {
                 >
                   ❤️ My Library
                 </button>
+                <div className="w-px h-6 bg-white/20 mx-1" />
+                <button
+                  onClick={() => setShowTrendingPanel(!showTrendingPanel)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition border flex items-center gap-1 ${
+                    showTrendingPanel 
+                      ? 'bg-cyan-500/30 border-cyan-500/50 text-cyan-200' 
+                      : 'bg-cyan-500/20 border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/30'
+                  }`}
+                  title="Research trending topics with Perplexity AI"
+                >
+                  🔍 Research
+                </button>
               </div>
             </div>
+
+            {/* Trending Research Panel */}
+            <AnimatePresence>
+              {showTrendingPanel && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="backdrop-blur-2xl bg-cyan-500/10 rounded-2xl border border-cyan-500/30 p-4 overflow-hidden"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-semibold text-cyan-300 flex items-center gap-2">
+                      🔍 Trending Research
+                      <span className="text-xs text-cyan-300/50 font-normal">Powered by Perplexity</span>
+                    </h3>
+                    <button
+                      onClick={() => setShowTrendingPanel(false)}
+                      className="p-1 hover:bg-white/10 rounded text-white/50 hover:text-white"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* Search Form */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
+                    <input
+                      type="text"
+                      value={trendingIndustry}
+                      onChange={(e) => setTrendingIndustry(e.target.value)}
+                      placeholder="Industry (e.g., Real Estate, Fitness)"
+                      className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 text-sm focus:outline-none focus:border-cyan-500/50"
+                    />
+                    <input
+                      type="text"
+                      value={trendingNiche}
+                      onChange={(e) => setTrendingNiche(e.target.value)}
+                      placeholder="Niche (optional)"
+                      className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 text-sm focus:outline-none focus:border-cyan-500/50"
+                    />
+                    <select
+                      value={trendingType}
+                      onChange={(e) => setTrendingType(e.target.value as any)}
+                      className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500/50"
+                    >
+                      <option value="trending">🔥 Trending Topics</option>
+                      <option value="ideas">💡 Content Ideas</option>
+                      <option value="news">📰 Industry News</option>
+                      <option value="questions">❓ FAQs</option>
+                    </select>
+                    <button
+                      onClick={searchTrending}
+                      disabled={trendingLoading || !trendingIndustry}
+                      className="px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 text-white text-sm font-medium hover:opacity-90 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                    >
+                      {trendingLoading ? (
+                        <>
+                          <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                          </svg>
+                          Searching...
+                        </>
+                      ) : 'Search'}
+                    </button>
+                  </div>
+
+                  {/* Results */}
+                  {trendingResults[trendingType] && trendingResults[trendingType]!.length > 0 && (
+                    <div className="space-y-3 max-h-80 overflow-y-auto">
+                      {trendingType === 'trending' && (trendingResults.trending as TrendingTopic[])?.map((topic, i) => (
+                        <div key={i} className="p-3 rounded-xl bg-white/5 border border-white/10 hover:border-cyan-500/30 transition">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1">
+                              <h4 className="font-medium text-white text-sm mb-1">{topic.topic}</h4>
+                              <p className="text-xs text-white/50 mb-2">{topic.reason}</p>
+                              <p className="text-xs text-cyan-300 font-medium">📝 {topic.blogTitle}</p>
+                              <div className="flex flex-wrap gap-1 mt-2">
+                                {topic.keywords?.map((kw, j) => (
+                                  <span key={j} className="px-2 py-0.5 rounded-full bg-cyan-500/10 text-[10px] text-cyan-300">{kw}</span>
+                                ))}
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => applyTrendingTopic(topic)}
+                              className="px-3 py-1 rounded-lg bg-cyan-500/20 text-cyan-300 text-xs hover:bg-cyan-500/30 transition shrink-0"
+                            >
+                              Use This
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+
+                      {trendingType === 'ideas' && (trendingResults.ideas as ContentIdea[])?.map((idea, i) => (
+                        <div key={i} className="p-3 rounded-xl bg-white/5 border border-white/10 hover:border-cyan-500/30 transition">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1">
+                              <h4 className="font-medium text-white text-sm mb-1">{idea.title}</h4>
+                              <p className="text-xs text-white/50 mb-2">{idea.description}</p>
+                              <div className="flex gap-3 text-[10px]">
+                                <span className="text-cyan-300">👥 {idea.audience}</span>
+                                <span className={`${idea.difficulty === 'easy' ? 'text-green-300' : idea.difficulty === 'hard' ? 'text-red-300' : 'text-amber-300'}`}>
+                                  ⚡ {idea.difficulty}
+                                </span>
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => applyContentIdea(idea)}
+                              className="px-3 py-1 rounded-lg bg-cyan-500/20 text-cyan-300 text-xs hover:bg-cyan-500/30 transition shrink-0"
+                            >
+                              Use This
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+
+                      {trendingType === 'news' && (trendingResults.news as NewsItem[])?.map((news, i) => (
+                        <div key={i} className="p-3 rounded-xl bg-white/5 border border-white/10 hover:border-cyan-500/30 transition">
+                          <div className="flex-1">
+                            <h4 className="font-medium text-white text-sm mb-1">📰 {news.headline}</h4>
+                            <p className="text-xs text-white/50 mb-1">{news.importance}</p>
+                            <p className="text-xs text-cyan-300">💡 Content angle: {news.contentAngle}</p>
+                            {news.source && <span className="text-[10px] text-white/30 mt-1 block">Source: {news.source}</span>}
+                          </div>
+                        </div>
+                      ))}
+
+                      {trendingType === 'questions' && (trendingResults.questions as FAQ[])?.map((faq, i) => (
+                        <div key={i} className="p-3 rounded-xl bg-white/5 border border-white/10 hover:border-cyan-500/30 transition">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1">
+                              <h4 className="font-medium text-white text-sm mb-1">❓ {faq.question}</h4>
+                              <p className="text-xs text-white/50 mb-2">{faq.approach}</p>
+                              <div className="flex flex-wrap gap-1">
+                                <span className="px-2 py-0.5 rounded-full bg-purple-500/10 text-[10px] text-purple-300">{faq.intent}</span>
+                                {faq.keywords?.map((kw, j) => (
+                                  <span key={j} className="px-2 py-0.5 rounded-full bg-cyan-500/10 text-[10px] text-cyan-300">{kw}</span>
+                                ))}
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => applyQuestion(faq)}
+                              className="px-3 py-1 rounded-lg bg-cyan-500/20 text-cyan-300 text-xs hover:bg-cyan-500/30 transition shrink-0"
+                            >
+                              Use This
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Empty State */}
+                  {(!trendingResults[trendingType] || trendingResults[trendingType]!.length === 0) && !trendingLoading && (
+                    <div className="text-center py-6 text-white/40 text-sm">
+                      Enter an industry and click Search to discover trending topics
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* AI Suggestions Panel */}
             <AnimatePresence>
