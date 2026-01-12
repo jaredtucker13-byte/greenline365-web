@@ -151,6 +151,21 @@ export default function BlogPolishPage() {
   const [analyzingStyle, setAnalyzingStyle] = useState(false);
   const [showStylePanel, setShowStylePanel] = useState(false);
   const [styleApplied, setStyleApplied] = useState(false);
+  const [showColorEditor, setShowColorEditor] = useState(false);
+  const [editingColor, setEditingColor] = useState<string | null>(null);
+  const [styleVariation, setStyleVariation] = useState(0); // Track regeneration count for variation
+
+  // Mood variations for regeneration
+  const moodVariations = [
+    'professional and trustworthy',
+    'creative and inspiring', 
+    'bold and energetic',
+    'calm and sophisticated',
+    'warm and friendly',
+    'modern and minimalist',
+    'luxurious and premium',
+    'playful and fun'
+  ];
 
   // Texture pattern generator
   const getTexturePattern = (type: string): string => {
