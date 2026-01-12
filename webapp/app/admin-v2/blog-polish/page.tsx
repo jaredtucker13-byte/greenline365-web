@@ -535,6 +535,7 @@ export default function BlogPolishPage() {
 
     setAnalyzingStyle(true);
     try {
+      console.log('[Style] Starting style analysis...', { title: post.title, contentLength: post.content.length });
       const response = await fetch('/api/blog/images', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -547,16 +548,21 @@ export default function BlogPolishPage() {
         }),
       });
 
+      console.log('[Style] Response status:', response.status, response.ok);
       const data = await response.json();
+      console.log('[Style] Response data:', data.success, data.styleGuide?.themeName, data.error);
+      
       if (response.ok && data.success && data.styleGuide) {
         setPageStyle(data.styleGuide);
         setShowStylePanel(true);
         setStyleApplied(false); // Reset applied state on new style
         setMessage({ type: 'success', text: `Style suggestion: "${data.styleGuide.themeName}"` });
       } else {
+        console.error('[Style] Failed:', data.error);
         setMessage({ type: 'error', text: data.error || 'Style analysis failed' });
       }
     } catch (error) {
+      console.error('[Style] Exception:', error);
       setMessage({ type: 'error', text: 'Failed to analyze style' });
     }
     setAnalyzingStyle(false);
