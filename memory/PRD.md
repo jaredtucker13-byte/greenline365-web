@@ -112,7 +112,6 @@ Build "GreenLine365," a comprehensive marketing OS for local businesses. The pla
 - Scheduled email campaigns
 
 ### P3 - Future Features
-- **Dashboard Theme Templates** - Let users customize look (Nature Glass, Dark Tactical, Light Modern, Custom)
 - God Mode CMS
 - Product Mockups Generator
 - Newsletter feature
@@ -120,6 +119,7 @@ Build "GreenLine365," a comprehensive marketing OS for local businesses. The pla
 - OTP verification (Twilio Verify Service)
 - Tax Reporting & POS Integrations
 - Location Pages (SEO Phase 3)
+- Additional theme templates (custom user themes)
 
 ---
 
