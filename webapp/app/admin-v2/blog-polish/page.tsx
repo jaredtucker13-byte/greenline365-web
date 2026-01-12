@@ -10,11 +10,13 @@
  * - AI-powered content enhancement
  * - Image upload and management
  * - Schedule or publish directly
+ * - Style Library for saved themes
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import StyleLibrary from '../components/StyleLibrary';
 
 interface SEOFeedback {
   type: 'success' | 'warning' | 'info' | 'error';
