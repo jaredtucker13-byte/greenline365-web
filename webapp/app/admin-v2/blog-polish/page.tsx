@@ -1504,7 +1504,7 @@ export default function BlogPolishPage() {
 
             {/* Image Suggestions Panel */}
             <AnimatePresence>
-              {showImagePanel && imageSuggestions.length > 0 && (
+              {showImagePanel && (imageSuggestions.length > 0 || generatingAllImages) && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
@@ -1513,9 +1513,23 @@ export default function BlogPolishPage() {
                 >
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-sm font-semibold text-amber-300 flex items-center gap-2">
-                      🖼️ Image Suggestions ({imageSuggestions.length})
+                      🖼️ {generatingAllImages ? 'Generating Images...' : `Image Suggestions (${imageSuggestions.length})`}
                     </h3>
                     <div className="flex items-center gap-3">
+                      {/* Progress indicator when generating all */}
+                      {generatingAllImages && imageGenProgress.total > 0 && (
+                        <div className="flex items-center gap-2">
+                          <div className="w-32 h-2 bg-white/10 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-gradient-to-r from-amber-500 to-orange-500 transition-all duration-300"
+                              style={{ width: `${(imageGenProgress.current / imageGenProgress.total) * 100}%` }}
+                            />
+                          </div>
+                          <span className="text-xs text-amber-300/80">
+                            {imageGenProgress.current}/{imageGenProgress.total}
+                          </span>
+                        </div>
+                      )}
                       {/* Template Selector */}
                       <select
                         value={selectedTemplate}
@@ -1538,7 +1552,18 @@ export default function BlogPolishPage() {
                     </div>
                   </div>
 
-                  {/* Image Suggestions List */}
+                  {/* Progress Status Message */}
+                  {generatingAllImages && imageGenProgress.status && (
+                    <div className="mb-4 p-3 bg-amber-500/10 rounded-xl border border-amber-500/20">
+                      <p className="text-xs text-amber-200 flex items-center gap-2">
+                        <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                        </svg>
+                        {imageGenProgress.status}
+                      </p>
+                    </div>
+                  )}
                   <div className="space-y-4">
                     {imageSuggestions.map((suggestion, idx) => (
                       <div 
