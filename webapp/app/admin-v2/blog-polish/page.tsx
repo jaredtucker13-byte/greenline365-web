@@ -85,6 +85,16 @@ export default function BlogPolishPage() {
   const [scheduleDate, setScheduleDate] = useState('');
   const [scheduleTime, setScheduleTime] = useState('');
 
+  // AI Enhancement state
+  const [aiLoading, setAiLoading] = useState<string | null>(null);
+  const [showAiPanel, setShowAiPanel] = useState(false);
+  const [aiSuggestions, setAiSuggestions] = useState<{
+    headlines?: string[];
+    tags?: string[];
+    meta?: { description: string; keywords: string[] };
+    outline?: string;
+  }>({});
+
   // Calculate stats
   const wordCount = post.content.split(/\s+/).filter(w => w).length;
   const readTime = Math.ceil(wordCount / 200);
