@@ -158,7 +158,7 @@ const DEMO_CONTENT: Record<string, SlotContent> = {
   'text-2': { 
     type: 'text', 
     title: 'Finding Your Path',
-    content: '<p>The path less traveled often leads to the most extraordinary discoveries. In the valleys between giants, small streams carve their way through ancient stone, teaching patience to all who listen.</p><p>Nature's architecture surpasses anything built by human hands, reminding us that we are merely visitors in a gallery of endless wonder.</p>' 
+    content: '<p>The path less traveled often leads to the most extraordinary discoveries. In the valleys between giants, small streams carve their way through ancient stone, teaching patience to all who listen.</p><p>Nature\'s architecture surpasses anything built by human hands, reminding us that we are merely visitors in a gallery of endless wonder.</p>' 
   },
   'image-3': { 
     type: 'image', 
