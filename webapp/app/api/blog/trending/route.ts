@@ -57,7 +57,7 @@ Return ONLY a valid JSON array with this exact format, no other text:
 Return ONLY a valid JSON array with this exact format, no other text:
 [{"headline": "News Headline", "importance": "Why it matters", "source": "Source", "contentAngle": "Content angle"}]`,
 
-      questions: `What are the ${count} most frequently asked questions by people interested in ${industry}${niche ? ` (${niche})` : ''} right now? Focus on questions with high search intent:
+      questions: `What are the ${count} most frequently asked questions by people ${industry ? `interested in ${industry}${niche ? ` (${niche})` : ''}` : 'searching online'} right now? Focus on questions with high search intent:
 1. The question
 2. Search intent type (informational/transactional/navigational)
 3. Suggested answer approach
