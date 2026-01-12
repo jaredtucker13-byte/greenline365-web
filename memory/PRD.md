@@ -190,6 +190,7 @@ Build "GreenLine365," a comprehensive marketing OS for local businesses. The pla
 - Keyboard shortcuts for Content Forge
 - Email analytics dashboard
 - Optimize image generation speed (currently ~40s)
+- Website Analyzer improvements: URL screenshot capture, history/saved analyses
 
 ### P2 - Medium Priority
 - Fix booking widget invisible text
