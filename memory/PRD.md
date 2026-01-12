@@ -140,6 +140,15 @@ Build "GreenLine365," a comprehensive marketing OS for local businesses. The pla
     - Blog title from suggestion
     - Keywords added to tags
   - **Real-time data** from Perplexity's live internet search
+- [x] **Website Analyzer - Premium Feature (COMPLETE - Jan 12, 2026):**
+  - **`/admin-v2/website-analyzer`** - Locked premium tool
+  - **GPT-4o Vision** analysis for comprehensive UX/UI feedback
+  - **Gemini Flash** for creative/unconventional suggestions
+  - **4 analysis types**: Full, Hero Section, Conversion, Visual Design
+  - **Screenshot upload** with drag-and-drop
+  - **Detailed scoring** (Overall X/100 with category breakdowns)
+  - **Copy Report** functionality
+  - **Premium badge** and "Restricted Access" indicator
 - [x] **Public Blog Pages (COMPLETE - Jan 12, 2026):**
   - `/blog` - Beautiful listing page with style-preview cards
   - `/blog/[slug]` - Individual posts fully styled with saved style_guide
