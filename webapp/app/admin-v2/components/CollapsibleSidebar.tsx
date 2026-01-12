@@ -166,10 +166,10 @@ export default function CollapsibleSidebar({
 
       {/* Action Buttons */}
       {!isCollapsed && (
-        <div className="p-4 border-t border-[#39FF14]/10 space-y-2">
+        <div className="p-4 border-t border-white/10 space-y-2">
           <button
             onClick={onNewBooking}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[#39FF14] text-black rounded-lg font-medium text-sm hover:bg-[#39FF14]/90 transition"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#84A98C] to-[#52796F] text-white rounded-xl font-medium text-sm hover:opacity-90 transition shadow-[0_0_20px_rgba(132,169,140,0.3)]"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -178,7 +178,7 @@ export default function CollapsibleSidebar({
           </button>
           <button
             onClick={onNewContent}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white/10 text-white rounded-lg font-medium text-sm hover:bg-white/20 transition"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white/[0.08] backdrop-blur-sm text-white rounded-xl font-medium text-sm hover:bg-white/[0.15] transition border border-white/10"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -186,7 +186,7 @@ export default function CollapsibleSidebar({
             New Content
           </button>
           {pendingCount > 0 && (
-            <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-amber-500/10 text-amber-400 rounded-lg font-medium text-sm hover:bg-amber-500/20 transition">
+            <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-amber-500/10 text-amber-400 rounded-xl font-medium text-sm hover:bg-amber-500/20 transition border border-amber-500/20">
               <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
               Pending ({pendingCount})
             </button>
