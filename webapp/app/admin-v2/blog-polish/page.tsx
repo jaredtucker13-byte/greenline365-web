@@ -93,6 +93,7 @@ export default function BlogPolishPage() {
     tags?: string[];
     meta?: { description: string; keywords: string[] };
     outline?: string;
+    enhanced?: string;
   }>({});
 
   // Calculate stats
