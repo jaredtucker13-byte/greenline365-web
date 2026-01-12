@@ -30,6 +30,7 @@ interface AIRequest {
 const getModel = (action: AIAction): string => {
   switch (action) {
     case 'enhance_content':
+    case 'custom_generate':
       // Claude excels at creative writing enhancement
       return 'anthropic/claude-3.5-sonnet';
     case 'generate_outline':
