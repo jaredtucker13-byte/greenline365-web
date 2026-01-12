@@ -779,6 +779,8 @@ function ChatContent({
   isExpanded,
   setIsExpanded,
   onContentSuggestion,
+  isListening,
+  toggleVoiceInput,
 }: ChatContentProps) {
   const getGreeting = () => {
     const hour = new Date().getHours();
