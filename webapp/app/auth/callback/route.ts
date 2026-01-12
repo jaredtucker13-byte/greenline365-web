@@ -22,7 +22,6 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // Redirect to HOME PAGE after successful auth (not dashboard)
-  // Users should explore the website after signing up
-  return NextResponse.redirect(`${origin}/?auth_success=true`);
+  // Redirect to DASHBOARD after successful auth
+  return NextResponse.redirect(`${origin}/admin-v2`);
 }

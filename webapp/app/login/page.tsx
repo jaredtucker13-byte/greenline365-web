@@ -30,8 +30,8 @@ export default function LoginPage() {
         }
         
         if (session) {
-          // User is already logged in, redirect to HOME
-          router.push('/');
+          // User is already logged in, redirect to DASHBOARD
+          router.push('/admin-v2');
         } else {
           setCheckingSession(false);
         }
@@ -70,8 +70,8 @@ export default function LoginPage() {
     }
 
     if (data.session) {
-      // Redirect to HOME after login (not dashboard)
-      router.push('/');
+      // Redirect to DASHBOARD after login
+      router.push('/admin-v2');
     }
 
     setLoading(false);
