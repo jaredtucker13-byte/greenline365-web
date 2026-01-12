@@ -237,6 +237,121 @@ export default function BlogPolishPage() {
     setPublishing(false);
   };
 
+  // AI Enhancement functions
+  const callAI = async (action: string) => {
+    setAiLoading(action);
+    try {
+      const response = await fetch('/api/blog/ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action,
+          title: post.title,
+          content: post.content,
+          category: post.category,
+          keywords: post.tags,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        return data.result;
+      } else {
+        setMessage({ type: 'error', text: data.error || 'AI request failed' });
+        return null;
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'AI service unavailable' });
+      return null;
+    } finally {
+      setAiLoading(null);
+    }
+  };
+
+  const generateOutline = async () => {
+    if (!post.title) {
+      setMessage({ type: 'error', text: 'Enter a title first to generate an outline' });
+      return;
+    }
+    const result = await callAI('generate_outline');
+    if (result) {
+      setAiSuggestions(prev => ({ ...prev, outline: result }));
+      setShowAiPanel(true);
+    }
+  };
+
+  const enhanceContent = async () => {
+    if (!post.content || post.content.length < 50) {
+      setMessage({ type: 'error', text: 'Add more content before enhancing' });
+      return;
+    }
+    const result = await callAI('enhance_content');
+    if (result) {
+      // Show in panel for review before applying
+      setAiSuggestions(prev => ({ ...prev, enhanced: result }));
+      setShowAiPanel(true);
+    }
+  };
+
+  const suggestHeadlines = async () => {
+    if (!post.title) {
+      setMessage({ type: 'error', text: 'Enter a title first' });
+      return;
+    }
+    const result = await callAI('suggest_headlines');
+    if (result && Array.isArray(result)) {
+      setAiSuggestions(prev => ({ ...prev, headlines: result }));
+      setShowAiPanel(true);
+    }
+  };
+
+  const suggestTags = async () => {
+    const result = await callAI('suggest_tags');
+    if (result && Array.isArray(result)) {
+      setAiSuggestions(prev => ({ ...prev, tags: result }));
+      setShowAiPanel(true);
+    }
+  };
+
+  const generateMeta = async () => {
+    if (!post.title || !post.content) {
+      setMessage({ type: 'error', text: 'Title and content required for meta generation' });
+      return;
+    }
+    const result = await callAI('generate_meta');
+    if (result) {
+      setAiSuggestions(prev => ({ ...prev, meta: result }));
+      setShowAiPanel(true);
+    }
+  };
+
+  const applyOutline = () => {
+    if (aiSuggestions.outline) {
+      setPost(prev => ({ ...prev, content: aiSuggestions.outline || '' }));
+      setAiSuggestions(prev => ({ ...prev, outline: undefined }));
+      setMessage({ type: 'success', text: 'Outline applied!' });
+    }
+  };
+
+  const applyEnhanced = () => {
+    if (aiSuggestions.enhanced) {
+      setPost(prev => ({ ...prev, content: aiSuggestions.enhanced || '' }));
+      setAiSuggestions(prev => ({ ...prev, enhanced: undefined }));
+      setMessage({ type: 'success', text: 'Enhanced content applied!' });
+    }
+  };
+
+  const applyHeadline = (headline: string) => {
+    setPost(prev => ({ ...prev, title: headline }));
+    setMessage({ type: 'success', text: 'Headline applied!' });
+  };
+
+  const applyTag = (tag: string) => {
+    if (!post.tags.includes(tag)) {
+      setPost(prev => ({ ...prev, tags: [...prev.tags, tag] }));
+    }
+  };
+
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-emerald-400';
     if (score >= 60) return 'text-amber-400';
