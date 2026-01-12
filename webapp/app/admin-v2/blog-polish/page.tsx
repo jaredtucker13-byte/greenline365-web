@@ -535,7 +535,7 @@ export default function BlogPolishPage() {
 
     setAnalyzingStyle(true);
     try {
-      console.log('[Style] Starting style analysis...', { title: post.title, contentLength: post.content.length });
+      console.log('[Style] Starting style analysis...', post.title, 'content length:', post.content.length);
       const response = await fetch('/api/blog/images', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -544,25 +544,25 @@ export default function BlogPolishPage() {
           title: post.title,
           content: post.content,
           category: post.category,
-          moodHint: moodHint, // Optional mood variation hint
+          moodHint: moodHint,
         }),
       });
 
       console.log('[Style] Response status:', response.status, response.ok);
       const data = await response.json();
-      console.log('[Style] Response data:', data.success, data.styleGuide?.themeName, data.error);
+      console.log('[Style] Response data success:', data.success, 'themeName:', data.styleGuide?.themeName, 'error:', data.error);
       
       if (response.ok && data.success && data.styleGuide) {
         setPageStyle(data.styleGuide);
         setShowStylePanel(true);
-        setStyleApplied(false); // Reset applied state on new style
+        setStyleApplied(false);
         setMessage({ type: 'success', text: `Style suggestion: "${data.styleGuide.themeName}"` });
       } else {
         console.error('[Style] Failed:', data.error);
         setMessage({ type: 'error', text: data.error || 'Style analysis failed' });
       }
-    } catch (error) {
-      console.error('[Style] Exception:', error);
+    } catch (error: any) {
+      console.error('[Style] Exception:', error?.message || error);
       setMessage({ type: 'error', text: 'Failed to analyze style' });
     }
     setAnalyzingStyle(false);
