@@ -4,6 +4,7 @@
  */
 
 import type { Metadata } from 'next';
+import { ThemeProvider } from './lib/ThemeContext';
 
 export const metadata: Metadata = {
   title: 'Tactical Command Center - GreenLine365',
@@ -12,8 +13,10 @@ export const metadata: Metadata = {
 
 export default function AdminV2Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-[#121212]">
-      {children}
-    </div>
+    <ThemeProvider>
+      <div className="min-h-screen bg-[#121212]">
+        {children}
+      </div>
+    </ThemeProvider>
   );
 }
