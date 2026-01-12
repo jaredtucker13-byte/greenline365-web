@@ -132,15 +132,15 @@ export default function HybridCalendar({
   };
 
   return (
-    <div className="backdrop-blur-2xl bg-white/[0.08] rounded-3xl border border-white/[0.15] overflow-hidden shadow-[0_8px_32px_0_rgba(0,0,0,0.36)]">
+    <div className="backdrop-blur-2xl rounded-3xl border overflow-hidden shadow-[0_8px_32px_0_var(--theme-shadow)]" style={{ background: 'var(--theme-bg-glass)', borderColor: 'var(--theme-glass-border)' }}>
       {/* Calendar Header */}
-      <div className="p-6 border-b border-white/10">
+      <div className="p-6 border-b" style={{ borderColor: 'var(--theme-glass-border)' }}>
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-light text-white tracking-tight">
+            <h2 className="text-2xl font-light tracking-tight" style={{ color: 'var(--theme-text-primary)' }}>
               {currentDate.toLocaleDateString('en-US', { month: 'long' })}
             </h2>
-            <p className="text-white/50 text-sm mt-1">
+            <p className="text-sm mt-1" style={{ color: 'var(--theme-text-muted)' }}>
               {currentDate.getFullYear()}
             </p>
           </div>
@@ -148,14 +148,14 @@ export default function HybridCalendar({
           {/* Legend */}
           <div className="flex items-center gap-6">
             {[
-              { color: 'bg-emerald-400', label: 'Booking' },
-              { color: 'bg-sky-400', label: 'Content' },
-              { color: 'bg-amber-400', label: 'Review' },
-              { color: 'bg-violet-400', label: 'Launch' },
+              { color: 'var(--theme-success)', label: 'Booking' },
+              { color: 'var(--theme-info)', label: 'Content' },
+              { color: 'var(--theme-warning)', label: 'Review' },
+              { color: '#8B5CF6', label: 'Launch' },
             ].map((item) => (
               <div key={item.label} className="flex items-center gap-2">
-                <span className={`w-2 h-2 rounded-full ${item.color}`} />
-                <span className="text-white/60 text-xs font-medium tracking-wide">{item.label}</span>
+                <span className="w-2 h-2 rounded-full" style={{ background: item.color }} />
+                <span className="text-xs font-medium tracking-wide" style={{ color: 'var(--theme-text-secondary)' }}>{item.label}</span>
               </div>
             ))}
           </div>
@@ -163,10 +163,10 @@ export default function HybridCalendar({
       </div>
 
       {/* Day Headers */}
-      <div className="grid grid-cols-7 border-b border-white/10 bg-white/[0.03]">
+      <div className="grid grid-cols-7 border-b" style={{ borderColor: 'var(--theme-glass-border)', background: 'var(--theme-bg-secondary)' }}>
         {DAYS.map((day) => (
           <div key={day} className="py-4 text-center">
-            <span className="text-xs font-semibold text-white/40 uppercase tracking-widest">
+            <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--theme-text-muted)' }}>
               {day}
             </span>
           </div>
