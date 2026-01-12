@@ -293,6 +293,7 @@ export default function BlogPolishPage() {
           ...post,
           status: scheduled ? 'scheduled' : 'published',
           scheduled_for: scheduledFor,
+          style_guide: styleApplied && pageStyle ? pageStyle : null,
         }),
       });
 
