@@ -98,6 +98,43 @@ export default function BlogPolishPage() {
     enhanced?: string;
   }>({});
 
+  // Trending Research state
+  interface TrendingTopic {
+    topic: string;
+    reason: string;
+    blogTitle: string;
+    keywords: string[];
+  }
+  interface ContentIdea {
+    title: string;
+    description: string;
+    audience: string;
+    difficulty: string;
+  }
+  interface NewsItem {
+    headline: string;
+    importance: string;
+    source: string;
+    contentAngle: string;
+  }
+  interface FAQ {
+    question: string;
+    intent: string;
+    approach: string;
+    keywords: string[];
+  }
+  const [showTrendingPanel, setShowTrendingPanel] = useState(false);
+  const [trendingLoading, setTrendingLoading] = useState(false);
+  const [trendingType, setTrendingType] = useState<'trending' | 'ideas' | 'news' | 'questions'>('trending');
+  const [trendingIndustry, setTrendingIndustry] = useState('');
+  const [trendingNiche, setTrendingNiche] = useState('');
+  const [trendingResults, setTrendingResults] = useState<{
+    trending?: TrendingTopic[];
+    ideas?: ContentIdea[];
+    news?: NewsItem[];
+    questions?: FAQ[];
+  }>({});
+
   // Image Generation state
   interface ImageSuggestion {
     id: string;
