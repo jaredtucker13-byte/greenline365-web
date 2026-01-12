@@ -210,8 +210,13 @@ export default function BlogPolishPage() {
   const [showStyleLibrary, setShowStyleLibrary] = useState(false);
 
   // Handle applying style from library
-  const applyStyleFromLibrary = (style: PageStyleGuide) => {
-    setPageStyle(style);
+  const applyStyleFromLibrary = (style: any) => {
+    // Ensure description is set
+    const fullStyle: PageStyleGuide = {
+      ...style,
+      description: style.description || style.mood || 'Custom style from library'
+    };
+    setPageStyle(fullStyle);
     setShowStylePanel(true);
     setStyleApplied(true);
     setMessage({ type: 'success', text: `Applied "${style.themeName}" from library` });
