@@ -195,14 +195,25 @@ export default function TacticalCommandCenter() {
   );
 
   return (
-    <div className="min-h-screen bg-[#121212] flex">
+    <div 
+      className="min-h-screen flex relative"
+      style={{
+        backgroundImage: `url('https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=2127&auto=format&fit=crop')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
+      }}
+    >
+      {/* Dark Overlay */}
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px]" />
+      
       {/* Preview Mode Banner */}
       {isPreviewMode && (
-        <div className="fixed top-0 left-0 right-0 z-[60] bg-gradient-to-r from-yellow-500 to-orange-500 text-black text-center py-2 px-4 flex items-center justify-center gap-4">
-          <span className="font-semibold">👁️ PREVIEW MODE - Viewing as Customer</span>
+        <div className="fixed top-0 left-0 right-0 z-[60] bg-gradient-to-r from-amber-500/90 to-orange-500/90 backdrop-blur-sm text-white text-center py-2 px-4 flex items-center justify-center gap-4">
+          <span className="font-medium">👁️ PREVIEW MODE - Viewing as Customer</span>
           <button
             onClick={() => setIsPreviewMode(false)}
-            className="px-3 py-1 bg-black/20 hover:bg-black/30 rounded-lg text-sm font-medium transition"
+            className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg text-sm font-medium transition"
           >
             Exit Preview
           </button>
