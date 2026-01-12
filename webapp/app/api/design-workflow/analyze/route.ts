@@ -179,63 +179,35 @@ asyncio.run(analyze())
         );
       }
 
-      // Use Claude Opus 4.5 for design specification
-      const { LlmChat, UserMessage } = await import('emergentintegrations/llm/chat');
+      // Use Claude Opus 4.5 for design specification via Python
+      const { execFile } = await import('child_process');
+      const { promisify } = await import('util');
+      const execFileAsync = promisify(execFile);
       
-      const chat = LlmChat({
-        apiKey: emergentKey,
-        sessionId: `scratch-${Date.now()}`,
-        systemMessage: 'You are a world-class web designer specializing in conversion-focused landing pages. Create detailed design specifications.',
-      });
+      const pythonScript = `
+import asyncio
+import json
+from emergentintegrations.llm.chat import LlmChat, UserMessage
 
-      chat.with_model('anthropic', 'claude-opus-4-5-20251101');
+async def generate():
+    chat = LlmChat(
+        api_key="${emergentKey}",
+        session_id="scratch-${Date.now()}",
+        system_message="You are a world-class web designer specializing in conversion-focused landing pages. Create detailed design specifications."
+    )
+    
+    chat.with_model("anthropic", "claude-opus-4-5-20251101")
+    
+    message = UserMessage(text='''${designPrompt.replace(/'/g, "\\'")}''')
+    result = await chat.send_message(message)
+    print(json.dumps({"analysis": result}))
 
-      const designPrompt = `Create a comprehensive design specification for a new website with these requirements:
+asyncio.run(generate())
+`;
 
-**Description:** ${description}
-${brandColors ? `**Brand Colors:** ${brandColors}` : ''}
-${stylePreference ? `**Style:** ${stylePreference}` : ''}
-${targetAudience ? `**Target Audience:** ${targetAudience}` : ''}
-
-Provide a detailed design specification including:
-
-**1. HERO SECTION:**
-- Headline text (exact copy)
-- Subheadline text
-- CTA button text and style
-- Background treatment
-
-**2. COLOR PALETTE:**
-- Primary color (HEX)
-- Secondary color (HEX)
-- Accent color (HEX)
-- Background colors (HEX)
-- Text colors (HEX)
-
-**3. TYPOGRAPHY:**
-- Heading font (Google Font name)
-- Body font (Google Font name)
-- Font sizes (h1, h2, body in px)
-
-**4. LAYOUT STRUCTURE:**
-- Hero section layout
-- Feature sections
-- Social proof section
-- CTA sections
-- Footer
-
-**5. KEY SECTIONS TO INCLUDE:**
-List 5-7 key sections with brief content guidance.
-
-**6. CONVERSION ELEMENTS:**
-- Primary CTAs (text and placement)
-- Trust indicators
-- Social proof elements
-
-Be extremely specific so a developer can build this from your spec.`;
-
-      const message = UserMessage({ text: designPrompt });
-      analysisText = await chat.send_message(message);
+      const { stdout } = await execFileAsync('python3', ['-c', pythonScript]);
+      const result = JSON.parse(stdout);
+      analysisText = result.analysis;
 
       // Parse design spec
       designSpec = {
