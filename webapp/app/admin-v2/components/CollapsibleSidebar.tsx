@@ -34,10 +34,10 @@ interface SidebarProps {
 const navItems = [
   { id: 'dashboard', label: 'Dashboard', icon: 'grid', href: '/admin-v2' },
   { id: 'schedule', label: 'Schedule', icon: 'calendar', href: '/admin-v2?view=schedule' },
+  { id: 'blog', label: 'Blog', icon: 'edit', href: '/admin-v2/blog-polish' },
   { id: 'email', label: 'Email', icon: 'mail', href: '/admin-v2/email' },
   { id: 'sms', label: 'SMS', icon: 'phone', href: '/admin-v2/sms' },
   { id: 'analytics', label: 'Analytics', icon: 'chart', href: '/admin-v2?view=analytics' },
-  { id: 'content', label: 'Content', icon: 'edit', href: '/admin/content' },
   { id: 'settings', label: 'Settings', icon: 'cog', href: '/admin-v2/settings' },
 ];
 
