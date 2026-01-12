@@ -1,5 +1,6 @@
-import { createServerClient } from '@supabase/ssr';
+import { createServerClient as createSupabaseServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 
 // Server-side Supabase client for Server Components and Route Handlers
 // Uses cookies to maintain session state
@@ -9,7 +10,7 @@ export async function createClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-  return createServerClient(supabaseUrl, supabaseAnonKey, {
+  return createSupabaseServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
       getAll() {
         return cookieStore.getAll();
@@ -29,13 +30,11 @@ export async function createClient() {
   });
 }
 
-// Legacy server client with service role for admin operations (bypasses RLS)
-export function createAdminClient() {
+// Legacy export name for backward compatibility with existing API routes
+// Returns a simple Supabase client with service role (bypasses RLS)
+export function createServerClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
-  // Import the standard client for admin operations
-  const { createClient: createSupabaseClient } = require('@supabase/supabase-js');
 
   return createSupabaseClient(supabaseUrl, supabaseServiceKey, {
     auth: {
@@ -44,3 +43,6 @@ export function createAdminClient() {
     },
   });
 }
+
+// Alias for admin operations
+export const createAdminClient = createServerClient;
