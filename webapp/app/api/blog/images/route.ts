@@ -353,17 +353,42 @@ ${content.slice(0, 2000)}${content.length > 2000 ? '...' : ''}`
     console.error('[Blog Style] JSON parse error:', e.message);
     console.error('[Blog Style] Raw response:', aiResponse.slice(0, 500));
     
-    // Try a more aggressive cleanup approach
+    // Try to fix truncated JSON by closing open brackets
     try {
-      const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
+      const jsonMatch = aiResponse.match(/\{[\s\S]*/);
       if (jsonMatch) {
-        // Remove all line breaks and extra spaces
-        const aggressive = jsonMatch[0]
+        let fixedJson = jsonMatch[0]
           .replace(/[\r\n]+/g, ' ')
           .replace(/\s+/g, ' ')
           .replace(/,\s*}/g, '}')
-          .replace(/,\s*]/g, ']');
-        const styleGuide = JSON.parse(aggressive);
+          .replace(/,\s*]/g, ']')
+          .replace(/[\u2018\u2019]/g, "'")
+          .replace(/[\u201C\u201D]/g, '"');
+        
+        // Count open and close brackets to fix truncation
+        const openBraces = (fixedJson.match(/{/g) || []).length;
+        const closeBraces = (fixedJson.match(/}/g) || []).length;
+        const openBrackets = (fixedJson.match(/\[/g) || []).length;
+        const closeBrackets = (fixedJson.match(/]/g) || []).length;
+        
+        // Try to close any unclosed quotes/strings
+        if (fixedJson.match(/"[^"]*$/)) {
+          fixedJson += '"';
+        }
+        
+        // Add missing closing brackets/braces
+        for (let i = 0; i < openBrackets - closeBrackets; i++) {
+          fixedJson += ']';
+        }
+        for (let i = 0; i < openBraces - closeBraces; i++) {
+          fixedJson += '}';
+        }
+        
+        // Remove trailing commas
+        fixedJson = fixedJson.replace(/,(\s*[}\]])/g, '$1');
+        
+        const styleGuide = JSON.parse(fixedJson);
+        console.log('[Blog Style] Successfully repaired truncated JSON');
         return NextResponse.json({ 
           success: true,
           styleGuide,
@@ -371,7 +396,7 @@ ${content.slice(0, 2000)}${content.length > 2000 ? '...' : ''}`
         });
       }
     } catch (e2) {
-      console.error('[Blog Style] Aggressive parse also failed');
+      console.error('[Blog Style] JSON repair also failed:', e2);
     }
   }
 
