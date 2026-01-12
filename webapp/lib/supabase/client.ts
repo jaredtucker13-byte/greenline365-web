@@ -1,38 +1,11 @@
-import { createClient, SupabaseClient, User, Session } from '@supabase/supabase-js';
+import { createBrowserClient } from '@supabase/ssr';
+import { User, Session } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-// Create a mock client for when env vars are missing (build time or missing config)
-function createSupabaseClient(): SupabaseClient {
-  if (!supabaseUrl || !supabaseAnonKey) {
-    console.warn('Supabase environment variables not set. Using mock client.');
-    return {
-      from: () => ({
-        select: () => ({ data: [], error: null, single: () => ({ data: null, error: null }) }),
-        insert: () => ({ data: null, error: { message: 'Supabase not configured' }, select: () => ({ single: () => ({ data: null, error: null }) }) }),
-        update: () => ({ data: null, error: { message: 'Supabase not configured' }, eq: () => ({ select: () => ({ single: () => ({ data: null, error: null }) }) }) }),
-        delete: () => ({ data: null, error: { message: 'Supabase not configured' } }),
-        upsert: () => ({ data: null, error: { message: 'Supabase not configured' } }),
-        eq: () => ({ select: () => ({ single: () => ({ data: null, error: null }) }) }),
-        order: () => ({ data: [], error: null }),
-      }),
-      auth: {
-        getSession: () => Promise.resolve({ data: { session: null }, error: null }),
-        getUser: () => Promise.resolve({ data: { user: null }, error: null }),
-        signInWithPassword: () => Promise.resolve({ data: { user: null, session: null }, error: { message: 'Supabase not configured' } }),
-        signUp: () => Promise.resolve({ data: { user: null, session: null }, error: { message: 'Supabase not configured' } }),
-        signOut: () => Promise.resolve({ error: null }),
-        signInWithOAuth: () => Promise.resolve({ data: { url: null, provider: 'google' }, error: { message: 'Supabase not configured' } }),
-        onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
-      },
-    } as unknown as SupabaseClient;
-  }
-  
-  return createClient(supabaseUrl, supabaseAnonKey);
-}
-
-export const supabase = createSupabaseClient();
+// Create the browser client with cookie support
+export const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey);
 
 // Auth helper functions
 export async function signUp(email: string, password: string, fullName?: string) {
