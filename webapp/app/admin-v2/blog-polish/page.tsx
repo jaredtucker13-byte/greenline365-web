@@ -156,6 +156,7 @@ export default function BlogPolishPage() {
   const [analyzingImages, setAnalyzingImages] = useState(false);
   const [showImagePanel, setShowImagePanel] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<'classic' | 'magazine' | 'minimal' | 'cards'>('classic');
+  const [showCopyrightPanel, setShowCopyrightPanel] = useState(false);
 
   // Page Styling state
   interface PageStyleGuide {
