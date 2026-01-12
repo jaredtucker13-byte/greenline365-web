@@ -883,7 +883,7 @@ export default function HomePage() {
                   ))}
                   <span className="text-white/50 text-xs ml-1">4.9/5</span>
                 </div>
-                <p className="text-white/50 text-xs">Trusted by 500+ businesses</p>
+                <p className="text-white/50 text-xs">Be one of our first customers</p>
               </div>
             </div>
             
