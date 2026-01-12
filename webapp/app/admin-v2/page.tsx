@@ -18,6 +18,8 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase/client';
 import CollapsibleSidebar from './components/CollapsibleSidebar';
 import TacticalHeader from './components/TacticalHeader';
 import HybridCalendar from './components/HybridCalendar';
