@@ -1777,6 +1777,14 @@ export default function BlogPolishPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Style Library Modal */}
+      <StyleLibrary
+        isOpen={showStyleLibrary}
+        onClose={() => setShowStyleLibrary(false)}
+        onApplyStyle={applyStyleFromLibrary}
+        currentStyle={pageStyle}
+      />
     </div>
   );
 }
