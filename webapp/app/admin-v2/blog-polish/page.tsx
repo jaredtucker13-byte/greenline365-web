@@ -686,7 +686,9 @@ export default function BlogPolishPage() {
             className={`relative z-30 mx-6 mt-4 p-4 rounded-xl backdrop-blur-xl flex items-center justify-between ${
               message.type === 'success'
                 ? 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-300'
-                : 'bg-red-500/20 border border-red-500/30 text-red-300'
+                : message.type === 'info'
+                  ? 'bg-blue-500/20 border border-blue-500/30 text-blue-300'
+                  : 'bg-red-500/20 border border-red-500/30 text-red-300'
             }`}
           >
             <span>{message.text}</span>
