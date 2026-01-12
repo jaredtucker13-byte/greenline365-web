@@ -251,19 +251,17 @@ async function analyzePageStyle(body: StyleAnalyzeRequest) {
       model: 'openai/gpt-4o-mini',
       messages: [
         {
-          role: 'system',
-          content: `You are a web designer. Return ONLY valid JSON for a page style theme. Keep ALL descriptions under 30 characters. No markdown.${moodInstruction}
-
-Required JSON structure (fill in hex colors and values):
-{"themeName":"","description":"","colors":{"primary":"#","secondary":"#","accent":"#","background":"#","backgroundGradient":null,"text":"#","textMuted":"#","headings":"#","links":"#"},"texture":{"type":"none","opacity":0,"description":""},"typography":{"headingStyle":"bold","headingSize":"medium","bodyLineHeight":"normal","emphasis":"bold"},"layout":{"contentWidth":"medium","imageStyle":"rounded","spacing":"balanced","headerStyle":"minimal"},"mood":""}`
+          role: 'system', 
+          content: `Return ONLY valid JSON for a page style theme. Keep all descriptions under 50 chars. No markdown or code blocks.${moodInstruction}`
         },
         {
           role: 'user',
-          content: `Create style for marketing blog: "${title}"`
+          content: `Create page style JSON for blog "${title}". Fill in this template with appropriate hex colors and values:
+{"themeName":"","description":"","colors":{"primary":"#","secondary":"#","accent":"#","background":"#","backgroundGradient":null,"text":"#","textMuted":"#","headings":"#","links":"#"},"texture":{"type":"none","opacity":0,"description":""},"typography":{"headingStyle":"bold","headingSize":"medium","bodyLineHeight":"normal","emphasis":"bold"},"layout":{"contentWidth":"medium","imageStyle":"rounded","spacing":"balanced","headerStyle":"minimal"},"mood":""}`
         }
       ],
       temperature: 0.5,
-      max_tokens: 600,
+      max_tokens: 700,
     }),
   });
 
