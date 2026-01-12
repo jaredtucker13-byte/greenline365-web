@@ -610,18 +610,14 @@ export default function BlogPolishPage() {
 
   // Trending Research with Perplexity via OpenRouter
   const searchTrending = async () => {
-    if (!trendingIndustry) {
-      setMessage({ type: 'error', text: 'Enter an industry to research' });
-      return;
-    }
-
+    // Industry is now OPTIONAL - can search general trends
     setTrendingLoading(true);
     try {
       const response = await fetch('/api/blog/trending', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          industry: trendingIndustry,
+          industry: trendingIndustry || undefined, // Optional now
           niche: trendingNiche || undefined,
           type: trendingType,
           count: 5,
