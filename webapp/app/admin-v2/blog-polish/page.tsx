@@ -1324,8 +1324,11 @@ export default function BlogPolishPage() {
         body: JSON.stringify({
           action: 'generate',
           prompt: suggestion.prompt,
-          style: 'professional',
+          enrichedPrompt: suggestion.enrichedPrompt, // Use the full artistic prompt
+          style: 'cinematic',
           count: 2,
+          aspectRatio: suggestion.suggestedRatio || '16:9',
+          isChart: suggestion.isChart || false,
         }),
       });
 
@@ -1338,12 +1341,12 @@ export default function BlogPolishPage() {
             : s
         ));
         playNotificationSound();
-        setMessage({ type: 'success', text: '🎨 Image generated!' });
+        setMessage({ type: 'success', text: `🎨 Image generated! ${genData.attempt > 1 ? `(Attempt ${genData.attempt})` : ''}` });
       } else {
         setImageSuggestions(prev => prev.map(s => 
           s.id === suggestionId ? { ...s, generating: false } : s
         ));
-        setMessage({ type: 'error', text: genData.message || 'Generation failed' });
+        setMessage({ type: 'error', text: genData.message || 'Generation failed after 3 attempts' });
       }
     } catch (error) {
       setImageSuggestions(prev => prev.map(s => 
@@ -1351,6 +1354,64 @@ export default function BlogPolishPage() {
       ));
       setMessage({ type: 'error', text: 'Failed to generate image' });
     }
+  };
+  
+  // Generate custom image from user prompt
+  const generateCustomImage = async () => {
+    if (!customImagePrompt.trim()) {
+      setMessage({ type: 'error', text: 'Please enter a description for your image' });
+      return;
+    }
+    
+    setGeneratingCustomImage(true);
+    
+    try {
+      const response = await fetch('/api/blog/images', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'generate-custom',
+          userPrompt: customImagePrompt,
+          aspectRatio: customImageRatio,
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok && data.images?.length > 0) {
+        setCustomGeneratedImages(prev => [...data.images, ...prev]);
+        playCompletionSound();
+        setMessage({ type: 'success', text: '🎨 Custom image created!' });
+        setCustomImagePrompt('');
+      } else {
+        setMessage({ type: 'error', text: data.message || 'Custom image generation failed' });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Failed to generate custom image' });
+    } finally {
+      setGeneratingCustomImage(false);
+    }
+  };
+  
+  // Apply image to blog content with layout
+  const applyImageToBlog = (imageUrl: string, layout: 'left' | 'right' | 'center' | 'full-width') => {
+    const layoutStyles: Record<string, string> = {
+      'left': 'float: left; margin: 0 20px 15px 0; max-width: 45%;',
+      'right': 'float: right; margin: 0 0 15px 20px; max-width: 45%;',
+      'center': 'display: block; margin: 20px auto; max-width: 80%;',
+      'full-width': 'display: block; width: 100%; margin: 20px 0;',
+    };
+    
+    const imageHtml = `\n\n<img src="${imageUrl}" alt="Blog image" style="${layoutStyles[layout]} border-radius: 8px;" />\n\n`;
+    
+    // Add to end of content (user can move it)
+    setPost(prev => ({
+      ...prev,
+      content: prev.content + imageHtml
+    }));
+    
+    setApplyingImageId(null);
+    setMessage({ type: 'success', text: `Image added with ${layout} layout. Move it to desired position in your content.` });
   };
 
   // Generate ALL images (with warning)
