@@ -1173,29 +1173,76 @@ export default function BlogPolishPage() {
                     <h3 className="text-sm font-semibold text-purple-300 flex items-center gap-2">
                       🤖 AI Suggestions
                     </h3>
-                    <button
-                      onClick={() => setShowAiPanel(false)}
-                      className="p-1 hover:bg-white/10 rounded text-white/50 hover:text-white"
-                    >
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setExpandedPanel(expandedPanel === 'ai' ? null : 'ai')}
+                        className="p-1.5 hover:bg-white/10 rounded text-white/50 hover:text-white transition"
+                        title="Expand panel"
+                      >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => setShowAiPanel(false)}
+                        className="p-1 hover:bg-white/10 rounded text-white/50 hover:text-white"
+                      >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Custom Prompt Input - Use Suggestions Here */}
+                  <div className="mb-4 p-3 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-xl border border-purple-400/30">
+                    <p className="text-xs text-purple-200 mb-2 font-medium">✨ Generate Content from Suggestion</p>
+                    <p className="text-[10px] text-white/40 mb-2">Click "Use This" on any suggestion below, then edit and generate new content</p>
+                    <div className="flex gap-2">
+                      <textarea
+                        value={customPromptInput}
+                        onChange={(e) => setCustomPromptInput(e.target.value)}
+                        placeholder="Paste a suggestion or type your own prompt to generate content..."
+                        className="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-purple-400/50 resize-none"
+                        rows={2}
+                        data-testid="custom-prompt-input"
+                      />
+                      <button
+                        onClick={generateFromPrompt}
+                        disabled={aiLoading === 'custom_prompt' || !customPromptInput.trim()}
+                        className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-medium hover:opacity-90 transition disabled:opacity-50 self-end"
+                      >
+                        {aiLoading === 'custom_prompt' ? (
+                          <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                          </svg>
+                        ) : 'Generate'}
+                      </button>
+                    </div>
                   </div>
 
                   {/* Headlines */}
                   {aiSuggestions.headlines && (
                     <div className="mb-4">
-                      <p className="text-xs text-white/50 mb-2">💡 Headline Options (click to apply)</p>
+                      <p className="text-xs text-white/50 mb-2">💡 Headline Options</p>
                       <div className="space-y-2">
                         {aiSuggestions.headlines.map((headline, i) => (
-                          <button
-                            key={i}
-                            onClick={() => applyHeadline(headline)}
-                            className="w-full text-left px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/80 text-sm transition"
-                          >
-                            {headline}
-                          </button>
+                          <div key={i} className="flex items-center gap-2">
+                            <button
+                              onClick={() => applyHeadline(headline)}
+                              className="flex-1 text-left px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/80 text-sm transition"
+                            >
+                              {headline}
+                            </button>
+                            <button
+                              onClick={() => useSuggestion(`Write a blog post with the headline: "${headline}"`)}
+                              className="px-2 py-1 rounded bg-purple-500/30 text-purple-200 text-[10px] hover:bg-purple-500/40 transition whitespace-nowrap"
+                              title="Use this suggestion to generate content"
+                            >
+                              Use This
+                            </button>
+                          </div>
                         ))}
                       </div>
                     </div>
@@ -1223,7 +1270,15 @@ export default function BlogPolishPage() {
                   {/* Meta */}
                   {aiSuggestions.meta && (
                     <div className="mb-4">
-                      <p className="text-xs text-white/50 mb-2">🔎 SEO Meta</p>
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-xs text-white/50">🔎 SEO Meta</p>
+                        <button
+                          onClick={() => useSuggestion(`Write content optimized for: ${aiSuggestions.meta?.description}. Keywords: ${aiSuggestions.meta?.keywords?.join(', ')}`)}
+                          className="px-2 py-1 rounded bg-purple-500/30 text-purple-200 text-[10px] hover:bg-purple-500/40 transition"
+                        >
+                          Use This
+                        </button>
+                      </div>
                       <div className="space-y-2 text-sm">
                         <p className="text-white/70"><span className="text-white/50">Description:</span> {aiSuggestions.meta.description}</p>
                         <p className="text-white/70">
@@ -1239,12 +1294,20 @@ export default function BlogPolishPage() {
                     <div className="mb-4">
                       <div className="flex items-center justify-between mb-2">
                         <p className="text-xs text-white/50">📋 Generated Outline</p>
-                        <button
-                          onClick={applyOutline}
-                          className="px-3 py-1 rounded-lg bg-purple-500/30 text-purple-200 text-xs hover:bg-purple-500/40 transition"
-                        >
-                          Apply to Content
-                        </button>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => useSuggestion(`Expand on this outline:\n${aiSuggestions.outline}`)}
+                            className="px-2 py-1 rounded bg-purple-500/30 text-purple-200 text-[10px] hover:bg-purple-500/40 transition"
+                          >
+                            Use This
+                          </button>
+                          <button
+                            onClick={applyOutline}
+                            className="px-3 py-1 rounded-lg bg-purple-500/30 text-purple-200 text-xs hover:bg-purple-500/40 transition"
+                          >
+                            Apply to Content
+                          </button>
+                        </div>
                       </div>
                       <pre className="text-xs text-white/70 bg-white/5 rounded-lg p-3 overflow-auto max-h-48 whitespace-pre-wrap">
                         {aiSuggestions.outline}
