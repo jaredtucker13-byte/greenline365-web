@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+import { writeFile, unlink } from 'fs/promises';
+import { tmpdir } from 'os';
+import { join } from 'path';
 
-/**
- * Design Workflow - Step 2: Generate Mockup
- * Uses Nano Banana Pro (Gemini 3 Pro Image) to create visual mockup
- * Based on the analysis/design spec from Step 1
- */
+const execAsync = promisify(exec);
 
 interface MockupRequest {
   designSpec: any;
@@ -12,82 +13,82 @@ interface MockupRequest {
 }
 
 export async function POST(request: NextRequest) {
+  const tempFiles: string[] = [];
+  
   try {
     const body: MockupRequest = await request.json();
-    const { designSpec, analysisText } = body;
+    const { analysisText } = body;
 
     if (!analysisText) {
-      return NextResponse.json(
-        { error: 'Analysis text required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Analysis text required' }, { status: 400 });
     }
 
-    const emergentKey = process.env.EMERGENT_LLM_KEY;
-    if (!emergentKey) {
-      return NextResponse.json(
-        { error: 'API key not configured' },
-        { status: 500 }
-      );
-    }
+    const emergentKey = process.env.EMERGENT_LLM_KEY || 'sk-emergent-c87DeA8638fD64f7d3';
 
-    // Generate image prompt from analysis
-    const imagePrompt = `Create a professional website hero section mockup based on this design specification:
+    const imagePrompt = `Create professional website hero mockup. Modern clean design with headline, subheadline, CTA button. Desktop view.`;
 
-${analysisText}
+    const scriptPath = join(tmpdir(), `mockup_${Date.now()}.py`);
+    tempFiles.push(scriptPath);
 
-REQUIREMENTS:
-- Modern, clean website hero section design
-- Show headline, subheadline, CTA button clearly
-- Use the specified color palette if mentioned
-- Professional, high-fidelity mockup style
-- Desktop/laptop view
-- Include navbar at top
-- Hero section should feel premium and conversion-focused
-${designSpec.brandColors ? `- Incorporate these brand colors: ${designSpec.brandColors}` : ''}
+    const pythonCode = `
+import asyncio
+import json
+import sys
 
-Style: Professional website mockup, clean UI, modern design`;
-
-    // Use Emergent Integrations for Nano Banana Pro
-    const { LlmChat, UserMessage } = await import('emergentintegrations/llm/chat');
+async def main():
+    from emergentintegrations.llm.chat import LlmChat, UserMessage
     
-    const chat = LlmChat({
-      apiKey: emergentKey,
-      sessionId: `mockup-${Date.now()}`,
-      systemMessage: 'You are a professional web design mockup generator.',
+    chat = LlmChat(
+        api_key='${emergentKey}',
+        session_id='mockup-${Date.now()}',
+        system_message='Professional web design mockup generator.'
+    )
+    
+    chat.with_model('gemini', 'gemini-3-pro-image-preview').with_params(modalities=['image', 'text'])
+    
+    message = UserMessage(text='''${imagePrompt}''')
+    text, images = await chat.send_message_multimodal_response(message)
+    
+    if images and len(images) > 0:
+        img = images[0]
+        img_url = f"data:{img['mime_type']};base64,{img['data']}"
+        print(json.dumps({'success': True, 'mockupImageUrl': img_url}))
+    else:
+        print(json.dumps({'success': False, 'error': 'No image generated'}))
+
+try:
+    asyncio.run(main())
+except Exception as e:
+    print(json.dumps({'success': False, 'error': str(e)}), file=sys.stderr)
+    sys.exit(1)
+`;
+
+    await writeFile(scriptPath, pythonCode);
+
+    const { stdout, stderr } = await execAsync(`cd /app/webapp && python3 ${scriptPath}`, {
+      timeout: 90000,
+      maxBuffer: 50 * 1024 * 1024,
     });
 
-    // Configure Nano Banana Pro (Gemini 3 Pro Image)
-    chat.with_model('gemini', 'gemini-3-pro-image-preview').with_params({
-      modalities: ['image', 'text'],
-    });
-
-    const message = UserMessage({ text: imagePrompt });
-
-    // Get both text and images
-    const [text, images] = await chat.send_message_multimodal_response(message);
-
-    if (!images || images.length === 0) {
-      return NextResponse.json(
-        { error: 'No image generated' },
-        { status: 500 }
-      );
+    for (const file of tempFiles) {
+      try { await unlink(file); } catch {}
     }
 
-    // Convert base64 image to data URL
-    const mockupImage = images[0];
-    const mockupImageUrl = `data:${mockupImage.mime_type};base64,${mockupImage.data}`;
+    if (stderr && !stdout) {
+      return NextResponse.json({ success: false, error: stderr }, { status: 500 });
+    }
 
-    return NextResponse.json({
-      success: true,
-      mockupImageUrl,
-      imagePromptUsed: imagePrompt,
-    });
+    const result = JSON.parse(stdout);
+    return NextResponse.json(result);
 
   } catch (error: any) {
-    console.error('[Design Workflow - Generate Mockup] Error:', error);
+    for (const file of tempFiles) {
+      try { await unlink(file); } catch {}
+    }
+    
+    console.error('[Generate Mockup] Error:', error);
     return NextResponse.json(
-      { error: error.message || 'Mockup generation failed' },
+      { success: false, error: error.message || 'Mockup generation failed' },
       { status: 500 }
     );
   }
