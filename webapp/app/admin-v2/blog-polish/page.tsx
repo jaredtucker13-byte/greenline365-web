@@ -765,6 +765,145 @@ export default function BlogPolishPage() {
               )}
             </AnimatePresence>
 
+            {/* Image Suggestions Panel */}
+            <AnimatePresence>
+              {showImagePanel && imageSuggestions.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="backdrop-blur-2xl bg-amber-500/10 rounded-2xl border border-amber-500/30 p-4 overflow-hidden"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-semibold text-amber-300 flex items-center gap-2">
+                      🖼️ Image Suggestions ({imageSuggestions.length})
+                    </h3>
+                    <div className="flex items-center gap-3">
+                      {/* Template Selector */}
+                      <select
+                        value={selectedTemplate}
+                        onChange={(e) => setSelectedTemplate(e.target.value as any)}
+                        className="px-2 py-1 rounded-lg bg-white/10 border border-white/20 text-white/80 text-xs"
+                      >
+                        <option value="classic">Classic Layout</option>
+                        <option value="magazine">Magazine Style</option>
+                        <option value="minimal">Minimal</option>
+                        <option value="cards">Card Grid</option>
+                      </select>
+                      <button
+                        onClick={() => setShowImagePanel(false)}
+                        className="p-1 hover:bg-white/10 rounded text-white/50 hover:text-white"
+                      >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Image Suggestions List */}
+                  <div className="space-y-4">
+                    {imageSuggestions.map((suggestion, idx) => (
+                      <div 
+                        key={suggestion.id}
+                        className="p-4 rounded-xl bg-white/5 border border-white/10"
+                      >
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                                suggestion.placement === 'header' 
+                                  ? 'bg-blue-500/20 text-blue-300' 
+                                  : suggestion.placement === 'inline'
+                                    ? 'bg-green-500/20 text-green-300'
+                                    : 'bg-purple-500/20 text-purple-300'
+                              }`}>
+                                {suggestion.placement === 'header' ? '🎯 Header' : 
+                                 suggestion.placement === 'inline' ? '📍 Inline' : '📐 Section Break'}
+                              </span>
+                              {suggestion.sectionTitle && (
+                                <span className="text-xs text-white/40">
+                                  After: {suggestion.sectionTitle}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm text-white/70 mb-2">{suggestion.context}</p>
+                            <p className="text-xs text-white/40 italic">"{suggestion.prompt.slice(0, 100)}..."</p>
+                          </div>
+                          <button
+                            onClick={() => generateImagesForSuggestion(suggestion.id)}
+                            disabled={suggestion.generating}
+                            className="px-3 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-black text-xs font-semibold hover:opacity-90 transition disabled:opacity-50"
+                          >
+                            {suggestion.generating ? (
+                              <span className="flex items-center gap-1">
+                                <svg className="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
+                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Generating...
+                              </span>
+                            ) : (
+                              '🎨 Generate'
+                            )}
+                          </button>
+                        </div>
+
+                        {/* Generated Images Grid */}
+                        {suggestion.generatedImages && suggestion.generatedImages.length > 0 && (
+                          <div className="mt-3 pt-3 border-t border-white/10">
+                            <p className="text-xs text-white/50 mb-2">Select an image (click to choose):</p>
+                            <div className="grid grid-cols-4 gap-2">
+                              {suggestion.generatedImages.map((img) => (
+                                <button
+                                  key={img.id}
+                                  onClick={() => selectImage(suggestion.id, img.id)}
+                                  className={`relative aspect-video rounded-lg overflow-hidden border-2 transition ${
+                                    suggestion.selectedImage === img.id
+                                      ? 'border-amber-400 ring-2 ring-amber-400/50'
+                                      : 'border-transparent hover:border-white/30'
+                                  }`}
+                                >
+                                  <img 
+                                    src={`data:${img.mime_type};base64,${img.data}`}
+                                    alt="Generated"
+                                    className="w-full h-full object-cover"
+                                  />
+                                  {suggestion.selectedImage === img.id && (
+                                    <div className="absolute top-1 right-1 w-5 h-5 rounded-full bg-amber-400 flex items-center justify-center">
+                                      <svg className="w-3 h-3 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                      </svg>
+                                    </div>
+                                  )}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Selected Images Summary */}
+                  {imageSuggestions.some(s => s.selectedImage) && (
+                    <div className="mt-4 pt-4 border-t border-white/10">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs text-white/50">
+                          {imageSuggestions.filter(s => s.selectedImage).length} image(s) selected
+                        </p>
+                        <button
+                          className="px-4 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-black text-sm font-semibold hover:opacity-90 transition"
+                        >
+                          Apply to Blog Post
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {/* Content Editor / Preview */}
             <div className="backdrop-blur-2xl bg-white/[0.08] rounded-2xl border border-white/[0.15] p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]">
               {activeTab === 'write' ? (
