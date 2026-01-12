@@ -2138,9 +2138,35 @@ export default function BlogPolishPage() {
                     data-testid="blog-content-input"
                   />
                   <div className="mt-4 flex items-center justify-between text-sm">
-                    <div className="flex gap-6 text-white/40">
+                    <div className="flex items-center gap-6 text-white/40">
                       <span>{wordCount} words</span>
                       <span>{readTime} min read</span>
+                      {/* Auto-save indicator */}
+                      {(post.title || post.content) && (
+                        <span className={`flex items-center gap-1.5 ${isAutoSaving ? 'text-amber-400' : hasUnsavedChanges ? 'text-amber-400/60' : 'text-green-400/60'}`}>
+                          {isAutoSaving ? (
+                            <>
+                              <svg className="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                              </svg>
+                              Saving...
+                            </>
+                          ) : hasUnsavedChanges ? (
+                            <>
+                              <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                              Unsaved
+                            </>
+                          ) : lastAutoSave ? (
+                            <>
+                              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                              </svg>
+                              Saved locally
+                            </>
+                          ) : null}
+                        </span>
+                      )}
                     </div>
                     <button
                       onClick={toggleVoiceRecording}
