@@ -137,7 +137,7 @@ export function FocusModeButton({
   className = '',
   onToggle,
 }: {
-  targetRef?: React.RefObject<HTMLElement>;
+  targetRef?: React.RefObject<HTMLElement | null>;
   className?: string;
   onToggle?: (isFullscreen: boolean) => void;
 }) {
