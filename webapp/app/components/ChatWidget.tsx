@@ -725,6 +725,8 @@ export default function ChatWidget({
               isExpanded={isExpanded}
               setIsExpanded={setIsExpanded}
               onContentSuggestion={onContentSuggestion}
+              isListening={isListening}
+              toggleVoiceInput={toggleVoiceInput}
             />
           </motion.div>
         )}
