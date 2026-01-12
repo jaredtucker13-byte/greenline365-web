@@ -206,8 +206,9 @@ Build "GreenLine365," a comprehensive marketing OS for local businesses. The pla
 - `email_templates` - Email templates (pending migration)
 - `email_campaigns` - Email campaigns (pending migration)
 - `email_sends` - Email send logs (pending migration)
-- `blog_posts` - Blog content (pending migration)
-- `blog_categories` - Blog categories (pending migration)
+- `blog_posts` - Blog content with style_guide JSONB (MIGRATED)
+- `blog_analytics` - Blog post analytics (MIGRATED)
+- `blog_categories` - Blog categories (MIGRATED)
 
 ---
 
