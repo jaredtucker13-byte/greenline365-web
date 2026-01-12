@@ -145,15 +145,17 @@ Build "GreenLine365," a comprehensive marketing OS for local businesses. The pla
 ## Prioritized Backlog
 
 ### P0 - Critical
-- Run `009_email_system.sql` migration
-- Run `007_blog_system.sql` migration
-- Complete Blog Auto-Polish MVP
+- ~~Run `009_email_system.sql` migration~~
+- ~~Run `007_blog_system.sql` migration~~
+- ~~Complete Blog Auto-Polish MVP~~
+- ~~Run `010_blog_style_guide.sql` migration (style_guide JSONB column)~~
 
 ### P1 - High Priority
-- Blog Auto-Polish Phase 2 (export to HTML/WordPress)
-- Test Retell AI Agent "Aiden"
+- Blog Auto-Polish Phase 2: Build public-facing blog pages (`/blog`, `/blog/[slug]`) that display posts with their saved `style_guide`
+- Test Retell AI Agent "Aiden" (PAUSED by user)
 - Keyboard shortcuts for Content Forge
 - Email analytics dashboard
+- Optimize image generation speed (currently ~40s)
 
 ### P2 - Medium Priority
 - Fix booking widget invisible text
