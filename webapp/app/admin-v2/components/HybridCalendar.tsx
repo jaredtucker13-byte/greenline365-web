@@ -1,15 +1,10 @@
 'use client';
 
 /**
- * HybridCalendar Component
- * GreenLine365 Admin V2 - Tactical Multi-Command Center
+ * HybridCalendar Component - Glassmorphism Edition
+ * GreenLine365 Admin V2 - Nature Glass Design
  * 
- * Unified calendar view for both Bookings and Social Media Content
- * Color Logic:
- * - Green Glow: Confirmed Booking Slots
- * - Teal Glow: Content Creation/Posting Slots
- * - Gold Glow: Review Stage (needs attention)
- * - Purple Glow: Launch Stage
+ * Premium calendar with frosted glass effects
  */
 
 import { motion, AnimatePresence } from 'framer-motion';
@@ -34,6 +29,7 @@ export default function HybridCalendar({
   onDateClick 
 }: HybridCalendarProps) {
   const [hoveredEvent, setHoveredEvent] = useState<string | null>(null);
+  const [hoveredDate, setHoveredDate] = useState<number | null>(null);
 
   // Generate calendar days
   const calendarDays = useMemo(() => {
@@ -48,17 +44,14 @@ export default function HybridCalendar({
       
       const days: Date[] = [];
       
-      // Previous month padding
       for (let i = startPadding - 1; i >= 0; i--) {
         days.push(new Date(year, month, -i));
       }
       
-      // Current month
       for (let i = 1; i <= totalDays; i++) {
         days.push(new Date(year, month, i));
       }
       
-      // Next month padding
       const remaining = 42 - days.length;
       for (let i = 1; i <= remaining; i++) {
         days.push(new Date(year, month + 1, i));
@@ -66,7 +59,6 @@ export default function HybridCalendar({
       
       return days;
     } else {
-      // Week view
       const startOfWeek = new Date(currentDate);
       startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
       
@@ -98,83 +90,85 @@ export default function HybridCalendar({
     switch (type) {
       case 'booking':
         return {
-          bg: 'bg-[#10B981]/20',
-          border: 'border-[#10B981]',
-          text: 'text-[#10B981]',
-          glow: 'shadow-[0_0_15px_rgba(16,185,129,0.4)]',
+          bg: 'bg-emerald-500/20',
+          border: 'border-l-emerald-400',
+          text: 'text-emerald-300',
+          dot: 'bg-emerald-400',
           icon: '📅',
         };
       case 'content':
         return {
-          bg: 'bg-[#0CE293]/20',
-          border: 'border-[#0CE293]',
-          text: 'text-[#0CE293]',
-          glow: 'shadow-[0_0_15px_rgba(12,226,147,0.4)]',
+          bg: 'bg-sky-500/20',
+          border: 'border-l-sky-400',
+          text: 'text-sky-300',
+          dot: 'bg-sky-400',
           icon: '📝',
         };
       case 'review':
         return {
-          bg: 'bg-[#FFC800]/20',
-          border: 'border-[#FFC800]',
-          text: 'text-[#FFC800]',
-          glow: 'shadow-[0_0_15px_rgba(255,200,0,0.4)]',
+          bg: 'bg-amber-500/20',
+          border: 'border-l-amber-400',
+          text: 'text-amber-300',
+          dot: 'bg-amber-400',
           icon: '⏳',
         };
       case 'launch':
         return {
-          bg: 'bg-[#8A2BE2]/20',
-          border: 'border-[#8A2BE2]',
-          text: 'text-[#8A2BE2]',
-          glow: 'shadow-[0_0_15px_rgba(138,43,226,0.4)]',
+          bg: 'bg-violet-500/20',
+          border: 'border-l-violet-400',
+          text: 'text-violet-300',
+          dot: 'bg-violet-400',
           icon: '🚀',
         };
       default:
         return {
-          bg: 'bg-gray-700/20',
-          border: 'border-gray-600',
-          text: 'text-gray-400',
-          glow: '',
+          bg: 'bg-white/10',
+          border: 'border-l-white/40',
+          text: 'text-white/80',
+          dot: 'bg-white/60',
           icon: '📌',
         };
     }
   };
 
   return (
-    <div className="bg-[#1A1A1A] rounded-2xl border border-[#39FF14]/20 overflow-hidden">
+    <div className="backdrop-blur-2xl bg-white/[0.08] rounded-3xl border border-white/[0.15] overflow-hidden shadow-[0_8px_32px_0_rgba(0,0,0,0.36)]">
       {/* Calendar Header */}
-      <div className="p-4 border-b border-[#39FF14]/10">
+      <div className="p-6 border-b border-white/10">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold text-white">
-            {currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-          </h2>
+          <div>
+            <h2 className="text-2xl font-light text-white tracking-tight">
+              {currentDate.toLocaleDateString('en-US', { month: 'long' })}
+            </h2>
+            <p className="text-white/50 text-sm mt-1">
+              {currentDate.getFullYear()}
+            </p>
+          </div>
           
           {/* Legend */}
-          <div className="flex items-center gap-4 text-xs">
-            <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-[#10B981]" />
-              <span className="text-gray-400">Booking</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-[#0CE293]" />
-              <span className="text-gray-400">Content</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-[#FFC800]" />
-              <span className="text-gray-400">Review</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-[#8A2BE2]" />
-              <span className="text-gray-400">Launch</span>
-            </div>
+          <div className="flex items-center gap-6">
+            {[
+              { color: 'bg-emerald-400', label: 'Booking' },
+              { color: 'bg-sky-400', label: 'Content' },
+              { color: 'bg-amber-400', label: 'Review' },
+              { color: 'bg-violet-400', label: 'Launch' },
+            ].map((item) => (
+              <div key={item.label} className="flex items-center gap-2">
+                <span className={`w-2 h-2 rounded-full ${item.color}`} />
+                <span className="text-white/60 text-xs font-medium tracking-wide">{item.label}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
       {/* Day Headers */}
-      <div className="grid grid-cols-7 border-b border-[#39FF14]/10">
+      <div className="grid grid-cols-7 border-b border-white/10 bg-white/[0.03]">
         {DAYS.map((day) => (
-          <div key={day} className="p-3 text-center text-sm font-medium text-gray-400">
-            {day}
+          <div key={day} className="py-4 text-center">
+            <span className="text-xs font-semibold text-white/40 uppercase tracking-widest">
+              {day}
+            </span>
           </div>
         ))}
       </div>
@@ -185,63 +179,90 @@ export default function HybridCalendar({
           const dayEvents = getEventsForDate(date);
           const today = isToday(date);
           const currentMonth = isCurrentMonth(date);
+          const isHovered = hoveredDate === idx;
 
           return (
             <motion.div
               key={idx}
-              whileHover={{ backgroundColor: 'rgba(57, 255, 20, 0.05)' }}
+              onHoverStart={() => setHoveredDate(idx)}
+              onHoverEnd={() => setHoveredDate(null)}
               onClick={() => onDateClick(date)}
-              className={`min-h-[100px] p-2 border-r border-b border-[#1E262E] cursor-pointer transition-colors ${
-                today ? 'bg-[#39FF14]/5' : ''
-              } ${!currentMonth ? 'opacity-40' : ''}`}
+              className={`
+                relative min-h-[120px] p-3 
+                border-r border-b border-white/[0.08] 
+                cursor-pointer transition-all duration-300
+                ${today ? 'bg-[#84A98C]/10' : ''}
+                ${!currentMonth ? 'opacity-30' : ''}
+                ${isHovered && currentMonth ? 'bg-white/[0.06]' : ''}
+              `}
             >
               {/* Date Number */}
-              <div className={`text-sm mb-2 ${
-                today 
-                  ? 'w-7 h-7 rounded-full bg-[#39FF14] text-black font-bold flex items-center justify-center'
-                  : 'text-gray-400'
-              }`}>
-                {date.getDate()}
+              <div className="flex justify-end mb-2">
+                <span className={`
+                  text-sm font-medium transition-all duration-300
+                  ${today 
+                    ? 'w-8 h-8 rounded-full bg-[#84A98C] text-white flex items-center justify-center shadow-[0_0_20px_rgba(132,169,140,0.4)]'
+                    : currentMonth 
+                      ? 'text-white/70' 
+                      : 'text-white/30'
+                  }
+                `}>
+                  {date.getDate()}
+                </span>
               </div>
 
               {/* Events */}
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <AnimatePresence>
                   {dayEvents.slice(0, 3).map((event) => {
                     const styles = getEventStyles(event.type);
-                    const isHovered = hoveredEvent === event.id;
+                    const isEventHovered = hoveredEvent === event.id;
 
                     return (
                       <motion.div
                         key={event.id}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.9 }}
-                        whileHover={{ scale: 1.02 }}
+                        initial={{ opacity: 0, y: 5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -5 }}
+                        whileHover={{ scale: 1.02, x: 2 }}
                         onHoverStart={() => setHoveredEvent(event.id)}
                         onHoverEnd={() => setHoveredEvent(null)}
                         onClick={(e) => {
                           e.stopPropagation();
                           onEventClick(event);
                         }}
-                        className={`px-2 py-1 rounded text-xs truncate border cursor-pointer transition-all ${
-                          styles.bg
-                        } ${styles.border} ${styles.text} ${
-                          isHovered ? styles.glow : ''
-                        }`}
+                        className={`
+                          px-2 py-1.5 rounded-lg text-xs truncate 
+                          backdrop-blur-md border-l-2 cursor-pointer
+                          transition-all duration-200
+                          ${styles.bg} ${styles.border} ${styles.text}
+                          ${isEventHovered ? 'bg-white/20 shadow-lg' : ''}
+                        `}
                       >
-                        <span className="mr-1">{styles.icon}</span>
                         {event.title}
                       </motion.div>
                     );
                   })}
                 </AnimatePresence>
                 {dayEvents.length > 3 && (
-                  <div className="text-xs text-gray-500 text-center">
+                  <div className="text-[10px] text-white/40 text-center font-medium">
                     +{dayEvents.length - 3} more
                   </div>
                 )}
               </div>
+
+              {/* Hover indicator */}
+              {isHovered && currentMonth && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="absolute bottom-2 right-2"
+                >
+                  <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center">
+                    <span className="text-white/60 text-xs">+</span>
+                  </div>
+                </motion.div>
+              )}
             </motion.div>
           );
         })}
