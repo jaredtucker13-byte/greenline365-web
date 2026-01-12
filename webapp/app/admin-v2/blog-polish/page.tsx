@@ -1103,6 +1103,17 @@ export default function BlogPolishPage() {
                       <p className="text-xs text-white/50 mt-1">{pageStyle.description}</p>
                     </div>
                     <div className="flex items-center gap-2">
+                      {/* My Styles Library Button */}
+                      <button
+                        onClick={() => setShowStyleLibrary(true)}
+                        className="px-3 py-1.5 rounded-lg bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-medium hover:bg-amber-500/30 transition flex items-center gap-1"
+                        title="Open Style Library"
+                      >
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                        </svg>
+                        Library
+                      </button>
                       {/* Regenerate Button */}
                       <button
                         onClick={regenerateStyle}
