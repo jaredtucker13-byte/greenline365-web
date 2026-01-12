@@ -467,6 +467,68 @@ export default function BlogPolishPage() {
     }
   };
 
+  // Trending Research with Perplexity via OpenRouter
+  const searchTrending = async () => {
+    if (!trendingIndustry) {
+      setMessage({ type: 'error', text: 'Enter an industry to research' });
+      return;
+    }
+
+    setTrendingLoading(true);
+    try {
+      const response = await fetch('/api/blog/trending', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          industry: trendingIndustry,
+          niche: trendingNiche || undefined,
+          type: trendingType,
+          count: 5,
+        }),
+      });
+
+      const data = await response.json();
+      if (data.success && data.results) {
+        setTrendingResults(prev => ({ ...prev, [trendingType]: data.results }));
+        setMessage({ type: 'success', text: `Found ${data.results.length} ${trendingType} results` });
+      } else {
+        setMessage({ type: 'error', text: data.error || 'Research failed' });
+      }
+    } catch (error) {
+      console.error('Trending research error:', error);
+      setMessage({ type: 'error', text: 'Failed to fetch trending topics' });
+    }
+    setTrendingLoading(false);
+  };
+
+  // Apply trending topic to blog post
+  const applyTrendingTopic = (topic: TrendingTopic) => {
+    setPost(prev => ({
+      ...prev,
+      title: topic.blogTitle,
+      tags: [...new Set([...prev.tags, ...topic.keywords])],
+    }));
+    setMessage({ type: 'success', text: `Applied: "${topic.blogTitle}"` });
+  };
+
+  const applyContentIdea = (idea: ContentIdea) => {
+    setPost(prev => ({
+      ...prev,
+      title: idea.title,
+      content: prev.content ? prev.content + '\n\n' + idea.description : idea.description,
+    }));
+    setMessage({ type: 'success', text: `Applied: "${idea.title}"` });
+  };
+
+  const applyQuestion = (faq: FAQ) => {
+    setPost(prev => ({
+      ...prev,
+      title: faq.question,
+      tags: [...new Set([...prev.tags, ...faq.keywords])],
+    }));
+    setMessage({ type: 'success', text: `Applied question as title` });
+  };
+
   const applyOutline = () => {
     if (aiSuggestions.outline) {
       setPost(prev => ({ ...prev, content: aiSuggestions.outline || '' }));
