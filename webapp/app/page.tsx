@@ -449,8 +449,8 @@ export default function HomePage() {
               
               <div data-hero-stats className="grid grid-cols-3 gap-6 max-w-md">
                 {[
-                  { value: '500+', label: 'Businesses' },
-                  { value: '40%', label: 'More Leads' },
+                  { value: 'New', label: 'Platform' },
+                  { value: 'AI', label: 'Powered' },
                   { value: '24/7', label: 'Always On' }
                 ].map((stat, i) => (
                   <div key={i} className="text-center px-2">
