@@ -235,18 +235,18 @@ export default function CollapsibleSidebar({
       )}
 
       {/* Status Footer */}
-      <div className={`p-4 border-t border-[#39FF14]/10 ${isCollapsed ? 'p-2' : ''}`}>
+      <div className={`p-4 border-t border-white/10 ${isCollapsed ? 'p-2' : ''}`}>
         {!isCollapsed && (
           <>
             <div className="flex items-center gap-2 mb-3">
-              <span className="w-2 h-2 rounded-full bg-[#39FF14] animate-pulse" />
-              <span className="text-[10px] text-[#39FF14] font-mono uppercase tracking-wider">System Online</span>
+              <span className="w-2 h-2 rounded-full bg-[#84A98C] animate-pulse shadow-[0_0_8px_rgba(132,169,140,0.5)]" />
+              <span className="text-[10px] text-[#A7C957] font-medium uppercase tracking-wider">System Online</span>
             </div>
             <div className="flex items-center gap-2">
               <svg className="w-3 h-3 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
-              <span className="text-[10px] text-white/30 font-mono">AES-256 ENCRYPTED</span>
+              <span className="text-[10px] text-white/30 font-medium">AES-256 ENCRYPTED</span>
             </div>
           </>
         )}
@@ -254,11 +254,11 @@ export default function CollapsibleSidebar({
         {/* Version - Triple click to open Demo Controller */}
         <motion.p 
           onClick={handleVersionClick}
-          whileHover={{ color: '#39FF14' }}
-          className={`text-[10px] text-gray-600 font-mono text-center cursor-pointer select-none transition-colors mt-3 ${isCollapsed ? 'mt-2' : ''}`}
+          whileHover={{ color: '#A7C957' }}
+          className={`text-[10px] text-white/30 font-medium text-center cursor-pointer select-none transition-colors mt-3 ${isCollapsed ? 'mt-2' : ''}`}
           title="Triple-click for Demo Mode"
         >
-          {isCollapsed ? 'V2.0' : 'TACTICAL V2.0 // BUILD 2026.01'}
+          {isCollapsed ? 'V2.0' : 'COMMAND CENTER V2.0'}
         </motion.p>
       </div>
     </div>
