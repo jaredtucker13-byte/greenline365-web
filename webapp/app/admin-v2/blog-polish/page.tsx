@@ -535,17 +535,20 @@ export default function BlogPolishPage() {
 
     setAnalyzingStyle(true);
     try {
-      console.log('[Style] Starting style analysis...', post.title, 'content length:', post.content.length);
+      // Extract only primitive values to avoid circular references
+      const requestBody = {
+        action: 'analyze-style',
+        title: String(post.title || ''),
+        content: String(post.content || ''),
+        category: String(post.category || ''),
+        moodHint: moodHint ? String(moodHint) : undefined,
+      };
+      console.log('[Style] Starting style analysis...', requestBody.title, 'content length:', requestBody.content.length);
+      
       const response = await fetch('/api/blog/images', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'analyze-style',
-          title: post.title,
-          content: post.content,
-          category: post.category,
-          moodHint: moodHint,
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       console.log('[Style] Response status:', response.status, response.ok);
