@@ -999,6 +999,17 @@ export default function BlogPolishPage() {
                 >
                   🔍 Research
                 </button>
+                <button
+                  onClick={() => setShowCopyrightPanel(!showCopyrightPanel)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition border flex items-center gap-1 ${
+                    showCopyrightPanel 
+                      ? 'bg-blue-500/30 border-blue-500/50 text-blue-200' 
+                      : 'bg-blue-500/20 border-blue-500/30 text-blue-300 hover:bg-blue-500/30'
+                  }`}
+                  title="Copyright tools: check content, licenses, attribution"
+                >
+                  ⚖️ Copyright
+                </button>
               </div>
             </div>
 
