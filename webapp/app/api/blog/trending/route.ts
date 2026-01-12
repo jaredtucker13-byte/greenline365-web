@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
 interface TrendingRequest {
-  industry: string;
+  industry?: string; // Now optional
   niche?: string;
   type?: 'trending' | 'ideas' | 'news' | 'questions';
   count?: number;
@@ -15,12 +15,10 @@ export async function POST(request: NextRequest) {
     const body: TrendingRequest = await request.json();
     const { industry, niche, type = 'trending', count = 5 } = body;
 
-    if (!industry) {
-      return NextResponse.json(
-        { error: 'Industry is required' },
-        { status: 400 }
-      );
-    }
+    // Industry is now OPTIONAL - default to general trending topics
+    const industryContext = industry 
+      ? `in the ${industry}${niche ? ` (specifically ${niche})` : ''} industry`
+      : 'across all industries';
 
     const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) {
@@ -32,7 +30,7 @@ export async function POST(request: NextRequest) {
 
     // Build the search prompt based on type
     const prompts: Record<string, string> = {
-      trending: `What are the top ${count} trending topics and conversations happening RIGHT NOW in the ${industry}${niche ? ` (specifically ${niche})` : ''} industry? Focus on what people are actively discussing THIS WEEK in 2025. For each topic, provide:
+      trending: `What are the top ${count} trending topics and conversations happening RIGHT NOW ${industryContext}? Focus on what people are actively discussing THIS WEEK in 2025. For each topic, provide:
 1. The topic/trend name
 2. Why it's trending (1-2 sentences)
 3. A potential blog title idea
@@ -41,7 +39,7 @@ export async function POST(request: NextRequest) {
 Return ONLY a valid JSON array with this exact format, no other text:
 [{"topic": "Topic Name", "reason": "Why trending", "blogTitle": "Blog Title Idea", "keywords": ["keyword1", "keyword2"]}]`,
 
-      ideas: `Generate ${count} unique and engaging blog post ideas for a ${industry}${niche ? ` (${niche})` : ''} business in 2025. Focus on topics that would attract organic search traffic and provide real value. For each idea:
+      ideas: `Generate ${count} unique and engaging blog post ideas ${industry ? `for a ${industry}${niche ? ` (${niche})` : ''} business` : 'that would work for any business'} in 2025. Focus on topics that would attract organic search traffic and provide real value. For each idea:
 1. Blog title (compelling, SEO-friendly)
 2. Brief description (2-3 sentences)
 3. Target audience
@@ -50,7 +48,7 @@ Return ONLY a valid JSON array with this exact format, no other text:
 Return ONLY a valid JSON array with this exact format, no other text:
 [{"title": "Blog Title", "description": "Description", "audience": "Target Audience", "difficulty": "easy"}]`,
 
-      news: `What are the ${count} most important recent news and developments in the ${industry}${niche ? ` (${niche})` : ''} industry from the PAST WEEK? For each item:
+      news: `What are the ${count} most important recent news and developments ${industryContext} from the PAST WEEK? For each item:
 1. Headline summary
 2. Why it matters for businesses
 3. Source type (if known)
