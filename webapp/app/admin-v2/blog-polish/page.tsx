@@ -1197,18 +1197,6 @@ export default function BlogPolishPage() {
                           <span className="font-medium">Gradient:</span> {pageStyle.colors.backgroundGradient}
                         </div>
                       )}
-                                title={`${name}: ${color}`}
-                              />
-                              <span className="text-[10px] text-white/50 capitalize">{name}</span>
-                            </div>
-                          )
-                        ))}
-                      </div>
-                      {pageStyle.colors.backgroundGradient && (
-                        <div className="mt-2 p-2 rounded-lg text-xs text-white/50">
-                          <span className="font-medium">Gradient:</span> {pageStyle.colors.backgroundGradient}
-                        </div>
-                      )}
                     </div>
 
                     {/* Texture & Typography */}
