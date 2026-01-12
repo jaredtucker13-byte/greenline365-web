@@ -5,6 +5,17 @@ Build a comprehensive marketing OS for local businesses called "GreenLine365".
 
 ## What's Been Implemented
 
+### January 2026 - Session 9 (Advanced Image Generation & Preview)
+- ✅ **Enriched Cinematic Prompts**: Backend now generates detailed artistic prompts with lighting, composition, camera angles - user sees clean description, API gets full artistic direction
+- ✅ **Chart Detection → GPT-5.2**: System detects when content needs charts/infographics and routes to GPT-5.2 via OpenRouter instead of Nano Banana
+- ✅ **Retry Logic**: If one image fails in a batch, discards all and retries (up to 3 attempts) - ensures both images always succeed together
+- ✅ **Multiple Aspect Ratios**: Support for 16:9 (landscape), 9:16 (portrait), 1:1 (square), 21:9 (cinematic) - all at 4K resolution
+- ✅ **Image Preview Modal**: Click any image to view in full-screen lightbox with zoom, download, and apply options
+- ✅ **Layout Options When Applying**: Choose Center, Float Left (text wrap), Float Right (text wrap), or Full Width when adding images to blog
+- ✅ **Custom Image Chat**: Dedicated prompt box to create custom images - describe any image and generate with Nano Banana
+- ✅ **Enhanced Placement Types**: Added right-float, left-float, full-width placement suggestions from AI analysis
+- ✅ **API: generate-custom action**: New endpoint for user-defined image generation
+
 ### January 2026 - Session 8 (Image Generation UX Overhaul)
 - ✅ **Image Generation Workflow Refactored**: Changed from auto-generate to analyze-first approach
 - ✅ **Analyze Images Button**: New "🖼️ Analyze Images" button shows suggestions without auto-generating
