@@ -81,8 +81,8 @@ export default function LoginPage() {
     }
 
     if (data.session) {
-      // Redirect to DASHBOARD after login
-      router.push('/admin-v2');
+      // Redirect to original destination or dashboard
+      router.push(redirectTo);
     }
 
     setLoading(false);
