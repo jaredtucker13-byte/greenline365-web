@@ -1,0 +1,128 @@
+{
+  "design_system": {
+    "typography": {
+      "font_family": {
+        "heading": "Playfair Display, Poppins, sans-serif",
+        "body": "Manrope, Inter, sans-serif",
+        "mono": "JetBrains Mono, monospace"
+      },
+      "scale": {
+        "h1": "text-5xl md:text-6xl font-light tracking-tight",
+        "h2": "text-4xl md:text-5xl font-light tracking-tight",
+        "h3": "text-3xl font-medium tracking-normal",
+        "h4": "text-2xl font-medium tracking-normal",
+        "body_lg": "text-lg leading-relaxed",
+        "body_base": "text-base leading-relaxed text-white/80",
+        "caption": "text-sm tracking-wide uppercase text-white/60"
+      }
+    },
+    "colors": {
+      "palette": {
+        "primary": {
+          "DEFAULT": "#84A98C",
+          "foreground": "#ffffff",
+          "50": "#f2f7f4",
+          "100": "#e1ede5",
+          "200": "#c3dbc9",
+          "300": "#9ebfa6",
+          "400": "#84a98c",
+          "500": "#628b6b",
+          "600": "#4a6e52",
+          "700": "#3d5843",
+          "800": "#334638",
+          "900": "#2b3a30"
+        },
+        "glass": {
+          "surface": "rgba(255, 255, 255, 0.08)",
+          "surface_hover": "rgba(255, 255, 255, 0.12)",
+          "border": "rgba(255, 255, 255, 0.15)",
+          "border_highlight": "rgba(255, 255, 255, 0.3)",
+          "text_primary": "#ffffff",
+          "text_secondary": "rgba(255, 255, 255, 0.7)",
+          "text_muted": "rgba(255, 255, 255, 0.5)"
+        },
+        "status": {
+          "success": "#A7C957",
+          "warning": "#E9C46A",
+          "error": "#E76F51",
+          "info": "#8ECAE6"
+        }
+      },
+      "background": {
+        "image_url": "https://images.unsplash.com/photo-1709137924046-26190dd12d06?q=85&w=2532&auto=format&fit=crop",
+        "overlay": "bg-black/40"
+      }
+    },
+    "visual_enhancers": {
+      "glassmorphism": {
+        "base": "backdrop-blur-xl bg-white/5 border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.36)]",
+        "card": "backdrop-blur-2xl bg-white/10 border border-white/20 shadow-lg hover:bg-white/15 transition-all duration-300",
+        "modal": "backdrop-blur-3xl bg-black/40 border border-white/10 shadow-2xl"
+      },
+      "borders": {
+        "subtle": "border border-white/10",
+        "highlight": "border-t border-t-white/30 border-b border-b-black/20 border-x-transparent"
+      },
+      "shadows": {
+        "soft": "0 10px 40px -10px rgba(0,0,0,0.5)",
+        "glow": "0 0 20px rgba(132, 169, 140, 0.3)"
+      }
+    },
+    "layout": {
+      "spacing": {
+        "container_padding": "p-6 md:p-10",
+        "section_gap": "gap-8",
+        "item_gap": "gap-4"
+      },
+      "grid": {
+        "calendar": "grid grid-cols-7 gap-px bg-white/10 rounded-lg overflow-hidden border border-white/10",
+        "dashboard": "grid grid-cols-1 md:grid-cols-12 gap-6"
+      }
+    },
+    "motion": {
+      "transitions": "transition-all duration-300 ease-out",
+      "hover": "hover:-translate-y-1 hover:shadow-lg",
+      "entrance": {
+        "initial": { "opacity": 0, "y": 20 },
+        "animate": { "opacity": 1, "y": 0 },
+        "exit": { "opacity": 0, "y": -20 }
+      }
+    }
+  },
+  "components": {
+    "Calendar": {
+      "path": "/app/webapp/app/admin/content/page.tsx",
+      "description": "Main content matrix calendar. Needs to be a glass grid over the nature background.",
+      "features": [
+        "Month/Week/Day view toggle (Segmented Control style)",
+        "Glass cards for events",
+        "Drag and drop support (visual only for now)",
+        "Filter sidebar (collapsible glass panel)"
+      ]
+    },
+    "EventCard": {
+      "style": "bg-white/10 hover:bg-white/20 border-l-2 border-l-primary-400 backdrop-blur-md p-2 rounded text-xs text-white cursor-pointer transition-colors"
+    },
+    "Sidebar": {
+      "style": "fixed left-0 top-0 h-full w-64 bg-black/20 backdrop-blur-xl border-r border-white/10 z-50"
+    }
+  },
+  "image_urls": {
+    "background": "https://images.unsplash.com/photo-1709137924046-26190dd12d06?q=85&w=2532&auto=format&fit=crop",
+    "user_avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=64&h=64"
+  },
+  "instructions_to_main_agent": [
+    "1. UPDATE GLOBAL CSS: Add the nature background image to the body with a dark overlay. Remove the 'circuit-bg' and neon gradients.",
+    "2. UPDATE TAILWIND CONFIG: Add the 'primary' (Sage Green) palette. Keep 'os-dark' as a fallback but prioritize the new glass colors.",
+    "3. REFACTOR /admin/content/page.tsx: Rewrite the entire page to use the new Glassmorphism design.",
+    "4. USE SHADCN: Use existing Shadcn components but override their styles with `className` to match the glass theme (transparent bg, white borders).",
+    "5. DO NOT DELETE existing logic if possible, but wrap it in the new UI.",
+    "6. ENSURE CONTRAST: All text must be readable against the nature background. Use `text-shadow-sm` if needed."
+  ],
+  "universal_guidelines": [
+    "Avoid generic 'AI slop' designs. Make it feel like a premium app.",
+    "Use 2-3x more spacing than usual.",
+    "Every interaction needs a micro-animation.",
+    "Use 'sonner' for toasts."
+  ]
+}
