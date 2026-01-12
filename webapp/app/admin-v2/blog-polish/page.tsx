@@ -2156,31 +2156,39 @@ export default function BlogPolishPage() {
                         {suggestion.generatedImages && suggestion.generatedImages.length > 0 && (
                           <div className="mt-3 pt-3 border-t border-white/10">
                             <p className="text-xs text-white/50 mb-2">Select an image (click to choose):</p>
-                            <div className="grid grid-cols-4 gap-2">
-                              {suggestion.generatedImages.map((img) => (
-                                <button
-                                  key={img.id}
-                                  onClick={() => selectImage(suggestion.id, img.id)}
-                                  className={`relative aspect-video rounded-lg overflow-hidden border-2 transition ${
-                                    suggestion.selectedImage === img.id
-                                      ? 'border-amber-400 ring-2 ring-amber-400/50'
-                                      : 'border-transparent hover:border-white/30'
-                                  }`}
-                                >
-                                  <img 
-                                    src={`data:${img.mime_type};base64,${img.data}`}
-                                    alt="Generated"
-                                    className="w-full h-full object-cover"
-                                  />
-                                  {suggestion.selectedImage === img.id && (
-                                    <div className="absolute top-1 right-1 w-5 h-5 rounded-full bg-amber-400 flex items-center justify-center">
-                                      <svg className="w-3 h-3 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                                      </svg>
-                                    </div>
-                                  )}
-                                </button>
-                              ))}
+                            <div className="grid grid-cols-2 gap-2">
+                              {suggestion.generatedImages.map((img) => {
+                                // Handle both URL and base64 formats
+                                const imgSrc = img.url || (img.data?.startsWith('http') ? img.data : `data:${img.mime_type || 'image/png'};base64,${img.data}`);
+                                return (
+                                  <button
+                                    key={img.id}
+                                    onClick={() => selectImage(suggestion.id, img.id)}
+                                    className={`relative aspect-video rounded-lg overflow-hidden border-2 transition ${
+                                      suggestion.selectedImage === img.id
+                                        ? 'border-amber-400 ring-2 ring-amber-400/50'
+                                        : 'border-transparent hover:border-white/30'
+                                    }`}
+                                  >
+                                    <img 
+                                      src={imgSrc}
+                                      alt="Generated"
+                                      className="w-full h-full object-cover"
+                                      onError={(e) => {
+                                        // Fallback for broken images
+                                        (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="60" viewBox="0 0 100 60"><rect fill="%23333" width="100" height="60"/><text fill="%23666" x="50" y="35" text-anchor="middle" font-size="10">Image</text></svg>';
+                                      }}
+                                    />
+                                    {suggestion.selectedImage === img.id && (
+                                      <div className="absolute top-1 right-1 w-5 h-5 rounded-full bg-amber-400 flex items-center justify-center">
+                                        <svg className="w-3 h-3 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                        </svg>
+                                      </div>
+                                    )}
+                                  </button>
+                                );
+                              })}
                             </div>
                           </div>
                         )}
