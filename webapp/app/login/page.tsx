@@ -81,8 +81,9 @@ export default function LoginPage() {
     }
 
     if (data.session) {
-      // Redirect to original destination or dashboard
-      router.push(redirectTo);
+      // Force a hard refresh to let middleware pick up the new session from cookies
+      window.location.href = redirectTo;
+      return;
     }
 
     setLoading(false);
