@@ -183,7 +183,8 @@ export default function CollapsibleSidebar({
           </button>
           <button
             onClick={onNewContent}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white/[0.08] backdrop-blur-sm text-white rounded-xl font-medium text-sm hover:bg-white/[0.15] transition border border-white/10"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 backdrop-blur-sm rounded-xl font-medium text-sm transition"
+            style={{ background: 'var(--theme-bg-glass)', color: 'var(--theme-text-primary)', border: '1px solid var(--theme-glass-border)' }}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -191,8 +192,11 @@ export default function CollapsibleSidebar({
             New Content
           </button>
           {pendingCount > 0 && (
-            <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-amber-500/10 text-amber-400 rounded-xl font-medium text-sm hover:bg-amber-500/20 transition border border-amber-500/20">
-              <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+            <button 
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm transition"
+              style={{ background: 'color-mix(in srgb, var(--theme-warning) 10%, transparent)', color: 'var(--theme-warning)', border: '1px solid color-mix(in srgb, var(--theme-warning) 20%, transparent)' }}
+            >
+              <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: 'var(--theme-warning)' }} />
               Pending ({pendingCount})
             </button>
           )}
@@ -200,11 +204,16 @@ export default function CollapsibleSidebar({
           {/* Preview Mode Toggle */}
           <button
             onClick={onPreviewModeToggle}
-            className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-medium text-sm transition ${
-              isPreviewMode 
-                ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 hover:bg-yellow-500/30'
-                : 'bg-purple-500/10 text-purple-400 border border-purple-500/20 hover:bg-purple-500/20'
-            }`}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-medium text-sm transition"
+            style={isPreviewMode ? {
+              background: 'color-mix(in srgb, var(--theme-warning) 20%, transparent)',
+              color: 'var(--theme-warning)',
+              border: '1px solid color-mix(in srgb, var(--theme-warning) 30%, transparent)',
+            } : {
+              background: 'color-mix(in srgb, #8B5CF6 10%, transparent)',
+              color: '#A78BFA',
+              border: '1px solid color-mix(in srgb, #8B5CF6 20%, transparent)',
+            }}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -217,10 +226,11 @@ export default function CollapsibleSidebar({
 
       {/* Collapsed Action Icons */}
       {isCollapsed && (
-        <div className="p-2 border-t border-[#39FF14]/10 space-y-2">
+        <div className="p-2 space-y-2" style={{ borderTop: '1px solid var(--theme-glass-border)' }}>
           <button
             onClick={onNewBooking}
-            className="w-full flex items-center justify-center p-2.5 bg-[#39FF14] text-black rounded-lg hover:bg-[#39FF14]/90 transition"
+            className="w-full flex items-center justify-center p-2.5 text-black rounded-lg hover:opacity-90 transition"
+            style={{ background: 'var(--theme-primary)' }}
             title="New Booking"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -229,7 +239,8 @@ export default function CollapsibleSidebar({
           </button>
           <button
             onClick={onNewContent}
-            className="w-full flex items-center justify-center p-2.5 bg-white/10 text-white rounded-lg hover:bg-white/20 transition"
+            className="w-full flex items-center justify-center p-2.5 rounded-lg transition"
+            style={{ background: 'var(--theme-bg-secondary)', color: 'var(--theme-text-primary)' }}
             title="New Content"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
