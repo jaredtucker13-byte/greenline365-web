@@ -114,10 +114,30 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     const supabase = createServerClient();
+    const { searchParams } = new URL(req.url);
+    const getSlots = searchParams.get('slots') === 'true';
 
+    if (getSlots) {
+      // Return booked datetime slots for availability checking
+      const { data, error } = await supabase
+        .from('bookings')
+        .select('preferred_datetime')
+        .neq('status', 'cancelled')
+        .gte('preferred_datetime', new Date().toISOString());
+
+      if (error) {
+        console.error('Supabase error:', error);
+        return Response.json({ error: error.message }, { status: 400 });
+      }
+
+      const bookedSlots = data?.map(b => b.preferred_datetime) || [];
+      return Response.json({ bookedSlots });
+    }
+
+    // Default: return all bookings (for admin)
     const { data, error } = await supabase
       .from('bookings')
       .select('*')
