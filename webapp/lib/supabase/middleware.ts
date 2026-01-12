@@ -1,7 +1,13 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import type { User } from '@supabase/supabase-js';
 
-export async function updateSession(request: NextRequest) {
+interface UpdateSessionResult {
+  user: User | null;
+  supabaseResponse: NextResponse;
+}
+
+export async function updateSession(request: NextRequest): Promise<UpdateSessionResult> {
   let supabaseResponse = NextResponse.next({
     request,
   });
@@ -11,7 +17,7 @@ export async function updateSession(request: NextRequest) {
 
   if (!supabaseUrl || !supabaseAnonKey) {
     console.error('Supabase environment variables not configured');
-    return supabaseResponse;
+    return { user: null, supabaseResponse };
   }
 
   const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
