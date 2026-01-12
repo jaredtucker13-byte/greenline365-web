@@ -527,7 +527,7 @@ export default function BlogPolishPage() {
   };
 
   // Page Style Analysis
-  const analyzePageStyle = async () => {
+  const analyzePageStyle = async (moodHint?: string) => {
     if (!post.content || post.content.length < 100) {
       setMessage({ type: 'error', text: 'Add more content before analyzing style' });
       return;
@@ -543,6 +543,7 @@ export default function BlogPolishPage() {
           title: post.title,
           content: post.content,
           category: post.category,
+          moodHint: moodHint, // Optional mood variation hint
         }),
       });
 
@@ -550,6 +551,7 @@ export default function BlogPolishPage() {
       if (response.ok && data.success && data.styleGuide) {
         setPageStyle(data.styleGuide);
         setShowStylePanel(true);
+        setStyleApplied(false); // Reset applied state on new style
         setMessage({ type: 'success', text: `Style suggestion: "${data.styleGuide.themeName}"` });
       } else {
         setMessage({ type: 'error', text: data.error || 'Style analysis failed' });
@@ -558,6 +560,31 @@ export default function BlogPolishPage() {
       setMessage({ type: 'error', text: 'Failed to analyze style' });
     }
     setAnalyzingStyle(false);
+  };
+
+  // Regenerate with different mood variation
+  const regenerateStyle = async () => {
+    const nextVariation = (styleVariation + 1) % moodVariations.length;
+    setStyleVariation(nextVariation);
+    const moodHint = moodVariations[nextVariation];
+    setMessage({ type: 'info', text: `Generating ${moodHint} style...` });
+    await analyzePageStyle(moodHint);
+  };
+
+  // Update individual color in style
+  const updateStyleColor = (colorKey: string, newColor: string) => {
+    if (!pageStyle) return;
+    setPageStyle({
+      ...pageStyle,
+      colors: {
+        ...pageStyle.colors,
+        [colorKey]: newColor,
+      }
+    });
+    // Auto-apply if already applied
+    if (styleApplied) {
+      setMessage({ type: 'success', text: `Updated ${colorKey} color` });
+    }
   };
 
   const applyPageStyle = () => {
@@ -571,6 +598,8 @@ export default function BlogPolishPage() {
     setStyleApplied(false);
     setPageStyle(null);
     setShowStylePanel(false);
+    setShowColorEditor(false);
+    setStyleVariation(0);
   };
 
   const getScoreColor = (score: number) => {
