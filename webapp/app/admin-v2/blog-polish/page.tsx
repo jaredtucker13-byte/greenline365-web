@@ -2619,8 +2619,17 @@ export default function BlogPolishPage() {
             <div className="backdrop-blur-2xl bg-white/[0.08] rounded-2xl border border-white/[0.15] p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]">
               <h3 className="text-white font-medium mb-4 flex items-center gap-2">
                 <span>📸</span> Images
+                {uploadingImages && (
+                  <span className="text-xs text-amber-400 animate-pulse ml-auto">
+                    Uploading {uploadProgress.current}/{uploadProgress.total}...
+                  </span>
+                )}
               </h3>
-              <div className="border-2 border-dashed border-white/20 rounded-xl p-4 text-center hover:border-[#84A98C]/50 transition-colors cursor-pointer">
+              <div className={`border-2 border-dashed rounded-xl p-4 text-center transition-colors cursor-pointer ${
+                uploadingImages 
+                  ? 'border-amber-500/50 bg-amber-500/5' 
+                  : 'border-white/20 hover:border-[#84A98C]/50'
+              }`}>
                 <input
                   type="file"
                   accept="image/*"
@@ -2628,11 +2637,30 @@ export default function BlogPolishPage() {
                   onChange={handleImageUpload}
                   className="hidden"
                   id="sidebar-image-upload"
+                  disabled={uploadingImages}
                 />
-                <label htmlFor="sidebar-image-upload" className="cursor-pointer block">
-                  <div className="text-2xl mb-2">📁</div>
-                  <p className="text-white/70 text-sm font-medium">Upload Images</p>
-                  <p className="text-white/30 text-xs mt-1">{imagePreviews.length}/5 uploaded</p>
+                <label htmlFor="sidebar-image-upload" className={`cursor-pointer block ${uploadingImages ? 'pointer-events-none' : ''}`}>
+                  {uploadingImages ? (
+                    <>
+                      <svg className="w-8 h-8 mx-auto mb-2 text-amber-400 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                      </svg>
+                      <p className="text-amber-400 text-sm font-medium">Uploading to cloud...</p>
+                      <div className="w-full bg-white/10 rounded-full h-1.5 mt-2">
+                        <div 
+                          className="bg-amber-400 h-1.5 rounded-full transition-all"
+                          style={{ width: `${uploadProgress.total > 0 ? (uploadProgress.current / uploadProgress.total) * 100 : 0}%` }}
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="text-2xl mb-2">📁</div>
+                      <p className="text-white/70 text-sm font-medium">Upload Images</p>
+                      <p className="text-white/30 text-xs mt-1">{imagePreviews.length}/5 • Cloud storage</p>
+                    </>
+                  )}
                 </label>
               </div>
               {imagePreviews.length > 0 && (
@@ -2646,6 +2674,15 @@ export default function BlogPolishPage() {
                       >
                         ×
                       </button>
+                      {/* Cloud indicator */}
+                      {img.includes('supabase') && (
+                        <div className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-green-500/80 rounded text-[10px] text-white flex items-center gap-1">
+                          <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          Cloud
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
