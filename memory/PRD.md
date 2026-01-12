@@ -6,8 +6,9 @@ Build "GreenLine365," a comprehensive marketing OS for local businesses. The pla
 ## Current Status: MVP Phase
 - Landing page complete with SEO optimizations
 - Waitlist system active and capturing leads
-- Google Auth integrated (redirects to home, not dashboard)
+- Google Auth integrated (redirects to dashboard after sign-in)
 - Email system built with SendGrid integration
+- **Global Theme System implemented** (5 themes available)
 - Blog Auto-Polish feature in progress
 
 ---
@@ -15,6 +16,29 @@ Build "GreenLine365," a comprehensive marketing OS for local businesses. The pla
 ## What's Been Implemented
 
 ### January 2026
+
+#### Global Theme System (COMPLETE - Jan 12, 2026)
+- [x] ThemeContext with CSS variables for all colors
+- [x] 5 theme templates:
+  - Glassmorphism (default - frosted glass with nature backdrop)
+  - Midnight Purple (deep purple with electric accents)
+  - Ocean Blue (calm cyan/teal tones)
+  - Sunset Orange (warm sunset vibes)
+  - Neon Tactical (high-tech command center)
+- [x] Settings page at `/admin-v2/settings` with theme selector
+- [x] Theme persists via localStorage
+- [x] CSS variables applied to:
+  - Sidebar (CollapsibleSidebar)
+  - Calendar (HybridCalendar)
+  - Quick Action buttons
+  - All text and accent colors
+- [x] Theme changes apply instantly across all pages
+
+#### Auth Redirect Fix (COMPLETE - Jan 12, 2026)
+- [x] Sign-in now redirects to `/admin-v2` (dashboard) instead of home
+- [x] Auth callback updated to redirect to dashboard
+- [x] Login page session check redirects to dashboard
+- [x] Settings link in sidebar now points to `/admin-v2/settings`
 
 #### Email System (COMPLETE - Jan 11, 2026)
 - [x] Email Command Center at `/admin-v2/email`
@@ -37,8 +61,8 @@ Build "GreenLine365," a comprehensive marketing OS for local businesses. The pla
 #### Authentication (COMPLETE - Jan 11, 2026)
 - [x] Google OAuth via Supabase
 - [x] Email/Password login
-- [x] Auth callback redirects to home (not dashboard)
-- [x] Login page redirects to home after success
+- [x] Auth callback redirects to dashboard
+- [x] Login page redirects to dashboard after success
 
 ### December 2025
 
