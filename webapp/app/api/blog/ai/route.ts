@@ -68,6 +68,26 @@ Format as markdown with ## for sections and bullet points for subpoints.`;
 - Optimizing for web readability (short paragraphs, subheadings)
 Return the enhanced content in markdown format.`;
 
+    case 'enhance_content_with_title':
+      return `You are an expert editor and content enhancer. Your task is to:
+1. Improve the blog content to be more engaging, readable, and polished
+2. Generate a compelling NEW title that matches the enhanced content
+
+Enhancement guidelines:
+- Make content more engaging and readable
+- Add vivid examples and analogies where appropriate
+- Improve flow and transitions
+- Keep the original voice and message
+- Optimize for web readability (short paragraphs, subheadings)
+
+You MUST return a JSON object with this exact structure:
+{
+  "title": "Your new suggested title here",
+  "content": "The enhanced blog content in markdown format here..."
+}
+
+Make sure the title is SEO-friendly (50-60 characters) and accurately reflects the enhanced content.`;
+
     case 'generate_meta':
       return `You are an SEO specialist. Generate:
 1. A compelling meta description (150-160 characters) that includes the main keyword and a call to action
