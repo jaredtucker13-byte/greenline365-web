@@ -65,6 +65,30 @@ Build "GreenLine365," a comprehensive marketing OS for local businesses. The pla
 - [x] Auth callback redirects to dashboard
 - [x] Login page redirects to dashboard after success
 
+#### Blog Auto-Polish (COMPLETE - Jan 12, 2026)
+- [x] Database schema: `007_blog_system.sql`
+- [x] Backend API routes:
+  - `GET /api/blog` - List posts with analytics
+  - `POST /api/blog` - Create new post with auto-SEO scoring
+  - `POST /api/blog/analyze` - Real-time SEO analysis
+  - `GET /api/blog/[slug]` - Get single post (increments views)
+  - `PATCH /api/blog/[slug]` - Update post
+  - `DELETE /api/blog/[slug]` - Delete post
+- [x] Admin editor UI at `/admin-v2/blog-polish`:
+  - Title input with character count (50-60 optimal)
+  - Markdown content editor with word count & read time
+  - Write/Preview tabs
+  - Category selector (5 categories)
+  - Tag management
+  - Image upload (up to 5)
+  - Real-time SEO Analysis:
+    - Animated circular score (0-100)
+    - Word count, headings, readability feedback
+    - Top keywords extraction
+  - Save Draft / Schedule / Publish Now actions
+  - Schedule modal with date/time picker
+- [x] Added "Blog" link to admin sidebar
+
 ### December 2025
 
 #### Landing Page & SEO (COMPLETE)
