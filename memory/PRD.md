@@ -101,8 +101,8 @@ Build a comprehensive marketing OS for local businesses called "GreenLine365".
 ## Prioritized Backlog
 
 ### P0 (Critical)
-- Test drafts panel functionality
-- Test Analytics page
+- ⚠️ Database Migration Required: `012_design_proposals.sql` must be run in Supabase for AI Website Analyzer
+- Test Auto Images feature end-to-end (requires login)
 
 ### P1 (High)
 - Auto-save with localStorage backup
