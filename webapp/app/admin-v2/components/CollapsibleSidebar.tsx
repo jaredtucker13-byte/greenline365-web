@@ -128,24 +128,29 @@ export default function CollapsibleSidebar({
       <div className={`p-4 ${isCollapsed ? 'px-2' : ''}`} style={{ borderBottom: '1px solid var(--theme-glass-border)' }}>
         <div className="flex items-center justify-between">
           <Link href="/" className={`flex items-center gap-2 ${isCollapsed ? 'justify-center w-full' : ''}`}>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, var(--theme-primary), var(--theme-secondary))', boxShadow: '0 0 15px var(--theme-glow)' }}>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'linear-gradient(135deg, var(--theme-primary), var(--theme-secondary))', boxShadow: '0 0 15px var(--theme-glow)' }}>
               <span className="text-white font-bold text-sm">G</span>
             </div>
             {!isCollapsed && (
               <span style={{ color: 'var(--theme-text-primary)' }} className="font-medium">GreenLine365</span>
             )}
           </Link>
-          {/* Desktop collapse toggle */}
-          <button
-            onClick={onToggleCollapse}
-            className={`hidden lg:flex w-6 h-6 rounded items-center justify-center transition ${isCollapsed ? 'absolute right-2 top-4' : ''}`}
-            style={{ color: 'var(--theme-text-muted)' }}
-          >
-            <svg className={`w-4 h-4 transition-transform ${isCollapsed ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-            </svg>
-          </button>
         </div>
+      </div>
+      
+      {/* Collapse Toggle - Placed BELOW the header line */}
+      <div className="hidden lg:flex justify-center py-2" style={{ borderBottom: '1px solid var(--theme-glass-border)' }}>
+        <button
+          onClick={onToggleCollapse}
+          className="w-8 h-8 rounded-lg flex items-center justify-center transition hover:bg-white/10 active:scale-95"
+          style={{ color: 'var(--theme-text-muted)', background: 'var(--theme-bg-glass)' }}
+          title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          <svg className={`w-4 h-4 transition-transform duration-300 ${isCollapsed ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+          </svg>
+        </button>
       </div>
 
       {/* Navigation */}
