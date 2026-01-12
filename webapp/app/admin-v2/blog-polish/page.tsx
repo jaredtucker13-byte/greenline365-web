@@ -692,6 +692,120 @@ export default function BlogPolishPage() {
     ));
   };
 
+  // NEW: Analyze blog and generate ALL images in a loop
+  const analyzeAndGenerateAllImages = async () => {
+    if (!post.content || post.content.length < 100) {
+      setMessage({ type: 'error', text: 'Add more content before generating images' });
+      return;
+    }
+
+    setGeneratingAllImages(true);
+    setShowImagePanel(true);
+    setImageGenProgress({ current: 0, total: 0, status: 'Analyzing blog content...' });
+
+    try {
+      // Step 1: Analyze the blog content to get image suggestions
+      const analyzeResponse = await fetch('/api/blog/images', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'analyze',
+          title: post.title,
+          content: post.content,
+        }),
+      });
+
+      const analyzeData = await analyzeResponse.json();
+      
+      if (!analyzeResponse.ok || !analyzeData.suggestions?.length) {
+        setMessage({ type: 'error', text: analyzeData.error || 'No image opportunities found' });
+        setGeneratingAllImages(false);
+        return;
+      }
+
+      const suggestions: ImageSuggestion[] = analyzeData.suggestions;
+      setImageSuggestions(suggestions);
+      setImageGenProgress({ 
+        current: 0, 
+        total: suggestions.length, 
+        status: `Found ${suggestions.length} images to generate...` 
+      });
+
+      // Step 2: Loop through each suggestion and generate images
+      for (let i = 0; i < suggestions.length; i++) {
+        const suggestion = suggestions[i];
+        
+        setImageGenProgress({ 
+          current: i + 1, 
+          total: suggestions.length, 
+          status: `Generating image ${i + 1}/${suggestions.length}: ${suggestion.context.slice(0, 50)}...` 
+        });
+
+        // Mark this suggestion as generating
+        setImageSuggestions(prev => prev.map(s => 
+          s.id === suggestion.id ? { ...s, generating: true } : s
+        ));
+
+        try {
+          const genResponse = await fetch('/api/blog/images', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'generate',
+              prompt: suggestion.prompt,
+              style: 'professional',
+              count: 2, // Generate 2 variations per suggestion for speed
+            }),
+          });
+
+          const genData = await genResponse.json();
+          
+          if (genResponse.ok && genData.images?.length > 0) {
+            // Update this suggestion with generated images
+            setImageSuggestions(prev => prev.map(s => 
+              s.id === suggestion.id 
+                ? { ...s, generatedImages: genData.images, generating: false, selectedImage: genData.images[0]?.id }
+                : s
+            ));
+          } else {
+            // Mark as failed but continue with others
+            setImageSuggestions(prev => prev.map(s => 
+              s.id === suggestion.id ? { ...s, generating: false } : s
+            ));
+            console.log(`[Image Gen] Failed for suggestion ${i + 1}:`, genData.message);
+          }
+        } catch (error) {
+          // Continue even if one fails
+          setImageSuggestions(prev => prev.map(s => 
+            s.id === suggestion.id ? { ...s, generating: false } : s
+          ));
+          console.error(`[Image Gen] Error for suggestion ${i + 1}:`, error);
+        }
+
+        // Small delay between generations to avoid rate limiting
+        if (i < suggestions.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+      }
+
+      // Count successfully generated images
+      setImageSuggestions(prev => {
+        const successCount = prev.filter(s => s.generatedImages && s.generatedImages.length > 0).length;
+        setMessage({ 
+          type: successCount > 0 ? 'success' : 'error', 
+          text: `Generated images for ${successCount}/${suggestions.length} placements!` 
+        });
+        return prev;
+      });
+
+    } catch (error: any) {
+      setMessage({ type: 'error', text: error.message || 'Failed to generate images' });
+    } finally {
+      setGeneratingAllImages(false);
+      setImageGenProgress({ current: 0, total: 0, status: '' });
+    }
+  };
+
   // Page Style Analysis
   const analyzePageStyle = async (moodHint?: string) => {
     if (!post.content || post.content.length < 100) {
