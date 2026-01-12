@@ -755,6 +755,8 @@ interface ChatContentProps {
   isExpanded?: boolean;
   setIsExpanded?: (expanded: boolean) => void;
   onContentSuggestion?: (suggestion: ContentSuggestion) => void;
+  isListening: boolean;
+  toggleVoiceInput: () => void;
 }
 
 function ChatContent({
