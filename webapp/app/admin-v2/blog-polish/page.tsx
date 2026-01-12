@@ -97,6 +97,8 @@ export default function BlogPolishPage() {
     outline?: string;
     enhanced?: string;
   }>({});
+  const [customPromptInput, setCustomPromptInput] = useState('');
+  const [expandedPanel, setExpandedPanel] = useState<string | null>(null); // For full-screen panels
 
   // Trending Research state
   interface TrendingTopic {
