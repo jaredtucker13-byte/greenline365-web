@@ -1274,19 +1274,20 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                       </div>
 
                       {/* Right - AI Suggestions */}
-                      <div className="p-3 rounded-lg bg-[#0D0D0D] border border-[#8A2BE2]/30">
-                        <h3 className="text-sm font-semibold text-[#8A2BE2] mb-2">🤖 AI Suggestions</h3>
-                        <p className="text-xs text-gray-500 mb-3">Click to add to your hashtags</p>
+                      <div className="p-3 rounded-lg" style={{ background: 'var(--theme-bg-secondary)', border: '1px solid rgba(138, 43, 226, 0.3)' }}>
+                        <h3 className="text-sm font-semibold mb-2" style={{ color: '#8A2BE2' }}>🤖 AI Suggestions</h3>
+                        <p className="text-xs mb-3" style={{ color: 'var(--theme-text-muted)' }}>Click to add to your hashtags</p>
                         <div className="flex flex-wrap gap-2 min-h-[100px]">
                           {suggestedHashtags.length === 0 ? (
-                            <span className="text-xs text-gray-600">Generate hashtags to see suggestions</span>
+                            <span className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>Generate hashtags to see suggestions</span>
                           ) : (
                             suggestedHashtags.map((hashtag) => (
                               <button
                                 key={hashtag}
                                 onClick={() => addSuggestedHashtag(hashtag)}
                                 disabled={optionalHashtags.length >= 5}
-                                className="px-2 py-1 rounded-full bg-[#8A2BE2]/10 text-[#8A2BE2] text-xs hover:bg-[#8A2BE2]/20 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="px-2 py-1 rounded-full text-xs transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                style={{ background: 'rgba(138, 43, 226, 0.1)', color: '#8A2BE2' }}
                               >
                                 + {hashtag}
                               </button>
@@ -1297,9 +1298,9 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                     </div>
 
                     {/* Hashtag Preview */}
-                    <div className="p-3 rounded-lg bg-[#0D0D0D] border border-[#2D3748]">
-                      <h3 className="text-xs font-medium text-gray-400 mb-2">Preview</h3>
-                      <p className="text-sm text-[#39FF14]">{getAllHashtags() || 'Add hashtags above...'}</p>
+                    <div className="p-3 rounded-lg" style={{ background: 'var(--theme-bg-secondary)', border: '1px solid var(--theme-glass-border)' }}>
+                      <h3 className="text-xs font-medium mb-2" style={{ color: 'var(--theme-text-muted)' }}>Preview</h3>
+                      <p className="text-sm" style={{ color: 'var(--theme-primary)' }}>{getAllHashtags() || 'Add hashtags above...'}</p>
                     </div>
                   </div>
                 )}
@@ -1311,27 +1312,29 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                       {/* Left - Blog Settings */}
                       <div className="space-y-4">
                         <div>
-                          <label className="block text-xs font-medium text-gray-400 mb-2">Blog Title</label>
+                          <label className="block text-xs font-medium mb-2" style={{ color: 'var(--theme-text-muted)' }}>Blog Title</label>
                           <input
                             type="text"
                             value={blogTitle}
                             onChange={(e) => setBlogTitle(e.target.value)}
                             placeholder="Enter a compelling blog title..."
-                            className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm placeholder:text-gray-500 focus:border-[#39FF14]/50 outline-none"
+                            className="w-full px-3 py-2 rounded-lg text-sm outline-none"
+                            style={{ background: 'var(--theme-bg-glass)', border: '1px solid var(--theme-glass-border)', color: 'var(--theme-text-primary)' }}
                           />
-                          <p className="text-xs text-gray-500 mt-1">{blogTitle.length}/60 characters (ideal for SEO)</p>
+                          <p className="text-xs mt-1" style={{ color: 'var(--theme-text-muted)' }}>{blogTitle.length}/60 characters (ideal for SEO)</p>
                         </div>
 
                         <div>
-                          <label className="block text-xs font-medium text-gray-400 mb-2">SEO Description</label>
+                          <label className="block text-xs font-medium mb-2" style={{ color: 'var(--theme-text-muted)' }}>SEO Description</label>
                           <textarea
                             value={blogSeoDescription}
                             onChange={(e) => setBlogSeoDescription(e.target.value)}
                             rows={2}
                             placeholder="Meta description for search engines..."
-                            className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm placeholder:text-gray-500 focus:border-[#39FF14]/50 outline-none resize-none"
+                            className="w-full px-3 py-2 rounded-lg text-sm outline-none resize-none"
+                            style={{ background: 'var(--theme-bg-glass)', border: '1px solid var(--theme-glass-border)', color: 'var(--theme-text-primary)' }}
                           />
-                          <p className={`text-xs mt-1 ${blogSeoDescription.length > 160 ? 'text-red-400' : 'text-gray-500'}`}>
+                          <p className="text-xs mt-1" style={{ color: blogSeoDescription.length > 160 ? '#EF4444' : 'var(--theme-text-muted)' }}>
                             {blogSeoDescription.length}/160 characters {blogSeoDescription.length > 160 && '(too long!)'}
                           </p>
                         </div>
@@ -1340,8 +1343,8 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                       {/* Right - SEO Preview & Actions */}
                       <div className="space-y-3">
                         {/* SEO Preview Card */}
-                        <div className="p-3 rounded-lg bg-white/5 border border-[#2D3748]">
-                          <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">Google Preview</p>
+                        <div className="p-3 rounded-lg" style={{ background: 'var(--theme-bg-glass)', border: '1px solid var(--theme-glass-border)' }}>
+                          <p className="text-[10px] uppercase tracking-wider mb-2" style={{ color: 'var(--theme-text-muted)' }}>Google Preview</p>
                           <div className="space-y-1">
                             <p className="text-[#8AB4F8] text-sm truncate hover:underline cursor-pointer">
                               {blogTitle || 'Your Blog Title Here'} - GreenLine365
@@ -1357,7 +1360,8 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                         <button
                           onClick={generateBlogContent}
                           disabled={isGeneratingBlog || !blogTitle.trim()}
-                          className="w-full px-4 py-2.5 rounded-lg bg-gradient-to-r from-[#8A2BE2] to-[#39FF14] text-black font-semibold text-sm disabled:opacity-50 flex items-center justify-center gap-2"
+                          className="w-full px-4 py-2.5 rounded-lg font-semibold text-sm disabled:opacity-50 flex items-center justify-center gap-2"
+                          style={{ background: 'linear-gradient(to right, #8A2BE2, var(--theme-primary))', color: '#000' }}
                         >
                           {isGeneratingBlog ? '⏳ Generating...' : '🧠 Generate Blog Content'}
                         </button>
