@@ -38,7 +38,7 @@ const navItems = [
   { id: 'sms', label: 'SMS', icon: 'phone', href: '/admin-v2/sms' },
   { id: 'analytics', label: 'Analytics', icon: 'chart', href: '/admin-v2?view=analytics' },
   { id: 'content', label: 'Content', icon: 'edit', href: '/admin/content' },
-  { id: 'settings', label: 'Settings', icon: 'cog', href: '/admin-v2?view=settings' },
+  { id: 'settings', label: 'Settings', icon: 'cog', href: '/admin-v2/settings' },
 ];
 
 const icons: Record<string, React.ReactElement> = {
