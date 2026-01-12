@@ -218,7 +218,7 @@ export default function PhoneMockup() {
       <motion.div
         animate={{ y: [0, -10, 0], rotate: [0, 5, 0] }}
         transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute -top-4 -right-8 w-16 h-16 bg-gradient-to-br from-neon-green-500/30 to-emerald-500/30 rounded-2xl backdrop-blur-sm border border-neon-green-500/30 flex items-center justify-center"
+        className="absolute -top-8 -right-16 w-16 h-16 bg-gradient-to-br from-neon-green-500/30 to-emerald-500/30 rounded-2xl backdrop-blur-sm border border-neon-green-500/30 flex items-center justify-center"
       >
         <span className="text-2xl">📈</span>
       </motion.div>
