@@ -161,9 +161,10 @@ Build "GreenLine365," a comprehensive marketing OS for local businesses. The pla
 - ~~Run `007_blog_system.sql` migration~~
 - ~~Complete Blog Auto-Polish MVP~~
 - ~~Run `010_blog_style_guide.sql` migration (style_guide JSONB column)~~
+- ~~Run `011_style_presets.sql` migration (Style Library)~~
+- ~~Build public-facing blog pages with style rendering~~
 
 ### P1 - High Priority
-- Blog Auto-Polish Phase 2: Build public-facing blog pages (`/blog`, `/blog/[slug]`) that display posts with their saved `style_guide`
 - Test Retell AI Agent "Aiden" (PAUSED by user)
 - Keyboard shortcuts for Content Forge
 - Email analytics dashboard
