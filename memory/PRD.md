@@ -130,6 +130,16 @@ Build "GreenLine365," a comprehensive marketing OS for local businesses. The pla
   - **Database migration**: `011_style_presets.sql` (requires manual execution)
 - [x] Added "Blog" link to admin sidebar
 - [x] **Testing**: All backend tests pass, full workflow verified (test_blog_polish_api.py)
+- [x] **Perplexity Trending Research (COMPLETE - Jan 12, 2026):**
+  - **"🔍 Research" button** in AI tools toolbar
+  - **Perplexity Sonar** integration via OpenRouter for real-time web search
+  - **4 research types**: 🔥 Trending Topics, 💡 Content Ideas, 📰 Industry News, ❓ FAQs
+  - **Industry + Niche** filtering for targeted research
+  - **Rich results** showing topic, reason (with citations), blog title suggestion, keywords
+  - **"Use This" button** to instantly apply:
+    - Blog title from suggestion
+    - Keywords added to tags
+  - **Real-time data** from Perplexity's live internet search
 - [x] **Public Blog Pages (COMPLETE - Jan 12, 2026):**
   - `/blog` - Beautiful listing page with style-preview cards
   - `/blog/[slug]` - Individual posts fully styled with saved style_guide
