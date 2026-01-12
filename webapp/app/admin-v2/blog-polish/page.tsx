@@ -178,6 +178,11 @@ export default function BlogPolishPage() {
     generating?: boolean;
     isChart?: boolean;
     suggestedRatio?: '16:9' | '9:16' | '1:1' | '21:9';
+    // New Living Canvas fields from Visual Director
+    suggestedShape?: string;
+    suggestedMode?: 'organic' | 'framed';
+    suggestedTemplate?: 's-flow' | 'gallery-grid' | 'drop-cap' | 'hero-feature' | 'circular-focus' | 'hexagonal-grid' | 'none';
+    frameStyle?: 'wood' | 'metal' | 'museum' | 'shadow-box' | 'minimal';
   }
   const [imageSuggestions, setImageSuggestions] = useState<ImageSuggestion[]>([]);
   const [analyzingImages, setAnalyzingImages] = useState(false);
