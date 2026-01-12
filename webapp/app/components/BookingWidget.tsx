@@ -36,6 +36,8 @@ export default function BookingWidget({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const [availableDates, setAvailableDates] = useState<string[]>([]);
+  const [bookedSlots, setBookedSlots] = useState<string[]>([]);
+  const [errorMessage, setErrorMessage] = useState('');
   const [mounted, setMounted] = useState(false);
 
   // Generate dates only on client to avoid hydration mismatch
@@ -52,10 +54,35 @@ export default function BookingWidget({
       }
     }
     setAvailableDates(dates);
+
+    // Fetch booked slots
+    fetchBookedSlots();
   }, []);
+
+  const fetchBookedSlots = async () => {
+    try {
+      const response = await fetch('/api/bookings?slots=true');
+      if (response.ok) {
+        const data = await response.json();
+        setBookedSlots(data.bookedSlots || []);
+      }
+    } catch (error) {
+      console.error('Error fetching booked slots:', error);
+    }
+  };
+
+  const isSlotBooked = (date: string, time: string): boolean => {
+    const datetime = `${date}T${convertTo24Hour(time)}`;
+    return bookedSlots.some(slot => slot && slot.startsWith(datetime.slice(0, 16)));
+  };
+
+  const getAvailableTimeSlotsForDate = (date: string): string[] => {
+    return timeSlots.filter(time => !isSlotBooked(date, time));
+  };
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
+    setErrorMessage('');
     try {
       // Save to Supabase via API
       const response = await fetch('/api/bookings', {
@@ -71,7 +98,18 @@ export default function BookingWidget({
         })
       });
 
-      if (!response.ok) throw new Error('Failed to create booking');
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Handle specific error codes
+        if (data.code === 'SLOT_TAKEN') {
+          setErrorMessage('This time slot was just booked. Please select another time.');
+          setStep('time');
+          fetchBookedSlots(); // Refresh available slots
+          return;
+        }
+        throw new Error(data.error || 'Failed to create booking');
+      }
 
       setIsComplete(true);
       onBookingComplete?.({
@@ -83,7 +121,7 @@ export default function BookingWidget({
       });
     } catch (error) {
       console.error('Booking error:', error);
-      alert('Failed to complete booking. Please try again.');
+      setErrorMessage(error instanceof Error ? error.message : 'Failed to complete booking. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
