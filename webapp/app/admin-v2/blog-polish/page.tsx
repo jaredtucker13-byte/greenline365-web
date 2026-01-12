@@ -1,81 +1,474 @@
 'use client';
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/os';
+/**
+ * Blog Auto-Polish - MVP
+ * GreenLine365 Admin
+ * 
+ * Features:
+ * - Create and edit blog posts
+ * - SEO analysis and scoring
+ * - AI-powered content enhancement
+ * - Image upload and management
+ * - Schedule or publish directly
+ */
+
+import { useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
+
+interface SEOFeedback {
+  type: 'success' | 'warning' | 'info' | 'error';
+  message: string;
+}
+
+interface SEOAnalysis {
+  score: number;
+  details: {
+    wordCount: number;
+    sentenceCount: number;
+    avgWordsPerSentence: number;
+    titleLength: number;
+    titleWords: number;
+    headingCount: number;
+    readabilityScore: number;
+    readTime: number;
+    topKeywords: string[];
+  };
+  feedback: SEOFeedback[];
+}
+
+interface BlogPost {
+  id?: string;
+  title: string;
+  slug?: string;
+  content: string;
+  excerpt?: string;
+  category: string;
+  tags: string[];
+  featured_image?: string;
+  images: string[];
+  status: 'draft' | 'scheduled' | 'published';
+  scheduled_for?: string;
+  seo_score?: number;
+}
+
+const CATEGORIES = [
+  'Business Growth',
+  'Marketing Automation',
+  'Local Business Tips',
+  'AI & Technology',
+  'Industry Insights',
+];
 
 export default function BlogPolishPage() {
-  const [blogText, setBlogText] = useState('');
-  const [title, setTitle] = useState('');
-  const [images, setImages] = useState<File[]>([]);
-  const [seoScore, setSeoScore] = useState<number | null>(null);
+  // Form state
+  const [post, setPost] = useState<BlogPost>({
+    title: '',
+    content: '',
+    category: '',
+    tags: [],
+    images: [],
+    status: 'draft',
+  });
+  const [tagInput, setTagInput] = useState('');
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+
+  // UI state
+  const [activeTab, setActiveTab] = useState<'write' | 'preview'>('write');
+  const [seoAnalysis, setSeoAnalysis] = useState<SEOAnalysis | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [publishing, setPublishing] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [scheduleDate, setScheduleDate] = useState('');
+  const [scheduleTime, setScheduleTime] = useState('');
+
+  // Calculate stats
+  const wordCount = post.content.split(/\s+/).filter(w => w).length;
+  const readTime = Math.ceil(wordCount / 200);
+
+  // Auto-analyze when content changes (debounced)
+  useEffect(() => {
+    if (post.content.length > 100 && post.title.length > 10) {
+      const timer = setTimeout(() => {
+        analyzeSEO();
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [post.content, post.title]);
+
+  const analyzeSEO = async () => {
+    if (!post.content || !post.title) return;
+    
+    setAnalyzing(true);
+    try {
+      const response = await fetch('/api/blog/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: post.content,
+          title: post.title,
+        }),
+      });
+      
+      const data = await response.json();
+      setSeoAnalysis(data);
+    } catch (error) {
+      console.error('SEO analysis error:', error);
+    }
+    setAnalyzing(false);
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      const fileArray = Array.from(e.target.files).slice(0, 5);
-      setImages(fileArray);
+      const files = Array.from(e.target.files).slice(0, 5);
+      setImageFiles(files);
+      
+      // Create previews
+      const previews = files.map(file => URL.createObjectURL(file));
+      setImagePreviews(previews);
     }
   };
 
-  const analyzeSEO = async () => {
-    setAnalyzing(true);
-    // TODO: Call API for SEO analysis
-    setTimeout(() => {
-      setSeoScore(78);
-      setAnalyzing(false);
-    }, 2000);
+  const removeImage = (index: number) => {
+    setImageFiles(prev => prev.filter((_, i) => i !== index));
+    setImagePreviews(prev => {
+      // Revoke the URL to prevent memory leaks
+      URL.revokeObjectURL(prev[index]);
+      return prev.filter((_, i) => i !== index);
+    });
+  };
+
+  const addTag = () => {
+    if (tagInput.trim() && !post.tags.includes(tagInput.trim())) {
+      setPost(prev => ({ ...prev, tags: [...prev.tags, tagInput.trim()] }));
+      setTagInput('');
+    }
+  };
+
+  const removeTag = (tag: string) => {
+    setPost(prev => ({ ...prev, tags: prev.tags.filter(t => t !== tag) }));
+  };
+
+  const saveDraft = async () => {
+    if (!post.title || !post.content) {
+      setMessage({ type: 'error', text: 'Please enter a title and content' });
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const response = await fetch('/api/blog', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...post,
+          status: 'draft',
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setMessage({ type: 'success', text: 'Draft saved successfully!' });
+        setPost(prev => ({ ...prev, id: data.post.id, slug: data.post.slug }));
+      } else {
+        setMessage({ type: 'error', text: data.error || 'Failed to save draft' });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Failed to save draft' });
+    }
+    setSaving(false);
+  };
+
+  const publishPost = async (scheduled = false) => {
+    if (!post.title || !post.content) {
+      setMessage({ type: 'error', text: 'Please enter a title and content' });
+      return;
+    }
+
+    if (!post.category) {
+      setMessage({ type: 'error', text: 'Please select a category' });
+      return;
+    }
+
+    setPublishing(true);
+    try {
+      let scheduledFor = null;
+      if (scheduled && scheduleDate && scheduleTime) {
+        scheduledFor = new Date(`${scheduleDate}T${scheduleTime}`).toISOString();
+      }
+
+      const response = await fetch('/api/blog', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...post,
+          status: scheduled ? 'scheduled' : 'published',
+          scheduled_for: scheduledFor,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setMessage({ 
+          type: 'success', 
+          text: scheduled ? 'Post scheduled successfully!' : 'Post published successfully!' 
+        });
+        setShowScheduleModal(false);
+        // Reset form or redirect
+      } else {
+        setMessage({ type: 'error', text: data.error || 'Failed to publish' });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Failed to publish' });
+    }
+    setPublishing(false);
+  };
+
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return 'text-emerald-400';
+    if (score >= 60) return 'text-amber-400';
+    return 'text-red-400';
+  };
+
+  const getScoreGradient = (score: number) => {
+    if (score >= 80) return 'from-emerald-500 to-emerald-400';
+    if (score >= 60) return 'from-amber-500 to-amber-400';
+    return 'from-red-500 to-red-400';
   };
 
   return (
-    <div className="min-h-screen bg-os-dark p-6">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-display font-bold text-white mb-8">
-          Blog Auto-Polish
-        </h1>
+    <div 
+      className="min-h-screen relative"
+      style={{
+        backgroundImage: `url('https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=2127&auto=format&fit=crop')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
+      }}
+    >
+      {/* Dark Overlay */}
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]" />
 
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Editor Section */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Title */}
-            <div className="os-card p-6">
-              <label className="text-white/70 text-sm mb-2 block">Blog Title</label>
-              <input
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Enter your blog title..."
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-white/30 focus:border-neon-green-500 focus:outline-none"
-              />
+      {/* Header */}
+      <header className="sticky top-0 z-40 backdrop-blur-2xl bg-black/30 border-b border-white/10">
+        <div className="px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Link
+                href="/admin-v2"
+                className="p-2 rounded-xl backdrop-blur-xl bg-white/[0.08] border border-white/[0.15] hover:bg-white/[0.15] text-white/60 hover:text-white transition"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+              </Link>
+              <div>
+                <h1 className="text-xl font-light text-white tracking-tight flex items-center gap-2">
+                  <span className="text-2xl">✍️</span>
+                  Blog Auto-Polish
+                </h1>
+                <p className="text-sm text-white/40">Create, analyze, and publish your content</p>
+              </div>
             </div>
 
-            {/* Content Editor */}
-            <div className="os-card p-6">
-              <label className="text-white/70 text-sm mb-2 block">Blog Content</label>
-              <textarea
-                value={blogText}
-                onChange={(e) => setBlogText(e.target.value)}
-                placeholder="Write your blog content here in your authentic voice..."
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-white/30 focus:border-neon-green-500 focus:outline-none min-h-[400px] font-mono text-sm"
+            {/* Actions */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={saveDraft}
+                disabled={saving}
+                className="px-5 py-2.5 backdrop-blur-xl bg-white/[0.08] border border-white/[0.15] text-white rounded-xl font-medium text-sm hover:bg-white/[0.15] transition disabled:opacity-50"
+              >
+                {saving ? 'Saving...' : 'Save Draft'}
+              </button>
+              <button
+                onClick={() => setShowScheduleModal(true)}
+                className="px-5 py-2.5 backdrop-blur-xl bg-white/[0.08] border border-white/[0.15] text-white rounded-xl font-medium text-sm hover:bg-white/[0.15] transition"
+              >
+                Schedule
+              </button>
+              <button
+                onClick={() => publishPost(false)}
+                disabled={publishing}
+                className="px-5 py-2.5 bg-gradient-to-r from-[#84A98C] to-[#52796F] text-white rounded-xl font-medium text-sm hover:opacity-90 transition shadow-[0_0_20px_rgba(132,169,140,0.3)] disabled:opacity-50"
+              >
+                {publishing ? 'Publishing...' : 'Publish Now'}
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Message Banner */}
+      <AnimatePresence>
+        {message && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className={`relative z-30 mx-6 mt-4 p-4 rounded-xl backdrop-blur-xl flex items-center justify-between ${
+              message.type === 'success'
+                ? 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-300'
+                : 'bg-red-500/20 border border-red-500/30 text-red-300'
+            }`}
+          >
+            <span>{message.text}</span>
+            <button onClick={() => setMessage(null)} className="p-1 hover:bg-white/10 rounded">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Main Content */}
+      <main className="relative z-10 p-6">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-3 gap-6">
+          
+          {/* Editor Panel (2/3) */}
+          <div className="lg:col-span-2 space-y-6">
+            
+            {/* Title */}
+            <div className="backdrop-blur-2xl bg-white/[0.08] rounded-2xl border border-white/[0.15] p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]">
+              <label className="text-white/60 text-sm mb-2 block font-medium">Blog Title</label>
+              <input
+                type="text"
+                value={post.title}
+                onChange={(e) => setPost(prev => ({ ...prev, title: e.target.value }))}
+                placeholder="Enter a compelling title..."
+                className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-4 py-3 text-white text-lg font-medium placeholder:text-white/30 focus:border-[#84A98C]/50 focus:outline-none transition"
+                data-testid="blog-title-input"
               />
-              <div className="mt-4 flex items-center justify-between">
-                <span className="text-white/50 text-sm">
-                  {blogText.split(/\s+/).filter(w => w).length} words
-                </span>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={analyzeSEO}
-                  disabled={analyzing || !blogText}
-                >
-                  {analyzing ? 'Analyzing...' : 'Analyze SEO'}
-                </Button>
+              <p className="text-xs text-white/40 mt-2">
+                {post.title.length}/60 characters (50-60 optimal for SEO)
+              </p>
+            </div>
+
+            {/* Tabs */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => setActiveTab('write')}
+                className={`px-5 py-2.5 rounded-xl font-medium text-sm transition ${
+                  activeTab === 'write'
+                    ? 'bg-[#84A98C]/20 text-[#A7C957] border border-[#84A98C]/30'
+                    : 'text-white/50 hover:text-white hover:bg-white/[0.08]'
+                }`}
+              >
+                ✍️ Write
+              </button>
+              <button
+                onClick={() => setActiveTab('preview')}
+                className={`px-5 py-2.5 rounded-xl font-medium text-sm transition ${
+                  activeTab === 'preview'
+                    ? 'bg-[#84A98C]/20 text-[#A7C957] border border-[#84A98C]/30'
+                    : 'text-white/50 hover:text-white hover:bg-white/[0.08]'
+                }`}
+              >
+                👁️ Preview
+              </button>
+            </div>
+
+            {/* Content Editor / Preview */}
+            <div className="backdrop-blur-2xl bg-white/[0.08] rounded-2xl border border-white/[0.15] p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]">
+              {activeTab === 'write' ? (
+                <>
+                  <label className="text-white/60 text-sm mb-2 block font-medium">Content</label>
+                  <textarea
+                    value={post.content}
+                    onChange={(e) => setPost(prev => ({ ...prev, content: e.target.value }))}
+                    placeholder="Write your blog post content here. Use markdown for formatting..."
+                    className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-4 py-4 text-white placeholder:text-white/30 focus:border-[#84A98C]/50 focus:outline-none min-h-[400px] font-mono text-sm leading-relaxed transition"
+                    data-testid="blog-content-input"
+                  />
+                  <div className="mt-4 flex items-center justify-between text-sm">
+                    <div className="flex gap-6 text-white/40">
+                      <span>{wordCount} words</span>
+                      <span>{readTime} min read</span>
+                    </div>
+                    <button
+                      onClick={analyzeSEO}
+                      disabled={analyzing || !post.content}
+                      className="px-4 py-2 bg-white/[0.08] border border-white/10 rounded-lg text-white/70 hover:text-white hover:bg-white/[0.15] transition disabled:opacity-50"
+                    >
+                      {analyzing ? 'Analyzing...' : '🔍 Analyze SEO'}
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="prose prose-invert prose-lg max-w-none min-h-[400px]">
+                  <h1 className="text-3xl font-bold text-white mb-6">{post.title || 'Untitled'}</h1>
+                  <div 
+                    className="text-white/80 leading-relaxed whitespace-pre-wrap"
+                    dangerouslySetInnerHTML={{ 
+                      __html: post.content.replace(/\n/g, '<br />') || '<p class="text-white/40">No content yet...</p>' 
+                    }} 
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Category & Tags */}
+            <div className="backdrop-blur-2xl bg-white/[0.08] rounded-2xl border border-white/[0.15] p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]">
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Category */}
+                <div>
+                  <label className="text-white/60 text-sm mb-2 block font-medium">Category</label>
+                  <select
+                    value={post.category}
+                    onChange={(e) => setPost(prev => ({ ...prev, category: e.target.value }))}
+                    className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-[#84A98C]/50 focus:outline-none transition"
+                    data-testid="blog-category-select"
+                  >
+                    <option value="">Select a category</option>
+                    {CATEGORIES.map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Tags */}
+                <div>
+                  <label className="text-white/60 text-sm mb-2 block font-medium">Tags</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={tagInput}
+                      onChange={(e) => setTagInput(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                      placeholder="Add a tag..."
+                      className="flex-1 bg-white/[0.05] border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:border-[#84A98C]/50 focus:outline-none transition"
+                    />
+                    <button
+                      onClick={addTag}
+                      className="px-4 py-3 bg-[#84A98C]/20 border border-[#84A98C]/30 rounded-xl text-[#A7C957] hover:bg-[#84A98C]/30 transition"
+                    >
+                      Add
+                    </button>
+                  </div>
+                  {post.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {post.tags.map(tag => (
+                        <span
+                          key={tag}
+                          className="px-3 py-1 bg-white/[0.08] border border-white/10 rounded-full text-white/70 text-sm flex items-center gap-2"
+                        >
+                          #{tag}
+                          <button onClick={() => removeTag(tag)} className="text-white/40 hover:text-white">×</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
             {/* Image Upload */}
-            <div className="os-card p-6">
-              <label className="text-white/70 text-sm mb-2 block">Upload Images (up to 5)</label>
-              <div className="border-2 border-dashed border-white/20 rounded-lg p-8 text-center hover:border-neon-green-500/50 transition-colors cursor-pointer">
+            <div className="backdrop-blur-2xl bg-white/[0.08] rounded-2xl border border-white/[0.15] p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]">
+              <label className="text-white/60 text-sm mb-4 block font-medium">Images (up to 5)</label>
+              <div className="border-2 border-dashed border-white/20 rounded-xl p-8 text-center hover:border-[#84A98C]/50 transition-colors cursor-pointer">
                 <input
                   type="file"
                   accept="image/*"
@@ -85,17 +478,26 @@ export default function BlogPolishPage() {
                   id="image-upload"
                 />
                 <label htmlFor="image-upload" className="cursor-pointer">
-                  <div className="text-4xl mb-2">📸</div>
-                  <p className="text-white/70">Click or drag images here</p>
-                  <p className="text-white/50 text-sm mt-1">PNG, JPG, WebP (max 10MB each)</p>
+                  <div className="text-4xl mb-3">📸</div>
+                  <p className="text-white/70 font-medium">Click or drag images here</p>
+                  <p className="text-white/40 text-sm mt-1">PNG, JPG, WebP (max 10MB each)</p>
                 </label>
               </div>
-              
-              {images.length > 0 && (
-                <div className="mt-4 grid grid-cols-5 gap-2">
-                  {images.map((img, i) => (
-                    <div key={i} className="aspect-square bg-white/5 rounded-lg flex items-center justify-center border border-white/10">
-                      <span className="text-white/50 text-xs">{img.name.slice(0, 10)}...</span>
+
+              {imagePreviews.length > 0 && (
+                <div className="mt-4 grid grid-cols-5 gap-3">
+                  {imagePreviews.map((preview, i) => (
+                    <div key={i} className="relative aspect-square rounded-lg overflow-hidden group">
+                      <img src={preview} alt={`Preview ${i + 1}`} className="w-full h-full object-cover" />
+                      <button
+                        onClick={() => removeImage(i)}
+                        className="absolute top-1 right-1 w-6 h-6 bg-black/60 rounded-full text-white opacity-0 group-hover:opacity-100 transition flex items-center justify-center"
+                      >
+                        ×
+                      </button>
+                      {i === 0 && (
+                        <span className="absolute bottom-1 left-1 px-2 py-0.5 bg-[#84A98C] text-white text-xs rounded">Featured</span>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -103,104 +505,217 @@ export default function BlogPolishPage() {
             </div>
           </div>
 
-          {/* Sidebar - SEO & Actions */}
+          {/* Sidebar (1/3) */}
           <div className="space-y-6">
+            
             {/* SEO Score */}
-            {seoScore !== null && (
-              <div className="os-card p-6">
-                <h3 className="text-white font-bold mb-4">SEO Analysis</h3>
-                <div className="flex items-center justify-center mb-4">
-                  <div className="relative w-32 h-32">
-                    <svg className="transform -rotate-90 w-32 h-32">
-                      <circle
-                        cx="64"
-                        cy="64"
-                        r="56"
-                        stroke="rgba(255,255,255,0.1)"
-                        strokeWidth="8"
-                        fill="none"
-                      />
-                      <circle
-                        cx="64"
-                        cy="64"
-                        r="56"
-                        stroke="#00FF88"
-                        strokeWidth="8"
-                        fill="none"
-                        strokeDasharray={`${2 * Math.PI * 56}`}
-                        strokeDashoffset={`${2 * Math.PI * 56 * (1 - seoScore / 100)}`}
-                        className="transition-all duration-1000"
-                      />
-                    </svg>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-3xl font-bold text-neon-green-500">{seoScore}</span>
+            <div className="backdrop-blur-2xl bg-white/[0.08] rounded-2xl border border-white/[0.15] p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]">
+              <h3 className="text-white font-medium mb-4 flex items-center gap-2">
+                <span>📊</span> SEO Analysis
+              </h3>
+              
+              {seoAnalysis ? (
+                <>
+                  {/* Score Circle */}
+                  <div className="flex items-center justify-center mb-6">
+                    <div className="relative w-32 h-32">
+                      <svg className="transform -rotate-90 w-32 h-32">
+                        <circle
+                          cx="64"
+                          cy="64"
+                          r="56"
+                          stroke="rgba(255,255,255,0.1)"
+                          strokeWidth="8"
+                          fill="none"
+                        />
+                        <circle
+                          cx="64"
+                          cy="64"
+                          r="56"
+                          stroke="url(#scoreGradient)"
+                          strokeWidth="8"
+                          fill="none"
+                          strokeDasharray={`${2 * Math.PI * 56}`}
+                          strokeDashoffset={`${2 * Math.PI * 56 * (1 - seoAnalysis.score / 100)}`}
+                          strokeLinecap="round"
+                          className="transition-all duration-1000"
+                        />
+                        <defs>
+                          <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stopColor={seoAnalysis.score >= 80 ? '#10b981' : seoAnalysis.score >= 60 ? '#f59e0b' : '#ef4444'} />
+                            <stop offset="100%" stopColor={seoAnalysis.score >= 80 ? '#34d399' : seoAnalysis.score >= 60 ? '#fbbf24' : '#f87171'} />
+                          </linearGradient>
+                        </defs>
+                      </svg>
+                      <div className="absolute inset-0 flex items-center justify-center flex-col">
+                        <span className={`text-4xl font-bold ${getScoreColor(seoAnalysis.score)}`}>
+                          {seoAnalysis.score}
+                        </span>
+                        <span className="text-white/40 text-xs">/ 100</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="space-y-2 text-sm">
-                  <div className="flex items-center gap-2">
-                    <span className="text-neon-green-500">✓</span>
-                    <span className="text-white/70">Good keyword density</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-neon-green-500">✓</span>
-                    <span className="text-white/70">Proper heading structure</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-yellow-500">⚠</span>
-                    <span className="text-white/70">Add more internal links</span>
-                  </div>
-                </div>
-              </div>
-            )}
 
-            {/* AI Enhancement */}
-            <div className="os-card p-6">
-              <h3 className="text-white font-bold mb-4">AI Enhancement</h3>
-              <p className="text-white/70 text-sm mb-4">
-                Want to see an AI-enhanced version while keeping your voice?
-              </p>
-              <Button variant="secondary" className="w-full" disabled={!blogText}>
-                Generate Alternative
-              </Button>
+                  {/* Feedback Items */}
+                  <div className="space-y-2">
+                    {seoAnalysis.feedback.map((item, i) => (
+                      <div key={i} className="flex items-start gap-2 text-sm">
+                        <span className={
+                          item.type === 'success' ? 'text-emerald-400' :
+                          item.type === 'warning' ? 'text-amber-400' :
+                          item.type === 'info' ? 'text-sky-400' : 'text-red-400'
+                        }>
+                          {item.type === 'success' ? '✓' : item.type === 'warning' ? '⚠' : 'ℹ'}
+                        </span>
+                        <span className="text-white/70">{item.message}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Keywords */}
+                  {seoAnalysis.details.topKeywords.length > 0 && (
+                    <div className="mt-4 pt-4 border-t border-white/10">
+                      <p className="text-white/50 text-xs mb-2">Top Keywords:</p>
+                      <div className="flex flex-wrap gap-1">
+                        {seoAnalysis.details.topKeywords.slice(0, 6).map(kw => (
+                          <span key={kw} className="px-2 py-0.5 bg-white/[0.05] rounded text-xs text-white/60">
+                            {kw}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="text-center py-8">
+                  <div className="text-4xl mb-3 opacity-50">📝</div>
+                  <p className="text-white/40 text-sm">
+                    {analyzing ? 'Analyzing your content...' : 'Write at least 100 words to see SEO analysis'}
+                  </p>
+                </div>
+              )}
             </div>
 
-            {/* Actions */}
-            <div className="os-card p-6">
-              <h3 className="text-white font-bold mb-4">Publish Options</h3>
+            {/* Post Stats */}
+            <div className="backdrop-blur-2xl bg-white/[0.08] rounded-2xl border border-white/[0.15] p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]">
+              <h3 className="text-white font-medium mb-4 flex items-center gap-2">
+                <span>📈</span> Post Stats
+              </h3>
               <div className="space-y-3">
-                <Button variant="primary" className="w-full" disabled={!title || !blogText}>
-                  Auto-Polish & Preview
-                </Button>
-                <Button variant="secondary" className="w-full">
-                  Save as Draft
-                </Button>
+                <div className="flex justify-between text-sm">
+                  <span className="text-white/50">Word Count</span>
+                  <span className="text-white font-medium">{wordCount}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-white/50">Read Time</span>
+                  <span className="text-white font-medium">{readTime} min</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-white/50">Images</span>
+                  <span className="text-white font-medium">{imagePreviews.length} / 5</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-white/50">Category</span>
+                  <span className="text-white font-medium">{post.category || '-'}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-white/50">Tags</span>
+                  <span className="text-white font-medium">{post.tags.length}</span>
+                </div>
               </div>
             </div>
 
-            {/* Stats */}
-            <div className="os-card p-6">
-              <h3 className="text-white font-bold mb-4">Blog Stats</h3>
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-white/50">Word Count</span>
-                  <span className="text-white">{blogText.split(/\s+/).filter(w => w).length}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-white/50">Images</span>
-                  <span className="text-white">{images.length} / 5</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-white/50">Read Time</span>
-                  <span className="text-white">
-                    {Math.ceil(blogText.split(/\s+/).filter(w => w).length / 200)} min
-                  </span>
-                </div>
-              </div>
+            {/* Quick Tips */}
+            <div className="backdrop-blur-2xl bg-white/[0.08] rounded-2xl border border-white/[0.15] p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]">
+              <h3 className="text-white font-medium mb-4 flex items-center gap-2">
+                <span>💡</span> SEO Quick Tips
+              </h3>
+              <ul className="space-y-2 text-sm text-white/60">
+                <li className="flex items-start gap-2">
+                  <span className="text-[#84A98C]">•</span>
+                  Title: 50-60 characters for best results
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-[#84A98C]">•</span>
+                  Content: 1000-2000 words is ideal
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-[#84A98C]">•</span>
+                  Use headings (## or ###) to structure
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-[#84A98C]">•</span>
+                  Include your focus keyword 3-5 times
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-[#84A98C]">•</span>
+                  Add alt text to all images
+                </li>
+              </ul>
             </div>
           </div>
         </div>
-      </div>
+      </main>
+
+      {/* Schedule Modal */}
+      <AnimatePresence>
+        {showScheduleModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center"
+            onClick={() => setShowScheduleModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="backdrop-blur-2xl bg-white/[0.12] rounded-2xl border border-white/[0.15] p-6 w-full max-w-md shadow-2xl"
+            >
+              <h3 className="text-xl font-medium text-white mb-4">Schedule Post</h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="text-white/60 text-sm mb-2 block">Date</label>
+                  <input
+                    type="date"
+                    value={scheduleDate}
+                    onChange={(e) => setScheduleDate(e.target.value)}
+                    className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-[#84A98C]/50 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-white/60 text-sm mb-2 block">Time</label>
+                  <input
+                    type="time"
+                    value={scheduleTime}
+                    onChange={(e) => setScheduleTime(e.target.value)}
+                    className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-[#84A98C]/50 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => setShowScheduleModal(false)}
+                  className="flex-1 px-4 py-3 bg-white/[0.08] border border-white/10 rounded-xl text-white hover:bg-white/[0.15] transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => publishPost(true)}
+                  disabled={!scheduleDate || !scheduleTime || publishing}
+                  className="flex-1 px-4 py-3 bg-gradient-to-r from-[#84A98C] to-[#52796F] text-white rounded-xl font-medium hover:opacity-90 transition disabled:opacity-50"
+                >
+                  {publishing ? 'Scheduling...' : 'Schedule'}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
