@@ -472,29 +472,189 @@ export default function BlogPolishPage() {
               </p>
             </div>
 
-            {/* Tabs */}
-            <div className="flex gap-2">
-              <button
-                onClick={() => setActiveTab('write')}
-                className={`px-5 py-2.5 rounded-xl font-medium text-sm transition ${
-                  activeTab === 'write'
-                    ? 'bg-[#84A98C]/20 text-[#A7C957] border border-[#84A98C]/30'
-                    : 'text-white/50 hover:text-white hover:bg-white/[0.08]'
-                }`}
-              >
-                ✍️ Write
-              </button>
-              <button
-                onClick={() => setActiveTab('preview')}
-                className={`px-5 py-2.5 rounded-xl font-medium text-sm transition ${
-                  activeTab === 'preview'
-                    ? 'bg-[#84A98C]/20 text-[#A7C957] border border-[#84A98C]/30'
-                    : 'text-white/50 hover:text-white hover:bg-white/[0.08]'
-                }`}
-              >
-                👁️ Preview
-              </button>
+            {/* Tabs + AI Tools */}
+            <div className="flex items-center justify-between">
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setActiveTab('write')}
+                  className={`px-5 py-2.5 rounded-xl font-medium text-sm transition ${
+                    activeTab === 'write'
+                      ? 'bg-[#84A98C]/20 text-[#A7C957] border border-[#84A98C]/30'
+                      : 'text-white/50 hover:text-white hover:bg-white/[0.08]'
+                  }`}
+                >
+                  ✍️ Write
+                </button>
+                <button
+                  onClick={() => setActiveTab('preview')}
+                  className={`px-5 py-2.5 rounded-xl font-medium text-sm transition ${
+                    activeTab === 'preview'
+                      ? 'bg-[#84A98C]/20 text-[#A7C957] border border-[#84A98C]/30'
+                      : 'text-white/50 hover:text-white hover:bg-white/[0.08]'
+                  }`}
+                >
+                  👁️ Preview
+                </button>
+              </div>
+
+              {/* AI Tools */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-white/40 mr-2">AI Tools:</span>
+                <button
+                  onClick={generateOutline}
+                  disabled={aiLoading !== null || !post.title}
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium transition bg-purple-500/20 border border-purple-500/30 text-purple-300 hover:bg-purple-500/30 disabled:opacity-50"
+                  title="Generate outline from title"
+                >
+                  {aiLoading === 'generate_outline' ? '⏳' : '📋'} Outline
+                </button>
+                <button
+                  onClick={enhanceContent}
+                  disabled={aiLoading !== null || post.content.length < 50}
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium transition bg-purple-500/20 border border-purple-500/30 text-purple-300 hover:bg-purple-500/30 disabled:opacity-50"
+                  title="Enhance content with AI"
+                >
+                  {aiLoading === 'enhance_content' ? '⏳' : '✨'} Enhance
+                </button>
+                <button
+                  onClick={suggestHeadlines}
+                  disabled={aiLoading !== null || !post.title}
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium transition bg-purple-500/20 border border-purple-500/30 text-purple-300 hover:bg-purple-500/30 disabled:opacity-50"
+                  title="Get headline suggestions"
+                >
+                  {aiLoading === 'suggest_headlines' ? '⏳' : '💡'} Headlines
+                </button>
+                <button
+                  onClick={suggestTags}
+                  disabled={aiLoading !== null}
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium transition bg-purple-500/20 border border-purple-500/30 text-purple-300 hover:bg-purple-500/30 disabled:opacity-50"
+                  title="Suggest tags"
+                >
+                  {aiLoading === 'suggest_tags' ? '⏳' : '🏷️'} Tags
+                </button>
+                <button
+                  onClick={generateMeta}
+                  disabled={aiLoading !== null || !post.title || !post.content}
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium transition bg-purple-500/20 border border-purple-500/30 text-purple-300 hover:bg-purple-500/30 disabled:opacity-50"
+                  title="Generate SEO meta"
+                >
+                  {aiLoading === 'generate_meta' ? '⏳' : '🔎'} Meta
+                </button>
+              </div>
             </div>
+
+            {/* AI Suggestions Panel */}
+            <AnimatePresence>
+              {showAiPanel && Object.keys(aiSuggestions).length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="backdrop-blur-2xl bg-purple-500/10 rounded-2xl border border-purple-500/30 p-4 overflow-hidden"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-sm font-semibold text-purple-300 flex items-center gap-2">
+                      🤖 AI Suggestions
+                    </h3>
+                    <button
+                      onClick={() => setShowAiPanel(false)}
+                      className="p-1 hover:bg-white/10 rounded text-white/50 hover:text-white"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* Headlines */}
+                  {aiSuggestions.headlines && (
+                    <div className="mb-4">
+                      <p className="text-xs text-white/50 mb-2">💡 Headline Options (click to apply)</p>
+                      <div className="space-y-2">
+                        {aiSuggestions.headlines.map((headline, i) => (
+                          <button
+                            key={i}
+                            onClick={() => applyHeadline(headline)}
+                            className="w-full text-left px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/80 text-sm transition"
+                          >
+                            {headline}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Tags */}
+                  {aiSuggestions.tags && (
+                    <div className="mb-4">
+                      <p className="text-xs text-white/50 mb-2">🏷️ Suggested Tags (click to add)</p>
+                      <div className="flex flex-wrap gap-2">
+                        {aiSuggestions.tags.map((tag, i) => (
+                          <button
+                            key={i}
+                            onClick={() => applyTag(tag)}
+                            disabled={post.tags.includes(tag)}
+                            className="px-2 py-1 rounded-full bg-purple-500/20 text-purple-300 text-xs hover:bg-purple-500/30 transition disabled:opacity-50"
+                          >
+                            + {tag}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Meta */}
+                  {aiSuggestions.meta && (
+                    <div className="mb-4">
+                      <p className="text-xs text-white/50 mb-2">🔎 SEO Meta</p>
+                      <div className="space-y-2 text-sm">
+                        <p className="text-white/70"><span className="text-white/50">Description:</span> {aiSuggestions.meta.description}</p>
+                        <p className="text-white/70">
+                          <span className="text-white/50">Keywords:</span>{' '}
+                          {aiSuggestions.meta.keywords?.join(', ')}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Outline */}
+                  {aiSuggestions.outline && (
+                    <div className="mb-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-xs text-white/50">📋 Generated Outline</p>
+                        <button
+                          onClick={applyOutline}
+                          className="px-3 py-1 rounded-lg bg-purple-500/30 text-purple-200 text-xs hover:bg-purple-500/40 transition"
+                        >
+                          Apply to Content
+                        </button>
+                      </div>
+                      <pre className="text-xs text-white/70 bg-white/5 rounded-lg p-3 overflow-auto max-h-48 whitespace-pre-wrap">
+                        {aiSuggestions.outline}
+                      </pre>
+                    </div>
+                  )}
+
+                  {/* Enhanced Content */}
+                  {aiSuggestions.enhanced && (
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-xs text-white/50">✨ Enhanced Content</p>
+                        <button
+                          onClick={applyEnhanced}
+                          className="px-3 py-1 rounded-lg bg-purple-500/30 text-purple-200 text-xs hover:bg-purple-500/40 transition"
+                        >
+                          Apply Changes
+                        </button>
+                      </div>
+                      <pre className="text-xs text-white/70 bg-white/5 rounded-lg p-3 overflow-auto max-h-64 whitespace-pre-wrap">
+                        {aiSuggestions.enhanced}
+                      </pre>
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Content Editor / Preview */}
             <div className="backdrop-blur-2xl bg-white/[0.08] rounded-2xl border border-white/[0.15] p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]">
