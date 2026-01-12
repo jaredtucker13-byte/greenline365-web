@@ -2977,6 +2977,25 @@ export default function BlogPolishPage() {
         onApplyStyle={applyStyleFromLibrary}
         currentStyle={pageStyle}
       />
+
+      {/* QR Code Modal */}
+      <QRCodeModal
+        isOpen={showQRModal}
+        onClose={() => setShowQRModal(false)}
+        data={`https://greenline365.com/blog/${post.slug || 'preview'}`}
+        title="Share Blog Post"
+      />
+
+      {/* Camera Capture */}
+      {showCamera && (
+        <CameraCapture
+          onCapture={handleCameraCapture}
+          onClose={() => setShowCamera(false)}
+        />
+      )}
+
+      {/* Network Status Indicator */}
+      <NetworkStatus />
     </div>
   );
 }
