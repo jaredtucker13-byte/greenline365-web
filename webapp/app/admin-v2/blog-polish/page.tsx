@@ -528,6 +528,86 @@ export default function BlogPolishPage() {
     setMessage({ type: 'info', text: 'Suggestion copied to prompt input. Edit and generate!' });
   };
 
+  // Voice Recording - Start/Stop
+  const toggleVoiceRecording = async () => {
+    if (isRecording) {
+      // Stop recording
+      mediaRecorderRef.current?.stop();
+      setIsRecording(false);
+    } else {
+      // Start recording
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+        mediaRecorderRef.current = mediaRecorder;
+        audioChunksRef.current = [];
+
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            audioChunksRef.current.push(event.data);
+          }
+        };
+
+        mediaRecorder.onstop = async () => {
+          // Stop all tracks
+          stream.getTracks().forEach(track => track.stop());
+          
+          // Create audio blob and transcribe
+          const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+          await transcribeAudio(audioBlob);
+        };
+
+        mediaRecorder.start();
+        setIsRecording(true);
+        setMessage({ type: 'info', text: '🎤 Recording... Click again to stop' });
+      } catch (error: any) {
+        console.error('Microphone error:', error);
+        setMessage({ type: 'error', text: 'Could not access microphone. Please allow permission.' });
+      }
+    }
+  };
+
+  // Transcribe audio using OpenRouter GPT-4o Audio
+  const transcribeAudio = async (audioBlob: Blob) => {
+    setIsTranscribing(true);
+    setMessage({ type: 'info', text: '✨ Transcribing your voice...' });
+
+    try {
+      // Convert blob to base64
+      const reader = new FileReader();
+      const base64Promise = new Promise<string>((resolve) => {
+        reader.onloadend = () => {
+          const base64 = (reader.result as string).split(',')[1];
+          resolve(base64);
+        };
+      });
+      reader.readAsDataURL(audioBlob);
+      const audioBase64 = await base64Promise;
+
+      const response = await fetch('/api/blog/transcribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ audio: audioBase64 }),
+      });
+
+      const data = await response.json();
+      if (response.ok && data.text) {
+        // Append transcribed text to content
+        setPost(prev => ({
+          ...prev,
+          content: prev.content ? `${prev.content}\n\n${data.text}` : data.text,
+        }));
+        setMessage({ type: 'success', text: '🎤 Voice transcribed and added!' });
+      } else {
+        setMessage({ type: 'error', text: data.error || 'Transcription failed' });
+      }
+    } catch (error) {
+      console.error('Transcription error:', error);
+      setMessage({ type: 'error', text: 'Failed to transcribe audio' });
+    }
+    setIsTranscribing(false);
+  };
+
   // Trending Research with Perplexity via OpenRouter
   const searchTrending = async () => {
     if (!trendingIndustry) {
