@@ -42,6 +42,7 @@ const navItems = [
   { id: 'analytics', label: 'Analytics', icon: 'chart', href: '/admin-v2/analytics' },
   { id: 'brand-voice', label: 'Brand Voice', icon: 'voice', href: '/admin-v2/brand-voice' },
   { id: 'knowledge', label: 'Knowledge Base', icon: 'database', href: '/admin-v2/knowledge' },
+  { id: 'audit', label: 'Audit Logs', icon: 'shield', href: '/admin-v2/audit' },
   { id: 'settings', label: 'Settings', icon: 'cog', href: '/admin-v2/settings' },
 ];
 
