@@ -123,28 +123,43 @@ Be brutally honest and extremely specific with colors, spacing, and recommendati
 5. Specific design improvements with exact values`,
       };
 
-      // Use Emergent Integrations for vision analysis
-      const { LlmChat, UserMessage, ImageContent } = await import('emergentintegrations/llm/chat');
+      // Use Python subprocess to call emergentintegrations
+      const { spawn } = await import('child_process');
+      const { promisify } = await import('util');
+      const execFile = promisify((await import('child_process')).execFile);
       
-      const chat = LlmChat({
-        apiKey: emergentKey,
-        sessionId: `vision-${Date.now()}`,
-        systemMessage: 'You are an expert UI/UX designer and CRO specialist. Analyze websites with brutal honesty. Be specific with colors (HEX), spacing (px), and fonts.',
-      });
+      const pythonScript = `
+import asyncio
+import json
+import sys
+from emergentintegrations.llm.chat import LlmChat, UserMessage, ImageContent
 
-      // Configure model
-      if (visionModel.startsWith('gemini')) {
-        chat.with_model('gemini', modelId);
-      } else {
-        chat.with_model('openai', 'gpt-4o');
-      }
+async def analyze():
+    chat = LlmChat(
+        api_key="${emergentKey}",
+        session_id="vision-${Date.now()}",
+        system_message="You are an expert UI/UX designer and CRO specialist. Analyze websites with brutal honesty. Be specific with colors (HEX), spacing (px), and fonts."
+    )
+    
+    ${visionModel.startsWith('gemini') 
+      ? `chat.with_model("gemini", "${modelId}")` 
+      : `chat.with_model("openai", "gpt-4o")`
+    }
+    
+    message = UserMessage(
+        text='''${(analysisPrompts[analysisType] || analysisPrompts.full).replace(/'/g, "\\'")}''',
+        file_contents=[ImageContent(image_base64="${imageBase64}")]
+    )
+    
+    result = await chat.send_message(message)
+    print(json.dumps({"analysis": result}))
 
-      const message = UserMessage({
-        text: analysisPrompts[analysisType] || analysisPrompts.full,
-        file_contents: [ImageContent({ image_base64: imageBase64 })],
-      });
+asyncio.run(analyze())
+`;
 
-      analysisText = await chat.send_message(message);
+      const { stdout } = await execFile('python3', ['-c', pythonScript]);
+      const result = JSON.parse(stdout);
+      analysisText = result.analysis;
 
       // Extract design spec from analysis
       designSpec = {
