@@ -189,24 +189,34 @@ export default function HybridCalendar({
               onClick={() => onDateClick(date)}
               className={`
                 relative min-h-[120px] p-3 
-                border-r border-b border-white/[0.08] 
                 cursor-pointer transition-all duration-300
-                ${today ? 'bg-[#84A98C]/10' : ''}
                 ${!currentMonth ? 'opacity-30' : ''}
-                ${isHovered && currentMonth ? 'bg-white/[0.06]' : ''}
               `}
+              style={{
+                borderRight: '1px solid var(--theme-glass-border)',
+                borderBottom: '1px solid var(--theme-glass-border)',
+                background: today 
+                  ? 'color-mix(in srgb, var(--theme-primary) 10%, transparent)' 
+                  : isHovered && currentMonth 
+                    ? 'var(--theme-bg-secondary)' 
+                    : 'transparent',
+              }}
             >
               {/* Date Number */}
               <div className="flex justify-end mb-2">
-                <span className={`
-                  text-sm font-medium transition-all duration-300
-                  ${today 
-                    ? 'w-8 h-8 rounded-full bg-[#84A98C] text-white flex items-center justify-center shadow-[0_0_20px_rgba(132,169,140,0.4)]'
-                    : currentMonth 
-                      ? 'text-white/70' 
-                      : 'text-white/30'
-                  }
-                `}>
+                <span 
+                  className="text-sm font-medium transition-all duration-300 flex items-center justify-center"
+                  style={today ? {
+                    width: '2rem',
+                    height: '2rem',
+                    borderRadius: '9999px',
+                    background: 'var(--theme-primary)',
+                    color: '#000',
+                    boxShadow: '0 0 20px var(--theme-glow)',
+                  } : {
+                    color: currentMonth ? 'var(--theme-text-secondary)' : 'var(--theme-text-muted)',
+                  }}
+                >
                   {date.getDate()}
                 </span>
               </div>
