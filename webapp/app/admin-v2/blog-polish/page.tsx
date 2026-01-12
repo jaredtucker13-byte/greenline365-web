@@ -1256,7 +1256,7 @@ export default function BlogPolishPage() {
                       type="text"
                       value={trendingIndustry}
                       onChange={(e) => setTrendingIndustry(e.target.value)}
-                      placeholder="Industry (e.g., Real Estate, Fitness)"
+                      placeholder="Industry (optional)"
                       className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 text-sm focus:outline-none focus:border-cyan-500/50"
                     />
                     <input
@@ -1278,7 +1278,7 @@ export default function BlogPolishPage() {
                     </select>
                     <button
                       onClick={searchTrending}
-                      disabled={trendingLoading || !trendingIndustry}
+                      disabled={trendingLoading}
                       className="px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 text-white text-sm font-medium hover:opacity-90 transition disabled:opacity-50 flex items-center justify-center gap-2"
                     >
                       {trendingLoading ? (
