@@ -391,24 +391,96 @@ export default function BlogPolishPage() {
     setAnalyzing(false);
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const files = Array.from(e.target.files).slice(0, 5);
-      setImageFiles(files);
+  // State for upload progress
+  const [uploadingImages, setUploadingImages] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<{ current: number; total: number }>({ current: 0, total: 0 });
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    
+    const files = Array.from(e.target.files).slice(0, 5);
+    setUploadingImages(true);
+    setUploadProgress({ current: 0, total: files.length });
+    
+    const uploadedUrls: string[] = [];
+    const newPreviews: string[] = [];
+    
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      setUploadProgress({ current: i + 1, total: files.length });
       
-      // Create previews
-      const previews = files.map(file => URL.createObjectURL(file));
-      setImagePreviews(previews);
+      try {
+        // Create local preview immediately
+        const localPreview = URL.createObjectURL(file);
+        newPreviews.push(localPreview);
+        
+        // Upload to cloud storage
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('folder', 'blog-posts');
+        
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok && data.url) {
+          uploadedUrls.push(data.url);
+          // Replace local preview with cloud URL
+          newPreviews[i] = data.url;
+        } else {
+          console.error('Upload failed:', data.error);
+          setMessage({ type: 'error', text: `Failed to upload ${file.name}: ${data.error}` });
+        }
+      } catch (error) {
+        console.error('Upload error:', error);
+        setMessage({ type: 'error', text: `Failed to upload ${file.name}` });
+      }
     }
+    
+    // Update state with uploaded images
+    setImageFiles(prev => [...prev, ...files]);
+    setImagePreviews(prev => [...prev, ...newPreviews]);
+    setPost(prev => ({ ...prev, images: [...prev.images, ...uploadedUrls] }));
+    
+    if (uploadedUrls.length > 0) {
+      setMessage({ type: 'success', text: `Uploaded ${uploadedUrls.length} image(s) to cloud storage` });
+    }
+    
+    setUploadingImages(false);
+    setUploadProgress({ current: 0, total: 0 });
+    
+    // Reset input
+    e.target.value = '';
   };
 
-  const removeImage = (index: number) => {
+  const removeImage = async (index: number) => {
+    const imageUrl = imagePreviews[index];
+    
+    // Remove from state first for instant UI feedback
     setImageFiles(prev => prev.filter((_, i) => i !== index));
     setImagePreviews(prev => {
-      // Revoke the URL to prevent memory leaks
-      URL.revokeObjectURL(prev[index]);
+      URL.revokeObjectURL(prev[index]); // Clean up blob URL if any
       return prev.filter((_, i) => i !== index);
     });
+    setPost(prev => ({ ...prev, images: prev.images.filter((_, i) => i !== index) }));
+    
+    // Try to delete from cloud storage if it's a Supabase URL
+    if (imageUrl && imageUrl.includes('supabase')) {
+      try {
+        // Extract path from URL
+        const urlParts = imageUrl.split('/storage/v1/object/public/blog-images/');
+        if (urlParts[1]) {
+          await fetch(`/api/upload?path=${encodeURIComponent(urlParts[1])}`, {
+            method: 'DELETE',
+          });
+        }
+      } catch (error) {
+        console.error('Failed to delete from storage:', error);
+      }
+    }
   };
 
   const addTag = () => {
