@@ -156,59 +156,57 @@ async function generateImages(body: GenerateRequest) {
 
   const enhancedPrompt = `${prompt}. Style: ${styleGuides[style]}. High resolution, suitable for web blog post.`;
 
-  // Generate images using emergentintegrations
+  // Generate images using the Python Nano Banana service
   const images: { id: string; data: string; mime_type: string }[] = [];
+  const apiKey = process.env.EMERGENT_LLM_KEY || 'sk-emergent-c87DeA8638fD64f7d3';
+  const generateCount = Math.min(count, 4);
   
-  try {
-    // Dynamic import for the Python bridge
-    const generateCount = Math.min(count, 4);
+  console.log('[Blog Images] Generating', generateCount, 'images...');
+  
+  for (let i = 0; i < generateCount; i++) {
+    const variationPrompt = i === 0 
+      ? enhancedPrompt 
+      : `${enhancedPrompt} Alternative composition ${i + 1}.`;
     
-    // Call internal API endpoint for image generation
-    for (let i = 0; i < generateCount; i++) {
-      const variationPrompt = i === 0 
-        ? enhancedPrompt 
-        : `${enhancedPrompt} Alternative composition ${i + 1}.`;
-      
-      try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/generate-nano-banana`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt: variationPrompt }),
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          if (data.image) {
-            images.push({
-              id: `img-${Date.now()}-${i}`,
-              data: data.image,
-              mime_type: 'image/png',
-            });
-          }
-        }
-      } catch (e) {
-        console.log(`[Blog Images] Failed to generate image ${i + 1}:`, e);
-      }
-    }
-
-    if (images.length > 0) {
-      return NextResponse.json({
-        success: true,
-        images,
-        message: `Generated ${images.length} images`,
+    try {
+      // Call the Python Nano Banana service directly
+      const response = await fetch('http://localhost:8002/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          prompt: variationPrompt,
+          api_key: apiKey,
+        }),
       });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.image) {
+          images.push({
+            id: `img-${Date.now()}-${i}`,
+            data: data.image,
+            mime_type: data.mime_type || 'image/png',
+          });
+          console.log(`[Blog Images] Generated image ${i + 1}/${generateCount}`);
+        }
+      }
+    } catch (e) {
+      console.log(`[Blog Images] Failed to generate image ${i + 1}:`, e);
     }
-  } catch (e) {
-    console.error('[Blog Images] Generation error:', e);
+  }
+
+  if (images.length > 0) {
+    return NextResponse.json({
+      success: true,
+      images,
+      message: `Generated ${images.length} images`,
+    });
   }
 
   // Return message if no images generated
   return NextResponse.json({
     success: false,
-    message: 'Image generation service is being set up. Images will be available soon.',
-    prompt: enhancedPrompt,
-    style,
-    count,
+    message: 'Image generation failed. Please try again.',
     images: [],
   });
 }
