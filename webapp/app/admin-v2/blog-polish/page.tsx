@@ -14,7 +14,7 @@
  * - Copyright tools and compliance
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import StyleLibrary from '../components/StyleLibrary';
