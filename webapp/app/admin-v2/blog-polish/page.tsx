@@ -1144,14 +1144,163 @@ export default function BlogPolishPage() {
                   </div>
                 </>
               ) : (
-                <div className="prose prose-invert prose-lg max-w-none min-h-[400px]">
-                  <h1 className="text-3xl font-bold text-white mb-6">{post.title || 'Untitled'}</h1>
+                /* Styled Preview */
+                <div 
+                  className="relative min-h-[500px] rounded-xl overflow-hidden transition-all duration-500"
+                  style={styleApplied && pageStyle ? {
+                    background: pageStyle.colors.backgroundGradient || pageStyle.colors.background,
+                    color: pageStyle.colors.text,
+                  } : {}}
+                >
+                  {/* Texture Overlay */}
+                  {styleApplied && pageStyle && pageStyle.texture.type !== 'none' && (
+                    <div 
+                      className="absolute inset-0 pointer-events-none z-10"
+                      style={{
+                        opacity: pageStyle.texture.opacity,
+                        backgroundImage: getTexturePattern(pageStyle.texture.type),
+                        backgroundSize: pageStyle.texture.type === 'grain' ? '200px 200px' : 
+                                        pageStyle.texture.type === 'dots' ? '20px 20px' :
+                                        pageStyle.texture.type === 'lines' ? '10px 10px' :
+                                        pageStyle.texture.type === 'geometric' ? '60px 60px' : '100px 100px',
+                      }}
+                    />
+                  )}
+                  
+                  {/* Content Container */}
                   <div 
-                    className="text-white/80 leading-relaxed whitespace-pre-wrap"
-                    dangerouslySetInnerHTML={{ 
-                      __html: post.content.replace(/\n/g, '<br />') || '<p class="text-white/40">No content yet...</p>' 
-                    }} 
-                  />
+                    className={`relative z-20 p-8 ${
+                      styleApplied && pageStyle?.layout.contentWidth === 'narrow' ? 'max-w-2xl mx-auto' :
+                      styleApplied && pageStyle?.layout.contentWidth === 'wide' ? 'max-w-5xl mx-auto' : 'max-w-3xl mx-auto'
+                    }`}
+                    style={styleApplied && pageStyle ? {
+                      lineHeight: pageStyle.typography.bodyLineHeight === 'relaxed' ? '1.8' :
+                                  pageStyle.typography.bodyLineHeight === 'tight' ? '1.4' : '1.6',
+                    } : {}}
+                  >
+                    {/* Header */}
+                    <h1 
+                      className={`mb-6 transition-all ${
+                        styleApplied && pageStyle?.typography.headingStyle === 'uppercase' ? 'uppercase tracking-wider' :
+                        styleApplied && pageStyle?.typography.headingStyle === 'italic' ? 'italic' :
+                        styleApplied && pageStyle?.typography.headingStyle === 'light' ? 'font-light' : 'font-bold'
+                      } ${
+                        styleApplied && pageStyle?.typography.headingSize === 'large' ? 'text-4xl' :
+                        styleApplied && pageStyle?.typography.headingSize === 'compact' ? 'text-2xl' : 'text-3xl'
+                      }`}
+                      style={styleApplied && pageStyle ? { color: pageStyle.colors.headings } : { color: 'white' }}
+                    >
+                      {post.title || 'Untitled'}
+                    </h1>
+
+                    {/* Meta Info */}
+                    <div 
+                      className="flex items-center gap-4 mb-8 text-sm"
+                      style={styleApplied && pageStyle ? { color: pageStyle.colors.textMuted } : { color: 'rgba(255,255,255,0.5)' }}
+                    >
+                      <span>{post.category || 'Uncategorized'}</span>
+                      <span>•</span>
+                      <span>{readTime} min read</span>
+                      {post.tags.length > 0 && (
+                        <>
+                          <span>•</span>
+                          <span>{post.tags.slice(0, 3).join(', ')}</span>
+                        </>
+                      )}
+                    </div>
+
+                    {/* Content */}
+                    <div 
+                      className={`prose max-w-none ${
+                        styleApplied && pageStyle?.layout.spacing === 'airy' ? 'space-y-6' :
+                        styleApplied && pageStyle?.layout.spacing === 'compact' ? 'space-y-2' : 'space-y-4'
+                      }`}
+                      style={styleApplied && pageStyle ? { 
+                        color: pageStyle.colors.text,
+                        '--tw-prose-headings': pageStyle.colors.headings,
+                        '--tw-prose-links': pageStyle.colors.links,
+                      } as React.CSSProperties : {}}
+                    >
+                      {post.content.split('\n').map((line, i) => {
+                        if (line.startsWith('## ')) {
+                          return (
+                            <h2 
+                              key={i} 
+                              className={`mt-8 mb-4 ${
+                                styleApplied && pageStyle?.typography.headingStyle === 'uppercase' ? 'uppercase tracking-wide' :
+                                styleApplied && pageStyle?.typography.headingStyle === 'italic' ? 'italic' :
+                                styleApplied && pageStyle?.typography.headingStyle === 'light' ? 'font-light' : 'font-bold'
+                              } ${
+                                styleApplied && pageStyle?.typography.headingSize === 'large' ? 'text-2xl' :
+                                styleApplied && pageStyle?.typography.headingSize === 'compact' ? 'text-lg' : 'text-xl'
+                              }`}
+                              style={styleApplied && pageStyle ? { color: pageStyle.colors.headings } : { color: 'white' }}
+                            >
+                              {line.replace('## ', '')}
+                            </h2>
+                          );
+                        }
+                        if (line.startsWith('### ')) {
+                          return (
+                            <h3 
+                              key={i} 
+                              className={`mt-6 mb-3 ${
+                                styleApplied && pageStyle?.typography.headingStyle === 'uppercase' ? 'uppercase tracking-wide' :
+                                styleApplied && pageStyle?.typography.headingStyle === 'italic' ? 'italic' :
+                                styleApplied && pageStyle?.typography.headingStyle === 'light' ? 'font-light' : 'font-semibold'
+                              }`}
+                              style={styleApplied && pageStyle ? { color: pageStyle.colors.headings } : { color: 'white' }}
+                            >
+                              {line.replace('### ', '')}
+                            </h3>
+                          );
+                        }
+                        if (line.trim() === '') return <br key={i} />;
+                        return (
+                          <p 
+                            key={i} 
+                            className="leading-relaxed"
+                            style={styleApplied && pageStyle ? { color: pageStyle.colors.text } : { color: 'rgba(255,255,255,0.8)' }}
+                          >
+                            {line}
+                          </p>
+                        );
+                      })}
+                    </div>
+
+                    {/* Tags Footer */}
+                    {post.tags.length > 0 && (
+                      <div className="mt-12 pt-6 border-t" style={styleApplied && pageStyle ? { borderColor: `${pageStyle.colors.textMuted}40` } : { borderColor: 'rgba(255,255,255,0.1)' }}>
+                        <div className="flex flex-wrap gap-2">
+                          {post.tags.map(tag => (
+                            <span 
+                              key={tag} 
+                              className={`px-3 py-1 text-sm ${
+                                styleApplied && pageStyle?.layout.imageStyle === 'rounded' ? 'rounded-full' :
+                                styleApplied && pageStyle?.layout.imageStyle === 'sharp' ? 'rounded-none' : 'rounded-lg'
+                              }`}
+                              style={styleApplied && pageStyle ? { 
+                                backgroundColor: `${pageStyle.colors.primary}20`,
+                                color: pageStyle.colors.primary,
+                              } : { 
+                                backgroundColor: 'rgba(255,255,255,0.1)',
+                                color: 'rgba(255,255,255,0.7)',
+                              }}
+                            >
+                              #{tag}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Style Applied Badge */}
+                  {styleApplied && pageStyle && (
+                    <div className="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-pink-500/20 border border-pink-500/30 text-pink-300 text-xs font-medium flex items-center gap-1.5 z-30">
+                      <span>🎨</span> {pageStyle.themeName}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
