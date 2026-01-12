@@ -319,32 +319,32 @@ export default function AnalyticsPage() {
               )}
             </motion.div>
 
-            {/* Platform Value Proposition */}
+            {/* Your Progress Summary */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
               className="backdrop-blur-xl bg-white/5 rounded-2xl border border-white/10 p-6"
             >
-              <h3 className="text-lg font-semibold text-white mb-4">📈 Your GreenLine365 Value</h3>
+              <h3 className="text-lg font-semibold text-white mb-4">📊 Your Progress</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="text-center p-4">
                   <div className="text-3xl font-bold text-emerald-400">
                     {overview?.summary.totalBlogs || 0}
                   </div>
-                  <div className="text-xs text-white/50">Blog posts created</div>
+                  <div className="text-xs text-white/50">Blog posts</div>
                 </div>
                 <div className="text-center p-4">
                   <div className="text-3xl font-bold text-blue-400">
                     {overview?.summary.imagesGenerated || 0}
                   </div>
-                  <div className="text-xs text-white/50">AI images generated</div>
+                  <div className="text-xs text-white/50">Images created</div>
                 </div>
                 <div className="text-center p-4">
                   <div className="text-3xl font-bold text-purple-400">
-                    {((overview?.summary.totalBlogs || 0) * 2.5).toFixed(0)}
+                    {overview?.summary.knowledgeChunks || 0}
                   </div>
-                  <div className="text-xs text-white/50">Hours saved (est.)</div>
+                  <div className="text-xs text-white/50">Knowledge items</div>
                 </div>
                 <div className="text-center p-4">
                   <div className="text-3xl font-bold text-amber-400">
