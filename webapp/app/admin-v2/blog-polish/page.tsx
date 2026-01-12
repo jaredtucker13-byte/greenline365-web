@@ -1613,20 +1613,52 @@ export default function BlogPolishPage() {
                   )}
 
                   {/* Enhanced Content */}
-                  {aiSuggestions.enhanced && (
+                  {(aiSuggestions.enhanced || aiSuggestions.enhancedTitle) && (
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <p className="text-xs text-white/50">✨ Enhanced Content</p>
-                        <button
-                          onClick={applyEnhanced}
-                          className="px-3 py-1 rounded-lg bg-purple-500/30 text-purple-200 text-xs hover:bg-purple-500/40 transition"
-                        >
-                          Apply Changes
-                        </button>
+                        <p className="text-xs text-white/50">✨ Enhanced Content & Title</p>
+                        <div className="flex gap-2">
+                          {aiSuggestions.enhancedTitle && (
+                            <button
+                              onClick={applyEnhancedTitle}
+                              className="px-2 py-1 rounded-lg bg-green-500/30 text-green-200 text-xs hover:bg-green-500/40 transition"
+                            >
+                              Apply Title
+                            </button>
+                          )}
+                          {aiSuggestions.enhanced && (
+                            <button
+                              onClick={applyEnhanced}
+                              className="px-2 py-1 rounded-lg bg-purple-500/30 text-purple-200 text-xs hover:bg-purple-500/40 transition"
+                            >
+                              Apply Content
+                            </button>
+                          )}
+                          {aiSuggestions.enhanced && aiSuggestions.enhancedTitle && (
+                            <button
+                              onClick={applyBothEnhanced}
+                              className="px-2 py-1 rounded-lg bg-gradient-to-r from-green-500/30 to-purple-500/30 text-white text-xs hover:opacity-80 transition"
+                            >
+                              Apply Both
+                            </button>
+                          )}
+                        </div>
                       </div>
-                      <pre className="text-xs text-white/70 bg-white/5 rounded-lg p-3 overflow-auto max-h-64 whitespace-pre-wrap">
-                        {aiSuggestions.enhanced}
-                      </pre>
+                      
+                      {/* Suggested Title */}
+                      {aiSuggestions.enhancedTitle && (
+                        <div className="mb-3 p-3 rounded-lg bg-green-500/10 border border-green-500/30">
+                          <p className="text-[10px] text-green-400 mb-1 font-semibold">📝 SUGGESTED TITLE</p>
+                          <p className="text-sm text-white font-medium">{aiSuggestions.enhancedTitle}</p>
+                        </div>
+                      )}
+                      
+                      {/* Enhanced Content */}
+                      {aiSuggestions.enhanced && (
+                        <pre className="text-xs text-white/70 bg-white/5 rounded-lg p-3 overflow-auto max-h-64 whitespace-pre-wrap">
+                          {aiSuggestions.enhanced}
+                        </pre>
+                      )}
                     </div>
                   )}
                 </motion.div>
