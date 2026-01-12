@@ -1492,7 +1492,7 @@ End with a call to action."
                   </div>
 
                   {/* Timestamp */}
-                  <p className="px-1 mt-2 text-gray-600 text-[10px]">
+                  <p className="px-1 mt-2 text-[10px]" style={{ color: 'var(--theme-text-muted)' }}>
                     Scheduled for {scheduledDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} at {scheduledTime}
                   </p>
                 </div>
@@ -1500,11 +1500,10 @@ End with a call to action."
                 {/* Platform Badges */}
                 <div className="mt-3 flex gap-2 justify-center">
                   {platforms.map((p) => (
-                    <span key={p} className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      p === 'instagram' ? 'bg-[#E4405F]/20 text-[#E4405F]'
-                      : p === 'twitter' ? 'bg-white/20 text-white'
-                      : 'bg-[#1877F2]/20 text-[#1877F2]'
-                    }`}>
+                    <span key={p} className="px-2 py-1 rounded-full text-xs font-medium" style={{
+                      background: p === 'instagram' ? 'rgba(228, 64, 95, 0.2)' : p === 'twitter' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(24, 119, 242, 0.2)',
+                      color: p === 'instagram' ? '#E4405F' : p === 'twitter' ? 'var(--theme-text-primary)' : '#1877F2',
+                    }}>
                       {p === 'instagram' ? 'Instagram' : p === 'twitter' ? 'X' : 'Facebook'}
                     </span>
                   ))}
@@ -1519,7 +1518,8 @@ End with a call to action."
                     animate={{ width: 380, opacity: 1 }}
                     exit={{ width: 0, opacity: 0 }}
                     transition={{ duration: 0.2 }}
-                    className="bg-[#0A0A0A] border-l border-[#8A2BE2]/30 overflow-hidden flex flex-col"
+                    className="overflow-hidden flex flex-col"
+                    style={{ background: 'var(--theme-bg-primary)', borderLeft: '1px solid var(--theme-glass-border)' }}
                   >
                     <div className="h-full">
                       <ChatWidget 
@@ -1534,28 +1534,29 @@ End with a call to action."
             </div>
 
             {/* Footer */}
-            <div className="flex-shrink-0 px-4 py-3 border-t border-[#39FF14]/20 bg-[#0D0D0D] flex items-center justify-between">
+            <div className="flex-shrink-0 px-4 py-3 flex items-center justify-between" style={{ borderTop: '1px solid var(--theme-glass-border)', background: 'var(--theme-bg-secondary)' }}>
               <button
                 onClick={() => { resetForm(); onClose(); }}
-                className="px-4 py-2 rounded-lg border border-[#2D3748] text-gray-400 hover:text-white hover:border-gray-600 transition text-sm font-medium"
+                className="px-4 py-2 rounded-lg transition text-sm font-medium"
+                style={{ border: '1px solid var(--theme-glass-border)', color: 'var(--theme-text-muted)' }}
               >
                 Cancel
               </button>
               <div className="flex items-center gap-2">
                 {/* Save Message */}
                 {saveMessage && (
-                  <span className={`text-sm px-3 py-1 rounded-lg ${
-                    saveMessage.type === 'success' 
-                      ? 'bg-[#39FF14]/10 text-[#39FF14]' 
-                      : 'bg-red-500/10 text-red-400'
-                  }`}>
+                  <span className="text-sm px-3 py-1 rounded-lg" style={{
+                    background: saveMessage.type === 'success' ? 'color-mix(in srgb, var(--theme-success) 10%, transparent)' : 'rgba(239, 68, 68, 0.1)',
+                    color: saveMessage.type === 'success' ? 'var(--theme-success)' : '#EF4444',
+                  }}>
                     {saveMessage.text}
                   </span>
                 )}
                 <button
                   onClick={handleSaveDraft}
                   disabled={isSaving || (!title.trim() && !blogTitle.trim() && !caption.trim())}
-                  className="px-4 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm font-medium hover:bg-[#2D3748] transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="px-4 py-2 rounded-lg text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  style={{ background: 'var(--theme-bg-glass)', border: '1px solid var(--theme-glass-border)', color: 'var(--theme-text-primary)' }}
                 >
                   {isSaving ? (
                     <>⏳ Saving...</>
@@ -1568,7 +1569,8 @@ End with a call to action."
                   whileTap={{ scale: 0.98 }}
                   onClick={handleScheduleBlast}
                   disabled={isSaving || (!title.trim() && !blogTitle.trim()) || platforms.length === 0}
-                  className="px-5 py-2 rounded-lg bg-[#39FF14] text-black font-bold text-sm hover:bg-[#39FF14]/90 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="px-5 py-2 rounded-lg font-bold text-sm transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  style={{ background: 'var(--theme-primary)', color: '#000' }}
                 >
                   {isSaving ? '⏳...' : '🚀 SCHEDULE BLAST'}
                 </motion.button>
