@@ -1171,16 +1171,17 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
 
                       {/* Product Description (for products only) */}
                       {contentType === 'product' && (
-                        <div className="p-3 rounded-lg bg-[#0D0D0D] border border-[#2D3748]">
+                        <div className="p-3 rounded-lg" style={{ background: 'var(--theme-bg-secondary)', border: '1px solid var(--theme-glass-border)' }}>
                           <div className="flex items-center justify-between mb-2">
-                            <label className="text-xs font-medium text-gray-400 flex items-center">
+                            <label className="text-xs font-medium flex items-center" style={{ color: 'var(--theme-text-muted)' }}>
                               Product Description
                               {productDescription && <FeedbackButtons feedback={descriptionFeedback} onFeedback={setDescriptionFeedback} />}
                             </label>
                             <button
                               onClick={generateProductDescription}
                               disabled={isGeneratingDescription}
-                              className="px-2 py-1 rounded bg-gradient-to-r from-[#8A2BE2] to-[#39FF14] text-black text-xs font-semibold disabled:opacity-50"
+                              className="px-2 py-1 rounded text-black text-xs font-semibold disabled:opacity-50"
+                              style={{ background: 'linear-gradient(to right, #8A2BE2, var(--theme-primary))' }}
                             >
                               {isGeneratingDescription ? '⏳...' : '🧠 Generate'}
                             </button>
@@ -1190,7 +1191,8 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                             onChange={(e) => setProductDescription(e.target.value)}
                             rows={3}
                             placeholder="Describe your product..."
-                            className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#2D3748] text-white text-sm placeholder:text-gray-500 focus:border-[#39FF14]/50 outline-none resize-none"
+                            className="w-full px-3 py-2 rounded-lg text-sm outline-none resize-none"
+                            style={{ background: 'var(--theme-bg-glass)', border: '1px solid var(--theme-glass-border)', color: 'var(--theme-text-primary)' }}
                           />
                         </div>
                       )}
@@ -1204,7 +1206,8 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                     <button
                       onClick={generateSmartHashtags}
                       disabled={isGeneratingHashtags}
-                      className="w-full px-4 py-3 rounded-lg bg-gradient-to-r from-[#39FF14]/20 to-[#39FF14]/10 border border-[#39FF14]/30 text-[#39FF14] text-sm font-medium hover:from-[#39FF14]/30 hover:to-[#39FF14]/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                      className="w-full px-4 py-3 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                      style={{ background: 'linear-gradient(to right, color-mix(in srgb, var(--theme-primary) 20%, transparent), color-mix(in srgb, var(--theme-primary) 10%, transparent))', border: '1px solid color-mix(in srgb, var(--theme-primary) 30%, transparent)', color: 'var(--theme-primary)' }}
                     >
                       {isGeneratingHashtags ? (
                         <>⏳ Generating...</>
@@ -1216,42 +1219,45 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                     <div className="grid grid-cols-2 gap-4">
                       {/* Left - Standard Hashtags */}
                       <div className="space-y-4">
-                        <div className="p-3 rounded-lg bg-[#39FF14]/5 border border-[#39FF14]/20">
-                          <h3 className="text-sm font-semibold text-[#39FF14] mb-3">📌 Standard Hashtags</h3>
+                        <div className="p-3 rounded-lg" style={{ background: 'color-mix(in srgb, var(--theme-primary) 5%, transparent)', border: '1px solid color-mix(in srgb, var(--theme-primary) 20%, transparent)' }}>
+                          <h3 className="text-sm font-semibold mb-3" style={{ color: 'var(--theme-primary)' }}>📌 Standard Hashtags</h3>
                           <div className="space-y-3">
                             <div>
-                              <label className="block text-xs text-gray-400 mb-1">Brand</label>
+                              <label className="block text-xs mb-1" style={{ color: 'var(--theme-text-muted)' }}>Brand</label>
                               <input
                                 type="text"
                                 value={brandHashtag}
                                 onChange={(e) => setBrandHashtag(e.target.value.startsWith('#') ? e.target.value : `#${e.target.value}`)}
-                                className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#39FF14]/30 text-[#39FF14] text-sm focus:border-[#39FF14] outline-none"
+                                className="w-full px-3 py-2 rounded-lg text-sm outline-none"
+                                style={{ background: 'var(--theme-bg-glass)', border: '1px solid color-mix(in srgb, var(--theme-primary) 30%, transparent)', color: 'var(--theme-primary)' }}
                               />
                             </div>
                             <div>
-                              <label className="block text-xs text-gray-400 mb-1">Local</label>
+                              <label className="block text-xs mb-1" style={{ color: 'var(--theme-text-muted)' }}>Local</label>
                               <input
                                 type="text"
                                 value={localHashtag}
                                 onChange={(e) => setLocalHashtag(e.target.value.startsWith('#') ? e.target.value : `#${e.target.value}`)}
-                                className="w-full px-3 py-2 rounded-lg bg-[#1A1A1A] border border-[#39FF14]/30 text-[#39FF14] text-sm focus:border-[#39FF14] outline-none"
+                                className="w-full px-3 py-2 rounded-lg text-sm outline-none"
+                                style={{ background: 'var(--theme-bg-glass)', border: '1px solid color-mix(in srgb, var(--theme-primary) 30%, transparent)', color: 'var(--theme-primary)' }}
                               />
                             </div>
                           </div>
                         </div>
 
                         {/* Active Optional Hashtags */}
-                        <div className="p-3 rounded-lg bg-[#1A1A1A] border border-[#2D3748]">
-                          <h3 className="text-sm font-semibold text-white mb-2">🎯 Your Hashtags</h3>
-                          <p className="text-xs text-gray-500 mb-3">Click suggestions to add (max 5)</p>
+                        <div className="p-3 rounded-lg" style={{ background: 'var(--theme-bg-glass)', border: '1px solid var(--theme-glass-border)' }}>
+                          <h3 className="text-sm font-semibold mb-2" style={{ color: 'var(--theme-text-primary)' }}>🎯 Your Hashtags</h3>
+                          <p className="text-xs mb-3" style={{ color: 'var(--theme-text-muted)' }}>Click suggestions to add (max 5)</p>
                           <div className="flex flex-wrap gap-2 min-h-[40px]">
                             {optionalHashtags.length === 0 ? (
-                              <span className="text-xs text-gray-600">Click suggestions to add →</span>
+                              <span className="text-xs" style={{ color: 'var(--theme-text-muted)' }}>Click suggestions to add →</span>
                             ) : (
                               optionalHashtags.map((hashtag) => (
                                 <span 
                                   key={hashtag}
-                                  className="px-2 py-1 rounded-full bg-[#39FF14]/20 text-[#39FF14] text-xs flex items-center gap-1"
+                                  className="px-2 py-1 rounded-full text-xs flex items-center gap-1"
+                                  style={{ background: 'color-mix(in srgb, var(--theme-primary) 20%, transparent)', color: 'var(--theme-primary)' }}
                                 >
                                   {hashtag}
                                   <button 
