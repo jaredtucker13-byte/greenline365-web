@@ -113,11 +113,13 @@ Build "GreenLine365," a comprehensive marketing OS for local businesses. The pla
   - **Mood**: Emotional impact description
   - One-click "Apply Style" to preview pane
   - **"Reset" button** to undo style application
+  - **"Regenerate" button** to explore mood variations (8 preset moods: professional, creative, bold, calm, warm, modern, luxurious, playful)
+  - **Color Editor** - click "Edit" to fine-tune individual color values with color pickers and hex input
   - **style_guide saved to database** as JSONB column in blog_posts table
   - Preview shows styled content with applied colors, typography, textures
   - Style badge shows theme name on preview (e.g., "🎨 Growth Catalyst")
 - [x] Added "Blog" link to admin sidebar
-- [x] **Testing**: All 10 backend tests pass (test_blog_polish_api.py)
+- [x] **Testing**: All backend tests pass, full workflow verified (test_blog_polish_api.py)
 
 ### December 2025
 
