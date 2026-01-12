@@ -2139,6 +2139,9 @@ export default function BlogPolishPage() {
                 </li>
               </ul>
             </div>
+
+            {/* AI Content Disclaimer */}
+            <AIContentDisclaimer compact={true} />
           </div>
         </div>
       </main>
