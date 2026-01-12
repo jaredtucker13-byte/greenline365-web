@@ -491,6 +491,53 @@ export default function BlogPolishPage() {
     ));
   };
 
+  // Page Style Analysis
+  const analyzePageStyle = async () => {
+    if (!post.content || post.content.length < 100) {
+      setMessage({ type: 'error', text: 'Add more content before analyzing style' });
+      return;
+    }
+
+    setAnalyzingStyle(true);
+    try {
+      const response = await fetch('/api/blog/images', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'analyze-style',
+          title: post.title,
+          content: post.content,
+          category: post.category,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok && data.success && data.styleGuide) {
+        setPageStyle(data.styleGuide);
+        setShowStylePanel(true);
+        setMessage({ type: 'success', text: `Style suggestion: "${data.styleGuide.themeName}"` });
+      } else {
+        setMessage({ type: 'error', text: data.error || 'Style analysis failed' });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Failed to analyze style' });
+    }
+    setAnalyzingStyle(false);
+  };
+
+  const applyPageStyle = () => {
+    if (pageStyle) {
+      setStyleApplied(true);
+      setMessage({ type: 'success', text: 'Style applied to preview!' });
+    }
+  };
+
+  const resetPageStyle = () => {
+    setStyleApplied(false);
+    setPageStyle(null);
+    setShowStylePanel(false);
+  };
+
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-emerald-400';
     if (score >= 60) return 'text-amber-400';
