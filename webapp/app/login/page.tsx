@@ -17,6 +17,18 @@ export default function LoginPage() {
     password: '',
   });
 
+  // Get redirect URL from query params
+  const [redirectTo, setRedirectTo] = useState('/admin-v2');
+
+  useEffect(() => {
+    // Get redirectTo from URL params
+    const params = new URLSearchParams(window.location.search);
+    const redirect = params.get('redirectTo');
+    if (redirect) {
+      setRedirectTo(redirect);
+    }
+  }, []);
+
   // Check for existing session on page load
   useEffect(() => {
     const checkSession = async () => {
@@ -30,8 +42,8 @@ export default function LoginPage() {
         }
         
         if (session) {
-          // User is already logged in, redirect to DASHBOARD
-          router.push('/admin-v2');
+          // User is already logged in, redirect
+          router.push(redirectTo);
         } else {
           setCheckingSession(false);
         }
@@ -41,7 +53,6 @@ export default function LoginPage() {
       }
     };
     
-    // Set a timeout fallback - stop checking after 3 seconds
     const timeout = setTimeout(() => {
       setCheckingSession(false);
     }, 3000);
@@ -49,7 +60,7 @@ export default function LoginPage() {
     checkSession();
     
     return () => clearTimeout(timeout);
-  }, [router]);
+  }, [router, redirectTo]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
