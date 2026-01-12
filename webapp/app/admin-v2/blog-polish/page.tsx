@@ -113,6 +113,45 @@ export default function BlogPolishPage() {
   const [showImagePanel, setShowImagePanel] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<'classic' | 'magazine' | 'minimal' | 'cards'>('classic');
 
+  // Page Styling state
+  interface PageStyleGuide {
+    themeName: string;
+    description: string;
+    colors: {
+      primary: string;
+      secondary: string;
+      accent: string;
+      background: string;
+      backgroundGradient?: string;
+      text: string;
+      textMuted: string;
+      headings: string;
+      links: string;
+    };
+    texture: {
+      type: 'none' | 'grain' | 'dots' | 'lines' | 'geometric' | 'organic';
+      opacity: number;
+      description: string;
+    };
+    typography: {
+      headingStyle: string;
+      headingSize: string;
+      bodyLineHeight: string;
+      emphasis: string;
+    };
+    layout: {
+      contentWidth: string;
+      imageStyle: string;
+      spacing: string;
+      headerStyle: string;
+    };
+    mood: string;
+  }
+  const [pageStyle, setPageStyle] = useState<PageStyleGuide | null>(null);
+  const [analyzingStyle, setAnalyzingStyle] = useState(false);
+  const [showStylePanel, setShowStylePanel] = useState(false);
+  const [styleApplied, setStyleApplied] = useState(false);
+
   // Calculate stats
   const wordCount = post.content.split(/\s+/).filter(w => w).length;
   const readTime = Math.ceil(wordCount / 200);
