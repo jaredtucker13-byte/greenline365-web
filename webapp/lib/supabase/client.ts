@@ -7,6 +7,11 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 // Create the browser client with cookie support
 export const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey);
 
+// Factory function for creating fresh client instances (for components)
+export function createClient() {
+  return createBrowserClient(supabaseUrl, supabaseAnonKey);
+}
+
 // Auth helper functions
 export async function signUp(email: string, password: string, fullName?: string) {
   const { data, error } = await supabase.auth.signUp({

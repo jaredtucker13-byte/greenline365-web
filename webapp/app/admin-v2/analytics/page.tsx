@@ -1,348 +1,361 @@
 'use client';
 
 /**
- * Analytics Page - Full Dashboard
+ * Analytics Page - Real Data Dashboard
  * GreenLine365 Admin V2
  * 
- * Features:
- * - Multi-metric widgets (engagement, impressions, clicks, conversions)
- * - Image performance analytics
- * - Trend sources analysis
- * - Publish frequency tracking
- * - Drafts-to-publish rates
- * - Configurable date range and filters
- * - Export CSV/PDF
+ * Two-sided metrics:
+ * 1. Platform value (prove ROI for GreenLine365)
+ * 2. Tenant metrics (help their business grow)
+ * 3. Pattern discovery (insights they didn't know)
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import Link from 'next/link';
+import CollapsibleSidebar from '../components/CollapsibleSidebar';
 
-type DateRange = '7d' | '30d' | '90d' | 'custom';
-type ContentType = 'all' | 'blog' | 'social' | 'email';
+type DateRange = '7d' | '30d' | '90d' | 'all';
+
+interface OverviewData {
+  summary: {
+    totalEvents: number;
+    totalBlogs: number;
+    publishedBlogs: number;
+    draftBlogs: number;
+    knowledgeChunks: number;
+    imagesGenerated: number;
+    emailsSent: number;
+    smsSent: number;
+  };
+  breakdown: {
+    byCategory: Record<string, number>;
+    byType: Record<string, number>;
+  };
+}
+
+interface PatternData {
+  patterns: string[];
+  insights: string[];
+  stats: {
+    totalEvents: number;
+    uniqueDays: number;
+    topEventTypes: [string, number][];
+  };
+}
+
+interface TimelineData {
+  timeline: Record<string, Array<{
+    type: string;
+    category: string;
+    title: string;
+    time: string;
+  }>>;
+  totalEvents: number;
+}
 
 export default function AnalyticsPage() {
   const [dateRange, setDateRange] = useState<DateRange>('30d');
-  const [contentType, setContentType] = useState<ContentType>('all');
-  const [isExporting, setIsExporting] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  // Data states
+  const [overview, setOverview] = useState<OverviewData | null>(null);
+  const [patterns, setPatterns] = useState<PatternData | null>(null);
+  const [timeline, setTimeline] = useState<TimelineData | null>(null);
 
-  // Mock data
-  const overviewMetrics = [
-    { label: 'Total Impressions', value: '124.5K', change: '+18.3%', changeType: 'up' as const, icon: '👁️' },
-    { label: 'Total Clicks', value: '12,847', change: '+12.7%', changeType: 'up' as const, icon: '🖱️' },
-    { label: 'Engagement Rate', value: '8.4%', change: '+2.1%', changeType: 'up' as const, icon: '💬' },
-    { label: 'Conversions', value: '847', change: '-5.2%', changeType: 'down' as const, icon: '🎯' },
-  ];
+  // Fetch data
+  useEffect(() => {
+    async function fetchAnalytics() {
+      setLoading(true);
+      try {
+        const [overviewRes, patternsRes, timelineRes] = await Promise.all([
+          fetch(`/api/analytics?range=${dateRange}`),
+          fetch('/api/analytics', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'patterns', dateRange }),
+          }),
+          fetch('/api/analytics', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'timeline', dateRange }),
+          }),
+        ]);
 
-  const imageMetrics = {
-    withImages: { impressions: 89200, ctr: 12.4 },
-    withoutImages: { impressions: 35300, ctr: 4.8 },
-    topColors: ['#39FF14', '#0CE293', '#1E262E', '#FFC800'],
-    avgAestheticScore: 7.8,
-  };
+        if (overviewRes.ok) setOverview(await overviewRes.json());
+        if (patternsRes.ok) setPatterns(await patternsRes.json());
+        if (timelineRes.ok) setTimeline(await timelineRes.json());
+      } catch (e) {
+        console.error('Failed to fetch analytics:', e);
+      } finally {
+        setLoading(false);
+      }
+    }
 
-  const trendSources = [
-    { source: 'Google Trends', count: 24, percentage: 35 },
-    { source: 'Twitter/X', count: 18, percentage: 26 },
-    { source: 'Reddit', count: 12, percentage: 17 },
-    { source: 'Industry News', count: 15, percentage: 22 },
-  ];
+    fetchAnalytics();
+  }, [dateRange]);
 
-  const publishFrequency = [
-    { day: 'Mon', posts: 5 },
-    { day: 'Tue', posts: 8 },
-    { day: 'Wed', posts: 12 },
-    { day: 'Thu', posts: 7 },
-    { day: 'Fri', posts: 10 },
-    { day: 'Sat', posts: 3 },
-    { day: 'Sun', posts: 2 },
-  ];
-
-  const draftStats = {
-    totalDrafts: 23,
-    published: 156,
-    conversionRate: 87.2,
-    avgTimeToPublish: '2.4 days',
-  };
-
-  const handleExport = async (format: 'csv' | 'pdf') => {
-    setIsExporting(true);
-    // Simulate export
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    alert(`${format.toUpperCase()} export started! Check your downloads.`);
-    setIsExporting(false);
-  };
+  const hasData = overview && overview.summary.totalEvents > 0;
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] p-6">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div>
-          <div className="flex items-center gap-3 mb-2">
-            <Link href="/admin-v2" className="text-gray-400 hover:text-white transition">
-              ← Back
-            </Link>
+    <div 
+      className="min-h-screen flex relative"
+      style={{
+        backgroundImage: `url('https://images.unsplash.com/photo-1639322537228-f710d846310a?q=80&w=2232&auto=format&fit=crop')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
+      }}
+    >
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+
+      <CollapsibleSidebar
+        activeItem="analytics"
+        onNewBooking={() => {}}
+        onNewContent={() => {}}
+        pendingCount={0}
+        isCollapsed={sidebarCollapsed}
+        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        isMobileOpen={mobileMenuOpen}
+        onMobileToggle={() => setMobileMenuOpen(!mobileMenuOpen)}
+      />
+
+      <div className="flex-1 min-w-0 relative z-10 p-4 md:p-8 overflow-auto">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-white">Analytics</h1>
+            <p className="text-white/60">Real insights from your activity</p>
           </div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-3">
-            <span className="text-[#39FF14]">📊</span> Analytics Dashboard
-          </h1>
-          <p className="text-gray-400 text-sm mt-1">
-            Track performance across all your content
-          </p>
-        </div>
-
-        {/* Filters */}
-        <div className="flex flex-wrap items-center gap-3">
-          {/* Date Range */}
-          <select
-            value={dateRange}
-            onChange={(e) => setDateRange(e.target.value as DateRange)}
-            className="bg-[#1A1A1A] border border-[#2D3748] rounded-lg px-3 py-2 text-sm text-white focus:border-[#39FF14]/50 focus:outline-none"
-          >
-            <option value="7d">Last 7 days</option>
-            <option value="30d">Last 30 days</option>
-            <option value="90d">Last 90 days</option>
-            <option value="custom">Custom range</option>
-          </select>
-
-          {/* Content Type */}
-          <select
-            value={contentType}
-            onChange={(e) => setContentType(e.target.value as ContentType)}
-            className="bg-[#1A1A1A] border border-[#2D3748] rounded-lg px-3 py-2 text-sm text-white focus:border-[#39FF14]/50 focus:outline-none"
-          >
-            <option value="all">All Content</option>
-            <option value="blog">Blog Posts</option>
-            <option value="social">Social Media</option>
-            <option value="email">Email</option>
-          </select>
-
-          {/* Export */}
-          <div className="flex gap-2">
-            <button
-              onClick={() => handleExport('csv')}
-              disabled={isExporting}
-              className="px-4 py-2 bg-[#1A1A1A] border border-[#2D3748] rounded-lg text-sm text-white hover:border-[#39FF14]/50 transition active:scale-95 disabled:opacity-50"
-            >
-              📄 CSV
-            </button>
-            <button
-              onClick={() => handleExport('pdf')}
-              disabled={isExporting}
-              className="px-4 py-2 bg-[#1A1A1A] border border-[#2D3748] rounded-lg text-sm text-white hover:border-[#39FF14]/50 transition active:scale-95 disabled:opacity-50"
-            >
-              📑 PDF
-            </button>
+          
+          {/* Date Range Selector */}
+          <div className="flex gap-2 bg-white/5 rounded-xl p-1">
+            {(['7d', '30d', '90d', 'all'] as DateRange[]).map((range) => (
+              <button
+                key={range}
+                onClick={() => setDateRange(range)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  dateRange === range
+                    ? 'bg-emerald-500 text-white'
+                    : 'text-white/60 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                {range === 'all' ? 'All Time' : range === '7d' ? '7 Days' : range === '30d' ? '30 Days' : '90 Days'}
+              </button>
+            ))}
           </div>
         </div>
-      </div>
 
-      {/* Overview Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {overviewMetrics.map((metric, idx) => (
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="text-white/60">Loading analytics...</div>
+          </div>
+        ) : !hasData ? (
+          /* Empty State */
           <motion.div
-            key={metric.label}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.1 }}
-            className="bg-[#1A1A1A] rounded-xl border border-[#2D3748] p-5 hover:border-[#39FF14]/30 transition"
+            className="backdrop-blur-xl bg-white/5 rounded-3xl border border-white/10 p-12 text-center max-w-2xl mx-auto"
           >
-            <div className="flex items-start justify-between mb-3">
-              <span className="text-2xl">{metric.icon}</span>
-              <span className={`text-xs font-medium px-2 py-1 rounded-full ${
-                metric.changeType === 'up' 
-                  ? 'bg-green-500/20 text-green-400' 
-                  : 'bg-red-500/20 text-red-400'
-              }`}>
-                {metric.change}
-              </span>
+            <div className="text-6xl mb-4">📊</div>
+            <h2 className="text-2xl font-bold text-white mb-2">No Activity Yet</h2>
+            <p className="text-white/60 mb-6">
+              Start using GreenLine365 to see your analytics here. Create blog posts, 
+              generate images, send emails - we'll track it all and show you patterns.
+            </p>
+            <div className="flex flex-wrap justify-center gap-3">
+              <a href="/admin-v2/blog-polish" className="px-6 py-3 rounded-xl bg-emerald-500 text-white font-medium hover:bg-emerald-600">
+                Create a Blog Post
+              </a>
+              <a href="/admin-v2/brand-voice" className="px-6 py-3 rounded-xl bg-white/10 text-white font-medium hover:bg-white/20">
+                Set Up Brand Voice
+              </a>
             </div>
-            <p className="text-2xl font-bold text-white mb-1">{metric.value}</p>
-            <p className="text-sm text-gray-400">{metric.label}</p>
           </motion.div>
-        ))}
-      </div>
-
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Image Performance */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="lg:col-span-2 bg-[#1A1A1A] rounded-xl border border-[#2D3748] p-6"
-        >
-          <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-            🖼️ Image Performance Analytics
-          </h3>
-          
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* CTR Comparison */}
-            <div>
-              <p className="text-sm text-gray-400 mb-3">Click-Through Rate Comparison</p>
-              <div className="space-y-3">
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-white">Posts with Images</span>
-                    <span className="text-[#39FF14] font-bold">{imageMetrics.withImages.ctr}%</span>
-                  </div>
-                  <div className="h-3 bg-[#2D3748] rounded-full overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${imageMetrics.withImages.ctr * 5}%` }}
-                      className="h-full bg-gradient-to-r from-[#39FF14] to-[#0CE293] rounded-full"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-white">Posts without Images</span>
-                    <span className="text-gray-400 font-bold">{imageMetrics.withoutImages.ctr}%</span>
-                  </div>
-                  <div className="h-3 bg-[#2D3748] rounded-full overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${imageMetrics.withoutImages.ctr * 5}%` }}
-                      className="h-full bg-gray-500 rounded-full"
-                    />
-                  </div>
-                </div>
-              </div>
-              <p className="text-xs text-gray-500 mt-3">
-                💡 Posts with images get <span className="text-[#39FF14]">2.6x</span> more clicks
-              </p>
-            </div>
-
-            {/* Color & Aesthetics */}
-            <div>
-              <p className="text-sm text-gray-400 mb-3">Top Performing Colors</p>
-              <div className="flex gap-2 mb-4">
-                {imageMetrics.topColors.map((color, idx) => (
-                  <div
-                    key={idx}
-                    className="w-10 h-10 rounded-lg border-2 border-white/20"
-                    style={{ backgroundColor: color }}
-                    title={color}
-                  />
-                ))}
-              </div>
-              <div className="p-3 bg-[#0D0D0D] rounded-lg">
-                <p className="text-xs text-gray-500 mb-1">Average Aesthetic Score</p>
-                <p className="text-2xl font-bold text-white">
-                  {imageMetrics.avgAestheticScore}
-                  <span className="text-sm text-gray-400">/10</span>
-                </p>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Trend Sources */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="bg-[#1A1A1A] rounded-xl border border-[#2D3748] p-6"
-        >
-          <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-            🔥 Trend Sources
-          </h3>
-          <div className="space-y-4">
-            {trendSources.map((source, idx) => (
-              <div key={source.source}>
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="text-white">{source.source}</span>
-                  <span className="text-gray-400">{source.count} posts</span>
-                </div>
-                <div className="h-2 bg-[#2D3748] rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${source.percentage}%` }}
-                    transition={{ delay: 0.6 + idx * 0.1 }}
-                    className="h-full rounded-full"
-                    style={{
-                      background: `linear-gradient(90deg, ${['#39FF14', '#0CE293', '#FFC800', '#8A2BE2'][idx]}, transparent)`,
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Publish Frequency */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="bg-[#1A1A1A] rounded-xl border border-[#2D3748] p-6"
-        >
-          <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-            📅 Publish Frequency
-          </h3>
-          <div className="flex items-end justify-between h-32 gap-2">
-            {publishFrequency.map((day, idx) => (
-              <div key={day.day} className="flex-1 flex flex-col items-center gap-1">
+        ) : (
+          <div className="space-y-6">
+            {/* Overview Metrics */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { label: 'Total Activities', value: overview?.summary.totalEvents || 0, icon: '📈', color: 'emerald' },
+                { label: 'Blog Posts', value: overview?.summary.totalBlogs || 0, icon: '📝', color: 'blue' },
+                { label: 'Images Generated', value: overview?.summary.imagesGenerated || 0, icon: '🖼️', color: 'purple' },
+                { label: 'Knowledge Items', value: overview?.summary.knowledgeChunks || 0, icon: '📚', color: 'amber' },
+              ].map((metric, i) => (
                 <motion.div
-                  initial={{ height: 0 }}
-                  animate={{ height: `${(day.posts / 12) * 100}%` }}
-                  transition={{ delay: 0.7 + idx * 0.05 }}
-                  className="w-full bg-gradient-to-t from-[#39FF14] to-[#0CE293] rounded-t"
-                />
-                <span className="text-xs text-gray-500">{day.day}</span>
+                  key={metric.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                  className="backdrop-blur-xl bg-white/5 rounded-2xl border border-white/10 p-6"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-2xl">{metric.icon}</span>
+                    <span className={`text-xs px-2 py-1 rounded-full bg-${metric.color}-500/20 text-${metric.color}-400`}>
+                      {dateRange}
+                    </span>
+                  </div>
+                  <div className="text-3xl font-bold text-white">{metric.value.toLocaleString()}</div>
+                  <div className="text-sm text-white/50">{metric.label}</div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Activity Breakdown & Patterns */}
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Activity by Type */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="backdrop-blur-xl bg-white/5 rounded-2xl border border-white/10 p-6"
+              >
+                <h3 className="text-lg font-semibold text-white mb-4">Activity Breakdown</h3>
+                {overview?.breakdown.byType && Object.entries(overview.breakdown.byType).length > 0 ? (
+                  <div className="space-y-3">
+                    {Object.entries(overview.breakdown.byType)
+                      .sort((a, b) => b[1] - a[1])
+                      .slice(0, 8)
+                      .map(([type, count]) => {
+                        const percentage = ((count / overview.summary.totalEvents) * 100).toFixed(0);
+                        const readableType = type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                        return (
+                          <div key={type}>
+                            <div className="flex justify-between text-sm mb-1">
+                              <span className="text-white/80">{readableType}</span>
+                              <span className="text-white/50">{count} ({percentage}%)</span>
+                            </div>
+                            <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                              <div 
+                                className="h-full bg-gradient-to-r from-emerald-500 to-blue-500 rounded-full"
+                                style={{ width: `${percentage}%` }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+                ) : (
+                  <p className="text-white/40 text-center py-4">No activity breakdown yet</p>
+                )}
+              </motion.div>
+
+              {/* Discovered Patterns */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="backdrop-blur-xl bg-white/5 rounded-2xl border border-white/10 p-6"
+              >
+                <h3 className="text-lg font-semibold text-white mb-4">🔮 Discovered Patterns</h3>
+                {patterns?.patterns && patterns.patterns.length > 0 ? (
+                  <div className="space-y-3">
+                    {patterns.patterns.map((pattern, i) => (
+                      <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-white/5">
+                        <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400">
+                          {i + 1}
+                        </div>
+                        <span className="text-white/80">{pattern}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-white/40 text-center py-4">Keep using the platform to discover patterns!</p>
+                )}
+              </motion.div>
+            </div>
+
+            {/* AI Insights */}
+            {patterns?.insights && patterns.insights.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="backdrop-blur-xl bg-gradient-to-r from-emerald-500/10 to-blue-500/10 rounded-2xl border border-emerald-500/20 p-6"
+              >
+                <h3 className="text-lg font-semibold text-white mb-4">💡 AI Insights</h3>
+                <div className="grid md:grid-cols-2 gap-4">
+                  {patterns.insights.map((insight, i) => (
+                    <div key={i} className="p-4 rounded-xl bg-white/5">
+                      <p className="text-white/80">{insight}</p>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {/* Activity Timeline */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="backdrop-blur-xl bg-white/5 rounded-2xl border border-white/10 p-6"
+            >
+              <h3 className="text-lg font-semibold text-white mb-4">Recent Activity</h3>
+              {timeline?.timeline && Object.keys(timeline.timeline).length > 0 ? (
+                <div className="space-y-6 max-h-96 overflow-y-auto">
+                  {Object.entries(timeline.timeline).slice(0, 7).map(([date, events]) => (
+                    <div key={date}>
+                      <div className="text-sm font-medium text-white/50 mb-2">
+                        {new Date(date).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
+                      </div>
+                      <div className="space-y-2 pl-4 border-l-2 border-white/10">
+                        {events.slice(0, 5).map((event, i) => (
+                          <div key={i} className="flex items-center gap-3 text-sm">
+                            <span className="text-white/40">{event.time}</span>
+                            <span className="text-white/80">{event.title || event.type.replace(/_/g, ' ')}</span>
+                          </div>
+                        ))}
+                        {events.length > 5 && (
+                          <div className="text-xs text-white/40">+{events.length - 5} more</div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-white/40 text-center py-4">No recent activity</p>
+              )}
+            </motion.div>
+
+            {/* Platform Value Proposition */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="backdrop-blur-xl bg-white/5 rounded-2xl border border-white/10 p-6"
+            >
+              <h3 className="text-lg font-semibold text-white mb-4">📈 Your GreenLine365 Value</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="text-center p-4">
+                  <div className="text-3xl font-bold text-emerald-400">
+                    {overview?.summary.totalBlogs || 0}
+                  </div>
+                  <div className="text-xs text-white/50">Blog posts created</div>
+                </div>
+                <div className="text-center p-4">
+                  <div className="text-3xl font-bold text-blue-400">
+                    {overview?.summary.imagesGenerated || 0}
+                  </div>
+                  <div className="text-xs text-white/50">AI images generated</div>
+                </div>
+                <div className="text-center p-4">
+                  <div className="text-3xl font-bold text-purple-400">
+                    {((overview?.summary.totalBlogs || 0) * 2.5).toFixed(0)}
+                  </div>
+                  <div className="text-xs text-white/50">Hours saved (est.)</div>
+                </div>
+                <div className="text-center p-4">
+                  <div className="text-3xl font-bold text-amber-400">
+                    {patterns?.stats?.uniqueDays || 0}
+                  </div>
+                  <div className="text-xs text-white/50">Active days</div>
+                </div>
               </div>
-            ))}
+            </motion.div>
           </div>
-          <p className="text-xs text-gray-500 mt-3 text-center">
-            Best day: <span className="text-[#39FF14]">Wednesday</span> (12 posts avg)
-          </p>
-        </motion.div>
-
-        {/* Draft to Publish Stats */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
-          className="lg:col-span-2 bg-[#1A1A1A] rounded-xl border border-[#2D3748] p-6"
-        >
-          <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-            📝 Drafts to Publish Pipeline
-          </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="p-4 bg-[#0D0D0D] rounded-lg text-center">
-              <p className="text-3xl font-bold text-amber-400">{draftStats.totalDrafts}</p>
-              <p className="text-xs text-gray-500 mt-1">Active Drafts</p>
-            </div>
-            <div className="p-4 bg-[#0D0D0D] rounded-lg text-center">
-              <p className="text-3xl font-bold text-green-400">{draftStats.published}</p>
-              <p className="text-xs text-gray-500 mt-1">Published This Month</p>
-            </div>
-            <div className="p-4 bg-[#0D0D0D] rounded-lg text-center">
-              <p className="text-3xl font-bold text-[#39FF14]">{draftStats.conversionRate}%</p>
-              <p className="text-xs text-gray-500 mt-1">Publish Rate</p>
-            </div>
-            <div className="p-4 bg-[#0D0D0D] rounded-lg text-center">
-              <p className="text-3xl font-bold text-blue-400">{draftStats.avgTimeToPublish}</p>
-              <p className="text-xs text-gray-500 mt-1">Avg Time to Publish</p>
-            </div>
-          </div>
-        </motion.div>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="mt-8 flex justify-center gap-4">
-        <Link
-          href="/admin-v2/blog-polish"
-          className="px-6 py-3 bg-[#39FF14]/20 text-[#39FF14] rounded-xl font-medium hover:bg-[#39FF14]/30 transition active:scale-95"
-        >
-          📝 Create New Content
-        </Link>
-        <button
-          onClick={() => alert('Scheduling reports coming soon!')}
-          className="px-6 py-3 bg-[#1A1A1A] border border-[#2D3748] text-white rounded-xl font-medium hover:border-[#39FF14]/50 transition active:scale-95"
-        >
-          📧 Schedule Reports
-        </button>
+        )}
       </div>
     </div>
   );

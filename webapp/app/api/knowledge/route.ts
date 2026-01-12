@@ -1,0 +1,217 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
+
+/**
+ * Knowledge Warehouse API
+ * Manages Layer 2 of the Dynamic Memory Bucket System
+ * 
+ * Actions:
+ * - seed: Bulk add knowledge chunks for a tenant
+ * - add: Add single knowledge chunk
+ * - search: Search knowledge by query (text-based for now, vector later)
+ * - list: List all knowledge by category
+ * - delete: Remove a knowledge chunk
+ */
+
+interface KnowledgeChunk {
+  category: 'services' | 'pricing' | 'faq' | 'products' | 'processes' | 'policies' | 'anti-knowledge';
+  subcategory?: string;
+  title?: string;
+  content: string;
+  source?: string;
+  confidence?: number;
+  priority?: number;
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const { action } = body;
+
+    switch (action) {
+      case 'seed':
+        return seedKnowledge(supabase, user.id, body.chunks as KnowledgeChunk[]);
+      case 'add':
+        return addKnowledge(supabase, user.id, body.chunk as KnowledgeChunk);
+      case 'search':
+        return searchKnowledge(supabase, user.id, body.query, body.category);
+      case 'list':
+        return listKnowledge(supabase, user.id, body.category);
+      case 'delete':
+        return deleteKnowledge(supabase, user.id, body.id);
+      default:
+        return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+    }
+  } catch (error: any) {
+    console.error('[Knowledge API] Error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+async function seedKnowledge(supabase: any, userId: string, chunks: KnowledgeChunk[]) {
+  if (!chunks || !Array.isArray(chunks) || chunks.length === 0) {
+    return NextResponse.json({ error: 'No chunks provided' }, { status: 400 });
+  }
+
+  const insertData = chunks.map(chunk => ({
+    user_id: userId,
+    category: chunk.category,
+    subcategory: chunk.subcategory,
+    title: chunk.title,
+    content: chunk.content,
+    source: chunk.source || 'onboarding',
+    confidence: chunk.confidence || 1.0,
+    priority: chunk.priority || 5,
+    is_active: true,
+  }));
+
+  const { data, error } = await supabase
+    .from('memory_knowledge_chunks')
+    .insert(insertData)
+    .select('id, category, title');
+
+  if (error) {
+    console.error('[Knowledge API] Seed error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ 
+    success: true, 
+    inserted: data.length,
+    chunks: data 
+  });
+}
+
+async function addKnowledge(supabase: any, userId: string, chunk: KnowledgeChunk) {
+  if (!chunk || !chunk.content || !chunk.category) {
+    return NextResponse.json({ error: 'Content and category required' }, { status: 400 });
+  }
+
+  const { data, error } = await supabase
+    .from('memory_knowledge_chunks')
+    .insert({
+      user_id: userId,
+      category: chunk.category,
+      subcategory: chunk.subcategory,
+      title: chunk.title,
+      content: chunk.content,
+      source: chunk.source || 'manual',
+      confidence: chunk.confidence || 1.0,
+      priority: chunk.priority || 5,
+      is_active: true,
+    })
+    .select('id, category, title')
+    .single();
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ success: true, chunk: data });
+}
+
+async function searchKnowledge(supabase: any, userId: string, query: string, category?: string) {
+  if (!query) {
+    return NextResponse.json({ error: 'Query required' }, { status: 400 });
+  }
+
+  let queryBuilder = supabase
+    .from('memory_knowledge_chunks')
+    .select('id, category, subcategory, title, content, priority')
+    .eq('user_id', userId)
+    .eq('is_active', true)
+    .ilike('content', `%${query}%`)
+    .order('priority', { ascending: false })
+    .limit(10);
+
+  if (category) {
+    queryBuilder = queryBuilder.eq('category', category);
+  }
+
+  const { data, error } = await queryBuilder;
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ results: data });
+}
+
+async function listKnowledge(supabase: any, userId: string, category?: string) {
+  let queryBuilder = supabase
+    .from('memory_knowledge_chunks')
+    .select('id, category, subcategory, title, content, priority, created_at')
+    .eq('user_id', userId)
+    .eq('is_active', true)
+    .order('category')
+    .order('priority', { ascending: false });
+
+  if (category) {
+    queryBuilder = queryBuilder.eq('category', category);
+  }
+
+  const { data, error } = await queryBuilder;
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  // Group by category
+  const grouped = data.reduce((acc: any, item: any) => {
+    if (!acc[item.category]) {
+      acc[item.category] = [];
+    }
+    acc[item.category].push(item);
+    return acc;
+  }, {});
+
+  return NextResponse.json({ 
+    total: data.length,
+    byCategory: grouped,
+    items: data 
+  });
+}
+
+async function deleteKnowledge(supabase: any, userId: string, id: string) {
+  if (!id) {
+    return NextResponse.json({ error: 'ID required' }, { status: 400 });
+  }
+
+  // Soft delete by setting is_active to false
+  const { error } = await supabase
+    .from('memory_knowledge_chunks')
+    .update({ is_active: false })
+    .eq('id', id)
+    .eq('user_id', userId);
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ success: true });
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const category = searchParams.get('category');
+
+    return listKnowledge(supabase, user.id, category || undefined);
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
