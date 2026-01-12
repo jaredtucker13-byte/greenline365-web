@@ -182,6 +182,11 @@ export default function BlogPolishPage() {
   const [selectedTemplate, setSelectedTemplate] = useState<'classic' | 'magazine' | 'minimal' | 'cards'>('classic');
   const [showCopyrightPanel, setShowCopyrightPanel] = useState(false);
   
+  // Browser Features state
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [showCamera, setShowCamera] = useState(false);
+  const editorRef = useRef<HTMLDivElement>(null);
+  
   // Batch image generation state
   const [generatingAllImages, setGeneratingAllImages] = useState(false);
   const [imageGenProgress, setImageGenProgress] = useState<{ current: number; total: number; status: string }>({ current: 0, total: 0, status: '' });
