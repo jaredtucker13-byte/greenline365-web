@@ -20,16 +20,35 @@ export default function LoginPage() {
   // Check for existing session on page load
   useEffect(() => {
     const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        // User is already logged in, redirect to HOME (not dashboard)
-        // Users should explore the website, not go straight to admin
-        router.push('/');
-      } else {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Session check error:', error);
+          setCheckingSession(false);
+          return;
+        }
+        
+        if (session) {
+          // User is already logged in, redirect to HOME
+          router.push('/');
+        } else {
+          setCheckingSession(false);
+        }
+      } catch (err) {
+        console.error('Session check failed:', err);
         setCheckingSession(false);
       }
     };
+    
+    // Set a timeout fallback - stop checking after 3 seconds
+    const timeout = setTimeout(() => {
+      setCheckingSession(false);
+    }, 3000);
+    
     checkSession();
+    
+    return () => clearTimeout(timeout);
   }, [router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
