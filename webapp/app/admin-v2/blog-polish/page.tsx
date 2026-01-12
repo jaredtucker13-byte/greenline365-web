@@ -998,6 +998,125 @@ export default function BlogPolishPage() {
               )}
             </AnimatePresence>
 
+            {/* Page Style Panel */}
+            <AnimatePresence>
+              {showStylePanel && pageStyle && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="backdrop-blur-2xl bg-pink-500/10 rounded-2xl border border-pink-500/30 p-4 overflow-hidden"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 className="text-sm font-semibold text-pink-300 flex items-center gap-2">
+                        🎨 {pageStyle.themeName}
+                      </h3>
+                      <p className="text-xs text-white/50 mt-1">{pageStyle.description}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {!styleApplied ? (
+                        <button
+                          onClick={applyPageStyle}
+                          className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-pink-500 to-rose-500 text-white text-xs font-semibold hover:opacity-90 transition"
+                        >
+                          Apply Style
+                        </button>
+                      ) : (
+                        <button
+                          onClick={resetPageStyle}
+                          className="px-3 py-1.5 rounded-lg bg-white/10 text-white/70 text-xs hover:bg-white/20 transition"
+                        >
+                          Reset
+                        </button>
+                      )}
+                      <button
+                        onClick={() => setShowStylePanel(false)}
+                        className="p-1 hover:bg-white/10 rounded text-white/50 hover:text-white"
+                      >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Colors */}
+                    <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+                      <h4 className="text-xs font-semibold text-white/70 mb-3 flex items-center gap-1">
+                        <span>🎨</span> Color Palette
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        {Object.entries(pageStyle.colors).map(([name, color]) => (
+                          color && !name.includes('Gradient') && (
+                            <div key={name} className="flex items-center gap-1.5">
+                              <div 
+                                className="w-6 h-6 rounded-full border border-white/20 shadow-sm"
+                                style={{ backgroundColor: color }}
+                                title={`${name}: ${color}`}
+                              />
+                              <span className="text-[10px] text-white/50 capitalize">{name}</span>
+                            </div>
+                          )
+                        ))}
+                      </div>
+                      {pageStyle.colors.backgroundGradient && (
+                        <div className="mt-2 p-2 rounded-lg text-xs text-white/50">
+                          <span className="font-medium">Gradient:</span> {pageStyle.colors.backgroundGradient}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Texture & Typography */}
+                    <div className="space-y-3">
+                      <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+                        <h4 className="text-xs font-semibold text-white/70 mb-2 flex items-center gap-1">
+                          <span>✨</span> Texture
+                        </h4>
+                        <p className="text-xs text-white/60">
+                          <span className="font-medium capitalize">{pageStyle.texture.type}</span>
+                          {pageStyle.texture.type !== 'none' && (
+                            <span className="text-white/40"> ({Math.round(pageStyle.texture.opacity * 100)}% opacity)</span>
+                          )}
+                        </p>
+                        <p className="text-[10px] text-white/40 mt-1">{pageStyle.texture.description}</p>
+                      </div>
+
+                      <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+                        <h4 className="text-xs font-semibold text-white/70 mb-2 flex items-center gap-1">
+                          <span>📝</span> Typography
+                        </h4>
+                        <div className="text-xs text-white/60 space-y-1">
+                          <p>Headings: <span className="text-white/80 capitalize">{pageStyle.typography.headingStyle}</span></p>
+                          <p>Size: <span className="text-white/80 capitalize">{pageStyle.typography.headingSize}</span></p>
+                          <p>Spacing: <span className="text-white/80 capitalize">{pageStyle.layout.spacing}</span></p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Layout & Mood */}
+                  <div className="mt-3 p-3 rounded-xl bg-white/5 border border-white/10">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="text-xs font-semibold text-white/70 flex items-center gap-1">
+                          <span>🖼️</span> Layout
+                        </h4>
+                        <p className="text-xs text-white/50 mt-1">
+                          {pageStyle.layout.contentWidth} width • {pageStyle.layout.imageStyle} images • {pageStyle.layout.headerStyle} header
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <h4 className="text-xs font-semibold text-white/70">Mood</h4>
+                        <p className="text-xs text-pink-300/80 mt-1">{pageStyle.mood}</p>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {/* Content Editor / Preview */}
             <div className="backdrop-blur-2xl bg-white/[0.08] rounded-2xl border border-white/[0.15] p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]">
               {activeTab === 'write' ? (
