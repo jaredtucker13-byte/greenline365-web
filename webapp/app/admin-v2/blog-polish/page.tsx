@@ -89,6 +89,13 @@ export default function BlogPolishPage() {
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [scheduleDate, setScheduleDate] = useState('');
   const [scheduleTime, setScheduleTime] = useState('');
+  
+  // Auto-save state
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [lastAutoSave, setLastAutoSave] = useState<Date | null>(null);
+  const [isAutoSaving, setIsAutoSaving] = useState(false);
+  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const LOCAL_STORAGE_KEY = 'greenline365_blog_draft';
 
   // AI Enhancement state
   const [aiLoading, setAiLoading] = useState<string | null>(null);
