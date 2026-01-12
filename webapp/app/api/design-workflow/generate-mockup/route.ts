@@ -77,7 +77,7 @@ async def main():
         session_id='mockup-gen',
         system_message='You are a professional web design mockup generator.'
     )
-    chat.with_model('gemini', 'gemini-2.5-flash-image')
+    chat.with_model('gemini', 'gemini-2.5-flash-image-preview')
     chat.with_params(modalities=['image', 'text'])
     
     message = UserMessage(text='''${imagePrompt.replace(/'/g, "\\'")}''')
