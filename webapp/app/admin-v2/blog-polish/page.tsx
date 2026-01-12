@@ -710,6 +710,26 @@ export default function BlogPolishPage() {
     }
   };
 
+  const applyEnhancedTitle = () => {
+    if (aiSuggestions.enhancedTitle) {
+      setPost(prev => ({ ...prev, title: aiSuggestions.enhancedTitle || '' }));
+      setAiSuggestions(prev => ({ ...prev, enhancedTitle: undefined }));
+      setMessage({ type: 'success', text: 'New title applied!' });
+    }
+  };
+
+  const applyBothEnhanced = () => {
+    if (aiSuggestions.enhanced || aiSuggestions.enhancedTitle) {
+      setPost(prev => ({
+        ...prev,
+        content: aiSuggestions.enhanced || prev.content,
+        title: aiSuggestions.enhancedTitle || prev.title,
+      }));
+      setAiSuggestions(prev => ({ ...prev, enhanced: undefined, enhancedTitle: undefined }));
+      setMessage({ type: 'success', text: 'Title and content updated!' });
+    }
+  };
+
   const applyHeadline = (headline: string) => {
     setPost(prev => ({ ...prev, title: headline }));
     setMessage({ type: 'success', text: 'Headline applied!' });
