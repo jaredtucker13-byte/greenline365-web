@@ -140,7 +140,7 @@ ${content}`
 }
 
 async function generateImages(body: GenerateRequest) {
-  const { prompt, style = 'professional', count = 3 } = body;
+  const { prompt, style = 'professional', count = 2 } = body; // Default to 2 images for speed
 
   if (!prompt) {
     return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
@@ -155,45 +155,48 @@ async function generateImages(body: GenerateRequest) {
   };
 
   const enhancedPrompt = `${prompt}. Style: ${styleGuides[style]}. High resolution, suitable for web blog post.`;
-
-  // Generate images using the Python Nano Banana service
-  const images: { id: string; data: string; mime_type: string }[] = [];
   const apiKey = process.env.EMERGENT_LLM_KEY || 'sk-emergent-c87DeA8638fD64f7d3';
-  const generateCount = Math.min(count, 4);
+  const generateCount = Math.min(count, 3); // Max 3 images
   
-  console.log('[Blog Images] Generating', generateCount, 'images...');
+  console.log('[Blog Images] Generating', generateCount, 'images in parallel...');
   
-  for (let i = 0; i < generateCount; i++) {
+  // PARALLEL generation for speed
+  const generatePromises = Array.from({ length: generateCount }, (_, i) => {
     const variationPrompt = i === 0 
       ? enhancedPrompt 
-      : `${enhancedPrompt} Alternative composition ${i + 1}.`;
+      : `${enhancedPrompt} Alternative style ${i + 1}.`;
     
-    try {
-      // Call the Python Nano Banana service directly
-      const response = await fetch('http://localhost:8002/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          prompt: variationPrompt,
-          api_key: apiKey,
-        }),
-      });
-      
+    return fetch('http://localhost:8002/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        prompt: variationPrompt,
+        api_key: apiKey,
+      }),
+    })
+    .then(async (response) => {
       if (response.ok) {
         const data = await response.json();
         if (data.success && data.image) {
-          images.push({
+          console.log(`[Blog Images] Generated image ${i + 1}/${generateCount}`);
+          return {
             id: `img-${Date.now()}-${i}`,
             data: data.image,
             mime_type: data.mime_type || 'image/png',
-          });
-          console.log(`[Blog Images] Generated image ${i + 1}/${generateCount}`);
+          };
         }
       }
-    } catch (e) {
-      console.log(`[Blog Images] Failed to generate image ${i + 1}:`, e);
-    }
-  }
+      return null;
+    })
+    .catch((e) => {
+      console.log(`[Blog Images] Failed image ${i + 1}:`, e);
+      return null;
+    });
+  });
+
+  // Wait for all images in parallel
+  const results = await Promise.all(generatePromises);
+  const images = results.filter((img): img is { id: string; data: string; mime_type: string } => img !== null);
 
   if (images.length > 0) {
     return NextResponse.json({
@@ -203,7 +206,6 @@ async function generateImages(body: GenerateRequest) {
     });
   }
 
-  // Return message if no images generated
   return NextResponse.json({
     success: false,
     message: 'Image generation failed. Please try again.',
