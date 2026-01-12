@@ -1198,6 +1198,59 @@ export default function BlogPolishPage() {
     }
   };
 
+  // Play more noticeable completion melody (for batch operations)
+  const playCompletionSound = () => {
+    try {
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      
+      // Success melody: C-E-G-C (major chord arpeggio)
+      const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+      
+      notes.forEach((freq, i) => {
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        
+        osc.frequency.value = freq;
+        osc.type = 'sine';
+        
+        const startTime = audioContext.currentTime + (i * 0.12);
+        gain.gain.setValueAtTime(0.35, startTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.25);
+        
+        osc.start(startTime);
+        osc.stop(startTime + 0.25);
+      });
+      
+      // Final sustained note
+      setTimeout(() => {
+        const finalOsc = audioContext.createOscillator();
+        const finalGain = audioContext.createGain();
+        
+        finalOsc.connect(finalGain);
+        finalGain.connect(audioContext.destination);
+        
+        finalOsc.frequency.value = 1046.50; // C6
+        finalOsc.type = 'triangle';
+        
+        finalGain.gain.setValueAtTime(0.4, audioContext.currentTime);
+        finalGain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+        
+        finalOsc.start(audioContext.currentTime);
+        finalOsc.stop(audioContext.currentTime + 0.5);
+      }, 500);
+      
+      // Also vibrate on mobile
+      if ('vibrate' in navigator) {
+        navigator.vibrate([100, 50, 100, 50, 200]);
+      }
+    } catch (e) {
+      console.log('Could not play completion sound');
+    }
+  };
+
   // Analyze blog to get image suggestions (without generating)
   const analyzeForImageSuggestions = async () => {
     if (!post.content || post.content.length < 100) {
