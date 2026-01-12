@@ -5,6 +5,15 @@ Build a comprehensive marketing OS for local businesses called "GreenLine365".
 
 ## What's Been Implemented
 
+### January 2026 - Session 5 (Auto Image Generation Loop)
+- ✅ **Auto Images Feature**: Single-click button to analyze blog and auto-generate ALL images
+- ✅ **Image Analysis Loop**: AI analyzes blog content to identify image placement opportunities
+- ✅ **Batch Image Generation**: Loops through each suggestion and generates images via Nano Banana
+- ✅ **Progress Indicator**: Visual progress bar showing current/total images being generated
+- ✅ **Status Messages**: Real-time feedback on which image is currently generating
+- ✅ **Auto-Selection**: First generated image is auto-selected for each placement
+- ✅ Uses `gemini-2.5-flash-image-preview` via emergentintegrations
+
 ### January 2026 - Session 4 (Drafts & Analytics)
 - ✅ DraftsPanel overhaul with action menu (Edit, Publish, Delete, Duplicate)
 - ✅ Draft click-to-edit functionality
