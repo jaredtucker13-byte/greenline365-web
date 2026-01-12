@@ -11,12 +11,15 @@
  * - Image upload and management
  * - Schedule or publish directly
  * - Style Library for saved themes
+ * - Copyright tools and compliance
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import StyleLibrary from '../components/StyleLibrary';
+import CopyrightTools from '../components/CopyrightTools';
+import AIContentDisclaimer from '../components/AIContentDisclaimer';
 
 interface SEOFeedback {
   type: 'success' | 'warning' | 'info' | 'error';
