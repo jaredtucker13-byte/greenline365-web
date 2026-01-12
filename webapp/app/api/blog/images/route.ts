@@ -251,17 +251,23 @@ async function analyzePageStyle(body: StyleAnalyzeRequest) {
       model: 'openai/gpt-4o-mini',
       messages: [
         {
-          role: 'system', 
-          content: `Return ONLY valid JSON for a page style theme. Keep all descriptions under 50 chars. No markdown or code blocks.${moodInstruction}`
-        },
-        {
           role: 'user',
-          content: `Create page style JSON for blog "${title}". Fill in this template with appropriate hex colors and values:
-{"themeName":"","description":"","colors":{"primary":"#","secondary":"#","accent":"#","background":"#","backgroundGradient":null,"text":"#","textMuted":"#","headings":"#","links":"#"},"texture":{"type":"none","opacity":0,"description":""},"typography":{"headingStyle":"bold","headingSize":"medium","bodyLineHeight":"normal","emphasis":"bold"},"layout":{"contentWidth":"medium","imageStyle":"rounded","spacing":"balanced","headerStyle":"minimal"},"mood":""}`
+          content: `Return a JSON object for styling a blog titled "${title}". ${moodHint ? `Make it feel ${moodHint}.` : ''}
+
+Required fields:
+- themeName: creative name (string)
+- description: brief description under 40 chars (string)  
+- colors: object with primary, secondary, accent, background, text, headings, links (all hex strings like "#FFFFFF")
+- texture: object with type ("none"|"grain"|"dots"), opacity (0-1 number)
+- typography: object with headingStyle ("bold"|"light"), headingSize ("large"|"medium"|"small")
+- layout: object with contentWidth ("narrow"|"medium"|"wide"), spacing ("compact"|"balanced"|"airy")
+- mood: emotional description under 30 chars (string)
+
+Return ONLY the raw JSON object, no markdown, no code blocks, no explanation.`
         }
       ],
-      temperature: 0.5,
-      max_tokens: 700,
+      temperature: 0.7,
+      max_tokens: 500,
     }),
   });
 
