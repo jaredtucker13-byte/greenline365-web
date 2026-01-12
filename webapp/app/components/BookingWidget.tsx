@@ -247,24 +247,43 @@ export default function BookingWidget({
           <label className="block text-sm font-semibold text-gray-700 mb-3">
             Select a Time
           </label>
+          {errorMessage && (
+            <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+              {errorMessage}
+            </div>
+          )}
           <div className="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto">
-            {timeSlots.map((time) => (
-              <button
-                key={time}
-                type="button"
-                onClick={() => {
-                  setSelectedTime(time);
-                  setStep('details');
-                }}
-                className={`p-3 rounded-lg border text-center transition-all ${
-                  selectedTime === time
-                    ? 'border-emerald-500 bg-emerald-50'
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-              >
-                <span className="text-sm font-medium text-gray-900">{time}</span>
-              </button>
-            ))}
+            {timeSlots.map((time) => {
+              const isBooked = isSlotBooked(selectedDate, time);
+              return (
+                <button
+                  key={time}
+                  type="button"
+                  onClick={() => {
+                    if (!isBooked) {
+                      setSelectedTime(time);
+                      setErrorMessage('');
+                      setStep('details');
+                    }
+                  }}
+                  disabled={isBooked}
+                  className={`p-3 rounded-lg border text-center transition-all ${
+                    isBooked
+                      ? 'border-gray-100 bg-gray-50 cursor-not-allowed opacity-50'
+                      : selectedTime === time
+                        ? 'border-emerald-500 bg-emerald-50'
+                        : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <span className={`text-sm font-medium ${isBooked ? 'text-gray-400 line-through' : 'text-gray-900'}`}>
+                    {time}
+                  </span>
+                  {isBooked && (
+                    <span className="block text-xs text-gray-400">Booked</span>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
