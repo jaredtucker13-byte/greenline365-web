@@ -248,31 +248,22 @@ async function analyzePageStyle(body: StyleAnalyzeRequest) {
       'X-Title': 'GreenLine365 Blog Styling',
     },
     body: JSON.stringify({
-      model: 'openai/gpt-4o',
+      model: 'openai/gpt-4o-mini',
       messages: [
         {
           role: 'system',
-          content: `You are an expert web designer and brand strategist. Analyze blog content and suggest a complete page styling theme that enhances the content's message and emotional impact.
+          content: `You are a web designer. Return ONLY valid JSON for a page style theme. Keep ALL descriptions under 30 characters. No markdown.${moodInstruction}
 
-Consider:
-- Content tone (professional, casual, urgent, educational, inspiring)
-- Target audience
-- Industry/topic context
-- Emotional impact desired
-- Readability and accessibility${moodInstruction}
-
-CRITICAL: Return ONLY compact JSON, no extra spaces or newlines. Keep descriptions SHORT (under 50 chars). Return COMPLETE JSON.
-
-JSON format (keep it compact):
-{"themeName":"name","description":"short desc","colors":{"primary":"#hex","secondary":"#hex","accent":"#hex","background":"#hex","backgroundGradient":null,"text":"#hex","textMuted":"#hex","headings":"#hex","links":"#hex"},"texture":{"type":"none","opacity":0,"description":"short"},"typography":{"headingStyle":"bold","headingSize":"medium","bodyLineHeight":"normal","emphasis":"bold"},"layout":{"contentWidth":"medium","imageStyle":"rounded","spacing":"balanced","headerStyle":"minimal"},"mood":"short mood"}`
+Required JSON structure (fill in hex colors and values):
+{"themeName":"","description":"","colors":{"primary":"#","secondary":"#","accent":"#","background":"#","backgroundGradient":null,"text":"#","textMuted":"#","headings":"#","links":"#"},"texture":{"type":"none","opacity":0,"description":""},"typography":{"headingStyle":"bold","headingSize":"medium","bodyLineHeight":"normal","emphasis":"bold"},"layout":{"contentWidth":"medium","imageStyle":"rounded","spacing":"balanced","headerStyle":"minimal"},"mood":""}`
         },
         {
           role: 'user',
-          content: `Suggest page styling for: "${title}" (${category || 'General'}) - ${content.slice(0, 500)}`
+          content: `Create style for marketing blog: "${title}"`
         }
       ],
-      temperature: 0.6,
-      max_tokens: 800,
+      temperature: 0.5,
+      max_tokens: 600,
     }),
   });
 
