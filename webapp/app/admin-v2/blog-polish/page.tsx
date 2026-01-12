@@ -1462,8 +1462,11 @@ export default function BlogPolishPage() {
           body: JSON.stringify({
             action: 'generate',
             prompt: suggestion.prompt,
-            style: 'professional',
-            count: 1, // Just 1 per suggestion for batch mode
+            enrichedPrompt: suggestion.enrichedPrompt,
+            style: 'cinematic',
+            count: 2,
+            aspectRatio: suggestion.suggestedRatio || '16:9',
+            isChart: suggestion.isChart || false,
           }),
         });
 
