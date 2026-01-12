@@ -1162,19 +1162,53 @@ export default function BlogPolishPage() {
     ));
   };
 
-  // NEW: Analyze blog and generate ALL images in a loop
-  const analyzeAndGenerateAllImages = async () => {
+  // Play notification sound
+  const playNotificationSound = () => {
+    try {
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.value = 800;
+      oscillator.type = 'sine';
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.3);
+      
+      // Second beep
+      setTimeout(() => {
+        const osc2 = audioContext.createOscillator();
+        const gain2 = audioContext.createGain();
+        osc2.connect(gain2);
+        gain2.connect(audioContext.destination);
+        osc2.frequency.value = 1000;
+        osc2.type = 'sine';
+        gain2.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+        osc2.start(audioContext.currentTime);
+        osc2.stop(audioContext.currentTime + 0.3);
+      }, 150);
+    } catch (e) {
+      console.log('Could not play notification sound');
+    }
+  };
+
+  // Analyze blog to get image suggestions (without generating)
+  const analyzeForImageSuggestions = async () => {
     if (!post.content || post.content.length < 100) {
-      setMessage({ type: 'error', text: 'Add more content before generating images' });
+      setMessage({ type: 'error', text: 'Add more content before analyzing images' });
       return;
     }
 
-    setGeneratingAllImages(true);
+    setAnalyzingImages(true);
     setShowImagePanel(true);
-    setImageGenProgress({ current: 0, total: 0, status: 'Analyzing blog content...' });
 
     try {
-      // Step 1: Analyze the blog content to get image suggestions
       const analyzeResponse = await fetch('/api/blog/images', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1189,91 +1223,141 @@ export default function BlogPolishPage() {
       
       if (!analyzeResponse.ok || !analyzeData.suggestions?.length) {
         setMessage({ type: 'error', text: analyzeData.error || 'No image opportunities found' });
-        setGeneratingAllImages(false);
+        setAnalyzingImages(false);
         return;
       }
 
       const suggestions: ImageSuggestion[] = analyzeData.suggestions;
       setImageSuggestions(suggestions);
-      setImageGenProgress({ 
-        current: 0, 
-        total: suggestions.length, 
-        status: `Found ${suggestions.length} images to generate...` 
+      setMessage({ type: 'success', text: `Found ${suggestions.length} image opportunities! Click "Generate" on each to create.` });
+    } catch (error: any) {
+      setMessage({ type: 'error', text: error.message || 'Failed to analyze content' });
+    } finally {
+      setAnalyzingImages(false);
+    }
+  };
+
+  // Generate image for a single suggestion
+  const generateSingleImage = async (suggestionId: string) => {
+    const suggestion = imageSuggestions.find(s => s.id === suggestionId);
+    if (!suggestion) return;
+
+    // Mark as generating
+    setImageSuggestions(prev => prev.map(s => 
+      s.id === suggestionId ? { ...s, generating: true } : s
+    ));
+
+    try {
+      const genResponse = await fetch('/api/blog/images', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'generate',
+          prompt: suggestion.prompt,
+          style: 'professional',
+          count: 2,
+        }),
       });
 
-      // Step 2: Loop through each suggestion and generate images
-      for (let i = 0; i < suggestions.length; i++) {
-        const suggestion = suggestions[i];
-        
-        setImageGenProgress({ 
-          current: i + 1, 
-          total: suggestions.length, 
-          status: `Generating image ${i + 1}/${suggestions.length}: ${suggestion.context.slice(0, 50)}...` 
+      const genData = await genResponse.json();
+      
+      if (genResponse.ok && genData.images?.length > 0) {
+        setImageSuggestions(prev => prev.map(s => 
+          s.id === suggestionId 
+            ? { ...s, generatedImages: genData.images, generating: false, selectedImage: genData.images[0]?.id }
+            : s
+        ));
+        playNotificationSound();
+        setMessage({ type: 'success', text: '🎨 Image generated!' });
+      } else {
+        setImageSuggestions(prev => prev.map(s => 
+          s.id === suggestionId ? { ...s, generating: false } : s
+        ));
+        setMessage({ type: 'error', text: genData.message || 'Generation failed' });
+      }
+    } catch (error) {
+      setImageSuggestions(prev => prev.map(s => 
+        s.id === suggestionId ? { ...s, generating: false } : s
+      ));
+      setMessage({ type: 'error', text: 'Failed to generate image' });
+    }
+  };
+
+  // Generate ALL images (with warning)
+  const generateAllImages = async () => {
+    const pendingSuggestions = imageSuggestions.filter(s => !s.generatedImages || s.generatedImages.length === 0);
+    if (pendingSuggestions.length === 0) {
+      setMessage({ type: 'info', text: 'All images already generated!' });
+      return;
+    }
+
+    setGeneratingAllImages(true);
+    setImageGenProgress({ current: 0, total: pendingSuggestions.length, status: 'Starting batch generation...' });
+    setMessage({ type: 'info', text: `⏳ Generating ${pendingSuggestions.length} images. This may take a minute. You can work on other things - we'll beep when done!` });
+
+    let successCount = 0;
+
+    for (let i = 0; i < pendingSuggestions.length; i++) {
+      const suggestion = pendingSuggestions[i];
+      
+      setImageGenProgress({ 
+        current: i + 1, 
+        total: pendingSuggestions.length, 
+        status: `Generating ${i + 1}/${pendingSuggestions.length}...` 
+      });
+
+      setImageSuggestions(prev => prev.map(s => 
+        s.id === suggestion.id ? { ...s, generating: true } : s
+      ));
+
+      try {
+        const genResponse = await fetch('/api/blog/images', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'generate',
+            prompt: suggestion.prompt,
+            style: 'professional',
+            count: 1, // Just 1 per suggestion for batch mode
+          }),
         });
 
-        // Mark this suggestion as generating
-        setImageSuggestions(prev => prev.map(s => 
-          s.id === suggestion.id ? { ...s, generating: true } : s
-        ));
-
-        try {
-          const genResponse = await fetch('/api/blog/images', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              action: 'generate',
-              prompt: suggestion.prompt,
-              style: 'professional',
-              count: 2, // Generate 2 variations per suggestion for speed
-            }),
-          });
-
-          const genData = await genResponse.json();
-          
-          if (genResponse.ok && genData.images?.length > 0) {
-            // Update this suggestion with generated images
-            setImageSuggestions(prev => prev.map(s => 
-              s.id === suggestion.id 
-                ? { ...s, generatedImages: genData.images, generating: false, selectedImage: genData.images[0]?.id }
-                : s
-            ));
-          } else {
-            // Mark as failed but continue with others
-            setImageSuggestions(prev => prev.map(s => 
-              s.id === suggestion.id ? { ...s, generating: false } : s
-            ));
-            console.log(`[Image Gen] Failed for suggestion ${i + 1}:`, genData.message);
-          }
-        } catch (error) {
-          // Continue even if one fails
+        const genData = await genResponse.json();
+        
+        if (genResponse.ok && genData.images?.length > 0) {
+          setImageSuggestions(prev => prev.map(s => 
+            s.id === suggestion.id 
+              ? { ...s, generatedImages: genData.images, generating: false, selectedImage: genData.images[0]?.id }
+              : s
+          ));
+          successCount++;
+        } else {
           setImageSuggestions(prev => prev.map(s => 
             s.id === suggestion.id ? { ...s, generating: false } : s
           ));
-          console.error(`[Image Gen] Error for suggestion ${i + 1}:`, error);
         }
-
-        // Small delay between generations to avoid rate limiting
-        if (i < suggestions.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 500));
-        }
+      } catch (error) {
+        setImageSuggestions(prev => prev.map(s => 
+          s.id === suggestion.id ? { ...s, generating: false } : s
+        ));
       }
 
-      // Count successfully generated images
-      setImageSuggestions(prev => {
-        const successCount = prev.filter(s => s.generatedImages && s.generatedImages.length > 0).length;
-        setMessage({ 
-          type: successCount > 0 ? 'success' : 'error', 
-          text: `Generated images for ${successCount}/${suggestions.length} placements!` 
-        });
-        return prev;
-      });
-
-    } catch (error: any) {
-      setMessage({ type: 'error', text: error.message || 'Failed to generate images' });
-    } finally {
-      setGeneratingAllImages(false);
-      setImageGenProgress({ current: 0, total: 0, status: '' });
+      // Small delay between generations
+      if (i < pendingSuggestions.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
     }
+
+    setGeneratingAllImages(false);
+    setImageGenProgress({ current: 0, total: 0, status: '' });
+    
+    // Play sound and show notification
+    playNotificationSound();
+    sendNotification('Images Ready! 🎨', { body: `Generated ${successCount}/${pendingSuggestions.length} images` });
+    setMessage({ 
+      type: successCount > 0 ? 'success' : 'error', 
+      text: `🎉 Done! Generated ${successCount}/${pendingSuggestions.length} images` 
+    });
   };
 
   // Page Style Analysis
