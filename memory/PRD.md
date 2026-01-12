@@ -143,15 +143,27 @@ Build a comprehensive marketing OS for local businesses called "GreenLine365".
 ## File Structure
 ```
 /app/webapp/app/admin-v2/
-├── analytics/page.tsx           # NEW: Full analytics dashboard
-├── blog-polish/page.tsx         # Blog editor
+├── analytics/page.tsx           # Full analytics dashboard
+├── blog-polish/page.tsx         # Blog editor with image generation
+├── living-canvas/page.tsx       # NEW: Template editor with live preview
 ├── components/
-│   ├── DraftsPanel.tsx          # UPDATED: Action menu, click-to-edit
-│   ├── MiniAnalyticsWidget.tsx  # NEW: Compact metric toggle
-│   ├── CollapsibleSidebar.tsx   # UPDATED: Collapse button position
+│   ├── DraftsPanel.tsx          # Action menu, click-to-edit
+│   ├── MiniAnalyticsWidget.tsx  # Compact metric toggle
+│   ├── CollapsibleSidebar.tsx   # Collapse button position
 │   ├── CopyrightTools.tsx
 │   └── AIContentDisclaimer.tsx
+
+/app/webapp/app/components/living-canvas/  # NEW: Living Canvas library
+├── index.ts                     # Exports all components
+├── ImageContainers.tsx          # Organic & Framed image components
+├── TemplateRenderer.tsx         # Renders templates from DB
+├── css-shapes.ts                # 25+ shape presets for text wrap
+└── color-extraction.ts          # Extract palette from images
+
+/app/webapp/supabase/migrations/
+└── 013_living_canvas.sql        # NEW: Templates, frames, compositions tables
 ```
+
 
 ## Prioritized Backlog
 
