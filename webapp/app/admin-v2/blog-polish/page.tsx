@@ -157,6 +157,10 @@ export default function BlogPolishPage() {
   const [showImagePanel, setShowImagePanel] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<'classic' | 'magazine' | 'minimal' | 'cards'>('classic');
   const [showCopyrightPanel, setShowCopyrightPanel] = useState(false);
+  
+  // Batch image generation state
+  const [generatingAllImages, setGeneratingAllImages] = useState(false);
+  const [imageGenProgress, setImageGenProgress] = useState<{ current: number; total: number; status: string }>({ current: 0, total: 0, status: '' });
 
   // Page Styling state
   interface PageStyleGuide {
