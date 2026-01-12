@@ -474,6 +474,45 @@ export default function BlogPolishPage() {
     }
   };
 
+  // Generate content from custom prompt (use suggestions)
+  const generateFromPrompt = async () => {
+    if (!customPromptInput.trim()) {
+      setMessage({ type: 'error', text: 'Enter a prompt or paste a suggestion' });
+      return;
+    }
+    setAiLoading('custom_prompt');
+    try {
+      const response = await fetch('/api/blog/ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'custom_generate',
+          customPrompt: customPromptInput,
+          title: post.title,
+          content: post.content,
+          category: post.category,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok && data.result) {
+        setAiSuggestions(prev => ({ ...prev, enhanced: data.result }));
+        setMessage({ type: 'success', text: 'Content generated from your prompt!' });
+      } else {
+        setMessage({ type: 'error', text: data.error || 'Generation failed' });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Failed to generate content' });
+    }
+    setAiLoading(null);
+  };
+
+  // Copy suggestion to custom prompt input
+  const useSuggestion = (text: string) => {
+    setCustomPromptInput(text);
+    setMessage({ type: 'info', text: 'Suggestion copied to prompt input. Edit and generate!' });
+  };
+
   // Trending Research with Perplexity via OpenRouter
   const searchTrending = async () => {
     if (!trendingIndustry) {
