@@ -333,7 +333,8 @@ export default function CollapsibleSidebar({
         initial={false}
         animate={{ width: isCollapsed ? 72 : 280 }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        className="hidden lg:flex flex-col backdrop-blur-2xl bg-black/40 border-r border-white/10 h-screen sticky top-0"
+        className="hidden lg:flex flex-col backdrop-blur-2xl h-screen sticky top-0"
+        style={{ background: 'var(--theme-bg-primary)', borderRight: '1px solid var(--theme-glass-border)' }}
       >
         {sidebarContent}
       </motion.aside>
