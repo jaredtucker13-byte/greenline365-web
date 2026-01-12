@@ -1175,6 +1175,27 @@ export default function BlogPolishPage() {
               )}
             </AnimatePresence>
 
+            {/* Copyright Tools Panel */}
+            <AnimatePresence>
+              {showCopyrightPanel && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="overflow-hidden"
+                >
+                  <CopyrightTools 
+                    content={post.content} 
+                    title={post.title}
+                    onAttributionGenerated={(attr) => {
+                      // Optionally append attribution to content
+                      setMessage({ type: 'success', text: 'Attribution generated!' });
+                    }}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {/* AI Suggestions Panel */}
             <AnimatePresence>
               {showAiPanel && Object.keys(aiSuggestions).length > 0 && (
