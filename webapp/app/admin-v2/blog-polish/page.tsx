@@ -172,7 +172,7 @@ export default function BlogPolishPage() {
     prompt: string;
     position: number;
     sectionTitle?: string;
-    generatedImages?: { id: string; data: string; mime_type: string }[];
+    generatedImages?: { id: string; data?: string; url?: string; mime_type?: string }[];
     selectedImage?: string;
     generating?: boolean;
   }
