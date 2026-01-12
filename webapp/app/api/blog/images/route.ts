@@ -323,83 +323,117 @@ ${content.slice(0, 2000)}${content.length > 2000 ? '...' : ''}`
   const data = await response.json();
   const aiResponse = data.choices?.[0]?.message?.content || '{}';
 
-  // Parse JSON response with robust cleaning
-  try {
-    const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      // Clean the JSON string - fix common AI response issues
-      let cleanedJson = jsonMatch[0]
-        // Replace smart quotes with regular quotes
-        .replace(/[\u2018\u2019]/g, "'")
-        .replace(/[\u201C\u201D]/g, '"')
-        // Remove any trailing commas before closing braces/brackets
-        .replace(/,(\s*[}\]])/g, '$1')
-        // Handle line breaks in string values
-        .replace(/\n/g, '\\n')
-        // Fix unescaped quotes in string values (basic)
-        .replace(/"([^"]*)":\s*"([^"]*)"/g, (match, key, value) => {
-          const cleanValue = value.replace(/(?<!\\)"/g, '\\"');
-          return `"${key}": "${cleanValue}"`;
-        });
-      
-      const styleGuide = JSON.parse(cleanedJson);
+  // Helper function to attempt JSON parsing
+  const tryParseJson = (jsonStr: string): any | null => {
+    try {
+      return JSON.parse(jsonStr);
+    } catch {
+      return null;
+    }
+  };
+
+  // Clean common AI response issues
+  const cleanJson = (str: string): string => {
+    return str
+      .replace(/[\u2018\u2019]/g, "'")
+      .replace(/[\u201C\u201D]/g, '"')
+      .replace(/,(\s*[}\]])/g, '$1');
+  };
+
+  // Try to find and parse JSON from response
+  let jsonContent = aiResponse;
+  
+  // Remove markdown code block if present
+  const codeBlockMatch = aiResponse.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (codeBlockMatch) {
+    jsonContent = codeBlockMatch[1];
+  }
+  
+  // Find JSON object
+  const jsonMatch = jsonContent.match(/\{[\s\S]*\}/);
+  if (jsonMatch) {
+    const cleaned = cleanJson(jsonMatch[0]);
+    const parsed = tryParseJson(cleaned);
+    if (parsed) {
       return NextResponse.json({ 
         success: true,
-        styleGuide,
+        styleGuide: parsed,
         raw: aiResponse,
       });
     }
-  } catch (e: any) {
-    console.error('[Blog Style] JSON parse error:', e.message);
-    console.error('[Blog Style] Raw response:', aiResponse.slice(0, 500));
+  }
+
+  // If direct parse failed, try to repair truncated JSON
+  console.log('[Blog Style] Attempting to repair truncated JSON...');
+  const partialMatch = jsonContent.match(/\{[\s\S]*/);
+  if (partialMatch) {
+    let fixedJson = cleanJson(partialMatch[0])
+      .replace(/[\r\n]+/g, ' ')
+      .replace(/\s+/g, ' ');
     
-    // Try to fix truncated JSON by closing open brackets
-    try {
-      const jsonMatch = aiResponse.match(/\{[\s\S]*/);
-      if (jsonMatch) {
-        let fixedJson = jsonMatch[0]
-          .replace(/[\r\n]+/g, ' ')
-          .replace(/\s+/g, ' ')
-          .replace(/,\s*}/g, '}')
-          .replace(/,\s*]/g, ']')
-          .replace(/[\u2018\u2019]/g, "'")
-          .replace(/[\u201C\u201D]/g, '"');
-        
-        // Count open and close brackets to fix truncation
-        const openBraces = (fixedJson.match(/{/g) || []).length;
-        const closeBraces = (fixedJson.match(/}/g) || []).length;
-        const openBrackets = (fixedJson.match(/\[/g) || []).length;
-        const closeBrackets = (fixedJson.match(/]/g) || []).length;
-        
-        // Try to close any unclosed quotes/strings
-        if (fixedJson.match(/"[^"]*$/)) {
-          fixedJson += '"';
-        }
-        
-        // Add missing closing brackets/braces
-        for (let i = 0; i < openBrackets - closeBrackets; i++) {
-          fixedJson += ']';
-        }
-        for (let i = 0; i < openBraces - closeBraces; i++) {
-          fixedJson += '}';
-        }
-        
-        // Remove trailing commas
-        fixedJson = fixedJson.replace(/,(\s*[}\]])/g, '$1');
-        
-        const styleGuide = JSON.parse(fixedJson);
-        console.log('[Blog Style] Successfully repaired truncated JSON');
-        return NextResponse.json({ 
-          success: true,
-          styleGuide,
-          raw: aiResponse,
-        });
+    // Count brackets to fix truncation
+    const openBraces = (fixedJson.match(/\{/g) || []).length;
+    const closeBraces = (fixedJson.match(/\}/g) || []).length;
+    const openBrackets = (fixedJson.match(/\[/g) || []).length;
+    const closeBrackets = (fixedJson.match(/\]/g) || []).length;
+    
+    // Check if we're in the middle of a string
+    const quoteCount = (fixedJson.match(/"/g) || []).length;
+    if (quoteCount % 2 !== 0) {
+      fixedJson += '"';
+    }
+    
+    // Handle truncated number/null values
+    if (fixedJson.match(/:\s*\d*$/)) {
+      fixedJson += '0';
+    }
+    if (fixedJson.match(/:\s*nul$/)) {
+      fixedJson += 'l';
+    }
+    if (fixedJson.match(/:\s*nu$/)) {
+      fixedJson += 'll';
+    }
+    if (fixedJson.match(/:\s*n$/)) {
+      fixedJson += 'ull';
+    }
+    
+    // Handle truncated in the middle of a key-value
+    if (fixedJson.match(/,\s*"[^"]*"?\s*$/)) {
+      // Remove incomplete key-value pair
+      fixedJson = fixedJson.replace(/,\s*"[^"]*"?\s*$/, '');
+    }
+    if (fixedJson.match(/,\s*$/)) {
+      fixedJson = fixedJson.slice(0, -1).trimEnd();
+      if (fixedJson.endsWith(',')) {
+        fixedJson = fixedJson.slice(0, -1);
       }
-    } catch (e2) {
-      console.error('[Blog Style] JSON repair also failed:', e2);
+    }
+    
+    // Add missing closing brackets/braces
+    for (let i = 0; i < openBrackets - closeBrackets; i++) {
+      fixedJson += ']';
+    }
+    for (let i = 0; i < openBraces - closeBraces; i++) {
+      fixedJson += '}';
+    }
+    
+    // Final cleanup of trailing commas
+    fixedJson = fixedJson.replace(/,(\s*[}\]])/g, '$1');
+    
+    const parsed = tryParseJson(fixedJson);
+    if (parsed) {
+      console.log('[Blog Style] Successfully repaired truncated JSON');
+      return NextResponse.json({ 
+        success: true,
+        styleGuide: parsed,
+        raw: aiResponse,
+      });
+    } else {
+      console.error('[Blog Style] JSON repair failed. Fixed JSON:', fixedJson.slice(0, 500));
     }
   }
 
+  console.error('[Blog Style] All parse attempts failed');
   return NextResponse.json({ 
     success: false,
     error: 'Could not parse style suggestions',
