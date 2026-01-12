@@ -169,6 +169,13 @@ ${title ? `The blog title context is: "${title}"` : ''}`;
         userMessage = `Enhance this blog post:\n\nTitle: ${title || 'Untitled'}\n\nContent:\n${content}`;
         break;
 
+      case 'enhance_content_with_title':
+        if (!content) {
+          return NextResponse.json({ error: 'Content is required for enhancement' }, { status: 400 });
+        }
+        userMessage = `Enhance this blog post and suggest a matching title:\n\nCurrent Title: ${title || 'Untitled'}\n${category ? `Category: ${category}\n` : ''}\nContent:\n${content}\n\nRemember to return a JSON object with "title" and "content" keys.`;
+        break;
+
       case 'generate_meta':
         if (!title || !content) {
           return NextResponse.json({ error: 'Title and content are required for meta generation' }, { status: 400 });
