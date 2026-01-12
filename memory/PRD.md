@@ -95,6 +95,14 @@ Build "GreenLine365," a comprehensive marketing OS for local businesses. The pla
   - 🏷️ Suggest Tags - Auto-generate relevant tags (GPT-4o-mini)
   - 🔎 Generate Meta - SEO description & keywords (GPT-4o-mini)
   - AI Suggestions Panel with one-click apply
+- [x] **Image Generation System (Nano Banana):**
+  - 🖼️ Content Analyzer - AI identifies optimal image placements (header, inline, section-break)
+  - 🎨 Nano Banana Pro - Generates custom illustrations matching content
+  - Smart prompts generated based on blog context
+  - Multiple image variations per suggestion (up to 4)
+  - Template selector (Classic, Magazine, Minimal, Cards)
+  - Click-to-select image UI
+  - Python microservice at port 8002 for image generation
 - [x] Added "Blog" link to admin sidebar
 
 ### December 2025
