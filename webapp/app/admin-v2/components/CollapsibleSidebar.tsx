@@ -119,14 +119,14 @@ export default function CollapsibleSidebar({
   const sidebarContent = (
     <div className="flex flex-col h-full">
       {/* Header / Logo */}
-      <div className={`p-4 border-b border-[#39FF14]/10 ${isCollapsed ? 'px-2' : ''}`}>
+      <div className={`p-4 border-b border-white/10 ${isCollapsed ? 'px-2' : ''}`}>
         <div className="flex items-center justify-between">
           <Link href="/" className={`flex items-center gap-2 ${isCollapsed ? 'justify-center w-full' : ''}`}>
-            <div className="w-8 h-8 rounded-lg bg-[#39FF14] flex items-center justify-center">
-              <span className="text-black font-bold text-sm">G</span>
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#84A98C] to-[#52796F] flex items-center justify-center shadow-[0_0_15px_rgba(132,169,140,0.3)]">
+              <span className="text-white font-bold text-sm">G</span>
             </div>
             {!isCollapsed && (
-              <span className="text-white font-bold">GreenLine365</span>
+              <span className="text-white font-medium">GreenLine365</span>
             )}
           </Link>
           {/* Desktop collapse toggle */}
@@ -142,19 +142,19 @@ export default function CollapsibleSidebar({
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
+      <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
         {navItems.map((item) => (
           <Link
             key={item.id}
             href={item.href}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition group ${
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 group ${
               activeItem === item.id
-                ? 'bg-[#39FF14]/10 text-[#39FF14]'
-                : 'text-white/60 hover:text-white hover:bg-white/5'
+                ? 'bg-[#84A98C]/20 text-[#A7C957] border border-[#84A98C]/30'
+                : 'text-white/60 hover:text-white hover:bg-white/[0.08]'
             } ${isCollapsed ? 'justify-center px-2' : ''}`}
             title={isCollapsed ? item.label : undefined}
           >
-            <span className={activeItem === item.id ? 'text-[#39FF14]' : 'text-white/50 group-hover:text-white/80'}>
+            <span className={activeItem === item.id ? 'text-[#A7C957]' : 'text-white/50 group-hover:text-white/80'}>
               {icons[item.icon]}
             </span>
             {!isCollapsed && (
