@@ -169,6 +169,17 @@ export default function BlogPolishPage() {
     'playful and fun'
   ];
 
+  // Style Library state
+  const [showStyleLibrary, setShowStyleLibrary] = useState(false);
+
+  // Handle applying style from library
+  const applyStyleFromLibrary = (style: PageStyleGuide) => {
+    setPageStyle(style);
+    setShowStylePanel(true);
+    setStyleApplied(true);
+    setMessage({ type: 'success', text: `Applied "${style.themeName}" from library` });
+  };
+
   // Texture pattern generator
   const getTexturePattern = (type: string): string => {
     switch (type) {
