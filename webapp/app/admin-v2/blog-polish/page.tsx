@@ -2405,38 +2405,69 @@ export default function BlogPolishPage() {
                         {/* Generated Images Grid */}
                         {suggestion.generatedImages && suggestion.generatedImages.length > 0 && (
                           <div className="mt-3 pt-3 border-t border-white/10">
-                            <p className="text-xs text-white/50 mb-2">Select an image (click to choose):</p>
+                            <p className="text-xs text-white/50 mb-2">Click to preview • Right-click for options:</p>
                             <div className="grid grid-cols-2 gap-2">
                               {suggestion.generatedImages.map((img) => {
                                 // Handle both URL and base64 formats
                                 const imgSrc = img.url || (img.data?.startsWith('http') ? img.data : `data:${img.mime_type || 'image/png'};base64,${img.data}`);
                                 return (
-                                  <button
-                                    key={img.id}
-                                    onClick={() => selectImage(suggestion.id, img.id)}
-                                    className={`relative aspect-video rounded-lg overflow-hidden border-2 transition ${
-                                      suggestion.selectedImage === img.id
-                                        ? 'border-amber-400 ring-2 ring-amber-400/50'
-                                        : 'border-transparent hover:border-white/30'
-                                    }`}
-                                  >
-                                    <img 
-                                      src={imgSrc}
-                                      alt="Generated"
-                                      className="w-full h-full object-cover"
-                                      onError={(e) => {
-                                        // Fallback for broken images
-                                        (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="60" viewBox="0 0 100 60"><rect fill="%23333" width="100" height="60"/><text fill="%23666" x="50" y="35" text-anchor="middle" font-size="10">Image</text></svg>';
+                                  <div key={img.id} className="relative group">
+                                    <button
+                                      onClick={() => setPreviewImage({ url: imgSrc, id: img.id })}
+                                      onContextMenu={(e) => {
+                                        e.preventDefault();
+                                        selectImage(suggestion.id, img.id);
                                       }}
-                                    />
-                                    {suggestion.selectedImage === img.id && (
-                                      <div className="absolute top-1 right-1 w-5 h-5 rounded-full bg-amber-400 flex items-center justify-center">
-                                        <svg className="w-3 h-3 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                      className={`relative aspect-video rounded-lg overflow-hidden border-2 transition w-full ${
+                                        suggestion.selectedImage === img.id
+                                          ? 'border-amber-400 ring-2 ring-amber-400/50'
+                                          : 'border-transparent hover:border-white/30'
+                                      }`}
+                                    >
+                                      <img 
+                                        src={imgSrc}
+                                        alt="Generated"
+                                        className="w-full h-full object-cover"
+                                        onError={(e) => {
+                                          (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="60" viewBox="0 0 100 60"><rect fill="%23333" width="100" height="60"/><text fill="%23666" x="50" y="35" text-anchor="middle" font-size="10">Image</text></svg>';
+                                        }}
+                                      />
+                                      {suggestion.selectedImage === img.id && (
+                                        <div className="absolute top-1 right-1 w-5 h-5 rounded-full bg-amber-400 flex items-center justify-center">
+                                          <svg className="w-3 h-3 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                          </svg>
+                                        </div>
+                                      )}
+                                      {/* Hover overlay with zoom icon */}
+                                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                                        <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
                                         </svg>
                                       </div>
+                                    </button>
+                                    {/* Apply button with layout selector */}
+                                    {suggestion.selectedImage === img.id && (
+                                      <div className="mt-2 flex gap-1">
+                                        <select
+                                          value={selectedLayout}
+                                          onChange={(e) => setSelectedLayout(e.target.value as any)}
+                                          className="flex-1 px-2 py-1 rounded text-xs bg-white/10 border border-white/20 text-white"
+                                        >
+                                          <option value="center">Center</option>
+                                          <option value="left">Float Left</option>
+                                          <option value="right">Float Right</option>
+                                          <option value="full-width">Full Width</option>
+                                        </select>
+                                        <button
+                                          onClick={() => applyImageToBlog(imgSrc, selectedLayout)}
+                                          className="px-2 py-1 rounded bg-green-500/20 text-green-300 text-xs font-medium hover:bg-green-500/30 transition"
+                                        >
+                                          Apply
+                                        </button>
+                                      </div>
                                     )}
-                                  </button>
+                                  </div>
                                 );
                               })}
                             </div>
