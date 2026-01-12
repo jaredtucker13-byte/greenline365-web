@@ -219,10 +219,29 @@ export default async function TrustPage() {
                       <h3 className="font-semibold text-blue-400 mb-2">Row-Level Security (RLS)</h3>
                       <p className="text-white/60 text-sm">
                         We enforce isolation at the database level. Every single row of data—from a lead's email 
-                        to a financial metric—is stamped with a unique <code className="bg-white/10 px-1.5 py-0.5 rounded text-xs">tenant_id</code>. 
+                        to a financial metric—is stamped with a unique <code className="bg-white/10 px-1.5 py-0.5 rounded text-xs">user_id</code> or <code className="bg-white/10 px-1.5 py-0.5 rounded text-xs">tenant_id</code>. 
                         Our database acts as a <strong className="text-white">"Digital Bouncer,"</strong> automatically rejecting 
-                        any query that attempts to cross tenant lines. It is <em>mathematically impossible</em> for 
-                        one tenant to query another tenant's data.
+                        any query that attempts to cross tenant lines. RLS policies are enforced on <strong className="text-white">100% of tables</strong> containing user data. 
+                        It is <em>mathematically impossible</em> for one tenant to query another tenant's data.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Memory System Card */}
+                <div className="bg-gradient-to-r from-violet-500/10 to-violet-500/5 border border-violet-500/20 rounded-xl p-5">
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 bg-violet-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-violet-400 mb-2">4-Layer AI Memory System</h3>
+                      <p className="text-white/60 text-sm">
+                        Our Dynamic Memory Bucket System ensures AI context is <strong className="text-white">strictly tenant-isolated</strong>: 
+                        Core Identity (your brand voice), Knowledge Warehouse (your business facts), Event Journal (your activity history), 
+                        and Real-time Buffer (current session). Each layer is protected by RLS, ensuring your AI never "remembers" another tenant's data.
                       </p>
                     </div>
                   </div>
