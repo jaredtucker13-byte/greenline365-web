@@ -1291,6 +1291,20 @@ export default function BlogPolishPage() {
       return;
     }
 
+    // Show warning confirmation
+    const confirmed = window.confirm(
+      `⚠️ Generate All Images\n\n` +
+      `This will generate ${pendingSuggestions.length} image(s) using AI.\n\n` +
+      `• This may take 1-2 minutes\n` +
+      `• You'll hear a sound when done\n` +
+      `• You can continue working while images generate\n\n` +
+      `Continue?`
+    );
+    
+    if (!confirmed) {
+      return;
+    }
+
     setGeneratingAllImages(true);
     setImageGenProgress({ current: 0, total: pendingSuggestions.length, status: 'Starting batch generation...' });
     setMessage({ type: 'info', text: `⏳ Generating ${pendingSuggestions.length} images. This may take a minute. You can work on other things - we'll beep when done!` });
@@ -1351,8 +1365,8 @@ export default function BlogPolishPage() {
     setGeneratingAllImages(false);
     setImageGenProgress({ current: 0, total: 0, status: '' });
     
-    // Play sound and show notification
-    playNotificationSound();
+    // Play completion sound (more noticeable melody)
+    playCompletionSound();
     sendNotification('Images Ready! 🎨', { body: `Generated ${successCount}/${pendingSuggestions.length} images` });
     setMessage({ 
       type: successCount > 0 ? 'success' : 'error', 
