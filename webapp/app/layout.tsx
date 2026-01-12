@@ -284,10 +284,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="min-h-screen bg-[#050a08]">
-        <Navbar />
-        <main>{children}</main>
-        <ChatWidget />
-        <Footer />
+        <ServiceWorkerProvider>
+          <Navbar />
+          <main>{children}</main>
+          <ChatWidget />
+          <Footer />
+        </ServiceWorkerProvider>
       </body>
     </html>
   );
