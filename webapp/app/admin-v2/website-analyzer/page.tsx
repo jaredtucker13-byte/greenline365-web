@@ -41,6 +41,7 @@ export default function WebsiteAnalyzerPage() {
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [visionModel, setVisionModel] = useState<VisionModel>('gemini-3-pro');
   const [analysisType, setAnalysisType] = useState<'full' | 'hero' | 'conversion' | 'visual'>('full');
+  const [generationMode, setGenerationMode] = useState<GenerationMode>('recreate');
   
   // Scratch mode states
   const [description, setDescription] = useState('');
