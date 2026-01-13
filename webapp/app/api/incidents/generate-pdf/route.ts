@@ -215,18 +215,18 @@ export async function GET(request: NextRequest) {
       .order('occurred_at', { ascending: true });
 
     // Generate PDF
-    const pdfBuffer = await renderToBuffer(
-      IncidentReportPDF({
-        incident,
-        images: incident.incident_images || [],
-        company: DEFAULT_COMPANY,
-        signatureEvents: signatureEvents || []
-      })
-    );
+    const pdfDocument = React.createElement(IncidentReportPDF, {
+      incident,
+      images: incident.incident_images || [],
+      company: DEFAULT_COMPANY,
+      signatureEvents: signatureEvents || []
+    });
+    
+    const pdfBuffer = await renderToBuffer(pdfDocument as any);
 
     const filename = `incident-report-${incident.id.substring(0, 8).toUpperCase()}.pdf`;
 
-    return new NextResponse(pdfBuffer, {
+    return new NextResponse(new Uint8Array(pdfBuffer), {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="${filename}"`,
