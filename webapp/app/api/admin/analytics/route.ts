@@ -15,7 +15,7 @@ import { createClient } from '@/lib/supabase/server';
 
 // Admin email addresses that can access this endpoint
 const ADMIN_EMAILS = [
-  'jared@greenline365.com',
+  'greenline365help@gmail.com',
   'admin@greenline365.com',
   // Add more admin emails as needed
 ];

@@ -10,7 +10,7 @@ import { createClient } from '@/lib/supabase/server';
 
 // Admin emails that can see all logs
 const ADMIN_EMAILS = [
-  'jared@greenline365.com',
+  'greenline365help@gmail.com',
   'admin@greenline365.com',
 ];
 
