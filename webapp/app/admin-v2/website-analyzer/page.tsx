@@ -116,8 +116,10 @@ export default function WebsiteAnalyzerPage() {
   const [inputMethod, setInputMethod] = useState<'upload' | 'url'>('upload');
   const [websiteUrl, setWebsiteUrl] = useState('');
   const [capturingUrl, setCapturingUrl] = useState(false);
+  const [crawlingUrl, setCrawlingUrl] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageBase64, setImageBase64] = useState<string | null>(null);
+  const [extractedWebsite, setExtractedWebsite] = useState<ExtractedWebsite | null>(null);
   const [visionModel, setVisionModel] = useState<VisionModel>('gemini-3-pro');
   const [analysisType, setAnalysisType] = useState<'full' | 'hero' | 'conversion' | 'visual'>('full');
   const [generationMode, setGenerationMode] = useState<GenerationMode>('recreate');
