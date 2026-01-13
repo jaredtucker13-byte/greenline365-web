@@ -180,6 +180,98 @@ export const SHAPE_PRESETS: Record<string, ShapeDefinition> = {
     shapeMargin: '1rem',
   },
 
+  // T-Shapes (for magazine story layouts)
+  't-shape-down': {
+    shapeOutside: 'polygon(0% 0%, 100% 0%, 100% 40%, 70% 40%, 70% 100%, 30% 100%, 30% 40%, 0% 40%)',
+    clipPath: 'polygon(0% 0%, 100% 0%, 100% 40%, 70% 40%, 70% 100%, 30% 100%, 30% 40%, 0% 40%)',
+    float: 'left',
+    shapeMargin: '1.5rem',
+  },
+  't-shape-up': {
+    shapeOutside: 'polygon(30% 0%, 70% 0%, 70% 60%, 100% 60%, 100% 100%, 0% 100%, 0% 60%, 30% 60%)',
+    clipPath: 'polygon(30% 0%, 70% 0%, 70% 60%, 100% 60%, 100% 100%, 0% 100%, 0% 60%, 30% 60%)',
+    float: 'left',
+    shapeMargin: '1.5rem',
+  },
+  't-shape-right': {
+    shapeOutside: 'polygon(0% 0%, 60% 0%, 60% 30%, 100% 30%, 100% 70%, 60% 70%, 60% 100%, 0% 100%)',
+    clipPath: 'polygon(0% 0%, 60% 0%, 60% 30%, 100% 30%, 100% 70%, 60% 70%, 60% 100%, 0% 100%)',
+    float: 'left',
+    shapeMargin: '1.5rem',
+  },
+  't-shape-left': {
+    shapeOutside: 'polygon(40% 0%, 100% 0%, 100% 100%, 40% 100%, 40% 70%, 0% 70%, 0% 30%, 40% 30%)',
+    clipPath: 'polygon(40% 0%, 100% 0%, 100% 100%, 40% 100%, 40% 70%, 0% 70%, 0% 30%, 40% 30%)',
+    float: 'right',
+    shapeMargin: '1.5rem',
+  },
+
+  // Lightning bolt shape
+  'lightning-bolt': {
+    shapeOutside: 'polygon(40% 0%, 65% 0%, 55% 35%, 100% 35%, 35% 100%, 45% 55%, 0% 55%)',
+    clipPath: 'polygon(40% 0%, 65% 0%, 55% 35%, 100% 35%, 35% 100%, 45% 55%, 0% 55%)',
+    float: 'left',
+    shapeMargin: '2rem',
+  },
+  'lightning-bolt-mirror': {
+    shapeOutside: 'polygon(60% 0%, 35% 0%, 45% 35%, 0% 35%, 65% 100%, 55% 55%, 100% 55%)',
+    clipPath: 'polygon(60% 0%, 35% 0%, 45% 35%, 0% 35%, 65% 100%, 55% 55%, 100% 55%)',
+    float: 'right',
+    shapeMargin: '2rem',
+  },
+
+  // Stair-step shapes (for visual journey layouts)
+  'stairs-down-right': {
+    shapeOutside: 'polygon(0% 0%, 50% 0%, 50% 33%, 100% 33%, 100% 100%, 50% 100%, 50% 66%, 0% 66%)',
+    clipPath: 'polygon(0% 0%, 50% 0%, 50% 33%, 100% 33%, 100% 100%, 50% 100%, 50% 66%, 0% 66%)',
+    float: 'left',
+    shapeMargin: '1.5rem',
+  },
+  'stairs-down-left': {
+    shapeOutside: 'polygon(50% 0%, 100% 0%, 100% 66%, 50% 66%, 50% 100%, 0% 100%, 0% 33%, 50% 33%)',
+    clipPath: 'polygon(50% 0%, 100% 0%, 100% 66%, 50% 66%, 50% 100%, 0% 100%, 0% 33%, 50% 33%)',
+    float: 'right',
+    shapeMargin: '1.5rem',
+  },
+
+  // Cross/Plus shape
+  'cross': {
+    shapeOutside: 'polygon(35% 0%, 65% 0%, 65% 35%, 100% 35%, 100% 65%, 65% 65%, 65% 100%, 35% 100%, 35% 65%, 0% 65%, 0% 35%, 35% 35%)',
+    clipPath: 'polygon(35% 0%, 65% 0%, 65% 35%, 100% 35%, 100% 65%, 65% 65%, 65% 100%, 35% 100%, 35% 65%, 0% 65%, 0% 35%, 35% 35%)',
+    float: 'left',
+    shapeMargin: '2rem',
+  },
+
+  // Puzzle piece shapes
+  'puzzle-right': {
+    shapeOutside: 'polygon(0% 0%, 75% 0%, 75% 25%, 85% 25%, 100% 40%, 85% 55%, 75% 55%, 75% 100%, 0% 100%)',
+    clipPath: 'polygon(0% 0%, 75% 0%, 75% 25%, 85% 25%, 100% 40%, 85% 55%, 75% 55%, 75% 100%, 0% 100%)',
+    float: 'left',
+    shapeMargin: '1.5rem',
+  },
+  'puzzle-left': {
+    shapeOutside: 'polygon(25% 0%, 100% 0%, 100% 100%, 25% 100%, 25% 55%, 15% 55%, 0% 40%, 15% 25%, 25% 25%)',
+    clipPath: 'polygon(25% 0%, 100% 0%, 100% 100%, 25% 100%, 25% 55%, 15% 55%, 0% 40%, 15% 25%, 25% 25%)',
+    float: 'right',
+    shapeMargin: '1.5rem',
+  },
+
+  // Banner/Ribbon shape
+  'ribbon': {
+    shapeOutside: 'polygon(10% 0%, 90% 0%, 100% 50%, 90% 100%, 10% 100%, 0% 50%)',
+    clipPath: 'polygon(10% 0%, 90% 0%, 100% 50%, 90% 100%, 10% 100%, 0% 50%)',
+    float: 'left',
+    shapeMargin: '1.5rem',
+  },
+
+  // Speech bubble shape
+  'speech-bubble': {
+    shapeOutside: 'polygon(0% 0%, 100% 0%, 100% 75%, 25% 75%, 15% 100%, 20% 75%, 0% 75%)',
+    clipPath: 'polygon(0% 0%, 100% 0%, 100% 75%, 25% 75%, 15% 100%, 20% 75%, 0% 75%)',
+    float: 'left',
+    shapeMargin: '1.5rem',
+  },
+
   // Rectangle variants
   'rectangle': {
     shapeOutside: 'inset(0)',
