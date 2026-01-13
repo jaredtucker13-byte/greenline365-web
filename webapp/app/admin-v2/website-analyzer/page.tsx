@@ -442,12 +442,16 @@ Generate a high-quality mockup specifically for this ${section.label} section on
     setCurrentSectionIndex(0);
     setAnalysisText('');
     setError(null);
-    localStorage.removeItem('websiteBuilder_project');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('websiteBuilder_project');
+    }
   };
 
   // Clear saved project
   const clearSavedProject = () => {
-    localStorage.removeItem('websiteBuilder_project');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('websiteBuilder_project');
+    }
     resetWorkflow();
   };
 
