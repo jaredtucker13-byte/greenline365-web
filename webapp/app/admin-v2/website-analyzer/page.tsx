@@ -646,12 +646,21 @@ Generate a high-quality mockup specifically for this ${section.label} section on
                             className="w-full rounded-xl border border-white/20"
                             data-testid="image-preview"
                           />
+                          {/* X button to remove image */}
+                          <button
+                            onClick={clearImage}
+                            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-red-500/80 hover:bg-red-500 text-white flex items-center justify-center transition shadow-lg"
+                            data-testid="remove-image-btn"
+                          >
+                            ✕
+                          </button>
+                          {/* Hover overlay to change image */}
                           <button
                             onClick={() => fileInputRef.current?.click()}
                             className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-medium rounded-xl"
                             data-testid="change-image-btn"
                           >
-                            Click to change image
+                            📷 Click to change image
                           </button>
                         </div>
                       ) : (
