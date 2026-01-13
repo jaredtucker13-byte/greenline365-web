@@ -1,15 +1,31 @@
 # GreenLine365 - Product Requirements Document
 
 ## Latest Update: January 13, 2026
-### Build Status: ✅ BUILD PASSING + AI WEBSITE BUILDER FIXED
+### Build Status: ✅ BUILD PASSING + MAGIC LINK AUTH ADDED
 
 ## Recent Changes (This Session - January 13, 2026)
+- ✅ **Magic Link Authentication Implemented** - No more Twilio SMS needed!
+  - Login page: Toggle between "✨ Magic Link" and "🔐 Password" (Magic Link default)
+  - Signup page: Same toggle, Magic Link auto-creates new accounts
+  - Uses Supabase built-in OTP via email (FREE with SendGrid)
+  - Success states show "Check Your Email!" message
 - ✅ **Fixed Website Crawler Integration** - Syntax error in `startAnalysis` function resolved
 - ✅ **Website Reverse-Engineering API** - `/api/crawl-website` fully functional
   - Extracts: title, description, favicon, colors, headlines, CTAs, navigation, images, structure
   - Auto-detects sections: Navigation, Hero, Features, Testimonials, Pricing, Footer
 - ✅ **Start Analysis Button** - Now enables correctly when either image OR extracted website data is available
 - ✅ Build passes successfully (`yarn build`)
+
+## Authentication System
+**Current Options:**
+1. **Magic Link (Recommended)** - One-click email login, no password needed
+2. **Google OAuth** - "Continue with Google" button
+3. **Password** - Traditional email/password (toggle available)
+
+**Files Modified:**
+- `/lib/supabase/client.ts` - Added `signInWithMagicLink()` function
+- `/app/login/page.tsx` - Added Magic Link UI with toggle
+- `/app/signup/page.tsx` - Added Magic Link UI with toggle
 
 ## AI Website Builder Feature (`/admin-v2/website-analyzer`)
 **Status: WORKING (requires deployment)**
