@@ -435,17 +435,6 @@ ${extractedWebsite.images.hero ? `- Hero: ${extractedWebsite.images.hero}` : ''}
       }
 
       setAnalysisText(combinedAnalysis);
-      });
-
-      const data = await response.json();
-
-      if (!data.success) {
-        setError(data.error || 'Analysis failed');
-        setLoading(false);
-        return;
-      }
-
-      setAnalysisText(data.analysisText);
       
       // Create project
       const newProject: Project = {
