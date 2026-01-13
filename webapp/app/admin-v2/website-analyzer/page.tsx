@@ -136,6 +136,7 @@ export default function WebsiteAnalyzerPage() {
     if (typeof window === 'undefined') return;
     const saved = localStorage.getItem('websiteBuilder_project');
     if (saved) {
+      setHasSavedProject(true);
       try {
         const data = JSON.parse(saved);
         if (data.project) setProject(data.project);
