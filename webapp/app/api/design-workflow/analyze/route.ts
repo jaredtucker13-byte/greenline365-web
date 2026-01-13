@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenAI } from '@google/genai';
 
 interface AnalyzeRequest {
   mode: 'analyze' | 'scratch';
@@ -12,7 +11,7 @@ interface AnalyzeRequest {
   targetAudience?: string;
 }
 
-const EMERGENT_KEY = process.env.EMERGENT_LLM_KEY || 'sk-emergent-c87DeA8638fD64f7d3';
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 
 // Analysis prompts for different types
 const ANALYSIS_PROMPTS: Record<string, string> = {
@@ -26,45 +25,100 @@ const ANALYSIS_PROMPTS: Record<string, string> = {
   visual: 'Analyze visual design: colors (HEX codes), typography, spacing, layout balance.',
 };
 
-async function analyzeWithGemini(imageBase64: string, prompt: string, modelId: string): Promise<string> {
-  const genAI = new GoogleGenAI({ apiKey: EMERGENT_KEY });
-  
-  // Use the models.generateContent method directly
-  const response = await genAI.models.generateContent({
-    model: modelId,
-    contents: [
-      {
-        role: 'user',
-        parts: [
-          { text: `You are an expert UI/UX designer and web development consultant. Analyze websites thoroughly and provide actionable insights.\n\n${prompt}` },
-          {
-            inlineData: {
-              mimeType: 'image/png',
-              data: imageBase64,
+// OpenRouter model mapping
+const MODEL_MAP: Record<string, string> = {
+  'gemini-3-pro': 'google/gemini-2.0-flash-exp:free', // Free tier Gemini with vision
+  'gemini-2.0-pro': 'google/gemini-2.0-flash-exp:free',
+  'gpt-4o': 'openai/gpt-4o', // GPT-4o with vision
+};
+
+async function analyzeWithOpenRouter(
+  imageBase64: string, 
+  prompt: string, 
+  modelId: string
+): Promise<string> {
+  if (!OPENROUTER_API_KEY) {
+    throw new Error('OpenRouter API key not configured');
+  }
+
+  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+      'Content-Type': 'application/json',
+      'HTTP-Referer': 'https://greenline365.com',
+      'X-Title': 'GreenLine365 Website Builder',
+    },
+    body: JSON.stringify({
+      model: modelId,
+      messages: [
+        {
+          role: 'system',
+          content: 'You are an expert UI/UX designer and web development consultant. Analyze websites thoroughly and provide actionable insights.',
+        },
+        {
+          role: 'user',
+          content: [
+            { type: 'text', text: prompt },
+            {
+              type: 'image_url',
+              image_url: {
+                url: `data:image/png;base64,${imageBase64}`,
+              },
             },
-          },
-        ],
-      },
-    ],
+          ],
+        },
+      ],
+      max_tokens: 4096,
+    }),
   });
 
-  return response.text || 'No analysis generated';
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    console.error('OpenRouter error:', errorData);
+    throw new Error(errorData.error?.message || `OpenRouter API error: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data.choices?.[0]?.message?.content || 'No analysis generated';
 }
 
-async function generateDesignWithGemini(prompt: string): Promise<string> {
-  const genAI = new GoogleGenAI({ apiKey: EMERGENT_KEY });
-  
-  const response = await genAI.models.generateContent({
-    model: 'gemini-2.5-pro',
-    contents: [
-      {
-        role: 'user',
-        parts: [{ text: `You are a world-class web designer who creates stunning, conversion-optimized websites.\n\n${prompt}` }],
-      },
-    ],
+async function generateDesignWithOpenRouter(prompt: string): Promise<string> {
+  if (!OPENROUTER_API_KEY) {
+    throw new Error('OpenRouter API key not configured');
+  }
+
+  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+      'Content-Type': 'application/json',
+      'HTTP-Referer': 'https://greenline365.com',
+      'X-Title': 'GreenLine365 Website Builder',
+    },
+    body: JSON.stringify({
+      model: 'anthropic/claude-3.5-sonnet', // Claude for text-only design generation
+      messages: [
+        {
+          role: 'system',
+          content: 'You are a world-class web designer who creates stunning, conversion-optimized websites.',
+        },
+        {
+          role: 'user',
+          content: prompt,
+        },
+      ],
+      max_tokens: 4096,
+    }),
   });
 
-  return response.text || 'No design generated';
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error?.message || `OpenRouter API error: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data.choices?.[0]?.message?.content || 'No design generated';
 }
 
 export async function POST(request: NextRequest) {
@@ -83,17 +137,10 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Screenshot required' }, { status: 400 });
       }
 
-      // Map UI model names to actual Gemini model IDs
-      const modelMap: Record<string, string> = {
-        'gemini-3-pro': 'gemini-2.5-pro',
-        'gemini-2.0-pro': 'gemini-2.5-pro',
-        'gpt-4o': 'gemini-2.5-pro', // Fallback to Gemini for now
-      };
-
-      const modelId = modelMap[visionModel] || 'gemini-2.5-pro';
+      const modelId = MODEL_MAP[visionModel] || MODEL_MAP['gpt-4o'];
       const prompt = ANALYSIS_PROMPTS[analysisType] || ANALYSIS_PROMPTS.full;
 
-      const analysisText = await analyzeWithGemini(imageBase64, prompt, modelId);
+      const analysisText = await analyzeWithOpenRouter(imageBase64, prompt, modelId);
 
       return NextResponse.json({
         success: true,
@@ -124,7 +171,7 @@ Please provide:
 5. KEY SECTIONS - what to include and why
 6. CONVERSION ELEMENTS - CTAs, forms, trust indicators`;
 
-      const analysisText = await generateDesignWithGemini(designPrompt);
+      const analysisText = await generateDesignWithOpenRouter(designPrompt);
 
       return NextResponse.json({
         success: true,
