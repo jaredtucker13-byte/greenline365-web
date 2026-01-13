@@ -768,7 +768,7 @@ export default function IncidentsPage() {
 
                 {/* Action Buttons */}
                 <div className="flex flex-wrap gap-3">
-                  {selectedIncident.status === 'draft' && selectedIncident.incident_images?.length > 0 && (
+                  {selectedIncident.status === 'draft' && (selectedIncident.incident_images?.length ?? 0) > 0 && (
                     <button
                       onClick={generateReport}
                       disabled={generating}
