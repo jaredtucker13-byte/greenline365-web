@@ -254,6 +254,39 @@ export default function IncidentsPage() {
     }
   };
 
+  const generatePdf = async () => {
+    if (!selectedIncident) return;
+    
+    setGeneratingPdf(true);
+    try {
+      const res = await fetch('/api/incidents/generate-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ incident_id: selectedIncident.id, download: true })
+      });
+      
+      if (res.ok) {
+        // Download the PDF
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `incident-report-${selectedIncident.id.substring(0, 8).toUpperCase()}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        a.remove();
+      } else {
+        alert('Failed to generate PDF');
+      }
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Error generating PDF');
+    } finally {
+      setGeneratingPdf(false);
+    }
+  };
+
   const deleteIncident = async (id: string) => {
     if (!confirm('Are you sure you want to delete this incident?')) return;
     
