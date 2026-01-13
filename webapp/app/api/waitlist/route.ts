@@ -128,8 +128,7 @@ export async function POST(request: NextRequest) {
       console.error('[Waitlist] Email send failed:', emailResult.error);
       return NextResponse.json(
         { 
-          error: 'Failed to send verification email. Please try again.',
-          details: emailResult.error 
+          error: `Failed to send verification email: ${emailResult.error}`,
         },
         { status: 500 }
       );
