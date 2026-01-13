@@ -19,6 +19,7 @@
     "@gsap/react": "^2.1.2",
     "@headlessui/react": "^2.2.9",
     "@hookform/resolvers": "^5.2.2",
+    "@react-pdf/renderer": "^4.3.2",
     "@react-spring/web": "^10.0.3",
     "@sendgrid/mail": "^8.1.6",
     "@supabase/ssr": "^0.8.0",
