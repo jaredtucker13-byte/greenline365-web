@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 /**
- * Generate Mockup API
- * Uses KIE.ai Nano Banana Pro for high-quality website mockup generation
+ * Generate Mockup API - Context-Aware
+ * Uses KIE.ai Nano Banana Pro for high-quality mockup generation
+ * 
+ * The mockup is generated based on:
+ * 1. The AI analysis of the original image (what type of page it is)
+ * 2. User-specified generation mode (recreate, redesign, or landing page)
+ * 3. Optional ingredients (brand colors, style preferences, etc.)
  * 
  * Pricing (as of Jan 2026):
  * - 1K/2K Resolution: 18 credits (~$0.09 per image)
@@ -10,10 +15,22 @@ import { NextRequest, NextResponse } from 'next/server';
  */
 
 interface MockupRequest {
-  designSpec: any;
+  designSpec?: any;
   analysisText: string;
+  mode?: 'recreate' | 'redesign' | 'landing_page' | 'custom';
+  pageType?: string; // e.g., 'calendar', 'dashboard', 'settings', 'landing', etc.
   aspectRatio?: string;
   resolution?: '1K' | '2K' | '4K';
+  // Ingredients for customization
+  ingredients?: {
+    brandColors?: string[];
+    logo?: string;
+    heroText?: string;
+    sections?: string[];
+    targetAudience?: string;
+    style?: string;
+  };
+  customPrompt?: string;
 }
 
 const KIE_API_KEY = process.env.KIE_API_KEY || '1f1d2d3eed99f294339cb1f17b5bc743';
@@ -44,7 +61,6 @@ async function pollForResult(taskId: string, maxAttempts = 60): Promise<{ imageU
   for (let i = 0; i < maxAttempts; i++) {
     await new Promise(resolve => setTimeout(resolve, 2000));
     
-    // Use GET method with taskId as query parameter
     const statusResponse = await fetch(`${KIE_QUERY_STATUS_URL}?taskId=${taskId}`, {
       method: 'GET',
       headers: {
@@ -74,33 +90,189 @@ async function pollForResult(taskId: string, maxAttempts = 60): Promise<{ imageU
   throw new Error('Mockup generation timed out');
 }
 
+/**
+ * Detect the type of page from the analysis text
+ */
+function detectPageType(analysisText: string): string {
+  const text = analysisText.toLowerCase();
+  
+  // Check for specific page types
+  if (text.includes('calendar') || text.includes('schedule') || text.includes('event')) {
+    return 'calendar';
+  }
+  if (text.includes('dashboard') || text.includes('analytics') || text.includes('metrics') || text.includes('chart')) {
+    return 'dashboard';
+  }
+  if (text.includes('settings') || text.includes('preferences') || text.includes('configuration')) {
+    return 'settings';
+  }
+  if (text.includes('profile') || text.includes('account') || text.includes('user info')) {
+    return 'profile';
+  }
+  if (text.includes('checkout') || text.includes('payment') || text.includes('cart')) {
+    return 'checkout';
+  }
+  if (text.includes('login') || text.includes('sign in') || text.includes('authentication')) {
+    return 'login';
+  }
+  if (text.includes('blog') || text.includes('article') || text.includes('post')) {
+    return 'blog';
+  }
+  if (text.includes('pricing') || text.includes('plan') || text.includes('subscription')) {
+    return 'pricing';
+  }
+  if (text.includes('contact') || text.includes('form') || text.includes('inquiry')) {
+    return 'contact';
+  }
+  if (text.includes('gallery') || text.includes('portfolio') || text.includes('showcase')) {
+    return 'gallery';
+  }
+  if (text.includes('about') || text.includes('team') || text.includes('company')) {
+    return 'about';
+  }
+  if (text.includes('landing') || text.includes('hero') || text.includes('cta') || text.includes('conversion')) {
+    return 'landing';
+  }
+  
+  // Default to the detected content
+  return 'page';
+}
+
+/**
+ * Generate a context-aware prompt based on the page type and mode
+ */
+function generatePrompt(
+  pageType: string,
+  mode: string,
+  analysisText: string,
+  ingredients?: MockupRequest['ingredients'],
+  aspectRatio?: string
+): string {
+  const styleNotes = ingredients?.style || 'modern, clean, professional';
+  const colorNotes = ingredients?.brandColors?.length 
+    ? `Brand colors: ${ingredients.brandColors.join(', ')}` 
+    : 'Professional color scheme';
+  const audienceNotes = ingredients?.targetAudience || 'modern business users';
+
+  // Base prompt structure
+  let prompt = '';
+
+  if (mode === 'recreate') {
+    // Recreate the exact page type with improved design
+    prompt = `Professional ${pageType} page mockup. Recreate and improve upon this design:
+
+${analysisText.slice(0, 500)}
+
+Requirements:
+- Maintain the same page type: ${pageType}
+- Keep the core functionality and layout structure
+- Apply modern design improvements
+- ${colorNotes}
+- Style: ${styleNotes}
+- Target audience: ${audienceNotes}
+- ${aspectRatio ? `Aspect ratio: ${aspectRatio}` : 'Desktop view'}
+- High-quality photorealistic UI render
+- Clean typography with proper hierarchy`;
+
+  } else if (mode === 'redesign') {
+    // Redesign with more creative freedom but same page type
+    prompt = `Completely redesigned ${pageType} page mockup. Transform this design:
+
+Key insights from original:
+${analysisText.slice(0, 400)}
+
+Requirements:
+- Same page type (${pageType}) but fresh, innovative design
+- Modern 2025 design trends
+- ${colorNotes}
+- Style: ${styleNotes}
+- Target audience: ${audienceNotes}
+- ${aspectRatio ? `Aspect ratio: ${aspectRatio}` : 'Desktop view'}
+- High-quality photorealistic UI render
+- Bold, creative approach while maintaining usability`;
+
+  } else if (mode === 'landing_page') {
+    // Convert to landing page (the original behavior)
+    prompt = `Professional website landing page mockup for a modern business.
+
+Inspired by analysis:
+${analysisText.slice(0, 300)}
+
+Requirements:
+- Bold headline text prominently displayed
+- Clear value proposition subheadline
+- Prominent call-to-action button
+- ${colorNotes}
+- Modern gradient or solid background
+- ${aspectRatio ? `Aspect ratio: ${aspectRatio}` : 'Desktop view, 16:9'}
+- High-quality photorealistic render
+- Style: ${styleNotes}
+- Conversion-optimized layout`;
+
+  } else {
+    // Custom or default - intelligent recreation
+    prompt = `Professional ${pageType} UI mockup based on this analysis:
+
+${analysisText.slice(0, 500)}
+
+Requirements:
+- Accurately represent a ${pageType} interface
+- Modern, polished design
+- ${colorNotes}
+- Style: ${styleNotes}
+- ${aspectRatio ? `Aspect ratio: ${aspectRatio}` : 'Desktop view'}
+- High-quality photorealistic UI render
+- Clean, professional appearance`;
+  }
+
+  // Add sections if specified
+  if (ingredients?.sections?.length) {
+    prompt += `\n\nInclude these sections: ${ingredients.sections.join(', ')}`;
+  }
+
+  // Add hero text if specified
+  if (ingredients?.heroText) {
+    prompt += `\n\nMain headline: "${ingredients.heroText}"`;
+  }
+
+  return prompt;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body: MockupRequest = await request.json();
-    const { analysisText, aspectRatio = '16:9', resolution = '2K' } = body;
+    const { 
+      analysisText, 
+      mode = 'recreate',  // Default to recreate (context-aware)
+      pageType: userPageType,
+      aspectRatio = '16:9', 
+      resolution = '2K',
+      ingredients,
+      customPrompt
+    } = body;
 
-    if (!analysisText) {
-      return NextResponse.json({ error: 'Analysis text required' }, { status: 400 });
+    if (!analysisText && !customPrompt) {
+      return NextResponse.json({ error: 'Analysis text or custom prompt required' }, { status: 400 });
     }
 
     if (!KIE_API_KEY) {
       return NextResponse.json({ error: 'KIE API key not configured' }, { status: 500 });
     }
 
-    // Create a detailed prompt for mockup generation
-    const imagePrompt = `Professional website hero section mockup for a modern business landing page. 
-Clean minimal design with:
-- Bold headline text prominently displayed
-- Clear subheadline explaining the value proposition
-- Prominent call-to-action button with contrasting color
-- Professional color scheme (dark theme preferred)
-- Modern gradient or solid background
-- Desktop view, ${aspectRatio} aspect ratio
-- High-quality photorealistic render
-- Clean typography with good hierarchy
-Style: Modern SaaS landing page, professional, conversion-optimized`;
+    // Detect page type from analysis if not specified
+    const pageType = userPageType || detectPageType(analysisText || '');
+    
+    // Generate the appropriate prompt
+    const imagePrompt = customPrompt || generatePrompt(
+      pageType,
+      mode,
+      analysisText,
+      ingredients,
+      aspectRatio
+    );
 
-    console.log('[Generate Mockup] Creating task with KIE.ai Nano Banana Pro');
+    console.log(`[Generate Mockup] Mode: ${mode}, Page Type: ${pageType}`);
+    console.log('[Generate Mockup] Prompt:', imagePrompt.slice(0, 200) + '...');
 
     // Create task with KIE.ai Nano Banana Pro
     const createTaskResponse = await fetch(KIE_CREATE_TASK_URL, {
@@ -179,6 +351,9 @@ Style: Modern SaaS landing page, professional, conversion-optimized`;
       costTime: result.costTime,
       estimatedCost,
       resolution,
+      pageType,
+      mode,
+      promptUsed: imagePrompt.slice(0, 200) + '...',
     });
 
   } catch (error: any) {
