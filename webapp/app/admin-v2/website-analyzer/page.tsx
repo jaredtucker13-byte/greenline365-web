@@ -160,6 +160,9 @@ export default function WebsiteAnalyzerPage() {
         body: JSON.stringify({
           designSpec: data.designSpec,
           analysisText: data.analysisText,
+          mode: mode === 'analyze' ? generationMode : 'landing_page',
+          aspectRatio: '16:9',
+          resolution: '2K',
         }),
       });
 
