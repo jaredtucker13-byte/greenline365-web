@@ -1,12 +1,94 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { 
-  Upload, FileImage, AlertTriangle, CheckCircle, XCircle, 
-  Send, Eye, Clock, Trash2, Plus, Loader2, Zap, FileText,
-  Camera, Shield, Mail, Download
-} from 'lucide-react';
+import { supabase } from '@/lib/supabase/client';
+
+// Inline SVG Icons
+const Icons = {
+  Upload: () => (
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+    </svg>
+  ),
+  FileImage: () => (
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+    </svg>
+  ),
+  AlertTriangle: () => (
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+    </svg>
+  ),
+  CheckCircle: () => (
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  ),
+  XCircle: () => (
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  ),
+  Eye: () => (
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+    </svg>
+  ),
+  Clock: () => (
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  ),
+  Trash2: () => (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+    </svg>
+  ),
+  Plus: () => (
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+    </svg>
+  ),
+  Loader2: () => (
+    <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+    </svg>
+  ),
+  Zap: () => (
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+    </svg>
+  ),
+  FileText: () => (
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    </svg>
+  ),
+  Camera: () => (
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+    </svg>
+  ),
+  Shield: () => (
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+    </svg>
+  ),
+  Mail: () => (
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+    </svg>
+  ),
+  Download: () => (
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+    </svg>
+  ),
+};
 
 interface Incident {
   id: string;
@@ -72,8 +154,6 @@ export default function IncidentsPage() {
     property_address: '',
     severity: 'medium'
   });
-
-  const supabase = createClientComponentClient();
 
   const fetchIncidents = useCallback(async () => {
     try {
@@ -266,7 +346,6 @@ export default function IncidentsPage() {
       });
       
       if (res.ok) {
-        // Download the PDF
         const blob = await res.blob();
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -310,7 +389,7 @@ export default function IncidentsPage() {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-3">
-              <Shield className="text-emerald-400" />
+              <span className="text-emerald-400"><Icons.Shield /></span>
               Liability Documentation
             </h1>
             <p className="text-gray-400 mt-1">
@@ -321,7 +400,7 @@ export default function IncidentsPage() {
             onClick={() => setShowNewForm(true)}
             className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 rounded-lg transition-colors"
           >
-            <Plus size={20} />
+            <Icons.Plus />
             New Incident
           </button>
         </div>
@@ -333,12 +412,12 @@ export default function IncidentsPage() {
             
             {loading ? (
               <div className="text-center py-8">
-                <Loader2 className="animate-spin mx-auto mb-2" />
-                <p className="text-gray-400">Loading...</p>
+                <Icons.Loader2 />
+                <p className="text-gray-400 mt-2">Loading...</p>
               </div>
             ) : incidents.length === 0 ? (
               <div className="text-center py-8 bg-white/5 rounded-lg border border-white/10">
-                <FileText className="mx-auto mb-2 text-gray-500" size={40} />
+                <div className="flex justify-center mb-2 text-gray-500"><Icons.FileText /></div>
                 <p className="text-gray-400">No incidents yet</p>
                 <button
                   onClick={() => setShowNewForm(true)}
@@ -364,7 +443,7 @@ export default function IncidentsPage() {
                       onClick={(e) => { e.stopPropagation(); deleteIncident(incident.id); }}
                       className="text-gray-500 hover:text-red-400 p-1"
                     >
-                      <Trash2 size={16} />
+                      <Icons.Trash2 />
                     </button>
                   </div>
                   
@@ -479,7 +558,7 @@ export default function IncidentsPage() {
                     disabled={creating || !newIncident.title}
                     className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 rounded-lg transition-colors"
                   >
-                    {creating ? <Loader2 className="animate-spin" size={18} /> : <Plus size={18} />}
+                    {creating ? <Icons.Loader2 /> : <Icons.Plus />}
                     Create Incident
                   </button>
                   <button
@@ -520,12 +599,12 @@ export default function IncidentsPage() {
                     <div className={`p-3 rounded-lg ${selectedIncident.signature_type === 'acknowledged' ? 'bg-green-500/10 border border-green-500/30' : 'bg-red-500/10 border border-red-500/30'}`}>
                       {selectedIncident.signature_type === 'acknowledged' ? (
                         <div className="flex items-center gap-2 text-green-400">
-                          <CheckCircle size={20} />
+                          <Icons.CheckCircle />
                           <span>Acknowledged on {new Date(selectedIncident.signed_at).toLocaleString()}</span>
                         </div>
                       ) : (
                         <div className="flex items-center gap-2 text-red-400">
-                          <XCircle size={20} />
+                          <Icons.XCircle />
                           <span>Refused on {new Date(selectedIncident.signed_at).toLocaleString()}</span>
                         </div>
                       )}
@@ -537,12 +616,12 @@ export default function IncidentsPage() {
                 <div className="bg-white/5 rounded-lg border border-white/10 p-6">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg font-semibold flex items-center gap-2">
-                      <Camera size={20} />
+                      <Icons.Camera />
                       Evidence Images
                     </h3>
                     <div className="flex gap-2">
                       <label className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded-lg cursor-pointer transition-colors">
-                        <Upload size={18} />
+                        <Icons.Upload />
                         Upload Images
                         <input
                           type="file"
@@ -558,7 +637,7 @@ export default function IncidentsPage() {
                           disabled={analyzing}
                           className="flex items-center gap-2 px-4 py-2 bg-purple-500 hover:bg-purple-600 disabled:opacity-50 rounded-lg transition-colors"
                         >
-                          {analyzing ? <Loader2 className="animate-spin" size={18} /> : <Zap size={18} />}
+                          {analyzing ? <Icons.Loader2 /> : <Icons.Zap />}
                           Analyze All
                         </button>
                       )}
@@ -567,7 +646,7 @@ export default function IncidentsPage() {
                   
                   {uploadingImages && (
                     <div className="flex items-center gap-2 text-blue-400 mb-4">
-                      <Loader2 className="animate-spin" size={18} />
+                      <Icons.Loader2 />
                       Uploading images...
                     </div>
                   )}
@@ -614,7 +693,7 @@ export default function IncidentsPage() {
                     </div>
                   ) : (
                     <div className="text-center py-8 border-2 border-dashed border-white/10 rounded-lg">
-                      <FileImage className="mx-auto mb-2 text-gray-500" size={40} />
+                      <div className="flex justify-center mb-2 text-gray-500"><Icons.FileImage /></div>
                       <p className="text-gray-400">No images uploaded yet</p>
                       <p className="text-sm text-gray-500">Upload photos to analyze for the report</p>
                     </div>
@@ -625,7 +704,7 @@ export default function IncidentsPage() {
                 {selectedIncident.ai_analysis && Object.keys(selectedIncident.ai_analysis).length > 0 && (
                   <div className="bg-white/5 rounded-lg border border-white/10 p-6">
                     <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
-                      <AlertTriangle className="text-yellow-400" size={20} />
+                      <span className="text-yellow-400"><Icons.AlertTriangle /></span>
                       AI Analysis Summary
                     </h3>
                     <div className="space-y-3">
@@ -649,7 +728,7 @@ export default function IncidentsPage() {
                 {selectedIncident.report_sections && Object.keys(selectedIncident.report_sections).length > 0 && (
                   <div className="bg-white/5 rounded-lg border border-white/10 p-6">
                     <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
-                      <FileText size={20} />
+                      <Icons.FileText />
                       Generated Report
                     </h3>
                     
@@ -695,7 +774,7 @@ export default function IncidentsPage() {
                       disabled={generating}
                       className="flex items-center gap-2 px-4 py-2 bg-purple-500 hover:bg-purple-600 disabled:opacity-50 rounded-lg transition-colors"
                     >
-                      {generating ? <Loader2 className="animate-spin" size={18} /> : <FileText size={18} />}
+                      {generating ? <Icons.Loader2 /> : <Icons.FileText />}
                       Generate Report
                     </button>
                   )}
@@ -707,26 +786,26 @@ export default function IncidentsPage() {
                       disabled={sending}
                       className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 rounded-lg transition-colors"
                     >
-                      {sending ? <Loader2 className="animate-spin" size={18} /> : <Mail size={18} />}
+                      {sending ? <Icons.Loader2 /> : <Icons.Mail />}
                       Send for Signature
                     </button>
                   )}
                   
-                  {/* PDF Download Button - always show if report exists */}
+                  {/* PDF Download Button */}
                   {selectedIncident.report_sections && Object.keys(selectedIncident.report_sections).length > 0 && (
                     <button
                       onClick={generatePdf}
                       disabled={generatingPdf}
                       className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:opacity-50 rounded-lg transition-colors"
                     >
-                      {generatingPdf ? <Loader2 className="animate-spin" size={18} /> : <Download size={18} />}
+                      {generatingPdf ? <Icons.Loader2 /> : <Icons.Download />}
                       Download PDF
                     </button>
                   )}
                   
                   {selectedIncident.email_sent_at && !selectedIncident.signed_at && (
                     <div className="flex items-center gap-2 text-purple-400 px-4 py-2 bg-purple-500/10 rounded-lg">
-                      <Clock size={18} />
+                      <Icons.Clock />
                       Awaiting signature (sent {new Date(selectedIncident.email_sent_at).toLocaleDateString()})
                     </div>
                   )}
@@ -735,21 +814,21 @@ export default function IncidentsPage() {
                     onClick={() => window.open(`/sign/${selectedIncident.signature_token}`, '_blank')}
                     className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
                   >
-                    <Eye size={18} />
+                    <Icons.Eye />
                     Preview Signing Page
                   </button>
                 </div>
               </div>
             ) : (
               <div className="text-center py-20 bg-white/5 rounded-lg border border-white/10">
-                <Shield className="mx-auto mb-4 text-gray-500" size={60} />
+                <div className="flex justify-center mb-4 text-gray-500"><Icons.Shield /></div>
                 <h3 className="text-xl font-semibold text-gray-300 mb-2">Select an Incident</h3>
                 <p className="text-gray-500 mb-4">Choose an incident from the list or create a new one</p>
                 <button
                   onClick={() => setShowNewForm(true)}
                   className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 rounded-lg transition-colors"
                 >
-                  <Plus size={18} />
+                  <Icons.Plus />
                   Create New Incident
                 </button>
               </div>
