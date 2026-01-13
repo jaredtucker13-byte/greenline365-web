@@ -1,20 +1,60 @@
 # GreenLine365 - Product Requirements Document
 
-## Latest Update: January 2026
-### Build Status: ✅ PASSING
+## Latest Update: December 2025
+### Build Status: ⚠️ MIGRATIONS PENDING
 
-## Recent Changes (This Session)
-- ✅ Fixed build errors (unescaped apostrophe, TypeScript type mismatch)
-- ✅ Added pre-commit build hook via Husky
-- ✅ Integrated Memory Bucket System into Chat API
-- ✅ Created Brand Voice settings page (`/admin-v2/brand-voice`)
-- ✅ Created Knowledge Base page (`/admin-v2/knowledge`)
-- ✅ Created Knowledge API (`/api/knowledge`)
-- ✅ **HONESTY AUDIT** - Cleaned false claims from chat prompts:
-  - Removed social integration claims (not built)
-  - Removed "Connect my accounts" action (not built)
-  - Added "coming soon" transparency for unbuilt features
-  - Updated quick actions to reflect actual capabilities
+## Recent Changes (This Session - December 2025)
+- ✅ Fixed `017_security_fixes.sql` - `v_active_conversations` view was referencing non-existent `conversations` table
+- ✅ Fixed `018_audit_logging.sql` - Made triggers conditional, fixed `super_admins` RLS policy
+- ✅ Created `CONSOLIDATED_MIGRATION_FIX.sql` - Single idempotent script for Supabase SQL Editor
+
+## Migration Status
+- **015_social_and_analytics.sql** - Needs to run
+- **016_tenant_crm.sql** - Needs to run
+- **017_security_fixes.sql** - FIXED, needs to run
+- **018_audit_logging.sql** - FIXED, needs to run
+
+Run `CONSOLIDATED_MIGRATION_FIX.sql` in Supabase SQL Editor to apply all at once.
+
+## Original Problem Statement
+Build a comprehensive multi-tenant Business Operating System for local businesses called "GreenLine365".
+
+## Core Architecture: Multi-Tenant System
+
+### The 4-Layer Memory System
+Each tenant has isolated data using RLS with `tenant_id`/`user_id` columns:
+
+1. **Layer 1: Tenant Identity (Persona)**
+   - Table: `memory_core_profiles`
+   - Content: Business name, brand voice, personality, biography
+   - UI: `/admin-v2/brand-voice`
+
+2. **Layer 2: Tenant Warehouse (Knowledge Base)**
+   - Table: `memory_knowledge_chunks` with pgvector
+   - Content: Services, pricing, FAQs, processes
+   - UI: `/admin-v2/knowledge`
+
+3. **Layer 3: Tenant Journal (Track Record)**
+   - Table: `memory_event_journal`
+   - Content: Published blogs, captured leads, engagement metrics
+   - API: `/api/analytics`
+
+4. **Layer 4: Live Buffer (Active Task)**
+   - Table: `memory_context_buffer`
+   - Content: Current session/conversation context
+   - TTL: 24 hours
+
+### Tenant CRM System (NEW)
+- **Tables:** `crm_leads`, `crm_customers`, `crm_email_events`, `crm_revenue`
+- **UI:** `/admin-v2/crm` (placeholder)
+- **API:** `/api/crm`
+- **Purpose:** Each tenant tracks their own customers, leads, revenue, ROI
+
+### SOC2 Audit Logging (NEW)
+- **Table:** `audit_logs` (append-only, 7-year retention)
+- **UI:** `/admin-v2/audit`
+- **API:** `/api/audit`
+- **Triggers:** Auto-log changes to CRM, Knowledge, Blog, Social tables
 
 ## What's Actually Working (Verified)
 - ✅ Blog Polish tool (AI writing + image generation)
@@ -25,231 +65,73 @@
 - ✅ Brand Voice settings (Layer 1)
 - ✅ Knowledge Base (Layer 2)
 - ✅ Memory-enhanced chat (all 4 layers integrated)
-- ✅ Event Logger service (auto-tracks activities)
-- ✅ Analytics API (real data aggregation)
-- ✅ Analytics Dashboard (real metrics, patterns, insights)
-- ✅ Knowledge Import API (CSV/JSON bulk upload)
-- ✅ Onboarding Wizard (guided + long-form options)
-- ✅ Social OAuth framework (user-provided credentials)
 
-## New APIs & Pages Built This Session
-- `/api/analytics` - Real data analytics with pattern discovery
-- `/api/knowledge/import` - Bulk import from CSV/JSON
-- `/api/social` - Social media connection framework
-- `/onboarding` - Dual-mode onboarding wizard
-- `/admin-v2/analytics` - Real data analytics dashboard
-- `/admin-v2/knowledge` - Knowledge base management
-- `/admin-v2/brand-voice` - Brand voice settings
-- `/lib/event-logger.ts` - Auto-event tracking service
-
-## Database Migrations Created
-- `014_memory_bucket_system.sql` - 4-layer memory system
-- `015_social_and_analytics.sql` - Social connections + analytics events
-
-## What's NOT Built Yet (Coming Soon)
-- ❌ Social media posting (OAuth framework ready, posting not implemented)
-- ❌ Vector search for knowledge (pgvector setup pending)
-- ❌ Human handoff escalation
-
-## Original Problem Statement
-Build a comprehensive marketing OS for local businesses called "GreenLine365".
-
-## What's Been Implemented
-
-### January 2026 - Session 10 (Living Canvas Phase 1 + Memory Bucket System)
-- ✅ **Living Canvas Component Library**: Complete component system for dynamic, templated layouts
-- ✅ **CSS Shapes System**: 25+ shape presets (L-shapes, circles, hexagons, organic blobs) for text wrapping
-- ✅ **Color Extraction Engine**: Auto-extracts palette from images, applies as CSS custom properties
-- ✅ **Two Visual Modes**: Organic (borderless with atmospheric glow) and Framed (photorealistic frames with shadows)
-- ✅ **Template Renderer**: Renders 6 template types from database structure
-- ✅ **System Templates**: Winding Path (S-Flow), Gallery Grid, Drop Cap, Hero Feature, Circular Focus, Hexagonal Grid
-- ✅ **Database Schema**: `living_canvas_templates`, `living_canvas_frames`, `living_canvas_compositions` tables (FIXED migration order)
-- ✅ **Living Canvas Page**: `/admin-v2/living-canvas` - Template editor with live preview
-- ✅ **Dynamic Theming**: Backgrounds, accents, text colors all derived from primary image
-- ✅ **Frame Assets Table**: Stores photorealistic frame definitions (wood, metal, museum, shadow-box, minimal)
-- ✅ **"Visual Director" Agent**: Upgraded analyzer to know ALL Living Canvas options (shapes, modes, templates, frames)
-- ✅ **AI Gold Rush Memory**: Created `/app/memory/THE_AI_GOLD_RUSH.md` documenting this historical moment
-
-**Dynamic Memory Bucket System** (The "Brain" of GreenLine365):
-- ✅ **Layer 1: Core** - `memory_core_profiles` table - User identity, brand voice, personality, biography
-- ✅ **Layer 2: Warehouse** - `memory_knowledge_chunks` table - RAG knowledge base with pgvector for semantic search
-- ✅ **Layer 3: Journal** - `memory_event_journal` table - Timeline of all events (blogs, leads, SMS, images)
-- ✅ **Layer 4: Buffer** - `memory_context_buffer` table - Real-time conversation/task context (24hr TTL)
-- ✅ **Priority Fetch Order**: Buffer → Core → Warehouse → Journal (prevents hallucinations)
-- ✅ **TypeScript Service**: `/app/webapp/lib/memory-bucket-service.ts` - Complete API for all 4 layers
-- ✅ **Architecture Doc**: `/app/memory/DYNAMIC_MEMORY_BUCKET_SYSTEM.md` - Full system documentation
-
-### January 2026 - Session 9 (Advanced Image Generation & Preview)
-- ✅ **Enriched Cinematic Prompts**: Backend now generates detailed artistic prompts with lighting, composition, camera angles - user sees clean description, API gets full artistic direction
-- ✅ **Chart Detection → GPT-5.2**: System detects when content needs charts/infographics and routes to GPT-5.2 via OpenRouter instead of Nano Banana
-- ✅ **Retry Logic**: If one image fails in a batch, discards all and retries (up to 3 attempts) - ensures both images always succeed together
-- ✅ **Multiple Aspect Ratios**: Support for 16:9 (landscape), 9:16 (portrait), 1:1 (square), 21:9 (cinematic) - all at 4K resolution
-- ✅ **Image Preview Modal**: Click any image to view in full-screen lightbox with zoom, download, and apply options
-- ✅ **Layout Options When Applying**: Choose Center, Float Left (text wrap), Float Right (text wrap), or Full Width when adding images to blog
-- ✅ **Custom Image Chat**: Dedicated prompt box to create custom images - describe any image and generate with Nano Banana
-- ✅ **Enhanced Placement Types**: Added right-float, left-float, full-width placement suggestions from AI analysis
-- ✅ **API: generate-custom action**: New endpoint for user-defined image generation
-
-### January 2026 - Session 8 (Image Generation UX Overhaul)
-- ✅ **Image Generation Workflow Refactored**: Changed from auto-generate to analyze-first approach
-- ✅ **Analyze Images Button**: New "🖼️ Analyze Images" button shows suggestions without auto-generating
-- ✅ **Individual Generate Buttons**: Each image suggestion has its own "Generate" button
-- ✅ **Generate All Button**: Added "⚡ Generate All (N)" button with confirmation warning dialog
-- ✅ **Warning Dialog**: Confirmation prompt warns user about time requirement before batch generation
-- ✅ **Completion Sound**: New melodic sound notification (C-E-G-C arpeggio) plays when batch generation completes
-- ✅ **Visual Status**: Generate buttons show "✓ Generated" status after image is created
-- ✅ **Fixed Image Display**: Images now display correctly from URL (was broken due to URL vs base64 mismatch)
-- ✅ **Mobile Vibration**: Added vibration pattern on batch completion for mobile devices
-
-### January 2026 - Session 7 (Auto-save & Cloud Storage)
-- ✅ **Auto-save with localStorage**: Debounced (3s) auto-save to browser storage
-- ✅ **Restore on page load**: Automatically restores unsaved drafts from last session
-- ✅ **Unsaved changes warning**: Browser prompt before leaving with unsaved work
-- ✅ **Visual indicators**: Shows "Saving...", "Unsaved", "Saved locally" status
-- ✅ **Clear on save**: localStorage cleared after successful save to database
-- ✅ **Cloud Image Upload**: Images uploaded to Supabase Storage
-- ✅ **Upload Progress**: Visual progress bar during multi-image uploads
-- ✅ **Cloud indicator**: Shows "Cloud" badge on uploaded images
-- ✅ **Delete from cloud**: Removes images from storage when deleted from post
-- ✅ API: `/api/upload` - POST (upload), DELETE (remove), GET (list)
-
-### January 2026 - Session 6 (Security & Stress Testing Fixes)
-- ✅ **CRITICAL: Double-Booking Prevention** - API now checks for existing bookings before inserting
-- ✅ **CRITICAL: Race Condition Protection** - Returns 409 Conflict for duplicate slots
-- ✅ **Input Validation** - Required fields (name, email), format validation, length limits
-- ✅ **XSS Sanitization** - HTML entities escaped in all user inputs
-- ✅ **Booked Slots API** - GET /api/bookings?slots=true returns unavailable times
-- ✅ **Frontend Update** - BookingWidget now shows booked slots as unavailable
-- ✅ Comprehensive stress testing with pytest (17 tests)
-
-### January 2026 - Session 5 (Auto Image Generation Loop)
-- ✅ **Auto Images Feature**: Single-click button to analyze blog and auto-generate ALL images
-- ✅ **Image Analysis Loop**: AI analyzes blog content to identify image placement opportunities
-- ✅ **Batch Image Generation**: Loops through each suggestion and generates images via Nano Banana
-- ✅ **Progress Indicator**: Visual progress bar showing current/total images being generated
-- ✅ **Status Messages**: Real-time feedback on which image is currently generating
-- ✅ **Auto-Selection**: First generated image is auto-selected for each placement
-- ✅ Uses `gemini-2.5-flash-image-preview` via emergentintegrations
-
-### January 2026 - Session 4 (Drafts & Analytics)
-- ✅ DraftsPanel overhaul with action menu (Edit, Publish, Delete, Duplicate)
-- ✅ Draft click-to-edit functionality
-- ✅ Status badges and timestamps
-- ✅ Error handling with retry
-- ✅ MiniAnalyticsWidget with metric toggle
-- ✅ Full Analytics page with multi-metric dashboard
-- ✅ Image performance analytics
-- ✅ Trend sources breakdown
-- ✅ Publish frequency chart
-- ✅ Drafts-to-Publish pipeline
-- ✅ Sidebar collapse button repositioned
-- ✅ Nano Banana CTA for content without images
-
-### January 2026 - Session 3 (UX Improvements)
-- ✅ Fixed image generation model name
-- ✅ Reorganized Blog Auto-Polish layout
-- ✅ Added button click feedback
-- ✅ Tags and Images moved to sidebar
-
-### January 2026 - Session 2 (Copyright System)
-- ✅ Copyright Tools component
-- ✅ AI Content Disclaimer
-- ✅ Copyright Guide page
-
-### January 2026 - Session 1 (Auth & Fixes)
-- ✅ Supabase SSR authentication
-- ✅ Custom prompt input for AI suggestions
-
-## Core Features
-
-### Blog Auto-Polish
-- Write/Preview modes
-- AI Tools: Outline, Enhance, Headlines, Tags, Meta, Images, Style, Research, Copyright
-- Right sidebar: SEO Score, Stats, Tags, Images, Tips, AI Disclaimer
-- Style Library for saved themes
-
-### Drafts Management (NEW)
-- Click to edit
-- Action menu: Edit, Publish, Delete, Duplicate
-- Status badges (DRAFT/SCHEDULED/PUBLISHED)
-- Last saved timestamps
-- Error handling with retry
-- Keyboard navigation (Enter to edit)
-- Nano Banana image CTA
-
-### Analytics Dashboard (NEW)
-- Overview metrics: Impressions, Clicks, Engagement, Conversions
-- Image Performance: CTR comparison, top colors, aesthetic score
-- Trend Sources: Google Trends, Twitter, Reddit, Industry News
-- Publish Frequency chart
-- Drafts-to-Publish pipeline stats
-- Date range and content type filters
-- Export CSV/PDF
-
-### Mini Analytics Widget (NEW)
-- Compact metric display
-- Toggle: Impressions → Clicks → Engagement → Top Posts
-- Keyboard shortcuts: T (toggle), E (expand)
-- Click to view full analytics
-
-## API Endpoints
-
-### Blog APIs
-- `POST /api/blog/ai` - AI content generation
-- `POST /api/blog/images` - Image generation (gemini-2.5-flash-image-preview)
-- `POST /api/drafts` - CRUD for drafts
-
-### Analytics APIs (Mock data currently)
-- Future: Real analytics aggregation endpoints
-
-## File Structure
-```
-/app/webapp/app/admin-v2/
-├── analytics/page.tsx           # Full analytics dashboard
-├── blog-polish/page.tsx         # Blog editor with image generation
-├── living-canvas/page.tsx       # NEW: Template editor with live preview
-├── components/
-│   ├── DraftsPanel.tsx          # Action menu, click-to-edit
-│   ├── MiniAnalyticsWidget.tsx  # Compact metric toggle
-│   ├── CollapsibleSidebar.tsx   # Collapse button position
-│   ├── CopyrightTools.tsx
-│   └── AIContentDisclaimer.tsx
-
-/app/webapp/app/components/living-canvas/  # NEW: Living Canvas library
-├── index.ts                     # Exports all components
-├── ImageContainers.tsx          # Organic & Framed image components
-├── TemplateRenderer.tsx         # Renders templates from DB
-├── css-shapes.ts                # 25+ shape presets for text wrap
-└── color-extraction.ts          # Extract palette from images
-
-/app/webapp/supabase/migrations/
-└── 013_living_canvas.sql        # NEW: Templates, frames, compositions tables
-```
-
+## What's NOT Built Yet (Scaffolding Only)
+- ❌ Tenant CRM Dashboard (UI placeholder exists)
+- ❌ Analytics Dashboard (basic UI, needs enhancement)
+- ❌ Onboarding Wizard (page exists, flow not implemented)
+- ❌ Vector search for knowledge (pgvector schema ready)
+- ❌ Social media posting (OAuth framework ready)
+- ❌ Living Canvas publishing platform
 
 ## Prioritized Backlog
 
-### P0 (Critical)
-- ✅ ~~Image Generation Workflow~~ - FIXED in Session 8
-- ⚠️ Database Migration Required: `012_design_proposals.sql` must be run in Supabase for AI Website Analyzer
-- ⚠️ Verify image generation end-to-end with user login
+### P0 (Critical - Blockers)
+- ⚠️ **Database Migrations** - Run `CONSOLIDATED_MIGRATION_FIX.sql` in Supabase
 
-### P1 (High)
-- Add voice input (STT) to Chat Widget
-- Implement Perplexity verification for AI-generated outlines
-- Verify AI Website Analyzer end-to-end
+### P1 (High Priority)
+- Integrate Event & Audit Loggers into API endpoints
+- Build functional Tenant CRM Dashboard
+- Enhance Analytics Dashboard with visualizations
+- Implement Onboarding Wizard multi-step flow
+- Knowledge Base bulk import (CSV/JSON)
 
-### P2 (Medium)
-- Image analytics depth (recognition tags, face detection)
-- Keyboard shortcuts throughout app
-- Schedule reports via email
-- Real analytics data integration
+### P2 (Medium Priority)
+- Living Canvas Publishing Platform
+- Complete Image Generation Features
+- Social OAuth connections
+- Vector search implementation (pgvector)
 
 ### P3 (Future)
-- Full voice navigation system
-- Multi-author support
-- Campaign tracking
-- A/B testing for content
-- Social media auto-sharing for blog posts
-- Resume Retell AI agent "Aiden"
+- POS Integration & Payment Processing
+- AI-driven Tax Reports
 - "God Mode" CMS
+- Retell AI agent "Aiden"
+
+## File Structure
+```
+/app/webapp/
+├── app/
+│   ├── admin-v2/
+│   │   ├── analytics/page.tsx       # Real data analytics
+│   │   ├── audit/page.tsx           # SOC2 audit log viewer
+│   │   ├── brand-voice/page.tsx     # Memory Layer 1
+│   │   ├── crm/page.tsx             # Tenant CRM (placeholder)
+│   │   ├── knowledge/page.tsx       # Memory Layer 2
+│   │   └── living-canvas/page.tsx   # Publishing platform
+│   ├── api/
+│   │   ├── admin/analytics/route.ts # Admin-only metrics
+│   │   ├── analytics/route.ts       # Tenant analytics
+│   │   ├── audit/route.ts           # Audit logging
+│   │   ├── chat/route.ts            # Memory-enhanced chat
+│   │   ├── crm/route.ts             # CRM operations
+│   │   └── knowledge/route.ts       # Knowledge management
+│   └── onboarding/page.tsx          # Tenant onboarding
+├── lib/
+│   ├── audit-logger.ts              # Server-side audit utility
+│   ├── event-logger.ts              # Event tracking utility
+│   └── memory-bucket-service.ts     # 4-layer memory API
+└── supabase/migrations/
+    ├── 014_memory_bucket_system.sql
+    ├── 015_social_and_analytics.sql
+    ├── 016_tenant_crm.sql
+    ├── 017_security_fixes.sql       # FIXED
+    ├── 018_audit_logging.sql        # FIXED
+    └── CONSOLIDATED_MIGRATION_FIX.sql # Run this!
+```
+
+## 3rd Party Integrations
+- **Supabase:** DB, Auth, Storage, pgvector
+- **OpenRouter:** Text AI generation
+- **Kie.ai:** Image generation
+- **Playwright:** Server-side screenshots
