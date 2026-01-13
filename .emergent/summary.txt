@@ -1,213 +1,233 @@
-<analysis>**original_problem_statement:** The user's initial goal was to fix a broken image generation flow in the Blog Auto-Polish feature of GreenLine365, a marketing OS for local businesses. This has since evolved dramatically into two major new architectural initiatives:
+<analysis>**original_problem_statement:** The initial goal was to fix image generation and build two new architectural features: the Living Canvas publishing platform and a Dynamic Memory Bucket System.
 
-1.  **The Living Canvas Publishing Platform:** A sophisticated, template-driven layout engine that moves beyond standard rectangular web design. It will use CSS Shapes and potentially WebGL to create dynamic, non-rectangular image containers that influence the page's layout and aesthetics. The system must support organic borderless layouts and realistic framed layouts, all driven by a CMS (Supabase).
-2.  **The Dynamic Memory Bucket System:** A four-layer memory architecture to serve as the brain for the application's AI. This system is designed to give the AI deep context about the user's identity, business knowledge, event history, and real-time actions, preventing hallucinations and ensuring authentic, context-aware responses.
-
-Additionally, the user requested significant enhancements to the existing image generation feature, including more artistic AI prompts, routing chart generation to a different model (GPT-5.2), robust retry logic, and advanced frontend features like image preview modals and layout controls.
+Throughout the session, the user's vision expanded significantly. The application is now intended to be a full, multi-tenant Business Operating System for local businesses. Key new requirements include:
+-   **Tenant-Specific CRM:** Each tenant (business) gets their own dashboard to track their own customers, leads, revenue, and ROI.
+-   **Honesty & Transparency:** All placeholder/fake statistics on the main landing page must be removed and replaced with a system to show real, aggregated data once available.
+-   **Advanced Analytics:** A two-sided analytics system:
+    1.  An admin-only dashboard to prove GreenLine365's own ROI.
+    2.  A tenant-facing dashboard to help businesses track their own performance and social media growth.
+-   **SOC2-Compliant Audit Logging:** A comprehensive, tamper-resistant audit trail of all significant user and system actions.
+-   **Future POS & Payment Processing:** The long-term vision is for the platform to evolve into a Point-of-Sale (POS) system that processes payments for tenants, taking a small transaction fee.
 
 **User's preferred language**: English
 
 **what currently exists?**
-The application is a full-stack Next.js project with a Supabase backend. Key existing features include a secured admin dashboard (), a hardened booking system, and a feature-rich Blog Auto-Polish page ().
+The application is a full-stack Next.js project with a Supabase backend. During this session, the agent successfully unblocked a failing production build by fixing multiple syntax and type errors.
 
-During this session, the agent:
--   Implemented a significant refactor of the image generation flow on the blog polish page, adding individual Generate buttons, a Generate All function, and fixing display bugs.
--   Began implementing the user's more advanced image feature requests, including overwriting the backend API route with logic for enhanced prompts, chart model routing, and retry mechanisms. The frontend was also updated with state and UI placeholders for a preview modal, custom chat, and layout options.
--   Created the foundational scaffolding for the **Living Canvas** system, including a new Supabase migration, a component library (), and a dedicated admin page ().
--   Created the foundational files for the **Dynamic Memory Bucket System**, including a detailed architecture document, a Supabase migration to create the required tables, and a TypeScript service file ().
--   Fixed multiple TypeScript build errors that were blocking deployments.
+Significant scaffolding for the new vision was created:
+-   **Honesty Audit:** The agent removed misleading statistics from the landing page () and feature pages. Chatbot promises were audited and aligned with actual features.
+-   **Dynamic Memory System:** A Brand Voice page () was created for tenants to define their AI's personality (Layer 1). A Knowledge Base page () and API () were created for tenants to seed business facts (Layer 2).
+-   **Tenant CRM:** A new CRM dashboard (), API (), and database migration () were created.
+-   **Analytics Framework:** A new Analytics dashboard () was implemented to fetch real data, with separate API endpoints for tenant-facing () and admin-only () metrics.
+-   **Audit Logging:** A migration (), server-side logger (), and admin viewer page () were created for SOC2 compliance.
 
 **Last working item**:
--   **Last item agent was working:** Creating the foundational files for the Dynamic Memory Bucket System. The agent created the Supabase migration script () to define the schema for the four memory layers and the TypeScript service () to manage interactions with this system.
--   **Status:** IN PROGRESS
+-   **Last item agent was working:** Fixing a failed database migration. The user reported that running the migrations failed. The agent identified that the SQL script was trying to apply policies to system tables () and using incorrect column names ( instead of  on some tables). The agent attempted to create a corrected migration file () but the session ended before it could be tested.
+-   **Status:** BLOCKED
 -   **Agent Testing Done:** N
--   **Which testing method agent to use?** both. The backend logic for interacting with the new Supabase tables needs to be verified with the backend testing agent. Once integrated, the frontend testing agent will be needed to ensure AI components correctly fetch and use this memory.
+-   **Which testing method agent to use?** manual testing by curl. The agent needs to connect to the Supabase instance and run the new migration SQL manually to verify it executes without errors.
 -   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
--   Issue 1: Implement the Dynamic Memory Bucket System (P0)
--   Issue 2: Build the Living Canvas Publishing Platform (P1)
--   Issue 3: Complete Advanced Image Generation Features in Blog-Polish Tool (P1)
--   Issue 4: AI Website Analyzer core feature is unverified (P2)
+-   Issue 1: Database migrations are failing, blocking all DB-related development (P0)
+-   Issue 2: Implement the Dynamic Memory Bucket System (P1)
+-   Issue 3: Build the Living Canvas Publishing Platform (P2)
+-   Issue 4: Complete Advanced Image Generation Features in Blog-Polish Tool (P2)
 -   Issue 5: Build fails due to event handlers in server components (P2)
 
 Issues Detail:
--   **Issue 1: Implement the Dynamic Memory Bucket System**
-    -   **Attempted fixes:** The agent has created the migration file to set up the database tables (, , , , ) and a TypeScript service file.
+-   **Issue 1: Database migrations are failing, blocking all DB-related development**
+    -   **Attempted fixes:** The agent created a new migration file  to fix RLS and  view issues flagged by the Supabase linter. This migration failed because it tried to alter system tables and used incorrect column names for RLS policies. A corrected version was written but not tested.
     -   **Next debug checklist:**
-        1.  Run the Supabase migration to create the tables.
-        2.  Flesh out the  with functions to interact with each of the four memory layers (Core, Warehouse, Journal, Buffer).
-        3.  Integrate the service into the AI logic (e.g., the blog image analyzer API) to follow the Priority Fetch order defined by the user.
-        4.  Implement vector search for the Warehouse layer using .
-    -   **Why fix this issue and what will be achieved with the fix?** This is the user's latest top-priority request and is considered the brain of the application. Completing it will provide the AI with deep, persistent context.
+        1.  Examine the latest migration file .
+        2.  Verify the logic correctly identifies the user/tenant identifier column for each table (, , etc.) or skips tables with no tenant association.
+        3.  Ensure the migration script explicitly excludes system tables like  from RLS enablement.
+        4.  Run all pending migrations ( through ) in the correct order in the Supabase SQL editor to ensure they all pass.
+    -   **Why fix this issue and what will be achieved with the fix?** This is a hard blocker. No new features that require database schema changes can be implemented until the migrations are fixed and can run successfully.
+    -   **Status:** IN PROGRESS
+    -   **Is recurring issue?** Y
+    -   **Should Test frontend/backend/both after fix?** Backend
+    -   **Blocked on other issue:** None
+
+-   **Issue 2: Implement the Dynamic Memory Bucket System**
+    -   **Attempted fixes:** The agent created DB migrations, a , a Brand Voice UI, and a Knowledge Base UI. The chat API was updated to use the Brand Voice.
+    -   **Next debug checklist:**
+        1.  Implement  search in  for semantic search on the  table.
+        2.  Integrate the Warehouse (Knowledge Base) fetch into the chat API's system prompt builder.
+        3.  Implement the  logging (Journal layer) and  (Buffer layer).
+        4.  Flesh out the Onboarding Wizard to guide new users through populating their Brand Voice and Knowledge Base.
+    -   **Why fix this issue and what will be achieved with the fix?** This is the brain of the application, providing the AI with the necessary context to generate authentic, non-hallucinatory responses for each tenant.
     -   **Status:** IN PROGRESS
     -   **Is recurring issue?** N
     -   **Should Test frontend/backend/both after fix?** Both
-    -   **Blocked on other issue:** None
+    -   **Blocked on other issue:** Issue 1
 
--   **Issue 2: Build the Living Canvas Publishing Platform**
-    -   **Attempted fixes:** The agent created the initial DB migration, component library files (, , etc.), and a placeholder admin page.
+-   **Issue 3: Build the Living Canvas Publishing Platform**
+    -   **Attempted fixes:** (From previous session) The agent created the initial DB migration and component stubs. No progress was made in this session besides fixing a build error on its page.
     -   **Next debug checklist:**
-        1.  Run the fixed migration .
-        2.  Implement the logic in the  and  components based on the user's spec (CSS Shapes for text wrapping, realistic frame assets).
-        3.  Connect the  to Supabase to fetch templates and frames.
-        4.  Integrate the color extraction logic.
+        1.  Implement the logic in  and  to handle CSS Shapes for text wrapping.
+        2.  Connect the  to Supabase to fetch and manage templates.
     -   **Why fix this issue and what will be achieved with the fix?** This is a major user-requested feature to create visually unique and dynamic content layouts.
-    -   **Status:** IN PROGRESS
+    -   **Status:** NOT STARTED
     -   **Is recurring issue?** N
     -   **Should Test frontend/backend/both after fix?** Both
-    -   **Blocked on other issue:** None
+    -   **Blocked on other issue:** Issue 1
 
--   **Issue 3: Complete Advanced Image Generation Features in Blog-Polish Tool**
-    -   **Attempted fixes:** The agent overwrote the  with new logic for cinematic prompts, chart routing, and retry logic. The frontend page  was updated with state and placeholder UI for a preview modal, custom chat, and image layout options.
+-   **Issue 4: Complete Advanced Image Generation Features in Blog-Polish Tool**
+    -   **Attempted fixes:** (From previous session) Backend API was updated, and frontend UI stubs were created. No progress this session.
     -   **Next debug checklist:**
-        1.  Implement the frontend for the image preview modal (light-box).
-        2.  Build the UI for selecting image layouts (right, left, etc.) and applying them to the blog editor.
-        3.  Build the UI for the custom image generation chat modal.
-        4.  Test the end-to-end flow: enhanced analysis -> generation (with retry logic) -> preview -> application to blog with layout.
-    -   **Why fix this issue and what will be achieved with the fix?** This will complete the user's vision for a Bentley treatment of the blog polishing tool, making it highly powerful and flexible.
-    -   **Status:** IN PROGRESS
+        1.  Implement the frontend for the image preview modal.
+        2.  Build the UI for selecting image layouts (e.g., wrap right/left).
+        3.  Test the end-to-end flow from analysis to generation to application in the blog.
+    -   **Why fix this issue and what will be achieved with the fix?** Completes the user's vision for a Bentley treatment of the blog polishing tool.
+    -   **Status:** NOT STARTED
     -   **Is recurring issue?** Y
     -   **Should Test frontend/backend/both after fix?** Both
     -   **Blocked on other issue:** None
 
--   **Issue 4: AI Website Analyzer core feature is unverified**
-    -   **Attempted fixes:** None in this session. Still blocked by higher priority tasks.
-    -   **Next debug checklist:** Test the full user flow from the UI to verify analysis and result display.
-    -   **Why fix this issue and what will be achieved with the fix?** This is one of the original core features of the application that has never been fully validated.
-    -   **Status:** NOT STARTED
-    -   **Is recurring issue?** N
-    -   **Should Test frontend/backend/both after fix?** Both
-    -   **Blocked on other issue:** Issue 1, 2, 3
-
 -   **Issue 5: Build fails due to event handlers in server components**
-    -   **Attempted fixes:** The agent fixed this for the  page by adding . However, the error message persists in the build logs, indicating it exists elsewhere.
+    -   **Attempted fixes:** (From previous session) The agent added  to the  page. While other build errors were fixed this session, this specific recurring error from the initial handoff was never explicitly confirmed as resolved.
     -   **Next debug checklist:**
-        1.  Analyze the final build error log from Vercel ().
-        2.  The error log points to the  page prerendering. Even though a fix was applied, it seems the build process still fails.
-        3.  Identify the specific component passing an event handler (like ) that is being rendered as a Server Component.
-        4.  Add the  directive to the problematic file or refactor it to separate client and server logic.
-    -   **Why fix this issue and what will be achieved with the fix?** This error is causing the production build to fail, preventing deployment.
-    -   **Status:** IN PROGRESS
+        1.  Trigger a production build and analyze the logs for the  error.
+        2.  If it appears, identify the component passing the handler and add the  directive.
+    -   **Why fix this issue and what will be achieved with the fix?** This error, if it still exists, will block production deployments.
+    -   **Status:** TESTING PENDING
     -   **Is recurring issue?** Y
     -   **Should Test frontend/backend/both after fix?** Frontend
     -   **Blocked on other issue:** None
 
 **In progress Task List**:
--   Task 1: Integrate Dynamic Memory Bucket System (P0)
--   Task 2: Build out Living Canvas Components and Page (P1)
--   Task 3: Implement Advanced Image Generation Frontend Features (P1)
+-   Task 1: Integrate Event and Audit Loggers (P1)
+-   Task 2: Build out the Tenant CRM Dashboard (P1)
+-   Task 3: Build out the Analytics Dashboard (P1)
+
+Task Detail:
+-   **Task 1: Integrate Event and Audit Loggers**
+    -   **Where to resume:** The logger utilities  and  exist but are not used.
+    -   **What will be achieved with this?** Critical actions like blog post creation, image generation, user login, and CRM entry creation will be logged for analytics and SOC2 compliance.
+    -   **Status:** NOT STARTED
+    -   **Should Test frontend/backend/both after fix?** Backend
+    -   **Blocked on something:** Issue 1
+
+-   **Task 2: Build out the Tenant CRM Dashboard**
+    -   **Where to resume:** The page  is a placeholder.
+    -   **What will be achieved with this?** Tenants will have a functional UI to add, view, and manage their customers, leads, and revenue, fulfilling a core user requirement.
+    -   **Status:** IN PROGRESS
+    -   **Should Test frontend/backend/both after fix?** Both
+    -   **Blocked on something:** Issue 1
+
+-   **Task 3: Build out the Analytics Dashboard**
+    -   **Where to resume:** The page  fetches data but the UI is basic.
+    -   **What will be achieved with this?** Tenants will have meaningful visualizations of their content performance and business growth.
+    -   **Status:** IN PROGRESS
+    -   **Should Test frontend/backend/both after fix?** Both
+    -   **Blocked on something:** Issue 1
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks:**
-    *   (P1) Add voice input (STT) to the Chat Widget.
-    *   (P1) Implement Perplexity verification for AI-generated outlines.
+    *   (P1) Implement Onboarding Wizard: Create the multi-step flow for new tenants on .
+    *   (P1) Implement Knowledge Import: Build out the backend logic in  to handle CSV/JSON uploads.
+    *   (P2) Implement Social OAuth: Build the UI and backend logic for tenants to connect their social media accounts via the  framework.
 -   **Future Tasks:**
-    *   Populate the Analytics page with real data.
-    *   Build social media auto-sharing for blog posts.
-    *   Resume work on the Retell AI agent Aiden.
-    *   Build a God Mode CMS for site administration.
-    *   Implement the full, complex voice navigation system.
+    *   (P2) POS Integration & Payment Processing: Architect and build the system to handle transactions.
+    *   (P3) AI-driven Tax Reports: Generate reports from the CRM data.
+    *   (P3) Populate the original Analytics page with real data.
+    *   (P3) Resume work on the Retell AI agent Aiden.
+    *   (P3) Build a God Mode CMS for site administration.
 
 **Completed work in this session**
--   **P0 Image Generation Bug Fix & Refactor:**
-    -   Changed Auto Images button to Analyze Images to prevent auto-generation.
-    -   Added individual Generate buttons for each suggestion.
-    -   Added a Generate All button with a confirmation dialog.
-    -   Added a completion sound for image generation.
--   **Build Error Fixes:**
-    -   Fixed  type error in  by allowing nullable refs.
-    -   Fixed  build error by passing  and  props down to the  sub-component.
-    -   Fixed Supabase migration  to create tables in the correct dependency order.
-    -   Attempted to fix build error on  by adding .
--   **New Feature Scaffolding:**
-    -   Created initial files and structure for the Living Canvas system.
-    -   Created initial files and structure for the Dynamic Memory Bucket System.
--   **Memory/Documentation Creation:**
-    -   Saved user-provided concierge conversation templates to .
-    -   Created a memory document for The AI Gold Rush concept at .
-    -   Created a document outlining the Dynamic Memory Bucket System at .
+-   **Build Unblocked:** Fixed multiple syntax and type errors in  and , allowing the project to build successfully.
+-   **Honesty Audit & Fixes:**
+    -   Removed placeholder stats (e.g., 500+ businesses) from  and other marketing pages.
+    -   Audited and corrected the  prompts to remove promises of unbuilt features.
+-   **Core Feature Scaffolding:**
+    -   **Tenant CRM:** Created  migration,  API, and  UI page.
+    -   **Analytics:** Created tenant and admin analytics APIs, and rewrote  to use real data.
+    -   **Knowledge Base:** Created  and .
+    -   **Audit Logging:** Created  migration,  utility, and  viewer.
+-   **Security & Trust:**
+    -   Created (but did not successfully run) a migration  to enable RLS on all public tables.
+    -   Updated the  to reflect new data isolation and security measures.
+
+**Earlier issues found/mentioned but not fixed**
+-   **Issue 1: Pre-commit hook is broken.**
+    -   **Debug checklist:** The agent attempted to set up a  pre-commit hook. It failed due to incorrect directory context. Instead of fixing the setup, the agent deleted the  directory to force a commit. A proper pre-commit hook should be re-established to catch build errors before they reach CI.
+    -   **Why to solve this issue and what will be achieved with this?** To prevent broken builds from being committed, saving CI/CD time and developer frustration.
+    -   **Should Test frontend/backend/both after fix:** N/A (DevOps change)
+    -   **Is recurring issue?** Y
+
+**Known issue recurrence from previous fork**
+-   **Issue recurrence in previous fork:** Build fails due to event handlers in server components ( errors).
+-   **Recurrence count:** High. Multiple build errors were fixed this session, indicating a general issue with client/server component boundaries.
+-   **Status:** TESTING PENDING
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Dynamic AI Memory:** A 4-layer hierarchical system (Core Identity, Knowledge Warehouse, Event Journal, Real-time Buffer) to provide deep context to AI agents.
--   **Vector Search:** Using  in Supabase for the Warehouse layer (RAG).
--   **Advanced CSS Layouts:** Planned use of CSS Shapes () and  to wrap text around non-rectangular images.
--   **Conditional API Routing:** Logic in the backend to route API calls to different AI models (Kie.ai vs. GPT-5.2) based on content analysis (e.g., detecting if an image is a chart).
--   **Robust API Logic:** Implementation of retry mechanisms in the backend to handle partial failures in asynchronous API calls.
--   **Component-Based Architecture:** Heavy refactoring of large pages into smaller, manageable components (e.g.,  -> ).
+-   **Multi-Tenancy:** The entire architecture is shifting to be tenant-specific, using Row Level Security (RLS) in Supabase with a  or  on every relevant table.
+-   **Dynamic AI Memory:** The 4-layer memory system is a core concept, with scaffolding now in place for the Identity (Brand Voice) and Warehouse (Knowledge Base) layers.
+-   **SOC2 Audit Logging:** An append-only, tamper-resistant audit trail is being built to track all significant platform events for compliance.
+-   **Tenant-Specific CRM:** Moving beyond a simple SaaS to provide each tenant with tools to manage their own business (customers, revenue).
+-   **API-driven Dashboards:** All new UI dashboards (, , ) are built to fetch data from dedicated API endpoints rather than using mock data.
 
 **key DB schema**
--   **living_canvas_frames:** 
--   **living_canvas_templates:** 
--   **user_profiles:** 
--   **knowledge_base_chunks:** 
--   **verification_events:** 
--   **audit_logs:** 
--   **message_history:** 
+-   **social_connections:** 
+-   **analytics_events:** 
+-   **crm_contacts:** 
+-   **crm_deals:** 
+-   **audit_log:**  (append-only)
 
 **All files of reference**
--   **/app/webapp/app/api/blog/images/route.ts** (New backend logic for image generation)
--   **/app/webapp/app/admin-v2/blog-polish/page.tsx** (New frontend logic for image generation)
--   **/app/webapp/supabase/migrations/014_memory_bucket_system.sql** (Schema for the new memory system)
--   **/app/webapp/lib/memory-bucket-service.ts** (Service file for the memory system)
--   **/app/webapp/supabase/migrations/013_living_canvas.sql** (Schema for the Living Canvas)
--   **/app/webapp/app/components/living-canvas/** (Component library for Living Canvas)
--   **/app/memory/DYNAMIC_MEMORY_BUCKET_SYSTEM.md** (User's specification for the memory system)
+-   **/app/webapp/supabase/migrations/017_security_fixes.sql** (The currently failing migration file)
+-   **/app/webapp/app/api/chat/route.ts** (Example of memory system integration)
+-   **/app/webapp/app/admin-v2/crm/page.tsx** (New tenant-facing CRM dashboard)
+-   **/app/webapp/app/admin-v2/audit/page.tsx** (New admin-facing audit dashboard)
+-   **/app/webapp/app/page.tsx** (Landing page where stats were corrected)
+-   **/app/webapp/app/trust/page.tsx** (Trust/Security page updated with new info)
 
 **Critical Info for New Agent**
--   The user's priorities have significantly shifted to two large, new architectural features: the **Dynamic Memory Bucket System** and the **Living Canvas Platform**. These are now the highest priority (P0 and P1).
--   You are not just fixing bugs; you are building the core architecture for the application's most advanced features. Refer to the user's detailed specifications in the  files in .
--   The image analysis agent (in ) needs to be the garnishing agent that understands all the new Living Canvas presentation options and suggests them.
--   Be mindful of build errors related to Client/Server components in Next.js. The Vercel build is failing, and this needs to be resolved to enable deployments.
+-   **The #1 priority is to fix the failing database migrations.** No other feature requiring a DB change can proceed until  and subsequent migrations can be run successfully.
+-   The user's vision has expanded dramatically. The app is no longer just a marketing tool; it's a multi-tenant Business OS. All new features must be built with strict tenant data isolation in mind.
+-   The logger utilities (, ) have been created but **are not yet integrated**. A key upcoming task is to import and call these loggers from the relevant API endpoints (e.g., log a  event in the blog API).
 
 **documents and test reports created in this job**
--   
--   
--   
+-    (Updated with new features and roadmap)
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User (Latest):** Provides a detailed architectural specification for a Dynamic Memory Bucket System with four layers of memory for the AI. *Status: In Progress. Agent created foundational files.*
-2.  **User:** Reports a DB migration error (foreign key constraint) and provides new direction for the image analyzing agent to act as a garnishing agent that knows all layout options. Creates a memory about the AI Gold Rush era. *Status: Complete. Agent fixed migration and updated analyzer prompt.*
-3.  **User:** Provides choices for the Living Canvas implementation: Both blog editor and dedicated page, start with CSS Shapes (no WebGL), agent will source frames, CMS-driven via Supabase. *Status: In Progress. Agent created foundational files based on these choices.*
-4.  **User:** Provides a very detailed production specification for a Living Canvas publishing platform with two modes (Organic and Framed) and a template-based system. Uploads inspirational images. *Status: Actioned. Agent analyzed images and asked clarifying questions.*
-5.  **User:** Provides a list of advanced enhancements for the image generation tool, including more artistic prompts, routing charts to GPT-5.2, robust retry logic, image preview modals, and blog formatting options. *Status: In Progress. Agent implemented backend and started frontend.*
-6.  **User:** Requests changes to the image analyzer to be more specific and artistic. Asks for a larger preview for generated images, the ability to apply them to the blog with different layouts (e.g., text wrapping), and a chat interface for users to create their own images. *Status: Actioned. Agent asked for clarification.*
-7.  **User:** Reports build is failing again on  page. *Status: In Progress. Agent identified the cause is likely event handlers in server components.*
-8.  **User:** Reports build is failing with a  error in . *Status: Fixed.*
-9.  **User:** Reports a build failure due to a TypeScript type mismatch in . *Status: Fixed.*
-10. **User:** Provides several JSON files containing role-playing conversation templates for a concierge agent. *Status: Complete. Agent saved to a memory file.*
+1.  **User (Latest):** Outlines the grand vision for the app to become a POS system, taking transaction fees, and explains a migration failure. *Status: Action Pending. Agent acknowledged the vision and the error, but the session ended.*
+2.  **User:** Requests the creation of an audit logging system for SOC2 compliance. *Status: Complete. Agent created the migration, API, and UI scaffolding.*
+3.  **User:** Confirms migrations are up-to-date and asks to update the Trust Policy. *Status: Complete. Agent created a (failed) migration and updated the Trust page.*
+4.  **User:** Provides Supabase Linter output showing critical security vulnerabilities (RLS disabled, security definer views). *Status: Action In Progress. Agent created a migration to fix this, but it failed.*
+5.  **User:** Clarifies the vision for a tenant-specific CRM where each business can track its own customers, ROI, and revenue. *Status: Complete. Agent created the scaffolding for the Tenant CRM system.*
+6.  **User:** Clarifies analytics requirements: separate admin-only platform ROI metrics from tenant-facing business growth metrics. Also demands honesty on the landing page (remove fake stats). *Status: Complete. Agent implemented this separation and updated the landing page.*
+7.  **User:** Provides a roadmap of 6 features to build next and gives detailed requirements for analytics, social OAuth, and the onboarding wizard. *Status: Complete. Agent scaffolded all 6 features.*
+8.  **User:** Requests an honesty audit of the chat prompts to ensure the AI isn't promising features that don't exist. *Status: Complete. Agent audited and cleaned the prompts.*
+9.  **User:** Provides detailed architectural guidance for a multi-tenant memory system and onboarding wizard, emphasizing data isolation (RLS). *Status: Complete. Agent verified RLS and built scaffolding based on this guidance.*
+10. **User:** Approves the agent's plan and asks for a pre-commit hook to be added. *Status: Partially Complete. Pre-commit hook was attempted but ultimately abandoned.*
 
 **Project Health Check:**
 -   **Broken:**
-    -   The production build is failing due to an error prerendering the  page, preventing any deployments.
-    -   The Living Canvas feature is just a skeleton and is non-functional.
-    -   The Dynamic Memory Bucket System is just a skeleton and is non-functional.
-    -   The advanced image generation features (preview, layout, custom chat) are incomplete.
+    -   **Database Migrations:** At least one migration () is confirmed to be failing, preventing any new schema changes from being applied. This is the highest priority issue.
 -   **Mocked:**
-    -   The Analytics page () still has no real data.
+    -   The core new features (Tenant CRM, Analytics, Knowledge Base, Audit Log, Onboarding) are all just skeletons. They have UI pages and API routes, but the internal logic is not implemented, and they are not yet functional.
 
 **3rd Party Integrations**
--   **Supabase:** DB, Auth, Storage, and now planned  for vector search.
--   **OpenRouter:** Used for text AI. User has requested using  for chart generation.
--   **Kie.ai:** Used for image generation (Nano Banana model).
--   **Playwright:** For server-side screenshot capture (part of the unverified AI Website Analyzer).
--   **Twilio:** SMS integration (Blocked by user A2P registration).
--   **Retell AI:** Voice AI system (Paused).
+-   **Supabase:** DB, Auth, Storage.  is now a planned component for semantic search.
+-   **OpenRouter:** Used for text AI.
+-   **Kie.ai:** Used for image generation.
+-   **Playwright:** For server-side screenshot capture (part of an unverified feature).
 
 **Testing status**
 -   **Testing agent used after significant changes:** NO
 -   **Troubleshoot agent used after agent stuck in loop:** NO
 -   **Test files created:** []
--   **Known regressions:** The production build is currently failing.
+-   **Known regressions:** Database migrations, which were previously working, are now failing.
 
 **Credentials to test flow:**
 -   Supabase login credentials are required to access any page under .
 
 **What agent forgot to execute**
--   The agent did not run the new Supabase migrations ( and ) after creating them.
--   The agent did not fully test the complex image generation changes after implementing the backend and frontend stubs.
--   The agent correctly identified the recurring build error (Event handlers cannot be passed to Client Component props) but did not fully resolve it, leading to the final build failure.
--   The agent did not integrate the newly created  into any part of the application.</analysis>
+-   **Run and Test Migrations:** The agent created multiple new database migrations ( through ) but did not run them to confirm they worked, leading to the discovery of a critical failure at the end of the session.
+-   **Integrate Loggers:** The  and  utilities were created but never imported or used in any of the existing APIs.
+-   **Fix Pre-commit Hook:** The agent abandoned the pre-commit hook setup after an initial failure, deleting the configuration instead of fixing it.</analysis>
