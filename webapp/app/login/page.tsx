@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { signIn, signInWithGoogle, supabase } from '@/lib/supabase/client';
+import { signIn, signInWithGoogle, signInWithMagicLink, supabase } from '@/lib/supabase/client';
 
 export default function LoginPage() {
   const router = useRouter();
