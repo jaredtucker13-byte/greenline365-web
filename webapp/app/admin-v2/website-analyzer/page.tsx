@@ -116,6 +116,7 @@ export default function WebsiteAnalyzerPage() {
 
   // Auto-save project to localStorage
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     if (project && sections.length > 0) {
       const saveData = {
         project,
@@ -131,6 +132,7 @@ export default function WebsiteAnalyzerPage() {
 
   // Restore project from localStorage
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     const saved = localStorage.getItem('websiteBuilder_project');
     if (saved) {
       try {
