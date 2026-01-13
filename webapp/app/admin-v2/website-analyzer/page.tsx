@@ -193,6 +193,10 @@ export default function WebsiteAnalyzerPage() {
       if (data.success && data.screenshot) {
         setImageBase64(data.screenshot);
         setImagePreview(`data:image/png;base64,${data.screenshot}`);
+      } else if (data.manualRequired) {
+        // Show helpful manual upload message
+        setError('URL capture unavailable. Please take a screenshot manually (Mac: Cmd+Shift+4 | Windows: Win+Shift+S) and upload it using the Upload tab.');
+        setInputMethod('upload'); // Switch to upload tab
       } else {
         setError(data.error || 'Failed to capture screenshot. Try uploading manually.');
       }
