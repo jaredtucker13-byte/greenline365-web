@@ -203,6 +203,15 @@ export default function WebsiteAnalyzerPage() {
     setCapturingUrl(false);
   };
 
+  // Clear uploaded image
+  const clearImage = () => {
+    setImagePreview(null);
+    setImageBase64(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   // Start the workflow - analyze first
   const startAnalysis = async () => {
     if (mode === 'analyze' && !imageBase64) {
