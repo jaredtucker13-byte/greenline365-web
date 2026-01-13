@@ -36,6 +36,7 @@ const navItems = [
   { id: 'schedule', label: 'Schedule', icon: 'calendar', href: '/admin-v2?view=schedule' },
   { id: 'blog', label: 'Blog', icon: 'edit', href: '/admin-v2/blog-polish' },
   { id: 'website-builder', label: 'Website Builder', icon: 'paint', href: '/admin-v2/website-analyzer' },
+  { id: 'incidents', label: 'Incidents', icon: 'alert', href: '/admin-v2/incidents' },
   { id: 'email', label: 'Email', icon: 'mail', href: '/admin-v2/email' },
   { id: 'sms', label: 'SMS', icon: 'phone', href: '/admin-v2/sms' },
   { id: 'crm', label: 'CRM', icon: 'users', href: '/admin-v2/crm' },
