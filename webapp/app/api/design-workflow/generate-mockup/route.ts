@@ -3,18 +3,24 @@ import { NextRequest, NextResponse } from 'next/server';
 /**
  * Generate Mockup API
  * Uses KIE.ai Nano Banana Pro for high-quality website mockup generation
+ * 
+ * Pricing (as of Jan 2026):
+ * - 1K/2K Resolution: 18 credits (~$0.09 per image)
+ * - 4K Resolution: 24 credits (~$0.12 per image)
  */
 
 interface MockupRequest {
   designSpec: any;
   analysisText: string;
+  aspectRatio?: string;
+  resolution?: '1K' | '2K' | '4K';
 }
 
 const KIE_API_KEY = process.env.KIE_API_KEY;
-const KIE_API_URL = 'https://api.kie.ai/api/v1/jobs/createTask';
-const KIE_TASK_STATUS_URL = 'https://api.kie.ai/api/v1/jobs/getTaskInfo';
+const KIE_CREATE_TASK_URL = 'https://api.kie.ai/api/v1/jobs/createTask';
+const KIE_QUERY_STATUS_URL = 'https://api.kie.ai/api/v1/jobs/recordInfo';
 
-interface KieTaskResponse {
+interface KieCreateTaskResponse {
   code: number;
   msg: string;
   data: {
@@ -22,40 +28,46 @@ interface KieTaskResponse {
   };
 }
 
-interface KieTaskStatusResponse {
+interface KieQueryStatusResponse {
   code: number;
   msg: string;
   data: {
-    status: string;
-    output?: {
-      imageUrl?: string;
-      images?: string[];
-    };
+    taskId: string;
+    state: 'waiting' | 'success' | 'fail';
+    resultJson: string | null;
+    failMsg: string | null;
+    costTime: number | null;
   };
 }
 
-async function pollForResult(taskId: string, maxAttempts = 45): Promise<string | null> {
+async function pollForResult(taskId: string, maxAttempts = 60): Promise<{ imageUrl: string; costTime?: number } | null> {
   for (let i = 0; i < maxAttempts; i++) {
-    await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds between polls
+    await new Promise(resolve => setTimeout(resolve, 2000));
     
-    const statusResponse = await fetch(KIE_TASK_STATUS_URL, {
-      method: 'POST',
+    // Use GET method with taskId as query parameter
+    const statusResponse = await fetch(`${KIE_QUERY_STATUS_URL}?taskId=${taskId}`, {
+      method: 'GET',
       headers: {
         'Authorization': `Bearer ${KIE_API_KEY}`,
-        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ taskId }),
     });
 
     if (!statusResponse.ok) continue;
 
-    const statusData: KieTaskStatusResponse = await statusResponse.json();
+    const statusData: KieQueryStatusResponse = await statusResponse.json();
     
-    if (statusData.data?.status === 'completed' || statusData.data?.status === 'success') {
-      const imageUrl = statusData.data.output?.imageUrl || statusData.data.output?.images?.[0];
-      if (imageUrl) return imageUrl;
-    } else if (statusData.data?.status === 'failed') {
-      throw new Error('Mockup generation failed');
+    if (statusData.data?.state === 'success' && statusData.data?.resultJson) {
+      try {
+        const result = JSON.parse(statusData.data.resultJson);
+        const imageUrl = result.resultUrls?.[0];
+        if (imageUrl) {
+          return { imageUrl, costTime: statusData.data.costTime || undefined };
+        }
+      } catch {
+        // Continue polling
+      }
+    } else if (statusData.data?.state === 'fail') {
+      throw new Error(statusData.data.failMsg || 'Mockup generation failed');
     }
   }
   
@@ -65,7 +77,7 @@ async function pollForResult(taskId: string, maxAttempts = 45): Promise<string |
 export async function POST(request: NextRequest) {
   try {
     const body: MockupRequest = await request.json();
-    const { analysisText } = body;
+    const { analysisText, aspectRatio = '16:9', resolution = '2K' } = body;
 
     if (!analysisText) {
       return NextResponse.json({ error: 'Analysis text required' }, { status: 400 });
@@ -83,7 +95,7 @@ Clean minimal design with:
 - Prominent call-to-action button with contrasting color
 - Professional color scheme (dark theme preferred)
 - Modern gradient or solid background
-- Desktop view, 16:9 aspect ratio
+- Desktop view, ${aspectRatio} aspect ratio
 - High-quality photorealistic render
 - Clean typography with good hierarchy
 Style: Modern SaaS landing page, professional, conversion-optimized`;
@@ -91,7 +103,7 @@ Style: Modern SaaS landing page, professional, conversion-optimized`;
     console.log('[Generate Mockup] Creating task with KIE.ai Nano Banana Pro');
 
     // Create task with KIE.ai Nano Banana Pro
-    const createTaskResponse = await fetch(KIE_API_URL, {
+    const createTaskResponse = await fetch(KIE_CREATE_TASK_URL, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${KIE_API_KEY}`,
@@ -101,6 +113,10 @@ Style: Modern SaaS landing page, professional, conversion-optimized`;
         model: 'nano-banana-pro',
         input: {
           prompt: imagePrompt,
+          image_input: [],
+          aspect_ratio: aspectRatio,
+          resolution: resolution,
+          output_format: 'png',
         },
       }),
     });
@@ -108,15 +124,23 @@ Style: Modern SaaS landing page, professional, conversion-optimized`;
     if (!createTaskResponse.ok) {
       const errorText = await createTaskResponse.text();
       console.error('[Generate Mockup] Task creation failed:', errorText);
+      
+      if (createTaskResponse.status === 401) {
+        return NextResponse.json({ success: false, error: 'KIE.ai authentication failed' }, { status: 500 });
+      }
+      if (createTaskResponse.status === 402) {
+        return NextResponse.json({ success: false, error: 'KIE.ai insufficient balance' }, { status: 500 });
+      }
+      
       return NextResponse.json(
         { success: false, error: 'Failed to create mockup generation task' },
         { status: 500 }
       );
     }
 
-    const taskData: KieTaskResponse = await createTaskResponse.json();
+    const taskData: KieCreateTaskResponse = await createTaskResponse.json();
     
-    if (taskData.code !== 0 && taskData.code !== 200) {
+    if (taskData.code !== 200) {
       console.error('[Generate Mockup] Task creation error:', taskData.msg);
       return NextResponse.json(
         { success: false, error: taskData.msg || 'Task creation failed' },
@@ -135,9 +159,9 @@ Style: Modern SaaS landing page, professional, conversion-optimized`;
     console.log('[Generate Mockup] Task created:', taskId);
 
     // Poll for result
-    const imageUrl = await pollForResult(taskId);
+    const result = await pollForResult(taskId);
 
-    if (!imageUrl) {
+    if (!result?.imageUrl) {
       return NextResponse.json(
         { success: false, error: 'No image URL in response' },
         { status: 500 }
@@ -146,9 +170,15 @@ Style: Modern SaaS landing page, professional, conversion-optimized`;
 
     console.log('[Generate Mockup] Mockup generated successfully');
 
+    // Calculate estimated cost
+    const estimatedCost = resolution === '4K' ? 0.12 : 0.09;
+
     return NextResponse.json({
       success: true,
-      mockupImageUrl: imageUrl,
+      mockupImageUrl: result.imageUrl,
+      costTime: result.costTime,
+      estimatedCost,
+      resolution,
     });
 
   } catch (error: any) {
