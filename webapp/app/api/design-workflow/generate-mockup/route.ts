@@ -16,7 +16,7 @@ interface MockupRequest {
   resolution?: '1K' | '2K' | '4K';
 }
 
-const KIE_API_KEY = process.env.KIE_API_KEY;
+const KIE_API_KEY = process.env.KIE_API_KEY || '1f1d2d3eed99f294339cb1f17b5bc743';
 const KIE_CREATE_TASK_URL = 'https://api.kie.ai/api/v1/jobs/createTask';
 const KIE_QUERY_STATUS_URL = 'https://api.kie.ai/api/v1/jobs/recordInfo';
 
