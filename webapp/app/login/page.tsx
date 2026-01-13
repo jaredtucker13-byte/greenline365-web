@@ -12,6 +12,8 @@ export default function LoginPage() {
   const [checkingSession, setCheckingSession] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [magicLinkSent, setMagicLinkSent] = useState(false);
+  const [authMethod, setAuthMethod] = useState<'password' | 'magic-link'>('magic-link');
   const [formData, setFormData] = useState({
     email: '',
     password: '',
