@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { 
   Shield, CheckCircle, XCircle, AlertTriangle, FileText, 
-  Camera, Loader2, Clock, MapPin, User
+  Camera, Loader2, Clock, MapPin, User, Download
 } from 'lucide-react';
 
 interface Incident {
