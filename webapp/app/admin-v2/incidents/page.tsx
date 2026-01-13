@@ -59,6 +59,7 @@ export default function IncidentsPage() {
   const [creating, setCreating] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [generatingPdf, setGeneratingPdf] = useState(false);
   const [sending, setSending] = useState(false);
   const [uploadingImages, setUploadingImages] = useState(false);
   const [showNewForm, setShowNewForm] = useState(false);
