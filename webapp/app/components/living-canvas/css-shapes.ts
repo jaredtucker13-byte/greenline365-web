@@ -374,9 +374,12 @@ export function mirrorShapeHorizontally(shape: ShapeDefinition): ShapeDefinition
 // Shape categories for UI organization
 export const SHAPE_CATEGORIES = {
   'L-Shapes': ['l-shape-right', 'l-shape-left', 'l-shape-inverted-right', 'l-shape-inverted-left'],
+  'T-Shapes': ['t-shape-down', 't-shape-up', 't-shape-right', 't-shape-left'],
   'Circular': ['circle', 'circle-large', 'ellipse-horizontal', 'ellipse-vertical'],
-  'Geometric': ['hexagon', 'hexagon-flat', 'pentagon', 'octagon', 'diamond'],
+  'Geometric': ['hexagon', 'hexagon-flat', 'pentagon', 'octagon', 'diamond', 'cross'],
   'Organic': ['blob-1', 'blob-2', 'organic-wave'],
+  'Dynamic': ['lightning-bolt', 'lightning-bolt-mirror', 'stairs-down-right', 'stairs-down-left'],
+  'Special': ['puzzle-right', 'puzzle-left', 'ribbon', 'speech-bubble'],
   'Angular': ['arrow-right', 'arrow-left', 'trapezoid', 'parallelogram', 'slant-right', 'slant-left'],
   'Drop Caps': ['drop-cap-circle', 'drop-cap-square', 'drop-cap-diamond'],
   'Basic': ['rectangle', 'rounded-rectangle', 'pill'],
