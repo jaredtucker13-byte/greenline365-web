@@ -45,6 +45,10 @@ export async function sendEmail(options: EmailOptions): Promise<{ success: boole
     return { success: false, error: 'Email service not configured' };
   }
 
+  // Log the recipient for debugging
+  console.log('[Email] Attempting to send to:', options.to);
+  console.log('[Email] From:', GMAIL_USER);
+
   try {
     const info = await transporter.sendMail({
       from: `"GreenLine365" <${GMAIL_USER}>`,
@@ -54,10 +58,10 @@ export async function sendEmail(options: EmailOptions): Promise<{ success: boole
       text: options.text || options.html.replace(/<[^>]*>/g, ''),
     });
 
-    console.log('[Email] Sent successfully:', info.messageId);
+    console.log('[Email] Sent successfully to:', options.to, '| MessageId:', info.messageId);
     return { success: true };
   } catch (error: any) {
-    console.error('[Email] Send failed:', error.message);
+    console.error('[Email] Send failed to:', options.to, '| Error:', error.message);
     return { success: false, error: error.message };
   }
 }
