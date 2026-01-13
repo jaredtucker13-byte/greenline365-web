@@ -24,6 +24,136 @@ import {
 
 // System templates (these would come from Supabase in production)
 const SYSTEM_TEMPLATES: Template[] = [
+  // ========== STORY SHAPE TEMPLATES (New!) ==========
+  {
+    id: 'ai-visual-journey',
+    name: 'Visual Journey (AI Story)',
+    slug: 'ai-visual-journey',
+    description: 'A phased visual story with T-shapes, circles, and hexagons - perfect for AI/tech narratives',
+    category: 'story',
+    visual_mode: 'framed',
+    structure: {
+      type: 'visual-journey',
+      slots: [
+        // Hero section
+        { id: 'hero-image', type: 'image', shape: 'rectangle', aspectRatio: '21:9', gridArea: '1 / 1 / 2 / 3' },
+        { id: 'hero-title', type: 'text', overlay: true },
+        // Phase 1: Genesis
+        { id: 'phase1-image', type: 'image', shape: 't-shape-down', aspectRatio: '4:3' },
+        { id: 'phase1-text', type: 'text', wrapAround: 'phase1-image' },
+        { id: 'phase1-inset', type: 'image', shape: 'circle', aspectRatio: '1:1', size: 'small' },
+        // Phase 2: Integration
+        { id: 'phase2-brain', type: 'image', shape: 'hexagon', aspectRatio: '1:1', size: 'small' },
+        { id: 'phase2-arm', type: 'image', shape: 'circle', aspectRatio: '1:1', size: 'small' },
+        { id: 'phase2-hands', type: 'image', shape: 'hexagon', aspectRatio: '1:1', size: 'small' },
+        { id: 'phase2-main', type: 'image', shape: 't-shape-right', aspectRatio: '16:9' },
+        { id: 'phase2-city', type: 'image', shape: 'rectangle', aspectRatio: '21:9' },
+        { id: 'phase2-text', type: 'text' },
+        // Phase 3: Harmonization
+        { id: 'phase3-image', type: 'image', shape: 'rectangle', aspectRatio: '21:9' },
+        { id: 'phase3-text', type: 'text' },
+      ],
+      gridConfig: { columns: 2, rows: 6, gap: '2rem' },
+    },
+  },
+  {
+    id: 'lightning-story',
+    name: 'Lightning Story',
+    slug: 'lightning-story',
+    description: 'Dynamic layout with lightning bolt shapes and circles - great for innovation stories',
+    category: 'story',
+    visual_mode: 'framed',
+    structure: {
+      type: 'lightning-story',
+      slots: [
+        { id: 'hero-image', type: 'image', shape: 'rectangle', aspectRatio: '16:9' },
+        { id: 'hero-title', type: 'text', overlay: true },
+        { id: 'section1-lightning', type: 'image', shape: 'lightning-bolt', aspectRatio: '3:4' },
+        { id: 'section1-text', type: 'text', wrapAround: 'section1-lightning' },
+        { id: 'section2-circle', type: 'image', shape: 'circle', aspectRatio: '1:1' },
+        { id: 'section2-text', type: 'text', wrapAround: 'section2-circle' },
+        { id: 'section3-lightning', type: 'image', shape: 'lightning-bolt-mirror', aspectRatio: '3:4' },
+        { id: 'section3-text', type: 'text', wrapAround: 'section3-lightning' },
+        { id: 'footer-image', type: 'image', shape: 'rectangle', aspectRatio: '21:9' },
+      ],
+      gridConfig: { columns: 2, rows: 5, gap: '2rem' },
+    },
+  },
+  {
+    id: 't-shape-cascade',
+    name: 'T-Shape Cascade',
+    slug: 't-shape-cascade',
+    description: 'Alternating T-shaped images with text flowing around - professional magazine style',
+    category: 'story',
+    visual_mode: 'framed',
+    structure: {
+      type: 't-cascade',
+      slots: [
+        { id: 'hero-image', type: 'image', shape: 'rectangle', aspectRatio: '16:9' },
+        { id: 'intro-text', type: 'text' },
+        { id: 'section1-image', type: 'image', shape: 't-shape-down', aspectRatio: '4:3' },
+        { id: 'section1-text', type: 'text', wrapAround: 'section1-image' },
+        { id: 'section2-image', type: 'image', shape: 't-shape-up', aspectRatio: '4:3' },
+        { id: 'section2-text', type: 'text', wrapAround: 'section2-image' },
+        { id: 'section3-image', type: 'image', shape: 't-shape-right', aspectRatio: '4:3' },
+        { id: 'section3-text', type: 'text', wrapAround: 'section3-image' },
+        { id: 'conclusion-image', type: 'image', shape: 'rectangle', aspectRatio: '21:9' },
+        { id: 'conclusion-text', type: 'text' },
+      ],
+      gridConfig: { columns: 2, rows: 6, gap: '2rem' },
+    },
+  },
+  {
+    id: 'geometric-narrative',
+    name: 'Geometric Narrative',
+    slug: 'geometric-narrative',
+    description: 'Mix of hexagons, circles, and T-shapes telling a visual story',
+    category: 'story',
+    visual_mode: 'organic',
+    structure: {
+      type: 'geometric-narrative',
+      slots: [
+        { id: 'hero-image', type: 'image', shape: 'rectangle', aspectRatio: '16:9' },
+        { id: 'intro-text', type: 'text' },
+        { id: 'hex1', type: 'image', shape: 'hexagon', aspectRatio: '1:1', size: 'medium' },
+        { id: 'hex2', type: 'image', shape: 'hexagon', aspectRatio: '1:1', size: 'medium' },
+        { id: 'hex3', type: 'image', shape: 'hexagon', aspectRatio: '1:1', size: 'medium' },
+        { id: 'middle-text', type: 'text' },
+        { id: 'circle-feature', type: 'image', shape: 'circle', aspectRatio: '1:1', size: 'large' },
+        { id: 'circle-text', type: 'text', wrapAround: 'circle-feature' },
+        { id: 't-feature', type: 'image', shape: 't-shape-down', aspectRatio: '4:3' },
+        { id: 't-text', type: 'text', wrapAround: 't-feature' },
+        { id: 'conclusion-image', type: 'image', shape: 'rectangle', aspectRatio: '16:9' },
+      ],
+      gridConfig: { columns: 3, rows: 5, gap: '1.5rem' },
+    },
+  },
+  {
+    id: 'staircase-story',
+    name: 'Staircase Story',
+    slug: 'staircase-story',
+    description: 'Step-by-step visual journey using stair shapes - perfect for tutorials or processes',
+    category: 'story',
+    visual_mode: 'framed',
+    structure: {
+      type: 'staircase',
+      slots: [
+        { id: 'hero-image', type: 'image', shape: 'rectangle', aspectRatio: '16:9' },
+        { id: 'intro-text', type: 'text' },
+        { id: 'step1-image', type: 'image', shape: 'stairs-down-right', aspectRatio: '4:3' },
+        { id: 'step1-text', type: 'text', wrapAround: 'step1-image' },
+        { id: 'step2-image', type: 'image', shape: 'stairs-down-left', aspectRatio: '4:3' },
+        { id: 'step2-text', type: 'text', wrapAround: 'step2-image' },
+        { id: 'step3-image', type: 'image', shape: 'stairs-down-right', aspectRatio: '4:3' },
+        { id: 'step3-text', type: 'text', wrapAround: 'step3-image' },
+        { id: 'final-image', type: 'image', shape: 'rectangle', aspectRatio: '21:9' },
+        { id: 'conclusion-text', type: 'text' },
+      ],
+      gridConfig: { columns: 2, rows: 6, gap: '2rem' },
+    },
+  },
+  
+  // ========== ORIGINAL TEMPLATES ==========
   {
     id: 'winding-path',
     name: 'Winding Path (S-Flow)',
