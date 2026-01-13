@@ -1,20 +1,19 @@
 # GreenLine365 - Product Requirements Document
 
-## Latest Update: December 2025
-### Build Status: ⚠️ MIGRATIONS PENDING
+## Latest Update: January 2026
+### Build Status: ✅ MIGRATIONS COMPLETE
 
-## Recent Changes (This Session - December 2025)
-- ✅ Fixed `017_security_fixes.sql` - `v_active_conversations` view was referencing non-existent `conversations` table
-- ✅ Fixed `018_audit_logging.sql` - Made triggers conditional, fixed `super_admins` RLS policy
-- ✅ Created `CONSOLIDATED_MIGRATION_FIX.sql` - Single idempotent script for Supabase SQL Editor
+## Recent Changes (This Session - January 2026)
+- ✅ Fixed `audit_logs` RLS policies (uses `tenant_id` + `actor_id`, not `user_id`)
+- ✅ Fixed CRM tables RLS policies (`crm_leads`, `crm_customers`, `crm_revenue`)
+- ✅ Fixed `social_connections` RLS policies
+- ✅ All tables secured with Row Level Security
 
-## Migration Status
-- **015_social_and_analytics.sql** - Needs to run
-- **016_tenant_crm.sql** - Needs to run
-- **017_security_fixes.sql** - FIXED, needs to run
-- **018_audit_logging.sql** - FIXED, needs to run
-
-Run `CONSOLIDATED_MIGRATION_FIX.sql` in Supabase SQL Editor to apply all at once.
+## Migration Status: COMPLETE
+All migrations have been successfully applied:
+- `audit_logs` - RLS enabled, append-only for SOC2
+- `crm_leads`, `crm_customers`, `crm_revenue` - RLS with user_id
+- `social_connections` - RLS with user_id
 
 ## Original Problem Statement
 Build a comprehensive multi-tenant Business Operating System for local businesses called "GreenLine365".
@@ -77,7 +76,7 @@ Each tenant has isolated data using RLS with `tenant_id`/`user_id` columns:
 ## Prioritized Backlog
 
 ### P0 (Critical - Blockers)
-- ⚠️ **Database Migrations** - Run `CONSOLIDATED_MIGRATION_FIX.sql` in Supabase
+- ✅ **Database Migrations** - COMPLETE
 
 ### P1 (High Priority)
 - Integrate Event & Audit Loggers into API endpoints
