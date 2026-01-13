@@ -15,6 +15,7 @@ import Link from 'next/link';
 
 type AnalysisMode = 'analyze' | 'scratch';
 type VisionModel = 'gemini-3-pro' | 'gemini-2.0-pro' | 'gpt-4o';
+type GenerationMode = 'recreate' | 'redesign' | 'landing_page';
 
 interface DesignProposal {
   id: string;
