@@ -72,6 +72,28 @@ export default function SignUpPage() {
     }
   };
 
+  const handleMagicLink = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.email) {
+      setError('Please enter your email address');
+      return;
+    }
+    
+    setLoading(true);
+    setError(null);
+
+    const { error } = await signInWithMagicLink(formData.email, '/admin-v2');
+
+    if (error) {
+      setError(error.message);
+      setLoading(false);
+      return;
+    }
+
+    setMagicLinkSent(true);
+    setLoading(false);
+  };
+
   // Eye icon component for show/hide password
   const EyeIcon = ({ show, onClick }: { show: boolean; onClick: () => void }) => (
     <button
