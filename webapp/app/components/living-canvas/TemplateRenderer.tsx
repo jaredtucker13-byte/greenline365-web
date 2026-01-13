@@ -26,6 +26,7 @@ export interface TemplateSlot {
   overlay?: boolean;
   size?: 'small' | 'medium' | 'large';
   position?: { x: number; y: number; width: number; height: number };
+  aspectRatio?: '16:9' | '9:16' | '4:3' | '3:4' | '1:1' | '21:9' | string;
 }
 
 export interface TemplateStructure {
