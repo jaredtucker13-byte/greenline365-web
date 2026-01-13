@@ -5,7 +5,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { 
   Upload, FileImage, AlertTriangle, CheckCircle, XCircle, 
   Send, Eye, Clock, Trash2, Plus, Loader2, Zap, FileText,
-  Camera, Shield, Mail
+  Camera, Shield, Mail, Download
 } from 'lucide-react';
 
 interface Incident {
