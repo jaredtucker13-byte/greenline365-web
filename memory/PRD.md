@@ -1,14 +1,37 @@
 # GreenLine365 - Product Requirements Document
 
-## Latest Update: January 2026
-### Build Status: ✅ MIGRATIONS COMPLETE + NEW FEATURE
+## Latest Update: January 13, 2026
+### Build Status: ✅ BUILD PASSING + AI WEBSITE BUILDER FIXED
 
-## Recent Changes (This Session - January 2026)
+## Recent Changes (This Session - January 13, 2026)
+- ✅ **Fixed Website Crawler Integration** - Syntax error in `startAnalysis` function resolved
+- ✅ **Website Reverse-Engineering API** - `/api/crawl-website` fully functional
+  - Extracts: title, description, favicon, colors, headlines, CTAs, navigation, images, structure
+  - Auto-detects sections: Navigation, Hero, Features, Testimonials, Pricing, Footer
+- ✅ **Start Analysis Button** - Now enables correctly when either image OR extracted website data is available
+- ✅ Build passes successfully (`yarn build`)
+
+## AI Website Builder Feature (`/admin-v2/website-analyzer`)
+**Status: WORKING (requires deployment)**
+- **URL Reverse-Engineering**: Crawl any website to extract content, colors, and structure
+- **Multi-Section Workflow**: Build websites section-by-section (Header, Body, Footer)
+- **Drag-and-Drop**: Reorder sections before final assembly
+- **AI Models**: Gemini 3 Pro (vision), Claude 4.5 Sonnet (code), Nano Banana Pro (images)
+- **API Providers**: OpenRouter (text/vision), KIE.ai (image generation)
+
+### Key Files:
+- `/app/webapp/app/admin-v2/website-analyzer/page.tsx` - Main UI
+- `/app/webapp/app/api/crawl-website/route.ts` - Website crawler API
+- `/app/webapp/app/api/design-workflow/analyze/route.ts` - Vision analysis
+- `/app/webapp/app/api/design-workflow/generate-mockup/route.ts` - Image generation
+- `/app/webapp/app/api/design-workflow/generate-code/route.ts` - Code generation
+
+## Previous Session Changes
 - ✅ Fixed `audit_logs` RLS policies (uses `tenant_id` + `actor_id`, not `user_id`)
 - ✅ Fixed CRM tables RLS policies (`crm_leads`, `crm_customers`, `crm_revenue`)
 - ✅ Fixed `social_connections` RLS policies
 - ✅ All tables secured with Row Level Security
-- ✅ **NEW: Liability Documentation System** - Full incident reporting with AI analysis
+- ✅ **Liability Documentation System** - Full incident reporting with AI analysis
 
 ## NEW FEATURE: Liability Documentation System
 Complete incident documentation flow for HVAC industry:
