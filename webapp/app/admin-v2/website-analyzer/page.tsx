@@ -456,6 +456,31 @@ export default function WebsiteAnalyzerPage() {
                       ))}
                     </div>
                   </div>
+
+                  {/* Generation Mode - NEW! */}
+                  <div className="mt-6">
+                    <label className="text-sm font-medium text-white/70 block mb-3">Mockup Generation Mode</label>
+                    <div className="grid grid-cols-1 gap-2">
+                      {[
+                        { value: 'recreate', label: '🔄 Recreate This Page', desc: 'Keep page type, improve design (calendar stays calendar)' },
+                        { value: 'redesign', label: '✨ Redesign This Page', desc: 'Fresh creative approach, same page type' },
+                        { value: 'landing_page', label: '🚀 Convert to Landing Page', desc: 'Transform into a conversion-focused landing page' },
+                      ].map((gm) => (
+                        <button
+                          key={gm.value}
+                          onClick={() => setGenerationMode(gm.value as GenerationMode)}
+                          className={`p-3 rounded-xl text-left transition ${
+                            generationMode === gm.value
+                              ? 'bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/50'
+                              : 'bg-white/5 border border-white/10 hover:bg-white/10'
+                          }`}
+                        >
+                          <div className="text-sm font-medium">{gm.label}</div>
+                          <div className="text-xs text-white/40">{gm.desc}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               )}
 
