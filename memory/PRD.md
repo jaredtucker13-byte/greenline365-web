@@ -16,17 +16,36 @@ Complete incident documentation flow for HVAC industry:
 - **AI Analysis**: GPT-4o via OpenRouter for mold/damage/hazard detection
 - **Report Generation**: Auto-generated professional liability reports
 - **E-Signature**: Click-to-acknowledge or refuse with timestamp capture
+- **PDF Generation**: Full professional 14-section PDF with all legal elements
 - **Audit Trail**: Full tracking of views, signatures, and actions
+
+### PDF Template Structure (14 Sections):
+1. Document Header (company info, report ID, dates)
+2. Parties Involved (contractor, client, witnesses)
+3. Incident Summary (executive summary)
+4. Incident Details (type, severity, location, status)
+5. Evidence & Media (images with AI captions, EXIF data)
+6. Timeline of Events (chronological with sources)
+7. Findings & Analysis (AI-detected issues with severity)
+8. Risk Assessment (overall risk level, concerns)
+9. Recommendations (prioritized actions)
+10. Liability Statement & Legal Notice
+11. Customer Response & Acknowledgment (digital signature/refusal)
+12. Report Author & Verification (technician signature)
+13. Audit Metadata & Chain of Custody (SHA-256 hash, event log)
+14. Data Retention & Legal (footer, retention policy)
 
 ### Files Created:
 - `/app/api/incidents/route.ts` - CRUD operations
 - `/app/api/incidents/analyze/route.ts` - GPT-4o image analysis
 - `/app/api/incidents/upload/route.ts` - Image upload handling
 - `/app/api/incidents/generate-report/route.ts` - AI report generation
+- `/app/api/incidents/generate-pdf/route.ts` - **PDF generation with @react-pdf/renderer**
 - `/app/api/incidents/send-for-signature/route.ts` - Email delivery
 - `/app/api/incidents/sign/route.ts` - Public signing endpoint
 - `/app/admin-v2/incidents/page.tsx` - Admin dashboard
 - `/app/sign/[token]/page.tsx` - Public customer signing page
+- `/lib/pdf/IncidentReportPDF.tsx` - **Full 14-section PDF template**
 
 ### Database Migrations to Run:
 1. `020_liability_documentation.sql` - Tables: incidents, incident_images, signature_events
