@@ -1,13 +1,36 @@
 # GreenLine365 - Product Requirements Document
 
 ## Latest Update: January 2026
-### Build Status: ✅ MIGRATIONS COMPLETE
+### Build Status: ✅ MIGRATIONS COMPLETE + NEW FEATURE
 
 ## Recent Changes (This Session - January 2026)
 - ✅ Fixed `audit_logs` RLS policies (uses `tenant_id` + `actor_id`, not `user_id`)
 - ✅ Fixed CRM tables RLS policies (`crm_leads`, `crm_customers`, `crm_revenue`)
 - ✅ Fixed `social_connections` RLS policies
 - ✅ All tables secured with Row Level Security
+- ✅ **NEW: Liability Documentation System** - Full incident reporting with AI analysis
+
+## NEW FEATURE: Liability Documentation System
+Complete incident documentation flow for HVAC industry:
+- **Upload**: Batch image upload with EXIF extraction
+- **AI Analysis**: GPT-4o via OpenRouter for mold/damage/hazard detection
+- **Report Generation**: Auto-generated professional liability reports
+- **E-Signature**: Click-to-acknowledge or refuse with timestamp capture
+- **Audit Trail**: Full tracking of views, signatures, and actions
+
+### Files Created:
+- `/app/api/incidents/route.ts` - CRUD operations
+- `/app/api/incidents/analyze/route.ts` - GPT-4o image analysis
+- `/app/api/incidents/upload/route.ts` - Image upload handling
+- `/app/api/incidents/generate-report/route.ts` - AI report generation
+- `/app/api/incidents/send-for-signature/route.ts` - Email delivery
+- `/app/api/incidents/sign/route.ts` - Public signing endpoint
+- `/app/admin-v2/incidents/page.tsx` - Admin dashboard
+- `/app/sign/[token]/page.tsx` - Public customer signing page
+
+### Database Migrations to Run:
+1. `020_liability_documentation.sql` - Tables: incidents, incident_images, signature_events
+2. `021_incident_storage_bucket.sql` - Storage bucket for images
 
 ## Migration Status: COMPLETE
 All migrations have been successfully applied:
