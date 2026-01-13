@@ -100,6 +100,28 @@ export default function LoginPage() {
     }
   };
 
+  const handleMagicLink = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.email) {
+      setError('Please enter your email address');
+      return;
+    }
+    
+    setLoading(true);
+    setError(null);
+
+    const { error } = await signInWithMagicLink(formData.email, redirectTo);
+
+    if (error) {
+      setError(error.message);
+      setLoading(false);
+      return;
+    }
+
+    setMagicLinkSent(true);
+    setLoading(false);
+  };
+
   // Show loading while checking session
   if (checkingSession) {
     return (
