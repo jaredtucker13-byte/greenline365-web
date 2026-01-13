@@ -99,6 +99,7 @@ export default function WebsiteAnalyzerPage() {
   // Preview states
   const [selectedPreviewSection, setSelectedPreviewSection] = useState<Section | null>(null);
   const [showFullPreview, setShowFullPreview] = useState(false);
+  const [hasSavedProject, setHasSavedProject] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
