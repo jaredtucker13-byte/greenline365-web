@@ -253,6 +253,83 @@ export default function WebsiteAnalyzerPage() {
     setCapturingUrl(false);
   };
 
+  // Crawl URL and extract all content
+  const crawlWebsite = async () => {
+    if (!websiteUrl.trim()) {
+      setError('Please enter a website URL');
+      return;
+    }
+
+    setCrawlingUrl(true);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/crawl-website', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: websiteUrl }),
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.data) {
+        setExtractedWebsite(data.data);
+        
+        // Auto-populate sections based on detected structure
+        const detectedSections: Section[] = [];
+        let order = 0;
+        
+        if (data.data.structure.hasNavbar) {
+          detectedSections.push({ id: `section-${Date.now()}-nav`, type: 'header', label: 'Header / Navigation', status: 'pending', order: order++ });
+        }
+        if (data.data.structure.hasHero) {
+          detectedSections.push({ id: `section-${Date.now()}-hero`, type: 'hero', label: 'Hero Section', status: 'pending', order: order++ });
+        }
+        if (data.data.structure.hasFeatures) {
+          detectedSections.push({ id: `section-${Date.now()}-features`, type: 'features', label: 'Features Grid', status: 'pending', order: order++ });
+        }
+        if (data.data.structure.hasTestimonials) {
+          detectedSections.push({ id: `section-${Date.now()}-testimonials`, type: 'testimonials', label: 'Testimonials', status: 'pending', order: order++ });
+        }
+        if (data.data.structure.hasPricing) {
+          detectedSections.push({ id: `section-${Date.now()}-pricing`, type: 'pricing', label: 'Pricing Table', status: 'pending', order: order++ });
+        }
+        if (data.data.structure.hasFooter) {
+          detectedSections.push({ id: `section-${Date.now()}-footer`, type: 'footer', label: 'Footer', status: 'pending', order: order++ });
+        }
+        
+        // Ensure minimum 3 sections
+        if (detectedSections.length < 3) {
+          if (!detectedSections.find(s => s.type === 'header')) {
+            detectedSections.unshift({ id: `section-${Date.now()}-h`, type: 'header', label: 'Header / Navigation', status: 'pending', order: 0 });
+          }
+          if (!detectedSections.find(s => s.type === 'hero')) {
+            detectedSections.push({ id: `section-${Date.now()}-he`, type: 'hero', label: 'Hero Section', status: 'pending', order: 1 });
+          }
+          if (!detectedSections.find(s => s.type === 'footer')) {
+            detectedSections.push({ id: `section-${Date.now()}-f`, type: 'footer', label: 'Footer', status: 'pending', order: detectedSections.length });
+          }
+        }
+        
+        // Re-order
+        detectedSections.forEach((s, i) => s.order = i);
+        setSections(detectedSections);
+        
+        // Set brand colors if found
+        if (data.data.colors.primary.length > 0) {
+          setBrandColors(data.data.colors.primary.slice(0, 3).join(', '));
+        }
+        
+      } else {
+        setError(data.error || 'Failed to crawl website');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to crawl website');
+    }
+
+    setCrawlingUrl(false);
+  };
+
   // Clear uploaded image
   const clearImage = () => {
     setImagePreview(null);
