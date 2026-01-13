@@ -457,7 +457,7 @@ Generate a high-quality mockup specifically for this ${section.label} section on
 
   // Open in Code Studio
   const openInCodeStudio = () => {
-    if (project?.generatedCode) {
+    if (project?.generatedCode && typeof window !== 'undefined') {
       // Save code to localStorage for Code Studio to pick up
       localStorage.setItem('codeStudio_importCode', project.generatedCode);
       window.open('/admin-v2/code-studio', '_blank');
