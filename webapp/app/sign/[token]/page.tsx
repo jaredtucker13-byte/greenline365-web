@@ -198,7 +198,16 @@ export default function SignPage() {
             <Shield className="text-emerald-400" size={28} />
             <span className="font-bold text-lg">GreenLine365</span>
           </div>
-          <span className="text-sm text-gray-400">Incident Documentation</span>
+          <div className="flex items-center gap-3">
+            <a
+              href={`/api/incidents/generate-pdf?token=${token}`}
+              className="flex items-center gap-2 px-3 py-1.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg text-sm transition-colors"
+            >
+              <Download size={16} />
+              Download PDF
+            </a>
+            <span className="text-sm text-gray-400">Incident Documentation</span>
+          </div>
         </div>
       </header>
 
