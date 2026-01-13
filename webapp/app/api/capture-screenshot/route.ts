@@ -1,81 +1,141 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+/**
+ * URL Screenshot Capture API
+ * Uses multiple fallback services for reliability
+ */
+
 interface CaptureRequest {
   url: string;
+  fullPage?: boolean;
+  width?: number;
+  height?: number;
 }
-
-// Use a free screenshot API service since Playwright doesn't work in Vercel serverless
-const SCREENSHOT_API = 'https://api.screenshotone.com/take';
 
 export async function POST(request: NextRequest) {
   try {
     const body: CaptureRequest = await request.json();
-    const { url } = body;
+    const { url, fullPage = false, width = 1920, height = 1080 } = body;
 
     if (!url) {
       return NextResponse.json({ error: 'URL is required' }, { status: 400 });
     }
 
-    // Validate URL
+    // Validate and normalize URL
+    let normalizedUrl = url.trim();
+    if (!normalizedUrl.startsWith('http://') && !normalizedUrl.startsWith('https://')) {
+      normalizedUrl = 'https://' + normalizedUrl;
+    }
+
     try {
-      new URL(url);
+      new URL(normalizedUrl);
     } catch {
       return NextResponse.json({ error: 'Invalid URL format' }, { status: 400 });
     }
 
-    // Method 1: Try using a public screenshot service
-    // We'll use a free tier approach - fetch the page and create a simple capture
-    
-    // For production, you'd use services like:
-    // - ScreenshotOne API
-    // - Microlink API  
-    // - ScrapingBee
-    // - Puppeteer deployed on a separate serverless function with browser support
-    
-    // Free alternative: Use microlink.io which has a free tier
-    const screenshotUrl = `https://api.microlink.io/?url=${encodeURIComponent(url)}&screenshot=true&meta=false&embed=screenshot.url`;
-    
-    const response = await fetch(screenshotUrl, {
-      headers: {
-        'Accept': 'application/json',
-      },
-    });
+    console.log('[Screenshot] Capturing:', normalizedUrl);
 
-    if (!response.ok) {
-      throw new Error(`Screenshot service returned ${response.status}`);
+    // Try multiple screenshot services in order of reliability
+    let screenshotBase64: string | null = null;
+    let lastError: string = '';
+
+    // Service 1: Microlink API (free tier)
+    try {
+      const microlinkUrl = `https://api.microlink.io/?url=${encodeURIComponent(normalizedUrl)}&screenshot=true&meta=false&embed=screenshot.url&viewport.width=${width}&viewport.height=${height}${fullPage ? '&screenshot.fullPage=true' : ''}`;
+      
+      const response = await fetch(microlinkUrl, {
+        headers: { 'Accept': 'application/json' },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.status === 'success' && data.data?.screenshot?.url) {
+          const imageResponse = await fetch(data.data.screenshot.url);
+          if (imageResponse.ok) {
+            const imageBuffer = await imageResponse.arrayBuffer();
+            screenshotBase64 = Buffer.from(imageBuffer).toString('base64');
+            console.log('[Screenshot] Success via Microlink');
+          }
+        }
+      }
+    } catch (e: any) {
+      lastError = e.message;
+      console.log('[Screenshot] Microlink failed:', e.message);
     }
 
-    const data = await response.json();
-    
-    if (data.status !== 'success' || !data.data?.screenshot?.url) {
-      throw new Error('Screenshot service failed to capture the page');
+    // Service 2: Screenshot Machine (free tier)
+    if (!screenshotBase64) {
+      try {
+        // Using a public screenshot service
+        const screenshotMachineUrl = `https://api.screenshotmachine.com?key=guest&url=${encodeURIComponent(normalizedUrl)}&dimension=${width}x${height}&format=png`;
+        
+        const response = await fetch(screenshotMachineUrl);
+        if (response.ok && response.headers.get('content-type')?.includes('image')) {
+          const imageBuffer = await response.arrayBuffer();
+          screenshotBase64 = Buffer.from(imageBuffer).toString('base64');
+          console.log('[Screenshot] Success via Screenshot Machine');
+        }
+      } catch (e: any) {
+        lastError = e.message;
+        console.log('[Screenshot] Screenshot Machine failed:', e.message);
+      }
     }
 
-    // Fetch the actual screenshot image
-    const imageUrl = data.data.screenshot.url;
-    const imageResponse = await fetch(imageUrl);
-    
-    if (!imageResponse.ok) {
-      throw new Error('Failed to fetch screenshot image');
+    // Service 3: thum.io (free tier)
+    if (!screenshotBase64) {
+      try {
+        const thumUrl = `https://image.thum.io/get/width/${width}/crop/${height}/noanimate/${normalizedUrl}`;
+        
+        const response = await fetch(thumUrl);
+        if (response.ok && response.headers.get('content-type')?.includes('image')) {
+          const imageBuffer = await response.arrayBuffer();
+          screenshotBase64 = Buffer.from(imageBuffer).toString('base64');
+          console.log('[Screenshot] Success via thum.io');
+        }
+      } catch (e: any) {
+        lastError = e.message;
+        console.log('[Screenshot] thum.io failed:', e.message);
+      }
     }
 
-    const imageBuffer = await imageResponse.arrayBuffer();
-    const screenshotBase64 = Buffer.from(imageBuffer).toString('base64');
+    // Service 4: Urlbox-style URL (public endpoint)
+    if (!screenshotBase64) {
+      try {
+        const apiflashUrl = `https://api.apiflash.com/v1/urltoimage?access_key=demo&url=${encodeURIComponent(normalizedUrl)}&width=${width}&height=${height}&format=png`;
+        
+        const response = await fetch(apiflashUrl);
+        if (response.ok && response.headers.get('content-type')?.includes('image')) {
+          const imageBuffer = await response.arrayBuffer();
+          screenshotBase64 = Buffer.from(imageBuffer).toString('base64');
+          console.log('[Screenshot] Success via APIFlash');
+        }
+      } catch (e: any) {
+        lastError = e.message;
+        console.log('[Screenshot] APIFlash failed:', e.message);
+      }
+    }
+
+    if (!screenshotBase64) {
+      return NextResponse.json({
+        success: false,
+        error: `All screenshot services failed. Last error: ${lastError}. Please upload a screenshot manually.`,
+        suggestion: 'Try taking a screenshot manually (Cmd+Shift+4 on Mac, Win+Shift+S on Windows) and uploading it.',
+      }, { status: 500 });
+    }
 
     return NextResponse.json({
       success: true,
       screenshot: screenshotBase64,
+      url: normalizedUrl,
     });
 
   } catch (error: any) {
-    console.error('[Capture Screenshot] Error:', error);
+    console.error('[Screenshot] Error:', error);
     
-    return NextResponse.json(
-      { 
-        success: false, 
-        error: error.message || 'Screenshot capture failed. Try uploading a screenshot manually instead.' 
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({
+      success: false,
+      error: error.message || 'Screenshot capture failed',
+      suggestion: 'Please take a screenshot manually and upload it instead.',
+    }, { status: 500 });
   }
 }
