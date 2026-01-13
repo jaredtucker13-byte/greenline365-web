@@ -1100,7 +1100,7 @@ Generate a high-quality mockup specifically for this ${section.label} section on
               {/* Start Button */}
               <button
                 onClick={startAnalysis}
-                disabled={loading || (mode === 'analyze' && !imageBase64) || (mode === 'scratch' && !description.trim())}
+                disabled={loading || (mode === 'analyze' && !imageBase64 && !extractedWebsite) || (mode === 'scratch' && !description.trim())}
                 className="w-full py-4 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-semibold hover:opacity-90 transition disabled:opacity-50 flex items-center justify-center gap-3"
                 data-testid="start-analysis-btn"
               >
