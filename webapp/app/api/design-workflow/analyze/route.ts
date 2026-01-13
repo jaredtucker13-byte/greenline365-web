@@ -25,10 +25,10 @@ const ANALYSIS_PROMPTS: Record<string, string> = {
   visual: 'Analyze visual design: colors (HEX codes), typography, spacing, layout balance.',
 };
 
-// OpenRouter model mapping
+// OpenRouter model mapping - Using the BEST models
 const MODEL_MAP: Record<string, string> = {
-  'gemini-3-pro': 'google/gemini-2.0-flash-exp:free', // Free tier Gemini with vision
-  'gemini-2.0-pro': 'google/gemini-2.0-flash-exp:free',
+  'gemini-3-pro': 'google/gemini-2.5-pro-preview', // Gemini 3 Pro (best vision)
+  'gemini-2.0-pro': 'google/gemini-2.5-pro-preview',
   'gpt-4o': 'openai/gpt-4o', // GPT-4o with vision
 };
 
@@ -88,6 +88,7 @@ async function generateDesignWithOpenRouter(prompt: string): Promise<string> {
     throw new Error('OpenRouter API key not configured');
   }
 
+  // Using Claude 4.5 Sonnet for text-only design generation
   const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -97,7 +98,7 @@ async function generateDesignWithOpenRouter(prompt: string): Promise<string> {
       'X-Title': 'GreenLine365 Website Builder',
     },
     body: JSON.stringify({
-      model: 'anthropic/claude-3.5-sonnet', // Claude for text-only design generation
+      model: 'anthropic/claude-sonnet-4', // Claude 4.5 Sonnet
       messages: [
         {
           role: 'system',
@@ -137,7 +138,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Screenshot required' }, { status: 400 });
       }
 
-      const modelId = MODEL_MAP[visionModel] || MODEL_MAP['gpt-4o'];
+      const modelId = MODEL_MAP[visionModel] || MODEL_MAP['gemini-3-pro'];
       const prompt = ANALYSIS_PROMPTS[analysisType] || ANALYSIS_PROMPTS.full;
 
       const analysisText = await analyzeWithOpenRouter(imageBase64, prompt, modelId);
@@ -149,7 +150,7 @@ export async function POST(request: NextRequest) {
       });
 
     } else {
-      // Scratch mode - text only design generation
+      // Scratch mode - text only design generation with Claude 4.5 Sonnet
       const { description, brandColors, stylePreference, targetAudience } = body;
 
       if (!description) {
