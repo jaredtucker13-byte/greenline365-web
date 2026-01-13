@@ -138,6 +138,49 @@ export default function DailyTrendHunter({
 
   return (
     <div className="w-full max-w-6xl mx-auto px-4 py-8">
+      {/* Blocked State - Hard Paywall */}
+      {isBlocked && !unlimitedAccess && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+        >
+          <div className="bg-gradient-to-br from-gray-900 to-black border border-[#00e676]/30 rounded-2xl p-8 max-w-md w-full text-center shadow-2xl shadow-[#00e676]/10">
+            <div className="w-20 h-20 bg-[#00e676]/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <span className="text-4xl">🔒</span>
+            </div>
+            <h3 className="text-2xl font-bold text-white mb-3">
+              Free Trial Complete!
+            </h3>
+            <p className="text-gray-400 mb-2">
+              You've used all <span className="text-[#00e676] font-semibold">3 free searches</span>.
+            </p>
+            <p className="text-gray-500 text-sm mb-6">
+              Sign up to unlock unlimited trend hunting and discover local opportunities for your business.
+            </p>
+            
+            <div className="space-y-3">
+              <Link
+                href="/signup"
+                className="block w-full py-4 bg-[#00e676] hover:bg-[#00e676]/90 text-black font-bold rounded-xl transition-all transform hover:scale-105"
+              >
+                Sign Up Free →
+              </Link>
+              <Link
+                href="/login"
+                className="block w-full py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium rounded-xl transition-all"
+              >
+                Already have an account? Sign In
+              </Link>
+            </div>
+            
+            <p className="text-gray-600 text-xs mt-6">
+              ✨ Unlimited searches • 📊 Save trends • 🎯 Create content
+            </p>
+          </div>
+        </motion.div>
+      )}
+
       <div className="text-center mb-8">
         <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
           Daily Trend Hunter 🎯
@@ -145,6 +188,21 @@ export default function DailyTrendHunter({
         <p className="text-gray-400 text-base md:text-lg">
           Discover local opportunities and trending topics in your area
         </p>
+        
+        {/* Usage Counter - Show remaining searches */}
+        {!unlimitedAccess && !isBlocked && (
+          <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full">
+            <span className="text-gray-400 text-sm">Free searches remaining:</span>
+            <span className="text-[#00e676] font-bold">{MAX_FREE_USES - usageCount}</span>
+            <span className="text-gray-500 text-sm">/ {MAX_FREE_USES}</span>
+          </div>
+        )}
+        
+        {unlimitedAccess && (
+          <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-[#00e676]/10 border border-[#00e676]/30 rounded-full">
+            <span className="text-[#00e676] text-sm font-medium">✨ Unlimited Access</span>
+          </div>
+        )}
       </div>
 
       <form onSubmit={handleSubmit} className="mb-8">
@@ -154,16 +212,16 @@ export default function DailyTrendHunter({
             value={zipCode}
             onChange={(e) => setZipCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
             placeholder="Enter ZIP code (e.g., 10001)"
-            className="flex-1 px-6 py-4 bg-black/40 border border-[#00e676]/30 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-[#00e676] transition-all"
-            disabled={loading}
+            className="flex-1 px-6 py-4 bg-black/40 border border-[#00e676]/30 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-[#00e676] transition-all disabled:opacity-50"
+            disabled={loading || isBlocked}
             maxLength={5}
           />
           <button
             type="submit"
-            disabled={loading || zipCode.length !== 5}
+            disabled={loading || zipCode.length !== 5 || isBlocked}
             className="px-8 py-4 bg-[#00e676] hover:bg-[#00e676]/90 disabled:bg-gray-600 disabled:cursor-not-allowed text-black font-semibold rounded-xl transition-all transform hover:scale-105 active:scale-95"
           >
-            {loading ? 'Finding...' : 'Hunt Trends'}
+            {loading ? 'Finding...' : isBlocked ? '🔒 Locked' : 'Hunt Trends'}
           </button>
         </div>
 
