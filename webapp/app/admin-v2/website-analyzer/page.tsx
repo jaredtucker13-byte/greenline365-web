@@ -877,7 +877,7 @@ Generate a high-quality mockup specifically for this ${section.label} section on
               </div>
 
               {/* Saved Project Notice */}
-              {localStorage.getItem('websiteBuilder_project') && currentStep === 'input' && (
+              {hasSavedProject && currentStep === 'input' && (
                 <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
                   <h3 className="text-sm font-semibold text-amber-300 mb-2">💾 Saved Project Found</h3>
                   <p className="text-xs text-amber-200/70 mb-3">
