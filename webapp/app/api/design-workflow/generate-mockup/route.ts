@@ -1,47 +1,65 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { spawn } from 'child_process';
+
+/**
+ * Generate Mockup API
+ * Uses KIE.ai Nano Banana Pro for high-quality website mockup generation
+ */
 
 interface MockupRequest {
   designSpec: any;
   analysisText: string;
 }
 
-async function runPythonScript(scriptContent: string): Promise<{ stdout: string; stderr: string }> {
-  return new Promise((resolve, reject) => {
-    const pythonProcess = spawn('/root/.venv/bin/python3', ['-c', scriptContent], {
-      cwd: '/app/webapp',
-      env: { ...globalThis.process.env },
+const KIE_API_KEY = process.env.KIE_API_KEY;
+const KIE_API_URL = 'https://api.kie.ai/api/v1/jobs/createTask';
+const KIE_TASK_STATUS_URL = 'https://api.kie.ai/api/v1/jobs/getTaskInfo';
+
+interface KieTaskResponse {
+  code: number;
+  msg: string;
+  data: {
+    taskId: string;
+  };
+}
+
+interface KieTaskStatusResponse {
+  code: number;
+  msg: string;
+  data: {
+    status: string;
+    output?: {
+      imageUrl?: string;
+      images?: string[];
+    };
+  };
+}
+
+async function pollForResult(taskId: string, maxAttempts = 45): Promise<string | null> {
+  for (let i = 0; i < maxAttempts; i++) {
+    await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds between polls
+    
+    const statusResponse = await fetch(KIE_TASK_STATUS_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${KIE_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ taskId }),
     });
 
-    let stdout = '';
-    let stderr = '';
+    if (!statusResponse.ok) continue;
 
-    pythonProcess.stdout.on('data', (data) => {
-      stdout += data.toString();
-    });
-
-    pythonProcess.stderr.on('data', (data) => {
-      stderr += data.toString();
-    });
-
-    pythonProcess.on('close', (code) => {
-      if (code === 0 || stdout) {
-        resolve({ stdout, stderr });
-      } else {
-        reject(new Error(stderr || `Process exited with code ${code}`));
-      }
-    });
-
-    pythonProcess.on('error', (err) => {
-      reject(err);
-    });
-
-    // Timeout after 90 seconds for image generation
-    setTimeout(() => {
-      pythonProcess.kill();
-      reject(new Error('Script timeout'));
-    }, 90000);
-  });
+    const statusData: KieTaskStatusResponse = await statusResponse.json();
+    
+    if (statusData.data?.status === 'completed' || statusData.data?.status === 'success') {
+      const imageUrl = statusData.data.output?.imageUrl || statusData.data.output?.images?.[0];
+      if (imageUrl) return imageUrl;
+    } else if (statusData.data?.status === 'failed') {
+      throw new Error('Mockup generation failed');
+    }
+  }
+  
+  throw new Error('Mockup generation timed out');
 }
 
 export async function POST(request: NextRequest) {
@@ -53,63 +71,85 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Analysis text required' }, { status: 400 });
     }
 
-    const emergentKey = process.env.EMERGENT_LLM_KEY || 'sk-emergent-c87DeA8638fD64f7d3';
-
-    // Create a concise prompt for image generation
-    const imagePrompt = `Professional website hero section mockup for a modern business landing page. 
-Clean minimal design with:
-- Bold headline text
-- Subheadline
-- Call-to-action button
-- Professional color scheme
-Desktop view, 16:9 aspect ratio, photorealistic render.`;
-
-    const pythonScript = `
-import asyncio
-import json
-import sys
-
-async def main():
-    from emergentintegrations.llm.chat import LlmChat, UserMessage
-    
-    chat = LlmChat(
-        api_key='${emergentKey}',
-        session_id='mockup-gen',
-        system_message='You are a professional web design mockup generator.'
-    )
-    chat.with_model('gemini', 'gemini-2.5-flash-image-preview')
-    chat.with_params(modalities=['image', 'text'])
-    
-    message = UserMessage(text='''${imagePrompt.replace(/'/g, "\\'")}''')
-    
-    try:
-        text, images = await chat.send_message_multimodal_response(message)
-        
-        if images and len(images) > 0:
-            img = images[0]
-            img_url = f"data:{img['mime_type']};base64,{img['data']}"
-            print(json.dumps({'success': True, 'mockupImageUrl': img_url}))
-        else:
-            print(json.dumps({'success': False, 'error': 'No image generated'}))
-    except Exception as e:
-        print(json.dumps({'success': False, 'error': str(e)}))
-        sys.exit(1)
-
-try:
-    asyncio.run(main())
-except Exception as e:
-    print(json.dumps({'success': False, 'error': str(e)}))
-    sys.exit(1)
-`;
-
-    const { stdout, stderr } = await runPythonScript(pythonScript);
-
-    if (!stdout) {
-      return NextResponse.json({ success: false, error: stderr || 'No response from mockup generation' }, { status: 500 });
+    if (!KIE_API_KEY) {
+      return NextResponse.json({ error: 'KIE API key not configured' }, { status: 500 });
     }
 
-    const result = JSON.parse(stdout);
-    return NextResponse.json(result);
+    // Create a detailed prompt for mockup generation
+    const imagePrompt = `Professional website hero section mockup for a modern business landing page. 
+Clean minimal design with:
+- Bold headline text prominently displayed
+- Clear subheadline explaining the value proposition
+- Prominent call-to-action button with contrasting color
+- Professional color scheme (dark theme preferred)
+- Modern gradient or solid background
+- Desktop view, 16:9 aspect ratio
+- High-quality photorealistic render
+- Clean typography with good hierarchy
+Style: Modern SaaS landing page, professional, conversion-optimized`;
+
+    console.log('[Generate Mockup] Creating task with KIE.ai Nano Banana Pro');
+
+    // Create task with KIE.ai Nano Banana Pro
+    const createTaskResponse = await fetch(KIE_API_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${KIE_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'nano-banana-pro',
+        input: {
+          prompt: imagePrompt,
+        },
+      }),
+    });
+
+    if (!createTaskResponse.ok) {
+      const errorText = await createTaskResponse.text();
+      console.error('[Generate Mockup] Task creation failed:', errorText);
+      return NextResponse.json(
+        { success: false, error: 'Failed to create mockup generation task' },
+        { status: 500 }
+      );
+    }
+
+    const taskData: KieTaskResponse = await createTaskResponse.json();
+    
+    if (taskData.code !== 0 && taskData.code !== 200) {
+      console.error('[Generate Mockup] Task creation error:', taskData.msg);
+      return NextResponse.json(
+        { success: false, error: taskData.msg || 'Task creation failed' },
+        { status: 500 }
+      );
+    }
+
+    const taskId = taskData.data?.taskId;
+    if (!taskId) {
+      return NextResponse.json(
+        { success: false, error: 'No task ID received' },
+        { status: 500 }
+      );
+    }
+
+    console.log('[Generate Mockup] Task created:', taskId);
+
+    // Poll for result
+    const imageUrl = await pollForResult(taskId);
+
+    if (!imageUrl) {
+      return NextResponse.json(
+        { success: false, error: 'No image URL in response' },
+        { status: 500 }
+      );
+    }
+
+    console.log('[Generate Mockup] Mockup generated successfully');
+
+    return NextResponse.json({
+      success: true,
+      mockupImageUrl: imageUrl,
+    });
 
   } catch (error: any) {
     console.error('[Generate Mockup] Error:', error);
