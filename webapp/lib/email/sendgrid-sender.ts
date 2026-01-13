@@ -30,13 +30,16 @@ interface EmailOptions {
 export async function sendEmail(options: EmailOptions): Promise<{ success: boolean; error?: string }> {
   if (!SENDGRID_API_KEY) {
     console.error('[Email] SENDGRID_API_KEY not configured');
-    return { success: false, error: 'Email service not configured' };
+    return { success: false, error: 'Email service not configured - missing SENDGRID_API_KEY' };
   }
 
-  console.log('[Email] Sending to:', options.to);
+  console.log('[Email] Attempting to send email');
+  console.log('[Email] To:', options.to);
+  console.log('[Email] From:', FROM_EMAIL);
+  console.log('[Email] Subject:', options.subject);
 
   try {
-    await sgMail.send({
+    const result = await sgMail.send({
       from: {
         email: FROM_EMAIL,
         name: 'GreenLine365',
@@ -48,10 +51,22 @@ export async function sendEmail(options: EmailOptions): Promise<{ success: boole
     });
 
     console.log('[Email] Sent successfully to:', options.to);
+    console.log('[Email] SendGrid response:', JSON.stringify(result));
     return { success: true };
   } catch (error: any) {
-    console.error('[Email] Send failed:', error.response?.body || error.message);
-    return { success: false, error: error.message };
+    console.error('[Email] Send failed');
+    console.error('[Email] Error message:', error.message);
+    console.error('[Email] Error code:', error.code);
+    console.error('[Email] Error response:', JSON.stringify(error.response?.body || {}));
+    
+    // Extract specific error message
+    const errorBody = error.response?.body;
+    let detailedError = error.message;
+    if (errorBody?.errors && errorBody.errors.length > 0) {
+      detailedError = errorBody.errors.map((e: any) => e.message).join(', ');
+    }
+    
+    return { success: false, error: detailedError };
   }
 }
 
