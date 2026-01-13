@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
     
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('incident-images')
-      .upload(storagePath, pdfBuffer, {
+      .upload(storagePath, new Uint8Array(pdfBuffer), {
         contentType: 'application/pdf',
         upsert: true
       });
