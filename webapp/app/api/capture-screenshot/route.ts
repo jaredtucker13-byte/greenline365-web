@@ -118,9 +118,10 @@ export async function POST(request: NextRequest) {
     if (!screenshotBase64) {
       return NextResponse.json({
         success: false,
-        error: `All screenshot services failed. Last error: ${lastError}. Please upload a screenshot manually.`,
-        suggestion: 'Try taking a screenshot manually (Cmd+Shift+4 on Mac, Win+Shift+S on Windows) and uploading it.',
-      }, { status: 500 });
+        error: 'Free screenshot services are currently unavailable.',
+        suggestion: '📸 Please take a screenshot manually:\n• Mac: Cmd+Shift+4\n• Windows: Win+Shift+S\n• Then upload the image directly',
+        manualRequired: true,
+      }, { status: 503 });
     }
 
     return NextResponse.json({
