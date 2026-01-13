@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { chromium } from 'playwright';
 
 interface CaptureRequest {
   url: string;
 }
 
+// Use a free screenshot API service since Playwright doesn't work in Vercel serverless
+const SCREENSHOT_API = 'https://api.screenshotone.com/take';
+
 export async function POST(request: NextRequest) {
-  let browser = null;
-  
   try {
     const body: CaptureRequest = await request.json();
     const { url } = body;
@@ -23,51 +23,58 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid URL format' }, { status: 400 });
     }
 
-    // Launch browser and capture screenshot
-    browser = await chromium.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    // Method 1: Try using a public screenshot service
+    // We'll use a free tier approach - fetch the page and create a simple capture
+    
+    // For production, you'd use services like:
+    // - ScreenshotOne API
+    // - Microlink API  
+    // - ScrapingBee
+    // - Puppeteer deployed on a separate serverless function with browser support
+    
+    // Free alternative: Use microlink.io which has a free tier
+    const screenshotUrl = `https://api.microlink.io/?url=${encodeURIComponent(url)}&screenshot=true&meta=false&embed=screenshot.url`;
+    
+    const response = await fetch(screenshotUrl, {
+      headers: {
+        'Accept': 'application/json',
+      },
     });
+
+    if (!response.ok) {
+      throw new Error(`Screenshot service returned ${response.status}`);
+    }
+
+    const data = await response.json();
     
-    const page = await browser.newPage({
-      viewport: { width: 1920, height: 1080 }
-    });
+    if (data.status !== 'success' || !data.data?.screenshot?.url) {
+      throw new Error('Screenshot service failed to capture the page');
+    }
+
+    // Fetch the actual screenshot image
+    const imageUrl = data.data.screenshot.url;
+    const imageResponse = await fetch(imageUrl);
     
-    await page.goto(url, { 
-      waitUntil: 'networkidle',
-      timeout: 30000 
-    });
-    
-    // Take screenshot as buffer
-    const screenshotBuffer = await page.screenshot({
-      fullPage: true,
-      type: 'png'
-    });
-    
-    await browser.close();
-    browser = null;
-    
-    // Convert to base64
-    const screenshotBase64 = screenshotBuffer.toString('base64');
-    
+    if (!imageResponse.ok) {
+      throw new Error('Failed to fetch screenshot image');
+    }
+
+    const imageBuffer = await imageResponse.arrayBuffer();
+    const screenshotBase64 = Buffer.from(imageBuffer).toString('base64');
+
     return NextResponse.json({
       success: true,
-      screenshot: screenshotBase64
+      screenshot: screenshotBase64,
     });
 
   } catch (error: any) {
     console.error('[Capture Screenshot] Error:', error);
     
-    if (browser) {
-      try {
-        await browser.close();
-      } catch (e) {
-        // Ignore close errors
-      }
-    }
-    
     return NextResponse.json(
-      { success: false, error: error.message || 'Screenshot capture failed' },
+      { 
+        success: false, 
+        error: error.message || 'Screenshot capture failed. Try uploading a screenshot manually instead.' 
+      },
       { status: 500 }
     );
   }
