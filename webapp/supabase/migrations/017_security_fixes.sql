@@ -1,5 +1,5 @@
 -- ============================================================
--- SECURITY FIX MIGRATION v3
+-- SECURITY FIX MIGRATION v4
 -- Fix RLS disabled tables (EXCLUDING PostGIS system tables)
 -- ============================================================
 
@@ -100,15 +100,16 @@ END $$;
 
 -- ============================================
 -- PART 2: Fix Security Definer Views
+-- Only create views if underlying tables exist with correct columns
 -- ============================================
 
 DROP VIEW IF EXISTS public.v_recent_events CASCADE;
 DROP VIEW IF EXISTS public.v_active_conversations CASCADE;
 DROP VIEW IF EXISTS public.safe_training_data CASCADE;
 
--- Recreate if underlying tables exist
+-- Recreate v_recent_events if underlying table exists
 DO $$ BEGIN
-  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'memory_event_journal') THEN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'memory_event_journal' AND table_schema = 'public') THEN
     CREATE OR REPLACE VIEW public.v_recent_events AS
     SELECT id, user_id, event_type, event_category, title, description, occurred_at, metadata
     FROM memory_event_journal
@@ -118,16 +119,27 @@ DO $$ BEGIN
   END IF;
 END $$;
 
+-- Recreate v_active_conversations from memory_context_buffer (not conversations table)
 DO $$ BEGIN
-  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'conversations') THEN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'memory_context_buffer' AND table_schema = 'public') THEN
     CREATE OR REPLACE VIEW public.v_active_conversations AS
-    SELECT * FROM conversations WHERE status = 'active';
+    SELECT 
+      user_id,
+      session_id,
+      COUNT(*) as message_count,
+      MIN(created_at) as started_at,
+      MAX(created_at) as last_activity
+    FROM memory_context_buffer
+    WHERE context_type = 'message'
+      AND expires_at > NOW()
+    GROUP BY user_id, session_id;
     GRANT SELECT ON public.v_active_conversations TO authenticated;
   END IF;
 END $$;
 
+-- Recreate safe_training_data if underlying table exists
 DO $$ BEGIN
-  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'memory_knowledge_chunks') THEN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'memory_knowledge_chunks' AND table_schema = 'public') THEN
     CREATE OR REPLACE VIEW public.safe_training_data AS
     SELECT id, category, content, created_at
     FROM memory_knowledge_chunks WHERE is_active = true;

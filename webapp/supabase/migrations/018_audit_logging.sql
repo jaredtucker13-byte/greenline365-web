@@ -54,19 +54,30 @@ CREATE POLICY "Audit logs are append-only"
   TO authenticated, anon
   WITH CHECK (true);
 
--- Admins can read all audit logs
+-- Admins can read all audit logs (check for super_admins table existence)
 DROP POLICY IF EXISTS "Admins can read audit logs" ON audit_logs;
-CREATE POLICY "Admins can read audit logs" 
-  ON audit_logs FOR SELECT 
-  TO authenticated 
-  USING (
-    -- Check if user is super admin
-    EXISTS (
-      SELECT 1 FROM super_admins WHERE user_id = auth.uid()
-    )
-    -- Or users can see their own audit logs
-    OR user_id = auth.uid()
-  );
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'super_admins' AND table_schema = 'public') THEN
+    CREATE POLICY "Admins can read audit logs" 
+      ON audit_logs FOR SELECT 
+      TO authenticated 
+      USING (
+        -- Check if user is super admin (table may have user_id or id column)
+        EXISTS (
+          SELECT 1 FROM super_admins sa 
+          WHERE sa.user_id = auth.uid() OR sa.id = auth.uid()
+        )
+        -- Or users can see their own audit logs
+        OR user_id = auth.uid()
+      );
+  ELSE
+    -- If no super_admins table, just allow users to see their own logs
+    CREATE POLICY "Admins can read audit logs" 
+      ON audit_logs FOR SELECT 
+      TO authenticated 
+      USING (user_id = auth.uid());
+  END IF;
+END $$;
 
 -- Block all updates and deletes (append-only)
 DROP POLICY IF EXISTS "Block audit log modifications" ON audit_logs;
@@ -137,6 +148,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- ============================================
 -- AUTOMATIC AUDIT TRIGGERS
 -- Automatically log changes to critical tables
+-- Only creates triggers if tables exist
 -- ============================================
 
 -- Generic audit trigger function
@@ -185,49 +197,76 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Apply audit triggers to critical tables
-
+-- Apply audit triggers to critical tables ONLY if they exist
 -- CRM Leads
-DROP TRIGGER IF EXISTS audit_crm_leads ON crm_leads;
-CREATE TRIGGER audit_crm_leads
-  AFTER INSERT OR UPDATE OR DELETE ON crm_leads
-  FOR EACH ROW EXECUTE FUNCTION audit_trigger_func();
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'crm_leads' AND table_schema = 'public') THEN
+    DROP TRIGGER IF EXISTS audit_crm_leads ON crm_leads;
+    CREATE TRIGGER audit_crm_leads
+      AFTER INSERT OR UPDATE OR DELETE ON crm_leads
+      FOR EACH ROW EXECUTE FUNCTION audit_trigger_func();
+  END IF;
+END $$;
 
 -- CRM Customers  
-DROP TRIGGER IF EXISTS audit_crm_customers ON crm_customers;
-CREATE TRIGGER audit_crm_customers
-  AFTER INSERT OR UPDATE OR DELETE ON crm_customers
-  FOR EACH ROW EXECUTE FUNCTION audit_trigger_func();
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'crm_customers' AND table_schema = 'public') THEN
+    DROP TRIGGER IF EXISTS audit_crm_customers ON crm_customers;
+    CREATE TRIGGER audit_crm_customers
+      AFTER INSERT OR UPDATE OR DELETE ON crm_customers
+      FOR EACH ROW EXECUTE FUNCTION audit_trigger_func();
+  END IF;
+END $$;
 
 -- CRM Revenue
-DROP TRIGGER IF EXISTS audit_crm_revenue ON crm_revenue;
-CREATE TRIGGER audit_crm_revenue
-  AFTER INSERT OR UPDATE OR DELETE ON crm_revenue
-  FOR EACH ROW EXECUTE FUNCTION audit_trigger_func();
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'crm_revenue' AND table_schema = 'public') THEN
+    DROP TRIGGER IF EXISTS audit_crm_revenue ON crm_revenue;
+    CREATE TRIGGER audit_crm_revenue
+      AFTER INSERT OR UPDATE OR DELETE ON crm_revenue
+      FOR EACH ROW EXECUTE FUNCTION audit_trigger_func();
+  END IF;
+END $$;
 
 -- Memory Core Profiles (Brand Voice)
-DROP TRIGGER IF EXISTS audit_memory_core_profiles ON memory_core_profiles;
-CREATE TRIGGER audit_memory_core_profiles
-  AFTER INSERT OR UPDATE OR DELETE ON memory_core_profiles
-  FOR EACH ROW EXECUTE FUNCTION audit_trigger_func();
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'memory_core_profiles' AND table_schema = 'public') THEN
+    DROP TRIGGER IF EXISTS audit_memory_core_profiles ON memory_core_profiles;
+    CREATE TRIGGER audit_memory_core_profiles
+      AFTER INSERT OR UPDATE OR DELETE ON memory_core_profiles
+      FOR EACH ROW EXECUTE FUNCTION audit_trigger_func();
+  END IF;
+END $$;
 
 -- Knowledge Chunks
-DROP TRIGGER IF EXISTS audit_memory_knowledge_chunks ON memory_knowledge_chunks;
-CREATE TRIGGER audit_memory_knowledge_chunks
-  AFTER INSERT OR UPDATE OR DELETE ON memory_knowledge_chunks
-  FOR EACH ROW EXECUTE FUNCTION audit_trigger_func();
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'memory_knowledge_chunks' AND table_schema = 'public') THEN
+    DROP TRIGGER IF EXISTS audit_memory_knowledge_chunks ON memory_knowledge_chunks;
+    CREATE TRIGGER audit_memory_knowledge_chunks
+      AFTER INSERT OR UPDATE OR DELETE ON memory_knowledge_chunks
+      FOR EACH ROW EXECUTE FUNCTION audit_trigger_func();
+  END IF;
+END $$;
 
 -- Blog Posts
-DROP TRIGGER IF EXISTS audit_blog_posts ON blog_posts;
-CREATE TRIGGER audit_blog_posts
-  AFTER INSERT OR UPDATE OR DELETE ON blog_posts
-  FOR EACH ROW EXECUTE FUNCTION audit_trigger_func();
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'blog_posts' AND table_schema = 'public') THEN
+    DROP TRIGGER IF EXISTS audit_blog_posts ON blog_posts;
+    CREATE TRIGGER audit_blog_posts
+      AFTER INSERT OR UPDATE OR DELETE ON blog_posts
+      FOR EACH ROW EXECUTE FUNCTION audit_trigger_func();
+  END IF;
+END $$;
 
 -- Social Connections (sensitive - tracks OAuth tokens)
-DROP TRIGGER IF EXISTS audit_social_connections ON social_connections;
-CREATE TRIGGER audit_social_connections
-  AFTER INSERT OR UPDATE OR DELETE ON social_connections
-  FOR EACH ROW EXECUTE FUNCTION audit_trigger_func();
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'social_connections' AND table_schema = 'public') THEN
+    DROP TRIGGER IF EXISTS audit_social_connections ON social_connections;
+    CREATE TRIGGER audit_social_connections
+      AFTER INSERT OR UPDATE OR DELETE ON social_connections
+      FOR EACH ROW EXECUTE FUNCTION audit_trigger_func();
+  END IF;
+END $$;
 
 -- ============================================
 -- AUTH EVENT LOGGING
@@ -367,10 +406,10 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- ============================================
 -- SUMMARY
 -- After running this migration:
--- 1. All CRM actions are automatically logged
--- 2. All Memory/Knowledge changes are logged
--- 3. Blog post changes are logged
--- 4. Social connections are logged
+-- 1. All CRM actions are automatically logged (if tables exist)
+-- 2. All Memory/Knowledge changes are logged (if tables exist)
+-- 3. Blog post changes are logged (if table exists)
+-- 4. Social connections are logged (if table exists)
 -- 5. Admins can view all logs, users see their own
 -- 6. Logs are append-only (tamper-resistant)
 -- 7. 7-year retention for SOC2 compliance
