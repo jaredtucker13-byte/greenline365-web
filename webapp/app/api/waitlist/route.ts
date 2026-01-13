@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { sendEmail, generateVerificationToken, getVerificationEmailHtml } from '@/lib/email/gmail-sender';
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com';
 
 // GET /api/waitlist - Fetch waitlist submissions
 export async function GET(request: NextRequest) {
@@ -51,34 +54,50 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const normalizedEmail = email.toLowerCase().trim();
+
     // Create Supabase client
     const supabase = await createClient();
 
-    // Insert into waitlist_submissions table
+    // Check if already on waitlist and verified
+    const { data: existing } = await supabase
+      .from('waitlist_submissions')
+      .select('*')
+      .eq('email', normalizedEmail)
+      .single();
+
+    if (existing?.verified) {
+      return NextResponse.json(
+        { message: 'You are already on the waitlist!', alreadyVerified: true },
+        { status: 200 }
+      );
+    }
+
+    // Generate verification token
+    const token = generateVerificationToken();
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+
+    // Upsert waitlist submission (pending until verified)
     const { data, error } = await supabase
       .from('waitlist_submissions')
-      .insert([
-        {
-          email,
-          name: name || null,
-          company: company || null,
-          industry: industry || null,
-          source: 'website',
-          status: 'pending',
-        },
-      ])
+      .upsert({
+        email: normalizedEmail,
+        name: name || null,
+        company: company || null,
+        industry: industry || null,
+        source: 'website',
+        status: 'pending',
+        verified: false,
+        verification_token: token,
+        verification_expires: expiresAt,
+        created_at: existing?.created_at || new Date().toISOString(),
+      }, {
+        onConflict: 'email',
+      })
       .select()
       .single();
 
     if (error) {
-      // Check for duplicate email
-      if (error.code === '23505') {
-        return NextResponse.json(
-          { error: 'This email is already on the waitlist' },
-          { status: 409 }
-        );
-      }
-      
       console.error('Supabase error:', error);
       return NextResponse.json(
         { error: 'Failed to join waitlist' },
@@ -86,8 +105,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Send verification email
+    const verificationUrl = `${SITE_URL}/verify-email/${token}`;
+    const emailResult = await sendEmail({
+      to: normalizedEmail,
+      subject: 'Verify your email - GreenLine365 Waitlist',
+      html: getVerificationEmailHtml(name || '', verificationUrl, 'waitlist'),
+    });
+
+    if (!emailResult.success) {
+      console.error('[Waitlist] Email send failed:', emailResult.error);
+      // In dev, still return success
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[DEV] Verification URL: ${verificationUrl}`);
+      }
+    }
+
     return NextResponse.json(
-      { message: 'Successfully joined the waitlist!', data },
+      { 
+        message: 'Please check your email to verify and complete your signup!',
+        requiresVerification: true,
+        data 
+      },
       { status: 201 }
     );
   } catch (error) {
