@@ -1,233 +1,166 @@
-<analysis>**original_problem_statement:** The initial goal was to fix image generation and build two new architectural features: the Living Canvas publishing platform and a Dynamic Memory Bucket System.
+<analysis>**original_problem_statement:**
+The initial problem statement focused on fixing database migrations and implementing a Living Canvas publishing platform and a Dynamic Memory Bucket System.
 
-Throughout the session, the user's vision expanded significantly. The application is now intended to be a full, multi-tenant Business Operating System for local businesses. Key new requirements include:
--   **Tenant-Specific CRM:** Each tenant (business) gets their own dashboard to track their own customers, leads, revenue, and ROI.
--   **Honesty & Transparency:** All placeholder/fake statistics on the main landing page must be removed and replaced with a system to show real, aggregated data once available.
--   **Advanced Analytics:** A two-sided analytics system:
-    1.  An admin-only dashboard to prove GreenLine365's own ROI.
-    2.  A tenant-facing dashboard to help businesses track their own performance and social media growth.
--   **SOC2-Compliant Audit Logging:** A comprehensive, tamper-resistant audit trail of all significant user and system actions.
--   **Future POS & Payment Processing:** The long-term vision is for the platform to evolve into a Point-of-Sale (POS) system that processes payments for tenants, taking a small transaction fee.
+During this session, the user introduced a major new feature requirement: a comprehensive **Liability Documentation & E-Signature System**. The goal is to allow field workers to upload photos of incidents (e.g., property damage), have an AI (GPT-4o) analyze them for issues like mold or corrosion, automatically generate a professional PDF report, and send it to a customer for an e-signature.
+
+This builds on the broader vision of creating a multi-tenant Business Operating System for local businesses, which includes a Tenant-Specific CRM, Advanced Analytics, and SOC2-Compliant Audit Logging.
+
+**PRODUCT REQUIREMENTS:**
+-   **Liability Documentation System (MVP):**
+    1.  **Upload:** Field workers can upload incident images.
+    2.  **AI Analysis:** Use GPT-4o via OpenRouter to analyze images for specific industry issues (e.g., HVAC mold, water damage).
+    3.  **Report Generation:** Automatically draft a structured report based on the analysis.
+    4.  **E-Signature:** Send the report to a customer via a secure link for an e-signature (click-to-acknowledge).
+    5.  **PDF Finalization:** Generate a signed, timestamped, professional 14-section PDF document.
+    6.  **Admin UI:** An admin dashboard to manage incidents, review reports, and trigger actions.
+-   **Multi-Tenant Architecture:** All features must maintain strict data isolation using  and Supabase RLS.
 
 **User's preferred language**: English
 
 **what currently exists?**
-The application is a full-stack Next.js project with a Supabase backend. During this session, the agent successfully unblocked a failing production build by fixing multiple syntax and type errors.
+The application is a full-stack Next.js project with a Supabase backend. In this session, the agent successfully resolved a critical database migration blocker by working step-by-step with the user to debug and fix multiple failing SQL scripts.
 
-Significant scaffolding for the new vision was created:
--   **Honesty Audit:** The agent removed misleading statistics from the landing page () and feature pages. Chatbot promises were audited and aligned with actual features.
--   **Dynamic Memory System:** A Brand Voice page () was created for tenants to define their AI's personality (Layer 1). A Knowledge Base page () and API () were created for tenants to seed business facts (Layer 2).
--   **Tenant CRM:** A new CRM dashboard (), API (), and database migration () were created.
--   **Analytics Framework:** A new Analytics dashboard () was implemented to fetch real data, with separate API endpoints for tenant-facing () and admin-only () metrics.
--   **Audit Logging:** A migration (), server-side logger (), and admin viewer page () were created for SOC2 compliance.
+Following the migration fix, the agent built out the new **Liability Documentation System**. This includes:
+-   **Database:** New migrations for , ,  tables, and a Supabase storage bucket for uploads.
+-   **Backend:** A full suite of API endpoints under  to handle image upload, AI analysis, report generation, e-signature sending, and signing.
+-   **Frontend:**
+    -   An admin dashboard at .
+    -   A public-facing customer signing page at .
+    -   A comprehensive PDF generation template at  using .
+-   **Build Fix:** The agent addressed a Vercel build failure by replacing incorrect dependencies (, ) with the project's established patterns (inline SVGs and a custom Supabase client).
 
 **Last working item**:
--   **Last item agent was working:** Fixing a failed database migration. The user reported that running the migrations failed. The agent identified that the SQL script was trying to apply policies to system tables () and using incorrect column names ( instead of  on some tables). The agent attempted to create a corrected migration file () but the session ended before it could be tested.
--   **Status:** BLOCKED
+-   **Last item agent was working:** Fixing a Vercel production build failure that occurred after implementing the Liability Documentation System.
+-   **Status:** USER VERIFICATION PENDING
 -   **Agent Testing Done:** N
--   **Which testing method agent to use?** manual testing by curl. The agent needs to connect to the Supabase instance and run the new migration SQL manually to verify it executes without errors.
+-   **Which testing method agent to use?** User must re-deploy on Vercel to confirm the build now passes. No agent-side testing is possible for this.
 -   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
--   Issue 1: Database migrations are failing, blocking all DB-related development (P0)
--   Issue 2: Implement the Dynamic Memory Bucket System (P1)
--   Issue 3: Build the Living Canvas Publishing Platform (P2)
--   Issue 4: Complete Advanced Image Generation Features in Blog-Polish Tool (P2)
--   Issue 5: Build fails due to event handlers in server components (P2)
-
-Issues Detail:
--   **Issue 1: Database migrations are failing, blocking all DB-related development**
-    -   **Attempted fixes:** The agent created a new migration file  to fix RLS and  view issues flagged by the Supabase linter. This migration failed because it tried to alter system tables and used incorrect column names for RLS policies. A corrected version was written but not tested.
+-   **Issue 1: Production build fails due to missing modules (P0)**
+    -   **Attempted fixes:** The agent introduced  and  without adding them to , causing the build to fail. The agent then rewrote the affected files ( and ) to use inline SVGs for icons and the project's existing custom Supabase client (), which should resolve the dependency issues.
     -   **Next debug checklist:**
-        1.  Examine the latest migration file .
-        2.  Verify the logic correctly identifies the user/tenant identifier column for each table (, , etc.) or skips tables with no tenant association.
-        3.  Ensure the migration script explicitly excludes system tables like  from RLS enablement.
-        4.  Run all pending migrations ( through ) in the correct order in the Supabase SQL editor to ensure they all pass.
-    -   **Why fix this issue and what will be achieved with the fix?** This is a hard blocker. No new features that require database schema changes can be implemented until the migrations are fixed and can run successfully.
+        1.  Instruct the user to trigger a new Vercel deployment.
+        2.  If the build still fails, analyze the new build logs for any remaining errors.
+    -   **Why fix this issue and what will be achieved with the fix?** This is a hard blocker preventing the application from being deployed and tested.
     -   **Status:** IN PROGRESS
     -   **Is recurring issue?** Y
-    -   **Should Test frontend/backend/both after fix?** Backend
-    -   **Blocked on other issue:** None
-
--   **Issue 2: Implement the Dynamic Memory Bucket System**
-    -   **Attempted fixes:** The agent created DB migrations, a , a Brand Voice UI, and a Knowledge Base UI. The chat API was updated to use the Brand Voice.
-    -   **Next debug checklist:**
-        1.  Implement  search in  for semantic search on the  table.
-        2.  Integrate the Warehouse (Knowledge Base) fetch into the chat API's system prompt builder.
-        3.  Implement the  logging (Journal layer) and  (Buffer layer).
-        4.  Flesh out the Onboarding Wizard to guide new users through populating their Brand Voice and Knowledge Base.
-    -   **Why fix this issue and what will be achieved with the fix?** This is the brain of the application, providing the AI with the necessary context to generate authentic, non-hallucinatory responses for each tenant.
-    -   **Status:** IN PROGRESS
-    -   **Is recurring issue?** N
-    -   **Should Test frontend/backend/both after fix?** Both
-    -   **Blocked on other issue:** Issue 1
-
--   **Issue 3: Build the Living Canvas Publishing Platform**
-    -   **Attempted fixes:** (From previous session) The agent created the initial DB migration and component stubs. No progress was made in this session besides fixing a build error on its page.
-    -   **Next debug checklist:**
-        1.  Implement the logic in  and  to handle CSS Shapes for text wrapping.
-        2.  Connect the  to Supabase to fetch and manage templates.
-    -   **Why fix this issue and what will be achieved with the fix?** This is a major user-requested feature to create visually unique and dynamic content layouts.
-    -   **Status:** NOT STARTED
-    -   **Is recurring issue?** N
-    -   **Should Test frontend/backend/both after fix?** Both
-    -   **Blocked on other issue:** Issue 1
-
--   **Issue 4: Complete Advanced Image Generation Features in Blog-Polish Tool**
-    -   **Attempted fixes:** (From previous session) Backend API was updated, and frontend UI stubs were created. No progress this session.
-    -   **Next debug checklist:**
-        1.  Implement the frontend for the image preview modal.
-        2.  Build the UI for selecting image layouts (e.g., wrap right/left).
-        3.  Test the end-to-end flow from analysis to generation to application in the blog.
-    -   **Why fix this issue and what will be achieved with the fix?** Completes the user's vision for a Bentley treatment of the blog polishing tool.
-    -   **Status:** NOT STARTED
-    -   **Is recurring issue?** Y
-    -   **Should Test frontend/backend/both after fix?** Both
-    -   **Blocked on other issue:** None
-
--   **Issue 5: Build fails due to event handlers in server components**
-    -   **Attempted fixes:** (From previous session) The agent added  to the  page. While other build errors were fixed this session, this specific recurring error from the initial handoff was never explicitly confirmed as resolved.
-    -   **Next debug checklist:**
-        1.  Trigger a production build and analyze the logs for the  error.
-        2.  If it appears, identify the component passing the handler and add the  directive.
-    -   **Why fix this issue and what will be achieved with the fix?** This error, if it still exists, will block production deployments.
-    -   **Status:** TESTING PENDING
-    -   **Is recurring issue?** Y
-    -   **Should Test frontend/backend/both after fix?** Frontend
+    -   **Should Test frontend/backend/both after fix?** Frontend (via Vercel deployment)
     -   **Blocked on other issue:** None
 
 **In progress Task List**:
--   Task 1: Integrate Event and Audit Loggers (P1)
--   Task 2: Build out the Tenant CRM Dashboard (P1)
--   Task 3: Build out the Analytics Dashboard (P1)
-
-Task Detail:
--   **Task 1: Integrate Event and Audit Loggers**
-    -   **Where to resume:** The logger utilities  and  exist but are not used.
-    -   **What will be achieved with this?** Critical actions like blog post creation, image generation, user login, and CRM entry creation will be logged for analytics and SOC2 compliance.
-    -   **Status:** NOT STARTED
-    -   **Should Test frontend/backend/both after fix?** Backend
-    -   **Blocked on something:** Issue 1
-
--   **Task 2: Build out the Tenant CRM Dashboard**
-    -   **Where to resume:** The page  is a placeholder.
-    -   **What will be achieved with this?** Tenants will have a functional UI to add, view, and manage their customers, leads, and revenue, fulfilling a core user requirement.
-    -   **Status:** IN PROGRESS
+-   **Task 1: Verify and Test the Liability Documentation System (P1)**
+    -   **Where to resume:** The entire feature has been scaffolded but is untested.
+    -   **What will be achieved with this?** The user's latest and most critical feature request will be validated end-to-end, from image upload to signed PDF generation.
+    -   **Status:** USER VERIFICATION PENDING
     -   **Should Test frontend/backend/both after fix?** Both
-    -   **Blocked on something:** Issue 1
-
--   **Task 3: Build out the Analytics Dashboard**
-    -   **Where to resume:** The page  fetches data but the UI is basic.
-    -   **What will be achieved with this?** Tenants will have meaningful visualizations of their content performance and business growth.
-    -   **Status:** IN PROGRESS
-    -   **Should Test frontend/backend/both after fix?** Both
-    -   **Blocked on something:** Issue 1
+    -   **Blocked on something:** Issue 1: Production build fails due to missing modules.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks:**
     *   (P1) Implement Onboarding Wizard: Create the multi-step flow for new tenants on .
-    *   (P1) Implement Knowledge Import: Build out the backend logic in  to handle CSV/JSON uploads.
-    *   (P2) Implement Social OAuth: Build the UI and backend logic for tenants to connect their social media accounts via the  framework.
+    *   (P1) Build out the Tenant CRM Dashboard: Make  functional.
+    *   (P2) Build out the Analytics Dashboard: Add visualizations to .
+    *   (P2) Integrate Event and Audit Loggers: Use the existing loggers (, ) in the API endpoints.
+    *   (P2) Liability System Enhancements: Add PDF watermarking and editable liability clauses per jurisdiction.
 -   **Future Tasks:**
-    *   (P2) POS Integration & Payment Processing: Architect and build the system to handle transactions.
-    *   (P3) AI-driven Tax Reports: Generate reports from the CRM data.
-    *   (P3) Populate the original Analytics page with real data.
-    *   (P3) Resume work on the Retell AI agent Aiden.
-    *   (P3) Build a God Mode CMS for site administration.
+    *   (P2) Implement Dynamic Memory Bucket System (Knowledge Base  search, Journal/Buffer layers).
+    *   (P2) Build the Living Canvas Publishing Platform.
+    *   (P3) POS Integration & Payment Processing.
+    *   (P3) AI-driven Tax Reports.
+    *   (P3) Re-establish a working pre-commit hook.
 
 **Completed work in this session**
--   **Build Unblocked:** Fixed multiple syntax and type errors in  and , allowing the project to build successfully.
--   **Honesty Audit & Fixes:**
-    -   Removed placeholder stats (e.g., 500+ businesses) from  and other marketing pages.
-    -   Audited and corrected the  prompts to remove promises of unbuilt features.
--   **Core Feature Scaffolding:**
-    -   **Tenant CRM:** Created  migration,  API, and  UI page.
-    -   **Analytics:** Created tenant and admin analytics APIs, and rewrote  to use real data.
-    -   **Knowledge Base:** Created  and .
-    -   **Audit Logging:** Created  migration,  utility, and  viewer.
--   **Security & Trust:**
-    -   Created (but did not successfully run) a migration  to enable RLS on all public tables.
-    -   Updated the  to reflect new data isolation and security measures.
+-   **Database Migrations (RESOLVED):** Successfully fixed a series of complex and blocking Supabase migration failures by debugging SQL scripts step-by-step with the user. This unblocked all database development.
+-   **Liability Documentation System (BUILT - PENDING TEST):**
+    -   Created DB schema and storage bucket (, ).
+    -   Built API endpoints for the full workflow: upload, analyze (GPT-4o), generate report, send for signature, and sign.
+    -   Created frontend admin page () and customer signing page ().
+    -   Implemented a professional 14-section PDF generation system using .
+-   **Production Build Failure (FIX IMPLEMENTED):** Replaced uninstalled dependencies (, ) with project-correct patterns (inline SVGs, custom Supabase client) to fix Vercel build errors.
 
 **Earlier issues found/mentioned but not fixed**
 -   **Issue 1: Pre-commit hook is broken.**
-    -   **Debug checklist:** The agent attempted to set up a  pre-commit hook. It failed due to incorrect directory context. Instead of fixing the setup, the agent deleted the  directory to force a commit. A proper pre-commit hook should be re-established to catch build errors before they reach CI.
-    -   **Why to solve this issue and what will be achieved with this?** To prevent broken builds from being committed, saving CI/CD time and developer frustration.
+    -   **Debug checklist:** The  pre-commit hook setup was deleted in a previous session to force a commit. A proper pre-commit hook should be re-established to catch linting and build errors before they reach CI.
+    -   **Why to solve this issue and what will be achieved with this?** To improve code quality and prevent broken builds from being committed.
     -   **Should Test frontend/backend/both after fix:** N/A (DevOps change)
     -   **Is recurring issue?** Y
 
 **Known issue recurrence from previous fork**
--   **Issue recurrence in previous fork:** Build fails due to event handlers in server components ( errors).
--   **Recurrence count:** High. Multiple build errors were fixed this session, indicating a general issue with client/server component boundaries.
--   **Status:** TESTING PENDING
+-   **Issue recurrence in previous fork:** Build fails due to dependency or client/server component issues.
+-   **Recurrence count:** High. The latest build failure () is a direct continuation of this pattern.
+-   **Status:** IN PROGRESS
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Multi-Tenancy:** The entire architecture is shifting to be tenant-specific, using Row Level Security (RLS) in Supabase with a  or  on every relevant table.
--   **Dynamic AI Memory:** The 4-layer memory system is a core concept, with scaffolding now in place for the Identity (Brand Voice) and Warehouse (Knowledge Base) layers.
--   **SOC2 Audit Logging:** An append-only, tamper-resistant audit trail is being built to track all significant platform events for compliance.
--   **Tenant-Specific CRM:** Moving beyond a simple SaaS to provide each tenant with tools to manage their own business (customers, revenue).
--   **API-driven Dashboards:** All new UI dashboards (, , ) are built to fetch data from dedicated API endpoints rather than using mock data.
+-   **Multi-Tenancy:** Using Supabase RLS with  for data isolation.
+-   **AI-powered Image Analysis:** Using GPT-4o via OpenRouter to detect issues in images for incident reports.
+-   **Dynamic PDF Generation:** Using  to create complex, multi-section PDF documents from dynamic data on the server.
+-   **E-Signature Flow:** A secure, token-based workflow for customers to review and sign documents.
+-   **SOC2 Audit Logging:** The underlying framework for tracking events is in place.
 
 **key DB schema**
--   **social_connections:** 
--   **analytics_events:** 
--   **crm_contacts:** 
--   **crm_deals:** 
--   **audit_log:**  (append-only)
+-   **incidents:** 
+-   **incident_images:** 
+-   **incident_signatures:** 
 
 **All files of reference**
--   **/app/webapp/supabase/migrations/017_security_fixes.sql** (The currently failing migration file)
--   **/app/webapp/app/api/chat/route.ts** (Example of memory system integration)
--   **/app/webapp/app/admin-v2/crm/page.tsx** (New tenant-facing CRM dashboard)
--   **/app/webapp/app/admin-v2/audit/page.tsx** (New admin-facing audit dashboard)
--   **/app/webapp/app/page.tsx** (Landing page where stats were corrected)
--   **/app/webapp/app/trust/page.tsx** (Trust/Security page updated with new info)
+-   **Newly Created Files:**
+    -   
+    -   
+    -    (6 new API routes)
+    -   
+    -   
+    -   
+-   **Key Modified Files:**
+    -    (Added link to new page)
+    -    (Updated with new feature)
 
 **Critical Info for New Agent**
--   **The #1 priority is to fix the failing database migrations.** No other feature requiring a DB change can proceed until  and subsequent migrations can be run successfully.
--   The user's vision has expanded dramatically. The app is no longer just a marketing tool; it's a multi-tenant Business OS. All new features must be built with strict tenant data isolation in mind.
--   The logger utilities (, ) have been created but **are not yet integrated**. A key upcoming task is to import and call these loggers from the relevant API endpoints (e.g., log a  event in the blog API).
+1.  **Confirm the Build Fix:** The absolute first step is to have the user re-deploy to Vercel and confirm that the build now passes. The previous agent implemented a fix for  errors.
+2.  **Guide End-to-End Testing:** Once the build is fixed, the entire Liability Documentation System is ready for its first-ever test. Guide the user through the full flow: create an incident, upload an image, run analysis, generate the report, download the PDF, and send it for signature.
+3.  **Priorities Have Shifted:** The user's focus is now entirely on the new Liability Documentation System. The older backlog items (Living Canvas, Memory Bucket) are lower priority until this new feature is fully working and verified.
 
 **documents and test reports created in this job**
--    (Updated with new features and roadmap)
+-    (Updated with Liability Documentation feature)
+-   Multiple intermediate migration fix files were created but are now obsolete (, , ).
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User (Latest):** Outlines the grand vision for the app to become a POS system, taking transaction fees, and explains a migration failure. *Status: Action Pending. Agent acknowledged the vision and the error, but the session ended.*
-2.  **User:** Requests the creation of an audit logging system for SOC2 compliance. *Status: Complete. Agent created the migration, API, and UI scaffolding.*
-3.  **User:** Confirms migrations are up-to-date and asks to update the Trust Policy. *Status: Complete. Agent created a (failed) migration and updated the Trust page.*
-4.  **User:** Provides Supabase Linter output showing critical security vulnerabilities (RLS disabled, security definer views). *Status: Action In Progress. Agent created a migration to fix this, but it failed.*
-5.  **User:** Clarifies the vision for a tenant-specific CRM where each business can track its own customers, ROI, and revenue. *Status: Complete. Agent created the scaffolding for the Tenant CRM system.*
-6.  **User:** Clarifies analytics requirements: separate admin-only platform ROI metrics from tenant-facing business growth metrics. Also demands honesty on the landing page (remove fake stats). *Status: Complete. Agent implemented this separation and updated the landing page.*
-7.  **User:** Provides a roadmap of 6 features to build next and gives detailed requirements for analytics, social OAuth, and the onboarding wizard. *Status: Complete. Agent scaffolded all 6 features.*
-8.  **User:** Requests an honesty audit of the chat prompts to ensure the AI isn't promising features that don't exist. *Status: Complete. Agent audited and cleaned the prompts.*
-9.  **User:** Provides detailed architectural guidance for a multi-tenant memory system and onboarding wizard, emphasizing data isolation (RLS). *Status: Complete. Agent verified RLS and built scaffolding based on this guidance.*
-10. **User:** Approves the agent's plan and asks for a pre-commit hook to be added. *Status: Partially Complete. Pre-commit hook was attempted but ultimately abandoned.*
+1.  **User (Latest):** Posts Vercel build logs showing  errors for  and . *Status: Action In Progress. Agent implemented a fix.*
+2.  **User:** Confirms the new database migrations (, ) ran successfully. *Status: Complete.*
+3.  **User:** Provides the detailed 14-section template for the professional PDF report. *Status: Complete. Agent implemented it.*
+4.  **User:** Approves the plan for the Liability Documentation System and asks to proceed. *Status: Complete.*
+5.  **User:** Confirms requirements: Use GPT-4o, build the full e-sign flow, and use the existing OpenRouter API key. *Status: Complete. Agent built the feature based on this.*
+6.  **User:** Asks about vision models, suggesting GPT-4 or Gemini for analyzing HVAC mold/growth. *Status: Complete. Agent confirmed this is feasible with prompt engineering.*
+7.  **User:** Provides the high-level concept for the Liability Documentation feature. *Status: Complete. Agent acknowledged and planned the feature.*
+8.  **User:** Confirms the CRM RLS policies were applied successfully. *Status: Complete.*
+9.  **User:** Confirms the final  RLS fix worked, resolving the migration blocker. *Status: Complete.*
+10. **User (Series):** Provides a sequence of error messages and debug results while working with the agent to fix the failing database migrations. *Status: Complete. This entire thread led to the final resolution.*
 
 **Project Health Check:**
 -   **Broken:**
-    -   **Database Migrations:** At least one migration () is confirmed to be failing, preventing any new schema changes from being applied. This is the highest priority issue.
+    -   **Vercel Production Build:** The build is failing due to dependency issues. A fix has been implemented but requires user verification via re-deployment.
 -   **Mocked:**
-    -   The core new features (Tenant CRM, Analytics, Knowledge Base, Audit Log, Onboarding) are all just skeletons. They have UI pages and API routes, but the internal logic is not implemented, and they are not yet functional.
+    -   **Liability Documentation System:** The entire feature is built but completely untested. It is effectively a mock/skeleton until verified.
 
 **3rd Party Integrations**
--   **Supabase:** DB, Auth, Storage.  is now a planned component for semantic search.
--   **OpenRouter:** Used for text AI.
--   **Kie.ai:** Used for image generation.
--   **Playwright:** For server-side screenshot capture (part of an unverified feature).
+-   **Supabase:** DB, Auth, Storage.
+-   **OpenRouter:** Used for text AI (now planned for GPT-4o vision analysis).
+-   **Kie.ai:** Image generation.
+-   **@react-pdf/renderer:** Newly added for server-side PDF generation.
 
 **Testing status**
 -   **Testing agent used after significant changes:** NO
 -   **Troubleshoot agent used after agent stuck in loop:** NO
 -   **Test files created:** []
--   **Known regressions:** Database migrations, which were previously working, are now failing.
+-   **Known regressions:** The production build is broken.
 
 **Credentials to test flow:**
--   Supabase login credentials are required to access any page under .
+-   Supabase login credentials are required to access .
+-   OpenRouter API key is in  for AI analysis features.
 
 **What agent forgot to execute**
--   **Run and Test Migrations:** The agent created multiple new database migrations ( through ) but did not run them to confirm they worked, leading to the discovery of a critical failure at the end of the session.
--   **Integrate Loggers:** The  and  utilities were created but never imported or used in any of the existing APIs.
--   **Fix Pre-commit Hook:** The agent abandoned the pre-commit hook setup after an initial failure, deleting the configuration instead of fixing it.</analysis>
+-   The agent initially forgot to add required dependencies (, ) to  when introducing them in new code, which directly caused the production build to fail.
+-   The agent did not check for existing project patterns (e.g., how icons are handled, how the Supabase client is initialized) before writing new code, leading to the dependency mismatch.</analysis>
