@@ -711,7 +711,7 @@ export default function IncidentsPage() {
                       {selectedIncident.ai_analysis.summary && (
                         <p className="text-gray-300">{selectedIncident.ai_analysis.summary}</p>
                       )}
-                      {selectedIncident.ai_analysis.detected_issues?.length > 0 && (
+                      {(selectedIncident.ai_analysis.detected_issues?.length ?? 0) > 0 && (
                         <div className="flex flex-wrap gap-2">
                           {selectedIncident.ai_analysis.detected_issues.map((issue: string, i: number) => (
                             <span key={i} className="px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-sm">
