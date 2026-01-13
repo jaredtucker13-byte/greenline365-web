@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
 
     // Generate PDF buffer
     const pdfBuffer = await renderToBuffer(
-      IncidentReportPDF({
+      React.createElement(IncidentReportPDF, {
         incident,
         images: incident.incident_images || [],
         company,
