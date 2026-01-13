@@ -138,6 +138,42 @@ export default function SignUpPage() {
     );
   }
 
+  if (magicLinkSent) {
+    return (
+      <div className="py-20">
+        <div className="max-w-md mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-8 text-center"
+          >
+            <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-2">Check Your Email!</h2>
+            <p className="text-white/60 mb-4">
+              We sent a magic link to <span className="text-emerald-400 font-medium">{formData.email}</span>
+            </p>
+            <p className="text-white/40 text-sm mb-6">
+              Click the link in the email to sign in instantly. If you're new, your account will be created automatically!
+            </p>
+            <button
+              onClick={() => {
+                setMagicLinkSent(false);
+                setFormData({ fullName: '', email: '', password: '', confirmPassword: '' });
+              }}
+              className="text-emerald-400 hover:text-emerald-300 text-sm"
+            >
+              ← Use a different email
+            </button>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="py-12">
       <div className="max-w-md mx-auto px-6">
