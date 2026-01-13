@@ -341,8 +341,14 @@ export default function WebsiteAnalyzerPage() {
 
   // Start the workflow - analyze first
   const startAnalysis = async () => {
-    if (mode === 'analyze' && !imageBase64) {
+    // For URL method, we can proceed with extracted data even without image
+    if (mode === 'analyze' && inputMethod === 'upload' && !imageBase64) {
       setError('Please upload a screenshot first');
+      return;
+    }
+    
+    if (mode === 'analyze' && inputMethod === 'url' && !extractedWebsite && !imageBase64) {
+      setError('Please extract website data first or upload a screenshot');
       return;
     }
     
@@ -355,19 +361,80 @@ export default function WebsiteAnalyzerPage() {
     setError(null);
 
     try {
-      const response = await fetch('/api/design-workflow/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          mode,
-          imageBase64: mode === 'analyze' ? imageBase64 : undefined,
-          visionModel: mode === 'analyze' ? visionModel : undefined,
-          analysisType: mode === 'analyze' ? analysisType : undefined,
-          description: mode === 'scratch' ? description : undefined,
-          brandColors: mode === 'scratch' ? brandColors : undefined,
-          stylePreference: mode === 'scratch' ? stylePreference : undefined,
-          targetAudience: mode === 'scratch' ? targetAudience : undefined,
-        }),
+      // If we have extracted website data, create analysis text from it
+      let analysisFromExtraction = '';
+      if (extractedWebsite) {
+        analysisFromExtraction = `
+Website Analysis for: ${extractedWebsite.url}
+
+**Title:** ${extractedWebsite.title}
+**Description:** ${extractedWebsite.description}
+
+**Structure Detected:**
+${extractedWebsite.structure.sections.join(', ')}
+
+**Color Palette:**
+- Primary: ${extractedWebsite.colors.primary.join(', ') || 'N/A'}
+- Background: ${extractedWebsite.colors.background.join(', ') || 'N/A'}
+- Accent: ${extractedWebsite.colors.accent.join(', ') || 'N/A'}
+
+**Headlines Found:**
+${extractedWebsite.content.headlines.slice(0, 10).map(h => `- ${h}`).join('\n')}
+
+**Call-to-Actions:**
+${extractedWebsite.content.ctas.slice(0, 5).map(c => `- ${c}`).join('\n')}
+
+**Navigation Items:**
+${extractedWebsite.content.navigation.slice(0, 10).map(n => `- ${n}`).join('\n')}
+
+**Key Paragraphs:**
+${extractedWebsite.content.paragraphs.slice(0, 5).map(p => `- ${p.slice(0, 150)}...`).join('\n')}
+
+**Images Found:** ${extractedWebsite.images.all.length}
+${extractedWebsite.images.logo ? `- Logo: ${extractedWebsite.images.logo}` : ''}
+${extractedWebsite.images.hero ? `- Hero: ${extractedWebsite.images.hero}` : ''}
+        `.trim();
+      }
+
+      // If we have an image, also run vision analysis
+      let visionAnalysis = '';
+      if (imageBase64) {
+        const response = await fetch('/api/design-workflow/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            mode,
+            imageBase64: mode === 'analyze' ? imageBase64 : undefined,
+            visionModel: mode === 'analyze' ? visionModel : undefined,
+            analysisType: mode === 'analyze' ? analysisType : undefined,
+            description: mode === 'scratch' ? description : undefined,
+            brandColors: mode === 'scratch' ? brandColors : undefined,
+            stylePreference: mode === 'scratch' ? stylePreference : undefined,
+            targetAudience: mode === 'scratch' ? targetAudience : undefined,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+          setError(data.error || 'Analysis failed');
+          setLoading(false);
+          return;
+        }
+
+        visionAnalysis = data.analysisText;
+      }
+
+      // Combine analyses
+      const combinedAnalysis = [analysisFromExtraction, visionAnalysis].filter(Boolean).join('\n\n---\n\n');
+      
+      if (!combinedAnalysis) {
+        setError('No analysis data available');
+        setLoading(false);
+        return;
+      }
+
+      setAnalysisText(combinedAnalysis);
       });
 
       const data = await response.json();
