@@ -1,9 +1,63 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 /**
- * Nano Banana Image Generation API
- * Uses Emergent Integrations library with Gemini's image generation
+ * Nano Banana Pro Image Generation API
+ * Uses KIE.ai API for high-quality image generation
  */
+
+const KIE_API_KEY = process.env.KIE_API_KEY;
+const KIE_API_URL = 'https://api.kie.ai/api/v1/jobs/createTask';
+const KIE_TASK_STATUS_URL = 'https://api.kie.ai/api/v1/jobs/getTaskInfo';
+
+interface KieTaskResponse {
+  code: number;
+  msg: string;
+  data: {
+    taskId: string;
+  };
+}
+
+interface KieTaskStatusResponse {
+  code: number;
+  msg: string;
+  data: {
+    status: string;
+    output?: {
+      imageUrl?: string;
+      images?: string[];
+    };
+  };
+}
+
+async function pollForResult(taskId: string, maxAttempts = 30): Promise<string | null> {
+  for (let i = 0; i < maxAttempts; i++) {
+    await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds between polls
+    
+    const statusResponse = await fetch(KIE_TASK_STATUS_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${KIE_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ taskId }),
+    });
+
+    if (!statusResponse.ok) continue;
+
+    const statusData: KieTaskStatusResponse = await statusResponse.json();
+    
+    if (statusData.data?.status === 'completed' || statusData.data?.status === 'success') {
+      // Return the image URL
+      const imageUrl = statusData.data.output?.imageUrl || statusData.data.output?.images?.[0];
+      if (imageUrl) return imageUrl;
+    } else if (statusData.data?.status === 'failed') {
+      throw new Error('Image generation failed');
+    }
+    // Continue polling if still processing
+  }
+  
+  throw new Error('Image generation timed out');
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,41 +67,87 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
     }
 
-    const apiKey = process.env.EMERGENT_LLM_KEY;
-    if (!apiKey) {
-      console.error('[Nano Banana] EMERGENT_LLM_KEY not configured');
-      return NextResponse.json({ error: 'API key not configured' }, { status: 500 });
+    if (!KIE_API_KEY) {
+      console.error('[Nano Banana] KIE_API_KEY not configured');
+      return NextResponse.json({ error: 'KIE API key not configured' }, { status: 500 });
     }
 
     console.log('[Nano Banana] Generating image with prompt:', prompt.slice(0, 100) + '...');
 
-    // Call the Python service for image generation
-    // The emergentintegrations library requires Python runtime
-    const response = await fetch('http://localhost:8002/generate', {
+    // Create task with KIE.ai Nano Banana Pro
+    const createTaskResponse = await fetch(KIE_API_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        prompt,
-        api_key: apiKey,
+      headers: {
+        'Authorization': `Bearer ${KIE_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'nano-banana-pro',
+        input: {
+          prompt,
+        },
       }),
     });
 
-    if (response.ok) {
-      const data = await response.json();
-      if (data.image) {
-        return NextResponse.json({ 
-          success: true,
-          image: data.image,
-          mime_type: data.mime_type || 'image/png',
-        });
-      }
+    if (!createTaskResponse.ok) {
+      const errorText = await createTaskResponse.text();
+      console.error('[Nano Banana] Task creation failed:', errorText);
+      return NextResponse.json(
+        { error: 'Failed to create image generation task', details: errorText },
+        { status: 500 }
+      );
     }
 
-    // If Python service not available, return error
-    return NextResponse.json({ 
-      error: 'Image generation service not available',
-      details: 'The Nano Banana service is being initialized. Please try again in a moment.',
-    }, { status: 503 });
+    const taskData: KieTaskResponse = await createTaskResponse.json();
+    
+    if (taskData.code !== 0 && taskData.code !== 200) {
+      console.error('[Nano Banana] Task creation error:', taskData.msg);
+      return NextResponse.json(
+        { error: taskData.msg || 'Task creation failed' },
+        { status: 500 }
+      );
+    }
+
+    const taskId = taskData.data?.taskId;
+    if (!taskId) {
+      return NextResponse.json(
+        { error: 'No task ID received from KIE.ai' },
+        { status: 500 }
+      );
+    }
+
+    console.log('[Nano Banana] Task created:', taskId);
+
+    // Poll for result
+    const imageUrl = await pollForResult(taskId);
+
+    if (!imageUrl) {
+      return NextResponse.json(
+        { error: 'No image URL in response' },
+        { status: 500 }
+      );
+    }
+
+    // Fetch the image and convert to base64
+    const imageResponse = await fetch(imageUrl);
+    if (!imageResponse.ok) {
+      // Return the URL directly if we can't fetch it
+      return NextResponse.json({
+        success: true,
+        imageUrl,
+        mime_type: 'image/png',
+      });
+    }
+
+    const imageBuffer = await imageResponse.arrayBuffer();
+    const base64Image = Buffer.from(imageBuffer).toString('base64');
+
+    return NextResponse.json({
+      success: true,
+      image: base64Image,
+      imageUrl,
+      mime_type: 'image/png',
+    });
 
   } catch (error: any) {
     console.error('[Nano Banana] Error:', error);
