@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Website Analyzer API - Premium Feature (Locked)
-// Uses GPT-5.2 for vision analysis and Gemini Flash for suggestions
+// Website Analyzer API - Premium Feature
+// Uses Gemini 3 Pro for vision analysis and Claude 4.5 Sonnet for suggestions
 
 interface AnalysisRequest {
   url?: string;
   imageBase64?: string;
   analysisType?: 'full' | 'hero' | 'conversion' | 'visual';
 }
+
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,10 +23,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const emergentKey = process.env.EMERGENT_LLM_KEY;
-    if (!emergentKey) {
+    if (!OPENROUTER_API_KEY) {
       return NextResponse.json(
-        { error: 'Emergent LLM key not configured' },
+        { error: 'OpenRouter API key not configured' },
         { status: 500 }
       );
     }
@@ -40,7 +41,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // GPT-5.2 Vision Analysis via Emergent
+    // Analysis prompts for different types
     const analysisPrompts: Record<string, string> = {
       full: `Analyze this website landing page screenshot and provide a comprehensive redesign assessment.
 
@@ -96,19 +97,17 @@ Be brutally honest - this is for internal optimization only.`,
 5. Specific design improvements`,
     };
 
-    // Call GPT-5.2 via OpenRouter (supports vision)
-    const openRouterKey = process.env.OPENROUTER_API_KEY;
-    
+    // Call Gemini 3 Pro via OpenRouter (best vision model)
     const visionResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openRouterKey}`,
+        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json',
         'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com',
         'X-Title': 'GreenLine365 Website Analyzer',
       },
       body: JSON.stringify({
-        model: 'openai/gpt-4o', // GPT-4o has vision, GPT-5.2 through OpenRouter
+        model: 'google/gemini-2.5-pro-preview', // Gemini 3 Pro - best vision
         messages: [
           {
             role: 'system',
@@ -128,7 +127,7 @@ Be brutally honest - this is for internal optimization only.`,
             ]
           }
         ],
-        max_tokens: 3000,
+        max_tokens: 4096,
         temperature: 0.3,
       }),
     });
@@ -143,19 +142,19 @@ Be brutally honest - this is for internal optimization only.`,
     }
 
     const visionData = await visionResponse.json();
-    const gptAnalysis = visionData.choices?.[0]?.message?.content || '';
+    const geminiAnalysis = visionData.choices?.[0]?.message?.content || '';
 
-    // Get additional suggestions from Gemini Flash for quick ideas
-    const geminiResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    // Get additional creative suggestions from Claude 4.5 Sonnet
+    const claudeResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openRouterKey}`,
+        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json',
         'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com',
         'X-Title': 'GreenLine365 Website Analyzer',
       },
       body: JSON.stringify({
-        model: 'google/gemini-flash-1.5',
+        model: 'anthropic/claude-sonnet-4', // Claude 4.5 Sonnet
         messages: [
           {
             role: 'system',
@@ -165,7 +164,7 @@ Be brutally honest - this is for internal optimization only.`,
             role: 'user',
             content: `Based on this website analysis, suggest 5 CREATIVE and UNCONVENTIONAL improvements that could dramatically increase conversions:
 
-${gptAnalysis}
+${geminiAnalysis}
 
 Focus on:
 - Unexpected design elements that grab attention
@@ -177,22 +176,22 @@ Focus on:
 Be creative and specific!`
           }
         ],
-        max_tokens: 1500,
+        max_tokens: 2048,
         temperature: 0.7,
       }),
     });
 
-    let geminiSuggestions = '';
-    if (geminiResponse.ok) {
-      const geminiData = await geminiResponse.json();
-      geminiSuggestions = geminiData.choices?.[0]?.message?.content || '';
+    let claudeSuggestions = '';
+    if (claudeResponse.ok) {
+      const claudeData = await claudeResponse.json();
+      claudeSuggestions = claudeData.choices?.[0]?.message?.content || '';
     }
 
     return NextResponse.json({
       success: true,
       analysis: {
-        gpt52Analysis: gptAnalysis,
-        geminiCreativeSuggestions: geminiSuggestions,
+        gemini3ProAnalysis: geminiAnalysis,
+        claudeCreativeSuggestions: claudeSuggestions,
         analysisType,
         timestamp: new Date().toISOString(),
       },
