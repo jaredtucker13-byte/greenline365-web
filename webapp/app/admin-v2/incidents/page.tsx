@@ -739,7 +739,7 @@ export default function IncidentsPage() {
                       </div>
                     )}
                     
-                    {selectedIncident.report_sections.findings?.length > 0 && (
+                    {(selectedIncident.report_sections.findings?.length ?? 0) > 0 && (
                       <div className="mb-4">
                         <h4 className="text-sm text-emerald-400 uppercase tracking-wider mb-2">Key Findings</h4>
                         <div className="space-y-2">
