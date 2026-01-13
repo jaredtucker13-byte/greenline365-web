@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { renderToBuffer } from '@react-pdf/renderer';
 import { IncidentReportPDF } from '@/lib/pdf/IncidentReportPDF';
 import crypto from 'crypto';
+import React from 'react';
 
 // Company info - could come from tenant profile in production
 const DEFAULT_COMPANY = {
