@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
       signatureEvents: signatureEvents || []
     });
     
-    const pdfBuffer = await renderToBuffer(pdfDocument as React.ReactElement);
+    const pdfBuffer = await renderToBuffer(pdfDocument as any);
 
     // Generate hash for document integrity
     const pdfHash = crypto.createHash('sha256').update(pdfBuffer).digest('hex');
