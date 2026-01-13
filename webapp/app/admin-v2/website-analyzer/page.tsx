@@ -37,11 +37,55 @@ interface Section {
   order: number;
 }
 
+interface ExtractedWebsite {
+  url: string;
+  title: string;
+  description: string;
+  favicon?: string;
+  colors: {
+    primary: string[];
+    background: string[];
+    text: string[];
+    accent: string[];
+    all: string[];
+  };
+  content: {
+    headlines: string[];
+    paragraphs: string[];
+    ctas: string[];
+    navigation: string[];
+    footerLinks: string[];
+  };
+  images: {
+    logo?: string;
+    hero?: string;
+    all: { src: string; alt: string }[];
+  };
+  structure: {
+    hasNavbar: boolean;
+    hasHero: boolean;
+    hasFeatures: boolean;
+    hasTestimonials: boolean;
+    hasPricing: boolean;
+    hasFooter: boolean;
+    sectionCount: number;
+    sections: string[];
+  };
+  metadata: {
+    ogImage?: string;
+    ogTitle?: string;
+    ogDescription?: string;
+    keywords?: string;
+    author?: string;
+  };
+}
+
 interface Project {
   id: string;
   name: string;
   mode: AnalysisMode;
   sourceImagePreview?: string;
+  extractedData?: ExtractedWebsite;
   sections: Section[];
   generatedCode?: string;
   createdAt: string;
