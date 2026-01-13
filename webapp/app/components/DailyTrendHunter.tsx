@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
 
 interface Trend {
   id?: string;
@@ -20,22 +21,61 @@ interface DailyTrendHunterProps {
   trendType?: 'live_pulse' | 'weekly_batch' | 'manual';
   onTrendsLoaded?: (trends: Trend[]) => void;
   onCreateContent?: (trend: Trend) => void;
+  unlimitedAccess?: boolean; // For logged-in users
 }
+
+const MAX_FREE_USES = 3;
+const STORAGE_KEY = 'trendHunter_usageCount';
 
 export default function DailyTrendHunter({ 
   userId, 
   trendType = 'manual',
   onTrendsLoaded,
-  onCreateContent 
+  onCreateContent,
+  unlimitedAccess = false
 }: DailyTrendHunterProps) {
   const [zipCode, setZipCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [trends, setTrends] = useState<Trend[]>([]);
   const [error, setError] = useState('');
   const [expiresAt, setExpiresAt] = useState<string | null>(null);
+  const [usageCount, setUsageCount] = useState(0);
+  const [isBlocked, setIsBlocked] = useState(false);
+
+  // Load usage count from localStorage on mount
+  useEffect(() => {
+    if (typeof window === 'undefined' || unlimitedAccess) return;
+    
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      const count = parseInt(stored, 10);
+      setUsageCount(count);
+      if (count >= MAX_FREE_USES) {
+        setIsBlocked(true);
+      }
+    }
+  }, [unlimitedAccess]);
+
+  // Increment usage count
+  const incrementUsage = () => {
+    if (unlimitedAccess) return;
+    
+    const newCount = usageCount + 1;
+    setUsageCount(newCount);
+    localStorage.setItem(STORAGE_KEY, newCount.toString());
+    
+    if (newCount >= MAX_FREE_USES) {
+      setIsBlocked(true);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Check if blocked before allowing search
+    if (isBlocked && !unlimitedAccess) {
+      return;
+    }
     
     if (!/^\d{5}$/.test(zipCode)) {
       setError('Please enter a valid 5-digit zip code');
@@ -58,6 +98,9 @@ export default function DailyTrendHunter({
       if (!response.ok) {
         throw new Error(data.error || 'Failed to fetch trends');
       }
+
+      // Increment usage on successful search
+      incrementUsage();
 
       setTrends(data.trends || []);
       setExpiresAt(data.metadata?.expiresAt || null);
