@@ -712,6 +712,18 @@ export default function IncidentsPage() {
                     </button>
                   )}
                   
+                  {/* PDF Download Button - always show if report exists */}
+                  {selectedIncident.report_sections && Object.keys(selectedIncident.report_sections).length > 0 && (
+                    <button
+                      onClick={generatePdf}
+                      disabled={generatingPdf}
+                      className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:opacity-50 rounded-lg transition-colors"
+                    >
+                      {generatingPdf ? <Loader2 className="animate-spin" size={18} /> : <Download size={18} />}
+                      Download PDF
+                    </button>
+                  )}
+                  
                   {selectedIncident.email_sent_at && !selectedIncident.signed_at && (
                     <div className="flex items-center gap-2 text-purple-400 px-4 py-2 bg-purple-500/10 rounded-lg">
                       <Clock size={18} />
