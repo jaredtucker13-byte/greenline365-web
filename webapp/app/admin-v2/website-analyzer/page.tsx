@@ -706,12 +706,22 @@ Generate a high-quality mockup specifically for this ${section.label} section on
                       </div>
                       
                       {imagePreview && (
-                        <img
-                          src={imagePreview}
-                          alt="Captured screenshot"
-                          className="w-full rounded-xl border border-white/20"
-                          data-testid="captured-preview"
-                        />
+                        <div className="relative">
+                          <img
+                            src={imagePreview}
+                            alt="Captured screenshot"
+                            className="w-full rounded-xl border border-white/20"
+                            data-testid="captured-preview"
+                          />
+                          {/* X button to remove captured image */}
+                          <button
+                            onClick={clearImage}
+                            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-red-500/80 hover:bg-red-500 text-white flex items-center justify-center transition shadow-lg"
+                            data-testid="remove-captured-image-btn"
+                          >
+                            ✕
+                          </button>
+                        </div>
                       )}
                     </div>
                   )}
