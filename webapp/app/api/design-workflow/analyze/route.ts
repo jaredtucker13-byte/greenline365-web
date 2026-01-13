@@ -29,14 +29,14 @@ const ANALYSIS_PROMPTS: Record<string, string> = {
 async function analyzeWithGemini(imageBase64: string, prompt: string, modelId: string): Promise<string> {
   const genAI = new GoogleGenAI({ apiKey: EMERGENT_KEY });
   
-  const model = genAI.models.get(modelId);
-  
-  const response = await model.generateContent({
+  // Use the models.generateContent method directly
+  const response = await genAI.models.generateContent({
+    model: modelId,
     contents: [
       {
         role: 'user',
         parts: [
-          { text: prompt },
+          { text: `You are an expert UI/UX designer and web development consultant. Analyze websites thoroughly and provide actionable insights.\n\n${prompt}` },
           {
             inlineData: {
               mimeType: 'image/png',
@@ -46,9 +46,6 @@ async function analyzeWithGemini(imageBase64: string, prompt: string, modelId: s
         ],
       },
     ],
-    config: {
-      systemInstruction: 'You are an expert UI/UX designer and web development consultant. Analyze websites thoroughly and provide actionable insights.',
-    },
   });
 
   return response.text || 'No analysis generated';
@@ -57,18 +54,14 @@ async function analyzeWithGemini(imageBase64: string, prompt: string, modelId: s
 async function generateDesignWithGemini(prompt: string): Promise<string> {
   const genAI = new GoogleGenAI({ apiKey: EMERGENT_KEY });
   
-  const model = genAI.models.get('gemini-2.5-pro');
-  
-  const response = await model.generateContent({
+  const response = await genAI.models.generateContent({
+    model: 'gemini-2.5-pro',
     contents: [
       {
         role: 'user',
-        parts: [{ text: prompt }],
+        parts: [{ text: `You are a world-class web designer who creates stunning, conversion-optimized websites.\n\n${prompt}` }],
       },
     ],
-    config: {
-      systemInstruction: 'You are a world-class web designer who creates stunning, conversion-optimized websites.',
-    },
   });
 
   return response.text || 'No design generated';
