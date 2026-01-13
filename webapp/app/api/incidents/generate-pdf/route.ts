@@ -68,14 +68,14 @@ export async function POST(request: NextRequest) {
     } : DEFAULT_COMPANY;
 
     // Generate PDF buffer
-    const pdfBuffer = await renderToBuffer(
-      React.createElement(IncidentReportPDF, {
-        incident,
-        images: incident.incident_images || [],
-        company,
-        signatureEvents: signatureEvents || []
-      })
-    );
+    const pdfDocument = React.createElement(IncidentReportPDF, {
+      incident,
+      images: incident.incident_images || [],
+      company,
+      signatureEvents: signatureEvents || []
+    });
+    
+    const pdfBuffer = await renderToBuffer(pdfDocument as React.ReactElement);
 
     // Generate hash for document integrity
     const pdfHash = crypto.createHash('sha256').update(pdfBuffer).digest('hex');
