@@ -2,10 +2,68 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { 
-  Shield, CheckCircle, XCircle, AlertTriangle, FileText, 
-  Camera, Loader2, Clock, MapPin, User, Download
-} from 'lucide-react';
+
+// Inline SVG Icons
+const Icons = {
+  Shield: () => (
+    <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+    </svg>
+  ),
+  CheckCircle: () => (
+    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  ),
+  XCircle: () => (
+    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  ),
+  AlertTriangle: () => (
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+    </svg>
+  ),
+  FileText: () => (
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    </svg>
+  ),
+  Camera: () => (
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+    </svg>
+  ),
+  Loader2: () => (
+    <svg className="w-6 h-6 animate-spin" fill="none" viewBox="0 0 24 24">
+      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+    </svg>
+  ),
+  Clock: () => (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  ),
+  MapPin: () => (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+    </svg>
+  ),
+  User: () => (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+    </svg>
+  ),
+  Download: () => (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+    </svg>
+  ),
+};
 
 interface Incident {
   id: string;
@@ -60,12 +118,10 @@ export default function SignPage() {
         const data = await res.json();
         setIncident(data);
         
-        // Pre-fill signer name if available
         if (data.customer_name) {
           setSignerName(data.customer_name);
         }
         
-        // Check if already signed
         if (data.signed_at) {
           setSubmitted(true);
           setResult({
@@ -127,8 +183,8 @@ export default function SignPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="animate-spin mx-auto mb-4 text-emerald-400" size={40} />
+        <div className="text-center text-white">
+          <div className="flex justify-center mb-4"><Icons.Loader2 /></div>
           <p className="text-gray-400">Loading incident report...</p>
         </div>
       </div>
@@ -139,7 +195,7 @@ export default function SignPage() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 flex items-center justify-center p-4">
         <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-8 max-w-md text-center">
-          <XCircle className="mx-auto mb-4 text-red-400" size={50} />
+          <div className="flex justify-center mb-4 text-red-400"><Icons.XCircle /></div>
           <h1 className="text-xl font-bold text-white mb-2">Unable to Load Report</h1>
           <p className="text-gray-400">{error}</p>
           <p className="text-sm text-gray-500 mt-4">
@@ -160,7 +216,7 @@ export default function SignPage() {
         }`}>
           {result?.action === 'acknowledge' ? (
             <>
-              <CheckCircle className="mx-auto mb-4 text-emerald-400" size={60} />
+              <div className="flex justify-center mb-4 text-emerald-400"><Icons.CheckCircle /></div>
               <h1 className="text-2xl font-bold text-white mb-2">Report Acknowledged</h1>
               <p className="text-gray-300 mb-4">
                 Thank you for reviewing and acknowledging this incident report.
@@ -168,7 +224,7 @@ export default function SignPage() {
             </>
           ) : (
             <>
-              <AlertTriangle className="mx-auto mb-4 text-orange-400" size={60} />
+              <div className="flex justify-center mb-4 text-orange-400"><Icons.AlertTriangle /></div>
               <h1 className="text-2xl font-bold text-white mb-2">Refusal Recorded</h1>
               <p className="text-gray-300 mb-4">
                 Your refusal has been recorded and will be reviewed.
@@ -195,7 +251,7 @@ export default function SignPage() {
       <header className="bg-slate-800/50 border-b border-white/10 py-4">
         <div className="max-w-4xl mx-auto px-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Shield className="text-emerald-400" size={28} />
+            <span className="text-emerald-400"><Icons.Shield /></span>
             <span className="font-bold text-lg">GreenLine365</span>
           </div>
           <div className="flex items-center gap-3">
@@ -203,7 +259,7 @@ export default function SignPage() {
               href={`/api/incidents/generate-pdf?token=${token}`}
               className="flex items-center gap-2 px-3 py-1.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg text-sm transition-colors"
             >
-              <Download size={16} />
+              <Icons.Download />
               Download PDF
             </a>
             <span className="text-sm text-gray-400">Incident Documentation</span>
@@ -219,15 +275,15 @@ export default function SignPage() {
               <h1 className="text-2xl font-bold mb-1">{incident?.title}</h1>
               <div className="flex items-center gap-4 text-gray-400 text-sm">
                 <span className="flex items-center gap-1">
-                  <User size={14} />
+                  <Icons.User />
                   {incident?.customer_name}
                 </span>
                 <span className="flex items-center gap-1">
-                  <MapPin size={14} />
+                  <Icons.MapPin />
                   {incident?.property_address}
                 </span>
                 <span className="flex items-center gap-1">
-                  <Clock size={14} />
+                  <Icons.Clock />
                   {new Date(incident?.created_at || '').toLocaleDateString()}
                 </span>
               </div>
@@ -248,7 +304,7 @@ export default function SignPage() {
         {incident?.incident_images && incident.incident_images.length > 0 && (
           <div className="bg-white/5 rounded-lg border border-white/10 p-6 mb-6">
             <h2 className="text-lg font-semibold flex items-center gap-2 mb-4">
-              <Camera size={20} />
+              <Icons.Camera />
               Documented Evidence ({incident.incident_images.length} images)
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -277,7 +333,7 @@ export default function SignPage() {
         {incident?.report_sections && (
           <div className="bg-white/5 rounded-lg border border-white/10 p-6 mb-6">
             <h2 className="text-lg font-semibold flex items-center gap-2 mb-4">
-              <FileText size={20} />
+              <Icons.FileText />
               Inspection Findings
             </h2>
             
@@ -331,7 +387,7 @@ export default function SignPage() {
         {/* Liability Notice */}
         <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 mb-6">
           <div className="flex items-start gap-3">
-            <AlertTriangle className="text-yellow-400 flex-shrink-0 mt-0.5" size={20} />
+            <span className="text-yellow-400 flex-shrink-0 mt-0.5"><Icons.AlertTriangle /></span>
             <div className="text-sm">
               <p className="text-yellow-200 font-medium mb-1">Important Notice</p>
               <p className="text-yellow-200/80">
@@ -375,7 +431,7 @@ export default function SignPage() {
                   disabled={submitting || !signerName.trim() || !refusalReason.trim()}
                   className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-orange-500 hover:bg-orange-600 disabled:opacity-50 rounded-lg font-semibold transition-colors"
                 >
-                  {submitting ? <Loader2 className="animate-spin" size={20} /> : <XCircle size={20} />}
+                  {submitting ? <Icons.Loader2 /> : <Icons.XCircle />}
                   Submit Refusal
                 </button>
                 <button
@@ -393,7 +449,7 @@ export default function SignPage() {
                 disabled={submitting || !signerName.trim()}
                 className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 rounded-lg font-semibold text-lg transition-colors"
               >
-                {submitting ? <Loader2 className="animate-spin" size={24} /> : <CheckCircle size={24} />}
+                {submitting ? <Icons.Loader2 /> : <Icons.CheckCircle />}
                 I Acknowledge This Report
               </button>
               <button
@@ -401,7 +457,7 @@ export default function SignPage() {
                 disabled={submitting}
                 className="flex items-center justify-center gap-2 px-6 py-4 bg-white/10 hover:bg-white/20 rounded-lg font-semibold transition-colors"
               >
-                <XCircle size={20} />
+                <Icons.XCircle />
                 I Refuse
               </button>
             </div>
