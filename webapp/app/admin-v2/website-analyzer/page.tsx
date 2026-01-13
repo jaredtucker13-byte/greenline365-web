@@ -804,9 +804,13 @@ Generate a high-quality mockup specifically for this ${section.label} section on
                     </div>
                   )}
 
-                  {/* URL Method */}
+                  {/* URL Method - Crawl & Extract */}
                   {inputMethod === 'url' && (
                     <div className="space-y-4">
+                      <p className="text-sm text-white/60">
+                        🔍 Enter a URL to reverse-engineer the website. We'll extract all content, colors, and structure so you can redesign while keeping the content intact.
+                      </p>
+                      
                       <div className="flex gap-2">
                         <input
                           type="url"
@@ -817,39 +821,100 @@ Generate a high-quality mockup specifically for this ${section.label} section on
                           data-testid="url-input"
                         />
                         <button
-                          onClick={captureUrlScreenshot}
-                          disabled={capturingUrl || !websiteUrl.trim()}
-                          className="px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-medium disabled:opacity-50 flex items-center gap-2"
-                          data-testid="capture-url-btn"
+                          onClick={crawlWebsite}
+                          disabled={crawlingUrl || !websiteUrl.trim()}
+                          className="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium disabled:opacity-50 flex items-center gap-2"
+                          data-testid="crawl-url-btn"
                         >
-                          {capturingUrl ? (
+                          {crawlingUrl ? (
                             <>
-                              <span className="animate-spin">⏳</span> Capturing...
+                              <span className="animate-spin">⏳</span> Crawling...
                             </>
                           ) : (
-                            <>📷 Capture</>
+                            <>🔍 Extract</>
                           )}
                         </button>
                       </div>
                       
-                      {imagePreview && (
-                        <div className="relative">
-                          <img
-                            src={imagePreview}
-                            alt="Captured screenshot"
-                            className="w-full rounded-xl border border-white/20"
-                            data-testid="captured-preview"
-                          />
-                          {/* X button to remove captured image */}
-                          <button
-                            onClick={clearImage}
-                            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-red-500/80 hover:bg-red-500 text-white flex items-center justify-center transition shadow-lg"
-                            data-testid="remove-captured-image-btn"
-                          >
-                            ✕
-                          </button>
+                      {/* Extracted Website Data Display */}
+                      {extractedWebsite && (
+                        <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 space-y-4">
+                          <div className="flex items-center justify-between">
+                            <h4 className="font-semibold text-emerald-300 flex items-center gap-2">
+                              ✅ Website Extracted Successfully
+                            </h4>
+                            <button
+                              onClick={() => setExtractedWebsite(null)}
+                              className="text-white/50 hover:text-white"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                              <span className="text-white/50">Title:</span>
+                              <p className="text-white truncate">{extractedWebsite.title || 'N/A'}</p>
+                            </div>
+                            <div>
+                              <span className="text-white/50">Sections Found:</span>
+                              <p className="text-white">{extractedWebsite.structure.sections.join(', ') || 'N/A'}</p>
+                            </div>
+                          </div>
+                          
+                          {/* Colors Preview */}
+                          {extractedWebsite.colors.all.length > 0 && (
+                            <div>
+                              <span className="text-white/50 text-sm">Colors Detected:</span>
+                              <div className="flex gap-1 mt-1 flex-wrap">
+                                {extractedWebsite.colors.all.slice(0, 10).map((color, i) => (
+                                  <div
+                                    key={i}
+                                    className="w-6 h-6 rounded border border-white/20"
+                                    style={{ backgroundColor: color }}
+                                    title={color}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Content Preview */}
+                          <div>
+                            <span className="text-white/50 text-sm">Headlines ({extractedWebsite.content.headlines.length}):</span>
+                            <ul className="text-xs text-white/70 mt-1 space-y-1 max-h-24 overflow-y-auto">
+                              {extractedWebsite.content.headlines.slice(0, 5).map((h, i) => (
+                                <li key={i} className="truncate">• {h}</li>
+                              ))}
+                            </ul>
+                          </div>
+                          
+                          {/* CTAs Preview */}
+                          {extractedWebsite.content.ctas.length > 0 && (
+                            <div>
+                              <span className="text-white/50 text-sm">CTAs Found:</span>
+                              <div className="flex gap-2 mt-1 flex-wrap">
+                                {extractedWebsite.content.ctas.slice(0, 5).map((cta, i) => (
+                                  <span key={i} className="text-xs px-2 py-1 rounded bg-white/10 text-white/70">
+                                    {cta}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )}
+                      
+                      {/* Also allow manual screenshot upload */}
+                      <div className="pt-4 border-t border-white/10">
+                        <p className="text-xs text-white/40 mb-2">Or upload a screenshot for visual analysis:</p>
+                        <button
+                          onClick={() => setInputMethod('upload')}
+                          className="text-sm text-cyan-400 hover:text-cyan-300"
+                        >
+                          → Switch to Upload
+                        </button>
+                      </div>
                     </div>
                   )}
 
