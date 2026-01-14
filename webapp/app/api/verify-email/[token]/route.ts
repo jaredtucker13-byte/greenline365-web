@@ -2,7 +2,7 @@
  * Verify Email Token API
  * 
  * POST /api/verify-email/[token]
- * Marks the email as verified in the database
+ * Verifies the magic link token from the waitlist signup
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -24,75 +24,71 @@ export async function POST(
       return NextResponse.json({ invalid: true, error: 'Token is required' }, { status: 400 });
     }
 
-    // Find the verification record
-    const { data: verification, error: findError } = await supabase
-      .from('email_verifications')
+    console.log('[Verify Token] Looking up token:', token.substring(0, 8) + '...');
+
+    // Find the waitlist entry with this token
+    const { data: entry, error: findError } = await supabase
+      .from('waitlist_submissions')
       .select('*')
-      .eq('token', token)
+      .eq('verification_token', token)
       .single();
 
-    if (findError || !verification) {
+    if (findError || !entry) {
+      console.log('[Verify Token] Token not found in database');
       return NextResponse.json({ invalid: true, error: 'Invalid verification token' }, { status: 400 });
     }
 
+    console.log('[Verify Token] Found entry for:', entry.email);
+
     // Check if already verified
-    if (verification.verified) {
+    if (entry.verified) {
       return NextResponse.json({ 
         success: true, 
-        message: 'Email already verified',
+        message: 'Email already verified!',
         alreadyVerified: true 
       });
     }
 
     // Check if expired
-    if (new Date(verification.expires_at) < new Date()) {
+    if (entry.verification_expires && new Date(entry.verification_expires) < new Date()) {
+      console.log('[Verify Token] Token expired');
       return NextResponse.json({ expired: true, error: 'Verification link has expired' }, { status: 400 });
     }
 
     // Mark as verified
     const { error: updateError } = await supabase
-      .from('email_verifications')
+      .from('waitlist_submissions')
       .update({ 
         verified: true,
+        status: 'verified',
         verified_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        verification_token: null, // Clear token after use (single-use)
+        verification_code: null,  // Clear code too
       })
-      .eq('token', token);
+      .eq('email', entry.email);
 
     if (updateError) {
       console.error('[Verify Token] Update error:', updateError);
       return NextResponse.json({ error: 'Failed to verify email' }, { status: 500 });
     }
 
-    // Also update the source table (waitlist, newsletter, etc.)
-    const { source, email, name, metadata } = verification;
-    
-    // Insert into the appropriate table based on source
-    if (source === 'waitlist') {
-      await supabase.from('waitlist').upsert({
-        email,
-        name,
-        verified: true,
-        metadata,
-        created_at: verification.created_at,
-      }, { onConflict: 'email' });
-    } else if (source === 'newsletter') {
-      await supabase.from('newsletter_subscribers').upsert({
-        email,
-        name,
-        verified: true,
-        subscribed_at: new Date().toISOString(),
-      }, { onConflict: 'email' });
-    }
-    // Add more sources as needed
+    console.log('[Verify Token] Successfully verified:', entry.email);
 
     return NextResponse.json({
       success: true,
-      message: 'Email verified successfully!',
+      message: 'Email verified successfully! Welcome to GreenLine365.',
     });
 
   } catch (error: any) {
     console.error('[Verify Token] Error:', error);
     return NextResponse.json({ error: error.message || 'Server error' }, { status: 500 });
   }
+}
+
+// Also support GET for direct link clicks
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ token: string }> }
+) {
+  return POST(request, { params });
 }
