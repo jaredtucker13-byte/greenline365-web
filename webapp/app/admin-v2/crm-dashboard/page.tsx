@@ -17,24 +17,23 @@ import Link from 'next/link';
 
 interface Lead {
   id: string;
+  user_id?: string;
   email: string;
   name?: string;
   phone?: string;
   company?: string;
-  role?: string;
-  country?: string;
+  status: string;
   source: string;
-  source_detail?: string;
-  interest_type?: string;
-  desired_plan?: string;
-  company_size?: string;
-  priority: 'low' | 'medium' | 'high' | 'urgent';
+  value?: number;
+  first_contact_at?: string;
+  last_contact_at?: string;
+  converted_at?: string;
+  lost_at?: string;
+  lost_reason?: string;
   tags: string[];
-  status: 'new' | 'unverified' | 'verified' | 'invited' | 'onboarded' | 'converted' | 'churned' | 'unsubscribed' | 'archived';
-  lead_score: number;
-  verification_attempts: number;
-  verified_at?: string;
   notes?: string;
+  assigned_to?: string;
+  metadata?: Record<string, any>;
   created_at: string;
   updated_at: string;
 }
@@ -45,22 +44,16 @@ interface Stats {
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bgColor: string }> = {
   new: { label: 'New', color: 'text-blue-400', bgColor: 'bg-blue-500/20' },
-  unverified: { label: 'Unverified', color: 'text-yellow-400', bgColor: 'bg-yellow-500/20' },
+  pending: { label: 'Pending', color: 'text-yellow-400', bgColor: 'bg-yellow-500/20' },
   verified: { label: 'Verified', color: 'text-emerald-400', bgColor: 'bg-emerald-500/20' },
-  invited: { label: 'Invited', color: 'text-purple-400', bgColor: 'bg-purple-500/20' },
-  onboarded: { label: 'Onboarded', color: 'text-cyan-400', bgColor: 'bg-cyan-500/20' },
+  contacted: { label: 'Contacted', color: 'text-purple-400', bgColor: 'bg-purple-500/20' },
+  qualified: { label: 'Qualified', color: 'text-cyan-400', bgColor: 'bg-cyan-500/20' },
   converted: { label: 'Converted', color: 'text-green-400', bgColor: 'bg-green-500/20' },
-  churned: { label: 'Churned', color: 'text-red-400', bgColor: 'bg-red-500/20' },
-  unsubscribed: { label: 'Unsubscribed', color: 'text-gray-400', bgColor: 'bg-gray-500/20' },
+  lost: { label: 'Lost', color: 'text-red-400', bgColor: 'bg-red-500/20' },
   archived: { label: 'Archived', color: 'text-gray-500', bgColor: 'bg-gray-600/20' },
 };
 
-const PRIORITY_CONFIG: Record<string, { label: string; color: string }> = {
-  low: { label: 'Low', color: 'text-gray-400' },
-  medium: { label: 'Medium', color: 'text-yellow-400' },
-  high: { label: 'High', color: 'text-orange-400' },
-  urgent: { label: 'Urgent', color: 'text-red-400' },
-};
+// Removed PRIORITY_CONFIG since priority column doesn't exist
 
 export default function CRMDashboard() {
   // Data state
