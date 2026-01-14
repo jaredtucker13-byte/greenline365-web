@@ -192,28 +192,34 @@ export default function CollapsibleSidebar({
 
       {/* Navigation */}
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-        {navItems.map((item) => (
-          <Link
-            key={item.id}
-            href={item.href}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 group ${isCollapsed ? 'justify-center px-2' : ''}`}
-            style={activeItem === item.id ? {
-              background: 'color-mix(in srgb, var(--theme-primary) 20%, transparent)',
-              color: 'var(--theme-accent)',
-              border: '1px solid color-mix(in srgb, var(--theme-primary) 30%, transparent)',
-            } : {
-              color: 'var(--theme-text-secondary)',
-            }}
-            title={isCollapsed ? item.label : undefined}
-          >
-            <span style={{ color: activeItem === item.id ? 'var(--theme-accent)' : 'var(--theme-text-muted)' }}>
-              {icons[item.icon]}
-            </span>
-            {!isCollapsed && (
-              <span className="text-sm font-medium">{item.label}</span>
-            )}
-          </Link>
-        ))}
+        {navItems.map((item) => {
+          // Use the ID to check active state instead of relying on prop
+          const isCurrentActive = activeItem === item.id;
+          
+          return (
+            <Link
+              key={item.id}
+              href={item.href}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 group ${isCollapsed ? 'justify-center px-2' : ''}`}
+              style={isCurrentActive ? {
+                background: 'color-mix(in srgb, var(--theme-primary) 20%, transparent)',
+                color: 'var(--theme-accent)',
+                border: '1px solid color-mix(in srgb, var(--theme-primary) 30%, transparent)',
+              } : {
+                color: 'var(--theme-text-secondary)',
+              }}
+              title={isCollapsed ? item.label : undefined}
+              data-testid={`nav-${item.id}`}
+            >
+              <span style={{ color: isCurrentActive ? 'var(--theme-accent)' : 'var(--theme-text-muted)' }}>
+                {icons[item.icon]}
+              </span>
+              {!isCollapsed && (
+                <span className="text-sm font-medium">{item.label}</span>
+              )}
+            </Link>
+          );
+        })}
       </nav>
 
       {/* Action Buttons */}
