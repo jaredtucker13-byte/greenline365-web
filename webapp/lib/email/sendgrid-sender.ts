@@ -90,7 +90,8 @@ export function getVerificationEmailHtml(
   name: string, 
   verificationUrl: string, 
   code: string,
-  source: string
+  source: string,
+  email?: string
 ): string {
   const sourceLabel = {
     waitlist: 'Waitlist',
@@ -99,6 +100,9 @@ export function getVerificationEmailHtml(
     demo: 'Demo Request',
     signup: 'Account',
   }[source] || 'Registration';
+
+  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com';
+  const unsubscribeUrl = `${SITE_URL}/unsubscribe?email=${encodeURIComponent(email || '')}&list=${source}`;
 
   return `
 <!DOCTYPE html>
@@ -156,13 +160,21 @@ export function getVerificationEmailHtml(
       </p>
     </div>
     
-    <!-- Footer -->
-    <div style="text-align: center; margin-top: 32px;">
+    <!-- Footer with Unsubscribe -->
+    <div style="text-align: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid #333;">
       <p style="color: #606060; font-size: 12px; margin: 0;">
         If you didn't request this, you can safely ignore this email.
       </p>
       <p style="color: #404040; font-size: 12px; margin: 16px 0 0;">
         © ${new Date().getFullYear()} GreenLine365. All rights reserved.
+      </p>
+      <p style="color: #404040; font-size: 11px; margin: 16px 0 0;">
+        <a href="${unsubscribeUrl}" style="color: #606060; text-decoration: underline;">Unsubscribe</a>
+        &nbsp;|&nbsp;
+        <a href="${SITE_URL}/privacy" style="color: #606060; text-decoration: underline;">Privacy Policy</a>
+      </p>
+      <p style="color: #333; font-size: 10px; margin: 12px 0 0;">
+        GreenLine365 • Tampa, FL
       </p>
     </div>
   </div>
