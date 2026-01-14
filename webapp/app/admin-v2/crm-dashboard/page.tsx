@@ -531,11 +531,9 @@ export default function CRMDashboard() {
                     </select>
                   </div>
                   <div className="flex-1">
-                    <label className="block text-sm text-white/60 mb-2">Lead Score</label>
-                    <div className={`px-4 py-2 rounded-lg bg-white/5 border border-white/10 font-bold ${
-                      selectedLead.lead_score >= 50 ? 'text-emerald-400' : 'text-white'
-                    }`}>
-                      {selectedLead.lead_score} points
+                    <label className="block text-sm text-white/60 mb-2">Value</label>
+                    <div className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 font-bold text-emerald-400">
+                      {selectedLead.value ? `$${selectedLead.value.toLocaleString()}` : '—'}
                     </div>
                   </div>
                 </div>
@@ -556,66 +554,58 @@ export default function CRMDashboard() {
                         <span className="text-white">{selectedLead.company}</span>
                       </div>
                     )}
-                    {selectedLead.role && (
+                    {selectedLead.assigned_to && (
                       <div className="flex items-center gap-3">
-                        <span className="text-white/40">💼</span>
-                        <span className="text-white">{selectedLead.role}</span>
-                      </div>
-                    )}
-                    {selectedLead.country && (
-                      <div className="flex items-center gap-3">
-                        <span className="text-white/40">🌍</span>
-                        <span className="text-white">{selectedLead.country}</span>
+                        <span className="text-white/40">👤</span>
+                        <span className="text-white">Assigned to: {selectedLead.assigned_to}</span>
                       </div>
                     )}
                   </div>
                 </div>
 
-                {/* Source & Interest */}
+                {/* Source & Value */}
                 <div className="mb-6">
-                  <h3 className="text-sm font-medium text-white/60 mb-3">Source & Interest</h3>
+                  <h3 className="text-sm font-medium text-white/60 mb-3">Source & Details</h3>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="p-3 rounded-lg bg-white/5">
                       <div className="text-white/50 text-xs mb-1">Source</div>
-                      <div className="text-white capitalize">{selectedLead.source}</div>
+                      <div className="text-white capitalize">{selectedLead.source || '—'}</div>
                     </div>
-                    {selectedLead.interest_type && (
+                    {selectedLead.first_contact_at && (
                       <div className="p-3 rounded-lg bg-white/5">
-                        <div className="text-white/50 text-xs mb-1">Interest</div>
-                        <div className="text-white capitalize">{selectedLead.interest_type}</div>
+                        <div className="text-white/50 text-xs mb-1">First Contact</div>
+                        <div className="text-white">{new Date(selectedLead.first_contact_at).toLocaleDateString()}</div>
                       </div>
                     )}
-                    {selectedLead.desired_plan && (
+                    {selectedLead.last_contact_at && (
                       <div className="p-3 rounded-lg bg-white/5">
-                        <div className="text-white/50 text-xs mb-1">Desired Plan</div>
-                        <div className="text-white capitalize">{selectedLead.desired_plan}</div>
+                        <div className="text-white/50 text-xs mb-1">Last Contact</div>
+                        <div className="text-white">{new Date(selectedLead.last_contact_at).toLocaleDateString()}</div>
                       </div>
                     )}
-                    {selectedLead.company_size && (
+                    {selectedLead.converted_at && (
                       <div className="p-3 rounded-lg bg-white/5">
-                        <div className="text-white/50 text-xs mb-1">Company Size</div>
-                        <div className="text-white capitalize">{selectedLead.company_size}</div>
+                        <div className="text-white/50 text-xs mb-1">Converted</div>
+                        <div className="text-emerald-400">{new Date(selectedLead.converted_at).toLocaleDateString()}</div>
                       </div>
                     )}
                   </div>
                 </div>
 
-                {/* Verification Info */}
-                <div className="mb-6">
-                  <h3 className="text-sm font-medium text-white/60 mb-3">Verification</h3>
-                  <div className="p-4 rounded-lg bg-white/5 space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-white/50">Attempts</span>
-                      <span className="text-white">{selectedLead.verification_attempts}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-white/50">Verified</span>
-                      <span className={selectedLead.verified_at ? 'text-emerald-400' : 'text-white/40'}>
-                        {selectedLead.verified_at ? new Date(selectedLead.verified_at).toLocaleString() : 'Not yet'}
-                      </span>
+                {/* Lost Reason (if applicable) */}
+                {selectedLead.lost_at && (
+                  <div className="mb-6">
+                    <h3 className="text-sm font-medium text-white/60 mb-3">Lost Details</h3>
+                    <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/30">
+                      <div className="text-red-400 text-sm mb-1">
+                        Lost on {new Date(selectedLead.lost_at).toLocaleDateString()}
+                      </div>
+                      {selectedLead.lost_reason && (
+                        <div className="text-white/70">{selectedLead.lost_reason}</div>
+                      )}
                     </div>
                   </div>
-                </div>
+                )}
 
                 {/* Tags */}
                 {selectedLead.tags && selectedLead.tags.length > 0 && (
