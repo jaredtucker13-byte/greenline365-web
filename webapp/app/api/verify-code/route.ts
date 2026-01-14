@@ -16,54 +16,82 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-// Sync verified lead to CRM
-async function syncToCRM(entry: any) {
+// Sync verified lead to CRM - minimal fields for compatibility
+async function syncToCRM(entry: any): Promise<{ success: boolean; error?: string }> {
+  console.log('[CRM Sync] Starting sync for:', entry.email);
+  
   try {
-    // Check if lead already exists in CRM
-    const { data: existingLead } = await supabase
+    // First check if crm_leads table exists by trying a simple query
+    const { error: tableCheckError } = await supabase
       .from('crm_leads')
       .select('id')
+      .limit(1);
+    
+    if (tableCheckError) {
+      console.error('[CRM Sync] Table check failed:', tableCheckError.message);
+      return { success: false, error: `Table error: ${tableCheckError.message}` };
+    }
+
+    // Check if lead already exists in CRM
+    const { data: existingLead, error: findError } = await supabase
+      .from('crm_leads')
+      .select('id, status')
       .eq('email', entry.email)
-      .single();
+      .maybeSingle(); // Use maybeSingle to avoid error when not found
+
+    if (findError) {
+      console.error('[CRM Sync] Find error:', findError.message);
+    }
 
     if (existingLead) {
       // Update existing lead
-      await supabase
+      const { error: updateError } = await supabase
         .from('crm_leads')
         .update({
           status: 'verified',
           verified_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
         })
         .eq('id', existingLead.id);
       
+      if (updateError) {
+        console.error('[CRM Sync] Update failed:', updateError.message);
+        return { success: false, error: updateError.message };
+      }
+      
       console.log('[CRM Sync] Updated existing lead:', entry.email);
+      return { success: true };
     } else {
-      // Create new CRM lead from waitlist data
-      const { error: insertError } = await supabase
+      // Create new CRM lead - using only basic columns that should exist
+      const insertData: Record<string, any> = {
+        email: entry.email,
+        status: 'verified',
+        verified_at: new Date().toISOString(),
+        source: 'waitlist',
+      };
+      
+      // Add optional fields if they exist in entry
+      if (entry.name) insertData.name = entry.name;
+      if (entry.company) insertData.company = entry.company;
+      
+      console.log('[CRM Sync] Attempting insert with data:', JSON.stringify(insertData));
+      
+      const { data: newLead, error: insertError } = await supabase
         .from('crm_leads')
-        .insert({
-          email: entry.email,
-          name: entry.name || null,
-          company: entry.company || null,
-          source: 'waitlist',
-          source_detail: entry.industry || null,
-          status: 'verified',
-          verified_at: new Date().toISOString(),
-          consent_given: true,
-          consent_timestamp: new Date().toISOString(),
-          tags: ['waitlist'],
-        });
+        .insert(insertData)
+        .select()
+        .single();
 
       if (insertError) {
-        console.error('[CRM Sync] Failed to create lead:', insertError);
-      } else {
-        console.log('[CRM Sync] Created new lead:', entry.email);
+        console.error('[CRM Sync] Insert failed:', insertError.message, insertError.details, insertError.hint);
+        return { success: false, error: insertError.message };
       }
+      
+      console.log('[CRM Sync] Created new lead:', entry.email, 'ID:', newLead?.id);
+      return { success: true };
     }
-  } catch (err) {
-    console.error('[CRM Sync] Error:', err);
-    // Don't throw - CRM sync failure shouldn't block verification
+  } catch (err: any) {
+    console.error('[CRM Sync] Unexpected error:', err.message);
+    return { success: false, error: err.message };
   }
 }
 
