@@ -393,9 +393,8 @@ export default function CRMDashboard() {
                   <th className="px-4 py-3 text-left text-sm font-medium text-white/60">Contact</th>
                   <th className="px-4 py-3 text-left text-sm font-medium text-white/60">Company</th>
                   <th className="px-4 py-3 text-left text-sm font-medium text-white/60">Status</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-white/60">Priority</th>
                   <th className="px-4 py-3 text-left text-sm font-medium text-white/60">Source</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-white/60">Score</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-white/60">Value</th>
                   <th className="px-4 py-3 text-left text-sm font-medium text-white/60">Created</th>
                   <th className="px-4 py-3 text-right text-sm font-medium text-white/60">Actions</th>
                 </tr>
@@ -403,13 +402,13 @@ export default function CRMDashboard() {
               <tbody className="divide-y divide-white/5">
                 {loading ? (
                   <tr>
-                    <td colSpan={9} className="px-4 py-12 text-center">
+                    <td colSpan={8} className="px-4 py-12 text-center">
                       <div className="w-8 h-8 border-2 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin mx-auto" />
                     </td>
                   </tr>
                 ) : leads.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="px-4 py-12 text-center text-white/40">
+                    <td colSpan={8} className="px-4 py-12 text-center text-white/40">
                       No leads found
                     </td>
                   </tr>
@@ -440,22 +439,16 @@ export default function CRMDashboard() {
                       </td>
                       <td className="px-4 py-3">
                         <div className="text-white">{lead.company || '—'}</div>
-                        <div className="text-white/50 text-sm">{lead.role || ''}</div>
                       </td>
                       <td className="px-4 py-3">
-                        <span className={`px-2 py-1 rounded-full text-xs ${STATUS_CONFIG[lead.status]?.bgColor} ${STATUS_CONFIG[lead.status]?.color}`}>
-                          {STATUS_CONFIG[lead.status]?.label}
+                        <span className={`px-2 py-1 rounded-full text-xs ${STATUS_CONFIG[lead.status]?.bgColor || 'bg-gray-500/20'} ${STATUS_CONFIG[lead.status]?.color || 'text-gray-400'}`}>
+                          {STATUS_CONFIG[lead.status]?.label || lead.status || 'Unknown'}
                         </span>
                       </td>
+                      <td className="px-4 py-3 text-white/60 text-sm capitalize">{lead.source || '—'}</td>
                       <td className="px-4 py-3">
-                        <span className={`text-sm ${PRIORITY_CONFIG[lead.priority]?.color}`}>
-                          {PRIORITY_CONFIG[lead.priority]?.label}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-white/60 text-sm capitalize">{lead.source}</td>
-                      <td className="px-4 py-3">
-                        <span className={`font-medium ${lead.lead_score >= 50 ? 'text-emerald-400' : lead.lead_score >= 25 ? 'text-yellow-400' : 'text-white/40'}`}>
-                          {lead.lead_score}
+                        <span className="text-emerald-400 font-medium">
+                          {lead.value ? `$${lead.value.toLocaleString()}` : '—'}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-white/50 text-sm">
@@ -474,7 +467,7 @@ export default function CRMDashboard() {
                       </td>
                     </tr>
                   ))
-                )}
+                )}}
               </tbody>
             </table>
           </div>
