@@ -1,226 +1,150 @@
-# GreenLine365 - Product Requirements Document
-
-## Latest Update: January 13, 2026
-### Build Status: ✅ BUILD PASSING + MAJOR FEATURES ADDED
-
-## Recent Changes (This Session - January 13, 2026)
-
-### 1. Email Verification System (Double Opt-In) ✅
-- **SendGrid Integration** - Using free tier (100 emails/day)
-- **Verification Options**: Magic Link OR 6-digit code
-- **Waitlist Flow**: Submit → Check Email → Enter Code → Verified
-- **Spam Warning**: Prominent "Check your spam folder" message
-- **Files**: `/lib/email/sendgrid-sender.ts`, `/app/waitlist/page.tsx`
-
-### 2. Unsubscribe System ✅
-- **Unsubscribe Page**: `/unsubscribe` - Easy one-click unsubscribe
-- **Email Footer**: All emails include Unsubscribe + Privacy Policy links
-- **CAN-SPAM Compliant**: Physical address in footer
-- **API**: `/api/unsubscribe` - Handles all list types
-
-### 3. Trend Hunter Usage Limit ✅
-- **3 Free Searches**: Counter shows "Free searches remaining: X/3"
-- **Hard Block**: After 3 uses, modal blocks further use
-- **Signup CTA**: Prompts signup for unlimited access
-- **LocalStorage**: Tracks usage across sessions
-
-### 4. Website Builder Projects ✅
-- **Project Management**: Create, save, open, delete projects
-- **Project List View**: See all saved projects with status
-- **Auto-Save**: Work automatically saved every 2 seconds
-- **Database**: `website_projects` table with RLS
-- **API**: `/api/website-projects` (GET, POST, PUT, DELETE)
-
-### 5. Magic Link Authentication ✅
-- **Login/Signup Pages**: Toggle between Magic Link and Password
-- **Supabase OTP**: Uses built-in email OTP (free)
-- **Default**: Magic Link selected by default
-
-## AI Website Builder Feature (`/admin-v2/website-analyzer`)
-**Status: WORKING (requires deployment)**
-- **URL Reverse-Engineering**: Crawl any website to extract content, colors, and structure
-- **Multi-Section Workflow**: Build websites section-by-section (Header, Body, Footer)
-- **Drag-and-Drop**: Reorder sections before final assembly
-- **AI Models**: Gemini 3 Pro (vision), Claude 4.5 Sonnet (code), Nano Banana Pro (images)
-- **API Providers**: OpenRouter (text/vision), KIE.ai (image generation)
-
-### Key Files:
-- `/app/webapp/app/admin-v2/website-analyzer/page.tsx` - Main UI
-- `/app/webapp/app/api/crawl-website/route.ts` - Website crawler API
-- `/app/webapp/app/api/design-workflow/analyze/route.ts` - Vision analysis
-- `/app/webapp/app/api/design-workflow/generate-mockup/route.ts` - Image generation
-- `/app/webapp/app/api/design-workflow/generate-code/route.ts` - Code generation
-
-## Previous Session Changes
-- ✅ Fixed `audit_logs` RLS policies (uses `tenant_id` + `actor_id`, not `user_id`)
-- ✅ Fixed CRM tables RLS policies (`crm_leads`, `crm_customers`, `crm_revenue`)
-- ✅ Fixed `social_connections` RLS policies
-- ✅ All tables secured with Row Level Security
-- ✅ **Liability Documentation System** - Full incident reporting with AI analysis
-
-## NEW FEATURE: Liability Documentation System
-Complete incident documentation flow for HVAC industry:
-- **Upload**: Batch image upload with EXIF extraction
-- **AI Analysis**: GPT-4o via OpenRouter for mold/damage/hazard detection
-- **Report Generation**: Auto-generated professional liability reports
-- **E-Signature**: Click-to-acknowledge or refuse with timestamp capture
-- **PDF Generation**: Full professional 14-section PDF with all legal elements
-- **Audit Trail**: Full tracking of views, signatures, and actions
-
-### PDF Template Structure (14 Sections):
-1. Document Header (company info, report ID, dates)
-2. Parties Involved (contractor, client, witnesses)
-3. Incident Summary (executive summary)
-4. Incident Details (type, severity, location, status)
-5. Evidence & Media (images with AI captions, EXIF data)
-6. Timeline of Events (chronological with sources)
-7. Findings & Analysis (AI-detected issues with severity)
-8. Risk Assessment (overall risk level, concerns)
-9. Recommendations (prioritized actions)
-10. Liability Statement & Legal Notice
-11. Customer Response & Acknowledgment (digital signature/refusal)
-12. Report Author & Verification (technician signature)
-13. Audit Metadata & Chain of Custody (SHA-256 hash, event log)
-14. Data Retention & Legal (footer, retention policy)
-
-### Files Created:
-- `/app/api/incidents/route.ts` - CRUD operations
-- `/app/api/incidents/analyze/route.ts` - GPT-4o image analysis
-- `/app/api/incidents/upload/route.ts` - Image upload handling
-- `/app/api/incidents/generate-report/route.ts` - AI report generation
-- `/app/api/incidents/generate-pdf/route.ts` - **PDF generation with @react-pdf/renderer**
-- `/app/api/incidents/send-for-signature/route.ts` - Email delivery
-- `/app/api/incidents/sign/route.ts` - Public signing endpoint
-- `/app/admin-v2/incidents/page.tsx` - Admin dashboard
-- `/app/sign/[token]/page.tsx` - Public customer signing page
-- `/lib/pdf/IncidentReportPDF.tsx` - **Full 14-section PDF template**
-
-### Database Migrations to Run:
-1. `020_liability_documentation.sql` - Tables: incidents, incident_images, signature_events
-2. `021_incident_storage_bucket.sql` - Storage bucket for images
-
-## Migration Status: COMPLETE
-All migrations have been successfully applied:
-- `audit_logs` - RLS enabled, append-only for SOC2
-- `crm_leads`, `crm_customers`, `crm_revenue` - RLS with user_id
-- `social_connections` - RLS with user_id
+# GreenLine365 Business Operating System - PRD
 
 ## Original Problem Statement
-Build a comprehensive multi-tenant Business Operating System for local businesses called "GreenLine365".
+Build a Business Operating System with the current primary focus on an **AI Website Builder** and **AI Receptionist/Booking System**. Key features include URL reverse-engineering, context-aware redesign, multi-section workflow, live code sandbox, and a "Living Blog".
 
-## Core Architecture: Multi-Tenant System
+## User Personas
+- **Business Owners**: Need 24/7 AI receptionist to handle calls and bookings
+- **Multi-tenant Clients**: Various businesses using GreenLine365's AI services
+- **Internal Team**: Managing leads, content, and platform operations
 
-### The 4-Layer Memory System
-Each tenant has isolated data using RLS with `tenant_id`/`user_id` columns:
+## Core Requirements
 
-1. **Layer 1: Tenant Identity (Persona)**
-   - Table: `memory_core_profiles`
-   - Content: Business name, brand voice, personality, biography
-   - UI: `/admin-v2/brand-voice`
+### 1. AI Receptionist (Retell Integration)
+- 24/7 call handling and appointment booking
+- Multi-tenant support with dynamic variables
+- Memory system for returning customers
+- Human transfer during business hours
+- Sales transfer to Aiden (NEPQ agent)
 
-2. **Layer 2: Tenant Warehouse (Knowledge Base)**
-   - Table: `memory_knowledge_chunks` with pgvector
-   - Content: Services, pricing, FAQs, processes
-   - UI: `/admin-v2/knowledge`
+### 2. Booking/Calendar System
+- Flexible time slots per tenant
+- Service-based durations (10min, 30min, etc.)
+- Real-time availability checking
+- Confirmation numbers and SMS notifications
 
-3. **Layer 3: Tenant Journal (Track Record)**
-   - Table: `memory_event_journal`
-   - Content: Published blogs, captured leads, engagement metrics
-   - API: `/api/analytics`
+### 3. Email Verification (Double Opt-In)
+- Verification code sent via SendGrid
+- Code entry UI on waitlist page
+- Auto-sync verified leads to CRM
 
-4. **Layer 4: Live Buffer (Active Task)**
-   - Table: `memory_context_buffer`
-   - Content: Current session/conversation context
-   - TTL: 24 hours
+### 4. CRM Dashboard
+- View and manage all leads
+- Filter by status, source
+- Resend verification emails
+- Update lead status
 
-### Tenant CRM System (NEW)
-- **Tables:** `crm_leads`, `crm_customers`, `crm_email_events`, `crm_revenue`
-- **UI:** `/admin-v2/crm` (placeholder)
-- **API:** `/api/crm`
-- **Purpose:** Each tenant tracks their own customers, leads, revenue, ROI
+### 5. AI Website Builder
+- URL crawler for reverse-engineering
+- Project management system
+- Multi-section workflow
+- Live code sandbox (future)
 
-### SOC2 Audit Logging (NEW)
-- **Table:** `audit_logs` (append-only, 7-year retention)
-- **UI:** `/admin-v2/audit`
-- **API:** `/api/audit`
-- **Triggers:** Auto-log changes to CRM, Knowledge, Blog, Social tables
+---
 
-## What's Actually Working (Verified)
-- ✅ Blog Polish tool (AI writing + image generation)
-- ✅ Content Forge (content creation)
-- ✅ Email campaigns and templates
-- ✅ SMS templates (Twilio A2P pending)
-- ✅ Booking management
-- ✅ Brand Voice settings (Layer 1)
-- ✅ Knowledge Base (Layer 2)
-- ✅ Memory-enhanced chat (all 4 layers integrated)
+## What's Been Implemented
 
-## What's NOT Built Yet (Scaffolding Only)
-- ❌ Tenant CRM Dashboard (UI placeholder exists)
-- ❌ Analytics Dashboard (basic UI, needs enhancement)
-- ❌ Onboarding Wizard (page exists, flow not implemented)
-- ❌ Vector search for knowledge (pgvector schema ready)
-- ❌ Social media posting (OAuth framework ready)
-- ❌ Living Canvas publishing platform
+### January 14, 2025
+
+**Email Verification Flow (FIXED)**
+- Added missing columns to `waitlist_submissions` table
+- Migration: `025_add_verification_columns.sql`
+- Code-only email template (removed magic link)
+- CRM auto-sync on verification
+
+**Calendar/Booking System (NEW)**
+- Full calendar page at `/admin-v2/calendar`
+- Month/Week/Day views
+- Booking management UI
+- Migration: `026_flexible_booking_system.sql`
+- APIs: `/api/bookings`, `/api/services`
+
+**Retell AI Agent Setup (IN PROGRESS)**
+- Guided through Single Prompt Agent creation
+- 8 custom functions configured
+- Transfer setup documented
+
+### Previous Sessions
+- Magic Link authentication (Supabase)
+- 3-use limit for Trend Hunter demo
+- Unsubscribe system for compliance
+- Project management for Website Builder
+- CRM database schema
+
+---
 
 ## Prioritized Backlog
 
-### P0 (Critical - Blockers)
-- ✅ **Database Migrations** - COMPLETE
+### P0 - Critical (Blocking)
+- [x] Fix email verification flow
+- [x] Fix CRM lead sync
+- [ ] Run migration 026 (user action)
+- [ ] Complete Retell agent setup
+- [ ] Test booking flow end-to-end
 
-### P1 (High Priority)
-- Integrate Event & Audit Loggers into API endpoints
-- Build functional Tenant CRM Dashboard
-- Enhance Analytics Dashboard with visualizations
-- Implement Onboarding Wizard multi-step flow
-- Knowledge Base bulk import (CSV/JSON)
+### P1 - High Priority
+- [ ] Build CRM Dashboard frontend UI
+- [ ] Extend double opt-in to all forms
+- [ ] Create Aiden (sales agent)
+- [ ] Add calendar widget to Command Center
 
-### P2 (Medium Priority)
-- Living Canvas Publishing Platform
-- Complete Image Generation Features
-- Social OAuth connections
-- Vector search implementation (pgvector)
+### P2 - Medium Priority
+- [ ] Google Calendar integration
+- [ ] Comprehensive Website Builder test
+- [ ] Live Code Sandbox implementation
+- [ ] User-configurable default landing page
 
-### P3 (Future)
-- POS Integration & Payment Processing
-- AI-driven Tax Reports
-- "God Mode" CMS
-- Retell AI agent "Aiden"
+### P3 - Low Priority / Future
+- [ ] Living Blog enhancements
+- [ ] Website template marketplace
+- [ ] Interactive chatbot in builder
+- [ ] Fix pre-commit hook
 
-## File Structure
+---
+
+## Technical Architecture
+
 ```
 /app/webapp/
 ├── app/
 │   ├── admin-v2/
-│   │   ├── analytics/page.tsx       # Real data analytics
-│   │   ├── audit/page.tsx           # SOC2 audit log viewer
-│   │   ├── brand-voice/page.tsx     # Memory Layer 1
-│   │   ├── crm/page.tsx             # Tenant CRM (placeholder)
-│   │   ├── knowledge/page.tsx       # Memory Layer 2
-│   │   └── living-canvas/page.tsx   # Publishing platform
+│   │   ├── calendar/page.tsx          # Full booking calendar
+│   │   ├── crm-dashboard/page.tsx     # CRM (needs UI)
+│   │   └── website-analyzer/page.tsx  # AI Website Builder
 │   ├── api/
-│   │   ├── admin/analytics/route.ts # Admin-only metrics
-│   │   ├── analytics/route.ts       # Tenant analytics
-│   │   ├── audit/route.ts           # Audit logging
-│   │   ├── chat/route.ts            # Memory-enhanced chat
-│   │   ├── crm/route.ts             # CRM operations
-│   │   └── knowledge/route.ts       # Knowledge management
-│   └── onboarding/page.tsx          # Tenant onboarding
+│   │   ├── bookings/route.ts          # Booking CRUD
+│   │   ├── services/route.ts          # Tenant services
+│   │   ├── mcp/route.ts               # Retell MCP endpoint
+│   │   ├── verify-code/route.ts       # Email verification
+│   │   └── crm/leads/route.ts         # CRM API
+│   └── waitlist/page.tsx              # Double opt-in flow
 ├── lib/
-│   ├── audit-logger.ts              # Server-side audit utility
-│   ├── event-logger.ts              # Event tracking utility
-│   └── memory-bucket-service.ts     # 4-layer memory API
+│   └── email/sendgrid-sender.ts       # Email templates
 └── supabase/migrations/
-    ├── 014_memory_bucket_system.sql
-    ├── 015_social_and_analytics.sql
-    ├── 016_tenant_crm.sql
-    ├── 017_security_fixes.sql       # FIXED
-    ├── 018_audit_logging.sql        # FIXED
-    └── CONSOLIDATED_MIGRATION_FIX.sql # Run this!
+    ├── 025_add_verification_columns.sql
+    └── 026_flexible_booking_system.sql
 ```
 
+## Database Schema
+
+### Key Tables
+- `tenants` - Multi-tenant business configs
+- `bookings` - Appointments
+- `tenant_services` - Per-tenant services
+- `tenant_availability` - Business hours
+- `waitlist_submissions` - Leads with verification
+- `crm_leads` - CRM lead management
+- `agent_memory` - Customer history for AI
+
 ## 3rd Party Integrations
-- **Supabase:** DB, Auth, Storage, pgvector
-- **OpenRouter:** Text AI generation
-- **Kie.ai:** Image generation
-- **Playwright:** Server-side screenshots
+- **Supabase**: DB, Auth, Storage
+- **Retell AI**: Voice agent, call handling
+- **SendGrid**: Transactional emails
+- **OpenRouter**: Vision/text models
+- **KIE.ai**: Nano Banana image generation
+
+## Credentials Required
+- `SENDGRID_API_KEY` - Email sending
+- `SENDGRID_FROM_EMAIL` - greenline365help@gmail.com
+- `RETELL_API_KEY` - Voice agent
+- Supabase keys (configured)
