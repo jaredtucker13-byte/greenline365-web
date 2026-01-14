@@ -112,21 +112,11 @@ export async function POST(request: NextRequest) {
       name,
       phone,
       company,
-      role,
-      country,
       source = 'manual',
-      sourceDetail,
-      interestType,
-      desiredPlan,
-      useCase,
-      companySize,
-      priority = 'medium',
+      value,
       tags = [],
       notes,
-      newsletterOptIn = false,
-      utmSource,
-      utmMedium,
-      utmCampaign,
+      status = 'new',
     } = body;
     
     if (!email) {
@@ -140,53 +130,38 @@ export async function POST(request: NextRequest) {
       .from('crm_leads')
       .select('id')
       .eq('email', normalizedEmail)
-      .single();
+      .maybeSingle();
     
     if (existing) {
       return NextResponse.json({ error: 'Lead with this email already exists', existingId: existing.id }, { status: 409 });
     }
     
-    // Create lead
+    const now = new Date().toISOString();
+    
+    // Create lead - only use columns that exist in the actual table
     const { data: lead, error } = await supabase
       .from('crm_leads')
       .insert({
         email: normalizedEmail,
-        name,
-        phone,
-        company,
-        role,
-        country,
-        source,
-        source_detail: sourceDetail,
-        interest_type: interestType,
-        desired_plan: desiredPlan,
-        use_case: useCase,
-        company_size: companySize,
-        priority,
-        tags,
-        notes,
-        newsletter_opt_in: newsletterOptIn,
-        utm_source: utmSource,
-        utm_medium: utmMedium,
-        utm_campaign: utmCampaign,
-        status: 'new',
-        consent_given: true,
-        consent_timestamp: new Date().toISOString(),
+        name: name || null,
+        phone: phone || null,
+        company: company || null,
+        source: source || 'manual',
+        value: value || null,
+        tags: tags || [],
+        notes: notes || null,
+        status: status || 'new',
+        first_contact_at: now,
+        created_at: now,
+        updated_at: now,
       })
       .select()
       .single();
     
     if (error) {
       console.error('[CRM] Create error:', error);
-      return NextResponse.json({ error: 'Failed to create lead' }, { status: 500 });
+      return NextResponse.json({ error: 'Failed to create lead', details: error.message }, { status: 500 });
     }
-    
-    // Log activity
-    await supabase.from('crm_lead_activities').insert({
-      lead_id: lead.id,
-      activity_type: 'lead_created',
-      activity_data: { source, email: normalizedEmail },
-    });
     
     return NextResponse.json({ lead }, { status: 201 });
   } catch (error: any) {
