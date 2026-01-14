@@ -746,6 +746,7 @@ export default function ContentForge2() {
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
     </div>
   );
 }
