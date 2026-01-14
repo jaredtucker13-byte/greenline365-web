@@ -20,6 +20,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { KPICard, FunnelChart, TimeSeriesChart, DataTable, type Column } from '../components/shared';
+import { PageHeader } from '../components/PageHeader';
 
 // ============================================
 // TYPES
