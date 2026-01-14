@@ -80,15 +80,18 @@ export async function POST(request: NextRequest) {
     }
 
     // Log the unsubscribe action
-    await supabase
-      .from('email_unsubscribes')
-      .insert({
-        email: normalizedEmail,
-        list,
-        unsubscribed_at: new Date().toISOString(),
-        ip_address: request.headers.get('x-forwarded-for') || 'unknown',
-      })
-      .catch(() => {}); // Ignore if table doesn't exist
+    try {
+      await supabase
+        .from('email_unsubscribes')
+        .insert({
+          email: normalizedEmail,
+          list,
+          unsubscribed_at: new Date().toISOString(),
+          ip_address: request.headers.get('x-forwarded-for') || 'unknown',
+        });
+    } catch (e) {
+      // Ignore if table doesn't exist
+    }
 
     console.log('[Unsubscribe] Successfully unsubscribed:', normalizedEmail);
 
