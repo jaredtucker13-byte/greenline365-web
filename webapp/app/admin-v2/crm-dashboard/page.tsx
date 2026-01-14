@@ -16,6 +16,9 @@
 
 'use client';
 
+// Force dynamic rendering (uses navigation context)
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
