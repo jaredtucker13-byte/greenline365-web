@@ -16,6 +16,7 @@
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 interface SidebarProps {
   activeItem: 'dashboard' | 'schedule' | 'analytics' | 'settings' | 'content';
