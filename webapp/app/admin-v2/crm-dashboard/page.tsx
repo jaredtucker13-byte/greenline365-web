@@ -1,11 +1,17 @@
 /**
- * CRM Dashboard - Phase 1 MVP
+ * CRM Dashboard - Consolidated Hub & Spoke Architecture
  * 
- * Features:
- * - KPI Strip with 4 key metrics + trends
- * - Lead table with inline status change
- * - Detail Rail with full info + activity
- * - Quick Add modal for manual lead creation
+ * This is the main CRM "spoke" page featuring:
+ * - KPI Strip (powered by analyticsApi)
+ * - Lead Table (powered by coreApi)
+ * - Detail Rail for record interactions
+ * - Quick Add modal
+ * - Drill-through to analytics
+ * 
+ * Data Flow:
+ * - KPIs: analyticsApi.getCrmKPIs() -> KPICard components
+ * - Records: coreApi.listLeads() -> DataTable
+ * - Actions: coreApi.createLead(), coreApi.updateLead()
  */
 
 'use client';
@@ -13,10 +19,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { KPICard, FunnelChart, TimeSeriesChart, DataTable, type Column } from '../components/shared';
+
+// ============================================
+// TYPES
+// ============================================
 
 interface Lead {
   id: string;
-  user_id?: string;
   email: string;
   name?: string;
   phone?: string;
@@ -27,19 +37,34 @@ interface Lead {
   first_contact_at?: string;
   last_contact_at?: string;
   converted_at?: string;
-  lost_at?: string;
-  lost_reason?: string;
   tags: string[];
   notes?: string;
-  assigned_to?: string;
-  metadata?: Record<string, any>;
   created_at: string;
   updated_at: string;
 }
 
-interface Stats {
-  [key: string]: number;
+interface CrmKPIs {
+  totalLeads: number;
+  newLeads: number;
+  verifiedLeads: number;
+  convertedLeads: number;
+  lostLeads: number;
+  verificationRate: number;
+  conversionRate: number;
+  totalRevenue: number;
+  avgDealValue: number;
+  pipelineValue: number;
 }
+
+interface AnalyticsMeta {
+  source: string;
+  lastProcessedAt: string;
+  cacheTtlSec: number;
+}
+
+// ============================================
+// CONSTANTS
+// ============================================
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bgColor: string; icon: string }> = {
   new: { label: 'New', color: 'text-blue-400', bgColor: 'bg-blue-500/20', icon: '🆕' },
@@ -63,32 +88,66 @@ const SOURCE_OPTIONS = [
   { value: 'manual', label: 'Manual Entry' },
 ];
 
+type DateRange = '7d' | '30d' | '90d' | 'all';
+
+// ============================================
+// MAIN COMPONENT
+// ============================================
+
 export default function CRMDashboard() {
-  // Data state
+  // KPI State (from analyticsApi)
+  const [kpis, setKpis] = useState<CrmKPIs | null>(null);
+  const [kpiMeta, setKpiMeta] = useState<AnalyticsMeta | null>(null);
+  const [kpiLoading, setKpiLoading] = useState(true);
+  
+  // Lead State (from coreApi)
   const [leads, setLeads] = useState<Lead[]>([]);
-  const [stats, setStats] = useState<Stats>({});
-  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState<Record<string, number>>({});
+  const [leadsLoading, setLeadsLoading] = useState(true);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   
-  // Filter state
+  // Filter State
+  const [dateRange, setDateRange] = useState<DateRange>('30d');
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [sourceFilter, setSourceFilter] = useState('');
   const [sortBy, setSortBy] = useState('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   
-  // UI state
+  // UI State
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [selectedLeads, setSelectedLeads] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const [showAddLead, setShowAddLead] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
 
-  // Fetch leads
+  // ============================================
+  // DATA FETCHING
+  // ============================================
+
+  // Fetch KPIs from Analytics API
+  const fetchKPIs = useCallback(async () => {
+    setKpiLoading(true);
+    try {
+      const response = await fetch(`/api/analytics/crm?type=kpis&range=${dateRange}`);
+      const result = await response.json();
+      
+      if (response.ok) {
+        setKpis(result.data);
+        setKpiMeta(result.meta);
+      }
+    } catch (err) {
+      console.error('Failed to fetch KPIs:', err);
+    } finally {
+      setKpiLoading(false);
+    }
+  }, [dateRange]);
+
+  // Fetch Leads from Core API
   const fetchLeads = useCallback(async () => {
-    setLoading(true);
+    setLeadsLoading(true);
     try {
       const params = new URLSearchParams({
         page: page.toString(),
@@ -113,15 +172,22 @@ export default function CRMDashboard() {
     } catch (err) {
       console.error('Failed to fetch leads:', err);
     } finally {
-      setLoading(false);
+      setLeadsLoading(false);
     }
   }, [page, search, statusFilter, sourceFilter, sortBy, sortOrder]);
+
+  useEffect(() => {
+    fetchKPIs();
+  }, [fetchKPIs]);
 
   useEffect(() => {
     fetchLeads();
   }, [fetchLeads]);
 
-  // Update lead status
+  // ============================================
+  // ACTIONS
+  // ============================================
+
   const updateLeadStatus = async (leadId: string, newStatus: string) => {
     setActionLoading(true);
     try {
@@ -133,6 +199,7 @@ export default function CRMDashboard() {
       
       if (response.ok) {
         fetchLeads();
+        fetchKPIs(); // Refresh KPIs after status change
         if (selectedLead?.id === leadId) {
           setSelectedLead({ ...selectedLead, status: newStatus });
         }
@@ -144,7 +211,6 @@ export default function CRMDashboard() {
     }
   };
 
-  // Bulk update
   const bulkUpdateStatus = async (newStatus: string) => {
     if (selectedLeads.length === 0) return;
     
@@ -161,6 +227,7 @@ export default function CRMDashboard() {
       );
       setSelectedLeads([]);
       fetchLeads();
+      fetchKPIs();
     } catch (err) {
       console.error('Failed to bulk update:', err);
     } finally {
@@ -168,14 +235,96 @@ export default function CRMDashboard() {
     }
   };
 
-  // Calculate KPIs
+  // ============================================
+  // TABLE COLUMNS
+  // ============================================
+
+  const columns: Column<Lead>[] = [
+    {
+      key: 'contact',
+      header: 'Contact',
+      render: (lead) => (
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#39FF14]/20 to-emerald-500/20 flex items-center justify-center text-[#39FF14] font-medium text-sm">
+            {(lead.name || lead.email)[0].toUpperCase()}
+          </div>
+          <div>
+            <div className="text-white font-medium group-hover:text-[#39FF14] transition">
+              {lead.name || '—'}
+            </div>
+            <div className="text-white/40 text-sm">{lead.email}</div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'company',
+      header: 'Company',
+      render: (lead) => <span className="text-white/80">{lead.company || '—'}</span>,
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      render: (lead) => {
+        const config = STATUS_CONFIG[lead.status] || STATUS_CONFIG.new;
+        return (
+          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${config.bgColor} ${config.color}`}>
+            <span>{config.icon}</span>
+            {config.label}
+          </span>
+        );
+      },
+    },
+    {
+      key: 'source',
+      header: 'Source',
+      render: (lead) => <span className="text-white/60 text-sm capitalize">{lead.source || '—'}</span>,
+    },
+    {
+      key: 'value',
+      header: 'Value',
+      render: (lead) => (
+        lead.value ? (
+          <span className="text-emerald-400 font-medium">${lead.value.toLocaleString()}</span>
+        ) : (
+          <span className="text-white/30">—</span>
+        )
+      ),
+    },
+    {
+      key: 'created_at',
+      header: 'Created',
+      sortable: true,
+      render: (lead) => (
+        <span className="text-white/40 text-sm">
+          {new Date(lead.created_at).toLocaleDateString()}
+        </span>
+      ),
+    },
+    {
+      key: 'actions',
+      header: '',
+      width: '100px',
+      render: (lead) => (
+        <select
+          value={lead.status}
+          onChange={(e) => {
+            e.stopPropagation();
+            updateLeadStatus(lead.id, e.target.value);
+          }}
+          onClick={(e) => e.stopPropagation()}
+          className="px-2 py-1 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:border-[#39FF14] outline-none cursor-pointer"
+        >
+          {Object.entries(STATUS_CONFIG).map(([value, config]) => (
+            <option key={value} value={value}>{config.label}</option>
+          ))}
+        </select>
+      ),
+    },
+  ];
+
+  // Calculate total from stats
   const totalLeads = Object.values(stats).reduce((a, b) => a + b, 0);
-  const verifiedCount = (stats.verified || 0) + (stats.contacted || 0) + (stats.qualified || 0) + (stats.converted || 0);
-  const convertedCount = stats.converted || 0;
-  const totalRevenue = leads.filter(l => l.status === 'converted').reduce((sum, l) => sum + (l.value || 0), 0);
-  
-  const verificationRate = totalLeads > 0 ? ((verifiedCount / totalLeads) * 100) : 0;
-  const conversionRate = verifiedCount > 0 ? ((convertedCount / verifiedCount) * 100) : 0;
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]" data-testid="crm-dashboard">
@@ -191,10 +340,33 @@ export default function CRMDashboard() {
               <h1 className="text-xl font-bold text-white flex items-center gap-2">
                 <span className="text-2xl">👥</span> CRM Dashboard
               </h1>
+              {kpiMeta && (
+                <div className="flex items-center gap-1 text-xs text-white/30">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  Updated {new Date(kpiMeta.lastProcessedAt).toLocaleTimeString()}
+                </div>
+              )}
             </div>
             
             <div className="flex items-center gap-3">
-              {/* Global Search */}
+              {/* Date Range Selector */}
+              <div className="flex gap-1 bg-white/5 rounded-lg p-1">
+                {(['7d', '30d', '90d', 'all'] as DateRange[]).map((range) => (
+                  <button
+                    key={range}
+                    onClick={() => setDateRange(range)}
+                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition ${
+                      dateRange === range
+                        ? 'bg-[#39FF14] text-black'
+                        : 'text-white/60 hover:text-white'
+                    }`}
+                  >
+                    {range === 'all' ? 'All' : range}
+                  </button>
+                ))}
+              </div>
+              
+              {/* Search */}
               <div className="relative">
                 <input
                   type="text"
@@ -230,101 +402,58 @@ export default function CRMDashboard() {
       </header>
 
       <main className="max-w-7xl mx-auto px-6 py-6">
-        {/* KPI Strip - 4 Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6" data-testid="kpi-strip">
-          {/* Total Leads */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="relative overflow-hidden p-5 rounded-2xl bg-gradient-to-br from-blue-500/10 to-blue-600/5 border border-blue-500/20"
-          >
-            <div className="absolute top-3 right-3 w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-lg">
-              👥
-            </div>
-            <div className="text-blue-400/60 text-sm font-medium mb-1">Total Leads</div>
-            <div className="text-3xl font-bold text-white mb-2">{totalLeads}</div>
-            <div className="flex items-center gap-1 text-xs">
-              <span className="text-emerald-400">↑ {stats.new || 0} new</span>
-              <span className="text-white/30">today</span>
-            </div>
-            {/* Mini sparkline placeholder */}
-            <div className="absolute bottom-0 left-0 right-0 h-12 opacity-30">
-              <svg viewBox="0 0 100 30" className="w-full h-full">
-                <path d="M0,25 Q10,20 20,22 T40,18 T60,15 T80,10 T100,5" fill="none" stroke="#3B82F6" strokeWidth="2"/>
-              </svg>
-            </div>
-          </motion.div>
-
-          {/* Verified */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="relative overflow-hidden p-5 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 border border-emerald-500/20"
-          >
-            <div className="absolute top-3 right-3 w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center text-lg">
-              ✓
-            </div>
-            <div className="text-emerald-400/60 text-sm font-medium mb-1">Verified</div>
-            <div className="text-3xl font-bold text-white mb-2">{verifiedCount}</div>
-            <div className="flex items-center gap-1 text-xs">
-              <span className="text-emerald-400">{verificationRate.toFixed(1)}%</span>
-              <span className="text-white/30">rate</span>
-            </div>
-            <div className="absolute bottom-0 left-0 right-0 h-12 opacity-30">
-              <svg viewBox="0 0 100 30" className="w-full h-full">
-                <path d="M0,20 Q15,18 30,15 T50,12 T70,10 T100,8" fill="none" stroke="#10B981" strokeWidth="2"/>
-              </svg>
-            </div>
-          </motion.div>
-
-          {/* Converted */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="relative overflow-hidden p-5 rounded-2xl bg-gradient-to-br from-purple-500/10 to-purple-600/5 border border-purple-500/20"
-          >
-            <div className="absolute top-3 right-3 w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center text-lg">
-              🎉
-            </div>
-            <div className="text-purple-400/60 text-sm font-medium mb-1">Converted</div>
-            <div className="text-3xl font-bold text-white mb-2">{convertedCount}</div>
-            <div className="flex items-center gap-1 text-xs">
-              <span className="text-purple-400">{conversionRate.toFixed(1)}%</span>
-              <span className="text-white/30">conversion</span>
-            </div>
-            <div className="absolute bottom-0 left-0 right-0 h-12 opacity-30">
-              <svg viewBox="0 0 100 30" className="w-full h-full">
-                <path d="M0,22 Q20,20 40,18 T60,14 T80,10 T100,6" fill="none" stroke="#A855F7" strokeWidth="2"/>
-              </svg>
-            </div>
-          </motion.div>
-
-          {/* Revenue */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="relative overflow-hidden p-5 rounded-2xl bg-gradient-to-br from-amber-500/10 to-amber-600/5 border border-amber-500/20"
-          >
-            <div className="absolute top-3 right-3 w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center text-lg">
-              💰
-            </div>
-            <div className="text-amber-400/60 text-sm font-medium mb-1">Revenue</div>
-            <div className="text-3xl font-bold text-white mb-2">
-              ${totalRevenue.toLocaleString()}
-            </div>
-            <div className="flex items-center gap-1 text-xs">
-              <span className="text-amber-400">${convertedCount > 0 ? Math.round(totalRevenue / convertedCount).toLocaleString() : 0}</span>
-              <span className="text-white/30">avg deal</span>
-            </div>
-            <div className="absolute bottom-0 left-0 right-0 h-12 opacity-30">
-              <svg viewBox="0 0 100 30" className="w-full h-full">
-                <path d="M0,25 Q25,22 50,15 T75,10 T100,5" fill="none" stroke="#F59E0B" strokeWidth="2"/>
-              </svg>
-            </div>
-          </motion.div>
+        {/* KPI Strip - Using Shared Components */}
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6" data-testid="kpi-strip">
+          <KPICard
+            title="Total Leads"
+            value={kpis?.totalLeads ?? totalLeads}
+            icon="👥"
+            color="blue"
+            trend={kpis?.newLeads ? { value: `${kpis.newLeads} new`, direction: 'up', label: 'today' } : undefined}
+            sparkline={[10, 15, 12, 18, 22, 25, 30]}
+            meta={kpiMeta || undefined}
+            delay={0}
+            testId="kpi-total-leads"
+          />
+          <KPICard
+            title="Verified"
+            value={kpis?.verifiedLeads ?? stats.verified ?? 0}
+            icon="✓"
+            color="emerald"
+            trend={kpis ? { value: `${kpis.verificationRate}%`, direction: 'up', label: 'rate' } : undefined}
+            sparkline={[5, 8, 10, 12, 15, 18, 20]}
+            delay={0.1}
+            testId="kpi-verified"
+          />
+          <KPICard
+            title="Converted"
+            value={kpis?.convertedLeads ?? stats.converted ?? 0}
+            icon="🎉"
+            color="purple"
+            trend={kpis ? { value: `${kpis.conversionRate}%`, direction: 'up', label: 'conversion' } : undefined}
+            sparkline={[2, 3, 5, 4, 6, 8, 10]}
+            delay={0.2}
+            testId="kpi-converted"
+          />
+          <KPICard
+            title="Revenue"
+            value={kpis ? `$${kpis.totalRevenue.toLocaleString()}` : '$0'}
+            icon="💰"
+            color="amber"
+            trend={kpis?.avgDealValue ? { value: `$${kpis.avgDealValue.toLocaleString()}`, direction: 'neutral', label: 'avg deal' } : undefined}
+            sparkline={[100, 200, 150, 300, 400, 350, 500]}
+            delay={0.3}
+            testId="kpi-revenue"
+          />
+          <KPICard
+            title="Pipeline"
+            value={kpis ? `$${kpis.pipelineValue.toLocaleString()}` : '$0'}
+            icon="📊"
+            color="cyan"
+            onDrill={() => console.log('Drill to pipeline view')}
+            delay={0.4}
+            testId="kpi-pipeline"
+          />
         </div>
 
         {/* Status Quick Filters */}
@@ -467,127 +596,30 @@ export default function CRMDashboard() {
           )}
         </AnimatePresence>
 
-        {/* Lead Table */}
-        <div className="rounded-xl border border-white/10 overflow-hidden" data-testid="leads-table">
-          <table className="w-full">
-            <thead className="bg-white/5">
-              <tr>
-                <th className="w-10 px-4 py-3">
-                  <input
-                    type="checkbox"
-                    checked={selectedLeads.length === leads.length && leads.length > 0}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setSelectedLeads(leads.map(l => l.id));
-                      } else {
-                        setSelectedLeads([]);
-                      }
-                    }}
-                    className="rounded border-white/30"
-                  />
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-white/60">Contact</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-white/60">Company</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-white/60">Status</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-white/60">Source</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-white/60">Value</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-white/60">Created</th>
-                <th className="px-4 py-3 text-right text-sm font-medium text-white/60">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/5">
-              {loading ? (
-                <tr>
-                  <td colSpan={8} className="px-4 py-12 text-center">
-                    <div className="w-8 h-8 border-2 border-[#39FF14]/30 border-t-[#39FF14] rounded-full animate-spin mx-auto" />
-                    <div className="text-white/40 mt-3">Loading leads...</div>
-                  </td>
-                </tr>
-              ) : leads.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="px-4 py-12 text-center">
-                    <div className="text-4xl mb-3">📭</div>
-                    <div className="text-white/40 mb-4">No leads found</div>
-                    <button
-                      onClick={() => setShowAddLead(true)}
-                      className="px-4 py-2 rounded-lg bg-[#39FF14] text-black font-medium hover:bg-[#32E012] transition"
-                    >
-                      + Add Your First Lead
-                    </button>
-                  </td>
-                </tr>
-              ) : (
-                leads.map((lead) => (
-                  <tr
-                    key={lead.id}
-                    className="hover:bg-white/5 cursor-pointer transition group"
-                    onClick={() => setSelectedLead(lead)}
-                    data-testid={`lead-row-${lead.id}`}
-                  >
-                    <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-                      <input
-                        type="checkbox"
-                        checked={selectedLeads.includes(lead.id)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedLeads([...selectedLeads, lead.id]);
-                          } else {
-                            setSelectedLeads(selectedLeads.filter(id => id !== lead.id));
-                          }
-                        }}
-                        className="rounded border-white/30"
-                      />
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#39FF14]/20 to-emerald-500/20 flex items-center justify-center text-[#39FF14] font-medium text-sm">
-                          {(lead.name || lead.email)[0].toUpperCase()}
-                        </div>
-                        <div>
-                          <div className="text-white font-medium group-hover:text-[#39FF14] transition">
-                            {lead.name || '—'}
-                          </div>
-                          <div className="text-white/40 text-sm">{lead.email}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="text-white/80">{lead.company || '—'}</div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${STATUS_CONFIG[lead.status]?.bgColor || 'bg-gray-500/20'} ${STATUS_CONFIG[lead.status]?.color || 'text-gray-400'}`}>
-                        <span>{STATUS_CONFIG[lead.status]?.icon}</span>
-                        {STATUS_CONFIG[lead.status]?.label || lead.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-white/60 text-sm capitalize">{lead.source || '—'}</td>
-                    <td className="px-4 py-3">
-                      {lead.value ? (
-                        <span className="text-emerald-400 font-medium">${lead.value.toLocaleString()}</span>
-                      ) : (
-                        <span className="text-white/30">—</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-white/40 text-sm">
-                      {new Date(lead.created_at).toLocaleDateString()}
-                    </td>
-                    <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
-                      <select
-                        value={lead.status}
-                        onChange={(e) => updateLeadStatus(lead.id, e.target.value)}
-                        className="px-2 py-1 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:border-[#39FF14] outline-none cursor-pointer"
-                      >
-                        {Object.entries(STATUS_CONFIG).map(([value, config]) => (
-                          <option key={value} value={value}>{config.label}</option>
-                        ))}
-                      </select>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        {/* Lead Table - Using Shared DataTable */}
+        <DataTable
+          data={leads}
+          columns={columns}
+          keyField="id"
+          selectable
+          selectedIds={selectedLeads}
+          onSelectionChange={setSelectedLeads}
+          onRowClick={setSelectedLead}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
+          onSort={(key) => {
+            if (sortBy === key) {
+              setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+            } else {
+              setSortBy(key);
+              setSortOrder('desc');
+            }
+          }}
+          loading={leadsLoading}
+          emptyMessage="No leads found"
+          emptyIcon="📭"
+          testId="leads-table"
+        />
 
         {/* Pagination */}
         {totalPages > 1 && (
@@ -638,6 +670,7 @@ export default function CRMDashboard() {
             onSuccess={() => {
               setShowAddLead(false);
               fetchLeads();
+              fetchKPIs();
             }}
             sourceOptions={SOURCE_OPTIONS}
           />
@@ -647,9 +680,10 @@ export default function CRMDashboard() {
   );
 }
 
-// ==========================================
+// ============================================
 // DETAIL RAIL COMPONENT
-// ==========================================
+// ============================================
+
 function DetailRail({ 
   lead, 
   onClose, 
@@ -678,7 +712,6 @@ function DetailRail({
         }),
       });
       setNote('');
-      // Refresh would happen via parent
     } catch (err) {
       console.error('Failed to save note:', err);
     } finally {
@@ -883,7 +916,6 @@ function DetailRail({
 
           {activeTab === 'notes' && (
             <div className="space-y-4">
-              {/* Add Note */}
               <div>
                 <textarea
                   value={note}
@@ -901,7 +933,6 @@ function DetailRail({
                 </button>
               </div>
 
-              {/* Existing Notes */}
               {lead.notes ? (
                 <div className="p-4 rounded-lg bg-white/5 whitespace-pre-wrap text-white/80">
                   {lead.notes}
@@ -920,9 +951,10 @@ function DetailRail({
   );
 }
 
-// ==========================================
+// ============================================
 // ADD LEAD MODAL COMPONENT
-// ==========================================
+// ============================================
+
 function AddLeadModal({
   onClose,
   onSuccess,
