@@ -2009,6 +2009,8 @@ Generate a high-quality mockup specifically for this ${section.label} section on
           )}
         </AnimatePresence>
       </main>
+        </>
+      )}
     </div>
   );
 }
