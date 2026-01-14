@@ -40,7 +40,7 @@ const navItems = [
   { id: 'incidents', label: 'Incidents', icon: 'alert', href: '/admin-v2/incidents' },
   { id: 'email', label: 'Email', icon: 'mail', href: '/admin-v2/email' },
   { id: 'sms', label: 'SMS', icon: 'phone', href: '/admin-v2/sms' },
-  { id: 'crm', label: 'CRM', icon: 'users', href: '/admin-v2/crm' },
+  { id: 'crm', label: 'CRM', icon: 'users', href: '/admin-v2/crm-dashboard' },
   { id: 'analytics', label: 'Analytics', icon: 'chart', href: '/admin-v2/analytics' },
   { id: 'brand-voice', label: 'Brand Voice', icon: 'voice', href: '/admin-v2/brand-voice' },
   { id: 'knowledge', label: 'Knowledge Base', icon: 'database', href: '/admin-v2/knowledge' },
