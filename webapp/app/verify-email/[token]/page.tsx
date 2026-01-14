@@ -145,7 +145,7 @@ export default function VerifyEmailPage() {
         )}
 
         {/* Code Entry Form (for invalid/expired/manual entry) */}
-        {showCodeEntry && status !== 'loading' && status !== 'success' && (
+        {showCodeEntry && (
           <div className="bg-gradient-to-br from-gray-900/80 to-gray-900/40 border border-white/10 rounded-2xl p-8">
             <div className="text-center mb-6">
               <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
