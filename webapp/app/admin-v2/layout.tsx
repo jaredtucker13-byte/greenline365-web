@@ -11,6 +11,9 @@ export const metadata: Metadata = {
   description: 'Multi-Command Center for bookings, content scheduling, and business intelligence.',
 };
 
+// Force dynamic rendering for all admin pages (uses NavigationProvider)
+export const dynamic = 'force-dynamic';
+
 export default function AdminV2Layout({ children }: { children: React.ReactNode }) {
   return (
     <ThemeWrapper>
