@@ -452,7 +452,7 @@ export default function CRMDashboard() {
                       </td>
                     </tr>
                   ))
-                )}}
+                )}
               </tbody>
             </table>
           </div>
