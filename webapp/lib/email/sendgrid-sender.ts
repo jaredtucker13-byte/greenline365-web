@@ -85,7 +85,7 @@ export function generateVerificationCode(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-// Email template with BOTH magic link and code
+// Email template - Code only (no magic link per user request)
 export function getVerificationEmailHtml(
   name: string, 
   verificationUrl: string, 
@@ -123,37 +123,29 @@ export function getVerificationEmailHtml(
     <!-- Main Card -->
     <div style="background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%); border: 1px solid #00e676; border-radius: 16px; padding: 40px; text-align: center;">
       <div style="width: 64px; height: 64px; background: rgba(0, 230, 118, 0.1); border-radius: 50%; margin: 0 auto 24px; display: flex; align-items: center; justify-content: center;">
-        <span style="font-size: 32px;">✉️</span>
+        <span style="font-size: 32px;">🔐</span>
       </div>
       
       <h2 style="color: #ffffff; font-size: 24px; margin: 0 0 16px;">
-        Verify Your Email
+        Your Verification Code
       </h2>
       
       <p style="color: #a0a0a0; font-size: 16px; line-height: 1.6; margin: 0 0 8px;">
         Hi${name ? ` ${name}` : ''},
       </p>
       
-      <p style="color: #a0a0a0; font-size: 16px; line-height: 1.6; margin: 0 0 32px;">
-        Please verify your email to complete your <strong style="color: #00e676;">${sourceLabel}</strong> signup.
+      <p style="color: #a0a0a0; font-size: 16px; line-height: 1.6; margin: 0 0 24px;">
+        You're almost on the <strong style="color: #00e676;">${sourceLabel}</strong>! Enter this code to verify your email:
       </p>
       
-      <!-- Option 1: Magic Link Button -->
-      <a href="${verificationUrl}" style="display: inline-block; background: #00e676; color: #000000; font-weight: 700; font-size: 16px; padding: 16px 48px; border-radius: 12px; text-decoration: none; margin-bottom: 24px;">
-        Verify My Email →
-      </a>
-      
-      <p style="color: #606060; font-size: 14px; margin: 24px 0 16px;">
-        — OR —
-      </p>
-      
-      <!-- Option 2: Verification Code -->
-      <p style="color: #a0a0a0; font-size: 14px; margin: 0 0 12px;">
-        Enter this code on the website:
-      </p>
-      <div style="background: #1a1a1a; border: 2px solid #00e676; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
-        <span style="font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #00e676;">${code}</span>
+      <!-- Verification Code -->
+      <div style="background: #1a1a1a; border: 2px solid #00e676; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+        <span style="font-size: 42px; font-weight: bold; letter-spacing: 10px; color: #00e676;">${code}</span>
       </div>
+      
+      <p style="color: #a0a0a0; font-size: 14px; margin: 0 0 8px;">
+        Go back to the signup page and enter this code to complete your registration.
+      </p>
       
       <p style="color: #606060; font-size: 12px; margin: 0;">
         This code expires in 24 hours.
