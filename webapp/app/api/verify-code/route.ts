@@ -153,11 +153,15 @@ export async function POST(request: NextRequest) {
     }
 
     // Sync to CRM automatically
-    await syncToCRM({ ...entry, email: normalizedEmail });
+    const crmResult = await syncToCRM({ ...entry, email: normalizedEmail });
+    
+    console.log('[Verify Code] CRM sync result:', crmResult);
 
     return NextResponse.json({
       success: true,
       message: 'Email verified successfully! Welcome to GreenLine365.',
+      crmSynced: crmResult.success,
+      crmError: crmResult.error || null,
     });
 
   } catch (error: any) {
