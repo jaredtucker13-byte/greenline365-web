@@ -316,43 +316,41 @@ export default function ContentForge2() {
   };
 
   return (
-    <div className="min-h-screen bg-os-dark p-6">
-      {/* Header */}
-      <div className="mb-6">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-neon-green-500 to-emerald-600 flex items-center justify-center">
-            <span className="text-xl">🔮</span>
+    <div className="min-h-screen bg-os-dark">
+      {/* Navigation Header */}
+      <PageHeader
+        title="Content Forge 2.0"
+        icon="🔮"
+        subtitle="Temporal Content Architecture • From 15 Years in the Future"
+        showBack
+        showBreadcrumbs
+        actions={
+          <div className="flex gap-2">
+            <button
+              onClick={() => setActiveTab('create')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                activeTab === 'create' 
+                  ? 'bg-neon-green-500 text-black' 
+                  : 'bg-white/10 text-white/70 hover:bg-white/20'
+              }`}
+            >
+              ⚡ Create Content
+            </button>
+            <button
+              onClick={() => setActiveTab('calendar')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                activeTab === 'calendar' 
+                  ? 'bg-neon-green-500 text-black' 
+                  : 'bg-white/10 text-white/70 hover:bg-white/20'
+              }`}
+            >
+              📅 4-Week Calendar
+            </button>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-white">Content Forge 2.0</h1>
-            <p className="text-xs text-white/50">Temporal Content Architecture • From 15 Years in the Future</p>
-          </div>
-        </div>
-        
-        {/* Tabs */}
-        <div className="flex gap-2 mt-4">
-          <button
-            onClick={() => setActiveTab('create')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-              activeTab === 'create' 
-                ? 'bg-neon-green-500 text-black' 
-                : 'bg-white/10 text-white/70 hover:bg-white/20'
-            }`}
-          >
-            ⚡ Create Content
-          </button>
-          <button
-            onClick={() => setActiveTab('calendar')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-              activeTab === 'calendar' 
-                ? 'bg-neon-green-500 text-black' 
-                : 'bg-white/10 text-white/70 hover:bg-white/20'
-            }`}
-          >
-            📅 4-Week Calendar
-          </button>
-        </div>
-      </div>
+        }
+      />
+
+      <div className="p-6">
 
       <AnimatePresence mode="wait">
         {activeTab === 'create' ? (
