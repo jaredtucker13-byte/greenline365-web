@@ -1,31 +1,40 @@
 # GreenLine365 - Product Requirements Document
 
 ## Latest Update: January 13, 2026
-### Build Status: ✅ BUILD PASSING + MAGIC LINK AUTH ADDED
+### Build Status: ✅ BUILD PASSING + MAJOR FEATURES ADDED
 
 ## Recent Changes (This Session - January 13, 2026)
-- ✅ **Magic Link Authentication Implemented** - No more Twilio SMS needed!
-  - Login page: Toggle between "✨ Magic Link" and "🔐 Password" (Magic Link default)
-  - Signup page: Same toggle, Magic Link auto-creates new accounts
-  - Uses Supabase built-in OTP via email (FREE with SendGrid)
-  - Success states show "Check Your Email!" message
-- ✅ **Fixed Website Crawler Integration** - Syntax error in `startAnalysis` function resolved
-- ✅ **Website Reverse-Engineering API** - `/api/crawl-website` fully functional
-  - Extracts: title, description, favicon, colors, headlines, CTAs, navigation, images, structure
-  - Auto-detects sections: Navigation, Hero, Features, Testimonials, Pricing, Footer
-- ✅ **Start Analysis Button** - Now enables correctly when either image OR extracted website data is available
-- ✅ Build passes successfully (`yarn build`)
 
-## Authentication System
-**Current Options:**
-1. **Magic Link (Recommended)** - One-click email login, no password needed
-2. **Google OAuth** - "Continue with Google" button
-3. **Password** - Traditional email/password (toggle available)
+### 1. Email Verification System (Double Opt-In) ✅
+- **SendGrid Integration** - Using free tier (100 emails/day)
+- **Verification Options**: Magic Link OR 6-digit code
+- **Waitlist Flow**: Submit → Check Email → Enter Code → Verified
+- **Spam Warning**: Prominent "Check your spam folder" message
+- **Files**: `/lib/email/sendgrid-sender.ts`, `/app/waitlist/page.tsx`
 
-**Files Modified:**
-- `/lib/supabase/client.ts` - Added `signInWithMagicLink()` function
-- `/app/login/page.tsx` - Added Magic Link UI with toggle
-- `/app/signup/page.tsx` - Added Magic Link UI with toggle
+### 2. Unsubscribe System ✅
+- **Unsubscribe Page**: `/unsubscribe` - Easy one-click unsubscribe
+- **Email Footer**: All emails include Unsubscribe + Privacy Policy links
+- **CAN-SPAM Compliant**: Physical address in footer
+- **API**: `/api/unsubscribe` - Handles all list types
+
+### 3. Trend Hunter Usage Limit ✅
+- **3 Free Searches**: Counter shows "Free searches remaining: X/3"
+- **Hard Block**: After 3 uses, modal blocks further use
+- **Signup CTA**: Prompts signup for unlimited access
+- **LocalStorage**: Tracks usage across sessions
+
+### 4. Website Builder Projects ✅
+- **Project Management**: Create, save, open, delete projects
+- **Project List View**: See all saved projects with status
+- **Auto-Save**: Work automatically saved every 2 seconds
+- **Database**: `website_projects` table with RLS
+- **API**: `/api/website-projects` (GET, POST, PUT, DELETE)
+
+### 5. Magic Link Authentication ✅
+- **Login/Signup Pages**: Toggle between Magic Link and Password
+- **Supabase OTP**: Uses built-in email OTP (free)
+- **Default**: Magic Link selected by default
 
 ## AI Website Builder Feature (`/admin-v2/website-analyzer`)
 **Status: WORKING (requires deployment)**
