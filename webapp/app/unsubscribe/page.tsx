@@ -198,3 +198,15 @@ function UnsubscribeContent() {
     </div>
   );
 }
+
+export default function UnsubscribePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+      </div>
+    }>
+      <UnsubscribeContent />
+    </Suspense>
+  );
+}
