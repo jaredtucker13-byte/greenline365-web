@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
     const emailResult = await sendEmail({
       to: normalizedEmail,
       subject: 'Verify your email - GreenLine365 Waitlist',
-      html: getVerificationEmailHtml(name || '', verificationUrl, code, 'waitlist'),
+      html: getVerificationEmailHtml(name || '', verificationUrl, code, 'waitlist', normalizedEmail),
     });
 
     if (!emailResult.success) {
