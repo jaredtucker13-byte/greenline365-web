@@ -7,14 +7,14 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
 type Status = 'loading' | 'confirm' | 'success' | 'error';
 
-export default function UnsubscribePage() {
+function UnsubscribeContent() {
   const searchParams = useSearchParams();
   const email = searchParams.get('email') || '';
   const list = searchParams.get('list') || 'all'; // waitlist, newsletter, marketing, all
