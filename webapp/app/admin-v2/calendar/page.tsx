@@ -212,8 +212,8 @@ export default function CalendarPage() {
     }
   };
 
-  const isToday = (date: Date) => date.toDateString() === new Date().toDateString();
-  const isSelected = (date: Date) => selectedDate?.toDateString() === date.toDateString();
+  const isToday = (date: Date | null) => date ? date.toDateString() === new Date().toDateString() : false;
+  const isSelected = (date: Date | null) => date && selectedDate ? selectedDate.toDateString() === date.toDateString() : false;
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
