@@ -119,12 +119,15 @@ export async function GET(req: NextRequest) {
     const supabase = createServerClient();
     const { searchParams } = new URL(req.url);
     const getSlots = searchParams.get('slots') === 'true';
+    const startDate = searchParams.get('startDate');
+    const endDate = searchParams.get('endDate');
+    const status = searchParams.get('status');
 
     if (getSlots) {
       // Return booked datetime slots for availability checking
       const { data, error } = await supabase
         .from('bookings')
-        .select('preferred_datetime')
+        .select('preferred_datetime, start_time')
         .neq('status', 'cancelled')
         .gte('preferred_datetime', new Date().toISOString());
 
@@ -133,22 +136,82 @@ export async function GET(req: NextRequest) {
         return Response.json({ error: error.message }, { status: 400 });
       }
 
-      const bookedSlots = data?.map(b => b.preferred_datetime) || [];
+      const bookedSlots = data?.map(b => b.start_time || b.preferred_datetime) || [];
       return Response.json({ bookedSlots });
     }
 
-    // Default: return all bookings (for admin)
-    const { data, error } = await supabase
-      .from('bookings')
-      .select('*')
-      .order('created_at', { ascending: false });
+    // Build query with filters
+    let query = supabase.from('bookings').select('*');
+    
+    // Date range filter - use start_time if available, fall back to preferred_datetime
+    if (startDate) {
+      query = query.or(`start_time.gte.${startDate},preferred_datetime.gte.${startDate}`);
+    }
+    if (endDate) {
+      const endDatePlusOne = new Date(endDate);
+      endDatePlusOne.setDate(endDatePlusOne.getDate() + 1);
+      query = query.or(`start_time.lt.${endDatePlusOne.toISOString()},preferred_datetime.lt.${endDatePlusOne.toISOString()}`);
+    }
+    
+    // Status filter
+    if (status) {
+      query = query.eq('status', status);
+    }
+    
+    // Order by start_time or preferred_datetime
+    query = query.order('start_time', { ascending: true, nullsFirst: false })
+                 .order('preferred_datetime', { ascending: true });
+
+    const { data, error } = await query;
 
     if (error) {
       console.error('Supabase error:', error);
       return Response.json({ error: error.message }, { status: 400 });
     }
 
-    return Response.json({ bookings: data });
+    return Response.json({ bookings: data || [] });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Server error';
+    console.error('Booking API error:', message);
+    return Response.json({ error: message }, { status: 500 });
+  }
+}
+
+export async function PUT(req: NextRequest) {
+  try {
+    const supabase = createServerClient();
+    const body = await req.json();
+    const { id, ...updates } = body;
+
+    if (!id) {
+      return Response.json({ error: 'Booking ID is required' }, { status: 400 });
+    }
+
+    // Build update object
+    const dbUpdates: Record<string, any> = {
+      updated_at: new Date().toISOString(),
+    };
+
+    if (updates.status) dbUpdates.status = updates.status;
+    if (updates.notes !== undefined) dbUpdates.notes = sanitizeInput(updates.notes);
+    if (updates.start_time) {
+      dbUpdates.start_time = updates.start_time;
+      dbUpdates.preferred_datetime = updates.start_time;
+    }
+
+    const { data, error } = await supabase
+      .from('bookings')
+      .update(dbUpdates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Supabase error:', error);
+      return Response.json({ error: error.message }, { status: 400 });
+    }
+
+    return Response.json({ booking: data });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Server error';
     console.error('Booking API error:', message);
