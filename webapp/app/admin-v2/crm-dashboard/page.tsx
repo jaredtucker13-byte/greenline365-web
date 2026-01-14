@@ -327,80 +327,70 @@ export default function CRMDashboard() {
   // Calculate total from stats
   const totalLeads = Object.values(stats).reduce((a, b) => a + b, 0);
 
+  // Header actions
+  const headerActions = (
+    <>
+      {/* Date Range Selector */}
+      <div className="flex gap-1 bg-white/5 rounded-lg p-1">
+        {(['7d', '30d', '90d', 'all'] as DateRange[]).map((range) => (
+          <button
+            key={range}
+            onClick={() => setDateRange(range)}
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition ${
+              dateRange === range
+                ? 'bg-[#39FF14] text-black'
+                : 'text-white/60 hover:text-white'
+            }`}
+          >
+            {range === 'all' ? 'All' : range}
+          </button>
+        ))}
+      </div>
+      
+      {/* Search */}
+      <div className="relative">
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search leads..."
+          className="w-64 pl-10 pr-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-[#39FF14] outline-none"
+          data-testid="search-input"
+        />
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30">🔍</span>
+      </div>
+      
+      <button
+        onClick={() => setShowFilters(!showFilters)}
+        className={`px-4 py-2 rounded-lg border transition ${
+          showFilters ? 'border-[#39FF14] text-[#39FF14]' : 'border-white/10 text-white/60 hover:text-white'
+        }`}
+        data-testid="filter-toggle"
+      >
+        Filters {showFilters ? '▲' : '▼'}
+      </button>
+      
+      <button
+        onClick={() => setShowAddLead(true)}
+        className="px-4 py-2 rounded-lg bg-[#39FF14] text-black font-medium hover:bg-[#32E012] transition flex items-center gap-2"
+        data-testid="add-lead-btn"
+      >
+        <span className="text-lg">+</span> Add Lead
+      </button>
+    </>
+  );
+
   return (
     <div className="min-h-screen bg-[#0a0a0a]" data-testid="crm-dashboard">
-      {/* Header */}
-      <header className="border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-xl sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link href="/admin-v2" className="text-white/50 hover:text-white transition">
-                ← Command Center
-              </Link>
-              <div className="h-6 w-px bg-white/20" />
-              <h1 className="text-xl font-bold text-white flex items-center gap-2">
-                <span className="text-2xl">👥</span> CRM Dashboard
-              </h1>
-              {kpiMeta && (
-                <div className="flex items-center gap-1 text-xs text-white/30">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  Updated {new Date(kpiMeta.lastProcessedAt).toLocaleTimeString()}
-                </div>
-              )}
-            </div>
-            
-            <div className="flex items-center gap-3">
-              {/* Date Range Selector */}
-              <div className="flex gap-1 bg-white/5 rounded-lg p-1">
-                {(['7d', '30d', '90d', 'all'] as DateRange[]).map((range) => (
-                  <button
-                    key={range}
-                    onClick={() => setDateRange(range)}
-                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition ${
-                      dateRange === range
-                        ? 'bg-[#39FF14] text-black'
-                        : 'text-white/60 hover:text-white'
-                    }`}
-                  >
-                    {range === 'all' ? 'All' : range}
-                  </button>
-                ))}
-              </div>
-              
-              {/* Search */}
-              <div className="relative">
-                <input
-                  type="text"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search leads..."
-                  className="w-64 pl-10 pr-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-[#39FF14] outline-none"
-                  data-testid="search-input"
-                />
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30">🔍</span>
-              </div>
-              
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className={`px-4 py-2 rounded-lg border transition ${
-                  showFilters ? 'border-[#39FF14] text-[#39FF14]' : 'border-white/10 text-white/60 hover:text-white'
-                }`}
-                data-testid="filter-toggle"
-              >
-                Filters {showFilters ? '▲' : '▼'}
-              </button>
-              
-              <button
-                onClick={() => setShowAddLead(true)}
-                className="px-4 py-2 rounded-lg bg-[#39FF14] text-black font-medium hover:bg-[#32E012] transition flex items-center gap-2"
-                data-testid="add-lead-btn"
-              >
-                <span className="text-lg">+</span> Add Lead
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+      {/* Header with Navigation */}
+      <PageHeader
+        title="CRM Dashboard"
+        icon="👥"
+        subtitle={kpiMeta ? `Updated ${new Date(kpiMeta.lastProcessedAt).toLocaleTimeString()}` : undefined}
+        actions={headerActions}
+        showBack
+        showBreadcrumbs
+      />
 
       <main className="max-w-7xl mx-auto px-6 py-6">
         {/* KPI Strip - Using Shared Components */}
