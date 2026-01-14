@@ -840,18 +840,224 @@ Generate a high-quality mockup specifically for this ${section.label} section on
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
+      {/* Project Selection View */}
+      {showProjectList && (
+        <div className="min-h-screen">
+          {/* Header */}
+          <header className="border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-xl sticky top-0 z-50">
+            <div className="max-w-7xl mx-auto px-6 py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <Link 
+                    href="/admin-v2" 
+                    className="text-white/50 hover:text-white transition"
+                  >
+                    ← Back
+                  </Link>
+                  <div className="h-6 w-px bg-white/20" />
+                  <h1 className="text-xl font-bold text-white flex items-center gap-2">
+                    <span className="text-2xl">🎨</span> AI Website Builder
+                    <span className="ml-2 text-xs px-2 py-1 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+                      Premium
+                    </span>
+                  </h1>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <main className="max-w-5xl mx-auto px-6 py-12">
+            {/* Hero Section */}
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-bold text-white mb-4">Your Projects</h2>
+              <p className="text-white/60 text-lg">
+                Create, manage, and publish AI-generated websites
+              </p>
+            </div>
+
+            {/* Create New Project Button */}
+            <div className="mb-8">
+              <button
+                onClick={() => setShowNewProjectModal(true)}
+                className="w-full py-6 border-2 border-dashed border-white/20 hover:border-cyan-500/50 rounded-2xl text-white/60 hover:text-white transition-all flex items-center justify-center gap-3 group"
+                data-testid="create-project-btn"
+              >
+                <span className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                  +
+                </span>
+                <span className="text-lg font-medium">Create New Project</span>
+              </button>
+            </div>
+
+            {/* Projects Grid */}
+            {loadingProjects ? (
+              <div className="flex items-center justify-center py-20">
+                <div className="w-8 h-8 border-2 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin" />
+              </div>
+            ) : savedProjects.length === 0 ? (
+              <div className="text-center py-20">
+                <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-4xl">📁</span>
+                </div>
+                <h3 className="text-xl font-semibold text-white mb-2">No projects yet</h3>
+                <p className="text-white/50">Create your first project to get started</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {savedProjects.map((proj) => (
+                  <motion.div
+                    key={proj.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    whileHover={{ y: -4 }}
+                    onClick={() => handleOpenProject(proj)}
+                    className="bg-gradient-to-br from-white/10 to-white/5 border border-white/10 rounded-2xl p-6 cursor-pointer hover:border-cyan-500/50 transition-all group"
+                    data-testid={`project-card-${proj.id}`}
+                  >
+                    {/* Preview Image or Placeholder */}
+                    <div className="aspect-video bg-black/40 rounded-xl mb-4 overflow-hidden flex items-center justify-center">
+                      {proj.preview_image ? (
+                        <img src={proj.preview_image} alt={proj.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-4xl opacity-30">🌐</span>
+                      )}
+                    </div>
+
+                    {/* Project Info */}
+                    <h3 className="text-lg font-semibold text-white mb-1 truncate">{proj.name}</h3>
+                    {proj.description && (
+                      <p className="text-white/50 text-sm mb-3 line-clamp-2">{proj.description}</p>
+                    )}
+
+                    {/* Status & Meta */}
+                    <div className="flex items-center justify-between">
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        proj.status === 'completed' ? 'bg-emerald-500/20 text-emerald-400' :
+                        proj.status === 'in_progress' ? 'bg-yellow-500/20 text-yellow-400' :
+                        proj.status === 'published' ? 'bg-cyan-500/20 text-cyan-400' :
+                        'bg-white/10 text-white/50'
+                      }`}>
+                        {proj.status.replace('_', ' ')}
+                      </span>
+                      <span className="text-xs text-white/30">
+                        {new Date(proj.updated_at).toLocaleDateString()}
+                      </span>
+                    </div>
+
+                    {/* Delete Button */}
+                    <button
+                      onClick={(e) => handleDeleteProject(proj.id, e)}
+                      className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-red-500/20 text-red-400 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hover:bg-red-500/30"
+                    >
+                      ×
+                    </button>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </main>
+
+          {/* New Project Modal */}
+          <AnimatePresence>
+            {showNewProjectModal && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+                onClick={() => setShowNewProjectModal(false)}
+              >
+                <motion.div
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.9, opacity: 0 }}
+                  onClick={(e) => e.stopPropagation()}
+                  className="w-full max-w-md bg-gradient-to-br from-gray-900 to-black border border-white/10 rounded-2xl p-6"
+                >
+                  <h3 className="text-2xl font-bold text-white mb-6">Create New Project</h3>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-white/80 mb-2">
+                        Project Name <span className="text-red-400">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={newProjectName}
+                        onChange={(e) => setNewProjectName(e.target.value)}
+                        placeholder="My Awesome Website"
+                        className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 outline-none transition"
+                        data-testid="new-project-name-input"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-white/80 mb-2">
+                        Description (optional)
+                      </label>
+                      <textarea
+                        value={newProjectDescription}
+                        onChange={(e) => setNewProjectDescription(e.target.value)}
+                        placeholder="Brief description of your project..."
+                        rows={3}
+                        className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 outline-none transition resize-none"
+                        data-testid="new-project-description-input"
+                      />
+                    </div>
+
+                    {error && (
+                      <p className="text-red-400 text-sm">{error}</p>
+                    )}
+
+                    <div className="flex gap-3 pt-4">
+                      <button
+                        onClick={() => setShowNewProjectModal(false)}
+                        className="flex-1 py-3 rounded-xl bg-white/5 text-white/70 hover:bg-white/10 transition"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={handleCreateProject}
+                        disabled={!newProjectName.trim() || creatingProject}
+                        className="flex-1 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-semibold hover:opacity-90 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                        data-testid="create-project-submit-btn"
+                      >
+                        {creatingProject ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            Creating...
+                          </>
+                        ) : (
+                          'Create Project'
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
+
+      {/* Main Builder View (shown after selecting/creating a project) */}
+      {!showProjectList && (
+        <>
       {/* Header */}
       <header className="border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Link 
-                href="/admin-v2" 
+              <button 
+                onClick={() => {
+                  setShowProjectList(true);
+                  setActiveProjectId(null);
+                }}
                 className="text-white/50 hover:text-white transition"
-                data-testid="back-to-dashboard"
+                data-testid="back-to-projects"
               >
-                ← Back
-              </Link>
+                ← Projects
+              </button>
               <div className="h-6 w-px bg-white/20" />
               <h1 className="text-xl font-bold text-white flex items-center gap-2">
                 <span className="text-2xl">🎨</span> AI Website Builder
@@ -859,6 +1065,12 @@ Generate a high-quality mockup specifically for this ${section.label} section on
                   Premium
                 </span>
               </h1>
+              {hasSavedProject && (
+                <span className="text-xs text-emerald-400 flex items-center gap-1">
+                  <span className="w-2 h-2 bg-emerald-400 rounded-full" />
+                  Saved
+                </span>
+              )}
             </div>
             
             {/* Progress indicator */}
