@@ -273,7 +273,7 @@ export default function CRMDashboard() {
               exit={{ height: 0, opacity: 0 }}
               className="overflow-hidden mb-6"
             >
-              <div className="p-6 rounded-xl bg-white/5 border border-white/10 grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="p-6 rounded-xl bg-white/5 border border-white/10 grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm text-white/60 mb-2">Search</label>
                   <input
@@ -312,19 +312,6 @@ export default function CRMDashboard() {
                     <option value="ad">Ad Campaign</option>
                     <option value="referral">Referral</option>
                     <option value="manual">Manual</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm text-white/60 mb-2">Priority</label>
-                  <select
-                    value={priorityFilter}
-                    onChange={(e) => setPriorityFilter(e.target.value)}
-                    className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:border-cyan-500 outline-none"
-                  >
-                    <option value="">All Priorities</option>
-                    {Object.entries(PRIORITY_CONFIG).map(([value, config]) => (
-                      <option key={value} value={value}>{config.label}</option>
-                    ))}
                   </select>
                 </div>
               </div>
