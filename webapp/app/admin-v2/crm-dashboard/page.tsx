@@ -92,7 +92,6 @@ export default function CRMDashboard() {
       if (search) params.set('search', search);
       if (statusFilter) params.set('status', statusFilter);
       if (sourceFilter) params.set('source', sourceFilter);
-      if (priorityFilter) params.set('priority', priorityFilter);
       
       const response = await fetch(`/api/crm/leads?${params}`);
       const data = await response.json();
@@ -108,7 +107,7 @@ export default function CRMDashboard() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, statusFilter, sourceFilter, priorityFilter, sortBy, sortOrder]);
+  }, [page, search, statusFilter, sourceFilter, sortBy, sortOrder]);
 
   useEffect(() => {
     fetchLeads();
