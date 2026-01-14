@@ -110,7 +110,34 @@ const SECTION_OPTIONS: { type: SectionType; label: string }[] = [
   { type: 'custom', label: 'Custom Section' },
 ];
 
+// Database project interface (from API)
+interface DbProject {
+  id: string;
+  user_id: string;
+  name: string;
+  description?: string;
+  source_url?: string;
+  source_type: 'url' | 'upload' | 'scratch';
+  status: 'draft' | 'in_progress' | 'completed' | 'published';
+  sections: Section[];
+  settings: Record<string, unknown>;
+  generated_code?: string;
+  preview_image?: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export default function WebsiteAnalyzerPage() {
+  // Project selection state
+  const [showProjectList, setShowProjectList] = useState(true);
+  const [savedProjects, setSavedProjects] = useState<DbProject[]>([]);
+  const [loadingProjects, setLoadingProjects] = useState(true);
+  const [showNewProjectModal, setShowNewProjectModal] = useState(false);
+  const [newProjectName, setNewProjectName] = useState('');
+  const [newProjectDescription, setNewProjectDescription] = useState('');
+  const [creatingProject, setCreatingProject] = useState(false);
+  const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
+
   // Mode & input states
   const [mode, setMode] = useState<AnalysisMode>('analyze');
   const [inputMethod, setInputMethod] = useState<'upload' | 'url'>('upload');
@@ -148,6 +175,133 @@ export default function WebsiteAnalyzerPage() {
   const [hasSavedProject, setHasSavedProject] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch saved projects from database
+  const fetchProjects = useCallback(async () => {
+    try {
+      setLoadingProjects(true);
+      const response = await fetch('/api/website-projects');
+      if (response.ok) {
+        const data = await response.json();
+        setSavedProjects(data.projects || []);
+      }
+    } catch (err) {
+      console.error('Failed to fetch projects:', err);
+    } finally {
+      setLoadingProjects(false);
+    }
+  }, []);
+
+  // Load projects on mount
+  useEffect(() => {
+    fetchProjects();
+  }, [fetchProjects]);
+
+  // Create new project
+  const handleCreateProject = async () => {
+    if (!newProjectName.trim()) return;
+    
+    setCreatingProject(true);
+    try {
+      const response = await fetch('/api/website-projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: newProjectName,
+          description: newProjectDescription,
+          sourceType: mode === 'scratch' ? 'scratch' : inputMethod === 'url' ? 'url' : 'upload',
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setActiveProjectId(data.project.id);
+        setShowNewProjectModal(false);
+        setShowProjectList(false);
+        setNewProjectName('');
+        setNewProjectDescription('');
+        fetchProjects();
+      } else {
+        const err = await response.json();
+        setError(err.error || 'Failed to create project');
+      }
+    } catch (err) {
+      setError('Failed to create project');
+    } finally {
+      setCreatingProject(false);
+    }
+  };
+
+  // Open existing project
+  const handleOpenProject = (proj: DbProject) => {
+    setActiveProjectId(proj.id);
+    setShowProjectList(false);
+    
+    // Restore project state
+    if (proj.sections && proj.sections.length > 0) {
+      setSections(proj.sections);
+    }
+    if (proj.source_url) {
+      setWebsiteUrl(proj.source_url);
+      setInputMethod('url');
+    }
+    if (proj.source_type === 'scratch') {
+      setMode('scratch');
+    }
+    if (proj.generated_code) {
+      setCurrentStep('code');
+    } else if (proj.sections?.some(s => s.status === 'approved')) {
+      setCurrentStep('preview');
+    }
+  };
+
+  // Save current work to project
+  const saveToProject = useCallback(async () => {
+    if (!activeProjectId) return;
+    
+    try {
+      await fetch('/api/website-projects', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: activeProjectId,
+          sections,
+          sourceUrl: websiteUrl || undefined,
+          status: sections.some(s => s.status === 'approved') ? 'in_progress' : 'draft',
+        }),
+      });
+      setHasSavedProject(true);
+    } catch (err) {
+      console.error('Failed to save project:', err);
+    }
+  }, [activeProjectId, sections, websiteUrl]);
+
+  // Auto-save when sections change
+  useEffect(() => {
+    if (activeProjectId && sections.length > 0) {
+      const timeout = setTimeout(() => {
+        saveToProject();
+      }, 2000);
+      return () => clearTimeout(timeout);
+    }
+  }, [activeProjectId, sections, saveToProject]);
+
+  // Delete project
+  const handleDeleteProject = async (projectId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!confirm('Are you sure you want to delete this project?')) return;
+    
+    try {
+      const response = await fetch(`/api/website-projects?id=${projectId}`, {
+        method: 'DELETE',
+      });
+      if (response.ok) {
+        fetchProjects();
+      }
+    } catch (err) {
+      console.error('Failed to delete project:', err);
+    }
+  };
 
   // Initialize default sections
   useEffect(() => {
