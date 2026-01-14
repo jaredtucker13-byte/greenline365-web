@@ -231,19 +231,6 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
-      await supabase.from('crm_lead_activities').insert({
-        lead_id: id,
-        activity_type: 'status_change',
-        activity_data: { newStatus: updates.status },
-      });
-    }
-    
-    return NextResponse.json({ lead });
-  } catch (error: any) {
-    console.error('[CRM] Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-}
 
 export async function DELETE(request: NextRequest) {
   try {
