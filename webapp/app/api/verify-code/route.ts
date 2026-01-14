@@ -5,6 +5,7 @@
  * Body: { email, code }
  * 
  * Verifies a user's email using the 6-digit code
+ * Also syncs verified leads to the CRM automatically
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -14,6 +15,57 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
+
+// Sync verified lead to CRM
+async function syncToCRM(entry: any) {
+  try {
+    // Check if lead already exists in CRM
+    const { data: existingLead } = await supabase
+      .from('crm_leads')
+      .select('id')
+      .eq('email', entry.email)
+      .single();
+
+    if (existingLead) {
+      // Update existing lead
+      await supabase
+        .from('crm_leads')
+        .update({
+          status: 'verified',
+          verified_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', existingLead.id);
+      
+      console.log('[CRM Sync] Updated existing lead:', entry.email);
+    } else {
+      // Create new CRM lead from waitlist data
+      const { error: insertError } = await supabase
+        .from('crm_leads')
+        .insert({
+          email: entry.email,
+          name: entry.name || null,
+          company: entry.company || null,
+          source: 'waitlist',
+          source_detail: entry.industry || null,
+          status: 'verified',
+          verified_at: new Date().toISOString(),
+          consent_given: true,
+          consent_timestamp: new Date().toISOString(),
+          tags: ['waitlist'],
+        });
+
+      if (insertError) {
+        console.error('[CRM Sync] Failed to create lead:', insertError);
+      } else {
+        console.log('[CRM Sync] Created new lead:', entry.email);
+      }
+    }
+  } catch (err) {
+    console.error('[CRM Sync] Error:', err);
+    // Don't throw - CRM sync failure shouldn't block verification
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -51,17 +103,19 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if expired
-    if (new Date(entry.verification_expires) < new Date()) {
+    if (entry.verification_expires && new Date(entry.verification_expires) < new Date()) {
       return NextResponse.json({ error: 'Verification code has expired. Please sign up again.' }, { status: 400 });
     }
 
-    // Mark as verified
+    // Mark as verified in waitlist
     const { error: updateError } = await supabase
       .from('waitlist_submissions')
       .update({ 
         verified: true,
         status: 'verified',
         verified_at: new Date().toISOString(),
+        verification_token: null, // Clear token after use
+        verification_code: null,  // Clear code after use
       })
       .eq('email', normalizedEmail);
 
@@ -69,6 +123,9 @@ export async function POST(request: NextRequest) {
       console.error('[Verify Code] Update error:', updateError);
       return NextResponse.json({ error: 'Failed to verify email' }, { status: 500 });
     }
+
+    // Sync to CRM automatically
+    await syncToCRM({ ...entry, email: normalizedEmail });
 
     return NextResponse.json({
       success: true,
