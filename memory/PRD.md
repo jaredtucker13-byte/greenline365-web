@@ -12,6 +12,27 @@ Build a Business Operating System with the current primary focus on an **AI Webs
 
 ## Architecture: Hub-and-Spoke Model
 
+### Navigation System
+The app uses a hub-and-spoke navigation pattern where:
+- **Command Center (`/admin-v2`)** is the global starting point (Hub)
+- **Spoke pages** (CRM, Analytics, Content Forge, etc.) can be accessed from the hub
+- **Back behavior** respects the navigation stack or `returnTo` query param
+- **Breadcrumbs** show current location in page hierarchy
+
+**Key Navigation Components** (`/lib/navigation/`):
+- `NavigationProvider` - Context provider wrapping admin-v2
+- `useNavigation()` - Hook for navigation actions  
+- `BackButton` - Consistent back behavior
+- `Breadcrumbs` - Shows page hierarchy
+- `NavLink` - Tracked navigation links
+- `PageHeader` - Reusable header with back + breadcrumbs
+
+**Navigation Rules**:
+1. If user came from Command Center → Back goes to Command Center
+2. If user came from Page X → Back goes to Page X (via `?returnTo=`)
+3. Subpage drills preserve parent in stack
+4. Deep links fallback to Command Center
+
 ### Data Flow Principles
 1. **Single Source of Truth**: 
    - Core API (CRUD): contacts, deals, tasks, activities (mutable, record-level)
@@ -29,6 +50,18 @@ Build a Business Operating System with the current primary focus on an **AI Webs
 ## What's Been Implemented
 
 ### January 14, 2025 (Latest Session)
+
+**Navigation System Implementation**
+- Created navigation context and utilities (`/lib/navigation/`):
+  - `NavigationContext.tsx` - Provider with navigation stack, returnTo tracking
+  - `NavLink.tsx` - Navigation-aware link component
+  - `Breadcrumbs.tsx` - Shows page hierarchy
+  - `BackButton.tsx` - Consistent back behavior
+- Created `PageHeader` component (`/admin-v2/components/PageHeader.tsx`)
+  - Includes back button, breadcrumbs, title, actions
+- Updated `ThemeWrapper` to include `NavigationProvider`
+- Updated CRM Dashboard to use `PageHeader`
+- Updated Content Forge to use `PageHeader`
 
 **Hub-and-Spoke Architecture Consolidation**
 - Created shared UI component library (`/admin-v2/components/shared/`):
