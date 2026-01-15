@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
       faq: [],
     };
 
-    // Step 1: Extract from images/PDFs using Gemini vision
+    // Step 1: Extract from images/PDFs using Gemini 3 Pro vision
     if (imageDataUrls && imageDataUrls.length > 0) {
       const fileData = await extractFromImages(imageDataUrls, industry, location);
       extractedData.services.push(...fileData.services);
