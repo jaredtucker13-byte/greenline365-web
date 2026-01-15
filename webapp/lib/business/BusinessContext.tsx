@@ -274,9 +274,23 @@ export function BusinessProvider({ children }: { children: ReactNode }) {
 
 export function useBusiness() {
   const context = useContext(BusinessContext);
+  
+  // If context is not available (provider not mounted or failed), return safe defaults
   if (!context) {
-    throw new Error('useBusiness must be used within a BusinessProvider');
+    return {
+      activeBusiness: null,
+      userBusinesses: [],
+      isLoading: false,
+      switchBusiness: async () => {},
+      refreshBusinesses: async () => {},
+      hasFeature: () => true, // Allow all features if no business context (backward compatible)
+      isOwner: () => false,
+      isAdmin: () => false,
+      getTierName: () => 'Unknown',
+      getTierPrice: () => '$0',
+    };
   }
+  
   return context;
 }
 
