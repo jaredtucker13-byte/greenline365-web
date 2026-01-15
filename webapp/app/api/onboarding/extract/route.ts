@@ -4,17 +4,17 @@ import { createClient } from '@/lib/supabase/server';
 /**
  * AI-Powered Onboarding Extraction API
  * 
- * The "Zero-Friction" engine that extracts business data from:
+ * The "Zero-Friction" engine using Gemini 3 Pro via OpenRouter
+ * Extracts business data from:
  * - Photos/PDFs (menus, flyers, documents) 
  * - Website URLs (scraping)
  * - Brand voice text
  * 
- * Uses Gemini 2.5 Pro for multimodal extraction
- * 
  * POST /api/onboarding/extract - Extract data from inputs
  */
 
-const GEMINI_API_KEY = process.env.EMERGENT_LLM_KEY || process.env.GOOGLE_API_KEY;
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+const GEMINI_3_PRO = 'google/gemini-2.5-pro-preview'; // Gemini 3 Pro on OpenRouter
 
 interface ExtractionRequest {
   businessId: string;
