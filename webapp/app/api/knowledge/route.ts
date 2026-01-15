@@ -162,11 +162,11 @@ async function searchKnowledge(supabase: any, businessId: string, query: string,
   return NextResponse.json({ results: data });
 }
 
-async function listKnowledge(supabase: any, userId: string, category?: string) {
+async function listKnowledge(supabase: any, businessId: string, category?: string) {
   let queryBuilder = supabase
     .from('memory_knowledge_chunks')
     .select('id, category, subcategory, title, content, priority, created_at')
-    .eq('user_id', userId)
+    .eq('business_id', businessId)
     .eq('is_active', true)
     .order('category')
     .order('priority', { ascending: false });
