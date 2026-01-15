@@ -1,34 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
-import { nanoid } from 'nanoid';
 
 /**
  * AI-Powered Onboarding Extraction API
  * 
  * The "Zero-Friction" engine that extracts business data from:
- * - Photos/PDFs (menus, flyers, documents)
+ * - Photos/PDFs (menus, flyers, documents) 
  * - Website URLs (scraping)
  * - Brand voice text
  * 
  * Uses Gemini 2.5 Pro for multimodal extraction
  * 
- * POST /api/onboarding/extract - Upload files and extract data
+ * POST /api/onboarding/extract - Extract data from inputs
  */
 
-const GEMINI_API_KEY = process.env.EMERGENT_LLM_KEY;
-const UPLOAD_DIR = '/tmp/onboarding-uploads';
+const GEMINI_API_KEY = process.env.EMERGENT_LLM_KEY || process.env.GOOGLE_API_KEY;
 
 interface ExtractionRequest {
   businessId: string;
   
   // Multimodal inputs
-  files?: Array<{
-    name: string;
-    type: string; // mime type
-    data: string; // base64
-  }>;
+  imageDataUrls?: string[]; // base64 data URLs for images/PDFs
   
   websiteUrl?: string;
   brandVoiceText?: string;
@@ -82,7 +74,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body: ExtractionRequest = await request.json();
-    const { businessId, files, websiteUrl, brandVoiceText, industry, location } = body;
+    const { businessId, imageDataUrls, websiteUrl, brandVoiceText, industry, location } = body;
 
     if (!businessId) {
       return NextResponse.json(
@@ -119,9 +111,9 @@ export async function POST(request: NextRequest) {
       faq: [],
     };
 
-    // Step 1: Extract from files (photos/PDFs)
-    if (files && files.length > 0) {
-      const fileData = await extractFromFiles(files, industry, location);
+    // Step 1: Extract from images/PDFs using Gemini vision
+    if (imageDataUrls && imageDataUrls.length > 0) {
+      const fileData = await extractFromImages(imageDataUrls, industry, location);
       extractedData.services.push(...fileData.services);
       if (fileData.businessInfo) {
         extractedData.businessInfo = { ...extractedData.businessInfo, ...fileData.businessInfo };
@@ -154,90 +146,90 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Extract data from uploaded files using Gemini 2.5 Pro vision
-async function extractFromFiles(
-  files: Array<{ name: string; type: string; data: string }>,
+// Extract from images/PDFs using Gemini 2.5 Pro multimodal
+async function extractFromImages(
+  imageDataUrls: string[],
   industry?: string,
   location?: string
 ): Promise<{ services: any[]; businessInfo: any }> {
   if (!GEMINI_API_KEY) {
-    throw new Error('Gemini API key not configured');
+    console.error('[Image Extraction] Gemini API key not configured');
+    return { services: [], businessInfo: {} };
   }
 
-  // Ensure upload directory exists
-  await mkdir(UPLOAD_DIR, { recursive: true });
-
-  // Save files temporarily
-  const filePaths = await Promise.all(
-    files.map(async (file) => {
-      const buffer = Buffer.from(file.data.split(',')[1], 'base64');
-      const filename = `${nanoid()}-${file.name}`;
-      const filepath = join(UPLOAD_DIR, filename);
-      await writeFile(filepath, buffer);
-      return { path: filepath, mime: file.type };
-    })
-  );
-
   try {
-    // Use emergentintegrations for Gemini multimodal
-    const { execSync } = require('child_process');
-    
-    // Create Python script for extraction
-    const pythonScript = `
-import os
-import json
-import asyncio
-from emergentintegrations.llm.chat import LlmChat, UserMessage, FileContentWithMimeType
-from dotenv import load_dotenv
-
-load_dotenv()
-
-async def extract():
-    chat = LlmChat(
-        api_key=os.getenv('EMERGENT_LLM_KEY'),
-        session_id='onboarding-extraction-${nanoid()}',
-        system_message='''You are a business data extraction expert. 
-Extract structured information from documents like menus, flyers, price lists, etc.
-Return ONLY valid JSON with this exact structure:
-{
-  "services": [{"name": "...", "description": "...", "price": "...", "category": "..."}],
-  "businessInfo": {"name": "...", "tagline": "...", "description": "...", "hours": "...", "contact": {}}
-}'''
-    ).with_model("gemini", "gemini-2.5-pro")
-    
-    files = [
-        ${filePaths.map(f => `FileContentWithMimeType(file_path="${f.path}", mime_type="${f.mime}")`).join(',\n        ')}
-    ]
-    
-    prompt = """Analyze these business documents and extract:
-    1. All services/products with names, descriptions, and prices
-    2. Business name, tagline, hours, contact info
-    
-    Industry context: ${industry || 'general'}
-    Location: ${location || 'unknown'}
-    
-    Return valid JSON only."""
-    
-    message = UserMessage(text=prompt, file_contents=files)
-    response = await chat.send_message(message)
-    print(response)
-
-asyncio.run(extract())
-`;
-
-    // Write and execute Python script
-    const scriptPath = join(UPLOAD_DIR, `extract-${nanoid()}.py`);
-    await writeFile(scriptPath, pythonScript);
-    
-    const output = execSync(`python3 ${scriptPath}`, {
-      encoding: 'utf-8',
-      timeout: 60000,
+    const contents = imageDataUrls.map(dataUrl => {
+      const mimeType = dataUrl.match(/data:([^;]+);/)?.[1] || 'image/jpeg';
+      const base64Data = dataUrl.split(',')[1];
+      
+      return {
+        inlineData: {
+          mimeType,
+          data: base64Data,
+        },
+      };
     });
 
-    // Parse JSON from output
-    const jsonMatch = output.match(/\{[\s\S]*\}/);
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            parts: [
+              {
+                text: `Analyze these business documents (menus, flyers, price lists, etc.) and extract structured data.
+
+Industry: ${industry || 'unknown'}
+Location: ${location || 'unknown'}
+
+Extract:
+1. All services/products with names, descriptions, and prices
+2. Business name, tagline, description
+3. Hours of operation
+4. Contact information
+
+Return ONLY valid JSON in this exact format:
+{
+  "services": [
+    {"name": "Service Name", "description": "Details", "price": "$XX", "category": "Category"}
+  ],
+  "businessInfo": {
+    "name": "Business Name",
+    "tagline": "Short tagline",
+    "description": "What they do",
+    "hours": "Mon-Fri 9-5",
+    "contact": {"phone": "", "email": "", "address": ""}
+  }
+}`
+              },
+              ...contents,
+            ],
+          }],
+          generationConfig: {
+            temperature: 0.2,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 8192,
+          },
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.text();
+      console.error('[Image Extraction] Gemini error:', error);
+      return { services: [], businessInfo: {} };
+    }
+
+    const result = await response.json();
+    const text = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    
+    // Extract JSON from response
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      console.error('[File Extraction] No JSON in response:', output);
+      console.error('[Image Extraction] No JSON in response');
       return { services: [], businessInfo: {} };
     }
 
@@ -248,12 +240,12 @@ asyncio.run(extract())
     };
 
   } catch (error) {
-    console.error('[File Extraction] Error:', error);
+    console.error('[Image Extraction] Error:', error);
     return { services: [], businessInfo: {} };
   }
 }
 
-// Extract data from website using existing scraper + Gemini
+// Extract from website
 async function extractFromWebsite(url: string): Promise<{
   services: any[];
   brandVoice: any;
@@ -261,67 +253,66 @@ async function extractFromWebsite(url: string): Promise<{
   faq: any[];
 }> {
   try {
-    // Use existing scrape API
-    const scrapeResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/scrape`, {
+    // Use existing scrape endpoint
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const scrapeResponse = await fetch(`${baseUrl}/api/scrape`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ url }),
     });
 
     const scrapeData = await scrapeResponse.json();
-    const rawContent = scrapeData.raw_content || scrapeData.content || '';
+    const rawContent = (scrapeData.raw_content || scrapeData.content || '').substring(0, 100000);
 
     if (!rawContent) {
       return { services: [], brandVoice: {}, businessInfo: {}, faq: [] };
     }
 
-    // Analyze with Gemini using emergentintegrations
-    const { execSync } = require('child_process');
-    
-    const pythonScript = `
-import os
-import json
-import asyncio
-from emergentintegrations.llm.chat import LlmChat, UserMessage
-from dotenv import load_dotenv
+    // Analyze with Gemini 2.5 Pro (2M context window)
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: `Analyze this website content and extract complete business intelligence:
 
-load_dotenv()
-
-async def analyze():
-    chat = LlmChat(
-        api_key=os.getenv('EMERGENT_LLM_KEY'),
-        session_id='website-extraction-${nanoid()}',
-        system_message='You are a business intelligence extraction expert.'
-    ).with_model("gemini", "gemini-2.5-pro")
-    
-    prompt = """Analyze this website content and extract structured data:
-
-${rawContent.replace(/"/g, '\\"').substring(0, 50000)}
+${rawContent}
 
 Return ONLY valid JSON:
 {
   "services": [{"name": "...", "description": "...", "price": "..."}],
-  "brandVoice": {"tone": [], "values": [], "mission": "", "target_audience": ""},
+  "brandVoice": {
+    "tone": ["professional", "friendly"],
+    "values": ["quality", "trust"],
+    "mission": "one sentence",
+    "target_audience": "who they serve",
+    "unique_selling_points": ["point 1", "point 2"]
+  },
   "businessInfo": {"name": "...", "tagline": "...", "description": "..."},
   "faq": [{"question": "...", "answer": "..."}]
-}"""
+}`
+            }],
+          }],
+          generationConfig: {
+            temperature: 0.2,
+            maxOutputTokens: 8192,
+          },
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      console.error('[Website Extraction] Gemini error');
+      return { services: [], brandVoice: {}, businessInfo: {}, faq: [] };
+    }
+
+    const result = await response.json();
+    const text = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
     
-    response = await chat.send_message(UserMessage(text=prompt))
-    print(response)
-
-asyncio.run(analyze())
-`;
-
-    const scriptPath = join(UPLOAD_DIR, `web-extract-${nanoid()}.py`);
-    await mkdir(UPLOAD_DIR, { recursive: true });
-    await writeFile(scriptPath, pythonScript);
-    
-    const output = execSync(`python3 ${scriptPath}`, {
-      encoding: 'utf-8',
-      timeout: 90000,
-    });
-
-    const jsonMatch = output.match(/\{[\s\S]*\}/);
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       return { services: [], brandVoice: {}, businessInfo: {}, faq: [] };
     }
@@ -334,56 +325,47 @@ asyncio.run(analyze())
   }
 }
 
-// Analyze brand voice text using Gemini thinking mode
+// Analyze brand voice
 async function analyzeBrandVoice(text: string): Promise<any> {
   try {
-    const { execSync } = require('child_process');
-    
-    const pythonScript = `
-import os
-import json
-import asyncio
-from emergentintegrations.llm.chat import LlmChat, UserMessage
-from dotenv import load_dotenv
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: `Analyze this brand voice text and distill the core identity:
 
-load_dotenv()
-
-async def analyze():
-    chat = LlmChat(
-        api_key=os.getenv('EMERGENT_LLM_KEY'),
-        session_id='brand-voice-${nanoid()}',
-        system_message='You are a brand strategy expert who distills brand identity from text.'
-    ).with_model("gemini", "gemini-2.5-pro")
-    
-    prompt = """Analyze this brand text and extract the core identity:
-
-${text.replace(/"/g, '\\"').substring(0, 10000)}
+${text.substring(0, 10000)}
 
 Return ONLY valid JSON:
 {
-  "tone": ["professional", "friendly", "authoritative"],
-  "values": ["quality", "innovation", "trust"],
-  "mission": "one sentence mission",
+  "tone": ["adjective1", "adjective2"],
+  "values": ["value1", "value2"],
+  "mission": "one clear sentence",
   "target_audience": "who they serve",
-  "unique_selling_points": ["point 1", "point 2"]
-}"""
+  "unique_selling_points": ["usp1", "usp2", "usp3"]
+}`
+            }],
+          }],
+          generationConfig: {
+            temperature: 0.3,
+            maxOutputTokens: 2048,
+          },
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      return {};
+    }
+
+    const result = await response.json();
+    const text = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
     
-    response = await chat.send_message(UserMessage(text=prompt))
-    print(response)
-
-asyncio.run(analyze())
-`;
-
-    const scriptPath = join(UPLOAD_DIR, `voice-${nanoid()}.py`);
-    await mkdir(UPLOAD_DIR, { recursive: true });
-    await writeFile(scriptPath, pythonScript);
-    
-    const output = execSync(`python3 ${scriptPath}`, {
-      encoding: 'utf-8',
-      timeout: 30000,
-    });
-
-    const jsonMatch = output.match(/\{[\s\S]*\}/);
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       return {};
     }
@@ -391,7 +373,7 @@ asyncio.run(analyze())
     return JSON.parse(jsonMatch[0]);
 
   } catch (error) {
-    console.error('[Brand Voice Analysis] Error:', error);
+    console.error('[Brand Voice] Error:', error);
     return {};
   }
 }
