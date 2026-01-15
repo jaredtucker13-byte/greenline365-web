@@ -146,54 +146,32 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Extract from images/PDFs using Gemini 2.5 Pro multimodal
+// Extract from images/PDFs using Gemini 3 Pro via OpenRouter
 async function extractFromImages(
   imageDataUrls: string[],
   industry?: string,
   location?: string
 ): Promise<{ services: any[]; businessInfo: any }> {
-  if (!GEMINI_API_KEY) {
-    console.error('[Image Extraction] Gemini API key not configured');
+  if (!OPENROUTER_API_KEY) {
+    console.error('[Image Extraction] OpenRouter API key not configured');
     return { services: [], businessInfo: {} };
   }
 
   try {
-    const contents = imageDataUrls.map(dataUrl => {
-      const mimeType = dataUrl.match(/data:([^;]+);/)?.[1] || 'image/jpeg';
-      const base64Data = dataUrl.split(',')[1];
-      
-      return {
-        inlineData: {
-          mimeType,
-          data: base64Data,
-        },
-      };
-    });
-
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            parts: [
-              {
-                text: `Analyze these business documents (menus, flyers, price lists, etc.) and extract structured data.
+    // Build content array with images
+    const content: any[] = [{
+      type: 'text',
+      text: `Analyze these business documents (menus, flyers, price lists, photos) and extract structured data.
 
 Industry: ${industry || 'unknown'}
 Location: ${location || 'unknown'}
 
-Extract:
-1. All services/products with names, descriptions, and prices
-2. Business name, tagline, description
-3. Hours of operation
-4. Contact information
+Extract ALL services/products with names, descriptions, and prices. Also extract business name, tagline, hours, contact info.
 
-Return ONLY valid JSON in this exact format:
+Return ONLY valid JSON in this EXACT format (no markdown, no code blocks):
 {
   "services": [
-    {"name": "Service Name", "description": "Details", "price": "$XX", "category": "Category"}
+    {"name": "Service Name", "description": "Full description", "price": "$XX", "category": "Category"}
   ],
   "businessInfo": {
     "name": "Business Name",
@@ -203,31 +181,52 @@ Return ONLY valid JSON in this exact format:
     "contact": {"phone": "", "email": "", "address": ""}
   }
 }`
-              },
-              ...contents,
-            ],
-          }],
-          generationConfig: {
-            temperature: 0.2,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 8192,
-          },
-        }),
-      }
-    );
+    }];
+
+    // Add images
+    imageDataUrls.forEach(dataUrl => {
+      content.push({
+        type: 'image_url',
+        image_url: { url: dataUrl }
+      });
+    });
+
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com',
+        'X-Title': 'GreenLine365 Onboarding Engine',
+      },
+      body: JSON.stringify({
+        model: GEMINI_3_PRO,
+        messages: [{
+          role: 'user',
+          content,
+        }],
+        temperature: 0.2,
+        max_tokens: 8000,
+      }),
+    });
 
     if (!response.ok) {
       const error = await response.text();
-      console.error('[Image Extraction] Gemini error:', error);
+      console.error('[Image Extraction] OpenRouter error:', error);
       return { services: [], businessInfo: {} };
     }
 
     const result = await response.json();
-    const text = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const text = result.choices?.[0]?.message?.content || '';
     
-    // Extract JSON from response
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    // Extract JSON from response (handle code blocks)
+    let jsonText = text;
+    if (text.includes('```')) {
+      const match = text.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+      jsonText = match ? match[1] : text;
+    }
+    
+    const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       console.error('[Image Extraction] No JSON in response');
       return { services: [], businessInfo: {} };
