@@ -197,7 +197,7 @@ async function listKnowledge(supabase: any, businessId: string, category?: strin
   });
 }
 
-async function deleteKnowledge(supabase: any, userId: string, id: string) {
+async function deleteKnowledge(supabase: any, businessId: string, id: string) {
   if (!id) {
     return NextResponse.json({ error: 'ID required' }, { status: 400 });
   }
@@ -207,7 +207,7 @@ async function deleteKnowledge(supabase: any, userId: string, id: string) {
     .from('memory_knowledge_chunks')
     .update({ is_active: false })
     .eq('id', id)
-    .eq('user_id', userId);
+    .eq('business_id', businessId);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
