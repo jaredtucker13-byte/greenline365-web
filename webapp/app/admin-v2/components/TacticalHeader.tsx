@@ -6,6 +6,7 @@
  */
 
 import { motion } from 'framer-motion';
+import { BusinessSwitcher } from './BusinessSwitcher';
 
 interface HeaderProps {
   title: string;
@@ -28,7 +29,7 @@ export default function TacticalHeader({
 }: HeaderProps) {
   return (
     <header className="h-20 backdrop-blur-2xl bg-black/30 border-b border-white/10 flex items-center justify-between px-8 sticky top-0 z-30">
-      {/* Left: Title */}
+      {/* Left: Title & Business Switcher */}
       <div className="flex items-center gap-6">
         <div>
           <motion.h1 
@@ -39,6 +40,11 @@ export default function TacticalHeader({
             {title}
           </motion.h1>
           <p className="text-xs tracking-widest text-white/40 font-medium mt-0.5">{subtitle}</p>
+        </div>
+        
+        {/* Business Switcher */}
+        <div className="ml-4">
+          <BusinessSwitcher />
         </div>
       </div>
 
