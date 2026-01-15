@@ -2,11 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
 /**
- * Knowledge Warehouse API
+ * Knowledge Warehouse API (Multi-tenant)
  * Manages Layer 2 of the Dynamic Memory Bucket System
  * 
  * Actions:
- * - seed: Bulk add knowledge chunks for a tenant
+ * - seed: Bulk add knowledge chunks for a business
  * - add: Add single knowledge chunk
  * - search: Search knowledge by query (text-based for now, vector later)
  * - list: List all knowledge by category
@@ -33,19 +33,35 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { action } = body;
+    const { action, businessId } = body;
+
+    if (!businessId) {
+      return NextResponse.json({ error: 'Business ID required' }, { status: 400 });
+    }
+
+    // Verify user has access to this business
+    const { data: access } = await supabase
+      .from('user_businesses')
+      .select('role')
+      .eq('user_id', user.id)
+      .eq('business_id', businessId)
+      .single();
+
+    if (!access) {
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 });
+    }
 
     switch (action) {
       case 'seed':
-        return seedKnowledge(supabase, user.id, body.chunks as KnowledgeChunk[]);
+        return seedKnowledge(supabase, user.id, businessId, body.chunks as KnowledgeChunk[]);
       case 'add':
-        return addKnowledge(supabase, user.id, body.chunk as KnowledgeChunk);
+        return addKnowledge(supabase, user.id, businessId, body.chunk as KnowledgeChunk);
       case 'search':
-        return searchKnowledge(supabase, user.id, body.query, body.category);
+        return searchKnowledge(supabase, businessId, body.query, body.category);
       case 'list':
-        return listKnowledge(supabase, user.id, body.category);
+        return listKnowledge(supabase, businessId, body.category);
       case 'delete':
-        return deleteKnowledge(supabase, user.id, body.id);
+        return deleteKnowledge(supabase, businessId, body.id);
       default:
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
     }
