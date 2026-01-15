@@ -71,13 +71,13 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function seedKnowledge(supabase: any, userId: string, chunks: KnowledgeChunk[]) {
+async function seedKnowledge(supabase: any, userId: string, businessId: string, chunks: KnowledgeChunk[]) {
   if (!chunks || !Array.isArray(chunks) || chunks.length === 0) {
     return NextResponse.json({ error: 'No chunks provided' }, { status: 400 });
   }
 
   const insertData = chunks.map(chunk => ({
-    user_id: userId,
+    business_id: businessId,
     category: chunk.category,
     subcategory: chunk.subcategory,
     title: chunk.title,
@@ -86,6 +86,7 @@ async function seedKnowledge(supabase: any, userId: string, chunks: KnowledgeChu
     confidence: chunk.confidence || 1.0,
     priority: chunk.priority || 5,
     is_active: true,
+    created_by: userId,
   }));
 
   const { data, error } = await supabase
