@@ -121,7 +121,7 @@ export function BusinessProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      // Fetch user's businesses
+      // Fetch user's businesses (gracefully handle if table doesn't exist)
       const { data: userBusinessData, error } = await supabase
         .from('user_businesses')
         .select(`
@@ -133,7 +133,14 @@ export function BusinessProvider({ children }: { children: ReactNode }) {
         .order('is_primary', { ascending: false });
 
       if (error) {
-        console.error('[BusinessProvider] Error loading businesses:', error);
+        // Table doesn't exist yet or other error - gracefully continue
+        console.warn('[BusinessProvider] Error loading businesses (tables may not exist yet):', error.message);
+        setIsLoading(false);
+        return;
+      }
+
+      if (!userBusinessData || userBusinessData.length === 0) {
+        // No businesses yet - this is fine
         setIsLoading(false);
         return;
       }
@@ -177,7 +184,7 @@ export function BusinessProvider({ children }: { children: ReactNode }) {
       }
 
     } catch (error) {
-      console.error('[BusinessProvider] Error:', error);
+      console.warn('[BusinessProvider] Error (tables may not exist yet):', error);
     } finally {
       setIsLoading(false);
     }
