@@ -226,9 +226,26 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
+    const businessId = searchParams.get('businessId');
     const category = searchParams.get('category');
 
-    return listKnowledge(supabase, user.id, category || undefined);
+    if (!businessId) {
+      return NextResponse.json({ error: 'Business ID required' }, { status: 400 });
+    }
+
+    // Verify access
+    const { data: access } = await supabase
+      .from('user_businesses')
+      .select('role')
+      .eq('user_id', user.id)
+      .eq('business_id', businessId)
+      .single();
+
+    if (!access) {
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 });
+    }
+
+    return listKnowledge(supabase, businessId, category || undefined);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
