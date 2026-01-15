@@ -16,10 +16,14 @@ export function BusinessSwitcher() {
   const { activeBusiness, userBusinesses, switchBusiness, isLoading, getTierName } = useBusiness();
   const [isOpen, setIsOpen] = useState(false);
 
-  if (isLoading || !activeBusiness) {
-    return (
-      <div className="h-10 w-48 bg-white/5 rounded-lg animate-pulse" />
-    );
+  // Don't show anything if still loading
+  if (isLoading) {
+    return null;
+  }
+
+  // Don't show if no businesses (migration not run yet)
+  if (!activeBusiness || userBusinesses.length === 0) {
+    return null;
   }
 
   const getTierIcon = (tier: string) => {
