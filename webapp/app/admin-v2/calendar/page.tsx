@@ -2,10 +2,13 @@
  * Calendar/Booking Management Page
  * Full calendar view with booking management
  * Hub-and-Spoke: This is the "Spoke" - dedicated full page
+ * 
+ * TIER REQUIREMENT: Tier 3 (Enterprise)
  */
 
 'use client';
 
+import { FeatureGate } from '../components/FeatureGate';
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
