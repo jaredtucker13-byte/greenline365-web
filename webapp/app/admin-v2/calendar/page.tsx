@@ -683,6 +683,7 @@ export default function CalendarPage() {
         )}
       </AnimatePresence>
     </div>
+    </FeatureGate>
   );
 }
 
