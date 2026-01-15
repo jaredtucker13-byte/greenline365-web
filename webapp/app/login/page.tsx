@@ -220,7 +220,7 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              disabled={loading || !formData.email || !formData.password}
+              disabled={loading}
               className="w-full py-4 bg-emerald-500 text-black font-bold rounded-xl hover:bg-emerald-400 transition disabled:opacity-50 flex items-center justify-center gap-2"
               data-testid="signin-btn"
             >
