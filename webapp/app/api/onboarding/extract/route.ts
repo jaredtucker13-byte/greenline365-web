@@ -244,7 +244,7 @@ Return ONLY valid JSON in this EXACT format (no markdown, no code blocks):
   }
 }
 
-// Extract from website
+// Extract from website using Gemini 3 Pro via OpenRouter
 async function extractFromWebsite(url: string): Promise<{
   services: any[];
   brandVoice: any;
@@ -267,51 +267,58 @@ async function extractFromWebsite(url: string): Promise<{
       return { services: [], brandVoice: {}, businessInfo: {}, faq: [] };
     }
 
-    // Analyze with Gemini 2.5 Pro (2M context window)
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: `Analyze this website content and extract complete business intelligence:
+    // Analyze with Gemini 3 Pro (2M context window)
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com',
+        'X-Title': 'GreenLine365 Onboarding Engine',
+      },
+      body: JSON.stringify({
+        model: GEMINI_3_PRO,
+        messages: [{
+          role: 'user',
+          content: `Analyze this complete website content and extract ALL business intelligence:
 
 ${rawContent}
 
-Return ONLY valid JSON:
+Return ONLY valid JSON (no markdown, no code blocks):
 {
-  "services": [{"name": "...", "description": "...", "price": "..."}],
+  "services": [{"name": "...", "description": "...", "price": "...", "category": "..."}],
   "brandVoice": {
     "tone": ["professional", "friendly"],
     "values": ["quality", "trust"],
-    "mission": "one sentence",
+    "mission": "one clear sentence",
     "target_audience": "who they serve",
-    "unique_selling_points": ["point 1", "point 2"]
+    "unique_selling_points": ["usp1", "usp2"]
   },
-  "businessInfo": {"name": "...", "tagline": "...", "description": "..."},
+  "businessInfo": {"name": "...", "tagline": "...", "description": "...", "hours": "...", "contact": {}},
   "faq": [{"question": "...", "answer": "..."}]
 }`
-            }],
-          }],
-          generationConfig: {
-            temperature: 0.2,
-            maxOutputTokens: 8192,
-          },
-        }),
-      }
-    );
+        }],
+        temperature: 0.2,
+        max_tokens: 8000,
+      }),
+    });
 
     if (!response.ok) {
-      console.error('[Website Extraction] Gemini error');
+      console.error('[Website Extraction] OpenRouter error');
       return { services: [], brandVoice: {}, businessInfo: {}, faq: [] };
     }
 
     const result = await response.json();
-    const text = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const text = result.choices?.[0]?.message?.content || '';
     
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    // Handle markdown code blocks
+    let jsonText = text;
+    if (text.includes('```')) {
+      const match = text.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+      jsonText = match ? match[1] : text;
+    }
+    
+    const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       return { services: [], brandVoice: {}, businessInfo: {}, faq: [] };
     }
