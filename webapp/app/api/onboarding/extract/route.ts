@@ -331,47 +331,57 @@ Return ONLY valid JSON (no markdown, no code blocks):
   }
 }
 
-// Analyze brand voice
+// Analyze brand voice using Gemini 3 Pro thinking mode
 async function analyzeBrandVoice(text: string): Promise<any> {
   try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: `Analyze this brand voice text and distill the core identity:
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com',
+        'X-Title': 'GreenLine365 Brand Voice Analyzer',
+      },
+      body: JSON.stringify({
+        model: GEMINI_3_PRO,
+        messages: [{
+          role: 'system',
+          content: 'You are a brand strategy expert who distills brand identity and voice from text. You analyze tone, vocabulary, and values to create permanent identity profiles.'
+        }, {
+          role: 'user',
+          content: `Analyze this brand voice text and extract the core identity elements:
 
-${text.substring(0, 10000)}
+${text.substring(0, 20000)}
 
-Return ONLY valid JSON:
+Return ONLY valid JSON (no markdown, no code blocks):
 {
-  "tone": ["adjective1", "adjective2"],
-  "values": ["value1", "value2"],
-  "mission": "one clear sentence",
-  "target_audience": "who they serve",
-  "unique_selling_points": ["usp1", "usp2", "usp3"]
+  "tone": ["adjective1", "adjective2", "adjective3"],
+  "values": ["value1", "value2", "value3"],
+  "mission": "one clear mission statement sentence",
+  "target_audience": "specific description of who they serve",
+  "unique_selling_points": ["unique point 1", "unique point 2", "unique point 3"]
 }`
-            }],
-          }],
-          generationConfig: {
-            temperature: 0.3,
-            maxOutputTokens: 2048,
-          },
-        }),
-      }
-    );
+        }],
+        temperature: 0.3,
+        max_tokens: 2048,
+      }),
+    });
 
     if (!response.ok) {
       return {};
     }
 
     const result = await response.json();
-    const text = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const text = result.choices?.[0]?.message?.content || '';
     
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    // Handle markdown code blocks
+    let jsonText = text;
+    if (text.includes('```')) {
+      const match = text.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+      jsonText = match ? match[1] : text;
+    }
+    
+    const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       return {};
     }
