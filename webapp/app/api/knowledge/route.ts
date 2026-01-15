@@ -106,7 +106,7 @@ async function seedKnowledge(supabase: any, userId: string, businessId: string, 
   });
 }
 
-async function addKnowledge(supabase: any, userId: string, chunk: KnowledgeChunk) {
+async function addKnowledge(supabase: any, userId: string, businessId: string, chunk: KnowledgeChunk) {
   if (!chunk || !chunk.content || !chunk.category) {
     return NextResponse.json({ error: 'Content and category required' }, { status: 400 });
   }
@@ -114,7 +114,7 @@ async function addKnowledge(supabase: any, userId: string, chunk: KnowledgeChunk
   const { data, error } = await supabase
     .from('memory_knowledge_chunks')
     .insert({
-      user_id: userId,
+      business_id: businessId,
       category: chunk.category,
       subcategory: chunk.subcategory,
       title: chunk.title,
@@ -123,6 +123,7 @@ async function addKnowledge(supabase: any, userId: string, chunk: KnowledgeChunk
       confidence: chunk.confidence || 1.0,
       priority: chunk.priority || 5,
       is_active: true,
+      created_by: userId,
     })
     .select('id, category, title')
     .single();
