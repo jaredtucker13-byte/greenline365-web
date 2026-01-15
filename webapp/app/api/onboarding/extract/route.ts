@@ -334,7 +334,7 @@ Return ONLY valid JSON (no markdown, no code blocks):
 // Analyze brand voice using Gemini 3 Pro thinking mode
 async function analyzeBrandVoice(text: string): Promise<any> {
   try {
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    const voiceResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
@@ -367,18 +367,18 @@ Return ONLY valid JSON (no markdown, no code blocks):
       }),
     });
 
-    if (!response.ok) {
+    if (!voiceResponse.ok) {
       return {};
     }
 
-    const result = await response.json();
-    const text = result.choices?.[0]?.message?.content || '';
+    const result = await voiceResponse.json();
+    const responseText = result.choices?.[0]?.message?.content || '';
     
     // Handle markdown code blocks
-    let jsonText = text;
-    if (text.includes('```')) {
-      const match = text.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
-      jsonText = match ? match[1] : text;
+    let jsonText = responseText;
+    if (responseText.includes('```')) {
+      const match = responseText.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+      jsonText = match ? match[1] : responseText;
     }
     
     const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
