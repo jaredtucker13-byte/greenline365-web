@@ -135,7 +135,7 @@ async function addKnowledge(supabase: any, userId: string, businessId: string, c
   return NextResponse.json({ success: true, chunk: data });
 }
 
-async function searchKnowledge(supabase: any, userId: string, query: string, category?: string) {
+async function searchKnowledge(supabase: any, businessId: string, query: string, category?: string) {
   if (!query) {
     return NextResponse.json({ error: 'Query required' }, { status: 400 });
   }
@@ -143,7 +143,7 @@ async function searchKnowledge(supabase: any, userId: string, query: string, cat
   let queryBuilder = supabase
     .from('memory_knowledge_chunks')
     .select('id, category, subcategory, title, content, priority')
-    .eq('user_id', userId)
+    .eq('business_id', businessId)
     .eq('is_active', true)
     .ilike('content', `%${query}%`)
     .order('priority', { ascending: false })
