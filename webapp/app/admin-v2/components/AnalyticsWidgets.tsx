@@ -27,8 +27,16 @@ export default function AnalyticsWidgets({
   pipeline, 
   bookingTrends 
 }: AnalyticsWidgetsProps) {
-  const maxMetricValue = Math.max(...teamMetrics.map(m => m.value));
-  const maxTrendValue = Math.max(...bookingTrends.flatMap(t => [t.current, t.previous]));
+  // Guard against empty arrays to prevent NaN values
+  const safeTeamMetrics = teamMetrics?.length > 0 ? teamMetrics : [];
+  const safeBookingTrends = bookingTrends?.length > 0 ? bookingTrends : [];
+  
+  const maxMetricValue = safeTeamMetrics.length > 0 
+    ? Math.max(...safeTeamMetrics.map(m => m.value), 1) 
+    : 1;
+  const maxTrendValue = safeBookingTrends.length > 0 
+    ? Math.max(...safeBookingTrends.flatMap(t => [t.current, t.previous]), 1) 
+    : 1;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
