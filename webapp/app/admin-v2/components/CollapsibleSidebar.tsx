@@ -13,11 +13,12 @@
  * - Hidden Demo Controller trigger (triple-click on version)
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-
+import { useBusiness } from '@/lib/business';
+import { Lock } from 'lucide-react';
 interface SidebarProps {
   activeItem: 'dashboard' | 'schedule' | 'analytics' | 'settings' | 'content';
   onNewBooking: () => void;
