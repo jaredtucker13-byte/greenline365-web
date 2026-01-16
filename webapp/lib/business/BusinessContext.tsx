@@ -86,6 +86,8 @@ interface BusinessContextType {
   hasFeature: (feature: keyof Business['settings']['features']) => boolean;
   isOwner: () => boolean;
   isAdmin: () => boolean;
+  isWhiteLabel: () => boolean;
+  canEditSite: () => boolean;
   getTierName: () => string;
   getTierPrice: () => string;
 }
