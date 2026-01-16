@@ -133,6 +133,7 @@ interface CostTrackingProviderProps {
 }
 
 export function CostTrackingProvider({ children }: CostTrackingProviderProps) {
+  const [isPlatformOwner, setIsPlatformOwner] = useState(false);
   const [costLog, setCostLog] = useState<CostLogEntry[]>(() => {
     // Load from localStorage on init
     if (typeof window !== 'undefined') {
@@ -155,6 +156,21 @@ export function CostTrackingProvider({ children }: CostTrackingProviderProps) {
     onConfirm: () => void;
     metadata?: Record<string, any>;
   } | null>(null);
+
+  // Check if current user is platform owner
+  useEffect(() => {
+    const checkPlatformOwner = async () => {
+      try {
+        const { createClient } = await import('@/lib/supabase/client');
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        setIsPlatformOwner(user?.id === PLATFORM_OWNER_ID);
+      } catch {
+        setIsPlatformOwner(false);
+      }
+    };
+    checkPlatformOwner();
+  }, []);
 
   // Calculate total spent
   const totalSpent = costLog.reduce((sum, entry) => sum + entry.totalCost, 0);
