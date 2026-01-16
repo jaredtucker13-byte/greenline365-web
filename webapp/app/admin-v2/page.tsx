@@ -94,6 +94,7 @@ const emptyBookingTrends: BookingTrend[] = [
 
 export default function TacticalCommandCenter() {
   const router = useRouter();
+  const { activeBusiness } = useBusiness();
   
   // Auth check - redirect to login if not authenticated
   useEffect(() => {
