@@ -16,6 +16,7 @@ interface GenerateMockupsRequest {
   businessId: string;
   productImages: string[]; // base64 reference images
   productDescription: string;
+  productType?: 'default' | 'wall_art' | 'apparel' | 'accessories';
   modelSeed?: string; // Character vault ID for consistency
   scenes?: string[]; // Which scenes to generate
 }
