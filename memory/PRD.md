@@ -1,11 +1,18 @@
 # GreenLine365 Business Operating System - PRD
 
+## ⚠️ HARD RULES (DO NOT OVERRIDE)
+1. **DO NOT use EMERGENT_LLM_KEY for image generation**
+2. **For Nano Banana / Image Generation: Use kie.ai** (user's preferred provider)
+3. **For LLM text analysis: Use OpenRouter with Gemini 3 Pro**
+
+---
+
 ## Original Problem Statement
 Build a Business Operating System with multi-tenant white-label support, AI-powered creative studio (ArtfulPhusion), and visual content management. The platform serves as infrastructure for local businesses to automate marketing, content creation, and customer engagement.
 
 **Unique Value Proposition**: 
 1. **White-Label Platform**: Agencies and brands can run their own branded instance ($1,200/mo Elite tier)
-2. **AI Creative Studio**: Autonomous product photography and mockup generation using Gemini 3 Pro + Nano Banana Pro
+2. **AI Creative Studio**: Autonomous product photography and mockup generation using Gemini 3 Pro + **kie.ai**
 3. **Visual Inline Editor**: "God Mode" for admins to edit any public page content without code
 
 ## User Personas
