@@ -200,8 +200,10 @@ mockup_scenes (name, slug, category, prompt_template)
 | Supabase | Database, Auth, Storage | Configured |
 | SendGrid | Transactional emails | Configured |
 | OpenRouter | LLM gateway (Gemini 3 Pro) | `OPENROUTER_API_KEY` |
-| Emergent | Nano Banana Pro image gen | `EMERGENT_LLM_KEY` ✅ |
+| **kie.ai** | **Nano Banana image gen** | `KIE_API_KEY` |
 | Slack | "The Brain" integration | Planned |
+
+> ⚠️ **IMPORTANT**: Do NOT use Emergent LLM Key for image generation. Use kie.ai with KIE_API_KEY.
 
 ---
 
