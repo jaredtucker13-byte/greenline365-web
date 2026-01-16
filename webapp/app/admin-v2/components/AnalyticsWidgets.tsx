@@ -205,43 +205,47 @@ export default function AnalyticsWidgets({
             ))}
             
             {/* Previous week line */}
-            <motion.polyline
-              initial={{ pathLength: 0 }}
-              animate={{ pathLength: 1 }}
-              transition={{ delay: 0.5, duration: 1 }}
-              fill="none"
-              stroke="#4A5568"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              points={bookingTrends.map((t, i) => 
-                `${(i / (bookingTrends.length - 1)) * 280 + 10},${120 - (t.previous / maxTrendValue) * 100}`
-              ).join(' ')}
-            />
+            {safeBookingTrends.length > 1 && (
+              <motion.polyline
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ delay: 0.5, duration: 1 }}
+                fill="none"
+                stroke="#4A5568"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                points={safeBookingTrends.map((t, i) => 
+                  `${(i / Math.max(safeBookingTrends.length - 1, 1)) * 280 + 10},${120 - (t.previous / maxTrendValue) * 100}`
+                ).join(' ')}
+              />
+            )}
             
             {/* Current week line */}
-            <motion.polyline
-              initial={{ pathLength: 0 }}
-              animate={{ pathLength: 1 }}
-              transition={{ delay: 0.7, duration: 1 }}
-              fill="none"
-              stroke="#39FF14"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              points={bookingTrends.map((t, i) => 
-                `${(i / (bookingTrends.length - 1)) * 280 + 10},${120 - (t.current / maxTrendValue) * 100}`
-              ).join(' ')}
-            />
+            {safeBookingTrends.length > 1 && (
+              <motion.polyline
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ delay: 0.7, duration: 1 }}
+                fill="none"
+                stroke="#39FF14"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                points={safeBookingTrends.map((t, i) => 
+                  `${(i / Math.max(safeBookingTrends.length - 1, 1)) * 280 + 10},${120 - (t.current / maxTrendValue) * 100}`
+                ).join(' ')}
+              />
+            )}
             
             {/* Current week dots */}
-            {bookingTrends.map((t, i) => (
+            {safeBookingTrends.map((t, i) => (
               <motion.circle
                 key={i}
                 initial={{ opacity: 0, r: 0 }}
                 animate={{ opacity: 1, r: 4 }}
                 transition={{ delay: 0.9 + i * 0.1 }}
-                cx={(i / (bookingTrends.length - 1)) * 280 + 10}
+                cx={(i / Math.max(safeBookingTrends.length - 1, 1)) * 280 + 10}
                 cy={120 - (t.current / maxTrendValue) * 100}
                 fill="#39FF14"
               />
