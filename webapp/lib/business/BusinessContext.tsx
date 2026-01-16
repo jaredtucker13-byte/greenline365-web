@@ -304,6 +304,8 @@ export function useBusiness() {
       hasFeature: () => true, // Allow all features if no business context (backward compatible)
       isOwner: () => false,
       isAdmin: () => false,
+      isWhiteLabel: () => false,
+      canEditSite: () => false,
       getTierName: () => 'Unknown',
       getTierPrice: () => '$0',
     };
