@@ -1,80 +1,45 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { spawn } from 'child_process';
+import { writeFileSync, readFileSync, unlinkSync, existsSync } from 'fs';
+import { join } from 'path';
+import { randomUUID } from 'crypto';
 
 /**
  * Mockup Generation API
  * 
- * Uses Nano Banana Pro (Gemini image generation) to create cinematic product mockups
- * Generates 6 distinct scenes: Macro, Lifestyle, Action, Studio, Golden Hour, Flat Lay
+ * Uses Nano Banana Pro (Gemini image generation via Emergent) to create cinematic product mockups
  * 
  * POST /api/studio/generate-mockups
  */
 
-const EMERGENT_LLM_KEY = process.env.EMERGENT_LLM_KEY;
-
 interface GenerateMockupsRequest {
-  businessId: string;
-  productImages: string[]; // base64 reference images
+  productImageUrl: string;
   productDescription: string;
-  productType?: 'default' | 'wall_art' | 'apparel' | 'accessories';
-  modelSeed?: string; // Character vault ID for consistency
-  scenes?: string[]; // Which scenes to generate
+  productType: string;
+  scenes: string[];  // Scene slugs to generate
+  signatureModelId?: string;
 }
 
-const DEFAULT_SCENES = [
-  {
-    name: 'macro',
-    prompt: 'Ultra close-up macro shot, shallow depth of field, product details in sharp focus, professional studio lighting, premium aesthetic'
-  },
-  {
-    name: 'lifestyle',
-    prompt: 'Lifestyle shot with attractive model using product naturally, candid moment, soft natural lighting, modern urban setting'
-  },
-  {
-    name: 'action',
-    prompt: 'Dynamic action shot, product in use, motion blur, energetic composition, outdoor setting with natural light'
-  },
-  {
-    name: 'studio',
-    prompt: 'Clean studio product photography, white background, professional lighting setup, commercial catalog style, high-end luxury aesthetic'
-  },
-  {
-    name: 'golden_hour',
-    prompt: 'Golden hour outdoor shot, warm sunset lighting, model holding product, cinematic depth, Instagram-worthy aesthetic'
-  },
-  {
-    name: 'flat_lay',
-    prompt: 'Flat lay composition from above, product artfully arranged with complementary items, clean background, editorial magazine style'
-  },
-];
+// Scene prompts by slug
+const SCENE_PROMPTS: Record<string, string> = {
+  'minimalist-studio': 'Product photography on clean white seamless background, soft diffused lighting, subtle shadow, professional studio setup, 8K quality, commercial catalog aesthetic',
+  'lifestyle-living': 'Product elegantly placed in modern minimalist living room, natural window light, cozy aesthetic, lifestyle photography, high-end interior',
+  'golden-hour': 'Product in golden hour sunlight, warm tones, bokeh background, cinematic outdoor photography, magic hour lighting, professional quality',
+  'urban-street': 'Product in urban street setting, concrete and brick textures, street style photography, authentic city vibe, editorial aesthetic',
+  'flat-lay': 'Flat lay product photography, styled arrangement with complementary props, top-down angle, editorial magazine style, clean background',
+  'nature-macro': 'Macro product shot with natural elements, leaves, flowers, water droplets, organic textures, nature-inspired, close-up detail',
+};
 
-// Wall Art specific scenes
-const WALL_ART_SCENES = [
-  {
-    name: 'living_room',
-    prompt: 'Modern minimalist living room, art piece mounted on clean white wall above a contemporary sofa, soft natural window light, high-end interior design, professional real estate photography style'
-  },
-  {
-    name: 'bedroom',
-    prompt: 'Luxury bedroom setting, art piece as focal point above headboard, warm ambient lighting, boutique hotel aesthetic, sophisticated interior design'
-  },
-  {
-    name: 'office',
-    prompt: 'Professional home office or workspace, art piece on feature wall, desk in foreground, plants and modern decor, inspirational creative space'
-  },
-  {
-    name: 'gallery_wall',
-    prompt: 'Curated gallery wall composition, art piece as centerpiece surrounded by complementary frames, museum-quality lighting, editorial interior design magazine style'
-  },
-  {
-    name: 'entryway',
-    prompt: 'Elegant entryway or hallway, art piece as statement piece, console table below, mirror and decor accents, welcoming sophisticated atmosphere'
-  },
-  {
-    name: 'dining',
-    prompt: 'Dining room scene, art piece above sideboard or buffet, dinner table in foreground, warm evening lighting, entertaining-ready aesthetic'
-  },
-];
+// Wall art specific prompts
+const WALL_ART_PROMPTS: Record<string, string> = {
+  'minimalist-studio': 'Art print displayed in modern gallery setting, white walls, professional museum lighting, clean minimal presentation',
+  'lifestyle-living': 'Art piece mounted on wall above contemporary sofa in modern living room, natural light from large windows, high-end interior design',
+  'golden-hour': 'Art print in sunlit room with golden hour light casting warm glow, sophisticated home setting, lifestyle editorial',
+  'urban-street': 'Art displayed in trendy loft space with exposed brick, industrial-chic interior, urban aesthetic',
+  'flat-lay': 'Art print laid flat with frame elements, craft supplies, styled mockup presentation, top-down view',
+  'nature-macro': 'Art piece in nature-inspired setting, plants and organic elements, biophilic design interior',
+};
 
 export async function POST(request: NextRequest) {
   try {
@@ -86,67 +51,64 @@ export async function POST(request: NextRequest) {
     }
 
     const body: GenerateMockupsRequest = await request.json();
-    const { businessId, productImages, productDescription, productType = 'default', modelSeed, scenes } = body;
+    const { productImageUrl, productDescription, productType, scenes, signatureModelId } = body;
 
-    if (!businessId || !productImages || productImages.length === 0 || !productDescription) {
+    if (!productImageUrl || !productDescription || !scenes || scenes.length === 0) {
       return NextResponse.json(
-        { error: 'Business ID, product images, and description required' },
+        { error: 'Product image URL, description, and scenes are required' },
         { status: 400 }
       );
     }
 
-    // Verify access
-    const { data: access } = await supabase
-      .from('user_businesses')
-      .select('role')
-      .eq('user_id', user.id)
-      .eq('business_id', businessId)
-      .single();
-
-    if (!access) {
-      return NextResponse.json(
-        { error: 'Access denied' },
-        { status: 403 }
-      );
+    // Check for API key
+    const apiKey = process.env.EMERGENT_LLM_KEY;
+    if (!apiKey) {
+      console.warn('[Mockup Gen] No EMERGENT_LLM_KEY, returning placeholders');
+      return NextResponse.json({
+        success: true,
+        mockups: scenes.map(scene => ({
+          scene,
+          imageUrl: `https://placehold.co/1024x1024/1a1a2e/8b5cf6?text=${encodeURIComponent(scene)}`,
+        })),
+        warning: 'Image generation not configured - showing placeholders',
+      });
     }
 
-    // Select scenes based on product type
-    const sceneSet = productType === 'wall_art' ? WALL_ART_SCENES : DEFAULT_SCENES;
-    
-    // Generate mockups for each scene
-    const scenesToGenerate = scenes && scenes.length > 0 
-      ? sceneSet.filter(s => scenes.includes(s.name))
-      : sceneSet;
+    // Select prompt set based on product type
+    const prompts = productType === 'wall_art' ? WALL_ART_PROMPTS : SCENE_PROMPTS;
 
-    const mockups = await Promise.all(
-      scenesToGenerate.map(async (scene) => {
-        try {
-          const mockup = await generateMockup(
-            productImages[0], // Use first image as reference
-            productDescription,
-            scene,
-            modelSeed
-          );
-          
-          return {
-            scene: scene.name,
-            imageUrl: mockup,
-            prompt: scene.prompt,
-          };
-        } catch (error) {
-          console.error(`[Mockup Gen] Failed for scene ${scene.name}:`, error);
-          return {
-            scene: scene.name,
-            imageUrl: null,
-            error: 'Generation failed',
-          };
-        }
-      })
-    );
+    // Generate mockups for each scene
+    const mockupPromises = scenes.slice(0, 6).map(async (sceneSlug) => {
+      const scenePrompt = prompts[sceneSlug] || SCENE_PROMPTS['minimalist-studio'];
+      
+      try {
+        const imageUrl = await generateSingleMockup(
+          apiKey,
+          productImageUrl,
+          productDescription,
+          scenePrompt,
+          sceneSlug
+        );
+        
+        return {
+          scene: sceneSlug,
+          imageUrl,
+        };
+      } catch (error) {
+        console.error(`[Mockup Gen] Scene ${sceneSlug} failed:`, error);
+        return {
+          scene: sceneSlug,
+          imageUrl: `https://placehold.co/1024x1024/1a1a2e/ff3b3b?text=Error`,
+          error: true,
+        };
+      }
+    });
+
+    const mockups = await Promise.all(mockupPromises);
 
     return NextResponse.json({
       success: true,
-      mockups: mockups.filter(m => m.imageUrl), // Only return successful ones
+      mockups: mockups.filter(m => m.imageUrl && !m.error),
     });
 
   } catch (error: any) {
@@ -155,100 +117,136 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Generate single mockup using Nano Banana Pro
-async function generateMockup(
-  referenceImage: string,
+// Generate single mockup using Python + Emergent integrations
+async function generateSingleMockup(
+  apiKey: string,
+  productImageUrl: string,
   productDescription: string,
-  scene: { name: string; prompt: string },
-  modelSeed?: string
-): Promise<string | null> {
-  if (!EMERGENT_LLM_KEY) {
-    throw new Error('Emergent LLM key not configured');
-  }
-
-  try {
-    // Use emergentintegrations for Nano Banana Pro
-    const { execSync } = require('child_process');
-    const { writeFileSync } = require('fs');
-    const { join } = require('path');
-    const { nanoid } = require('nanoid');
-
-    // Create Python script
-    const sessionId = nanoid();
-    const pythonScript = `
+  scenePrompt: string,
+  sceneName: string
+): Promise<string> {
+  
+  const sessionId = randomUUID();
+  const outputPath = `/tmp/mockup_${sessionId}.png`;
+  
+  // Create Python script
+  const pythonScript = `
 import asyncio
 import os
 import base64
-from dotenv import load_dotenv
+import urllib.request
+import sys
+
+# Set API key directly
+os.environ["EMERGENT_LLM_KEY"] = "${apiKey}"
+
 from emergentintegrations.llm.chat import LlmChat, UserMessage, ImageContent
 
-load_dotenv()
-
 async def generate():
-    api_key = os.getenv("EMERGENT_LLM_KEY")
-    chat = LlmChat(
-        api_key=api_key, 
-        session_id="${sessionId}",
-        system_message="You are a professional product photographer and creative director."
-    ).with_model("gemini", "gemini-3-pro-image-preview").with_params(modalities=["image", "text"])
-    
-    # Reference image
-    reference_base64 = """${referenceImage.split(',')[1]}"""
-    
-    # Generate prompt
-    prompt = """Create a hyper-realistic product mockup:
+    try:
+        # Download reference image
+        product_url = "${productImageUrl}"
+        req = urllib.request.Request(product_url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=30) as response:
+            image_bytes = response.read()
+            image_base64 = base64.b64encode(image_bytes).decode('utf-8')
+        
+        # Initialize chat
+        chat = LlmChat(
+            api_key="${apiKey}",
+            session_id="${sessionId}",
+            system_message="You are a professional product photographer and creative director specializing in high-end commercial imagery."
+        ).with_model("gemini", "gemini-3-pro-image-preview").with_params(modalities=["image", "text"])
+        
+        # Generate prompt
+        prompt = """Create a stunning, hyper-realistic product mockup image.
 
-Product: ${productDescription.replace(/"/g, '\\"')}
-Scene: ${scene.prompt.replace(/"/g, '\\"')}
-${modelSeed ? `Use consistent model: ${modelSeed}` : ''}
+PRODUCT: ${productDescription.replace(/"/g, '\\"').replace(/\n/g, ' ')}
 
-Requirements:
-- Product must look naturally integrated into the scene
-- Perfect lighting and shadows matching the environment
-- Cinematic composition and color grading
-- High-end luxury aesthetic
-- Realistic material textures and reflections
+SCENE STYLE: ${scenePrompt.replace(/"/g, '\\"')}
 
-Use the reference image to understand the product, then create a stunning marketing photo."""
-    
-    msg = UserMessage(
-        text=prompt,
-        file_contents=[ImageContent(reference_base64)]
-    )
-    
-    text, images = await chat.send_message_multimodal_response(msg)
-    
-    if images and len(images) > 0:
-        print(images[0]['data'][:50])  # Print only first 50 chars
-    else:
-        print("NO_IMAGE_GENERATED")
+REQUIREMENTS:
+- The product from the reference image must be the clear focal point
+- Seamlessly integrate the product into the scene with natural lighting and shadows
+- Cinematic composition with professional color grading
+- High-end luxury aesthetic suitable for premium marketing
+- Photorealistic quality, indistinguishable from a real photograph
+- Resolution suitable for print and digital marketing
+
+Generate one beautiful product mockup image."""
+
+        msg = UserMessage(
+            text=prompt,
+            file_contents=[ImageContent(image_base64)]
+        )
+        
+        text, images = await chat.send_message_multimodal_response(msg)
+        
+        if images and len(images) > 0:
+            # Save image to file
+            image_data = base64.b64decode(images[0]['data'])
+            with open("${outputPath}", "wb") as f:
+                f.write(image_data)
+            print("SUCCESS")
+        else:
+            print("NO_IMAGE")
+            
+    except Exception as e:
+        print(f"ERROR: {str(e)}", file=sys.stderr)
+        sys.exit(1)
 
 asyncio.run(generate())
 `;
 
-    const scriptPath = `/tmp/mockup-${nanoid()}.py`;
-    writeFileSync(scriptPath, pythonScript);
-    
-    const output = execSync(`python3 ${scriptPath}`, {
-      encoding: 'utf-8',
-      timeout: 120000, // 2 minutes
-      maxBuffer: 10 * 1024 * 1024, // 10MB buffer
-    });
-
-    // Extract base64 from output
-    if (output.includes('NO_IMAGE_GENERATED')) {
-      return null;
+  const scriptPath = `/tmp/gen_${sessionId}.py`;
+  
+  return new Promise((resolve, reject) => {
+    try {
+      writeFileSync(scriptPath, pythonScript);
+      
+      const python = spawn('python3', [scriptPath], {
+        timeout: 120000,
+        env: { ...process.env, EMERGENT_LLM_KEY: apiKey },
+      });
+      
+      let stdout = '';
+      let stderr = '';
+      
+      python.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+      
+      python.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+      
+      python.on('close', (code) => {
+        // Cleanup script
+        try { unlinkSync(scriptPath); } catch {}
+        
+        if (code === 0 && stdout.includes('SUCCESS') && existsSync(outputPath)) {
+          // Read image and convert to base64 data URL
+          const imageBuffer = readFileSync(outputPath);
+          const base64 = imageBuffer.toString('base64');
+          
+          // Cleanup output file
+          try { unlinkSync(outputPath); } catch {}
+          
+          resolve(`data:image/png;base64,${base64}`);
+        } else {
+          console.error(`[Mockup Gen] Python error for ${sceneName}:`, stderr || stdout);
+          reject(new Error(stderr || 'Generation failed'));
+        }
+      });
+      
+      python.on('error', (err) => {
+        try { unlinkSync(scriptPath); } catch {}
+        reject(err);
+      });
+      
+    } catch (err) {
+      try { unlinkSync(scriptPath); } catch {}
+      reject(err);
     }
-
-    // Get the first line of output (first 50 chars of base64)
-    const base64Prefix = output.trim().split('\n')[0];
-    
-    // For now, return a placeholder - in production this would be the full base64
-    // We'd need to modify the Python script to save to a file and return the path
-    return `data:image/png;base64,${base64Prefix}`;
-
-  } catch (error) {
-    console.error('[Mockup Generation] Error:', error);
-    return null;
-  }
+  });
 }
