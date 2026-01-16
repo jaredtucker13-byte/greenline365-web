@@ -245,12 +245,23 @@ export function BusinessProvider({ children }: { children: ReactNode }) {
 
   const getTierPrice = useCallback((): string => {
     if (!activeBusiness) return '$0';
+    if (activeBusiness.monthly_price) return `$${activeBusiness.monthly_price}`;
     const priceMap = {
       tier1: '$299',
       tier2: '$599',
       tier3: '$999',
     };
     return priceMap[activeBusiness.tier] || '$0';
+  }, [activeBusiness]);
+
+  const isWhiteLabel = useCallback((): boolean => {
+    if (!activeBusiness) return false;
+    return activeBusiness.is_white_label || false;
+  }, [activeBusiness]);
+
+  const canEditSite = useCallback((): boolean => {
+    if (!activeBusiness) return false;
+    return activeBusiness.can_edit_site || false;
   }, [activeBusiness]);
 
   const value: BusinessContextType = {
@@ -262,6 +273,8 @@ export function BusinessProvider({ children }: { children: ReactNode }) {
     hasFeature,
     isOwner,
     isAdmin,
+    isWhiteLabel,
+    canEditSite,
     getTierName,
     getTierPrice,
   };
