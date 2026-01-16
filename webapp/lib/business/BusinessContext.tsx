@@ -77,6 +77,7 @@ interface BusinessContextType {
   activeBusiness: Business | null;
   userBusinesses: UserBusiness[];
   isLoading: boolean;
+  isSwitchingBusiness: boolean; // NEW: True during business switch transition
   
   // Actions
   switchBusiness: (businessId: string) => Promise<void>;
@@ -108,6 +109,7 @@ export function BusinessProvider({ children }: { children: ReactNode }) {
   const [activeBusiness, setActiveBusiness] = useState<Business | null>(null);
   const [userBusinesses, setUserBusinesses] = useState<UserBusiness[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSwitchingBusiness, setIsSwitchingBusiness] = useState(false); // NEW
   const supabase = createClient();
 
   // Load businesses on mount
@@ -202,12 +204,27 @@ export function BusinessProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    // Smooth transition - just update state, no page reload
+    // Don't switch if already on this business
+    if (activeBusiness?.id === businessId) {
+      return;
+    }
+
+    // Start switching state - this triggers loading overlay in UI
+    setIsSwitchingBusiness(true);
+    
+    // Small delay to allow UI to show loading state before heavy re-renders
+    await new Promise(resolve => setTimeout(resolve, 50));
+    
+    // Update the active business
     setActiveBusiness(targetBusiness.business);
     localStorage.setItem(STORAGE_KEY, businessId);
     
-    // Note: Components should react to activeBusiness changes via context
-    // No page reload needed - React will re-render with new business data
+    // Give components time to re-fetch their data
+    // This delay allows dependent useEffects to fire and fetch new data
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    // End switching state
+    setIsSwitchingBusiness(false);
   };
 
   const refreshBusinesses = async () => {
@@ -266,6 +283,7 @@ export function BusinessProvider({ children }: { children: ReactNode }) {
     activeBusiness,
     userBusinesses,
     isLoading,
+    isSwitchingBusiness,
     switchBusiness,
     refreshBusinesses,
     hasFeature,
@@ -297,6 +315,7 @@ export function useBusiness() {
       activeBusiness: null,
       userBusinesses: [],
       isLoading: false,
+      isSwitchingBusiness: false,
       switchBusiness: async () => {},
       refreshBusinesses: async () => {},
       hasFeature: () => true, // Allow all features if no business context (backward compatible)
