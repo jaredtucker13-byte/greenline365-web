@@ -20,7 +20,7 @@ import { usePathname } from 'next/navigation';
 import { useBusiness } from '@/lib/business';
 import { Lock } from 'lucide-react';
 interface SidebarProps {
-  activeItem: 'dashboard' | 'schedule' | 'analytics' | 'settings' | 'content';
+  activeItem: string; // Dynamic - matches nav item IDs
   onNewBooking: () => void;
   onNewContent: () => void;
   pendingCount: number;
