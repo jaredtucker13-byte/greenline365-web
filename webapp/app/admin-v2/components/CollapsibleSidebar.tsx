@@ -227,28 +227,42 @@ export default function CollapsibleSidebar({
           </Link>
         </div>
         
-        {/* Business Switcher - Only show if multiple businesses and not collapsed */}
+        {/* Business Switcher Dropdown - Only show if multiple businesses and not collapsed */}
         {!isCollapsed && userBusinesses.length > 1 && (
-          <div className="mt-3">
-            <button
-              onClick={() => {
-                // Toggle through businesses
-                const currentIndex = userBusinesses.findIndex(ub => ub.business.id === activeBusiness?.id);
-                const nextIndex = (currentIndex + 1) % userBusinesses.length;
-                switchBusiness(userBusinesses[nextIndex].business.id);
+          <div className="mt-3 relative">
+            <select
+              value={activeBusiness?.id || ''}
+              onChange={(e) => {
+                if (e.target.value) {
+                  switchBusiness(e.target.value);
+                }
               }}
-              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition"
+              className="w-full px-3 py-2 rounded-lg text-xs appearance-none cursor-pointer transition focus:outline-none focus:ring-2 focus:ring-purple-500/50"
               style={{ 
                 background: 'var(--theme-bg-glass)', 
                 border: '1px solid var(--theme-glass-border)',
-                color: 'var(--theme-text-secondary)'
+                color: 'var(--theme-text-primary)'
               }}
             >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-              </svg>
-              <span>Switch Business ({userBusinesses.length})</span>
-            </button>
+              {userBusinesses.map((ub) => (
+                <option 
+                  key={ub.business.id} 
+                  value={ub.business.id}
+                  style={{ background: '#1A1A1A', color: '#fff' }}
+                >
+                  {ub.business.name} {ub.business.is_white_label ? '(WL)' : ub.is_primary ? '(Primary)' : ''}
+                </option>
+              ))}
+            </select>
+            <svg 
+              className="w-4 h-4 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+              style={{ color: 'var(--theme-text-muted)' }}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
           </div>
         )}
       </div>
