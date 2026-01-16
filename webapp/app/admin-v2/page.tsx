@@ -221,6 +221,9 @@ export default function TacticalCommandCenter() {
         backgroundAttachment: 'fixed',
       }}
     >
+      {/* Onboarding Banner */}
+      <OnboardingBanner />
+      
       {/* Dark Overlay */}
       <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px]" />
       
