@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import { useBusiness } from '@/lib/business';
+import { useCostTracking } from '@/lib/cost-tracking';
 import CollapsibleSidebar from '../components/CollapsibleSidebar';
 import TacticalHeader from '../components/TacticalHeader';
 import { 
