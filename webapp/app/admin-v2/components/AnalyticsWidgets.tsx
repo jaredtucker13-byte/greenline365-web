@@ -215,9 +215,12 @@ export default function AnalyticsWidgets({
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                points={safeBookingTrends.map((t, i) => 
-                  `${(i / Math.max(safeBookingTrends.length - 1, 1)) * 280 + 10},${120 - (t.previous / maxTrendValue) * 100}`
-                ).join(' ')}
+                points={safeBookingTrends.map((t, i) => {
+                  const divisor = Math.max(safeBookingTrends.length - 1, 1);
+                  const x = (i / divisor) * 280 + 10;
+                  const y = 120 - (t.previous / maxTrendValue) * 100;
+                  return `${x},${isNaN(y) ? 120 : y}`;
+                }).join(' ')}
               />
             )}
             
@@ -232,24 +235,32 @@ export default function AnalyticsWidgets({
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                points={safeBookingTrends.map((t, i) => 
-                  `${(i / Math.max(safeBookingTrends.length - 1, 1)) * 280 + 10},${120 - (t.current / maxTrendValue) * 100}`
-                ).join(' ')}
+                points={safeBookingTrends.map((t, i) => {
+                  const divisor = Math.max(safeBookingTrends.length - 1, 1);
+                  const x = (i / divisor) * 280 + 10;
+                  const y = 120 - (t.current / maxTrendValue) * 100;
+                  return `${x},${isNaN(y) ? 120 : y}`;
+                }).join(' ')}
               />
             )}
             
             {/* Current week dots */}
-            {safeBookingTrends.map((t, i) => (
-              <motion.circle
-                key={i}
-                initial={{ opacity: 0, r: 0 }}
-                animate={{ opacity: 1, r: 4 }}
-                transition={{ delay: 0.9 + i * 0.1 }}
-                cx={(i / Math.max(safeBookingTrends.length - 1, 1)) * 280 + 10}
-                cy={120 - (t.current / maxTrendValue) * 100}
-                fill="#39FF14"
-              />
-            ))}
+            {safeBookingTrends.length > 1 && safeBookingTrends.map((t, i) => {
+              const divisor = Math.max(safeBookingTrends.length - 1, 1);
+              const x = (i / divisor) * 280 + 10;
+              const y = 120 - (t.current / maxTrendValue) * 100;
+              return (
+                <motion.circle
+                  key={i}
+                  initial={{ opacity: 0, r: 0 }}
+                  animate={{ opacity: 1, r: 4 }}
+                  transition={{ delay: 0.9 + i * 0.1 }}
+                  cx={x}
+                  cy={isNaN(y) ? 120 : y}
+                  fill="#39FF14"
+                />
+              );
+            })}
           </svg>
           
           {/* X-axis labels */}
