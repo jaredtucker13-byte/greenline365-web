@@ -1,175 +1,169 @@
 <analysis>**original_problem_statement:**
-The user is building a comprehensive Business Operating System. The initial focus was an AI Website Builder, but priorities have expanded to include critical infrastructure and new features.
-
-Key user requests during this and previous sessions:
-1.  **AI Receptionist (Retell):** The main focus of the latter half of the session. The user wants to build a highly dynamic, multi-tenant AI phone agent using Retell AI, controlled by the Supabase backend. The goal is to have a single Blueprint Agent that can be customized for each tenant using dynamic variables for persona, services, hours, etc. The first major use case is appointment booking.
-2.  **CRM Dashboard:** Build a visually appealing and easy-to-use CRM dashboard to manage leads. The user provided detailed design specifications emphasizing a Hub-and-Spoke architecture with a main dashboard of widgets that drill down into dedicated pages.
-3.  **Advanced Blog Workflow:** The user wants to enhance the existing blog creation pipeline to feel more human-researched. This involves a multi-pass, temporally-layered search strategy and a sophisticated ingredient workflow for handling images, especially of public figures.
-4.  **Fix Email Verification & CRM Sync:** A recurring and critical issue where new leads from the waitlist were not being verified correctly or synced to the CRM.
-5.  **Login Page UX:** The user reported that their credentials were being autofilled on the login page, posing a security risk. They also requested the removal of the now-obsolete Magic Link login option.
+The user's initial goal was to refactor a Business Operating System's CRM and Navigation. However, the project quickly pivoted to a much larger vision. The primary requests are now:
+1.  **Multi-Tenant Architecture:** Implement a full multi-tenant system to support distinct brands (e.g., GreenLine365 and ArtfulPhusion) with strict data isolation using Supabase RLS.
+2.  **Special Access & Onboarding:** Create an Entitlement System allowing the admin (user) to generate invite codes that grant tiered access. This must feed into a Zero-Friction onboarding flow where a new customer can sign up with a code.
+3.  **AI-Powered Creative Studio:** Build the ArtfulPhusion Autonomous Studio, an advanced workflow using AI to automate marketing content. This involves:
+    *   **Multimodal Intake:** Using **Gemini 3 Pro** (via OpenRouter) to analyze uploaded product photos (e.g., apparel, wall art) and extract data.
+    *   **Character Vault:** A system to create and reuse persistent, consistent AI-generated models (Signature Models).
+    *   **Mockup Forge:** Using **Nano Banana Pro** to generate cinematic, hyper-realistic product mockups in various scenes.
+    *   **Content Multiplier:** Using AI to automatically create blog posts, Pinterest pins, and TikTok video scripts from the generated assets.
+4.  **The Brain - Thought Capture System:** Implement a personal productivity tool integrated with **Slack**. The user can send thoughts to a private Slack channel, and an AI will categorize them into four buckets (, , , ) stored in the database. The system should also provide daily and weekly reminders. A widget for this should be on the main dashboard.
+5.  **Content Forge 2.0:** Enhance the existing content creation tool with a block-based, drag-and-drop newsletter editor.
 
 **User's preferred language**: English
 
 **what currently exists?**
 The application is a Next.js frontend with a Supabase backend.
--   **Authentication:** A password-based login system. The email verification flow for the waitlist is now functional after a database migration and several API fixes, but the final lead sync to the CRM is pending user verification.
--   **CRM:** A newly redesigned CRM dashboard UI is in place at . It includes KPI cards, a lead table, and a detail panel. The backend APIs () have been updated to support creating and updating leads with a schema that now matches the database.
--   **Booking System:** A flexible booking system has been scaffolded with a new database migration (), API endpoints (, ), and a calendar UI page ().
--   **AI Receptionist (Retell):** The multi-tenant database structure exists ( table). An extensive plan for configuring a Single Prompt Agent in Retell is complete, with all custom functions, parameters, and examples defined. The user is in the process of configuring this in their Retell dashboard.
--   **Blog Workflow:** An initial blog generation system exists. A detailed, phased plan for an advanced, category-specific research pipeline has been created and approved by the user, starting with a Sports workflow.
+- **Multi-Tenancy Foundation:** Backend APIs, database migrations (, , ), and frontend components (, , , ) have been created. The system is designed for RLS-based data isolation. Conditional rendering for features based on tenant tier is implemented in the sidebar.
+- **Invite System:** An admin page () allows the user to generate and send invite codes via an existing SendGrid integration. A dedicated signup page () accepts these codes.
+- **AI Integration Backend:** Backend APIs are in place for the Creative Studio (, ) and The Brain (). These are configured to use Gemini 3 Pro (via OpenRouter) and Nano Banana Pro.
+- **UI Placeholders:** A  has been added to the main Command Center dashboard to display reminders and thoughts. An  CTA is also present.
 
 **Last working item**:
--   **Last item agent was working:** The agent was about to modify the login page () to address two user requests: 1) remove the Magic Link tab, as only code-based verification is used now, and 2) add  to the email and password fields to prevent browsers from auto-filling credentials.
+-   **Last item agent was working:** The agent created a comprehensive multi-phase roadmap outlining all remaining work for the Creative Studio, The Brain, and other features, as requested by the user before they took a break. The last coding action was adding the  to the dashboard and updating the mockup API to support wall art scenes.
 -   **Status:** IN PROGRESS
 -   **Agent Testing Done:** N
--   **Which testing method agent to use?** Frontend testing agent. The agent should be instructed to navigate to the  page and verify that the Magic Link tab is gone and that the input fields for email and password do not have any pre-filled values.
+-   **Which testing method agent to use?** Both. The frontend testing agent needs to verify the UI components (, feature gating, admin pages). The backend testing agent needs to verify all the new API endpoints (, , ).
 -   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
--   **Issue 1: Simplify Login Page (P0)**
-    -   **Description:** This is the highest priority. The agent must implement the changes to the login page as described in the Last working item section.
+-   **Issue 1: Resolve Migration & RLS Blockers (P0 - CRITICAL)**
+    -   **Description:** The user has repeatedly been blocked by database and Row-Level Security (RLS) issues when trying to test admin features like sending invites. The core problem is that the migrations haven't run correctly or the user's account () is not consistently flagged as an admin ( in the  table), causing RLS policies to deny access.
+    -   **Attempted fixes:** Multiple SQL scripts (, , etc.) were provided. The agent used the troubleshoot agent, which identified a missing RLS policy.
     -   **Next debug checklist:**
-        1.  Use  on .
-        2.  Remove the  component and all related code for the Magic Link option.
-        3.  Add the  attribute to the  and  input fields.
-    -   **Why fix this issue and what will be achieved with the fix?** To resolve a direct user request regarding UX and a perceived security concern.
-    -   **Status:** IN PROGRESS
-    -   **Is recurring issue?** N
-    -   **Should Test frontend/backend/both after fix?** Frontend
-
--   **Issue 2: CRM Lead Sync Unverified (P1)**
-    -   **Description:** The user previously reported that verified leads were not appearing in the CRM. The agent identified a schema mismatch and rewrote the CRM dashboard UI and updated the APIs (, ) to match the user's actual database. However, the user has **not** tested this complete flow since the latest fixes were deployed.
-    -   **Next debug checklist:**
-        1.  Ask the user to test the full flow: sign up on the waitlist with a new email, verify with the code, and check if the new lead appears in the CRM dashboard.
-        2.  If it fails, check Vercel logs for the  and  functions to trace the data flow.
-        3.  Verify the  table in Supabase directly to see if the record was inserted.
-    -   **Why fix this issue and what will be achieved with the fix?** This is the final step of the lead acquisition funnel. Until this is verified, the core business function of collecting and managing leads is not complete.
-    -   **Status:** USER VERIFICATION PENDING
+        1.  Have the user run the diagnostic script  to get a definitive report on which tables/columns exist.
+        2.  Provide **one final, idempotent SQL script** that ensures all tables are created and the user  is an admin.
+        3.  Test the  endpoint via  to confirm the RLS issue is resolved before handing it back to the user.
+    -   **Why fix this issue and what will be achieved with the fix?** The user cannot test ANY of the new functionality (invites, multi-tenancy) until their database is in a correct and stable state with proper admin permissions.
+    -   **Status:** BLOCKED
     -   **Is recurring issue?** Y
-    -   **Should Test frontend/backend/both after fix?** Both
+    -   **Should Test frontend/backend/both after fix?** Backend first (via curl), then Frontend.
+    -   **Blocked on other issue:** This is the primary blocker for all other tasks.
 
 **In progress Task List**:
--   **Task 1: Complete Retell AI Agent Setup (P0)**
-    -   **Where to resume:** The user is currently configuring the 8 custom functions in their Retell AI dashboard using the detailed specifications provided by the agent. The agent is blocked waiting for the user to finish this step.
-    -   **What will be achieved with this?** A fully configured, multi-tenant AI receptionist capable of booking appointments by interacting with the Supabase backend.
-    -   **Status:** BLOCKED (Waiting on user action)
-    -   **Next Step:** Once the user confirms the functions are set up, the agent must provide the final Blueprint System Prompt that ties all the functions and dynamic variables together.
-
--   **Task 2: Build Phase 1 of CRM Dashboard (P1)**
-    -   **Where to resume:** The agent has already implemented a significant portion of Phase 1 by overhauling  with better KPI cards and a detail rail. The API for creating leads is also fixed.
-    -   **What will be achieved with this?** A fully functional and user-friendly MVP of the CRM dashboard that allows viewing, creating, and managing leads effectively.
+-   **Task 1: Complete Multi-Tenant MVP User Journey (P0)**
+    -   **Description:** This task involves building the UI and connecting the pieces for a full end-to-end test of the invite system.
+    -   **Where to resume:** The backend APIs and the code-based signup page () are done. The next step is to build the UI for the Zero-Friction onboarding wizard that a user sees after successfully signing up.
+    -   **What will be achieved with this?** A testable flow: Admin sends invite -> New user gets email -> Signs up with code -> Completes onboarding -> Becomes an active tenant.
     -   **Status:** IN PROGRESS
-    -   **Next Step:** User verification of the new dashboard and the lead creation flow. Then, move to Phase 2 (Pipeline View).
+    -   **Should Test frontend/backend/both after fix?** Both.
+    -   **Blocked on something:** .
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks:**
-    *   (P0) **Provide Retell System Prompt:** Once the user finishes setup, provide the main system prompt for the Retell agent.
-    *   (P1) **Build Sports Research Workflow:** Implement the approved Phase 1 for the blog by creating the  with a sports-specific, 3-tier temporal search strategy.
-    *   (P2) **Test Calendar/Booking System:** The foundation is built, but it needs to be tested end-to-end.
-    *   (P2) **Build CRM Phase 2 (Pipeline View):** Add the Kanban-style pipeline board to the CRM dashboard.
+    *   **(P0) Build ArtfulPhusion Creative Studio UI:** (Phase 2) This is the user's top priority. Build the UI for product uploads, AI analysis review, mockup generation, and the Character Vault. The backend APIs are already in place.
+    *   **(P1) Build The Brain Full Dashboard & Integrations:** (Phase 4) Create the full-page UI for the Brain to manage all four buckets. Implement the Slack webhook for thought capture and the cron jobs for scheduled reminders.
 -   **Future Tasks:**
-    *   Implement double opt-in for all other forms (newsletter, etc.).
-    *   Implement the Live Code Sandbox for the AI Website Builder.
-    *   Build the remaining phases of the advanced blog workflow (ingredient panel, celebrity detection).
-    *   Living Blog visual enhancements.
-    *   Build out the remaining CRM phases (Tasks, Reports, Insights).
+    *   **(P2) Build Newsletter Forge:** (Phase 3) Implement the block-based, drag-and-drop editor.
+    *   **(P2) Build Content Multiplier:** (Phase 5) Implement the system to auto-generate content for blogs, Pinterest, and TikTok.
+    *   **(P3) Build Advanced UX Features:** (Phase 6) Implement a Cmd+K universal command bar and contextual AI suggestions.
+    *   **(P3) Full Platform Polish & Testing:** (Phase 7) A dedicated phase for comprehensive testing, security audits, and performance optimization.
 
 **Completed work in this session**
--   **Fixed Email Verification:** Corrected the broken email verification flow by adding a new database migration () with the required columns.
--   **Fixed CRM Schema Mismatches:** Aligned the API and frontend code with the user's actual  database schema, resolving a critical sync failure.
--   **Built Phase 1 CRM Dashboard:** Overhauled  with a new design including KPI cards, an improved lead table, a detail rail, and a Quick Add modal.
--   **Architected Retell AI Agent:** Designed a complete multi-tenant architecture for Retell AI, providing the user with detailed configurations for 8 custom functions, including parameters, JSON schemas, and example request/response pairs.
--   **Architected Advanced Blog Workflow:** Analyzed and created a detailed, phased plan for a category-specific, deep-research blog pipeline.
--   **Scaffolded Booking System:** Created the database migration (), APIs, and a calendar UI page for a new flexible booking system.
+-   **Fixed Critical Build Failure:** Resolved a Next.js build error related to  context during static site generation.
+-   **Implemented Multi-Tenant System:** Created the database schema, backend APIs, and foundational frontend components for multi-tenancy, an entitlement/invite system, and feature gating.
+-   **Integrated SendGrid:** The invite system now uses the existing SendGrid integration to email access codes.
+-   **Implemented Creative Studio & Brain Backend:** Created all necessary APIs for the ArtfulPhusion Creative Studio (using Gemini 3 Pro and Nano Banana Pro via OpenRouter) and The Brain thought capture system.
+-   **Built Core Frontend Components:** Created and integrated , , , , and .
+-   **Created Invite-to-Signup Flow:** Built the admin page to send invites and a dedicated signup page () to redeem them.
 
 **Earlier issues found/mentioned but not fixed**
--   **Issue 1: Pre-commit hook is broken.**
-    -   **Debug checklist:** The  setup needs to be re-initialized.
-    -   **Why to solve this issue and what will be achieved with this?** To enforce code quality and prevent committing code with linting or build errors.
-    -   **Should Test frontend/backend/both after fix:** N/A
-    -   **Is recurring issue?** Y
+-   **Pre-commit hook is broken:** This was noted in the initial handoff and has not been addressed.
+-   **CRM Lead Sync Unverified:** This was the original recurring issue but has been deprioritized by the user's pivot.
 
 **Known issue recurrence from previous fork**
--   **Issue recurrence in previous fork:** The email verification and CRM lead sync flow has been a persistent, multi-session issue. The latest fixes addressed a previously undiscovered root cause (database schema mismatch), but the flow requires rigorous user verification to confirm it is finally resolved.
--   **Recurrence count:** High
--   **Status:** USER VERIFICATION PENDING
+-   **Issue recurrence in previous fork:** CRM lead sync flow.
+-   **Recurrence count:** High.
+-   **Status:** USER VERIFICATION PENDING (deprioritized).
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Retell AI Multi-Tenancy:** Using a single Blueprint Agent with dynamic variables () and custom functions to serve multiple tenants from a single backend. The backend logic resides at .
--   **Hub-and-Spoke UI Architecture:** A central dashboard (Command Center) composed of widgets that provide summaries and link to dedicated, full-featured pages (Spokes).
--   **Temporal Layering (for Blog Research):** A planned search strategy that queries different time windows (e.g., last 48h, 2 weeks, 6 weeks) to build deep context and a narrative of how a story evolved.
--   **Category-Specific Workflows:** The concept of routing tasks (like blog research) to different pipelines based on a user-selected category (e.g., 'Sports', 'Business') to apply specialized logic.
+-   **Multi-Tenancy with RLS:** The core of the new architecture. Data is isolated by . RLS policies in Supabase enforce this and have been a major point of debugging.
+-   **Entitlement System:** An access control layer using  and manual  to grant tiered access.
+-   **AI-Powered Onboarding & Creation:** A pipeline combining multiple AI models: **Gemini 3 Pro** (analysis), **Nano Banana Pro** (image generation), and **Sora 2** (video - planned), all orchestrated via **OpenRouter**.
+-   **Thought Capture System (The Brain):** A system to capture unstructured thoughts (from Slack or UI), route them into structured database buckets, and generate reminders.
 
 **key DB schema**
--   **waitlist_submissions**: Now includes  (boolean),  (text),  (text),  (timestamp).
--   **crm_leads**: 
--   **services**:  (NEW)
--   **availability**:  (NEW)
--   **bookings**:  (NEW)
+-   : {id, name, slug, tier, settings (JSONB)}
+-   : {user_id, business_id, role}
+-   : {id, code, tier, max_uses, created_by}
+-   , , , : tables for the four memory buckets, linked to .
+-   :  boolean column is critical for RLS checks.
+
+**changes in tech stack**
+-   : Added for secure access code generation.
+-   : Added for UI icons.
 
 **All files of reference**
--   **Login Page Fix:**
-    -   
--   **CRM Verification:**
-    -   
-    -   
--   **Retell AI Setup:**
-    -    (The webhook target)
-    -    (Existing tenant tables)
--   **Blog Research Workflow:**
-    -    (Existing)
-    -    (Existing, to be modified)
+-   **Migrations:**  (and other individual/fix files in that directory).
+-   **Admin Invite Page:** .
+-   **New Signup Page:** .
+-   **Backend APIs:** All new files under .
+-   **Business Context:** .
+
+**Areas that need refactoring**:
+-   The migration files are disorganized. There are multiple partial-fix and consolidated files. They should be structured into a single, idempotent source-of-truth schema or a clean, ordered set of migration scripts to avoid the issues the user has faced.
+
+**key api endpoints**
+-   : Sends an access code invite email via SendGrid.
+-   : Validates and redeems an access code during the signup flow.
+-   : Analyzes product assets using Gemini 3 Pro.
+-   : Generates product mockups using Nano Banana Pro.
+-   : The main intake endpoint for The Brain.
 
 **Critical Info for New Agent**
-1.  **Start with the Login Page:** Your first action must be to fix the login page as described in Last working item. It's a direct user request and a P0 task.
-2.  **Verify CRM Sync:** Once the login page is fixed, the next priority is to guide the user to test the complete waitlist-to-CRM flow. This has been a recurring bug, and its resolution needs to be confirmed before moving to new features.
-3.  **Retell Agent is Blocked on You:** The user is currently setting up functions in Retell. Be prepared to provide the final Blueprint System Prompt as soon as they confirm they are done. This is a major user priority.
-4.  **Follow the Phased Plans:** The user has approved phased development for both the CRM Dashboard and the Advanced Blog Workflow. Do not build everything at once. Stick to the agreed-upon phases to manage complexity and deliver value incrementally.
+1.  **DATABASE/RLS IS THE #1 BLOCKER:** The user cannot test anything until their database schema is correct and their primary account (, ID: ) has admin privileges (). Your first task is to ensure this is resolved. Provide one clear, final, copy-pasteable SQL script and confirm its success before moving on.
+2.  **THE VISION IS HUGE:** The user has laid out a multi-phase roadmap for an Autonomous Creative Studio. Do not get sidetracked. Follow the recommended build order: Finish Invite Flow -> Build Creative Studio UI -> Build Brain System.
+3.  **USER IS NON-TECHNICAL:** The user does not want to edit SQL or code. Provide simple, complete, copy-paste instructions for any required database actions.
+4.  **USE OPENROUTER:** The user was explicit about using OpenRouter for all LLM calls (Gemini, etc.). Do not deviate.
+5.  **A LOT OF CODE IS UNTESTED:** Many backend APIs and frontend components exist but are not wired into a complete UI. The next phases are heavily focused on building the frontend UIs for the Creative Studio and Onboarding wizard.
 
 **documents and test reports created in this job**
 -   
 -   
--    (Updated with session recap)
+-   Multiple other migration/fix/check SQL files in .
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **LATEST/PENDING:** User requested to fix the login page: remove the magic link option and prevent autofill of credentials.
-2.  User asked for a session recap to prepare for a fork.
-3.  User provided detailed specs for a new CRM dashboard design.
-4.  User confirmed they were back to work after a break.
-5.  User agreed that category-specific workflows for the blog are the right approach.
-6.  User provided a deep-dive brainstorming document on an advanced, multi-search blog and image generation workflow.
-7.  User asked for a full configuration guide for all 8 custom functions in Retell, including speak during execution phrases.
-8.  User clarified they needed 3 full request/response examples for each Retell function.
-9.  User asked for all custom function definitions (name, URL, parameters) to set up in Retell.
-10. User selected Single Prompt Agent as the agent type in Retell.
+1.  **LATEST:** Asked for a clear, concise overview of all next steps and phases before taking a break. (COMPLETED - Agent provided a full roadmap).
+2.  Requested the addition of a Brain widget to the dashboard and for wall art mockups. (COMPLETED).
+3.  Confirmed the vision and instructed the agent to build, reminding them to use OpenRouter. (ACKNOWLEDGED).
+4.  Provided the comprehensive ArtfulPhusion Autonomous Studio brief. (IN PROGRESS).
+5.  Provided the Content Forge 2.0 brief with a block-based newsletter editor. (UPCOMING).
+6.  Asked for a check on which migrations still need to be run. (COMPLETED).
+7.  Requested conditional feature rendering and a skippable onboarding wizard. (COMPLETED).
+8.  Reported that the invite email worked but identified multiple issues with the signup flow. (PARTIALLY FIXED).
+9.  Asked where the Send Invite button was, as it wasn't visible. (FIXED - Agent added it to a new page and the sidebar).
+10. Confirmed that the RLS policy blocking them was a good sign that security is working. (ACKNOWLEDGED).
 
 **Project Health Check:**
--   **Broken:**
-    -   The login page has a UX/security flaw (autofill) and an obsolete UI element (Magic Link tab).
--   **Mocked:**
-    -   The booking/calendar system () is a UI scaffold with a backend, but is untested and not integrated.
--   **In Progress / Unverified:**
-    -   The CRM lead sync from the waitlist verification flow is implemented but not confirmed to be working by the user.
-    -   The Retell AI agent configuration is halfway complete (user is configuring functions).
+-   **Broken:** The core admin functionality is blocked by database/RLS issues. The application was crashing on startup before defensive fixes were added to the . The main user journey (invite -> signup -> onboard) is incomplete and untestable.
+-   **Mocked:** The Creative Studio, Brain, and Newsletter Forge are primarily backend APIs with minimal or no UI.
+-   **In Progress / Unverified:** The entire multi-tenant architecture and invite system are unverified end-to-end.
 
 **3rd Party Integrations**
--   **Supabase:** DB, Auth, Storage.
--   **SendGrid:** Transactional emails (verification codes).
--   **Retell AI:** **(In Progress)** For the multi-tenant AI receptionist. The setup uses a Single Prompt Agent controlled via the  webhook, leveraging custom functions and dynamic variables.
--   **OpenRouter:** Used for Perplexity searches and LLM calls in the backend.
+-   **Supabase:** DB, Auth, Storage
+-   **SendGrid:** Transactional emails
+-   **OpenRouter:** Primary gateway for LLM calls.
+-   **Gemini 3 Pro:** (via OpenRouter) For multimodal analysis. Requires .
+-   **Nano Banana Pro:** (via integration playbook) For image generation. Requires Emergent LLM Key.
+-   **Sora 2:** (Planned) For video generation.
+-   **Slack:** (Planned) For The Brain integration.
+-   **Firecrawl:** (Planned) For website scraping.
 
 **Testing status**
 -   **Testing agent used after significant changes:** NO
--   **Troubleshoot agent used after agent stuck in loop:** NO
+-   **Troubleshoot agent used after agent stuck in loop:** YES, for an RLS issue.
 -   **Test files created:** []
--   **Known regressions:** The CRM lead sync has been a recurring regression, though the latest fix addresses a newly discovered schema mismatch.
+-   **Known regressions:** The login button was briefly broken due to a new security check but has since been fixed.
 
 **Credentials to test flow:**
--   **SendGrid:**  is configured in user's Vercel environment.
--   **Retell AI:**  is configured in user's Vercel environment.
+-   **Admin User:** 
+-   **User ID:** 
+-   **Required State:** This user ID must have  in the  table for any admin functionality to work.
 
 **What agent forgot to execute**
--   The agent was in the process of analyzing the login page to apply user-requested fixes but was interrupted by the user's request for a session recap and fork. The immediate next action is to complete this modification.</analysis>
+-   The original task of testing the new Navigation System was completely superseded by the user's pivot to multi-tenancy and was never completed or mentioned again.
+-   The  from the initial handoff was never integrated into the dashboard.
+-   The broken pre-commit hook issue was never addressed.</analysis>
