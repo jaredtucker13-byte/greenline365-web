@@ -27,26 +27,19 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
     
+    // Parse body ONCE at the start
+    const body: CaptureThoughtRequest = await request.json();
+    const { text, businessId, source = 'web', slackMessageId, slackThreadTs } = body;
+    
     // Check if this is from Slack webhook (might not have auth)
-    const authHeader = request.headers.get('authorization');
     const slackToken = request.headers.get('x-slack-token');
     
-    let businessId: string;
-    
-    if (slackToken) {
-      // Validate Slack token and get business
-      // For now, extract businessId from request
-      const body = await request.json();
-      businessId = body.businessId;
-    } else {
+    if (!slackToken) {
       // Normal authenticated request
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
-      
-      const body: CaptureThoughtRequest = await request.json();
-      businessId = body.businessId;
       
       // Verify access
       const { data: access } = await supabase
@@ -60,9 +53,6 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Access denied' }, { status: 403 });
       }
     }
-
-    const body = await request.json();
-    const { text, source = 'web', slackMessageId, slackThreadTs } = body;
 
     if (!text || !businessId) {
       return NextResponse.json(
@@ -87,7 +77,7 @@ export async function POST(request: NextRequest) {
     if (saveError) {
       console.error('[Brain Capture] Save error:', saveError);
       return NextResponse.json(
-        { error: 'Failed to save thought' },
+        { error: 'Failed to save thought', details: saveError.message },
         { status: 500 }
       );
     }
