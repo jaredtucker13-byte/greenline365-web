@@ -21,7 +21,7 @@ interface BrainItem {
 }
 
 export function BrainWidget() {
-  const { activeBusiness } = useBusiness();
+  const { activeBusiness, isSwitchingBusiness } = useBusiness();
   const [items, setItems] = useState<BrainItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddThought, setShowAddThought] = useState(false);
@@ -29,10 +29,10 @@ export function BrainWidget() {
   const [activeTab, setActiveTab] = useState<'today' | 'week' | 'all'>('today');
 
   useEffect(() => {
-    if (activeBusiness) {
+    if (activeBusiness && !isSwitchingBusiness) {
       fetchBrainItems();
     }
-  }, [activeBusiness]);
+  }, [activeBusiness, isSwitchingBusiness]);
 
   const fetchBrainItems = async () => {
     if (!activeBusiness) return;
