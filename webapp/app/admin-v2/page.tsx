@@ -223,6 +223,17 @@ export default function TacticalCommandCenter() {
         backgroundAttachment: 'fixed',
       }}
     >
+      {/* Business Switching Loading Overlay */}
+      {isSwitchingBusiness && (
+        <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-[#39FF14]/30 border-t-[#39FF14] rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-white font-medium">Switching Business...</p>
+            <p className="text-white/60 text-sm mt-1">Loading data for {activeBusiness?.name || 'new business'}</p>
+          </div>
+        </div>
+      )}
+      
       {/* Onboarding Banner */}
       <OnboardingBanner />
       
