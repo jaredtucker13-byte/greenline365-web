@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
     };
 
     const senderName = profile.full_name || 'Jared';
-    const signupUrl = `${APP_URL}/signup?code=${code}`;
+    const signupUrl = `${APP_URL}/signup-business?code=${code}`;
     
     const expiryText = expiresInHours 
       ? `Valid for ${expiresInHours} hours` 
