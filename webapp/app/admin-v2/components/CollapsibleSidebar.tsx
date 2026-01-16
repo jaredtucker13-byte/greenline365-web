@@ -155,7 +155,7 @@ export default function CollapsibleSidebar({
   isPreviewMode,
   onPreviewModeToggle,
 }: SidebarProps) {
-  const { hasFeature, isAdmin, isWhiteLabel, activeBusiness, userBusinesses, switchBusiness } = useBusiness();
+  const { hasFeature, isAdmin, isWhiteLabel, activeBusiness, userBusinesses, switchBusiness, isSwitchingBusiness } = useBusiness();
   
   // Filter nav items based on features
   const visibleNavItems = useMemo(() => {
