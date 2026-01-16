@@ -143,6 +143,26 @@ export default function CollapsibleSidebar({
   isPreviewMode,
   onPreviewModeToggle,
 }: SidebarProps) {
+  const { hasFeature, isAdmin } = useBusiness();
+  
+  // Filter nav items based on features
+  const visibleNavItems = useMemo(() => {
+    return navItems.filter(item => {
+      // Admin-only items
+      if ((item as any).adminOnly && !isAdmin()) {
+        return false;
+      }
+      
+      // Feature-gated items
+      if ((item as any).feature) {
+        return hasFeature((item as any).feature);
+      }
+      
+      // Always show items without feature requirements
+      return true;
+    });
+  }, [hasFeature, isAdmin]);
+  
   // Triple-click handler for hidden Demo Controller
   const [clickCount, setClickCount] = useState(0);
   const [clickTimer, setClickTimer] = useState<NodeJS.Timeout | null>(null);
