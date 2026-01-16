@@ -183,15 +183,37 @@ export function CostTrackingProvider({ children }: CostTrackingProviderProps) {
   }, [costLog]);
 
   // Request confirmation before API call
+  // Only shows modal for platform owner - tenants bypass confirmation but still log costs
   const requestConfirmation = useCallback((
     endpoint: string,
     quantity: number,
     onConfirm: () => void,
     metadata?: Record<string, any>
   ) => {
-    setPendingAction({ endpoint, quantity, onConfirm, metadata });
-    setIsConfirmationOpen(true);
-  }, []);
+    if (isPlatformOwner) {
+      // Platform owner sees confirmation modal
+      setPendingAction({ endpoint, quantity, onConfirm, metadata });
+      setIsConfirmationOpen(true);
+    } else {
+      // Tenants: Skip confirmation, still log cost, proceed immediately
+      const costInfo = API_COSTS[endpoint];
+      if (costInfo) {
+        const newEntry: CostLogEntry = {
+          id: `cost_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          timestamp: new Date().toISOString(),
+          endpoint,
+          provider: costInfo.provider,
+          description: costInfo.description,
+          estimatedCost: costInfo.estimatedCost,
+          quantity,
+          totalCost: costInfo.estimatedCost * quantity,
+          metadata,
+        };
+        setCostLog(prev => [newEntry, ...prev]);
+      }
+      onConfirm();
+    }
+  }, [isPlatformOwner]);
 
   // Log a cost entry
   const logCost = useCallback((entry: Omit<CostLogEntry, 'id' | 'timestamp'>) => {
