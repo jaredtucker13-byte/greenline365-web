@@ -298,9 +298,9 @@ export default function TacticalCommandCenter() {
             <div className="lg:col-span-2">
               <WeeklyTrendBatch onCreateContent={handleForgeFromWeeklyTrend} />
             </div>
-            {/* Drafts Panel */}
+            {/* Brain Widget */}
             <div>
-              <DraftsPanel userId="demo-user" />
+              <BrainWidget />
             </div>
           </div>
 
