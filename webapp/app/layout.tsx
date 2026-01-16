@@ -3,6 +3,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ChatWidget from './components/ChatWidget';
 import { ServiceWorkerProvider } from '@/lib/use-service-worker';
+import { AdminEditModeProvider } from '@/components/editor';
 import type { Metadata } from 'next';
 
 // ===========================================
