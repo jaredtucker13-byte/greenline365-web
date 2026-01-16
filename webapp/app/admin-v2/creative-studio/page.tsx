@@ -197,44 +197,52 @@ export default function CreativeStudioPage() {
     }
   };
 
-  // AI Analysis
+  // AI Analysis (with cost confirmation)
   const analyzeProduct = async () => {
     if (uploadedFiles.length === 0 || !selectedProductType) return;
     
-    setIsAnalyzing(true);
-    
-    try {
-      // First upload files
-      const imageUrls = await uploadFiles();
-      if (imageUrls.length === 0) {
-        throw new Error('No images uploaded');
-      }
-      
-      // Call AI analysis API
-      const response = await fetch('/api/studio/analyze-product', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          imageUrls,
-          productType: selectedProductType,
-        }),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Analysis failed');
-      }
-      
-      const result = await response.json();
-      setAnalysisResult(result.analysis);
-      setProductName(result.analysis?.name || `${selectedProductType} Product`);
-      setStep(3);
-      
-    } catch (error) {
-      console.error('Analysis error:', error);
-      alert('Analysis failed. Please try again.');
-    } finally {
-      setIsAnalyzing(false);
-    }
+    // Request cost confirmation
+    requestConfirmation(
+      '/api/studio/analyze-product',
+      1, // 1 analysis call
+      async () => {
+        setIsAnalyzing(true);
+        
+        try {
+          // First upload files
+          const imageUrls = await uploadFiles();
+          if (imageUrls.length === 0) {
+            throw new Error('No images uploaded');
+          }
+          
+          // Call AI analysis API
+          const response = await fetch('/api/studio/analyze-product', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              imageUrls,
+              productType: selectedProductType,
+            }),
+          });
+          
+          if (!response.ok) {
+            throw new Error('Analysis failed');
+          }
+          
+          const result = await response.json();
+          setAnalysisResult(result.analysis);
+          setProductName(result.analysis?.name || `${selectedProductType} Product`);
+          setStep(3);
+          
+        } catch (error) {
+          console.error('Analysis error:', error);
+          alert('Analysis failed. Please try again.');
+        } finally {
+          setIsAnalyzing(false);
+        }
+      },
+      { productType: selectedProductType, imageCount: uploadedFiles.length }
+    );
   };
 
   // Save product
