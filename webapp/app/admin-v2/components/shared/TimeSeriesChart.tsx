@@ -44,17 +44,18 @@ export function TimeSeriesChart({
   animate = true,
   testId,
 }: TimeSeriesChartProps) {
-  if (data.length === 0) return null;
+  if (!data || data.length === 0) return null;
   
   const allValues = data.flatMap(d => [d.value, d.compareValue || 0]);
-  const maxValue = Math.max(...allValues) || 1;
+  const maxValue = Math.max(...allValues, 1) || 1;
   
   const hasCompare = data.some(d => d.compareValue !== undefined);
   
-  // Generate path points
+  // Generate path points - guard against single data point
   const generatePath = (getValue: (d: DataPoint) => number) => {
+    if (data.length < 2) return `10,${120 - (getValue(data[0]) / maxValue) * 100}`;
     return data.map((d, i) => {
-      const x = (i / (data.length - 1)) * 280 + 10;
+      const x = (i / Math.max(data.length - 1, 1)) * 280 + 10;
       const y = 120 - (getValue(d) / maxValue) * 100;
       return `${x},${y}`;
     }).join(' ');
