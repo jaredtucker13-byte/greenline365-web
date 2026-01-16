@@ -47,6 +47,34 @@ const DEFAULT_SCENES = [
   },
 ];
 
+// Wall Art specific scenes
+const WALL_ART_SCENES = [
+  {
+    name: 'living_room',
+    prompt: 'Modern minimalist living room, art piece mounted on clean white wall above a contemporary sofa, soft natural window light, high-end interior design, professional real estate photography style'
+  },
+  {
+    name: 'bedroom',
+    prompt: 'Luxury bedroom setting, art piece as focal point above headboard, warm ambient lighting, boutique hotel aesthetic, sophisticated interior design'
+  },
+  {
+    name: 'office',
+    prompt: 'Professional home office or workspace, art piece on feature wall, desk in foreground, plants and modern decor, inspirational creative space'
+  },
+  {
+    name: 'gallery_wall',
+    prompt: 'Curated gallery wall composition, art piece as centerpiece surrounded by complementary frames, museum-quality lighting, editorial interior design magazine style'
+  },
+  {
+    name: 'entryway',
+    prompt: 'Elegant entryway or hallway, art piece as statement piece, console table below, mirror and decor accents, welcoming sophisticated atmosphere'
+  },
+  {
+    name: 'dining',
+    prompt: 'Dining room scene, art piece above sideboard or buffet, dinner table in foreground, warm evening lighting, entertaining-ready aesthetic'
+  },
+];
+
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
