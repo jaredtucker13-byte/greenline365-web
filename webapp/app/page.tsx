@@ -428,16 +428,20 @@ export default function HomePage() {
                 <span className="text-xs text-neon-green-400 font-semibold tracking-wide">STATUS: ONLINE</span>
               </div>
               
-              <h1 data-hero-title className="font-display font-bold mb-4 leading-tight overflow-hidden" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)' }}>
-                <span className="text-white block">The Operating System</span>
-                <span className="text-white block">for the</span>
-                <span className="text-neon-green-500 block">Local Economy</span>
-              </h1>
+              <EditableRegion pageSlug="home" regionKey="hero_title" type="text">
+                <h1 data-hero-title className="font-display font-bold mb-4 leading-tight overflow-hidden" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)' }}>
+                  <span className="text-white block">The Operating System</span>
+                  <span className="text-white block">for the</span>
+                  <span className="text-neon-green-500 block">Local Economy</span>
+                </h1>
+              </EditableRegion>
               
-              <p data-hero-subtitle className="text-white/70 mb-6 leading-relaxed max-w-xl" style={{ fontSize: 'clamp(1rem, 2vw, 1.25rem)' }}>
-                Stop competing with algorithms. Start winning. Start running infrastructure that 
-                connects <span className="text-neon-green-500 font-semibold">local life</span> with local commerce.
-              </p>
+              <EditableRegion pageSlug="home" regionKey="hero_subtitle" type="text">
+                <p data-hero-subtitle className="text-white/70 mb-6 leading-relaxed max-w-xl" style={{ fontSize: 'clamp(1rem, 2vw, 1.25rem)' }}>
+                  Stop competing with algorithms. Start winning. Start running infrastructure that 
+                  connects <span className="text-neon-green-500 font-semibold">local life</span> with local commerce.
+                </p>
+              </EditableRegion>
               
               <div data-hero-cta className="flex flex-wrap gap-3 mb-8">
                 <Button variant="primary" size="lg" onClick={() => window.location.href = '/waitlist'} data-testid="hero-waitlist-btn">
