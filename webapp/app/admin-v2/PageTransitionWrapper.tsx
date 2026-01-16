@@ -9,11 +9,17 @@
 
 import { ReactNode } from 'react';
 import { PageTransition } from './components/PageTransition';
+import { NavigationProgress } from './components/NavigationProgress';
 
 interface PageTransitionWrapperProps {
   children: ReactNode;
 }
 
 export default function PageTransitionWrapper({ children }: PageTransitionWrapperProps) {
-  return <PageTransition>{children}</PageTransition>;
+  return (
+    <>
+      <NavigationProgress />
+      <PageTransition>{children}</PageTransition>
+    </>
+  );
 }
