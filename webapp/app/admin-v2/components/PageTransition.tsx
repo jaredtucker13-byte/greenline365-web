@@ -15,56 +15,35 @@ interface PageTransitionProps {
   children: ReactNode;
 }
 
-// Animation variants for page transitions
-const pageVariants = {
-  initial: {
-    opacity: 0,
-    y: 8,
-  },
-  enter: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.2,
-      ease: [0.25, 0.1, 0.25, 1], // cubic-bezier for smooth feel
-    },
-  },
-  exit: {
-    opacity: 0,
-    y: -8,
-    transition: {
-      duration: 0.15,
-      ease: [0.25, 0.1, 0.25, 1],
-    },
-  },
-};
-
 export function PageTransition({ children }: PageTransitionProps) {
   const pathname = usePathname();
-  const [isNavigating, setIsNavigating] = useState(false);
   const [displayChildren, setDisplayChildren] = useState(children);
 
   useEffect(() => {
-    // When pathname changes, trigger transition
-    setIsNavigating(true);
-    
-    // Small delay to allow exit animation
-    const timer = setTimeout(() => {
-      setDisplayChildren(children);
-      setIsNavigating(false);
-    }, 150);
-
-    return () => clearTimeout(timer);
+    setDisplayChildren(children);
   }, [pathname, children]);
 
   return (
     <AnimatePresence mode="wait">
       <motion.div
         key={pathname}
-        initial="initial"
-        animate="enter"
-        exit="exit"
-        variants={pageVariants}
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ 
+          opacity: 1, 
+          y: 0,
+          transition: {
+            duration: 0.2,
+            ease: 'easeOut',
+          }
+        }}
+        exit={{ 
+          opacity: 0, 
+          y: -8,
+          transition: {
+            duration: 0.15,
+            ease: 'easeIn',
+          }
+        }}
         className="w-full"
       >
         {displayChildren}
