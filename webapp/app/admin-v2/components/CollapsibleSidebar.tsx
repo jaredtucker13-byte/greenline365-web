@@ -233,11 +233,12 @@ export default function CollapsibleSidebar({
             <select
               value={activeBusiness?.id || ''}
               onChange={(e) => {
-                if (e.target.value) {
+                if (e.target.value && !isSwitchingBusiness) {
                   switchBusiness(e.target.value);
                 }
               }}
-              className="w-full px-3 py-2 rounded-lg text-xs appearance-none cursor-pointer transition focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+              disabled={isSwitchingBusiness}
+              className={`w-full px-3 py-2 rounded-lg text-xs appearance-none cursor-pointer transition focus:outline-none focus:ring-2 focus:ring-purple-500/50 ${isSwitchingBusiness ? 'opacity-50 cursor-wait' : ''}`}
               style={{ 
                 background: 'var(--theme-bg-glass)', 
                 border: '1px solid var(--theme-glass-border)',
@@ -254,15 +255,19 @@ export default function CollapsibleSidebar({
                 </option>
               ))}
             </select>
-            <svg 
-              className="w-4 h-4 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" 
-              fill="none" 
-              viewBox="0 0 24 24" 
-              stroke="currentColor"
-              style={{ color: 'var(--theme-text-muted)' }}
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
+            {isSwitchingBusiness ? (
+              <div className="w-4 h-4 absolute right-2 top-1/2 -translate-y-1/2 border-2 border-[#39FF14]/30 border-t-[#39FF14] rounded-full animate-spin" />
+            ) : (
+              <svg 
+                className="w-4 h-4 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+                style={{ color: 'var(--theme-text-muted)' }}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            )}
           </div>
         )}
       </div>
