@@ -64,6 +64,7 @@ interface Scene {
 export default function CreativeStudioPage() {
   const router = useRouter();
   const { activeBusiness, hasFeature } = useBusiness();
+  const { requestConfirmation } = useCostTracking();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   // State
