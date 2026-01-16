@@ -146,7 +146,7 @@ export async function POST(request: NextRequest) {
       ? `Valid for ${expiresInHours} hours` 
       : 'No expiration';
 
-    // Build HTML email
+    // Build HTML email - SINGLE CTA VERSION
     const htmlContent = `
 <!DOCTYPE html>
 <html>
@@ -217,17 +217,12 @@ export async function POST(request: NextRequest) {
                 ⏰ ${expiryText}
               </p>
               
-              <!-- CTA Button -->
+              <!-- SINGLE CTA -->
               <div style="text-align: center; margin: 30px 0;">
                 <a href="${signupUrl}" style="display: inline-block; background: linear-gradient(135deg, #39FF14 0%, #0CE293 100%); color: #000000; font-size: 16px; font-weight: bold; text-decoration: none; padding: 16px 40px; border-radius: 8px; box-shadow: 0 4px 12px rgba(57, 255, 20, 0.3);">
-                  Get Started →
+                  Click Here to Create Your Account →
                 </a>
               </div>
-              
-              <p style="font-size: 13px; line-height: 1.6; color: rgba(255, 255, 255, 0.6); margin: 30px 0 0 0; text-align: center;">
-                Or copy and paste this link:<br>
-                <span style="color: #39FF14; word-break: break-all;">${signupUrl}</span>
-              </p>
             </td>
           </tr>
           
@@ -244,11 +239,6 @@ export async function POST(request: NextRequest) {
           </tr>
           
         </table>
-        
-        <!-- Footer Text -->
-        <p style="font-size: 12px; color: rgba(255, 255, 255, 0.4); margin: 20px 0 0 0; text-align: center;">
-          GreenLine365 - Your Business Operating System
-        </p>
       </td>
     </tr>
   </table>
@@ -256,7 +246,7 @@ export async function POST(request: NextRequest) {
 </html>
     `;
 
-    // Plain text version
+    // Plain text version - SINGLE CTA
     const plainContent = `
 You're Invited to GreenLine365!
 
@@ -274,7 +264,7 @@ ${tierFeatures[tier]}
 
 ⏰ ${expiryText}
 
-Get started: ${signupUrl}
+Click here to create your account: ${signupUrl}
 
 Welcome aboard!
 - The GreenLine365 Team
