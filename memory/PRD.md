@@ -13,33 +13,33 @@ Build a Business Operating System with multi-tenant white-label support, AI-powe
 - **White-Label Clients**: Agencies/brands running their own branded platforms (e.g., ArtfulPhusion)
 - **End Users**: Business owners using the platform for content creation and automation
 
-## Architecture: Multi-Tenant White-Label System
+---
+
+## Architecture
 
 ### Tier Structure (Database-Driven)
-- **Starter ($299/mo)**: Content Forge, Mockup Generator, Social Posting
-- **Professional ($599/mo)**: + Creative Studio, CRM, Analytics, Knowledge Base
-- **Enterprise ($999/mo)**: + Product Library, Email, SMS, AI Receptionist
-- **Elite White-Label ($1,200/mo)**: + No branding, Custom domains, Visual editor
+| Tier | Price | Features |
+|------|-------|----------|
+| Starter | $299/mo | Content Forge, Mockup Generator, Social Posting |
+| Professional | $599/mo | + Creative Studio, CRM, Analytics, Knowledge Base |
+| Enterprise | $999/mo | + Product Library, Email, SMS, AI Receptionist |
+| Elite White-Label | $1,200/mo | + No branding, Custom domains, Visual editor |
 
-### White-Label Architecture
-```
-businesses
-├── is_white_label: boolean     # Enables white-label features
-├── can_edit_site: boolean      # Enables visual inline editor
-└── monthly_price: integer      # Tier pricing
+### Database Schema
 
-business_themes
-├── logo_url, favicon_url       # Branding assets
-├── company_name, tagline       # Override "GreenLine365"
-├── primary_color, secondary_color... # CSS variables
-├── hide_powered_by: boolean    # Remove "Powered by GreenLine365"
-└── custom_css: text            # Advanced customization
+```sql
+-- White-Label Foundation
+businesses (is_white_label, can_edit_site, monthly_price)
+business_themes (logo, colors, fonts, hide_powered_by)
+custom_domains (domain, verification_status, ssl_status)
+pricing_tiers (tier_key, price, features JSONB)
+site_content (page_slug, region_key, content)
 
-custom_domains
-├── domain: text                # e.g., "studio.artfulphusion.com"
-├── verification_status         # DNS verification
-├── ssl_status                  # Certificate status
-└── cname_target                # Our target for DNS setup
+-- Creative Studio
+signature_models (name, model_type, reference_images, ethnicity, age_range, style_tags)
+studio_products (name, product_type, original_images, ai_analysis JSONB, status)
+studio_mockups (product_id, scene_type, image_url, variants JSONB)
+mockup_scenes (name, slug, category, prompt_template)
 ```
 
 ---
@@ -48,123 +48,137 @@ custom_domains
 
 ### January 16, 2025 (Current Session)
 
-**Phase 1: White-Label Foundation**
-- Created database migration `/database/migrations/010_white_label_foundation.sql`:
-  - Extended `businesses` table with `is_white_label`, `can_edit_site`, `monthly_price`
-  - Created `business_themes` table for custom branding
-  - Created `custom_domains` table for custom domain support
-  - Created `pricing_tiers` table (database-driven pricing)
+#### ✅ Phase 1: White-Label Foundation
+- **Database Migration** (`010_white_label_MINIMAL.sql`):
+  - Added `is_white_label`, `can_edit_site`, `monthly_price` to businesses
+  - Created `business_themes` table with full branding options
+  - Created `custom_domains` table (CNAME-ready)
+  - Created `pricing_tiers` table with 4 default tiers
   - Created `site_content` table for editable regions
-  - Created ArtfulPhusion as first white-label test tenant
+  - **ArtfulPhusion** created as first white-label tenant
 
-- Created Theme Engine:
-  - `/lib/theme/WhiteLabelThemeContext.tsx` - Theme provider with CSS variable injection
-  - Supports custom logos, colors, fonts, and "Powered by" suppression
+- **Theme Engine** (`/lib/theme/WhiteLabelThemeContext.tsx`):
+  - CSS variable injection
+  - Logo/branding override support
+  - "Powered by" suppression for white-label
 
-- Created Theme Settings Admin Page (`/admin-v2/theme-settings`):
+- **Theme Settings Page** (`/admin-v2/theme-settings`):
   - Branding tab: Logo upload, company name, tagline
-  - Colors tab: Full color palette editor with live preview
+  - Colors tab: Full palette editor with live preview
   - Typography tab: Font selection
   - Domains tab: Custom domain management UI
   - Advanced tab: Custom CSS, footer text
 
-- Updated Sidebar Navigation:
-  - Added "Creative Studio" nav item
-  - Added "Theme Settings" nav item (white-label only)
-  - Updated filtering logic for `whiteLabelOnly` items
+#### ✅ Phase 2: Creative Studio Foundation
+- **Database Migration** (`011_creative_studio_schema.sql`):
+  - `signature_models` - Character Vault storage
+  - `studio_products` - Product Library
+  - `studio_mockups` - Generated mockups
+  - `mockup_scenes` - 6 default scene presets
 
-- Created API Endpoints:
+- **Creative Studio UI** (`/admin-v2/creative-studio`):
+  - 5-step workflow: Select Type → Upload → AI Analysis → Select Scenes → Results
+  - 8 product types (apparel, wall_art, jewelry, home_decor, packaging, footwear, accessories, default)
+  - Drag & drop file upload
+  - AI analysis review with editable fields
+  - Scene selection for 6-Pack mockup generation
+  - Character Vault tab (Photo-to-Seed + Virtual Generation)
+  - Product Library tab with grid view
+
+- **API Endpoints**:
+  - `POST /api/studio/analyze-product` - Gemini 3 Pro via OpenRouter
+  - `POST /api/studio/generate-mockups` - Nano Banana Pro via Emergent
+  - `GET/POST /api/studio/models` - Character Vault CRUD
+  - `GET/POST/PATCH/DELETE /api/studio/products` - Product Library
+  - `GET/POST /api/studio/export` - Omnichannel export (Pinterest/TikTok)
   - `GET/POST /api/pricing-tiers` - Database-driven pricing
   - `GET/POST /api/site-content` - Editable page regions
 
-- Created Creative Studio Placeholder (`/admin-v2/creative-studio`):
-  - Product type selection (apparel, wall_art, jewelry, home_decor, packaging, footwear)
-  - Upload workflow UI
-  - Character Vault tab (Photo-to-Seed + Virtual Generation)
-  - Product Library tab
-
-- Updated Business Context:
-  - Added `isWhiteLabel()` and `canEditSite()` helper functions
-  - Added `is_white_label`, `can_edit_site`, `monthly_price` to Business type
-
-**Database Fix (P0)**
-- Created `/database/FINAL_FIX_ALL.sql` - One-time idempotent fix for admin access
-- User confirmed admin status: ✅
-
-### January 15, 2025 (Previous Session)
-- Multi-tenant system foundation (businesses, user_businesses, access_codes)
-- SendGrid invite integration
-- Creative Studio backend APIs (analyze-product, generate-mockups)
-- Brain system backend APIs
-- Feature gating system
-
-### Earlier Sessions
-- Navigation system with hub-and-spoke pattern
-- CRM Dashboard consolidation
-- Email verification flow
-- Calendar/Booking system
+#### ✅ Infrastructure
+- Sidebar updated with "Creative Studio" and "Theme Settings" nav items
+- Business Context updated with `isWhiteLabel()` and `canEditSite()` helpers
+- Storage buckets SQL ready (`STORAGE_BUCKETS.sql`)
 
 ---
 
-## Upcoming Tasks (Prioritized)
+## Pending User Actions
 
-### P0 - User Action Required
-1. **Run Migration**: User must run `010_white_label_foundation.sql` in Supabase SQL Editor
-2. **Upload ArtfulPhusion Logo**: Via Theme Settings page after migration
+### SQL Scripts to Run (in order):
+1. ✅ `FINAL_FIX_ALL.sql` - Admin access fix (COMPLETED)
+2. ✅ `010_white_label_MINIMAL.sql` - White-label foundation (COMPLETED)
+3. ✅ `011_creative_studio_schema.sql` - Creative Studio schema (COMPLETED)
+4. ⏳ `LINK_USER_TO_ARTFULPHUSION.sql` - Link admin to ArtfulPhusion
+5. ⏳ `STORAGE_BUCKETS.sql` - Create storage buckets for uploads
 
-### P1 - Creative Studio Implementation
-1. Implement full product upload flow with Gemini 3 Pro analysis
-2. Build Character Vault with Identity Seed storage
-3. Implement 6-Pack mockup generation with scene selection
-4. Build Product Library with persistence
-5. Add Omnichannel Export (Pinterest/TikTok formatting)
+---
 
-### P2 - Inline Visual Editor
-1. Create "Editable Region" component wrapper
-2. Implement hover-to-edit pencil overlay
+## Upcoming Tasks
+
+### P1 - Visual Inline Editor (Phase 3)
+1. Create "Editable Region" component wrapper with pencil overlay
+2. Implement hover-to-edit behavior for God Mode admins
 3. Build rich text editor for text regions
-4. Build image swap with preserved styling
+4. Build image swap modal with preserved styling
 5. Connect to `site_content` API for persistence
+6. Mark specific regions on Home, Pricing, About, TOS pages
 
-### P3 - Future Tasks
-- Newsletter Forge (block-based editor)
-- Content Multiplier (auto-generate blog/Pinterest/TikTok)
-- "The Brain" system with Slack integration
-- Cmd+K universal command bar
+### P2 - Creative Studio Enhancements
+1. Implement actual image resizing for export
+2. Add virtual model preview generation
+3. Implement product "Rerun" feature for new mockups
+4. Add bulk download with ZIP packaging
+
+### P3 - "The Brain" System (Phase 4)
+1. Build full Brain dashboard UI
+2. Implement Slack webhook integration
+3. Create cron jobs for daily/weekly reminders
+4. Add AI categorization for thoughts
+
+### P4 - Newsletter Forge (Phase 5)
+1. Block-based drag-and-drop editor
+2. Template library
+3. SendGrid integration for sending
+
+### P5 - Content Multiplier (Phase 6)
+1. Auto-generate blog posts from mockups
+2. Pinterest pin generation
+3. TikTok script generation
 
 ---
 
 ## Key Files Reference
 
 ### White-Label System
-- `/lib/theme/WhiteLabelThemeContext.tsx` - Theme provider
-- `/lib/business/BusinessContext.tsx` - Business context with white-label helpers
-- `/app/admin-v2/theme-settings/page.tsx` - Theme configuration UI
-- `/database/migrations/010_white_label_foundation.sql` - Schema migration
+- `/lib/theme/WhiteLabelThemeContext.tsx`
+- `/lib/business/BusinessContext.tsx`
+- `/app/admin-v2/theme-settings/page.tsx`
+- `/database/migrations/010_white_label_MINIMAL.sql`
 
 ### Creative Studio
-- `/app/admin-v2/creative-studio/page.tsx` - Main studio UI
-- `/app/api/studio/analyze-product/route.ts` - Gemini 3 Pro analysis
-- `/app/api/studio/generate-mockups/route.ts` - Nano Banana Pro generation
-
-### APIs
-- `/app/api/pricing-tiers/route.ts` - Database-driven pricing
-- `/app/api/site-content/route.ts` - Editable content regions
+- `/app/admin-v2/creative-studio/page.tsx`
+- `/app/api/studio/analyze-product/route.ts`
+- `/app/api/studio/generate-mockups/route.ts`
+- `/app/api/studio/models/route.ts`
+- `/app/api/studio/products/route.ts`
+- `/app/api/studio/export/route.ts`
+- `/database/migrations/011_creative_studio_schema.sql`
 
 ### Navigation
-- `/app/admin-v2/components/CollapsibleSidebar.tsx` - Main sidebar with feature gating
+- `/app/admin-v2/components/CollapsibleSidebar.tsx`
 
 ---
 
 ## 3rd Party Integrations
-- **Supabase**: Database, Auth, Storage
-- **SendGrid**: Transactional emails
-- **OpenRouter**: LLM gateway (Gemini 3 Pro)
-- **Emergent LLM Key**: Nano Banana Pro image generation
-- **Slack**: Planned for "The Brain" integration
+| Service | Purpose | Key |
+|---------|---------|-----|
+| Supabase | Database, Auth, Storage | Configured |
+| SendGrid | Transactional emails | Configured |
+| OpenRouter | LLM gateway (Gemini 3 Pro) | `OPENROUTER_API_KEY` |
+| Emergent | Nano Banana Pro image gen | `EMERGENT_LLM_KEY` ✅ |
+| Slack | "The Brain" integration | Planned |
 
 ---
 
 ## Test Tenants
-1. **GreenLine365** (Default): Standard owner tenant
-2. **ArtfulPhusion** (White-Label): First test tenant with custom purple/pink branding
+1. **GreenLine365** (Default): Standard owner tenant, primary branding
+2. **ArtfulPhusion** (White-Label): Purple/pink branding, "Creative Sanctuary" tagline, hide_powered_by=true
