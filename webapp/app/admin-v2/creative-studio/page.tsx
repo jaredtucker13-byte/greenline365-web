@@ -267,38 +267,46 @@ export default function CreativeStudioPage() {
     }
   };
 
-  // Generate mockups
+  // Generate mockups (with cost confirmation)
   const generateMockups = async () => {
     if (selectedScenes.length === 0) return;
     
-    setIsGenerating(true);
-    setGeneratedMockups([]);
-    
-    try {
-      const response = await fetch('/api/studio/generate-mockups', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          productImageUrl: uploadedUrls[0],
-          productType: selectedProductType,
-          productDescription: analysisResult?.description || productName,
-          scenes: selectedScenes,
-          signatureModelId: selectedModel,
-        }),
-      });
-      
-      if (!response.ok) throw new Error('Generation failed');
-      
-      const result = await response.json();
-      setGeneratedMockups(result.mockups || []);
-      setStep(5);
-      
-    } catch (error) {
-      console.error('Generation error:', error);
-      alert('Mockup generation failed');
-    } finally {
-      setIsGenerating(false);
-    }
+    // Request cost confirmation - shows modal for platform owner, logs for tenants
+    requestConfirmation(
+      '/api/studio/generate-mockups',
+      selectedScenes.length, // Each scene = 1 image
+      async () => {
+        setIsGenerating(true);
+        setGeneratedMockups([]);
+        
+        try {
+          const response = await fetch('/api/studio/generate-mockups', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              productImageUrl: uploadedUrls[0],
+              productType: selectedProductType,
+              productDescription: analysisResult?.description || productName,
+              scenes: selectedScenes,
+              signatureModelId: selectedModel,
+            }),
+          });
+          
+          if (!response.ok) throw new Error('Generation failed');
+          
+          const result = await response.json();
+          setGeneratedMockups(result.mockups || []);
+          setStep(5);
+          
+        } catch (error) {
+          console.error('Generation error:', error);
+          alert('Mockup generation failed');
+        } finally {
+          setIsGenerating(false);
+        }
+      },
+      { scenes: selectedScenes, productType: selectedProductType }
+    );
   };
 
   // Reset flow
