@@ -24,6 +24,9 @@ export interface Business {
   slug: string;
   tier: 'tier1' | 'tier2' | 'tier3';
   industry: string | null;
+  is_white_label?: boolean;
+  can_edit_site?: boolean;
+  monthly_price?: number;
   settings: {
     features: {
       content_forge: boolean;
