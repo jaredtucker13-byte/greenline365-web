@@ -1,194 +1,170 @@
 # GreenLine365 Business Operating System - PRD
 
 ## Original Problem Statement
-Build a Business Operating System with the current primary focus on an **AI Website Builder** and **AI Receptionist/Booking System**. Key features include URL reverse-engineering, context-aware redesign, multi-section workflow, live code sandbox, and a "Living Blog".
+Build a Business Operating System with multi-tenant white-label support, AI-powered creative studio (ArtfulPhusion), and visual content management. The platform serves as infrastructure for local businesses to automate marketing, content creation, and customer engagement.
 
-**Unique Value Proposition**: Unlike other CRMs, GreenLine365 combines standard CRM capabilities with unique platform analytics - data from AI receptionist calls, booking performance, content engagement, and email campaigns - giving businesses insights no other platform offers.
+**Unique Value Proposition**: 
+1. **White-Label Platform**: Agencies and brands can run their own branded instance ($1,200/mo Elite tier)
+2. **AI Creative Studio**: Autonomous product photography and mockup generation using Gemini 3 Pro + Nano Banana Pro
+3. **Visual Inline Editor**: "God Mode" for admins to edit any public page content without code
 
 ## User Personas
-- **Business Owners**: Need 24/7 AI receptionist to handle calls and bookings
-- **Multi-tenant Clients**: Various businesses using GreenLine365's AI services
-- **Internal Team**: Managing leads, content, and platform operations
+- **Platform Owner (Jared)**: God Mode admin with full visual editing capabilities
+- **White-Label Clients**: Agencies/brands running their own branded platforms (e.g., ArtfulPhusion)
+- **End Users**: Business owners using the platform for content creation and automation
 
-## Architecture: Hub-and-Spoke Model
+## Architecture: Multi-Tenant White-Label System
 
-### Navigation System
-The app uses a hub-and-spoke navigation pattern where:
-- **Command Center (`/admin-v2`)** is the global starting point (Hub)
-- **Spoke pages** (CRM, Analytics, Content Forge, etc.) can be accessed from the hub
-- **Back behavior** respects the navigation stack or `returnTo` query param
-- **Breadcrumbs** show current location in page hierarchy
+### Tier Structure (Database-Driven)
+- **Starter ($299/mo)**: Content Forge, Mockup Generator, Social Posting
+- **Professional ($599/mo)**: + Creative Studio, CRM, Analytics, Knowledge Base
+- **Enterprise ($999/mo)**: + Product Library, Email, SMS, AI Receptionist
+- **Elite White-Label ($1,200/mo)**: + No branding, Custom domains, Visual editor
 
-**Key Navigation Components** (`/lib/navigation/`):
-- `NavigationProvider` - Context provider wrapping admin-v2
-- `useNavigation()` - Hook for navigation actions  
-- `BackButton` - Consistent back behavior
-- `Breadcrumbs` - Shows page hierarchy
-- `NavLink` - Tracked navigation links
-- `PageHeader` - Reusable header with back + breadcrumbs
+### White-Label Architecture
+```
+businesses
+├── is_white_label: boolean     # Enables white-label features
+├── can_edit_site: boolean      # Enables visual inline editor
+└── monthly_price: integer      # Tier pricing
 
-**Navigation Rules**:
-1. If user came from Command Center → Back goes to Command Center
-2. If user came from Page X → Back goes to Page X (via `?returnTo=`)
-3. Subpage drills preserve parent in stack
-4. Deep links fallback to Command Center
+business_themes
+├── logo_url, favicon_url       # Branding assets
+├── company_name, tagline       # Override "GreenLine365"
+├── primary_color, secondary_color... # CSS variables
+├── hide_powered_by: boolean    # Remove "Powered by GreenLine365"
+└── custom_css: text            # Advanced customization
 
-### Data Flow Principles
-1. **Single Source of Truth**: 
-   - Core API (CRUD): contacts, deals, tasks, activities (mutable, record-level)
-   - Analytics API (read-only aggregates): KPIs, series, funnels, cohorts, breakdowns
-
-2. **UI Separation**:
-   - Hub (Command Center): Dashboard with widgets summarizing each domain
-   - Spokes (Dedicated Pages): Full-featured pages for CRM, Analytics, Calendar, etc.
-
-3. **Drill-Through Pattern**:
-   - Analytics widgets show aggregates → User clicks → Fetch sample IDs → Core API for details
+custom_domains
+├── domain: text                # e.g., "studio.artfulphusion.com"
+├── verification_status         # DNS verification
+├── ssl_status                  # Certificate status
+└── cname_target                # Our target for DNS setup
+```
 
 ---
 
 ## What's Been Implemented
 
-### January 14, 2025 (Latest Session)
+### January 16, 2025 (Current Session)
 
-**Navigation System Implementation**
-- Created navigation context and utilities (`/lib/navigation/`):
-  - `NavigationContext.tsx` - Provider with navigation stack, returnTo tracking
-  - `NavLink.tsx` - Navigation-aware link component
-  - `Breadcrumbs.tsx` - Shows page hierarchy
-  - `BackButton.tsx` - Consistent back behavior
-- Created `PageHeader` component (`/admin-v2/components/PageHeader.tsx`)
-  - Includes back button, breadcrumbs, title, actions
-- Updated `ThemeWrapper` to include `NavigationProvider`
-- Updated CRM Dashboard to use `PageHeader`
-- Updated Content Forge to use `PageHeader`
+**Phase 1: White-Label Foundation**
+- Created database migration `/database/migrations/010_white_label_foundation.sql`:
+  - Extended `businesses` table with `is_white_label`, `can_edit_site`, `monthly_price`
+  - Created `business_themes` table for custom branding
+  - Created `custom_domains` table for custom domain support
+  - Created `pricing_tiers` table (database-driven pricing)
+  - Created `site_content` table for editable regions
+  - Created ArtfulPhusion as first white-label test tenant
 
-**Hub-and-Spoke Architecture Consolidation**
-- Created shared UI component library (`/admin-v2/components/shared/`):
-  - `KPICard` - Reusable metric card with sparkline, trends, drill action
-  - `FunnelChart` - Conversion funnel visualization
-  - `TimeSeriesChart` - Time series with compare line
-  - `DataTable` - Flexible table with selection, sorting, actions
-- Created API client structure (`/lib/api/`):
-  - `analyticsApi.ts` - Read-only aggregates with `meta` (lastProcessedAt, cacheTtl)
-  - `coreApi.ts` - CRUD operations for leads/records
-- New CRM Analytics endpoint (`/api/analytics/crm`):
-  - `?type=kpis` - KPI summary (leads, conversions, revenue, pipeline)
-  - `?type=funnel` - Pipeline funnel stages
-  - `?type=trends` - Time series of lead activity
-  - `?type=sources` - Breakdown by lead source
-- Consolidated CRM Dashboard (`/admin-v2/crm-dashboard`):
-  - KPI strip using shared `KPICard` components (powered by analyticsApi)
-  - Lead table using shared `DataTable` (powered by coreApi)
-  - Detail rail, Quick Add modal
-  - Date range selector, status filters
-- Created `CRMWidget` component for Command Center hub
-- Redirected old `/admin-v2/crm` to consolidated dashboard
+- Created Theme Engine:
+  - `/lib/theme/WhiteLabelThemeContext.tsx` - Theme provider with CSS variable injection
+  - Supports custom logos, colors, fonts, and "Powered by" suppression
 
-**Login Page Fix**
-- Removed corrupted duplicate code (~40 lines)
-- Verified `autoComplete="off"` already in place
+- Created Theme Settings Admin Page (`/admin-v2/theme-settings`):
+  - Branding tab: Logo upload, company name, tagline
+  - Colors tab: Full color palette editor with live preview
+  - Typography tab: Font selection
+  - Domains tab: Custom domain management UI
+  - Advanced tab: Custom CSS, footer text
 
-### Previous Sessions
-- Email verification flow fixed (migration 025)
-- Calendar/Booking system scaffolded (migration 026)
-- Retell AI agent architecture designed
-- Magic Link authentication
-- CRM database schema
+- Updated Sidebar Navigation:
+  - Added "Creative Studio" nav item
+  - Added "Theme Settings" nav item (white-label only)
+  - Updated filtering logic for `whiteLabelOnly` items
 
----
+- Created API Endpoints:
+  - `GET/POST /api/pricing-tiers` - Database-driven pricing
+  - `GET/POST /api/site-content` - Editable page regions
 
-## File Structure (Key Files)
+- Created Creative Studio Placeholder (`/admin-v2/creative-studio`):
+  - Product type selection (apparel, wall_art, jewelry, home_decor, packaging, footwear)
+  - Upload workflow UI
+  - Character Vault tab (Photo-to-Seed + Virtual Generation)
+  - Product Library tab
 
-```
-/app/webapp/
-├── app/
-│   ├── admin-v2/
-│   │   ├── page.tsx                    # Command Center (Hub)
-│   │   ├── crm-dashboard/page.tsx      # CRM Dashboard (Spoke) - CONSOLIDATED
-│   │   ├── crm/page.tsx                # Redirects to crm-dashboard
-│   │   ├── analytics/page.tsx          # Analytics (Spoke)
-│   │   ├── calendar/page.tsx           # Calendar (Spoke)
-│   │   └── components/
-│   │       ├── shared/                 # NEW: Shared UI components
-│   │       │   ├── KPICard.tsx
-│   │       │   ├── FunnelChart.tsx
-│   │       │   ├── TimeSeriesChart.tsx
-│   │       │   ├── DataTable.tsx
-│   │       │   └── index.ts
-│   │       ├── CRMWidget.tsx           # NEW: Hub widget
-│   │       └── ...existing components
-│   └── api/
-│       ├── analytics/
-│       │   ├── route.ts                # Platform analytics
-│       │   └── crm/route.ts            # NEW: CRM analytics
-│       └── crm/
-│           └── leads/route.ts          # Lead CRUD
-├── lib/
-│   └── api/                            # NEW: API clients
-│       ├── analyticsApi.ts
-│       ├── coreApi.ts
-│       └── index.ts
-└── supabase/
-    └── migrations/
-        ├── 025_add_verification_columns.sql
-        └── 026_flexible_booking_system.sql
-```
+- Updated Business Context:
+  - Added `isWhiteLabel()` and `canEditSite()` helper functions
+  - Added `is_white_label`, `can_edit_site`, `monthly_price` to Business type
+
+**Database Fix (P0)**
+- Created `/database/FINAL_FIX_ALL.sql` - One-time idempotent fix for admin access
+- User confirmed admin status: ✅
+
+### January 15, 2025 (Previous Session)
+- Multi-tenant system foundation (businesses, user_businesses, access_codes)
+- SendGrid invite integration
+- Creative Studio backend APIs (analyze-product, generate-mockups)
+- Brain system backend APIs
+- Feature gating system
+
+### Earlier Sessions
+- Navigation system with hub-and-spoke pattern
+- CRM Dashboard consolidation
+- Email verification flow
+- Calendar/Booking system
 
 ---
 
-## Prioritized Backlog
+## Upcoming Tasks (Prioritized)
 
-### P0 - Critical
-- [x] Fix login page (autocomplete, code cleanup)
-- [x] Consolidate CRM with hub-and-spoke architecture
-- [x] Create shared UI component library
-- [x] Create analytics API with `meta` responses
-- [ ] **USER ACTION**: Test CRM lead sync (waitlist → verify → CRM)
-- [ ] **USER ACTION**: Configure Retell custom functions
-- [ ] Provide Retell system prompt (blocked on user)
+### P0 - User Action Required
+1. **Run Migration**: User must run `010_white_label_foundation.sql` in Supabase SQL Editor
+2. **Upload ArtfulPhusion Logo**: Via Theme Settings page after migration
 
-### P1 - High Priority
-- [ ] Add CRMWidget to Command Center page
-- [ ] Build unique GreenLine analytics endpoints:
-  - [ ] `/api/analytics/bookings` - Booking performance
-  - [ ] `/api/analytics/content` - Content engagement
-  - [ ] `/api/analytics/ai-receptionist` - Call analytics
-  - [ ] `/api/analytics/email` - Campaign performance
-- [ ] Test calendar/booking flow end-to-end
-- [ ] Build CRM Phase 2 (Pipeline/Kanban view)
+### P1 - Creative Studio Implementation
+1. Implement full product upload flow with Gemini 3 Pro analysis
+2. Build Character Vault with Identity Seed storage
+3. Implement 6-Pack mockup generation with scene selection
+4. Build Product Library with persistence
+5. Add Omnichannel Export (Pinterest/TikTok formatting)
 
-### P2 - Medium Priority
-- [ ] Sports Research Workflow (Phase 1 of advanced blog)
-- [ ] Google Calendar integration
-- [ ] Live Code Sandbox
-- [ ] Double opt-in for all forms
+### P2 - Inline Visual Editor
+1. Create "Editable Region" component wrapper
+2. Implement hover-to-edit pencil overlay
+3. Build rich text editor for text regions
+4. Build image swap with preserved styling
+5. Connect to `site_content` API for persistence
 
-### P3 - Future
-- [ ] Living Blog enhancements
-- [ ] Website template marketplace
-- [ ] AI-powered insights and recommendations
+### P3 - Future Tasks
+- Newsletter Forge (block-based editor)
+- Content Multiplier (auto-generate blog/Pinterest/TikTok)
+- "The Brain" system with Slack integration
+- Cmd+K universal command bar
 
 ---
 
-## Unique Analytics (Differentiator)
+## Key Files Reference
 
-GreenLine365's unique value comes from combining these data sources:
+### White-Label System
+- `/lib/theme/WhiteLabelThemeContext.tsx` - Theme provider
+- `/lib/business/BusinessContext.tsx` - Business context with white-label helpers
+- `/app/admin-v2/theme-settings/page.tsx` - Theme configuration UI
+- `/database/migrations/010_white_label_foundation.sql` - Schema migration
 
-| Data Source | Metrics | Use Case |
-|-------------|---------|----------|
-| **AI Receptionist** | Call volume, answer rate, conversion, top intents | Understand customer inquiries |
-| **Booking System** | Completion rate, peak hours, source breakdown | Optimize scheduling |
-| **Content/Posts** | Views, shares, clicks, engagement rate | Content ROI |
-| **Email Campaigns** | Open rate, click rate, unsubscribes | Campaign effectiveness |
-| **CRM** | Pipeline value, conversion funnel, source ROI | Sales performance |
+### Creative Studio
+- `/app/admin-v2/creative-studio/page.tsx` - Main studio UI
+- `/app/api/studio/analyze-product/route.ts` - Gemini 3 Pro analysis
+- `/app/api/studio/generate-mockups/route.ts` - Nano Banana Pro generation
 
-All combined in one unified analytics view with drill-through to records.
+### APIs
+- `/app/api/pricing-tiers/route.ts` - Database-driven pricing
+- `/app/api/site-content/route.ts` - Editable content regions
+
+### Navigation
+- `/app/admin-v2/components/CollapsibleSidebar.tsx` - Main sidebar with feature gating
 
 ---
 
-## Tech Stack
-- **Frontend**: Next.js 14, React, Tailwind, Framer Motion
-- **Backend**: Next.js API Routes, Supabase (DB, Auth, Storage)
-- **Integrations**: Retell AI, SendGrid, OpenRouter
-- **Architecture**: Hub-and-Spoke UI, Two-API pattern (Core + Analytics)
+## 3rd Party Integrations
+- **Supabase**: Database, Auth, Storage
+- **SendGrid**: Transactional emails
+- **OpenRouter**: LLM gateway (Gemini 3 Pro)
+- **Emergent LLM Key**: Nano Banana Pro image generation
+- **Slack**: Planned for "The Brain" integration
+
+---
+
+## Test Tenants
+1. **GreenLine365** (Default): Standard owner tenant
+2. **ArtfulPhusion** (White-Label): First test tenant with custom purple/pink branding
