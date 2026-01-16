@@ -56,6 +56,24 @@ mockup_scenes (name, slug, category, prompt_template)
 
 ### January 16, 2025 (Current Session)
 
+#### ✅ CRITICAL BUG FIX: Business Switching UI Stability
+- **Issue**: Dashboard crashed with NaN SVG errors and widgets disappeared when switching between businesses
+- **Root Cause**: Components re-rendered with new business ID before data was loaded, causing division-by-zero errors
+- **Fix Applied**:
+  - Added `isSwitchingBusiness` state to BusinessContext
+  - Added full-page loading overlay during business transition
+  - Added NaN guards to all SVG chart calculations
+  - BrainWidget now shows skeleton loader instead of disappearing
+  - Sidebar dropdown disabled during switch with spinner indicator
+- **Files Modified**:
+  - `/lib/business/BusinessContext.tsx` - Added isSwitchingBusiness state
+  - `/app/admin-v2/page.tsx` - Added loading overlay (z-index 100)
+  - `/app/admin-v2/components/AnalyticsWidgets.tsx` - NaN guards in SVG
+  - `/app/admin-v2/components/BrainWidget.tsx` - Skeleton during switch
+  - `/app/admin-v2/components/CollapsibleSidebar.tsx` - Disabled dropdown + spinner
+  - `/app/admin-v2/components/shared/TimeSeriesChart.tsx` - NaN guards
+  - `/app/admin-v2/components/shared/KPICard.tsx` - NaN guards in sparkline
+
 #### ✅ Phase 1: White-Label Foundation
 - **Database Migration** (`010_white_label_MINIMAL.sql`):
   - Added `is_white_label`, `can_edit_site`, `monthly_price` to businesses
