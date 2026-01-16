@@ -298,9 +298,9 @@ export default function TacticalCommandCenter() {
             <div className="lg:col-span-2">
               <WeeklyTrendBatch onCreateContent={handleForgeFromWeeklyTrend} />
             </div>
-            {/* Brain Widget */}
+            {/* Brain Widget - key forces clean re-render on business switch */}
             <div>
-              <BrainWidget />
+              <BrainWidget key={activeBusiness?.id || 'default'} />
             </div>
           </div>
 
