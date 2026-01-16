@@ -292,20 +292,6 @@ function SignupForm() {
               type="submit"
               disabled={loading || (!!code && codeValid === false)}
               className="w-full py-4 bg-gradient-to-r from-[#39FF14] to-[#0CE293] text-black font-bold rounded-xl hover:opacity-90 transition disabled:opacity-50 flex items-center justify-center gap-2"
-
-
-export default function SignupWithCodePage() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center">
-        <div className="text-white/60">Loading...</div>
-      </div>
-    }>
-      <SignupForm />
-    </Suspense>
-  );
-}
-
             >
               {loading ? (
                 <>
@@ -329,5 +315,17 @@ export default function SignupWithCodePage() {
         </motion.div>
       </div>
     </div>
+  );
+}
+
+export default function SignupWithCodePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center">
+        <div className="text-white/60">Loading...</div>
+      </div>
+    }>
+      <SignupForm />
+    </Suspense>
   );
 }
