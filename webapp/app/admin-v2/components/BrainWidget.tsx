@@ -27,9 +27,15 @@ export function BrainWidget() {
   const [showAddThought, setShowAddThought] = useState(false);
   const [newThought, setNewThought] = useState('');
   const [activeTab, setActiveTab] = useState<'today' | 'week' | 'all'>('today');
+  const [fetchError, setFetchError] = useState<string | null>(null);
+  
+  // Track last fetched business to prevent duplicate requests
+  const lastFetchedBusiness = React.useRef<string | null>(null);
 
   useEffect(() => {
-    if (activeBusiness && !isSwitchingBusiness) {
+    // Only fetch if business changed and not switching
+    if (activeBusiness && !isSwitchingBusiness && lastFetchedBusiness.current !== activeBusiness.id) {
+      lastFetchedBusiness.current = activeBusiness.id;
       fetchBrainItems();
     }
   }, [activeBusiness, isSwitchingBusiness]);
@@ -39,9 +45,10 @@ export function BrainWidget() {
     
     try {
       setLoading(true);
+      setFetchError(null);
       
-      // Fetch from all buckets
-      const [peopleRes, projectsRes, ideasRes, adminRes] = await Promise.all([
+      // Fetch from all buckets with error handling per request
+      const [peopleRes, projectsRes, ideasRes, adminRes] = await Promise.allSettled([
         fetch(`/api/brain/people?businessId=${activeBusiness.id}`),
         fetch(`/api/brain/projects?businessId=${activeBusiness.id}`),
         fetch(`/api/brain/ideas?businessId=${activeBusiness.id}`),
@@ -52,8 +59,8 @@ export function BrainWidget() {
       const allItems: BrainItem[] = [];
       
       // Add people with upcoming follow-ups
-      if (peopleRes.ok) {
-        const people = await peopleRes.json();
+      if (peopleRes.status === 'fulfilled' && peopleRes.value.ok) {
+        const people = await peopleRes.value.json();
         people.items?.forEach((person: any) => {
           if (person.next_followup) {
             allItems.push({
@@ -67,8 +74,8 @@ export function BrainWidget() {
       }
 
       // Add active projects
-      if (projectsRes.ok) {
-        const projects = await projectsRes.json();
+      if (projectsRes.status === 'fulfilled' && projectsRes.value.ok) {
+        const projects = await projectsRes.value.json();
         projects.items?.forEach((project: any) => {
           if (project.next_action && project.status === 'active') {
             allItems.push({
@@ -82,8 +89,8 @@ export function BrainWidget() {
       }
 
       // Add admin tasks
-      if (adminRes.ok) {
-        const admin = await adminRes.json();
+      if (adminRes.status === 'fulfilled' && adminRes.value.ok) {
+        const admin = await adminRes.value.json();
         admin.items?.forEach((task: any) => {
           if (!task.completed) {
             allItems.push({
@@ -100,6 +107,7 @@ export function BrainWidget() {
       setItems(allItems);
     } catch (error) {
       console.error('Failed to fetch brain items:', error);
+      setFetchError('Could not load brain items');
     } finally {
       setLoading(false);
     }
