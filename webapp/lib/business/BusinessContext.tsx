@@ -202,14 +202,12 @@ export function BusinessProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    // Smooth transition - just update state, no page reload
     setActiveBusiness(targetBusiness.business);
     localStorage.setItem(STORAGE_KEY, businessId);
-
-    // Trigger a page refresh to clear any cached data
-    // In a production app, you might want to invalidate specific queries instead
-    if (typeof window !== 'undefined') {
-      window.location.reload();
-    }
+    
+    // Note: Components should react to activeBusiness changes via context
+    // No page reload needed - React will re-render with new business data
   };
 
   const refreshBusinesses = async () => {
