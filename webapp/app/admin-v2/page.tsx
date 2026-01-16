@@ -20,6 +20,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
+import { useBusiness } from '@/lib/business';
 import CollapsibleSidebar from './components/CollapsibleSidebar';
 import TacticalHeader from './components/TacticalHeader';
 import HybridCalendar from './components/HybridCalendar';
@@ -30,6 +31,7 @@ import LiveLocalPulse from './components/LiveLocalPulse';
 import AnalyticsWidgets from './components/AnalyticsWidgets';
 import DemoController from './components/DemoController';
 import DraftsPanel from './components/DraftsPanel';
+import OnboardingBanner from './components/OnboardingBanner';
 import type { CalendarEvent, LocalTrend, ActivityItem, TeamMetrics, PipelineStage, BookingTrend } from './lib/types';
 
 // ============================================
