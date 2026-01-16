@@ -155,13 +155,18 @@ export default function CollapsibleSidebar({
   isPreviewMode,
   onPreviewModeToggle,
 }: SidebarProps) {
-  const { hasFeature, isAdmin } = useBusiness();
+  const { hasFeature, isAdmin, isWhiteLabel } = useBusiness();
   
   // Filter nav items based on features
   const visibleNavItems = useMemo(() => {
     return navItems.filter(item => {
       // Admin-only items
       if ((item as any).adminOnly && !isAdmin()) {
+        return false;
+      }
+      
+      // White-label only items
+      if ((item as any).whiteLabelOnly && !isWhiteLabel()) {
         return false;
       }
       
@@ -173,7 +178,7 @@ export default function CollapsibleSidebar({
       // Always show items without feature requirements
       return true;
     });
-  }, [hasFeature, isAdmin]);
+  }, [hasFeature, isAdmin, isWhiteLabel]);
   
   // Triple-click handler for hidden Demo Controller
   const [clickCount, setClickCount] = useState(0);
