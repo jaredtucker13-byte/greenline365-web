@@ -33,21 +33,21 @@ interface SidebarProps {
 }
 
 const navItems = [
-  { id: 'dashboard', label: 'Dashboard', icon: 'grid', href: '/admin-v2' },
-  { id: 'schedule', label: 'Schedule', icon: 'calendar', href: '/admin-v2?view=schedule' },
-  { id: 'blog', label: 'Blog', icon: 'edit', href: '/admin-v2/blog-polish' },
-  { id: 'website-builder', label: 'Website Builder', icon: 'paint', href: '/admin-v2/website-analyzer' },
-  { id: 'code-studio', label: 'Code Studio', icon: 'code', href: '/admin-v2/code-studio' },
-  { id: 'incidents', label: 'Incidents', icon: 'alert', href: '/admin-v2/incidents' },
-  { id: 'email', label: 'Email', icon: 'mail', href: '/admin-v2/email' },
-  { id: 'sms', label: 'SMS', icon: 'phone', href: '/admin-v2/sms' },
-  { id: 'crm', label: 'CRM', icon: 'users', href: '/admin-v2/crm-dashboard' },
-  { id: 'analytics', label: 'Analytics', icon: 'chart', href: '/admin-v2/analytics' },
-  { id: 'access-codes', label: 'Access Codes', icon: 'ticket', href: '/admin-v2/access-codes' },
-  { id: 'brand-voice', label: 'Brand Voice', icon: 'voice', href: '/admin-v2/brand-voice' },
-  { id: 'knowledge', label: 'Knowledge Base', icon: 'database', href: '/admin-v2/knowledge' },
-  { id: 'audit', label: 'Audit Logs', icon: 'shield', href: '/admin-v2/audit' },
-  { id: 'settings', label: 'Settings', icon: 'cog', href: '/admin-v2/settings' },
+  { id: 'dashboard', label: 'Dashboard', icon: 'grid', href: '/admin-v2', feature: null },
+  { id: 'schedule', label: 'Schedule', icon: 'calendar', href: '/admin-v2?view=schedule', feature: 'calendar' },
+  { id: 'blog', label: 'Blog', icon: 'edit', href: '/admin-v2/blog-polish', feature: 'blog' },
+  { id: 'website-builder', label: 'Website Builder', icon: 'paint', href: '/admin-v2/website-analyzer', feature: 'mockup_generator' },
+  { id: 'code-studio', label: 'Code Studio', icon: 'code', href: '/admin-v2/code-studio', feature: 'mockup_generator' },
+  { id: 'incidents', label: 'Incidents', icon: 'alert', href: '/admin-v2/incidents', feature: null },
+  { id: 'email', label: 'Email', icon: 'mail', href: '/admin-v2/email', feature: 'email' },
+  { id: 'sms', label: 'SMS', icon: 'phone', href: '/admin-v2/sms', feature: 'sms' },
+  { id: 'crm', label: 'CRM', icon: 'users', href: '/admin-v2/crm-dashboard', feature: 'crm' },
+  { id: 'analytics', label: 'Analytics', icon: 'chart', href: '/admin-v2/analytics', feature: 'analytics' },
+  { id: 'access-codes', label: 'Access Codes', icon: 'ticket', href: '/admin-v2/access-codes', feature: null, adminOnly: true },
+  { id: 'brand-voice', label: 'Brand Voice', icon: 'voice', href: '/admin-v2/brand-voice', feature: 'knowledge_base' },
+  { id: 'knowledge', label: 'Knowledge Base', icon: 'database', href: '/admin-v2/knowledge', feature: 'knowledge_base' },
+  { id: 'audit', label: 'Audit Logs', icon: 'shield', href: '/admin-v2/audit', feature: null, adminOnly: true },
+  { id: 'settings', label: 'Settings', icon: 'cog', href: '/admin-v2/settings', feature: null },
 ];
 
 const icons: Record<string, React.ReactElement> = {
