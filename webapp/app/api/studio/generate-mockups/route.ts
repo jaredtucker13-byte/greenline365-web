@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body: GenerateMockupsRequest = await request.json();
-    const { businessId, productImages, productDescription, modelSeed, scenes } = body;
+    const { businessId, productImages, productDescription, productType = 'default', modelSeed, scenes } = body;
 
     if (!businessId || !productImages || productImages.length === 0 || !productDescription) {
       return NextResponse.json(
@@ -110,10 +110,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Select scenes based on product type
+    const sceneSet = productType === 'wall_art' ? WALL_ART_SCENES : DEFAULT_SCENES;
+    
     // Generate mockups for each scene
     const scenesToGenerate = scenes && scenes.length > 0 
-      ? DEFAULT_SCENES.filter(s => scenes.includes(s.name))
-      : DEFAULT_SCENES;
+      ? sceneSet.filter(s => scenes.includes(s.name))
+      : sceneSet;
 
     const mockups = await Promise.all(
       scenesToGenerate.map(async (scene) => {
