@@ -13,6 +13,7 @@ import FloatingShapes from './components/FloatingShapes';
 import { Button } from '@/components/ui/os';
 import { NeonText } from '@/components/ui/os';
 import { GlassCard } from '@/components/ui/os';
+import { EditableRegion } from '@/components/editor';
 
 // Register GSAP plugins
 if (typeof window !== 'undefined') {
