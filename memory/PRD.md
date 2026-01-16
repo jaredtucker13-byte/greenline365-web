@@ -1,9 +1,10 @@
 # GreenLine365 Business Operating System - PRD
 
 ## ⚠️ HARD RULES (DO NOT OVERRIDE)
-1. **DO NOT use EMERGENT_LLM_KEY for image generation**
-2. **For Nano Banana / Image Generation: Use kie.ai** (user's preferred provider)
+1. **DO NOT use EMERGENT_LLM_KEY for image generation** - Emergent does NOT have Nano Banana
+2. **For Nano Banana / Image Generation: Use kie.ai** (KIE_API_KEY) - User's preferred provider
 3. **For LLM text analysis: Use OpenRouter with Gemini 3 Pro**
+4. **GreenLine365 = Primary admin account, ArtfulPhusion = White-label test tenant (separate)**
 
 ---
 
