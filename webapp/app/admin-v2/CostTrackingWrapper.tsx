@@ -4,11 +4,13 @@
  * CostTrackingWrapper Component
  * 
  * Client-side wrapper for cost tracking functionality.
- * Includes the provider and the floating cost log button.
+ * PLATFORM OWNER ONLY - Not visible to tenants.
+ * 
+ * The cost log viewer is accessed via Settings, not a floating button.
  */
 
 import { ReactNode } from 'react';
-import { CostTrackingProvider, CostLogViewer } from '@/lib/cost-tracking';
+import { CostTrackingProvider } from '@/lib/cost-tracking';
 
 interface CostTrackingWrapperProps {
   children: ReactNode;
@@ -18,7 +20,7 @@ export default function CostTrackingWrapper({ children }: CostTrackingWrapperPro
   return (
     <CostTrackingProvider>
       {children}
-      <CostLogViewer />
+      {/* Cost log viewer is accessed via Settings page, not floating button */}
     </CostTrackingProvider>
   );
 }
