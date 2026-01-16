@@ -100,7 +100,7 @@ export default function AnalyticsWidgets({
         </div>
         
         <div className="flex items-end justify-between h-[160px] gap-2 pt-4">
-          {teamMetrics.map((metric, idx) => (
+          {safeTeamMetrics.map((metric, idx) => (
             <div key={metric.label} className="flex-1 flex flex-col items-center gap-2">
               <motion.div
                 initial={{ height: 0 }}
