@@ -163,9 +163,29 @@ export default function CollapsibleSidebar({
 }: SidebarProps) {
   const { hasFeature, isAdmin, isWhiteLabel, activeBusiness, userBusinesses, switchBusiness, isSwitchingBusiness } = useBusiness();
   
+  // Platform owner ID - only this user sees platform-level features
+  const PLATFORM_OWNER_ID = '677b536d-6521-4ac8-a0a5-98278b35f4cc';
+  const [isPlatformOwner, setIsPlatformOwner] = useState(false);
+  
+  // Check if current user is platform owner
+  useEffect(() => {
+    const checkPlatformOwner = async () => {
+      const { createClient } = await import('@/lib/supabase/client');
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      setIsPlatformOwner(user?.id === PLATFORM_OWNER_ID);
+    };
+    checkPlatformOwner();
+  }, []);
+  
   // Filter nav items based on features
   const visibleNavItems = useMemo(() => {
     return navItems.filter(item => {
+      // Platform owner only items (API Costs, etc.)
+      if ((item as any).platformOwnerOnly && !isPlatformOwner) {
+        return false;
+      }
+      
       // Admin-only items
       if ((item as any).adminOnly && !isAdmin()) {
         return false;
@@ -184,7 +204,7 @@ export default function CollapsibleSidebar({
       // Always show items without feature requirements
       return true;
     });
-  }, [hasFeature, isAdmin, isWhiteLabel]);
+  }, [hasFeature, isAdmin, isWhiteLabel, isPlatformOwner]);
   
   // Triple-click handler for hidden Demo Controller
   const [clickCount, setClickCount] = useState(0);
