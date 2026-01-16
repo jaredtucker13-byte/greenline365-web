@@ -128,13 +128,13 @@ export function TimeSeriesChart({
           />
           
           {/* Dots on primary line */}
-          {showDots && data.map((d, i) => (
+          {showDots && data.length > 1 && data.map((d, i) => (
             <motion.circle
               key={i}
               initial={animate ? { opacity: 0, r: 0 } : false}
               animate={{ opacity: 1, r: 4 }}
               transition={{ delay: 0.6 + i * 0.05 }}
-              cx={(i / (data.length - 1)) * 280 + 10}
+              cx={(i / Math.max(data.length - 1, 1)) * 280 + 10}
               cy={120 - (d.value / maxValue) * 100}
               fill={primaryColor}
             />
