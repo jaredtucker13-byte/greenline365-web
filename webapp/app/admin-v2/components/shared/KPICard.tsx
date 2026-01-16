@@ -193,16 +193,16 @@ export function KPICard({
 
 // Simple SVG sparkline component
 function Sparkline({ data, color }: { data: number[]; color: string }) {
-  if (data.length < 2) return null;
+  if (!data || data.length < 2) return null;
   
   const max = Math.max(...data);
   const min = Math.min(...data);
   const range = max - min || 1;
   
   const points = data.map((value, i) => {
-    const x = (i / (data.length - 1)) * 100;
+    const x = (i / Math.max(data.length - 1, 1)) * 100;
     const y = 30 - ((value - min) / range) * 25;
-    return `${x},${y}`;
+    return `${isNaN(x) ? 0 : x},${isNaN(y) ? 15 : y}`;
   }).join(' ');
   
   return (
