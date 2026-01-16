@@ -49,6 +49,7 @@ const navItems = [
   { id: 'brand-voice', label: 'Brand Voice', icon: 'voice', href: '/admin-v2/brand-voice', feature: 'knowledge_base' },
   { id: 'knowledge', label: 'Knowledge Base', icon: 'database', href: '/admin-v2/knowledge', feature: 'knowledge_base' },
   { id: 'theme-settings', label: 'Theme Settings', icon: 'palette', href: '/admin-v2/theme-settings', feature: null, whiteLabelOnly: true },
+  { id: 'platform-costs', label: 'API Costs', icon: 'dollar', href: '/admin-v2/platform-costs', feature: null, platformOwnerOnly: true },
   { id: 'audit', label: 'Audit Logs', icon: 'shield', href: '/admin-v2/audit', feature: null, adminOnly: true },
   { id: 'settings', label: 'Settings', icon: 'cog', href: '/admin-v2/settings', feature: null },
 ];
