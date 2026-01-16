@@ -3,13 +3,20 @@
 /**
  * Cost Tracking Context & Components
  * 
- * Tracks all paid API calls for tax and billing purposes.
- * Shows confirmation modal before any API call that costs money.
+ * PLATFORM OWNER ONLY - Tracks all paid API calls across ALL tenants
+ * for tax and accounting purposes.
+ * 
+ * - Confirmation modal before paid API calls
+ * - Cost logging with export functionality
+ * - Only visible to platform owner (not tenants)
  */
 
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, DollarSign, X, Check, FileText } from 'lucide-react';
+
+// Platform owner user ID - only this user sees cost tracking
+const PLATFORM_OWNER_ID = '677b536d-6521-4ac8-a0a5-98278b35f4cc';
 
 // ============================================
 // COST DEFINITIONS
