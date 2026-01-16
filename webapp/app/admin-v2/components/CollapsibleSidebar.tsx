@@ -205,18 +205,52 @@ export default function CollapsibleSidebar({
 
   const sidebarContent = (
     <div className="flex flex-col h-full">
-      {/* Header / Logo */}
+      {/* Header / Logo with Business Name */}
       <div className={`p-4 ${isCollapsed ? 'px-2' : ''}`} style={{ borderBottom: '1px solid var(--theme-glass-border)' }}>
         <div className="flex items-center justify-between">
-          <Link href="/" className={`flex items-center gap-2 ${isCollapsed ? 'justify-center w-full' : ''}`}>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'linear-gradient(135deg, var(--theme-primary), var(--theme-secondary))', boxShadow: '0 0 15px var(--theme-glow)' }}>
-              <span className="text-white font-bold text-sm">G</span>
+          <Link href="/admin-v2" className={`flex items-center gap-2 ${isCollapsed ? 'justify-center w-full' : ''}`}>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: activeBusiness?.is_white_label ? `linear-gradient(135deg, #8B5CF6, #EC4899)` : 'linear-gradient(135deg, var(--theme-primary), var(--theme-secondary))', boxShadow: '0 0 15px var(--theme-glow)' }}>
+              <span className="text-white font-bold text-sm">
+                {activeBusiness?.name?.[0] || 'G'}
+              </span>
             </div>
             {!isCollapsed && (
-              <span style={{ color: 'var(--theme-text-primary)' }} className="font-medium">GreenLine365</span>
+              <div className="flex flex-col">
+                <span style={{ color: 'var(--theme-text-primary)' }} className="font-semibold text-sm leading-tight">
+                  {activeBusiness?.name || 'GreenLine365'}
+                </span>
+                {activeBusiness?.is_white_label && (
+                  <span className="text-[10px] text-purple-400">White-Label</span>
+                )}
+              </div>
             )}
           </Link>
         </div>
+        
+        {/* Business Switcher - Only show if multiple businesses and not collapsed */}
+        {!isCollapsed && userBusinesses.length > 1 && (
+          <div className="mt-3">
+            <button
+              onClick={() => {
+                // Toggle through businesses
+                const currentIndex = userBusinesses.findIndex(ub => ub.business.id === activeBusiness?.id);
+                const nextIndex = (currentIndex + 1) % userBusinesses.length;
+                switchBusiness(userBusinesses[nextIndex].business.id);
+              }}
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition"
+              style={{ 
+                background: 'var(--theme-bg-glass)', 
+                border: '1px solid var(--theme-glass-border)',
+                color: 'var(--theme-text-secondary)'
+              }}
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+              </svg>
+              <span>Switch Business ({userBusinesses.length})</span>
+            </button>
+          </div>
+        )}
       </div>
       
       {/* Collapse Toggle - Placed BELOW the header line */}
