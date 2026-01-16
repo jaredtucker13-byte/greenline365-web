@@ -129,6 +129,11 @@ export default function PlatformCostsPage() {
         <TacticalHeader
           title="Platform API Costs"
           subtitle="Track all API usage across the platform for tax purposes"
+          onToday={() => {}}
+          onPrev={() => {}}
+          onNext={() => {}}
+          viewMode="month"
+          onViewChange={() => {}}
         />
 
         <div className="p-6 max-w-6xl mx-auto space-y-6">
