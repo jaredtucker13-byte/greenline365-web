@@ -5,3 +5,4 @@
  */
 
 export { EditableRegion } from './EditableRegion';
+export { AdminEditModeProvider, useAdminEditMode } from './AdminEditModeContext';
