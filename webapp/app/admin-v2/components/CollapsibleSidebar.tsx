@@ -219,7 +219,7 @@ export default function CollapsibleSidebar({
 
       {/* Navigation */}
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-        {navItems.map((item) => {
+        {visibleNavItems.map((item) => {
           // Use the ID to check active state instead of relying on prop
           const isCurrentActive = activeItem === item.id;
           
