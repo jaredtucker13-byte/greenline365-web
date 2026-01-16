@@ -290,7 +290,7 @@ export default function SignupWithCodePage() {
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={loading || (code && !codeValid)}
+              disabled={loading || (!!code && codeValid === false)}
               className="w-full py-4 bg-gradient-to-r from-[#39FF14] to-[#0CE293] text-black font-bold rounded-xl hover:opacity-90 transition disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {loading ? (
