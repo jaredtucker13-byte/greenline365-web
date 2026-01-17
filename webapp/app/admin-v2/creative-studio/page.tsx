@@ -3,6 +3,12 @@
 /**
  * ArtfulPhusion Creative Studio
  * Full Implementation with AI Analysis & Mockup Generation
+ * 
+ * FIXES APPLIED:
+ * - Product Library items now clickable with detail/re-run
+ * - Mockup images properly displayed
+ * - Scene selection with preview images
+ * - Product URL input added
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -16,7 +22,7 @@ import TacticalHeader from '../components/TacticalHeader';
 import { 
   Upload, Sparkles, Users, Image, Download, Share2, Folder,
   Plus, Camera, Wand2, Eye, ChevronRight, X, Check, Loader2,
-  RefreshCw, Trash2, Star, Grid, List, ArrowRight
+  RefreshCw, Trash2, Star, Grid, List, ArrowRight, Link, ExternalLink
 } from 'lucide-react';
 
 // Product types
@@ -31,6 +37,58 @@ const PRODUCT_TYPES = [
   { id: 'default', label: 'Other', icon: '📸', description: 'General products' },
 ];
 
+// Scene presets with preview images
+const SCENE_PRESETS = [
+  { 
+    id: 'minimalist', 
+    slug: 'minimalist_studio', 
+    name: 'Minimalist Studio', 
+    description: 'Clean white background with soft shadows',
+    preview: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&h=200&fit=crop',
+    category: 'studio'
+  },
+  { 
+    id: 'lifestyle', 
+    slug: 'lifestyle_living', 
+    name: 'Lifestyle Living Room', 
+    description: 'Cozy home environment setting',
+    preview: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=300&h=200&fit=crop',
+    category: 'lifestyle'
+  },
+  { 
+    id: 'golden_hour', 
+    slug: 'golden_hour', 
+    name: 'Golden Hour Outdoor', 
+    description: 'Warm sunset lighting outdoors',
+    preview: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=200&fit=crop',
+    category: 'outdoor'
+  },
+  { 
+    id: 'urban', 
+    slug: 'urban_street', 
+    name: 'Urban Street', 
+    description: 'City backdrop with modern vibes',
+    preview: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=300&h=200&fit=crop',
+    category: 'outdoor'
+  },
+  { 
+    id: 'flatlay', 
+    slug: 'flat_lay', 
+    name: 'Flat Lay Styled', 
+    description: 'Top-down with curated props',
+    preview: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&h=200&fit=crop',
+    category: 'studio'
+  },
+  { 
+    id: 'nature', 
+    slug: 'nature_macro', 
+    name: 'Nature Macro', 
+    description: 'Natural elements close-up',
+    preview: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=300&h=200&fit=crop',
+    category: 'outdoor'
+  },
+];
+
 interface Product {
   id: string;
   name: string;
@@ -40,6 +98,7 @@ interface Product {
   ai_analysis: any;
   status: string;
   created_at: string;
+  mockups?: { id: string; image_url: string; scene_id: string }[];
 }
 
 interface SignatureModel {
@@ -52,20 +111,12 @@ interface SignatureModel {
   style_tags: string[];
 }
 
-interface Scene {
-  id: string;
-  name: string;
-  slug: string;
-  description: string;
-  category: string;
-  preview_url: string | null;
-}
-
 export default function CreativeStudioPage() {
   const router = useRouter();
   const { activeBusiness, hasFeature } = useBusiness();
   const { requestConfirmation } = useCostTracking();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const urlInputRef = useRef<HTMLInputElement>(null);
   
   // State
   const [activeTab, setActiveTab] = useState<'upload' | 'vault' | 'library'>('upload');
@@ -78,16 +129,24 @@ export default function CreativeStudioPage() {
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [productName, setProductName] = useState('');
   
+  // NEW: Product URL input
+  const [productUrl, setProductUrl] = useState('');
+  const [isLoadingUrl, setIsLoadingUrl] = useState(false);
+  const [uploadMode, setUploadMode] = useState<'file' | 'url'>('file');
+  
   // Data
   const [products, setProducts] = useState<Product[]>([]);
   const [signatureModels, setSignatureModels] = useState<SignatureModel[]>([]);
-  const [scenes, setScenes] = useState<Scene[]>([]);
   const [selectedScenes, setSelectedScenes] = useState<string[]>([]);
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
   
   // Mockup generation
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedMockups, setGeneratedMockups] = useState<string[]>([]);
+  const [generatedMockups, setGeneratedMockups] = useState<{url: string; scene: string}[]>([]);
+  
+  // NEW: Product detail modal
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [showProductDetail, setShowProductDetail] = useState(false);
   
   // Sidebar
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -109,18 +168,32 @@ export default function CreativeStudioPage() {
     if (activeBusiness) {
       loadProducts();
       loadSignatureModels();
-      loadScenes();
     }
   }, [activeBusiness]);
 
   const loadProducts = async () => {
     if (!activeBusiness) return;
-    const { data } = await supabase
+    
+    // Load products with their mockups
+    const { data: productsData } = await supabase
       .from('studio_products')
       .select('*')
       .eq('business_id', activeBusiness.id)
       .order('created_at', { ascending: false });
-    if (data) setProducts(data);
+    
+    if (productsData) {
+      // Load mockups for each product
+      const productsWithMockups = await Promise.all(
+        productsData.map(async (product) => {
+          const { data: mockups } = await supabase
+            .from('studio_mockups')
+            .select('*')
+            .eq('product_id', product.id);
+          return { ...product, mockups: mockups || [] };
+        })
+      );
+      setProducts(productsWithMockups);
+    }
   };
 
   const loadSignatureModels = async () => {
@@ -131,15 +204,6 @@ export default function CreativeStudioPage() {
       .eq('business_id', activeBusiness.id)
       .eq('is_active', true);
     if (data) setSignatureModels(data);
-  };
-
-  const loadScenes = async () => {
-    const { data } = await supabase
-      .from('mockup_scenes')
-      .select('*')
-      .eq('is_active', true)
-      .order('display_order');
-    if (data) setScenes(data);
   };
 
   // File handling
@@ -162,12 +226,38 @@ export default function CreativeStudioPage() {
     setUploadedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
+  // NEW: Load image from URL
+  const loadImageFromUrl = async () => {
+    if (!productUrl.trim()) return;
+    
+    setIsLoadingUrl(true);
+    try {
+      // Validate URL
+      new URL(productUrl);
+      
+      // Add the URL to uploadedUrls directly
+      setUploadedUrls(prev => [...prev, productUrl].slice(0, 5));
+      setProductUrl('');
+    } catch (error) {
+      alert('Please enter a valid URL');
+    } finally {
+      setIsLoadingUrl(false);
+    }
+  };
+
   // Upload files to Supabase Storage
   const uploadFiles = async (): Promise<string[]> => {
-    if (!activeBusiness || uploadedFiles.length === 0) return [];
+    if (!activeBusiness) return uploadedUrls; // Return existing URLs if we have them
+    
+    // If we already have URLs (from URL input), return them
+    if (uploadedUrls.length > 0 && uploadedFiles.length === 0) {
+      return uploadedUrls;
+    }
+    
+    if (uploadedFiles.length === 0) return [];
     
     setIsUploading(true);
-    const urls: string[] = [];
+    const urls: string[] = [...uploadedUrls]; // Start with existing URLs
     
     try {
       for (const file of uploadedFiles) {
@@ -199,17 +289,17 @@ export default function CreativeStudioPage() {
 
   // AI Analysis (with cost confirmation)
   const analyzeProduct = async () => {
-    if (uploadedFiles.length === 0 || !selectedProductType) return;
+    if ((uploadedFiles.length === 0 && uploadedUrls.length === 0) || !selectedProductType) return;
     
     // Request cost confirmation
     requestConfirmation(
       '/api/studio/analyze-product',
-      1, // 1 analysis call
+      1,
       async () => {
         setIsAnalyzing(true);
         
         try {
-          // First upload files
+          // First upload files if any
           const imageUrls = await uploadFiles();
           if (imageUrls.length === 0) {
             throw new Error('No images uploaded');
@@ -241,7 +331,7 @@ export default function CreativeStudioPage() {
           setIsAnalyzing(false);
         }
       },
-      { productType: selectedProductType, imageCount: uploadedFiles.length }
+      { productType: selectedProductType, imageCount: uploadedFiles.length + uploadedUrls.length }
     );
   };
 
@@ -255,7 +345,7 @@ export default function CreativeStudioPage() {
         .insert({
           business_id: activeBusiness.id,
           name: productName,
-          description: analysisResult.description || '',
+          description: analysisResult.description,
           product_type: selectedProductType,
           original_images: uploadedUrls,
           ai_analysis: analysisResult,
@@ -266,7 +356,8 @@ export default function CreativeStudioPage() {
       
       if (error) throw error;
       
-      setProducts(prev => [data, ...prev]);
+      // Refresh products list
+      loadProducts();
       setStep(4);
       
     } catch (error) {
@@ -279,10 +370,9 @@ export default function CreativeStudioPage() {
   const generateMockups = async () => {
     if (selectedScenes.length === 0) return;
     
-    // Request cost confirmation - shows modal for platform owner, logs for tenants
     requestConfirmation(
       '/api/studio/generate-mockups',
-      selectedScenes.length, // Each scene = 1 image
+      selectedScenes.length,
       async () => {
         setIsGenerating(true);
         setGeneratedMockups([]);
@@ -303,7 +393,14 @@ export default function CreativeStudioPage() {
           if (!response.ok) throw new Error('Generation failed');
           
           const result = await response.json();
-          setGeneratedMockups(result.mockups || []);
+          
+          // Format mockups with scene info
+          const mockups = (result.mockups || []).map((url: string, idx: number) => ({
+            url,
+            scene: selectedScenes[idx] || 'unknown'
+          }));
+          
+          setGeneratedMockups(mockups);
           setStep(5);
           
         } catch (error) {
@@ -317,6 +414,22 @@ export default function CreativeStudioPage() {
     );
   };
 
+  // Re-run mockups for existing product
+  const rerunMockups = (product: Product) => {
+    setSelectedProduct(product);
+    setShowProductDetail(false);
+    
+    // Pre-fill data from product
+    setProductName(product.name);
+    setAnalysisResult(product.ai_analysis);
+    setUploadedUrls(product.original_images || []);
+    setSelectedProductType(product.product_type);
+    
+    // Go to scene selection step
+    setActiveTab('upload');
+    setStep(4);
+  };
+
   // Reset flow
   const resetFlow = () => {
     setStep(1);
@@ -328,6 +441,8 @@ export default function CreativeStudioPage() {
     setSelectedScenes([]);
     setSelectedModel(null);
     setGeneratedMockups([]);
+    setProductUrl('');
+    setUploadMode('file');
   };
 
   // Feature gate
@@ -446,7 +561,7 @@ export default function CreativeStudioPage() {
                 </motion.div>
               )}
 
-              {/* Step 2: Upload Photos */}
+              {/* Step 2: Upload Photos - UPDATED with URL input */}
               {step === 2 && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -455,75 +570,153 @@ export default function CreativeStudioPage() {
                 >
                   <div className="flex items-center justify-between mb-4">
                     <div>
-                      <h3 className="text-xl font-bold text-white">Upload Product Photos</h3>
-                      <p className="text-white/50">Add 1-5 photos from different angles</p>
+                      <h3 className="text-xl font-bold text-white">Upload Product Images</h3>
+                      <p className="text-white/50">Add photos or paste a product URL</p>
                     </div>
-                    <button onClick={() => setStep(1)} className="text-white/40 hover:text-white">
+                    <button
+                      onClick={() => setStep(1)}
+                      className="text-white/50 hover:text-white"
+                    >
                       <X className="w-5 h-5" />
                     </button>
                   </div>
 
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={handleFileSelect}
-                    className="hidden"
-                  />
+                  {/* Upload Mode Toggle */}
+                  <div className="flex gap-2 mb-4">
+                    <button
+                      onClick={() => setUploadMode('file')}
+                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition ${
+                        uploadMode === 'file' 
+                          ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30' 
+                          : 'bg-white/5 text-white/60 border border-white/10'
+                      }`}
+                    >
+                      <Upload className="w-4 h-4" />
+                      Upload Files
+                    </button>
+                    <button
+                      onClick={() => setUploadMode('url')}
+                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition ${
+                        uploadMode === 'url' 
+                          ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30' 
+                          : 'bg-white/5 text-white/60 border border-white/10'
+                      }`}
+                    >
+                      <Link className="w-4 h-4" />
+                      Paste URL
+                    </button>
+                  </div>
 
-                  {uploadedFiles.length === 0 ? (
+                  {/* File Upload Mode */}
+                  {uploadMode === 'file' && (
                     <div
-                      onClick={() => fileInputRef.current?.click()}
                       onDrop={handleFileDrop}
                       onDragOver={(e) => e.preventDefault()}
-                      className="border-2 border-dashed border-white/20 rounded-xl p-12 text-center hover:border-purple-500/50 transition cursor-pointer"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="border-2 border-dashed border-white/20 rounded-xl p-8 text-center cursor-pointer hover:border-purple-500/50 transition"
                     >
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={handleFileSelect}
+                        className="hidden"
+                      />
                       <Upload className="w-12 h-12 text-white/30 mx-auto mb-4" />
-                      <p className="text-white/60 mb-2">Drag and drop your product photos</p>
-                      <p className="text-white/40 text-sm">PNG, JPG up to 10MB each</p>
+                      <p className="text-white font-medium">Drop images here or click to upload</p>
+                      <p className="text-white/50 text-sm mt-1">PNG, JPG up to 10MB each (max 5)</p>
                     </div>
-                  ) : (
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-5 gap-3">
+                  )}
+
+                  {/* URL Input Mode */}
+                  {uploadMode === 'url' && (
+                    <div className="space-y-3">
+                      <div className="flex gap-2">
+                        <input
+                          ref={urlInputRef}
+                          type="url"
+                          value={productUrl}
+                          onChange={(e) => setProductUrl(e.target.value)}
+                          placeholder="https://example.com/product-image.jpg"
+                          className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 focus:border-purple-500 focus:outline-none"
+                        />
+                        <button
+                          onClick={loadImageFromUrl}
+                          disabled={!productUrl.trim() || isLoadingUrl}
+                          className="px-4 py-3 rounded-xl bg-purple-500 text-white font-medium disabled:opacity-50 flex items-center gap-2"
+                        >
+                          {isLoadingUrl ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Plus className="w-4 h-4" />
+                          )}
+                          Add
+                        </button>
+                      </div>
+                      <p className="text-white/40 text-xs">
+                        Paste a direct link to your product image. Works with most image URLs.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Preview uploaded files/URLs */}
+                  {(uploadedFiles.length > 0 || uploadedUrls.length > 0) && (
+                    <div className="mt-4">
+                      <p className="text-sm text-white/60 mb-2">
+                        {uploadedFiles.length + uploadedUrls.length} image(s) added
+                      </p>
+                      <div className="flex gap-2 flex-wrap">
+                        {/* Show file previews */}
                         {uploadedFiles.map((file, i) => (
-                          <div key={i} className="relative aspect-square rounded-lg overflow-hidden bg-white/10">
+                          <div key={`file-${i}`} className="relative w-20 h-20 rounded-lg overflow-hidden group">
                             <img
                               src={URL.createObjectURL(file)}
-                              alt={`Upload ${i + 1}`}
+                              alt={file.name}
                               className="w-full h-full object-cover"
                             />
                             <button
                               onClick={() => removeFile(i)}
-                              className="absolute top-1 right-1 p-1 rounded-full bg-black/50 text-white hover:bg-red-500"
+                              className="absolute top-1 right-1 p-1 rounded-full bg-black/70 opacity-0 group-hover:opacity-100 transition"
                             >
-                              <X className="w-3 h-3" />
+                              <X className="w-3 h-3 text-white" />
                             </button>
                           </div>
                         ))}
-                        {uploadedFiles.length < 5 && (
-                          <button
-                            onClick={() => fileInputRef.current?.click()}
-                            className="aspect-square rounded-lg border-2 border-dashed border-white/20 flex items-center justify-center hover:border-purple-500/50"
-                          >
-                            <Plus className="w-6 h-6 text-white/40" />
-                          </button>
-                        )}
+                        {/* Show URL previews */}
+                        {uploadedUrls.map((url, i) => (
+                          <div key={`url-${i}`} className="relative w-20 h-20 rounded-lg overflow-hidden group">
+                            <img
+                              src={url}
+                              alt={`Image ${i + 1}`}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill="%23333" width="80" height="80"/><text fill="%23666" x="40" y="45" text-anchor="middle" font-size="10">Error</text></svg>';
+                              }}
+                            />
+                            <button
+                              onClick={() => setUploadedUrls(prev => prev.filter((_, idx) => idx !== i))}
+                              className="absolute top-1 right-1 p-1 rounded-full bg-black/70 opacity-0 group-hover:opacity-100 transition"
+                            >
+                              <X className="w-3 h-3 text-white" />
+                            </button>
+                          </div>
+                        ))}
                       </div>
                       
-                      <div className="flex gap-3">
+                      <div className="mt-4 flex gap-3">
                         <button
-                          onClick={() => { setUploadedFiles([]); }}
-                          className="px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20"
+                          onClick={() => setStep(1)}
+                          className="px-4 py-2 rounded-lg bg-white/10 text-white"
                         >
-                          Clear All
+                          Back
                         </button>
                         <button
                           onClick={analyzeProduct}
-                          disabled={isUploading || isAnalyzing}
-                          className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold disabled:opacity-50"
+                          disabled={isAnalyzing || isUploading || (uploadedFiles.length === 0 && uploadedUrls.length === 0)}
+                          className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-purple-500 text-white font-bold disabled:opacity-50"
                         >
-                          {isUploading || isAnalyzing ? (
+                          {isAnalyzing || isUploading ? (
                             <>
                               <Loader2 className="w-5 h-5 animate-spin" />
                               {isUploading ? 'Uploading...' : 'Analyzing...'}
@@ -610,15 +803,6 @@ export default function CreativeStudioPage() {
                         </div>
                       )}
 
-                      {analysisResult.suggested_price && (
-                        <div>
-                          <label className="block text-sm font-medium text-white/70 mb-1">Suggested Price</label>
-                          <p className="text-white font-medium">
-                            ${analysisResult.suggested_price.min} - ${analysisResult.suggested_price.max}
-                          </p>
-                        </div>
-                      )}
-
                       <button
                         onClick={saveProduct}
                         className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-purple-500 text-white font-bold hover:bg-purple-600"
@@ -631,20 +815,20 @@ export default function CreativeStudioPage() {
                 </motion.div>
               )}
 
-              {/* Step 4: Select Scenes & Model */}
+              {/* Step 4: Select Scenes - UPDATED with preview images */}
               {step === 4 && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="space-y-6"
                 >
-                  {/* Scene Selection */}
+                  {/* Scene Selection with Previews */}
                   <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
                     <h3 className="text-xl font-bold text-white mb-2">Select Scenes (6-Pack)</h3>
                     <p className="text-white/50 mb-4">Choose up to 6 scenes for your mockups</p>
                     
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                      {scenes.map(scene => (
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {SCENE_PRESETS.map(scene => (
                         <button
                           key={scene.id}
                           onClick={() => {
@@ -654,20 +838,37 @@ export default function CreativeStudioPage() {
                               setSelectedScenes(prev => [...prev, scene.slug]);
                             }
                           }}
-                          className={`p-4 rounded-xl text-left transition ${
+                          className={`rounded-xl overflow-hidden text-left transition ${
                             selectedScenes.includes(scene.slug)
-                              ? 'bg-purple-500/20 border-2 border-purple-500'
-                              : 'bg-white/5 border border-white/10 hover:border-purple-500/50'
+                              ? 'ring-2 ring-purple-500 ring-offset-2 ring-offset-[#0A0A0A]'
+                              : 'hover:ring-1 hover:ring-purple-500/50'
                           }`}
                         >
-                          <div className="aspect-video rounded-lg bg-white/10 mb-2 flex items-center justify-center">
-                            <Camera className="w-6 h-6 text-white/30" />
+                          {/* Preview Image */}
+                          <div className="aspect-video relative">
+                            <img 
+                              src={scene.preview} 
+                              alt={scene.name}
+                              className="w-full h-full object-cover"
+                            />
+                            {selectedScenes.includes(scene.slug) && (
+                              <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-purple-500 flex items-center justify-center">
+                                <Check className="w-4 h-4 text-white" />
+                              </div>
+                            )}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                            <div className="absolute bottom-0 left-0 right-0 p-3">
+                              <p className="font-medium text-white text-sm">{scene.name}</p>
+                              <p className="text-xs text-white/60">{scene.description}</p>
+                            </div>
                           </div>
-                          <p className="font-medium text-white text-sm">{scene.name}</p>
-                          <p className="text-xs text-white/50">{scene.description}</p>
                         </button>
                       ))}
                     </div>
+                    
+                    <p className="text-center text-white/40 text-sm mt-4">
+                      {selectedScenes.length}/6 scenes selected
+                    </p>
                   </div>
 
                   {/* Model Selection (Optional) */}
@@ -729,7 +930,7 @@ export default function CreativeStudioPage() {
                 </motion.div>
               )}
 
-              {/* Step 5: Results */}
+              {/* Step 5: Results - UPDATED to handle image display */}
               {step === 5 && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -755,10 +956,35 @@ export default function CreativeStudioPage() {
 
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     {generatedMockups.length > 0 ? (
-                      generatedMockups.map((url, i) => (
+                      generatedMockups.map((mockup, i) => (
                         <div key={i} className="relative group rounded-xl overflow-hidden bg-white/10">
-                          <img src={url} alt={`Mockup ${i + 1}`} className="w-full aspect-square object-cover" />
+                          <img 
+                            src={mockup.url} 
+                            alt={`Mockup ${i + 1}`} 
+                            className="w-full aspect-square object-cover"
+                            onError={(e) => {
+                              // Show placeholder on error
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                              target.parentElement!.classList.add('flex', 'items-center', 'justify-center');
+                              const placeholder = document.createElement('div');
+                              placeholder.className = 'text-center p-4';
+                              placeholder.innerHTML = '<p class="text-white/40 text-sm">Image loading...</p>';
+                              target.parentElement!.appendChild(placeholder);
+                            }}
+                          />
+                          <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent">
+                            <p className="text-xs text-white/70 capitalize">{mockup.scene.replace(/_/g, ' ')}</p>
+                          </div>
                           <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
+                            <a 
+                              href={mockup.url} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="p-2 rounded-lg bg-white/20 hover:bg-white/30"
+                            >
+                              <ExternalLink className="w-5 h-5 text-white" />
+                            </a>
                             <button className="p-2 rounded-lg bg-white/20 hover:bg-white/30">
                               <Download className="w-5 h-5 text-white" />
                             </button>
@@ -769,12 +995,11 @@ export default function CreativeStudioPage() {
                         </div>
                       ))
                     ) : (
-                      // Placeholder if no mockups yet
-                      Array(6).fill(0).map((_, i) => (
-                        <div key={i} className="aspect-square rounded-xl bg-white/5 flex items-center justify-center">
-                          <Image className="w-8 h-8 text-white/20" />
-                        </div>
-                      ))
+                      <div className="col-span-full text-center py-12">
+                        <Loader2 className="w-8 h-8 text-purple-500 animate-spin mx-auto mb-4" />
+                        <p className="text-white/60">Generating your mockups...</p>
+                        <p className="text-white/40 text-sm mt-1">This may take a minute</p>
+                      </div>
                     )}
                   </div>
 
@@ -874,7 +1099,7 @@ export default function CreativeStudioPage() {
             </div>
           )}
 
-          {/* === PRODUCT LIBRARY TAB === */}
+          {/* === PRODUCT LIBRARY TAB - UPDATED with clickable items === */}
           {activeTab === 'library' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
@@ -907,23 +1132,32 @@ export default function CreativeStudioPage() {
               ) : (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {products.map(product => (
-                    <div key={product.id} className="rounded-xl bg-white/5 border border-white/10 overflow-hidden group">
+                    <div 
+                      key={product.id} 
+                      onClick={() => { setSelectedProduct(product); setShowProductDetail(true); }}
+                      className="rounded-xl bg-white/5 border border-white/10 overflow-hidden cursor-pointer hover:border-purple-500/50 hover:bg-white/[0.07] transition group"
+                    >
                       <div className="aspect-square bg-white/10 relative">
                         {product.original_images?.[0] && (
                           <img src={product.original_images[0]} alt={product.name} className="w-full h-full object-cover" />
                         )}
-                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
-                          <button className="p-2 rounded-lg bg-white/20 hover:bg-white/30">
-                            <RefreshCw className="w-5 h-5 text-white" />
-                          </button>
-                          <button className="p-2 rounded-lg bg-white/20 hover:bg-white/30">
-                            <Trash2 className="w-5 h-5 text-white" />
+                        {/* Mockup count badge */}
+                        {product.mockups && product.mockups.length > 0 && (
+                          <div className="absolute top-2 right-2 px-2 py-1 rounded-full bg-purple-500/80 text-white text-xs font-medium">
+                            {product.mockups.length} mockups
+                          </div>
+                        )}
+                        {/* Hover overlay with actions */}
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition flex flex-col items-center justify-center gap-2">
+                          <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-500 text-white text-sm font-medium">
+                            <Eye className="w-4 h-4" />
+                            View Details
                           </button>
                         </div>
                       </div>
                       <div className="p-3">
                         <p className="font-medium text-white truncate">{product.name}</p>
-                        <p className="text-xs text-white/50">{product.product_type}</p>
+                        <p className="text-xs text-white/50 capitalize">{product.product_type.replace(/_/g, ' ')}</p>
                       </div>
                     </div>
                   ))}
@@ -933,6 +1167,143 @@ export default function CreativeStudioPage() {
           )}
         </main>
       </div>
+
+      {/* === PRODUCT DETAIL MODAL === */}
+      <AnimatePresence>
+        {showProductDetail && selectedProduct && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+            onClick={() => setShowProductDetail(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="w-full max-w-4xl max-h-[90vh] bg-[#1a1a1a] border border-white/10 rounded-2xl overflow-hidden"
+              onClick={e => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="p-4 border-b border-white/10 flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-bold text-white">{selectedProduct.name}</h2>
+                  <p className="text-white/50 text-sm capitalize">{selectedProduct.product_type.replace(/_/g, ' ')}</p>
+                </div>
+                <button 
+                  onClick={() => setShowProductDetail(false)}
+                  className="p-2 hover:bg-white/10 rounded-lg"
+                >
+                  <X className="w-5 h-5 text-white/60" />
+                </button>
+              </div>
+
+              {/* Content */}
+              <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
+                <div className="grid md:grid-cols-2 gap-6">
+                  {/* Left: Product Images */}
+                  <div>
+                    <h3 className="text-sm font-medium text-white/70 mb-3">Original Images</h3>
+                    <div className="grid grid-cols-2 gap-2">
+                      {selectedProduct.original_images?.map((url, i) => (
+                        <div key={i} className="aspect-square rounded-lg overflow-hidden bg-white/10">
+                          <img src={url} alt={`${selectedProduct.name} ${i + 1}`} className="w-full h-full object-cover" />
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* AI Analysis */}
+                    {selectedProduct.ai_analysis && (
+                      <div className="mt-4">
+                        <h3 className="text-sm font-medium text-white/70 mb-2">AI Analysis</h3>
+                        <p className="text-white/60 text-sm">{selectedProduct.ai_analysis.description || selectedProduct.description}</p>
+                        {selectedProduct.ai_analysis.materials && (
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {selectedProduct.ai_analysis.materials.map((m: string, i: number) => (
+                              <span key={i} className="px-2 py-0.5 rounded-full bg-white/10 text-white/60 text-xs">{m}</span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Right: Generated Mockups */}
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-sm font-medium text-white/70">Generated Mockups</h3>
+                      <button
+                        onClick={() => rerunMockups(selectedProduct)}
+                        className="flex items-center gap-1 px-3 py-1 rounded-lg bg-purple-500/20 text-purple-400 text-xs font-medium hover:bg-purple-500/30"
+                      >
+                        <RefreshCw className="w-3 h-3" />
+                        Generate New
+                      </button>
+                    </div>
+                    
+                    {selectedProduct.mockups && selectedProduct.mockups.length > 0 ? (
+                      <div className="grid grid-cols-2 gap-2">
+                        {selectedProduct.mockups.map((mockup, i) => (
+                          <div key={mockup.id || i} className="aspect-square rounded-lg overflow-hidden bg-white/10 relative group">
+                            <img src={mockup.image_url} alt={`Mockup ${i + 1}`} className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
+                              <a 
+                                href={mockup.image_url} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="p-2 rounded-lg bg-white/20 hover:bg-white/30"
+                              >
+                                <ExternalLink className="w-4 h-4 text-white" />
+                              </a>
+                              <button className="p-2 rounded-lg bg-white/20 hover:bg-white/30">
+                                <Download className="w-4 h-4 text-white" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="aspect-video rounded-lg bg-white/5 border border-dashed border-white/20 flex flex-col items-center justify-center">
+                        <Image className="w-8 h-8 text-white/20 mb-2" />
+                        <p className="text-white/40 text-sm">No mockups generated yet</p>
+                        <button
+                          onClick={() => rerunMockups(selectedProduct)}
+                          className="mt-3 px-4 py-2 rounded-lg bg-purple-500 text-white text-sm font-medium"
+                        >
+                          Generate Mockups
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="p-4 border-t border-white/10 flex justify-between">
+                <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30">
+                  <Trash2 className="w-4 h-4" />
+                  Delete Product
+                </button>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => setShowProductDetail(false)}
+                    className="px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20"
+                  >
+                    Close
+                  </button>
+                  <button
+                    onClick={() => rerunMockups(selectedProduct)}
+                    className="px-4 py-2 rounded-lg bg-purple-500 text-white hover:bg-purple-600"
+                  >
+                    Re-run Mockups
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
