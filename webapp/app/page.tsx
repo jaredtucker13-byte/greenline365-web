@@ -1013,8 +1013,8 @@ export default function HomePage() {
             alt="Packed restaurant - The GreenLine Effect"
             fill
             className="object-cover object-center"
-            quality={100}
-            priority
+            quality={75}
+            loading="lazy"
           />
           <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-os-dark via-os-dark/60 to-transparent" />
         </div>
