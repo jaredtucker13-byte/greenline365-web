@@ -394,10 +394,10 @@ export default function CreativeStudioPage() {
           
           const result = await response.json();
           
-          // Format mockups with scene info
-          const mockups = (result.mockups || []).map((url: string, idx: number) => ({
-            url,
-            scene: selectedScenes[idx] || 'unknown'
+          // Format mockups - API returns {scene, imageUrl} objects
+          const mockups = (result.mockups || []).map((mockup: any) => ({
+            url: typeof mockup === 'string' ? mockup : (mockup.imageUrl || mockup.url),
+            scene: typeof mockup === 'string' ? 'unknown' : (mockup.scene || 'unknown')
           }));
           
           setGeneratedMockups(mockups);
