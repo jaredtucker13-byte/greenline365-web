@@ -676,6 +676,7 @@ export default function HomePage() {
                   width={600}
                   height={338}
                   className="w-full aspect-16-9 object-cover"
+                  loading="lazy"
                 />
                 <div
                   data-floating-badge
