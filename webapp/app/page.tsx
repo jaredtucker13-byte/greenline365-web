@@ -493,6 +493,9 @@ export default function HomePage() {
                   width={600}
                   height={338}
                   className="w-full aspect-16-9 object-cover"
+                  loading="lazy"
+                  placeholder="blur"
+                  blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMCwsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wAARCAAIAAoDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAcI/8QAIhAAAgEDAwUBAAAAAAAAAAAAAQIDAAQFBhESEyExQVFh/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAYEQEBAQEBAAAAAAAAAAAAAAABAgADEf/aAAwDAQACEQMRAD8AkOnNT6lzOp7C3mvpXtluY0aIhSrAuAQevvzVyqlaU0/jNN3NxNYWy28s4USMpYl9t9gSST1J6mvlKUzJDHZk/9k="
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-os-dark/80 via-transparent to-transparent" />
                 <div className="absolute bottom-4 left-4 right-4">
