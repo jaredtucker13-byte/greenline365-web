@@ -21,23 +21,35 @@ interface GenerateMockupsRequest {
   signatureModelId?: string;
 }
 
-// Scene prompts by slug
+// Scene prompts by slug (supports both underscore and hyphen formats)
 const SCENE_PROMPTS: Record<string, string> = {
+  'minimalist_studio': 'Product photography on clean white seamless background, soft diffused lighting, subtle shadow, professional studio setup, 8K quality, commercial catalog aesthetic',
   'minimalist-studio': 'Product photography on clean white seamless background, soft diffused lighting, subtle shadow, professional studio setup, 8K quality, commercial catalog aesthetic',
+  'lifestyle_living': 'Product elegantly placed in modern minimalist living room, natural window light, cozy aesthetic, lifestyle photography, high-end interior',
   'lifestyle-living': 'Product elegantly placed in modern minimalist living room, natural window light, cozy aesthetic, lifestyle photography, high-end interior',
+  'golden_hour': 'Product in golden hour sunlight, warm tones, bokeh background, cinematic outdoor photography, magic hour lighting, professional quality',
   'golden-hour': 'Product in golden hour sunlight, warm tones, bokeh background, cinematic outdoor photography, magic hour lighting, professional quality',
+  'urban_street': 'Product in urban street setting, concrete and brick textures, street style photography, authentic city vibe, editorial aesthetic',
   'urban-street': 'Product in urban street setting, concrete and brick textures, street style photography, authentic city vibe, editorial aesthetic',
+  'flat_lay': 'Flat lay product photography, styled arrangement with complementary props, top-down angle, editorial magazine style, clean background',
   'flat-lay': 'Flat lay product photography, styled arrangement with complementary props, top-down angle, editorial magazine style, clean background',
+  'nature_macro': 'Macro product shot with natural elements, leaves, flowers, water droplets, organic textures, nature-inspired, close-up detail',
   'nature-macro': 'Macro product shot with natural elements, leaves, flowers, water droplets, organic textures, nature-inspired, close-up detail',
 };
 
-// Wall art specific prompts
+// Wall art specific prompts (supports both underscore and hyphen formats)
 const WALL_ART_PROMPTS: Record<string, string> = {
+  'minimalist_studio': 'Art print displayed in modern gallery setting, white walls, professional museum lighting, clean minimal presentation',
   'minimalist-studio': 'Art print displayed in modern gallery setting, white walls, professional museum lighting, clean minimal presentation',
+  'lifestyle_living': 'Art piece mounted on wall above contemporary sofa in modern living room, natural light from large windows, high-end interior design',
   'lifestyle-living': 'Art piece mounted on wall above contemporary sofa in modern living room, natural light from large windows, high-end interior design',
+  'golden_hour': 'Art print in sunlit room with golden hour light casting warm glow, sophisticated home setting, lifestyle editorial',
   'golden-hour': 'Art print in sunlit room with golden hour light casting warm glow, sophisticated home setting, lifestyle editorial',
+  'urban_street': 'Art displayed in trendy loft space with exposed brick, industrial-chic interior, urban aesthetic',
   'urban-street': 'Art displayed in trendy loft space with exposed brick, industrial-chic interior, urban aesthetic',
+  'flat_lay': 'Art print laid flat with frame elements, craft supplies, styled mockup presentation, top-down view',
   'flat-lay': 'Art print laid flat with frame elements, craft supplies, styled mockup presentation, top-down view',
+  'nature_macro': 'Art piece in nature-inspired setting, plants and organic elements, biophilic design interior',
   'nature-macro': 'Art piece in nature-inspired setting, plants and organic elements, biophilic design interior',
 };
 
