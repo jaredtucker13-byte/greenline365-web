@@ -4,13 +4,14 @@ import { createClient } from '@/lib/supabase/server';
 /**
  * Mockup Generation API
  * 
- * Uses kie.ai (GPT-4o Image API) to create cinematic product mockups
+ * Uses kie.ai 4.5 Text-to-Image API (seedream) for cost-effective mockup generation
  * 
  * POST /api/studio/generate-mockups
  */
 
 const KIE_API_KEY = process.env.KIE_API_KEY;
-const KIE_API_URL = 'https://api.kie.ai/api/v1/gpt4o-image/generate';
+const KIE_CREATE_TASK_URL = 'https://api.kie.ai/api/v1/jobs/createTask';
+const KIE_QUERY_TASK_URL = 'https://api.kie.ai/api/v1/jobs/recordInfo';
 
 interface GenerateMockupsRequest {
   productImageUrl: string;
