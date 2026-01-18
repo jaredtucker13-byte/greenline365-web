@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Generate single mockup using kie.ai GPT-4o Image API
+// Generate single mockup using kie.ai 4.5 Text-to-Image API (cost-effective)
 async function generateWithKieAI(
   productImageUrl: string,
   productDescription: string,
@@ -136,47 +136,47 @@ REQUIREMENTS:
 - High-end luxury aesthetic suitable for premium marketing
 - Photorealistic quality, indistinguishable from a real photograph`;
 
-  // Start generation task
-  const response = await fetch(KIE_API_URL, {
+  // Step 1: Create generation task
+  const createResponse = await fetch(KIE_CREATE_TASK_URL, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${KIE_API_KEY}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      prompt,
-      imageUrls: [productImageUrl],  // Reference image
-      size: '1:1',  // Square aspect ratio
+      model: 'seedream/4.5-text-to-image',
+      input: {
+        prompt,
+        aspect_ratio: '1:1',  // Square for product mockups
+        quality: 'basic',     // Use basic for cost efficiency (2K)
+      },
     }),
   });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error(`[kie.ai] API error for ${sceneName}:`, errorText);
-    throw new Error(`kie.ai API error: ${response.status}`);
+  if (!createResponse.ok) {
+    const errorText = await createResponse.text();
+    console.error(`[kie.ai] Create task error for ${sceneName}:`, errorText);
+    throw new Error(`kie.ai API error: ${createResponse.status}`);
   }
 
-  const result = await response.json();
+  const createResult = await createResponse.json();
   
-  // kie.ai returns a task ID, we need to poll for the result
-  const taskId = result.data?.taskId || result.taskId;
-  
-  if (!taskId) {
-    // If direct URL is returned
-    if (result.data?.imageUrl || result.imageUrl) {
-      return result.data?.imageUrl || result.imageUrl;
-    }
-    throw new Error('No task ID or image URL returned');
+  if (createResult.code !== 200 || !createResult.data?.taskId) {
+    console.error(`[kie.ai] Create task failed:`, createResult);
+    throw new Error(createResult.msg || 'Failed to create generation task');
   }
 
-  // Poll for result (max 60 seconds)
-  const imageUrl = await pollForResult(taskId);
+  const taskId = createResult.data.taskId;
+  console.log(`[kie.ai] Task created for ${sceneName}: ${taskId}`);
+
+  // Step 2: Poll for result
+  const imageUrl = await pollForResult(taskId, sceneName);
   return imageUrl;
 }
 
 // Poll kie.ai for generation result
-async function pollForResult(taskId: string, maxAttempts = 30): Promise<string> {
-  const pollUrl = `https://api.kie.ai/api/v1/gpt4o-image/record-info?taskId=${taskId}`;
+async function pollForResult(taskId: string, sceneName: string, maxAttempts = 60): Promise<string> {
+  const pollUrl = `${KIE_QUERY_TASK_URL}?taskId=${taskId}`;
   
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds between polls
@@ -188,28 +188,44 @@ async function pollForResult(taskId: string, maxAttempts = 30): Promise<string> 
     });
 
     if (!response.ok) {
-      console.error(`[kie.ai] Poll error: ${response.status}`);
+      console.error(`[kie.ai] Poll error for ${sceneName}: ${response.status}`);
       continue;
     }
 
     const result = await response.json();
-    const status = result.data?.status || result.status;
     
-    if (status === 'completed' || status === 'success') {
-      const imageUrl = result.data?.response?.imageUrl || 
-                       result.data?.imageUrl || 
-                       result.response?.imageUrl ||
-                       result.imageUrl;
-      
-      if (imageUrl) {
-        return imageUrl;
-      }
-    } else if (status === 'failed' || status === 'error') {
-      throw new Error(`Generation failed: ${result.data?.error || 'Unknown error'}`);
+    if (result.code !== 200) {
+      console.error(`[kie.ai] Poll response error:`, result);
+      continue;
     }
     
-    // Status is still 'processing' or 'pending', continue polling
+    const state = result.data?.state;
+    
+    if (state === 'success') {
+      // Parse resultJson to get the image URL
+      try {
+        const resultJson = JSON.parse(result.data.resultJson || '{}');
+        const imageUrl = resultJson.resultUrls?.[0];
+        
+        if (imageUrl) {
+          console.log(`[kie.ai] Generation complete for ${sceneName}: ${imageUrl}`);
+          return imageUrl;
+        }
+      } catch (parseError) {
+        console.error(`[kie.ai] Error parsing resultJson:`, parseError);
+      }
+      throw new Error('No image URL in result');
+    } else if (state === 'fail') {
+      const failMsg = result.data?.failMsg || 'Unknown error';
+      console.error(`[kie.ai] Generation failed for ${sceneName}: ${failMsg}`);
+      throw new Error(`Generation failed: ${failMsg}`);
+    }
+    
+    // State is still 'waiting', continue polling
+    if (attempt % 10 === 0) {
+      console.log(`[kie.ai] Still waiting for ${sceneName}... (attempt ${attempt + 1})`);
+    }
   }
   
-  throw new Error('Generation timed out');
+  throw new Error('Generation timed out after 2 minutes');
 }
