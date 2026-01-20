@@ -199,11 +199,14 @@ mockup_scenes (name, slug, category, prompt_template)
 |---------|---------|-----|
 | Supabase | Database, Auth, Storage | Configured |
 | SendGrid | Transactional emails | Configured |
-| OpenRouter | LLM gateway (Gemini 3 Pro) | `OPENROUTER_API_KEY` |
-| **kie.ai** | **Nano Banana image gen** | `KIE_API_KEY` |
+| OpenRouter | LLM gateway (Gemini 3 Pro, Perplexity Sonar) | `OPENROUTER_API_KEY` |
+| **kie.ai** | **4.5 Text-to-Image (seedream)** | `KIE_API_KEY` |
+| OpenWeather | Real-Feel weather context | `OPENWEATHER_API_KEY` |
+| Retell AI | Voice AI booking agent | Planned |
 | Slack | "The Brain" integration | Planned |
 
 > ⚠️ **IMPORTANT**: Do NOT use Emergent LLM Key for image generation. Use kie.ai with KIE_API_KEY.
+> 📝 **Note**: Switched from Nano Banana to 4.5 Text-to-Image (seedream) for cost efficiency.
 
 ---
 
