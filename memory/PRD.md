@@ -213,3 +213,47 @@ mockup_scenes (name, slug, category, prompt_template)
 ## Test Tenants
 1. **GreenLine365** (Default): Standard owner tenant, primary branding
 2. **ArtfulPhusion** (White-Label): Purple/pink branding, "Creative Sanctuary" tagline, hide_powered_by=true
+
+---
+
+## Real-Feel AI Booking System (January 18, 2025)
+
+### Overview
+Multi-tenant "Real-Feel" AI Booking & Sales Ecosystem with weather awareness, intelligent call routing, and automated rescheduling.
+
+### Core Features
+1. **Weather-Aware Booking**: Outdoor businesses get contextual suggestions based on weather forecasts
+2. **Nudge Strategy**: Revenue protection by pivoting cancellation requests to reschedules
+3. **Warm Transfer Protocol**: AI-powered research during call hold, whisper briefing for sales reps
+4. **Industry Context Gating**: Differentiated behavior for indoor vs. outdoor businesses
+
+### Database Schema (013_realfeel_booking_system.sql)
+```sql
+-- Business config additions
+businesses: is_weather_dependent, weather_threshold, context_config, tenant_status, zip_code
+
+-- New tables
+call_logs: business_id, call_id, weather_context, perplexity_brief, intent_detected, action_taken, nudge tracking
+call_audits: audit_type, severity, context_snapshot (for optimization loop)
+weather_alerts: alert_type, severity_level, weather_data, auto_reschedule_triggered
+warm_transfer_queue: perplexity_research, weather_context, whisper_script, status
+```
+
+### API Endpoints
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/realfeel/weather` | GET | Public weather check by ZIP code |
+| `/api/realfeel/weather` | POST | Internal weather check with business context |
+| `/api/realfeel/research` | POST | Perplexity research for warm transfers |
+| `/api/realfeel/research` | GET | Retrieve existing transfer research |
+| `/api/realfeel/calls` | POST | Create call log |
+| `/api/realfeel/calls` | GET | List call logs with stats |
+| `/api/realfeel/calls` | PATCH | Update call log (outcome, nudge tracking) |
+| `/api/realfeel/context` | GET | Get business context config |
+| `/api/realfeel/context` | PATCH | Update business context config |
+
+### Retell AI Integration (Planned)
+- Function definitions for calendar operations (check_availability_cal, book_appointment_cal)
+- Silent Syntax guardrails in system prompts
+- Absolute date conversion enforcement
+- Rule of Three: Max 3 availability options verbalized
