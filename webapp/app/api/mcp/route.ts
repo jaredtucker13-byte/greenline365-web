@@ -155,6 +155,218 @@ const TOOLS = {
 // HELPER FUNCTIONS
 // =====================================================
 
+// Cal.com API Helpers
+async function getCalcomAvailability(date: string): Promise<string[]> {
+  const startTime = `${date}T00:00:00Z`;
+  const endTime = `${date}T23:59:59Z`;
+  
+  const response = await fetch(
+    `https://api.cal.com/v1/slots?apiKey=${CALCOM_API_KEY}&eventTypeId=${CALCOM_EVENT_TYPE_ID}&startTime=${startTime}&endTime=${endTime}&timeZone=${CALCOM_TIMEZONE}`,
+    { method: 'GET', headers: { 'Content-Type': 'application/json' } }
+  );
+  
+  if (!response.ok) {
+    console.error('[Cal.com] Availability error:', await response.text());
+    throw new Error('Cal.com availability check failed');
+  }
+  
+  const data = await response.json();
+  const slots: string[] = [];
+  
+  // Parse slots from Cal.com response
+  if (data.slots && typeof data.slots === 'object') {
+    for (const [dateKey, dateSlots] of Object.entries(data.slots)) {
+      if (Array.isArray(dateSlots)) {
+        for (const slot of dateSlots) {
+          const time = slot.time || slot;
+          if (typeof time === 'string') {
+            const d = new Date(time);
+            slots.push(`${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`);
+          }
+        }
+      }
+    }
+  }
+  
+  return slots;
+}
+
+async function createCalcomBooking(params: {
+  name: string;
+  email: string;
+  phone?: string;
+  startTime: string;
+  notes?: string;
+  timezone?: string;
+}): Promise<{ success: boolean; uid?: string; error?: string }> {
+  const { name, email, phone, startTime, notes, timezone } = params;
+  
+  // Format startTime for Cal.com (ISO 8601)
+  const start = new Date(startTime).toISOString();
+  
+  const bookingData = {
+    eventTypeId: parseInt(CALCOM_EVENT_TYPE_ID),
+    start,
+    responses: {
+      name,
+      email,
+      phone: phone || undefined,
+      notes: notes || 'Booked via AI Voice Agent'
+    },
+    timeZone: timezone || CALCOM_TIMEZONE,
+    language: 'en',
+    metadata: {
+      source: 'voice_ai',
+      bookedAt: new Date().toISOString()
+    }
+  };
+  
+  const response = await fetch(
+    `https://api.cal.com/v1/bookings?apiKey=${CALCOM_API_KEY}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(bookingData)
+    }
+  );
+  
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('[Cal.com] Booking error:', errorText);
+    return { success: false, error: errorText };
+  }
+  
+  const result = await response.json();
+  return { 
+    success: true, 
+    uid: result.uid || result.id?.toString()
+  };
+}
+
+async function getCalcomBookings(email: string): Promise<any[]> {
+  const response = await fetch(
+    `https://api.cal.com/v1/bookings?apiKey=${CALCOM_API_KEY}&attendeeEmail=${encodeURIComponent(email)}`,
+    { method: 'GET', headers: { 'Content-Type': 'application/json' } }
+  );
+  
+  if (!response.ok) {
+    console.error('[Cal.com] Get bookings error:', await response.text());
+    return [];
+  }
+  
+  const data = await response.json();
+  return data.bookings || [];
+}
+
+async function rescheduleCalcomBooking(uid: string, newTime: string, reason?: string): Promise<{ success: boolean; error?: string }> {
+  const response = await fetch(
+    `https://api.cal.com/v1/bookings/${uid}?apiKey=${CALCOM_API_KEY}`,
+    {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        start: new Date(newTime).toISOString(),
+        rescheduleReason: reason || 'Rescheduled via AI Voice Agent'
+      })
+    }
+  );
+  
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('[Cal.com] Reschedule error:', errorText);
+    return { success: false, error: errorText };
+  }
+  
+  return { success: true };
+}
+
+async function cancelCalcomBooking(uid: string, reason?: string): Promise<{ success: boolean; error?: string }> {
+  const response = await fetch(
+    `https://api.cal.com/v1/bookings/${uid}/cancel?apiKey=${CALCOM_API_KEY}`,
+    {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        cancellationReason: reason || 'Cancelled via AI Voice Agent'
+      })
+    }
+  );
+  
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('[Cal.com] Cancel error:', errorText);
+    return { success: false, error: errorText };
+  }
+  
+  return { success: true };
+}
+
+// Parse absolute date string like "2025 January 28 2:00 PM" to ISO format
+function parseAbsoluteDateToISO(dateStr: string): string {
+  if (!dateStr) return '';
+  
+  // If already ISO format, return as-is
+  if (dateStr.includes('T') || /^\d{4}-\d{2}-\d{2}/.test(dateStr)) {
+    return dateStr;
+  }
+  
+  // Try to parse various formats
+  try {
+    // Handle "2025 January 28 2:00 PM" format
+    const parsed = new Date(dateStr);
+    if (!isNaN(parsed.getTime())) {
+      return parsed.toISOString();
+    }
+    
+    // Handle relative dates by returning today + offset
+    const lower = dateStr.toLowerCase();
+    const today = new Date();
+    
+    if (lower === 'today') {
+      return today.toISOString().split('T')[0];
+    }
+    if (lower === 'tomorrow') {
+      today.setDate(today.getDate() + 1);
+      return today.toISOString().split('T')[0];
+    }
+    
+    // Try parsing with different patterns
+    return new Date(dateStr).toISOString();
+  } catch {
+    return dateStr;
+  }
+}
+
+// Format date for speech output
+function formatDateForSpeech(dateStr: string): string {
+  try {
+    const date = new Date(dateStr + 'T12:00:00');
+    return date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric'
+    });
+  } catch {
+    return dateStr;
+  }
+}
+
+// Format time for speech output
+function formatTimeForSpeech(timeStr: string): string {
+  try {
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const hour12 = hours % 12 || 12;
+    
+    if (minutes === 0) {
+      return `${hour12} ${period}`;
+    }
+    return `${hour12}:${String(minutes).padStart(2, '0')} ${period}`;
+  } catch {
+    return timeStr;
+  }
+}
+
 async function getTenant(phoneNumber?: string) {
   // Try to find tenant by phone number
   if (phoneNumber) {
