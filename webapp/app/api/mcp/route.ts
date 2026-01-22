@@ -493,7 +493,15 @@ async function executeTool(toolName: string, args: Record<string, any>, tenant: 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { tool_name, arguments: toolArgs, call } = body;
+    
+    // Support both Retell format and our format
+    // Retell sends: { name: "...", args: {...}, call: {...} }
+    // Our format: { tool_name: "...", arguments: {...}, call: {...} }
+    const tool_name = body.tool_name || body.name;
+    const toolArgs = body.arguments || body.args || {};
+    const call = body.call || {};
+    
+    console.log(`[MCP] Function: ${tool_name}`, JSON.stringify(toolArgs));
     
     // Get tenant context
     const tenant = await getTenant(call?.to_number);
