@@ -126,6 +126,24 @@ export async function POST(req: NextRequest) {
     const model = getModel(mode);
 
     // ========================================
+    // BOOKING INTENT DETECTION & HANDLING
+    // ========================================
+    const bookingIntent = detectBookingIntent(message, messages);
+    if (bookingIntent) {
+      const bookingResponse = await handleBookingIntent(bookingIntent, message, messages);
+      if (bookingResponse) {
+        return Response.json({
+          choices: [{
+            message: {
+              role: 'assistant',
+              content: bookingResponse
+            }
+          }]
+        });
+      }
+    }
+
+    // ========================================
     // MEMORY BUCKET INTEGRATION
     // ========================================
     let aiContext: AIContext | null = null;
