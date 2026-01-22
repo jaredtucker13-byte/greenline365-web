@@ -52,7 +52,7 @@ function detectBookingIntent(message: string, history: Msg[]): BookingIntent | n
   
   // Try to extract email
   const emailPattern = /[\w.-]+@[\w.-]+\.\w+/;
-  const emailMatch = message.match(emailPattern) || fullConvo.match(emailMatch);
+  const emailMatch = message.match(emailPattern) || fullConvo.match(emailPattern);
   const extractedEmail = emailMatch ? emailMatch[0] : undefined;
   
   // Try to extract phone
