@@ -4,6 +4,192 @@ import { MemoryBucketService, AIContext } from '@/lib/memory-bucket-service';
 
 type Msg = { role: 'user' | 'assistant' | 'system'; content: string };
 
+// ========================================
+// BOOKING INTENT DETECTION
+// ========================================
+
+interface BookingIntent {
+  type: 'schedule' | 'availability' | 'confirm';
+  date?: string;
+  time?: string;
+  name?: string;
+  email?: string;
+  phone?: string;
+}
+
+function detectBookingIntent(message: string, history: Msg[]): BookingIntent | null {
+  const lower = message.toLowerCase();
+  const fullConvo = history.map(m => m.content.toLowerCase()).join(' ');
+  
+  // Check if this is a booking-related conversation
+  const bookingKeywords = ['book', 'schedule', 'demo', 'appointment', 'meeting', 'call', 'consultation'];
+  const hasBookingIntent = bookingKeywords.some(kw => lower.includes(kw)) || 
+                           bookingKeywords.some(kw => fullConvo.includes(kw));
+  
+  if (!hasBookingIntent) return null;
+  
+  // Try to extract date
+  const datePatterns = [
+    /\b(today|tomorrow|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i,
+    /\b(january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{1,2}/i,
+    /\b\d{1,2}\/\d{1,2}(\/\d{2,4})?\b/,
+    /\b(next\s+week|this\s+week)\b/i
+  ];
+  
+  let extractedDate: string | undefined;
+  for (const pattern of datePatterns) {
+    const match = message.match(pattern) || fullConvo.match(pattern);
+    if (match) {
+      extractedDate = match[0];
+      break;
+    }
+  }
+  
+  // Try to extract time
+  const timePattern = /\b(\d{1,2}(?::\d{2})?\s*(?:am|pm|AM|PM)?)\b/;
+  const timeMatch = message.match(timePattern) || fullConvo.match(timePattern);
+  const extractedTime = timeMatch ? timeMatch[0] : undefined;
+  
+  // Try to extract email
+  const emailPattern = /[\w.-]+@[\w.-]+\.\w+/;
+  const emailMatch = message.match(emailPattern) || fullConvo.match(emailMatch);
+  const extractedEmail = emailMatch ? emailMatch[0] : undefined;
+  
+  // Try to extract phone
+  const phonePattern = /(?:\+1)?[\s.-]?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/;
+  const phoneMatch = message.match(phonePattern) || fullConvo.match(phonePattern);
+  const extractedPhone = phoneMatch ? phoneMatch[0] : undefined;
+  
+  // Determine intent type
+  if (lower.includes('available') || lower.includes('availability') || lower.includes('what time')) {
+    return { type: 'availability', date: extractedDate };
+  }
+  
+  if (extractedDate && extractedTime) {
+    return { 
+      type: 'confirm', 
+      date: extractedDate, 
+      time: extractedTime,
+      email: extractedEmail,
+      phone: extractedPhone
+    };
+  }
+  
+  return { type: 'schedule', date: extractedDate, time: extractedTime };
+}
+
+async function handleBookingIntent(intent: BookingIntent, message: string, history: Msg[]): Promise<string | null> {
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  
+  try {
+    if (intent.type === 'availability' && intent.date) {
+      // Check availability via MCP
+      const response = await fetch(`${baseUrl}/api/mcp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: 'check_availability',
+          args: { date: parseUserDate(intent.date) }
+        })
+      });
+      
+      const result = await response.json();
+      return result.result || result.message;
+    }
+    
+    if (intent.type === 'confirm' && intent.date && intent.time) {
+      // Extract name from conversation
+      const namePattern = /(?:my name is|i'm|i am|this is)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i;
+      const convoText = history.map(m => m.content).join(' ');
+      const nameMatch = convoText.match(namePattern);
+      const customerName = nameMatch ? nameMatch[1] : 'Guest';
+      
+      // Create booking via MCP
+      const response = await fetch(`${baseUrl}/api/mcp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: 'create_booking',
+          args: {
+            customer_name: customerName,
+            customer_email: intent.email || `demo-${Date.now()}@greenline365.com`,
+            customer_phone: intent.phone || '',
+            preferred_date: parseUserDate(intent.date),
+            preferred_time: parseUserTime(intent.time),
+            service_type: 'Demo Call',
+            notes: 'Booked via Concierge Chat'
+          }
+        })
+      });
+      
+      const result = await response.json();
+      return result.result || result.message;
+    }
+    
+    // For general schedule intent, return null to let AI handle the conversation
+    return null;
+    
+  } catch (error) {
+    console.error('[Chat] Booking intent error:', error);
+    return null;
+  }
+}
+
+function parseUserDate(dateStr: string): string {
+  const lower = dateStr.toLowerCase();
+  const today = new Date();
+  
+  if (lower === 'today') {
+    return today.toISOString().split('T')[0];
+  }
+  
+  if (lower === 'tomorrow') {
+    today.setDate(today.getDate() + 1);
+    return today.toISOString().split('T')[0];
+  }
+  
+  // Handle day names
+  const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+  const dayIndex = days.findIndex(d => lower.includes(d));
+  if (dayIndex !== -1) {
+    const currentDay = today.getDay();
+    let daysUntil = dayIndex - currentDay;
+    if (daysUntil <= 0) daysUntil += 7;
+    if (lower.includes('next')) daysUntil += 7;
+    today.setDate(today.getDate() + daysUntil);
+    return today.toISOString().split('T')[0];
+  }
+  
+  // Try parsing as-is
+  try {
+    const parsed = new Date(dateStr);
+    if (!isNaN(parsed.getTime())) {
+      return parsed.toISOString().split('T')[0];
+    }
+  } catch {}
+  
+  // Default to next available weekday
+  today.setDate(today.getDate() + 1);
+  while (today.getDay() === 0 || today.getDay() === 6) {
+    today.setDate(today.getDate() + 1);
+  }
+  return today.toISOString().split('T')[0];
+}
+
+function parseUserTime(timeStr: string): string {
+  const match = timeStr.match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm)?/i);
+  if (!match) return '10:00';
+  
+  let hours = parseInt(match[1]);
+  const minutes = match[2] ? parseInt(match[2]) : 0;
+  const period = match[3]?.toLowerCase();
+  
+  if (period === 'pm' && hours < 12) hours += 12;
+  if (period === 'am' && hours === 12) hours = 0;
+  
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+}
+
 // Model selection based on mode
 const getModel = (mode?: string): string => {
   switch (mode) {
