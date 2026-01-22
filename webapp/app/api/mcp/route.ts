@@ -6,6 +6,12 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+// Cal.com Configuration
+const CALCOM_API_KEY = process.env.CALCOM_API_KEY || '';
+const CALCOM_EVENT_TYPE_ID = process.env.CALCOM_EVENT_TYPE_ID || '4233765';
+const CALCOM_USERNAME = process.env.CALCOM_USERNAME || 'jared-tucker-2gdr7e';
+const CALCOM_TIMEZONE = 'America/New_York';
+
 // =====================================================
 // MCP TOOL DEFINITIONS
 // =====================================================
