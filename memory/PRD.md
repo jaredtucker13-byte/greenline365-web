@@ -252,8 +252,31 @@ warm_transfer_queue: perplexity_research, weather_context, whisper_script, statu
 | `/api/realfeel/context` | GET | Get business context config |
 | `/api/realfeel/context` | PATCH | Update business context config |
 
-### Retell AI Integration (Planned)
-- Function definitions for calendar operations (check_availability_cal, book_appointment_cal)
-- Silent Syntax guardrails in system prompts
-- Absolute date conversion enforcement
-- Rule of Three: Max 3 availability options verbalized
+### Retell AI Integration (January 20, 2025) ✅
+- **Three Agent Types Configured:**
+  - Receptionist: Booking, cancellation nudging, warm transfers
+  - Sales: Receives transfers with AI whisper briefings
+  - Customer Service: Issue resolution, refunds, escalation
+- **7 Custom Functions Implemented:**
+  - `check_availability_cal` - Calendar availability check
+  - `book_appointment_cal` - Create appointments
+  - `check_current_appointment` - Lookup existing bookings (required before reschedule/cancel)
+  - `reschedule_appointment` - Modify bookings
+  - `cancel_appointment` - Cancel with nudge protection
+  - `transfer_to_sales` - Warm transfer with context
+  - `get_weather_context` - Weather-aware booking
+- **Silent Syntax guardrails** in system prompts
+- **Absolute date conversion enforcement**
+- **Rule of Three**: Max 3 availability options verbalized
+- **Nudge Strategy**: Revenue protection for cancellations
+
+### API Endpoints
+| Endpoint | Purpose |
+|----------|---------|
+| `/api/retell/webhook` | Receive call events from Retell |
+| `/api/retell/functions` | Handle custom function calls |
+| `/api/retell/agents` | Get agent configurations & prompts |
+| `/api/realfeel/weather` | Weather context for bookings |
+| `/api/realfeel/research` | Perplexity research for warm transfers |
+| `/api/realfeel/calls` | Call logging and analytics |
+| `/api/realfeel/context` | Business context configuration |
