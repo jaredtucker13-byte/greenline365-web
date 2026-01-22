@@ -330,9 +330,9 @@ async function executeTool(toolName: string, args: Record<string, any>, tenant: 
         .from('bookings')
         .insert({
           full_name: customer_name,
-          phone: customer_phone,
-          email: customer_email,
-          notes: notes || service_type,
+          phone: customer_phone || '',
+          email: customer_email || 'noemail@placeholder.com',
+          notes: notes || service_type || '',
           start_time: startTime,
           preferred_datetime: startTime,
           confirmation_number,
@@ -351,17 +351,21 @@ async function executeTool(toolName: string, args: Record<string, any>, tenant: 
         };
       }
       
-      // Store in memory
-      await supabase.from('agent_memory').insert({
-        tenant_id: tenant?.id,
-        customer_phone,
-        customer_name,
-        customer_email,
-        memory_type: 'history',
-        memory_key: 'booking_created',
-        memory_value: `Booked ${service_type || 'appointment'} for ${preferred_date} at ${preferred_time}. Confirmation: ${confirmation_number}`,
-        source: 'voice_call'
-      });
+      // Store in memory (ignore errors)
+      try {
+        await supabase.from('agent_memory').insert({
+          tenant_id: tenant?.id,
+          customer_phone,
+          customer_name,
+          customer_email,
+          memory_type: 'history',
+          memory_key: 'booking_created',
+          memory_value: `Booked ${service_type || 'appointment'} for ${preferred_date} at ${preferred_time}. Confirmation: ${confirmation_number}`,
+          source: 'voice_call'
+        });
+      } catch (e) {
+        // Memory storage is optional
+      }
       
       return {
         success: true,
