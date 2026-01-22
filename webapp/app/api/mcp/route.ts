@@ -49,30 +49,65 @@ const TOOLS = {
     parameters: {}
   },
 
-  // ===== BOOKING TOOLS =====
+  // ===== BOOKING TOOLS (Cal.com Integration) =====
   check_availability: {
-    description: 'Check available time slots for booking',
+    description: 'Check available time slots for booking on Cal.com calendar. IMPORTANT: Even if the user asks for a relative date such as "next Tuesday", convert it to an absolute date format BEFORE calling this function.',
     parameters: {
-      date: { type: 'string', description: 'Date to check (YYYY-MM-DD)' }
+      date: { type: 'string', description: 'Date to check in YYYY-MM-DD format (e.g., "2025-01-25"). Must convert relative dates like "next Tuesday" to absolute dates.' }
+    }
+  },
+  check_availability_cal: {
+    description: 'Check Cal.com calendar availability. start_time and end_time MUST be full absolute dates. Convert relative dates like "next Tuesday" to "2025 January 28 10:00 AM" format.',
+    parameters: {
+      start_time: { type: 'string', description: 'Full absolute start date (e.g., "2025 January 28 10:00 AM"). NEVER pass relative dates.', required: true },
+      end_time: { type: 'string', description: 'Full absolute end date (e.g., "2025 January 28 6:00 PM")' }
     }
   },
   create_booking: {
-    description: 'Create a new booking/appointment',
+    description: 'Create a new booking/appointment on Cal.com. Time MUST be full absolute date in the future. Timezone is hardcoded to America/New_York. Guest email is required.',
     parameters: {
-      customer_name: { type: 'string', required: true },
-      customer_phone: { type: 'string', required: true },
-      customer_email: { type: 'string' },
-      service_type: { type: 'string', required: true },
-      preferred_date: { type: 'string', required: true },
-      preferred_time: { type: 'string', required: true },
-      notes: { type: 'string' }
+      customer_name: { type: 'string', description: 'Full name of the customer', required: true },
+      customer_phone: { type: 'string', description: 'Customer phone number in format: +1XXXXXXXXXX', required: true },
+      customer_email: { type: 'string', description: 'Customer email address. Required for Cal.com booking.' },
+      service_type: { type: 'string', description: 'Type of service/meeting' },
+      preferred_date: { type: 'string', description: 'Date in YYYY-MM-DD format', required: true },
+      preferred_time: { type: 'string', description: 'Time in HH:MM format (24hr)', required: true },
+      notes: { type: 'string', description: 'Notes about the booking' }
+    }
+  },
+  book_appointment_cal: {
+    description: 'Book appointment via Cal.com. Time MUST be full absolute date (e.g., "2025 January 28 2:00 PM"). Timezone is America/New_York. Guest email required - use placeholder if not provided. rescheduleReason should be "first time booking".',
+    parameters: {
+      time: { type: 'string', description: 'Full absolute datetime in future (e.g., "2025 January 28 2:00 PM"). NEVER use relative dates.', required: true },
+      guest_name: { type: 'string', description: 'Full name of guest', required: true },
+      guest_email: { type: 'string', description: 'Guest email (use random email if not provided)', required: true },
+      guest_phone: { type: 'string', description: 'Guest phone in +1XXXXXXXXXX format' },
+      notes: { type: 'string', description: 'One-sentence summary of conversation/reason for booking' },
+      timezone: { type: 'string', description: 'Timezone - hardcode to "America/New_York"' },
+      rescheduleReason: { type: 'string', description: 'Reason - use "first time booking" for new bookings' }
     }
   },
   lookup_booking: {
-    description: 'Look up existing bookings by phone or confirmation number',
+    description: 'Look up existing bookings by phone, email, or confirmation number',
     parameters: {
       phone: { type: 'string' },
+      email: { type: 'string' },
       confirmation_number: { type: 'string' }
+    }
+  },
+  reschedule_booking: {
+    description: 'Reschedule an existing Cal.com booking. Requires booking UID and new absolute datetime.',
+    parameters: {
+      booking_uid: { type: 'string', description: 'The booking UID to reschedule', required: true },
+      new_time: { type: 'string', description: 'New full absolute datetime (e.g., "2025 January 30 3:00 PM")', required: true },
+      reason: { type: 'string', description: 'Reason for rescheduling' }
+    }
+  },
+  cancel_booking: {
+    description: 'Cancel a Cal.com booking. Requires booking UID.',
+    parameters: {
+      booking_uid: { type: 'string', description: 'The booking UID to cancel', required: true },
+      reason: { type: 'string', description: 'Reason for cancellation' }
     }
   },
 
