@@ -280,13 +280,32 @@ async function executeTool(toolName: string, args: Record<string, any>, tenant: 
     case 'check_availability': {
       const { date } = args;
       
+      // Parse date if needed
+      let checkDate = date;
+      if (!checkDate) {
+        return {
+          success: false,
+          message: "What day were you thinking? I can check our availability."
+        };
+      }
+      
+      // Query existing bookings for that date
       const { data: existingBookings } = await supabase
         .from('bookings')
-        .select('preferred_time')
-        .eq('preferred_date', date)
+        .select('start_time, preferred_datetime')
+        .gte('start_time', `${date}T00:00:00`)
+        .lt('start_time', `${date}T23:59:59`)
         .neq('status', 'cancelled');
       
-      const bookedTimes = existingBookings?.map(b => b.preferred_time) || [];
+      const bookedTimes = existingBookings?.map(b => {
+        const time = b.start_time || b.preferred_datetime;
+        if (time) {
+          const d = new Date(time);
+          return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
+        }
+        return null;
+      }).filter(Boolean) || [];
+      
       const allSlots = generateTimeSlots(date);
       const availableSlots = allSlots.filter(slot => !bookedTimes.includes(slot));
       
@@ -304,24 +323,28 @@ async function executeTool(toolName: string, args: Record<string, any>, tenant: 
       const { customer_name, customer_phone, customer_email, service_type, preferred_date, preferred_time, notes } = args;
       const confirmation_number = generateConfirmationNumber();
       
+      // Build the start_time from date and time
+      const startTime = `${preferred_date}T${preferred_time}:00`;
+      
       const { data, error } = await supabase
         .from('bookings')
         .insert({
-          customer_name,
-          customer_phone,
-          customer_email,
-          service_type,
-          preferred_date,
-          preferred_time,
-          notes,
+          full_name: customer_name,
+          phone: customer_phone,
+          email: customer_email,
+          notes: notes || service_type,
+          start_time: startTime,
+          preferred_datetime: startTime,
           confirmation_number,
           status: 'confirmed',
-          source: 'voice_ai'
+          source: 'voice_ai',
+          business_id: tenant?.id
         })
         .select()
         .single();
       
       if (error) {
+        console.error('[MCP] Booking error:', error);
         return {
           success: false,
           message: "Booking system hiccup. Let me transfer you to get this sorted."
@@ -336,14 +359,14 @@ async function executeTool(toolName: string, args: Record<string, any>, tenant: 
         customer_email,
         memory_type: 'history',
         memory_key: 'booking_created',
-        memory_value: `Booked ${service_type} for ${preferred_date} at ${preferred_time}. Confirmation: ${confirmation_number}`,
+        memory_value: `Booked ${service_type || 'appointment'} for ${preferred_date} at ${preferred_time}. Confirmation: ${confirmation_number}`,
         source: 'voice_call'
       });
       
       return {
         success: true,
         confirmation_number,
-        message: `Done! ${service_type} booked for ${preferred_date} at ${preferred_time}. Your confirmation is ${confirmation_number}. You'll get a text shortly.`
+        message: `Done! Your appointment is booked for ${preferred_date} at ${preferred_time}. Your confirmation number is ${confirmation_number}. You'll get a text shortly.`
       };
     }
 
@@ -352,12 +375,12 @@ async function executeTool(toolName: string, args: Record<string, any>, tenant: 
       
       let query = supabase.from('bookings').select('*');
       if (confirmation_number) {
-        query = query.eq('confirmation_number', confirmation_number);
+        query = query.ilike('confirmation_number', `%${confirmation_number}%`);
       } else if (phone) {
-        query = query.eq('customer_phone', phone);
+        query = query.eq('phone', phone);
       }
       
-      const { data } = await query.order('preferred_date', { ascending: false }).limit(5);
+      const { data } = await query.order('start_time', { ascending: false }).limit(5);
       
       if (!data || data.length === 0) {
         return {
@@ -367,10 +390,14 @@ async function executeTool(toolName: string, args: Record<string, any>, tenant: 
       }
       
       const booking = data[0];
+      const bookingTime = booking.start_time || booking.preferred_datetime;
+      const formattedTime = bookingTime ? new Date(bookingTime).toLocaleString() : 'scheduled';
+      
       return {
         success: true,
         booking,
-        message: `Found it! ${booking.service_type} on ${booking.preferred_date} at ${booking.preferred_time}. Confirmation: ${booking.confirmation_number}`
+        booking_id: booking.id,
+        message: `Found it! Your appointment is ${formattedTime}. Confirmation: ${booking.confirmation_number || booking.id.slice(-6).toUpperCase()}`
       };
     }
 
