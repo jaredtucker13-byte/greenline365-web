@@ -861,62 +861,6 @@ async function executeTool(toolName: string, args: Record<string, any>, tenant: 
         message: "Your appointment has been cancelled. Would you like to book a different time?"
       };
     }
-        };
-      }
-      
-      // Store in memory (ignore errors)
-      try {
-        await supabase.from('agent_memory').insert({
-          tenant_id: tenant?.id,
-          customer_phone,
-          customer_name,
-          customer_email,
-          memory_type: 'history',
-          memory_key: 'booking_created',
-          memory_value: `Booked ${service_type || 'appointment'} for ${preferred_date} at ${preferred_time}. Confirmation: ${confirmation_number}`,
-          source: 'voice_call'
-        });
-      } catch (e) {
-        // Memory storage is optional
-      }
-      
-      return {
-        success: true,
-        confirmation_number,
-        message: `Done! Your appointment is booked for ${preferred_date} at ${preferred_time}. Your confirmation number is ${confirmation_number}. You'll get a text shortly.`
-      };
-    }
-
-    case 'lookup_booking': {
-      const { phone, confirmation_number } = args;
-      
-      let query = supabase.from('bookings').select('*');
-      if (confirmation_number) {
-        query = query.ilike('confirmation_number', `%${confirmation_number}%`);
-      } else if (phone) {
-        query = query.eq('phone', phone);
-      }
-      
-      const { data } = await query.order('start_time', { ascending: false }).limit(5);
-      
-      if (!data || data.length === 0) {
-        return {
-          success: false,
-          message: "I couldn't find any bookings. Want to create a new one?"
-        };
-      }
-      
-      const booking = data[0];
-      const bookingTime = booking.start_time || booking.preferred_datetime;
-      const formattedTime = bookingTime ? new Date(bookingTime).toLocaleString() : 'scheduled';
-      
-      return {
-        success: true,
-        booking,
-        booking_id: booking.id,
-        message: `Found it! Your appointment is ${formattedTime}. Confirmation: ${booking.confirmation_number || booking.id.slice(-6).toUpperCase()}`
-      };
-    }
 
     // ===== LEAD TOOLS =====
     case 'save_lead': {
