@@ -317,12 +317,17 @@ async function executeTool(toolName: string, args: Record<string, any>, tenant: 
       };
     }
 
-    // ===== BOOKING TOOLS =====
-    case 'check_availability': {
-      const { date } = args;
+    // ===== BOOKING TOOLS (Cal.com Integration) =====
+    case 'check_availability':
+    case 'check_availability_cal': {
+      const { date, start_time, end_time } = args;
       
-      // Parse date if needed
+      // Parse date from various formats
       let checkDate = date;
+      if (start_time) {
+        checkDate = parseAbsoluteDateToISO(start_time);
+      }
+      
       if (!checkDate) {
         return {
           success: false,
@@ -330,12 +335,39 @@ async function executeTool(toolName: string, args: Record<string, any>, tenant: 
         };
       }
       
-      // Query existing bookings for that date
+      // If Cal.com is configured, use it
+      if (CALCOM_API_KEY) {
+        try {
+          const slots = await getCalcomAvailability(checkDate);
+          if (slots.length === 0) {
+            return {
+              success: true,
+              date: checkDate,
+              available_slots: [],
+              message: `${formatDateForSpeech(checkDate)} is fully booked. Want to try another day?`
+            };
+          }
+          
+          // Return only first 3-4 slots (Rule of Three)
+          const topSlots = slots.slice(0, 4);
+          return {
+            success: true,
+            date: checkDate,
+            available_slots: topSlots,
+            message: `On ${formatDateForSpeech(checkDate)}, I have ${topSlots.map(s => formatTimeForSpeech(s)).join(', ')} available. Which time works best for you?`
+          };
+        } catch (error) {
+          console.error('[MCP] Cal.com availability error:', error);
+          // Fall back to Supabase
+        }
+      }
+      
+      // Fallback: Query existing bookings from Supabase
       const { data: existingBookings } = await supabase
         .from('bookings')
         .select('start_time, preferred_datetime')
-        .gte('start_time', `${date}T00:00:00`)
-        .lt('start_time', `${date}T23:59:59`)
+        .gte('start_time', `${checkDate}T00:00:00`)
+        .lt('start_time', `${checkDate}T23:59:59`)
         .neq('status', 'cancelled');
       
       const bookedTimes = existingBookings?.map(b => {
@@ -347,35 +379,103 @@ async function executeTool(toolName: string, args: Record<string, any>, tenant: 
         return null;
       }).filter(Boolean) || [];
       
-      const allSlots = generateTimeSlots(date);
+      const allSlots = generateTimeSlots(checkDate);
       const availableSlots = allSlots.filter(slot => !bookedTimes.includes(slot));
       
       return {
         success: true,
-        date,
-        available_slots: availableSlots,
+        date: checkDate,
+        available_slots: availableSlots.slice(0, 4),
         message: availableSlots.length > 0 
-          ? `On ${date}, I've got: ${availableSlots.slice(0, 4).join(', ')}. What works for you?`
-          : `${date} is fully booked. Want to try another day?`
+          ? `On ${formatDateForSpeech(checkDate)}, I have ${availableSlots.slice(0, 4).map(s => formatTimeForSpeech(s)).join(', ')} available. What works for you?`
+          : `${formatDateForSpeech(checkDate)} is fully booked. Want to try another day?`
       };
     }
 
-    case 'create_booking': {
-      const { customer_name, customer_phone, customer_email, service_type, preferred_date, preferred_time, notes } = args;
-      const confirmation_number = generateConfirmationNumber();
+    case 'create_booking':
+    case 'book_appointment_cal': {
+      // Handle both formats
+      const customer_name = args.customer_name || args.guest_name;
+      const customer_phone = args.customer_phone || args.guest_phone || '';
+      const customer_email = args.customer_email || args.guest_email || `booking-${Date.now()}@placeholder.com`;
+      const service_type = args.service_type || args.notes || 'Consultation';
       
-      // Build the start_time from date and time
-      const startTime = `${preferred_date}T${preferred_time}:00`;
+      // Parse time - support both formats
+      let bookingDateTime: string;
+      if (args.time) {
+        // Full absolute date format from Retell: "2025 January 28 2:00 PM"
+        bookingDateTime = parseAbsoluteDateToISO(args.time);
+      } else if (args.preferred_date && args.preferred_time) {
+        bookingDateTime = `${args.preferred_date}T${args.preferred_time}:00`;
+      } else {
+        return {
+          success: false,
+          message: "I need to confirm the date and time. What day and time would you like?"
+        };
+      }
+      
+      if (!customer_name) {
+        return {
+          success: false,
+          message: "I'll need your name to complete the booking. What name should I put this under?"
+        };
+      }
+      
+      // If Cal.com is configured, use it
+      if (CALCOM_API_KEY) {
+        try {
+          const calcomResult = await createCalcomBooking({
+            name: customer_name,
+            email: customer_email,
+            phone: customer_phone,
+            startTime: bookingDateTime,
+            notes: args.notes || service_type,
+            timezone: args.timezone || CALCOM_TIMEZONE
+          });
+          
+          if (calcomResult.success) {
+            // Also save to Supabase for our records
+            await supabase.from('bookings').insert({
+              full_name: customer_name,
+              phone: customer_phone,
+              email: customer_email,
+              notes: args.notes || service_type,
+              start_time: bookingDateTime,
+              confirmation_number: calcomResult.uid,
+              status: 'confirmed',
+              source: 'voice_ai_calcom',
+              external_calendar_id: calcomResult.uid,
+              business_id: tenant?.id
+            });
+            
+            const bookingDate = new Date(bookingDateTime);
+            return {
+              success: true,
+              confirmation_number: calcomResult.uid?.slice(-8).toUpperCase() || generateConfirmationNumber(),
+              booking_uid: calcomResult.uid,
+              message: `You're all set, ${customer_name}! Your appointment is confirmed for ${formatDateForSpeech(bookingDate.toISOString().split('T')[0])} at ${formatTimeForSpeech(bookingDate.toTimeString().slice(0, 5))}. Your confirmation number is ${calcomResult.uid?.slice(-8).toUpperCase()}. You'll receive a calendar invite at ${customer_email}.`
+            };
+          } else {
+            throw new Error(calcomResult.error || 'Cal.com booking failed');
+          }
+        } catch (error: any) {
+          console.error('[MCP] Cal.com booking error:', error);
+          // Fall back to Supabase-only booking
+        }
+      }
+      
+      // Fallback: Supabase-only booking
+      const confirmation_number = generateConfirmationNumber();
       
       const { data, error } = await supabase
         .from('bookings')
         .insert({
           full_name: customer_name,
           phone: customer_phone || '',
-          email: customer_email || 'noemail@placeholder.com',
-          notes: notes || service_type || '',
-          start_time: startTime,
-          preferred_datetime: startTime,
+          email: customer_email,
+          notes: args.notes || service_type || '',
+          start_time: bookingDateTime,
+          preferred_datetime: bookingDateTime,
           confirmation_number,
           status: 'confirmed',
           source: 'voice_ai',
@@ -389,6 +489,166 @@ async function executeTool(toolName: string, args: Record<string, any>, tenant: 
         return {
           success: false,
           message: "Booking system hiccup. Let me transfer you to get this sorted."
+        };
+      }
+      
+      const bookingDate = new Date(bookingDateTime);
+      return {
+        success: true,
+        confirmation_number,
+        message: `Done! Your appointment is booked for ${formatDateForSpeech(bookingDate.toISOString().split('T')[0])} at ${formatTimeForSpeech(bookingDate.toTimeString().slice(0, 5))}. Your confirmation number is ${confirmation_number}. You'll get a confirmation shortly.`
+      };
+    }
+
+    case 'lookup_booking': {
+      const { phone, email, confirmation_number } = args;
+      
+      // Try Cal.com first
+      if (CALCOM_API_KEY && email) {
+        try {
+          const calcomBookings = await getCalcomBookings(email);
+          if (calcomBookings.length > 0) {
+            const booking = calcomBookings[0];
+            return {
+              success: true,
+              booking,
+              booking_uid: booking.uid,
+              message: `Found it! Your appointment is ${formatDateForSpeech(booking.startTime.split('T')[0])} at ${formatTimeForSpeech(booking.startTime.split('T')[1].slice(0, 5))}. Confirmation: ${booking.uid?.slice(-8).toUpperCase()}`
+            };
+          }
+        } catch (error) {
+          console.error('[MCP] Cal.com lookup error:', error);
+        }
+      }
+      
+      // Fallback to Supabase
+      let query = supabase.from('bookings').select('*');
+      if (confirmation_number) {
+        query = query.ilike('confirmation_number', `%${confirmation_number}%`);
+      } else if (phone) {
+        query = query.eq('phone', phone);
+      } else if (email) {
+        query = query.eq('email', email);
+      }
+      
+      const { data } = await query.order('start_time', { ascending: false }).limit(5);
+      
+      if (!data || data.length === 0) {
+        return {
+          success: false,
+          message: "I couldn't find any bookings. Would you like to schedule a new appointment?"
+        };
+      }
+      
+      const booking = data[0];
+      const bookingTime = booking.start_time || booking.preferred_datetime;
+      
+      return {
+        success: true,
+        booking,
+        booking_uid: booking.external_calendar_id || booking.id,
+        message: `Found it! Your appointment is ${bookingTime ? formatDateForSpeech(new Date(bookingTime).toISOString().split('T')[0]) : 'scheduled'}. Confirmation: ${booking.confirmation_number || booking.id.slice(-8).toUpperCase()}`
+      };
+    }
+
+    case 'reschedule_booking': {
+      const { booking_uid, new_time, reason } = args;
+      
+      if (!booking_uid) {
+        return {
+          success: false,
+          message: "I need your confirmation number to reschedule. Do you have it handy?"
+        };
+      }
+      
+      const newDateTime = parseAbsoluteDateToISO(new_time);
+      
+      if (CALCOM_API_KEY) {
+        try {
+          const result = await rescheduleCalcomBooking(booking_uid, newDateTime, reason);
+          if (result.success) {
+            // Update Supabase record
+            await supabase
+              .from('bookings')
+              .update({ 
+                start_time: newDateTime,
+                updated_at: new Date().toISOString()
+              })
+              .eq('external_calendar_id', booking_uid);
+            
+            const newDate = new Date(newDateTime);
+            return {
+              success: true,
+              message: `Done! I've rescheduled your appointment to ${formatDateForSpeech(newDate.toISOString().split('T')[0])} at ${formatTimeForSpeech(newDate.toTimeString().slice(0, 5))}. You'll receive an updated calendar invite.`
+            };
+          }
+        } catch (error) {
+          console.error('[MCP] Cal.com reschedule error:', error);
+        }
+      }
+      
+      return {
+        success: false,
+        message: "I had trouble rescheduling. Let me connect you with our team to sort this out."
+      };
+    }
+
+    case 'cancel_booking': {
+      const { booking_uid, reason } = args;
+      
+      if (!booking_uid) {
+        return {
+          success: false,
+          message: "I need your confirmation number to cancel. Do you have it?"
+        };
+      }
+      
+      if (CALCOM_API_KEY) {
+        try {
+          const result = await cancelCalcomBooking(booking_uid, reason);
+          if (result.success) {
+            // Update Supabase record
+            await supabase
+              .from('bookings')
+              .update({ 
+                status: 'cancelled',
+                cancellation_reason: reason,
+                cancelled_at: new Date().toISOString()
+              })
+              .eq('external_calendar_id', booking_uid);
+            
+            return {
+              success: true,
+              message: "Your appointment has been cancelled. We're sorry to see you go! Would you like to schedule a different time in the future?"
+            };
+          }
+        } catch (error) {
+          console.error('[MCP] Cal.com cancel error:', error);
+        }
+      }
+      
+      // Fallback: Update Supabase only
+      const { error } = await supabase
+        .from('bookings')
+        .update({
+          status: 'cancelled',
+          cancellation_reason: reason || 'Customer requested',
+          cancelled_at: new Date().toISOString()
+        })
+        .or(`confirmation_number.ilike.%${booking_uid}%,id.ilike.%${booking_uid}%`);
+      
+      if (error) {
+        return {
+          success: false,
+          message: "I had trouble cancelling. Let me connect you with our team."
+        };
+      }
+      
+      return {
+        success: true,
+        message: "Your appointment has been cancelled. Would you like to book a different time?"
+      };
+    }
         };
       }
       
