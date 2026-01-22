@@ -4,17 +4,12 @@ import { NextRequest, NextResponse } from 'next/server';
  * Cal.com Event Types API
  * 
  * GET /api/calcom/event-types - List all event types
- * GET /api/calcom/event-types?id=123 - Get specific event type
  */
 
 const CALCOM_API_KEY = process.env.CALCOM_API_KEY || '';
-const CALCOM_API_URL = process.env.CALCOM_API_URL || 'https://api.cal.com/v2';
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const eventTypeId = searchParams.get('id');
-    
     if (!CALCOM_API_KEY) {
       return NextResponse.json({ 
         error: 'Cal.com API key not configured',
@@ -22,17 +17,11 @@ export async function GET(request: NextRequest) {
       }, { status: 500 });
     }
     
-    // Fetch event types from Cal.com
-    const endpoint = eventTypeId 
-      ? `${CALCOM_API_URL}/event-types/${eventTypeId}`
-      : `${CALCOM_API_URL}/event-types`;
-    
-    const response = await fetch(endpoint, {
+    // Use v1 API for event types list
+    const response = await fetch(`https://api.cal.com/v1/event-types?apiKey=${CALCOM_API_KEY}`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${CALCOM_API_KEY}`,
-        'Content-Type': 'application/json',
-        'cal-api-version': '2024-08-13'
+        'Content-Type': 'application/json'
       }
     });
     
@@ -48,15 +37,14 @@ export async function GET(request: NextRequest) {
     const data = await response.json();
     
     // Format the response for easy reading
-    if (data.data && Array.isArray(data.data)) {
-      const eventTypes = data.data.map((et: any) => ({
+    if (data.event_types && Array.isArray(data.event_types)) {
+      const eventTypes = data.event_types.map((et: any) => ({
         id: et.id,
         title: et.title,
         slug: et.slug,
         description: et.description,
         length: et.length, // Duration in minutes
-        locations: et.locations,
-        schedulingType: et.schedulingType
+        hidden: et.hidden
       }));
       
       return NextResponse.json({
@@ -69,7 +57,7 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json({
       success: true,
-      data: data.data || data
+      data: data
     });
     
   } catch (error: any) {
