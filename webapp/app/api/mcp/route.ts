@@ -526,6 +526,16 @@ export async function POST(request: NextRequest) {
     }
     
     const result = await executeTool(tool_name, toolArgs || {}, tenant, agentType);
+    
+    // Retell expects { result: "string" } format
+    // Convert our response to string if needed
+    if (typeof result === 'object' && result.message) {
+      return NextResponse.json({ 
+        result: result.message,
+        ...result  // Include additional data for our own use
+      });
+    }
+    
     return NextResponse.json(result);
     
   } catch (error) {
