@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     
     const twilioMessage = await client.messages.create({
       body: message,
-      from: TWILIO_PHONE_NUMBER,
+      from: TWILIO_SMS_NUMBER,
       to: formattedTo
     });
     
