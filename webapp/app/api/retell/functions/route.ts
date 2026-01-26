@@ -184,7 +184,7 @@ async function bookAppointment(
         date: dateStr,
         time_slot: timeSlot,
         customer_name: guest_name,
-        customer_email: guest_email || 'monitoring@amplifyvoice.ai',
+        customer_email: guest_email || 'greenline365help@gmail.com',
         customer_phone: guest_phone,
         notes: notes || '',
         status: 'confirmed',

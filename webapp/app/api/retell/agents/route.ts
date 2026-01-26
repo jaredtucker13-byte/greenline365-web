@@ -41,7 +41,7 @@ const FUNCTION_DEFINITIONS = {
   
   book_appointment_cal: {
     name: 'book_appointment_cal',
-    description: 'Book an appointment on the calendar. Time must always be in the future. Convert any relative dates to absolute dates. Timezone is America/New_York. Guest email should be customer email or monitoring@amplifyvoice.ai for tracking.',
+    description: 'Book an appointment on the calendar. Time must always be in the future. Convert any relative dates to absolute dates. Timezone is America/New_York. Guest email should be customer email or greenline365help@gmail.com for tracking.',
     parameters: {
       type: 'object',
       required: ['time', 'guest_name'],
@@ -56,7 +56,7 @@ const FUNCTION_DEFINITIONS = {
         },
         guest_email: {
           type: 'string',
-          description: 'Customer email address. Use "monitoring@amplifyvoice.ai" if not provided.'
+          description: 'Customer email address. Use "greenline365help@gmail.com" if not provided.'
         },
         guest_phone: {
           type: 'string',
