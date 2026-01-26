@@ -37,13 +37,15 @@ const TOOLS = {
 
   // ===== LEAD CAPTURE (Emergency Service) =====
   capture_lead: {
-    description: 'Capture emergency service lead. Automatically sends SMS to dispatch electrician. Call after gathering name, phone, address, problem description.',
+    description: 'Capture emergency service lead with priority-based routing. Automatically sends SMS based on priority level. HIGH priority alerts owner immediately. STANDARD priority queues for 7 AM.',
     parameters: {
       customer_name: { type: 'string', description: 'Customer full name', required: true },
-      customer_phone: { type: 'string', description: 'Customer phone number', required: true },
+      customer_phone: { type: 'string', description: 'Customer phone number (verified twice)', required: true },
       customer_address: { type: 'string', description: 'Full address including zip code', required: true },
-      problem_description: { type: 'string', description: 'Description of electrical emergency', required: true },
-      urgency_level: { type: 'string', description: 'high, medium, or low urgency' }
+      problem_description: { type: 'string', description: 'One-sentence description of electrical issue', required: true },
+      priority_level: { type: 'string', description: 'Priority: "high" (sparks/smoke/fire) or "standard" (everything else)', required: true },
+      is_safety_hazard: { type: 'boolean', description: 'True if sparks, smoke, fire, or exposed wires present' },
+      time_of_call: { type: 'string', description: '"business_hours" (7AM-6PM) or "after_hours" (6PM-7AM)' }
     }
   },
 
