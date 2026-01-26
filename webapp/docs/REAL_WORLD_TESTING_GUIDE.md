@@ -137,7 +137,7 @@ In Retell Dashboard → Functions tab, add these:
   "name": "book_appointment_cal",
   "url": "https://greenline365.com/api/mcp",
   "method": "POST",
-  "description": "Book a new appointment. Use monitoring@amplifyvoice.ai for email if customer doesn't provide one."
+  "description": "Book a new appointment. Use greenline365help@gmail.com for email if customer doesn't provide one."
 }
 ```
 
