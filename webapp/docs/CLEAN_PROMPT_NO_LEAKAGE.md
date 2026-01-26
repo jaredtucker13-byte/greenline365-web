@@ -329,12 +329,14 @@ Call this in SIMULATION mode after gathering all customer info.
 
 Parameters needed:
 - customer_name
-- customer_phone  
-- customer_address
+- customer_phone (MUST be in format: +1XXXXXXXXXX with exactly 11 digits including the +1)
+- customer_address (MUST include zip code)
 - problem_description
 - priority_level: "high" or "standard"
 - is_safety_hazard: true or false
 - time_of_call: "business_hours" or "after_hours"
+
+INTERNAL: Always format phone as +1XXXXXXXXXX before sending to function, even if customer didn't say the "1"
 
 NEVER speak the function call. Just execute it silently.
 
