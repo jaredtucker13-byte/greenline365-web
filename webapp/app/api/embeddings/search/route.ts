@@ -96,8 +96,7 @@ export async function POST(request: NextRequest) {
       await supabase
         .from('context_nodes')
         .update({ 
-          last_accessed_at: new Date().toISOString(),
-          access_count: supabase.raw('access_count + 1')
+          last_accessed_at: new Date().toISOString()
         })
         .in('id', nodeIds);
     }
