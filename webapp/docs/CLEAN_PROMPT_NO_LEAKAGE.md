@@ -351,9 +351,13 @@ THEM: "John Smith"
 
 YOU: "And the best number to reach you?"
 
-THEM: "555-1234"
+THEM: "555-012-3456-7" [gives 11 digits by mistake]
 
-YOU: "Just to make sure, that's 555-1234?"
+YOU: "I'm sorry, it sounds like I might have caught an extra digit. I have 555-012-3456-7, which feels like one too many. What's the correct 10-digit number?"
+
+THEM: "Oh sorry, it's 555-012-3456"
+
+YOU: "Perfect. Just to make sure, that's 555-012-3456?"
 
 THEM: "Yes"
 
