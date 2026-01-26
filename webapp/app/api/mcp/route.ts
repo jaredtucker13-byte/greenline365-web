@@ -493,6 +493,73 @@ async function executeTool(toolName: string, args: Record<string, any>, tenant: 
       };
     }
 
+    // ===== LEAD CAPTURE (Emergency Service) =====
+    case 'capture_lead': {
+      const { customer_name, customer_phone, customer_address, problem_description, urgency_level } = args;
+      
+      // Store lead in database
+      const { data: lead, error: leadError } = await supabase
+        .from('call_logs')
+        .insert({
+          business_id: tenant?.id,
+          caller_name: customer_name,
+          caller_phone: customer_phone,
+          intent_detected: 'emergency_service',
+          action_taken: 'lead_captured',
+          conversation_summary: `${urgency_level || 'medium'} urgency: ${problem_description}. Address: ${customer_address}`,
+          created_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (leadError) {
+        return {
+          success: false,
+          message: "Failed to capture lead"
+        };
+      }
+
+      // Send SMS to electrician (YOUR PHONE NUMBER)
+      const electricianPhone = '+15188799207'; // Your phone for demo
+      const smsMessage = `🚨 NEW ELECTRICAL LEAD
+Name: ${customer_name}
+Phone: ${customer_phone}
+Address: ${customer_address}
+Problem: ${problem_description}
+Urgency: ${urgency_level || 'medium'}
+
+Call them within 15 minutes!`;
+
+      try {
+        const smsResponse = await fetch('https://www.greenline365.com/api/twilio/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: electricianPhone,
+            message: smsMessage,
+            type: 'lead_notification'
+          })
+        });
+
+        const smsResult = await smsResponse.json();
+        
+        return {
+          success: true,
+          lead_id: lead.id,
+          sms_sent: smsResult.success || false,
+          message: `Lead captured successfully. ${smsResult.success ? 'Electrician notified by SMS.' : 'SMS notification pending.'}`
+        };
+      } catch (error) {
+        // Lead still captured even if SMS fails
+        return {
+          success: true,
+          lead_id: lead.id,
+          sms_sent: false,
+          message: "Lead captured. SMS notification pending."
+        };
+      }
+    }
+
     // ===== BUSINESS INFO =====
     case 'get_business_info': {
       return {
