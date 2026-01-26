@@ -35,6 +35,18 @@ const TOOLS = {
     }
   },
 
+  // ===== LEAD CAPTURE (Emergency Service) =====
+  capture_lead: {
+    description: 'Capture emergency service lead. Automatically sends SMS to dispatch electrician. Call after gathering name, phone, address, problem description.',
+    parameters: {
+      customer_name: { type: 'string', description: 'Customer full name', required: true },
+      customer_phone: { type: 'string', description: 'Customer phone number', required: true },
+      customer_address: { type: 'string', description: 'Full address including zip code', required: true },
+      problem_description: { type: 'string', description: 'Description of electrical emergency', required: true },
+      urgency_level: { type: 'string', description: 'high, medium, or low urgency' }
+    }
+  },
+
   // ===== BUSINESS INFO =====
   get_business_info: {
     description: 'Get tenant-specific business context including industry, pain points, and value proposition',
