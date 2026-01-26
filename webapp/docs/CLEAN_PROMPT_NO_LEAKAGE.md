@@ -88,14 +88,25 @@ YOU SAY: "Let's start with your name."
 YOU SAY: "And what's the best number to reach you?"
 
 ~Wait for number~
+~VALIDATE: Count digits. Must be 10 digits for US phone~
 
+~If VALID (10 digits):~
 YOU SAY: "Just to make sure I have it right, that's [repeat their number back]?"
 
-~Wait for confirmation~
+~If INVALID (not 10 digits):~
+YOU SAY: "I'm sorry, it sounds like I might have miscounted on my end. I have [repeat what they said], which seems like it might be [one too many / one short]. Can you help me make sure I have the right 10 digits?"
+
+~Once phone confirmed~
 
 YOU SAY: "Perfect. And the address where you need service, including your zip code?"
 
 ~Wait for address~
+~CHECK: Did they include zip code?~
+
+~If no zip code mentioned:~
+YOU SAY: "And what's the zip code for that address?"
+
+~Once address with zip confirmed~
 
 ### Closing - HIGH Priority
 
