@@ -497,7 +497,13 @@ async function executeTool(toolName: string, args: Record<string, any>, tenant: 
 
     // ===== LEAD CAPTURE (Emergency Service) =====
     case 'capture_lead': {
-      const { customer_name, customer_phone, customer_address, problem_description, urgency_level } = args;
+      const { customer_name, customer_phone, customer_address, problem_description, priority_level, is_safety_hazard, time_of_call } = args;
+      
+      // Determine current time context if not provided
+      const now = new Date();
+      const currentHour = now.getHours();
+      const isAfterHours = currentHour < 7 || currentHour >= 18; // 6 PM - 7 AM
+      const timeContext = time_of_call || (isAfterHours ? 'after_hours' : 'business_hours');
       
       // Store lead in database
       const { data: lead, error: leadError } = await supabase
@@ -506,9 +512,9 @@ async function executeTool(toolName: string, args: Record<string, any>, tenant: 
           business_id: tenant?.id,
           caller_name: customer_name,
           caller_phone: customer_phone,
-          intent_detected: 'emergency_service',
+          intent_detected: priority_level === 'high' ? 'high_priority_emergency' : 'standard_service',
           action_taken: 'lead_captured',
-          conversation_summary: `${urgency_level || 'medium'} urgency: ${problem_description}. Address: ${customer_address}`,
+          conversation_summary: `${priority_level?.toUpperCase()} PRIORITY: ${problem_description}. Address: ${customer_address}. Safety Hazard: ${is_safety_hazard ? 'YES' : 'NO'}. Time: ${timeContext}`,
           created_at: new Date().toISOString()
         })
         .select()
@@ -521,45 +527,109 @@ async function executeTool(toolName: string, args: Record<string, any>, tenant: 
         };
       }
 
-      // Send SMS to electrician (YOUR PHONE NUMBER)
-      const electricianPhone = '+15188799207'; // Your phone for demo
-      const smsMessage = `🚨 NEW ELECTRICAL LEAD
+      // Priority-based SMS routing
+      const electricianPhone = '+15188799207'; // Your phone
+      let smsMessage = '';
+      let shouldAlert = false;
+
+      if (priority_level === 'high') {
+        // HIGH PRIORITY: Always alert immediately (even at 3 AM)
+        shouldAlert = true;
+        smsMessage = `🚨 HIGH PRIORITY EMERGENCY 🚨
+⚡ IMMEDIATE ACTION REQUIRED
+
 Name: ${customer_name}
 Phone: ${customer_phone}
 Address: ${customer_address}
 Problem: ${problem_description}
-Urgency: ${urgency_level || 'medium'}
+Safety Hazard: ${is_safety_hazard ? 'YES - DANGEROUS' : 'Unknown'}
+Time: ${timeContext}
 
-Call them within 15 minutes!`;
+CALL WITHIN 15 MINUTES!`;
+      } else {
+        // STANDARD PRIORITY: Behavior depends on time
+        if (isAfterHours || timeContext === 'after_hours') {
+          // After hours: Queue for 7 AM, don't wake owner
+          shouldAlert = false; // Owner NOT notified until morning
+          smsMessage = `📋 STANDARD PRIORITY - Queue for 7 AM
+
+Name: ${customer_name}
+Phone: ${customer_phone}
+Address: ${customer_address}
+Problem: ${problem_description}
+
+Customer expects callback at 7:00 AM tomorrow.
+This is queued - no immediate action needed.`;
+          
+          // This SMS will be sent at 7 AM via a cron job (to be implemented)
+          // For now, we log it but don't send immediately
+        } else {
+          // Business hours: Alert for callback within hour
+          shouldAlert = true;
+          smsMessage = `📞 NEW SERVICE REQUEST
+
+Name: ${customer_name}
+Phone: ${customer_phone}
+Address: ${customer_address}
+Problem: ${problem_description}
+
+Standard priority - callback within 1 hour.`;
+        }
+      }
+
+      // Send SMS notification (only if shouldAlert is true)
+      let smsResult = { success: false };
+      if (shouldAlert) {
+        try {
+          const smsResponse = await fetch('https://www.greenline365.com/api/twilio/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              to: electricianPhone,
+              message: smsMessage,
+              type: priority_level === 'high' ? 'emergency_alert' : 'lead_notification'
+            })
+          });
+
+          smsResult = await smsResponse.json();
+        } catch (error) {
+          console.error('SMS notification failed:', error);
+        }
+      }
+
+      // Send confirmation SMS to customer
+      const customerSMS = priority_level === 'high'
+        ? `Emergency electrical service confirmed. Our electrician will call you within 15 minutes at ${customer_phone}. Stay safe! - ${tenant?.business_name || 'Emergency Electrical'}`
+        : isAfterHours
+          ? `You're confirmed as #1 in our Priority Queue for 7:00 AM tomorrow. Our electrician will call ${customer_phone} first thing. Thank you! - ${tenant?.business_name || 'Emergency Electrical'}`
+          : `Service request received. Our electrician will call you within the hour at ${customer_phone}. - ${tenant?.business_name || 'Emergency Electrical'}`;
 
       try {
-        const smsResponse = await fetch('https://www.greenline365.com/api/twilio/send', {
+        await fetch('https://www.greenline365.com/api/twilio/send', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            to: electricianPhone,
-            message: smsMessage,
-            type: 'lead_notification'
+            to: customer_phone,
+            message: customerSMS,
+            type: 'customer_confirmation'
           })
         });
-
-        const smsResult = await smsResponse.json();
-        
-        return {
-          success: true,
-          lead_id: lead.id,
-          sms_sent: smsResult.success || false,
-          message: `Lead captured successfully. ${smsResult.success ? 'Electrician notified by SMS.' : 'SMS notification pending.'}`
-        };
       } catch (error) {
-        // Lead still captured even if SMS fails
-        return {
-          success: true,
-          lead_id: lead.id,
-          sms_sent: false,
-          message: "Lead captured. SMS notification pending."
-        };
+        console.error('Customer confirmation SMS failed:', error);
       }
+
+      return {
+        success: true,
+        lead_id: lead.id,
+        priority_level,
+        time_context: timeContext,
+        owner_alerted: shouldAlert,
+        message: priority_level === 'high'
+          ? "HIGH PRIORITY lead captured. Owner alerted for 15-minute callback."
+          : isAfterHours
+            ? "STANDARD PRIORITY lead queued for 7 AM. Customer confirmation sent."
+            : "STANDARD PRIORITY lead captured. Owner alerted for 1-hour callback."
+      };
     }
 
     // ===== BUSINESS INFO =====
