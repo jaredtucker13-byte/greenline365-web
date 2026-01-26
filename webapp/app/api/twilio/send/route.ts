@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
     // Log the message
     await supabase.from('sms_messages').insert({
       direction: 'outbound',
-      from_number: TWILIO_PHONE_NUMBER,
+      from_number: TWILIO_SMS_NUMBER,
       to_number: formattedTo,
       body: message,
       message_sid: twilioMessage.sid,
