@@ -15,7 +15,7 @@ import twilio from 'twilio';
 
 const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID || '';
 const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN || '';
-const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER || '+18135409691';
+const TWILIO_SMS_NUMBER = process.env.TWILIO_SMS_NUMBER || process.env.TWILIO_PHONE_NUMBER || '+18135409691';
 
 export async function POST(request: NextRequest) {
   try {
