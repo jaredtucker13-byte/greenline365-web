@@ -434,6 +434,7 @@ async function executeTool(toolName: string, args: Record<string, any>, tenant: 
     case 'get_memory': {
       const { customer_phone } = args;
       
+      // Traditional memory lookup
       const { data: memories } = await supabase
         .from('agent_memory')
         .select('*')
@@ -442,17 +443,47 @@ async function executeTool(toolName: string, args: Record<string, any>, tenant: 
         .order('created_at', { ascending: false })
         .limit(20);
       
+      // Vector-based context graph lookup
+      let contextGraphResults = [];
+      try {
+        const searchResponse = await fetch('https://www.greenline365.com/api/embeddings/search', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: `Previous interactions and preferences for customer phone ${customer_phone}`,
+            customer_phone,
+            business_id: tenant?.id,
+            match_threshold: 0.7,
+            match_count: 5,
+            include_relationships: true
+          })
+        });
+
+        if (searchResponse.ok) {
+          const searchData = await searchResponse.json();
+          contextGraphResults = searchData.results || [];
+        }
+      } catch (error) {
+        console.log('Context graph search skipped:', error);
+      }
+      
       if (!memories || memories.length === 0) {
         return {
           success: true,
           is_new_customer: true,
           memories: [],
+          context_graph: contextGraphResults,
           message: "No previous interactions found. This is a new customer."
         };
       }
       
       const customerName = memories.find(m => m.customer_name)?.customer_name;
       const customerEmail = memories.find(m => m.customer_email)?.customer_email;
+      
+      // Build context summary from graph
+      const graphContext = contextGraphResults.length > 0
+        ? `Context Graph Insights: ${contextGraphResults.map((r: any) => r.content).join(' | ')}`
+        : '';
       
       return {
         success: true,
@@ -465,8 +496,10 @@ async function executeTool(toolName: string, args: Record<string, any>, tenant: 
           value: m.memory_value,
           date: m.created_at
         })),
+        context_graph: contextGraphResults,
+        graph_insights: graphContext,
         message: customerName 
-          ? `Found ${memories.length} memories for ${customerName}. Previous interactions loaded.`
+          ? `Found ${memories.length} memories for ${customerName}. ${contextGraphResults.length} context insights loaded.`
           : `Found ${memories.length} memories for this number.`
       };
     }
