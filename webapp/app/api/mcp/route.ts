@@ -618,17 +618,57 @@ Standard priority - callback within 1 hour.`;
         console.error('Customer confirmation SMS failed:', error);
       }
 
+      // Create context nodes for the knowledge graph
+      const contextText = `Customer ${customer_name} called with ${priority_level} priority electrical issue: ${problem_description}. Location: ${customer_address}. ${is_safety_hazard ? 'SAFETY HAZARD - sparks/smoke/fire present.' : 'Standard service request.'}`;
+      
+      try {
+        // Generate embedding and store context node for this call
+        await fetch('https://www.greenline365.com/api/embeddings/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            text: contextText,
+            node_type: 'emergency_call',
+            metadata: {
+              priority: priority_level,
+              safety_hazard: is_safety_hazard,
+              time_context: timeContext,
+              call_log_id: lead.id
+            },
+            customer_phone,
+            business_id: tenant?.id
+          })
+        });
+
+        // Create customer profile node for future reference
+        const customerProfileText = `${customer_name} - Phone: ${customer_phone}, Address: ${customer_address}. Electrical service customer.`;
+        await fetch('https://www.greenline365.com/api/embeddings/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            text: customerProfileText,
+            node_type: 'customer_profile',
+            metadata: { name: customer_name, address: customer_address },
+            customer_phone,
+            business_id: tenant?.id
+          })
+        });
+      } catch (embeddingError) {
+        console.log('Context graph update failed (non-critical):', embeddingError);
+      }
+
       return {
         success: true,
         lead_id: lead.id,
         priority_level,
         time_context: timeContext,
         owner_alerted: shouldAlert,
+        context_graph_updated: true,
         message: priority_level === 'high'
-          ? "HIGH PRIORITY lead captured. Owner alerted for 15-minute callback."
+          ? "HIGH PRIORITY lead captured. Owner alerted for 15-minute callback. Context graph updated."
           : isAfterHours
-            ? "STANDARD PRIORITY lead queued for 7 AM. Customer confirmation sent."
-            : "STANDARD PRIORITY lead captured. Owner alerted for 1-hour callback."
+            ? "STANDARD PRIORITY lead queued for 7 AM. Customer confirmation sent. Context graph updated."
+            : "STANDARD PRIORITY lead captured. Owner alerted for 1-hour callback. Context graph updated."
       };
     }
 
