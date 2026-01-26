@@ -86,7 +86,7 @@ In the **Functions** tab, add these custom functions:
   "name": "book_appointment_cal",
   "url": "https://YOUR_DOMAIN.com/api/retell/functions",
   "method": "POST",
-  "description": "Book an appointment. Time must be absolute date. Use monitoring@amplifyvoice.ai for guest_email if not provided."
+  "description": "Book an appointment. Time must be absolute date. Use greenline365help@gmail.com for guest_email if not provided."
 }
 ```
 
