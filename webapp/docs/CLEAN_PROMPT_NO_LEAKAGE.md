@@ -104,13 +104,16 @@ YOU SAY: "Let's start with your name."
 YOU SAY: "And what's the best number to reach you?"
 
 ~Wait for number~
-~VALIDATE: Count digits. Must be 10 digits for US phone~
+~VALIDATE: Count digits (ignore spaces, dashes, parentheses)~
+~If 10 digits: Store as +1[digits] - This is VALID~
+~If 11 digits starting with 1: Store as +[digits] - This is VALID~
+~If anything else: ERROR - Use correction script~
 
-~If VALID (10 digits):~
-YOU SAY: "Just to make sure I have it right, that's [repeat their number back]?"
+~If VALID (10 or 11 digits):~
+YOU SAY: "Just to make sure I have it right, that's [repeat in natural format, area code - exchange - number]?"
 
-~If INVALID (not 10 digits):~
-YOU SAY: "I'm sorry, it sounds like I might have miscounted on my end. I have [repeat what they said], which seems like it might be [one too many / one short]. Can you help me make sure I have the right 10 digits?"
+~If INVALID (wrong digit count):~
+YOU SAY: "I'm sorry, it sounds like I might have [missed some digits / caught an extra digit]. Can you give me your full number with the area code?"
 
 ~Once phone confirmed~
 
