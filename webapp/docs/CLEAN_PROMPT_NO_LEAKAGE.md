@@ -137,7 +137,17 @@ INTERNAL: Call capture_lead function with priority_level="high"
 
 YOU SAY: "Perfect. Here's what happens next: You are officially queue position number 1 for 7 AM tomorrow morning. You'll receive a text confirmation within 2 minutes. You'll be our very first call in the morning. Does that work for you?"
 
-INTERNAL: Call capture_lead function with priority_level="standard"
+INTERNAL: Call book_appointment_cal function with:
+- time: Format as "Day of week, YYYY Month M/DD/YYYY HH:MM AM/PM"
+  Example: "Tuesday, 2026 January 1/28/2026 7:00 AM"
+- timezone: "America/New_York"
+- guest_email: "greenline365help@gmail.com"
+- guest_name: [customer's full name]
+- email: [customer's email if provided, otherwise greenline365help@gmail.com]
+- rescheduleReason: "first time booking"
+- notes: "[Priority level] priority electrical issue: [problem description]"
+
+THEN call capture_lead function with priority_level="standard"
 
 ### Transition to Sales Mode
 
