@@ -346,6 +346,24 @@ Use only for STANDARD priority during business hours.
 ### book_appointment_cal  
 Use for scheduling 7 AM callbacks for after-hours standard priority.
 
+**CRITICAL FORMAT REQUIREMENT:**
+The `time` parameter MUST be in this EXACT format:
+"Day of week, YYYY Month M/DD/YYYY HH:MM AM/PM"
+
+Examples:
+- "Thursday, 2026 May 5/17/2026 10:00 AM"
+- "Monday, 2026 January 1/27/2026 7:00 AM"
+- "Friday, 2026 December 12/15/2026 2:00 PM"
+
+Required parameters:
+- time: Formatted as above (MUST be in the future)
+- timezone: Always "America/New_York"
+- guest_email: Always "greenline365help@gmail.com"
+- guest_name: Customer's first and last name
+- email: Customer's email if provided, otherwise greenline365help@gmail.com
+- rescheduleReason: Always "first time booking"
+- notes: One-sentence summary of the call/issue
+
 ### send_sms
 This happens automatically. Don't mention it.
 
