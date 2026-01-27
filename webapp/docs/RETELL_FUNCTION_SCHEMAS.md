@@ -96,7 +96,12 @@ Check calendar availability for STANDARD priority calls during business hours. O
 
 **Description:**
 ```
-Book callback appointment or service visit. Use for after-hours STANDARD priority (book for 7 AM next day) or business hours appointments. Email defaults to greenline365help@gmail.com if customer doesn't provide.
+Book callback appointment. For after-hours STANDARD priority, time should be 7:00 AM next business day. 
+
+CRITICAL: Time format MUST be exactly: "Day of week, YYYY Month M/DD/YYYY HH:MM AM/PM"
+Example: "Thursday, 2026 May 5/17/2026 10:00 AM"
+
+Email defaults to greenline365help@gmail.com if customer doesn't provide.
 ```
 
 **URL:** `https://www.greenline365.com/api/mcp`
@@ -108,32 +113,42 @@ Book callback appointment or service visit. Use for after-hours STANDARD priorit
 {
   "time": {
     "type": "string",
-    "description": "Absolute datetime in future. Format: 'Tuesday, January 28, 2026 7:00 AM'. For after-hours STANDARD priority, always use 7:00 AM next business day.",
+    "description": "EXACT FORMAT REQUIRED: 'Day of week, YYYY Month M/DD/YYYY HH:MM AM/PM'. Example: 'Thursday, 2026 May 5/17/2026 10:00 AM'. MUST be in the future.",
     "required": true
   },
   "guest_name": {
     "type": "string",
-    "description": "Customer's full name",
+    "description": "Customer full name (first and last)",
     "required": true
   },
   "guest_email": {
     "type": "string",
-    "description": "Customer email. Use greenline365help@gmail.com if not provided.",
+    "description": "Always use greenline365help@gmail.com",
     "required": true
+  },
+  "email": {
+    "type": "string",
+    "description": "Customer email if provided, otherwise greenline365help@gmail.com",
+    "required": false
   },
   "guest_phone": {
     "type": "string",
-    "description": "Customer phone number in format: +1XXXXXXXXXX",
+    "description": "Customer phone in +1XXXXXXXXXX format",
     "required": false
   },
   "notes": {
     "type": "string",
-    "description": "One-sentence summary including priority level and problem description",
+    "description": "One-sentence summary of conversation/issue",
     "required": false
   },
   "timezone": {
     "type": "string",
-    "description": "Always use America/New_York",
+    "description": "Always America/New_York",
+    "required": false
+  },
+  "rescheduleReason": {
+    "type": "string",
+    "description": "Always use 'first time booking'",
     "required": false
   }
 }
