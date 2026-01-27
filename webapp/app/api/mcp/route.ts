@@ -90,15 +90,16 @@ const TOOLS = {
     }
   },
   book_appointment_cal: {
-    description: 'Book appointment via Cal.com. Time MUST be full absolute date (e.g., "2025 January 28 2:00 PM"). Timezone is America/New_York. Guest email required - use placeholder if not provided. rescheduleReason should be "first time booking".',
+    description: 'Book appointment via Cal.com. CRITICAL FORMAT: time MUST be "Day of week, YYYY Month M/DD/YYYY HH:MM AM/PM" (Example: "Thursday, 2026 May 5/17/2026 10:00 AM"). MUST be in future. Timezone is America/New_York. Always use greenline365help@gmail.com for guest_email. rescheduleReason should be "first time booking".',
     parameters: {
-      time: { type: 'string', description: 'Full absolute datetime in future (e.g., "2025 January 28 2:00 PM"). NEVER use relative dates.', required: true },
-      guest_name: { type: 'string', description: 'Full name of guest', required: true },
-      guest_email: { type: 'string', description: 'Guest email (use random email if not provided)', required: true },
-      guest_phone: { type: 'string', description: 'Guest phone in +1XXXXXXXXXX format' },
-      notes: { type: 'string', description: 'One-sentence summary of conversation/reason for booking' },
-      timezone: { type: 'string', description: 'Timezone - hardcode to "America/New_York"' },
-      rescheduleReason: { type: 'string', description: 'Reason - use "first time booking" for new bookings' }
+      time: { type: 'string', description: 'EXACT FORMAT: "Thursday, 2026 May 5/17/2026 10:00 AM". Day of week, YYYY Month M/DD/YYYY HH:MM AM/PM. MUST be future datetime.', required: true },
+      guest_name: { type: 'string', description: 'Customer full name (first and last)', required: true },
+      guest_email: { type: 'string', description: 'Always use greenline365help@gmail.com', required: true },
+      email: { type: 'string', description: 'Customer email if provided, otherwise greenline365help@gmail.com' },
+      guest_phone: { type: 'string', description: 'Customer phone in +1XXXXXXXXXX format' },
+      notes: { type: 'string', description: 'One-sentence summary of conversation/issue' },
+      timezone: { type: 'string', description: 'Always America/New_York' },
+      rescheduleReason: { type: 'string', description: 'Always use "first time booking"' }
     }
   },
   lookup_booking: {
