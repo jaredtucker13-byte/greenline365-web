@@ -130,6 +130,44 @@ const TOOLS = {
     }
   },
 
+  // ===== SMS TOOLS (Retell Integration) =====
+  send_sms: {
+    description: 'Send an SMS message to the customer. Use for: 1) Meeting confirmations with details, 2) Value bomb follow-ups with links, 3) Any info that should be in writing.',
+    parameters: {
+      to: { type: 'string', description: 'Phone number to send SMS to (use customer phone)', required: true },
+      message: { type: 'string', description: 'The message content to send', required: true },
+      type: { type: 'string', description: 'Type: confirmation, value_bomb, followup, reminder' }
+    }
+  },
+  send_meeting_confirmation: {
+    description: 'USE CASE 1: Send meeting confirmation SMS with all details (time, location, zoom link, prep notes). Call this immediately after booking is confirmed.',
+    parameters: {
+      to: { type: 'string', required: true },
+      customer_name: { type: 'string', required: true },
+      date: { type: 'string', description: 'Meeting date', required: true },
+      time: { type: 'string', description: 'Meeting time', required: true },
+      location: { type: 'string', description: 'Physical location or "Virtual"' },
+      zoom_link: { type: 'string', description: 'Zoom/meeting link if virtual' },
+      prep_notes: { type: 'string', description: 'What to bring or prepare' }
+    }
+  },
+  send_value_bomb: {
+    description: 'USE CASE 2: Send a "value bomb" - a helpful resource link based on what the customer is interested in. Send DURING the call to capture attention.',
+    parameters: {
+      to: { type: 'string', required: true },
+      customer_name: { type: 'string', required: true },
+      interest: { type: 'string', description: 'What the customer is interested in: buying, rates, services, pricing, demo', required: true },
+      custom_message: { type: 'string', description: 'Optional custom message to include' }
+    }
+  },
+  request_contact_info: {
+    description: 'USE CASE 3: Perfect Transcription - Instead of asking customer to spell their name/email, send an SMS asking them to text their info back. Say: "I just texted you - please reply with your full name and email."',
+    parameters: {
+      to: { type: 'string', description: 'Customer phone number', required: true },
+      call_id: { type: 'string', description: 'Current call ID for tracking' }
+    }
+  },
+
   // ===== CALL CONTROL =====
   transfer_to_human: {
     description: 'Transfer the call to a human team member',
