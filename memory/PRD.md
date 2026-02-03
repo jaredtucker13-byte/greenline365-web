@@ -280,3 +280,122 @@ warm_transfer_queue: perplexity_research, weather_context, whisper_script, statu
 | `/api/realfeel/research` | Perplexity research for warm transfers |
 | `/api/realfeel/calls` | Call logging and analytics |
 | `/api/realfeel/context` | Business context configuration |
+
+---
+
+## Property-First Universal Home Service Engine (January 23, 2025)
+
+### Overview
+Major architectural pivot from a flat customer model to a **Property-First Relational Graph**. This transforms the system from an HVAC booking tool to a **Universal Home Service Engine** that any industry (plumbing, roofing, lawn care, security) can plug into.
+
+### Key Concepts
+1. **Property-First**: The physical address is the anchor, not the customer. New owners at old addresses inherit property history.
+2. **Polymorphic Assets**: A single `assets` table with JSONB metadata handles any equipment type (HVAC, water heater, roof, sprinkler).
+3. **Confidence Scoring**: Data freshness calculated from asset age + last verification date.
+4. **Customer Relationship Score (CRS)**: Determines if caller is Stranger (0-30), Regular (31-70), or VIP (71-100).
+5. **Witty Hooks Rotation**: Location-aware humor that doesn't repeat to the same caller.
+6. **Pre-Greeting Edge Function**: All context loaded BEFORE the agent speaks.
+
+### Database Schema (015_property_first_universal_engine.sql)
+```sql
+-- Core Tables
+properties (tenant_id, address, city, state, zip, gate_code, full_address GENERATED)
+contacts (tenant_id, property_id, phone, phone_normalized GENERATED, role, relationship_score)
+assets (tenant_id, property_id, asset_type, metadata JSONB, install_date, confidence_score)
+interactions (tenant_id, property_id, contact_id, type, summary, sentiment, joke_id)
+industry_configs (tenant_id, industry_type, decay_logic, verification_prompt, emergency_keywords)
+location_flavors (location_name, climate_quirk, witty_hooks JSONB)
+crm_sync_logs (entity_type, sync_status, payload, response)
+
+-- Helper Functions
+calculate_confidence_score(install_date, last_verified, stale_years, unreliable_years)
+search_properties_fuzzy(tenant_id, search_text, limit) -- pg_trgm fuzzy search
+get_contact_by_phone(tenant_id, phone)
+calculate_relationship_score(contact_id)
+```
+
+### Pre-Greeting Edge Function
+**Location**: `/supabase/functions/pre-greeting/index.ts`
+
+**Features:**
+- Instant caller phone lookup → Contact → Property → Assets
+- Confidence score calculation based on asset age and verification
+- Relationship score (CRS) determination for greeting style
+- Cal.com availability caching (60 seconds)
+- Witty hooks rotation (avoids repeating last joke)
+- Emergency keyword detection
+
+**Response Variables for Retell:**
+```json
+{
+  "is_new_caller": false,
+  "has_property_history": true,
+  "contact_name": "John Smith",
+  "property_address": "123 Main St, Tampa, FL",
+  "primary_asset": { "type": "HVAC", "brand": "Carrier", "install_year": 2018 },
+  "confidence_score": 75,
+  "relationship_score": 65,
+  "vibe_category": "regular",
+  "needs_verification": false,
+  "witty_hook": "I know that humidity feels like wearing a warm, wet blanket!",
+  "available_slots_today": ["10:00", "14:00", "15:30"],
+  "emergency_keywords": ["no air", "smoke", "gas leak"]
+}
+```
+
+### MCP Tools (Updated)
+| Tool | Purpose |
+|------|---------|
+| `lookup_property_by_address` | Fuzzy search for property history |
+| `get_property_assets` | Get equipment for a property |
+| `verify_asset` | Update asset info after customer confirmation |
+| `create_property` | Create new property record |
+| `create_contact` | Create new contact linked to property |
+| `log_interaction` | Log call/interaction to property history |
+| `send_sms` | Send generic SMS |
+| `send_meeting_confirmation` | Send booking confirmation SMS |
+| `send_value_bomb` | Send helpful resource link |
+| `request_contact_info` | Request customer details via SMS |
+
+### Retell System Prompt V2
+**Location**: `/docs/RETELL_SYSTEM_PROMPT_V2.md`
+
+**Features:**
+- Greeting logic by vibe category (stranger/regular/VIP)
+- "New Owner" pivot for known addresses with unknown callers
+- Asset verification when confidence < 70%
+- 10 witty compliance hooks with self-aware AI humor
+- Location-aware humor using climate quirk
+- SMS integration for all 3 use cases
+- Emergency detection and immediate transfer
+
+### Seed Data
+**Industries:**
+- HVAC (8-year stale, 15-year unreliable)
+- Plumbing (8-year stale, 12-year unreliable)
+- Roofing (15-year stale, 25-year unreliable)
+- Lawn Care (2-year stale, 5-year unreliable)
+- Security (5-year stale, 8-year unreliable)
+- Electrical (10-year stale, 25-year unreliable)
+
+**Locations:**
+- Tampa, FL (Humidity / "Wet Blanket")
+- Phoenix, AZ (Dry Heat / "The Oven")
+- Denver, CO (Thin Air / "Mile High")
+- Dallas, TX (Summer Heat / "The Griddle")
+- Miami, FL (Tropical Heat / "Paradise Problems")
+
+### Files Created
+- `/database/migrations/015_property_first_universal_engine.sql`
+- `/supabase/functions/pre-greeting/index.ts`
+- `/supabase/functions/pre-greeting/README.md`
+- `/docs/RETELL_SYSTEM_PROMPT_V2.md`
+
+### Next Steps for Property-First
+1. **Run Migration**: User must run `015_property_first_universal_engine.sql` in Supabase SQL Editor
+2. **Deploy Edge Function**: `supabase functions deploy pre-greeting`
+3. **Configure Retell Webhook**: Point inbound call webhook to pre-greeting function
+4. **Update Agent Prompts**: Copy system prompt V2 to Retell dashboard
+5. **Test End-to-End**: Make test call to verify property lookup and greeting personalization
+
+---
