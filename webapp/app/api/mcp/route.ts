@@ -956,6 +956,177 @@ async function executeTool(toolName: string, args: Record<string, any>, tenant: 
       };
     }
 
+    // ===== SMS TOOLS =====
+    case 'send_sms': {
+      const { to, message, type } = args;
+      
+      if (!to || !message) {
+        return {
+          success: false,
+          message: "I need a phone number and message to send the text."
+        };
+      }
+      
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL || 'http://localhost:3000';
+        const response = await fetch(`${baseUrl}/api/twilio/send`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ to, message, type: type || 'general' })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          return {
+            success: true,
+            message: "I just sent you a text message."
+          };
+        } else {
+          console.error('[MCP] SMS send error:', result.error);
+          return {
+            success: false,
+            message: "I had trouble sending the text. No worries, I can tell you the details over the phone."
+          };
+        }
+      } catch (error) {
+        console.error('[MCP] SMS send error:', error);
+        return {
+          success: false,
+          message: "Couldn't send the text right now, but let me give you the info verbally."
+        };
+      }
+    }
+
+    case 'send_meeting_confirmation': {
+      const { to, customer_name, date, time, location, zoom_link, prep_notes } = args;
+      
+      // Build confirmation message
+      let message = `Hi ${customer_name}! Your appointment is confirmed for ${date} at ${time}.`;
+      
+      if (location && location !== 'Virtual') {
+        message += `\n\nLocation: ${location}`;
+      }
+      
+      if (zoom_link) {
+        message += `\n\nMeeting Link: ${zoom_link}`;
+      }
+      
+      if (prep_notes) {
+        message += `\n\nPlease have ready: ${prep_notes}`;
+      }
+      
+      message += '\n\nReply YES to confirm or call us to reschedule.';
+      
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL || 'http://localhost:3000';
+        const response = await fetch(`${baseUrl}/api/twilio/send`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ to, message, type: 'confirmation' })
+        });
+        
+        const result = await response.json();
+        
+        return {
+          success: result.success,
+          message: result.success 
+            ? "I just sent you a confirmation text with all the details."
+            : "I couldn't send the text, but your appointment is confirmed!"
+        };
+      } catch (error) {
+        console.error('[MCP] Meeting confirmation SMS error:', error);
+        return {
+          success: false,
+          message: "Your appointment is confirmed! I'll make sure you get the details."
+        };
+      }
+    }
+
+    case 'send_value_bomb': {
+      const { to, customer_name, interest, custom_message } = args;
+      
+      // Build value bomb based on interest
+      const valueLinks: Record<string, { title: string; url: string }> = {
+        buying: { title: 'Homebuyer\'s Guide', url: 'https://greenline365.com/guides/buying' },
+        rates: { title: 'Current Rate Guide', url: 'https://greenline365.com/rates' },
+        services: { title: 'Our Services', url: 'https://greenline365.com/services' },
+        pricing: { title: 'Pricing Calculator', url: 'https://greenline365.com/pricing' },
+        demo: { title: 'Demo Overview', url: 'https://greenline365.com/demo' },
+        maintenance: { title: 'Maintenance Tips', url: 'https://greenline365.com/tips' },
+        emergency: { title: 'Emergency Services', url: 'https://greenline365.com/emergency' }
+      };
+      
+      const resource = valueLinks[interest?.toLowerCase()] || valueLinks.services;
+      
+      let message = `Hi ${customer_name}! Here's that ${resource.title} I mentioned: ${resource.url}`;
+      
+      if (custom_message) {
+        message += `\n\n${custom_message}`;
+      }
+      
+      message += '\n\n- The GreenLine365 Team';
+      
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL || 'http://localhost:3000';
+        const response = await fetch(`${baseUrl}/api/twilio/send`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ to, message, type: 'value_bomb' })
+        });
+        
+        const result = await response.json();
+        
+        return {
+          success: result.success,
+          message: result.success 
+            ? "I just sent you a link to check out!"
+            : "I couldn't send the text, but you can find that info on our website."
+        };
+      } catch (error) {
+        console.error('[MCP] Value bomb SMS error:', error);
+        return {
+          success: false,
+          message: "Check out our website for that information - greenline365.com"
+        };
+      }
+    }
+
+    case 'request_contact_info': {
+      const { to, call_id } = args;
+      
+      const message = `Hi! Just texted you from our call. To make sure I get your info exactly right, please reply with:\n\nFull Name:\nEmail:\n\nThanks!`;
+      
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL || 'http://localhost:3000';
+        const response = await fetch(`${baseUrl}/api/twilio/send`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            to, 
+            message, 
+            type: 'data_capture',
+            metadata: { call_id, awaiting_reply: true }
+          })
+        });
+        
+        const result = await response.json();
+        
+        return {
+          success: result.success,
+          message: result.success 
+            ? "I just sent you a text. Go ahead and reply with your full name and email, and I'll have it exactly right in our system."
+            : "Let me get your info verbally instead."
+        };
+      } catch (error) {
+        console.error('[MCP] Request contact info SMS error:', error);
+        return {
+          success: false,
+          message: "Let me get your info verbally instead."
+        };
+      }
+    }
+
     // ===== LEAD TOOLS =====
     case 'save_lead': {
       const { name, phone, email, interest, notes, follow_up_date } = args;
