@@ -247,6 +247,13 @@ If the same customer calls back within 24 hours, skip formal greeting:
 | `{{emergency_keywords}}` | industry_config | Words that trigger immediate transfer |
 | `{{owner_name}}` | tenant.owner_name | Human owner name for transfers |
 | `{{transfer_phone}}` | tenant.transfer_phone_number | Phone to transfer to |
+| `{{weather.city}}` | OpenWeather API | City from weather lookup |
+| `{{weather.temp}}` | OpenWeather API | Current temperature in °F |
+| `{{weather.description}}` | OpenWeather API | Weather description |
+| `{{weather.alerts}}` | OpenWeather API | Array of weather alerts |
+| `{{has_weather_alert}}` | derived | true if severe weather |
+| `{{weather_recommendation}}` | calculated | AI-generated booking suggestion based on weather |
+| `{{is_weather_dependent}}` | tenant config | true for outdoor service businesses |
 
 ---
 
