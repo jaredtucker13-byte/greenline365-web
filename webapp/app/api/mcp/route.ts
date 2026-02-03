@@ -168,6 +168,62 @@ const TOOLS = {
     }
   },
 
+  // ===== PROPERTY-FIRST TOOLS =====
+  lookup_property_by_address: {
+    description: 'Fuzzy search for a property by address. Use when customer gives their address to find property history even if they are a new caller.',
+    parameters: {
+      address: { type: 'string', description: 'The address to search for (can be partial)', required: true }
+    }
+  },
+  get_property_assets: {
+    description: 'Get all assets (equipment) for a property. Returns equipment type, brand, install date, and confidence score.',
+    parameters: {
+      property_id: { type: 'string', description: 'The property UUID', required: true }
+    }
+  },
+  verify_asset: {
+    description: 'Update asset information after customer confirms details. Updates last_verified timestamp and any corrected metadata.',
+    parameters: {
+      asset_id: { type: 'string', description: 'The asset UUID', required: true },
+      confirmed_correct: { type: 'boolean', description: 'True if customer confirmed asset info is correct' },
+      corrections: { type: 'object', description: 'Any corrections: {brand, model, install_date, metadata}' }
+    }
+  },
+  create_property: {
+    description: 'Create a new property record for a new address.',
+    parameters: {
+      address_line1: { type: 'string', required: true },
+      city: { type: 'string', required: true },
+      state: { type: 'string', required: true },
+      zip_code: { type: 'string', required: true },
+      gate_code: { type: 'string' },
+      property_type: { type: 'string', description: 'residential, commercial, industrial, multi-unit' }
+    }
+  },
+  create_contact: {
+    description: 'Create a new contact and optionally link to a property.',
+    parameters: {
+      first_name: { type: 'string', required: true },
+      last_name: { type: 'string' },
+      phone: { type: 'string', required: true },
+      email: { type: 'string' },
+      property_id: { type: 'string', description: 'Property to link this contact to' },
+      role: { type: 'string', description: 'owner, tenant, property_manager, emergency_contact' }
+    }
+  },
+  log_interaction: {
+    description: 'Log a call or interaction to the property history. Called at end of call.',
+    parameters: {
+      property_id: { type: 'string' },
+      contact_id: { type: 'string' },
+      interaction_type: { type: 'string', description: 'call, sms, email, repair, installation, quote' },
+      summary: { type: 'string', description: 'Brief summary of the interaction' },
+      sentiment: { type: 'string', description: 'positive, neutral, negative' },
+      outcome: { type: 'string', description: 'booked, callback, transferred, resolved, escalated' },
+      joke_id: { type: 'number', description: 'ID of witty hook used (for non-repetition)' }
+    }
+  },
+
   // ===== CALL CONTROL =====
   transfer_to_human: {
     description: 'Transfer the call to a human team member',
