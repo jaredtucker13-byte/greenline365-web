@@ -7,6 +7,7 @@
 // - Confidence score calculation
 // - Relationship score (CRS) determination
 // - Cal.com availability caching (60 seconds)
+// - Weather intelligence with alerts and recommendations
 // - Location flavor injection
 // - Witty hooks rotation (prevents repetition)
 
@@ -19,9 +20,163 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
-// Simple in-memory cache for Cal.com availability
+// Simple in-memory cache for Cal.com availability and weather
 const availabilityCache: Map<string, { slots: string[]; timestamp: number }> = new Map();
+const weatherCache: Map<string, { data: any; timestamp: number }> = new Map();
 const CACHE_TTL_MS = 60000; // 60 seconds
+const WEATHER_CACHE_TTL_MS = 300000; // 5 minutes for weather
+
+// OpenWeather API helper
+async function getWeatherContext(zipCode: string): Promise<any> {
+  const OPENWEATHER_API_KEY = Deno.env.get('OPENWEATHER_API_KEY');
+  
+  if (!OPENWEATHER_API_KEY || !zipCode) {
+    return null;
+  }
+  
+  // Check cache
+  const cacheKey = `weather-${zipCode}`;
+  const cached = weatherCache.get(cacheKey);
+  if (cached && (Date.now() - cached.timestamp) < WEATHER_CACHE_TTL_MS) {
+    console.log('[Pre-Greeting] Using cached weather data');
+    return cached.data;
+  }
+  
+  try {
+    // Get coordinates from ZIP
+    const geoResponse = await fetch(
+      `http://api.openweathermap.org/geo/1.0/zip?zip=${zipCode},US&appid=${OPENWEATHER_API_KEY}`
+    );
+    
+    if (!geoResponse.ok) {
+      console.error('[Pre-Greeting] Geocoding failed');
+      return null;
+    }
+    
+    const geoData = await geoResponse.json();
+    const { lat, lon, name: city } = geoData;
+    
+    // Get current weather
+    const weatherResponse = await fetch(
+      `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${OPENWEATHER_API_KEY}&units=imperial`
+    );
+    
+    if (!weatherResponse.ok) {
+      console.error('[Pre-Greeting] Weather API failed');
+      return null;
+    }
+    
+    const weatherData = await weatherResponse.json();
+    
+    // Get forecast for today/tomorrow
+    const forecastResponse = await fetch(
+      `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${OPENWEATHER_API_KEY}&units=imperial`
+    );
+    
+    let forecastData = null;
+    let alerts: any[] = [];
+    
+    if (forecastResponse.ok) {
+      const fullForecast = await forecastResponse.json();
+      forecastData = fullForecast.list?.slice(0, 8) || []; // Next 24 hours
+      
+      // Check for severe weather in forecast
+      for (const period of forecastData) {
+        const desc = period.weather?.[0]?.description?.toLowerCase() || '';
+        if (desc.includes('thunder') || desc.includes('storm') || desc.includes('tornado') || desc.includes('hurricane')) {
+          alerts.push({
+            event: period.weather?.[0]?.main || 'Severe Weather',
+            description: period.weather?.[0]?.description,
+            time: new Date(period.dt * 1000).toISOString(),
+            severity: desc.includes('tornado') || desc.includes('hurricane') ? 'extreme' : 'severe'
+          });
+        }
+      }
+    }
+    
+    // Try to get alerts from One Call API (may require subscription)
+    try {
+      const alertsResponse = await fetch(
+        `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=minutely,hourly,daily&appid=${OPENWEATHER_API_KEY}`
+      );
+      if (alertsResponse.ok) {
+        const alertsData = await alertsResponse.json();
+        if (alertsData.alerts && alertsData.alerts.length > 0) {
+          alerts = alertsData.alerts.map((a: any) => ({
+            event: a.event,
+            description: a.description,
+            start: new Date(a.start * 1000).toISOString(),
+            end: new Date(a.end * 1000).toISOString(),
+            severity: a.tags?.includes('Extreme') ? 'extreme' : 'severe'
+          }));
+        }
+      }
+    } catch (e) {
+      // Alerts API may not be available
+    }
+    
+    const result = {
+      city,
+      current: {
+        temp: Math.round(weatherData.main?.temp || 70),
+        feels_like: Math.round(weatherData.main?.feels_like || 70),
+        humidity: weatherData.main?.humidity || 50,
+        description: weatherData.weather?.[0]?.description || 'clear',
+        icon: weatherData.weather?.[0]?.icon
+      },
+      alerts,
+      has_severe_alert: alerts.length > 0,
+      recommendation: generateWeatherRecommendation(weatherData, forecastData, alerts)
+    };
+    
+    // Cache the result
+    weatherCache.set(cacheKey, { data: result, timestamp: Date.now() });
+    console.log(`[Pre-Greeting] Cached weather for ${zipCode}: ${result.current.temp}°F, ${alerts.length} alerts`);
+    
+    return result;
+  } catch (error) {
+    console.error('[Pre-Greeting] Weather error:', error);
+    return null;
+  }
+}
+
+// Generate weather-based booking recommendation
+function generateWeatherRecommendation(current: any, forecast: any[], alerts: any[]): string | null {
+  // Check for severe alerts first
+  if (alerts && alerts.length > 0) {
+    const severe = alerts.find((a: any) => a.severity === 'extreme' || a.severity === 'severe');
+    if (severe) {
+      return `I see there's a ${severe.event} warning for your area. For safety, I'd recommend we look at times after the weather clears.`;
+    }
+  }
+  
+  // Check forecast for storms
+  if (forecast && forecast.length > 0) {
+    const stormPeriod = forecast.find((p: any) => {
+      const desc = p.weather?.[0]?.description?.toLowerCase() || '';
+      return desc.includes('thunder') || desc.includes('storm');
+    });
+    
+    if (stormPeriod) {
+      const stormTime = new Date(stormPeriod.dt * 1000);
+      const hours = stormTime.getHours();
+      const timeStr = hours >= 12 ? `${hours - 12 || 12} PM` : `${hours || 12} AM`;
+      return `I see thunderstorms in the forecast around ${timeStr}. Would you prefer a morning slot before the storms, or tomorrow when it's clearer?`;
+    }
+  }
+  
+  // Check for extreme temperatures
+  const temp = current?.main?.temp || 70;
+  if (temp > 95) {
+    return `It's quite hot today at ${Math.round(temp)}°F. Would you prefer an early morning slot to beat the heat?`;
+  }
+  
+  if (temp < 35) {
+    return `It's pretty cold at ${Math.round(temp)}°F. Our techs are prepared, but would you prefer to wait for warmer weather?`;
+  }
+  
+  return null; // No weather concerns
+}
 
 serve(async (req) => {
   // Handle CORS preflight
