@@ -1026,6 +1026,319 @@ async function executeTool(toolName: string, args: Record<string, any>, tenant: 
       };
     }
 
+    // ===== PROPERTY-FIRST TOOLS =====
+    case 'lookup_property_by_address': {
+      const { address } = args;
+      
+      if (!address) {
+        return {
+          success: false,
+          message: "What's the address for the property?"
+        };
+      }
+      
+      // Use pg_trgm fuzzy search
+      const { data: properties, error } = await supabase
+        .rpc('search_properties_fuzzy', {
+          p_tenant_id: tenant?.id,
+          p_search_text: address,
+          p_limit: 5
+        });
+      
+      if (error) {
+        // Fallback to ILIKE if RPC not available
+        const { data: fallbackProperties } = await supabase
+          .from('properties')
+          .select('*, assets(*)')
+          .eq('tenant_id', tenant?.id)
+          .or(`full_address.ilike.%${address}%,address_line1.ilike.%${address}%`)
+          .limit(5);
+        
+        if (fallbackProperties && fallbackProperties.length > 0) {
+          const prop = fallbackProperties[0];
+          const primaryAsset = prop.assets?.[0];
+          return {
+            success: true,
+            found: true,
+            property_id: prop.id,
+            property_address: prop.full_address,
+            gate_code: prop.gate_code,
+            primary_asset: primaryAsset ? {
+              type: primaryAsset.asset_type,
+              brand: primaryAsset.brand,
+              install_year: primaryAsset.install_date ? new Date(primaryAsset.install_date).getFullYear() : null
+            } : null,
+            message: primaryAsset 
+              ? `I found ${prop.full_address}! I see we've serviced the ${primaryAsset.asset_type} there${primaryAsset.brand ? ` - a ${primaryAsset.brand}` : ''}.`
+              : `I found ${prop.full_address}! Let me pull up the service history.`
+          };
+        }
+        
+        return {
+          success: true,
+          found: false,
+          message: "I don't have that address in our system yet. Let me get it set up for you."
+        };
+      }
+      
+      if (properties && properties.length > 0) {
+        const topMatch = properties[0];
+        
+        // Get assets for this property
+        const { data: assets } = await supabase
+          .from('assets')
+          .select('*')
+          .eq('property_id', topMatch.id)
+          .eq('status', 'active')
+          .order('created_at', { ascending: false });
+        
+        const primaryAsset = assets?.[0];
+        
+        // Check if there are multiple similar matches
+        if (properties.length > 1 && properties[1].similarity_score > 0.3) {
+          return {
+            success: true,
+            found: true,
+            multiple_matches: true,
+            matches: properties.slice(0, 3).map((p: any) => ({
+              property_id: p.id,
+              address: p.full_address,
+              similarity: p.similarity_score
+            })),
+            message: `I found a few addresses that match. Is it ${topMatch.full_address}, or a different one?`
+          };
+        }
+        
+        return {
+          success: true,
+          found: true,
+          property_id: topMatch.id,
+          property_address: topMatch.full_address,
+          primary_asset: primaryAsset ? {
+            id: primaryAsset.id,
+            type: primaryAsset.asset_type,
+            brand: primaryAsset.brand,
+            install_year: primaryAsset.install_date ? new Date(primaryAsset.install_date).getFullYear() : null,
+            confidence_score: primaryAsset.confidence_score
+          } : null,
+          asset_count: assets?.length || 0,
+          message: primaryAsset 
+            ? `Found it! ${topMatch.full_address}. I see we have a ${primaryAsset.brand || ''} ${primaryAsset.asset_type} on file from ${primaryAsset.install_date ? new Date(primaryAsset.install_date).getFullYear() : 'a while back'}.`
+            : `Found ${topMatch.full_address}! Let me see what equipment we have on record.`
+        };
+      }
+      
+      return {
+        success: true,
+        found: false,
+        message: "I don't have that address in our system yet. No worries—I can get you set up as a new property!"
+      };
+    }
+
+    case 'get_property_assets': {
+      const { property_id } = args;
+      
+      if (!property_id) {
+        return {
+          success: false,
+          message: "I need the property ID to look up the equipment."
+        };
+      }
+      
+      const { data: assets } = await supabase
+        .from('assets')
+        .select('*')
+        .eq('property_id', property_id)
+        .eq('status', 'active')
+        .order('created_at', { ascending: false });
+      
+      if (!assets || assets.length === 0) {
+        return {
+          success: true,
+          assets: [],
+          message: "I don't have any equipment on file for this property yet."
+        };
+      }
+      
+      const assetSummaries = assets.map(a => ({
+        id: a.id,
+        type: a.asset_type,
+        brand: a.brand,
+        model: a.model_number,
+        install_date: a.install_date,
+        install_year: a.install_date ? new Date(a.install_date).getFullYear() : null,
+        confidence_score: a.confidence_score,
+        last_service: a.last_service_date,
+        metadata: a.metadata
+      }));
+      
+      const primary = assetSummaries[0];
+      
+      return {
+        success: true,
+        assets: assetSummaries,
+        primary_asset: primary,
+        message: assets.length === 1
+          ? `I have a ${primary.brand || ''} ${primary.type} on file${primary.install_year ? ` from ${primary.install_year}` : ''}.`
+          : `I have ${assets.length} pieces of equipment on file. The main one is a ${primary.brand || ''} ${primary.type}${primary.install_year ? ` from ${primary.install_year}` : ''}.`
+      };
+    }
+
+    case 'verify_asset': {
+      const { asset_id, confirmed_correct, corrections } = args;
+      
+      if (!asset_id) {
+        return {
+          success: false,
+          message: "I need the asset ID to update the records."
+        };
+      }
+      
+      const updateData: any = {
+        last_verified: new Date().toISOString(),
+        confidence_score: 100  // Reset to 100 after verification
+      };
+      
+      if (corrections) {
+        if (corrections.brand) updateData.brand = corrections.brand;
+        if (corrections.model) updateData.model_number = corrections.model;
+        if (corrections.install_date) updateData.install_date = corrections.install_date;
+        if (corrections.metadata) {
+          // Merge metadata
+          const { data: existing } = await supabase
+            .from('assets')
+            .select('metadata')
+            .eq('id', asset_id)
+            .single();
+          updateData.metadata = { ...(existing?.metadata || {}), ...corrections.metadata };
+        }
+      }
+      
+      const { error } = await supabase
+        .from('assets')
+        .update(updateData)
+        .eq('id', asset_id);
+      
+      if (error) {
+        console.error('[MCP] Asset verification error:', error);
+        return {
+          success: false,
+          message: "I had trouble updating the records. No worries, the tech will confirm on-site."
+        };
+      }
+      
+      return {
+        success: true,
+        message: confirmed_correct 
+          ? "Perfect, I've confirmed those details are current in our system."
+          : "Got it! I've updated our records with the correct information."
+      };
+    }
+
+    case 'create_property': {
+      const { address_line1, city, state, zip_code, gate_code, property_type } = args;
+      
+      const { data: property, error } = await supabase
+        .from('properties')
+        .insert({
+          tenant_id: tenant?.id,
+          address_line1,
+          city,
+          state,
+          zip_code,
+          gate_code,
+          property_type: property_type || 'residential',
+          first_service_date: new Date().toISOString().split('T')[0]
+        })
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('[MCP] Create property error:', error);
+        return {
+          success: false,
+          message: "I had trouble saving the address. Let me get a human to help with that."
+        };
+      }
+      
+      return {
+        success: true,
+        property_id: property.id,
+        property_address: property.full_address,
+        message: `Great! I've added ${address_line1}, ${city} to our system.`
+      };
+    }
+
+    case 'create_contact': {
+      const { first_name, last_name, phone, email, property_id, role } = args;
+      
+      // Normalize phone
+      const normalizedPhone = phone.replace(/[^0-9]/g, '');
+      
+      const { data: contact, error } = await supabase
+        .from('contacts')
+        .insert({
+          tenant_id: tenant?.id,
+          first_name,
+          last_name,
+          phone,
+          email,
+          property_id,
+          role: role || 'owner',
+          first_contact_date: new Date().toISOString().split('T')[0],
+          relationship_score: 50  // Start as "regular"
+        })
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('[MCP] Create contact error:', error);
+        return {
+          success: false,
+          message: "I had trouble saving your info. No worries, we can get that sorted."
+        };
+      }
+      
+      return {
+        success: true,
+        contact_id: contact.id,
+        message: `Perfect, ${first_name}! I've got you in our system now.`
+      };
+    }
+
+    case 'log_interaction': {
+      const { property_id, contact_id, interaction_type, summary, sentiment, outcome, joke_id } = args;
+      
+      const { error } = await supabase
+        .from('interactions')
+        .insert({
+          tenant_id: tenant?.id,
+          property_id,
+          contact_id,
+          interaction_type: interaction_type || 'call',
+          summary,
+          sentiment,
+          outcome,
+          joke_id,
+          call_direction: 'inbound',
+          agent_type: agentType
+        });
+      
+      if (error) {
+        console.error('[MCP] Log interaction error:', error);
+      }
+      
+      // Update contact relationship score if sentiment was positive
+      if (contact_id && sentiment === 'positive') {
+        await supabase.rpc('calculate_relationship_score', { p_contact_id: contact_id });
+      }
+      
+      return {
+        success: true,
+        message: "Interaction logged."
+      };
+    }
+
     // ===== CALL CONTROL =====
     case 'transfer_to_human': {
       return {
