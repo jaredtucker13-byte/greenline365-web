@@ -444,7 +444,15 @@ serve(async (req) => {
         .replace('{{asset_type}}', primaryAsset.asset_type || 'equipment');
     }
 
-    // 10. Build Response Variables for Retell
+    // 10. Get Weather Context (if property has ZIP code or tenant has default ZIP)
+    let weatherContext = null;
+    const zipCode = property?.zip_code || tenant?.zip_code || tenant?.service_area?.zip_codes?.[0];
+    
+    if (zipCode) {
+      weatherContext = await getWeatherContext(zipCode);
+    }
+
+    // 11. Build Response Variables for Retell
     const response = {
       success: true,
       
@@ -463,6 +471,7 @@ serve(async (req) => {
       property_id: property?.id || null,
       property_address: property?.full_address || null,
       gate_code: property?.gate_code || null,
+      property_zip: zipCode || null,
       
       // Asset info
       primary_asset: primaryAsset ? {
@@ -485,6 +494,19 @@ serve(async (req) => {
       needs_verification: confidenceScore < 70,
       verification_prompt: verificationPrompt,
       
+      // Weather Intelligence
+      weather: weatherContext ? {
+        city: weatherContext.city,
+        temp: weatherContext.current?.temp,
+        feels_like: weatherContext.current?.feels_like,
+        description: weatherContext.current?.description,
+        has_severe_alert: weatherContext.has_severe_alert,
+        alerts: weatherContext.alerts || [],
+        recommendation: weatherContext.recommendation
+      } : null,
+      has_weather_alert: weatherContext?.has_severe_alert || false,
+      weather_recommendation: weatherContext?.recommendation || null,
+      
       // Wit & Humor
       witty_hook: selectedWittyHook,
       joke_id: selectedJokeId,
@@ -499,6 +521,7 @@ serve(async (req) => {
       company_name: companyName,
       tenant_id: tenantId,
       industry_type: industryConfig?.industry_type || null,
+      is_weather_dependent: tenant?.is_weather_dependent || false,
       owner_name: tenant?.owner_name || null,
       transfer_phone: tenant?.transfer_phone_number || null,
       
@@ -510,7 +533,7 @@ serve(async (req) => {
       timestamp: new Date().toISOString(),
     };
 
-    console.log(`[Pre-Greeting] Response built for ${isNewCaller ? 'NEW' : 'RETURNING'} caller, CRS: ${relationshipScore}, Confidence: ${confidenceScore}`);
+    console.log(`[Pre-Greeting] Response built for ${isNewCaller ? 'NEW' : 'RETURNING'} caller, CRS: ${relationshipScore}, Confidence: ${confidenceScore}, Weather: ${weatherContext ? weatherContext.current?.temp + '°F' : 'N/A'}`);
 
     return new Response(JSON.stringify(response), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
