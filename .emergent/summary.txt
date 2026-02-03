@@ -1,169 +1,221 @@
-<analysis>**original_problem_statement:**
-The user's initial goal was to refactor a Business Operating System's CRM and Navigation. However, the project quickly pivoted to a much larger vision. The primary requests are now:
-1.  **Multi-Tenant Architecture:** Implement a full multi-tenant system to support distinct brands (e.g., GreenLine365 and ArtfulPhusion) with strict data isolation using Supabase RLS.
-2.  **Special Access & Onboarding:** Create an Entitlement System allowing the admin (user) to generate invite codes that grant tiered access. This must feed into a Zero-Friction onboarding flow where a new customer can sign up with a code.
-3.  **AI-Powered Creative Studio:** Build the ArtfulPhusion Autonomous Studio, an advanced workflow using AI to automate marketing content. This involves:
-    *   **Multimodal Intake:** Using **Gemini 3 Pro** (via OpenRouter) to analyze uploaded product photos (e.g., apparel, wall art) and extract data.
-    *   **Character Vault:** A system to create and reuse persistent, consistent AI-generated models (Signature Models).
-    *   **Mockup Forge:** Using **Nano Banana Pro** to generate cinematic, hyper-realistic product mockups in various scenes.
-    *   **Content Multiplier:** Using AI to automatically create blog posts, Pinterest pins, and TikTok video scripts from the generated assets.
-4.  **The Brain - Thought Capture System:** Implement a personal productivity tool integrated with **Slack**. The user can send thoughts to a private Slack channel, and an AI will categorize them into four buckets (, , , ) stored in the database. The system should also provide daily and weekly reminders. A widget for this should be on the main dashboard.
-5.  **Content Forge 2.0:** Enhance the existing content creation tool with a block-based, drag-and-drop newsletter editor.
+<analysis>
+**original_problem_statement:**
+The user's vision is a multi-phase project to build a comprehensive Business Operating System. The core requirements are:
+1.  **Multi-Tenant Architecture & White-Labeling:** Support distinct brands with data isolation and a theme engine.
+2.  **AI-Powered Creative Studio An advanced workflow to automate marketing content using **kie.ai** for image generation.
+3.  **Real-Feel AI Booking & Sales Ecosystem:** A high-revenue orchestration layer using Retell AI (for voice), Supabase, Perplexity, and a Weather API. This system should support multiple agent types (Receptionist, Sales, Customer Service) and implement sophisticated business logic like a Nudge Strategy for cancellations and Real-Feel context (e.g., weather awareness for outdoor businesses).
+4.  **Advanced SMS Integration:** Integrate Twilio for three specific use cases: effective meeting confirmations, value bomb follow-ups with dynamic content, and perfect data capture via text replies.
+5.  **Cal.com Integration:** Use Cal.com as the backend for all appointment bookings, managed by the AI agents.
+6.  **Admin God Mode (Visual Inline Editor):** An inline editing system for the admin on public-facing pages.
+7.  **The Brain - Thought Capture System:** A personal productivity tool integrated with Slack.
+8.  **Tenant Storage Billing:** A system to track, limit, and bill tenants for storage usage, integrated with Stripe.
+
+PRODUCT REQUIREMENTS:
+- **Phase 1 (Foundation):** White-Label + Theme Engine.
+- **Phase 2 (Hero Product):** ArtfulPhusion Creative Studio.
+- **Phase 3 (Real-Feel AI):** Implement the Retell AI voice agents, Cal.com booking, and advanced SMS logic.
+- **Phase 4 (God Mode):** Visual Inline Editor + CMS.
+- **Phase 5 (Operations):** Storage Billing & Enforcement.
 
 **User's preferred language**: English
 
 **what currently exists?**
-The application is a Next.js frontend with a Supabase backend.
-- **Multi-Tenancy Foundation:** Backend APIs, database migrations (, , ), and frontend components (, , , ) have been created. The system is designed for RLS-based data isolation. Conditional rendering for features based on tenant tier is implemented in the sidebar.
-- **Invite System:** An admin page () allows the user to generate and send invite codes via an existing SendGrid integration. A dedicated signup page () accepts these codes.
-- **AI Integration Backend:** Backend APIs are in place for the Creative Studio (, ) and The Brain (). These are configured to use Gemini 3 Pro (via OpenRouter) and Nano Banana Pro.
-- **UI Placeholders:** A  has been added to the main Command Center dashboard to display reminders and thoughts. An  CTA is also present.
+The application is a Next.js frontend with a Supabase backend. The foundation for a multi-tenant system exists. A significant amount of work has been done on the Real-Feel AI system:
+-   The database schema has been created for call logging, auditing, weather alerts, and warm transfers.
+-   API endpoints for weather (OpenWeather), research (Perplexity), and business context configuration are functional.
+-   Retell AI has been integrated, with API endpoints created for handling webhooks, dynamic function calls (), and serving agent prompts.
+-   Cal.com is integrated into the                                                                                 
+ Usage: mcp [OPTIONS] COMMAND [ARGS]...                                         
+                                                                                
+ MCP development tools                                                          
+                                                                                
+╭─ Options ────────────────────────────────────────────────────────────────────╮
+│ --help          Show this message and exit.                                  │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ Commands ───────────────────────────────────────────────────────────────────╮
+│ version  Show the MCP version.                                               │
+│ dev      Run an MCP server with the MCP Inspector.                           │
+│ run      Run an MCP server.                                                  │
+│ install  Install an MCP server in the Claude desktop app.                    │
+╰──────────────────────────────────────────────────────────────────────────────╯ endpoint for checking availability and creating bookings. The system correctly handles Cal.com's specific API requirements, like absolute date formats.
+-   The frontend chat concierge is now connected to the Cal.com booking system.
+-   The foundation for Twilio SMS integration is in place, with a webhook handler, a sending API, and a database table for messages created.
 
 **Last working item**:
--   **Last item agent was working:** The agent created a comprehensive multi-phase roadmap outlining all remaining work for the Creative Studio, The Brain, and other features, as requested by the user before they took a break. The last coding action was adding the  to the dashboard and updating the mockup API to support wall art scenes.
+-   **Last item agent was working:** Implementing three advanced SMS use cases as described by the user: 1) Meeting confirmations, 2) Value bomb follow-ups, and 3) Perfect data capture via text replies. The agent was in the process of adding a  tool to the main Retell AI function handler () to enable these scenarios.
 -   **Status:** IN PROGRESS
 -   **Agent Testing Done:** N
--   **Which testing method agent to use?** Both. The frontend testing agent needs to verify the UI components (, feature gating, admin pages). The backend testing agent needs to verify all the new API endpoints (, , ).
+-   **Which testing method agent to use?** backend testing agent. The agent needs to test the  endpoint directly, then test the  tool via the  endpoint to ensure it integrates with the Retell agent logic correctly.
 -   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
--   **Issue 1: Resolve Migration & RLS Blockers (P0 - CRITICAL)**
-    -   **Description:** The user has repeatedly been blocked by database and Row-Level Security (RLS) issues when trying to test admin features like sending invites. The core problem is that the migrations haven't run correctly or the user's account () is not consistently flagged as an admin ( in the  table), causing RLS policies to deny access.
-    -   **Attempted fixes:** Multiple SQL scripts (, , etc.) were provided. The agent used the troubleshoot agent, which identified a missing RLS policy.
-    -   **Next debug checklist:**
-        1.  Have the user run the diagnostic script  to get a definitive report on which tables/columns exist.
-        2.  Provide **one final, idempotent SQL script** that ensures all tables are created and the user  is an admin.
-        3.  Test the  endpoint via  to confirm the RLS issue is resolved before handing it back to the user.
-    -   **Why fix this issue and what will be achieved with the fix?** The user cannot test ANY of the new functionality (invites, multi-tenancy) until their database is in a correct and stable state with proper admin permissions.
-    -   **Status:** BLOCKED
-    -   **Is recurring issue?** Y
-    -   **Should Test frontend/backend/both after fix?** Backend first (via curl), then Frontend.
-    -   **Blocked on other issue:** This is the primary blocker for all other tasks.
+-   **Issue 1: Daily Trend Hunter Not Working (P1)**
+    -   **Description:** The user reported the Daily Trend Hunter feature is not working. The agent investigated and found it's not a standalone page but integrated into the main dashboard, relying on data pushed from an external N8N webhook.
+    -   **Attempted fixes:** The agent explained the integration location to the user.
+    -   **Next debug checklist:** Confirm with the user if this explanation resolves their concern or if they are seeing a specific error on the dashboard. If an error is present, inspect the  and  components and the  route logs.
+    -   **Why fix this issue and what will be achieved with the fix?** This is a core feature for the user's business.
+    -   **Status:** USER VERIFICATION PENDING
+    -   **Is recurring issue?** N
+    -   **Should Test frontend/backend/both after fix?** Both
+    -   **Blocked on other issue:** None.
 
 **In progress Task List**:
--   **Task 1: Complete Multi-Tenant MVP User Journey (P0)**
-    -   **Description:** This task involves building the UI and connecting the pieces for a full end-to-end test of the invite system.
-    -   **Where to resume:** The backend APIs and the code-based signup page () are done. The next step is to build the UI for the Zero-Friction onboarding wizard that a user sees after successfully signing up.
-    -   **What will be achieved with this?** A testable flow: Admin sends invite -> New user gets email -> Signs up with code -> Completes onboarding -> Becomes an active tenant.
+-   **Task 1: Complete Advanced SMS Integration (P0)**
+    -   **Where to resume:** Continue editing . The  tool needs to be fully implemented in the tool definition list and the main  case. Then, update the agent prompts to include logic for the three use cases (confirmations, value bombs, data capture).
+    -   **What will be achieved with this?** This will complete a key part of the Real-Feel system, enhancing the voice agents' capabilities and improving user experience.
     -   **Status:** IN PROGRESS
-    -   **Should Test frontend/backend/both after fix?** Both.
-    -   **Blocked on something:** .
+    -   **Should Test frontend/backend/both after fix?** Backend
+    -   **Blocked on something:** None.
+
+-   **Task 2: Complete Calendar CRUD Functionality (P2)**
+    -   **Where to resume:** This task has not been started. The user wants to view, edit, and delete calendar events. Since Cal.com is now the source of truth, this involves building a UI that interacts with the Cal.com API to manage bookings.
+    -   **What will be achieved with this?** Provide necessary content management capabilities for the user's scheduling workflow.
+    -   **Status:** NOT STARTED
+    -   **Should Test frontend/backend/both after fix?** Both
+    -   **Blocked on something:** None.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks:**
-    *   **(P0) Build ArtfulPhusion Creative Studio UI:** (Phase 2) This is the user's top priority. Build the UI for product uploads, AI analysis review, mockup generation, and the Character Vault. The backend APIs are already in place.
-    *   **(P1) Build The Brain Full Dashboard & Integrations:** (Phase 4) Create the full-page UI for the Brain to manage all four buckets. Implement the Slack webhook for thought capture and the cron jobs for scheduled reminders.
+    *   **(P1) Finalize Retell Agent Setup:** Fully configure and test the  and  agents.
+    *   **(P1) Deploy Weather Watcher Cron Job:** Guide the user through deploying the Supabase Edge Function () and setting up  to enable proactive weather alerts.
+    *   **(P2) Complete Visual Inline Editor (God Mode):** Expand the  component and connect the save action to the backend.
 -   **Future Tasks:**
-    *   **(P2) Build Newsletter Forge:** (Phase 3) Implement the block-based, drag-and-drop editor.
-    *   **(P2) Build Content Multiplier:** (Phase 5) Implement the system to auto-generate content for blogs, Pinterest, and TikTok.
-    *   **(P3) Build Advanced UX Features:** (Phase 6) Implement a Cmd+K universal command bar and contextual AI suggestions.
-    *   **(P3) Full Platform Polish & Testing:** (Phase 7) A dedicated phase for comprehensive testing, security audits, and performance optimization.
+    *   Build The Brain Full Dashboard & Slack Integration.
+    *   Build Newsletter Forge (block-based editor).
+    *   Build Content Multiplier (auto-posting to social media).
+    *   Implement Stripe Billing Integration for storage and API costs.
+    *   Implement Custom Domain CNAME/DNS resolution logic.
+    *   Implement a self-service upgrade flow for tenants.
 
 **Completed work in this session**
--   **Fixed Critical Build Failure:** Resolved a Next.js build error related to  context during static site generation.
--   **Implemented Multi-Tenant System:** Created the database schema, backend APIs, and foundational frontend components for multi-tenancy, an entitlement/invite system, and feature gating.
--   **Integrated SendGrid:** The invite system now uses the existing SendGrid integration to email access codes.
--   **Implemented Creative Studio & Brain Backend:** Created all necessary APIs for the ArtfulPhusion Creative Studio (using Gemini 3 Pro and Nano Banana Pro via OpenRouter) and The Brain thought capture system.
--   **Built Core Frontend Components:** Created and integrated , , , , and .
--   **Created Invite-to-Signup Flow:** Built the admin page to send invites and a dedicated signup page () to redeem them.
+-   **Real-Feel AI Booking System Foundation:**
+    -   Successfully executed a complex database migration () in parts to create tables for , , ,  and added required columns to the  table.
+    -   Created and tested API endpoints for Weather (), Perplexity Research (), Call Logging (), and Business Context ().
+-   **Retell AI Integration:**
+    -   Integrated the Retell AI SDK.
+    -   Built a robust MCP endpoint () to handle dynamic function calls from Retell agents.
+    -   Created API endpoints to serve prompts for , , and  agents.
+    -   Provided a comprehensive setup guide ().
+-   **Cal.com Integration:**
+    -   Successfully integrated the Cal.com API for checking availability and creating bookings.
+    -   Refactored the MCP endpoint to handle Cal.com's specific requirements (e.g., full absolute date format, username).
+    -   Debugged and resolved issues where no slots were appearing by identifying the correct API endpoint format and confirming the user's schedule setup. The system now correctly sees and books available slots for **2026**.
+-   **Chat Concierge Upgrade:**
+    -   Connected the frontend Chat Concierge to the backend Cal.com booking system, enabling it to detect booking intent, check availability, and create appointments.
+-   **Twilio SMS Foundation:**
+    -   Created API endpoints for receiving SMS () and sending SMS ().
+    -   Created a database migration () for storing SMS history.
+-   **Creative Studio Cost Optimization:**
+    -   Switched the image generation API from 's Nano Banana model to the more cost-effective 4.5 Text To Image model.
 
 **Earlier issues found/mentioned but not fixed**
--   **Pre-commit hook is broken:** This was noted in the initial handoff and has not been addressed.
--   **CRM Lead Sync Unverified:** This was the original recurring issue but has been deprioritized by the user's pivot.
+-   **Issue 1: Failed DB Indexes**
+    -   **Debug checklist:** The  commands in the final step of the Real-Feel database setup failed. The agent deemed them optional for performance and moved on. These should be re-attempted.
+    -   **Why to solve this issue and what will be achieved with this?** To ensure database query performance as the  and other tables grow.
+    -   **Should Test frontend/backend/both after fix:** Backend
+    -   **Is recurring issue?** Y (Part of the larger DB migration fragility)
 
 **Known issue recurrence from previous fork**
--   **Issue recurrence in previous fork:** CRM lead sync flow.
--   **Recurrence count:** High.
--   **Status:** USER VERIFICATION PENDING (deprioritized).
+-   **Issue recurrence in previous fork:** N/A
+-   **Recurrence count:** N/A
+-   **Status:** N/A
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Multi-Tenancy with RLS:** The core of the new architecture. Data is isolated by . RLS policies in Supabase enforce this and have been a major point of debugging.
--   **Entitlement System:** An access control layer using  and manual  to grant tiered access.
--   **AI-Powered Onboarding & Creation:** A pipeline combining multiple AI models: **Gemini 3 Pro** (analysis), **Nano Banana Pro** (image generation), and **Sora 2** (video - planned), all orchestrated via **OpenRouter**.
--   **Thought Capture System (The Brain):** A system to capture unstructured thoughts (from Slack or UI), route them into structured database buckets, and generate reminders.
+-   **Voice AI:** Retell AI for inbound/outbound calls, using a Model-Context-Protocol (MCP) endpoint for dynamic function execution.
+-   **Booking API:** Cal.com for managing availability, schedules, and creating bookings.
+-   **Serverless Functions:** Supabase Edge Functions for asynchronous tasks like the  cron job.
+-   **Database:** Supabase (PostgreSQL) with Row Level Security (RLS).
+-   **External APIs:** OpenWeather for weather data, Perplexity for web research (via OpenRouter), Twilio for SMS.
+-   **Frontend:** Next.js with React.
+-   **Key Constraint:** The system clock is set to **January 2026**. All date-based testing must use 2026.
 
 **key DB schema**
--   : {id, name, slug, tier, settings (JSONB)}
--   : {user_id, business_id, role}
--   : {id, code, tier, max_uses, created_by}
--   , , , : tables for the four memory buckets, linked to .
--   :  boolean column is critical for RLS checks.
+-   **businesses:** ADDED , , , , , , .
+-   **call_logs:** { uid=0(root) gid=0(root) groups=0(root), , , , ,  }
+-   **call_audits:** { uid=0(root) gid=0(root) groups=0(root), , , ,  }
+-   **weather_alerts:** { uid=0(root) gid=0(root) groups=0(root), , , ,  }
+-   **warm_transfer_queue:** { uid=0(root) gid=0(root) groups=0(root), , , , ,  }
+-   **sms_messages:** { uid=0(root) gid=0(root) groups=0(root), , , , , ,  }
 
 **changes in tech stack**
--   : Added for secure access code generation.
--   : Added for UI icons.
+-   The project has heavily adopted a Functions-as-a-Tool pattern, with a central  orchestrating calls to Supabase, Cal.com, Twilio, and other services for the AI agents.
 
 **All files of reference**
--   **Migrations:**  (and other individual/fix files in that directory).
--   **Admin Invite Page:** .
--   **New Signup Page:** .
--   **Backend APIs:** All new files under .
--   **Business Context:** .
-
-**Areas that need refactoring**:
--   The migration files are disorganized. There are multiple partial-fix and consolidated files. They should be structured into a single, idempotent source-of-truth schema or a clean, ordered set of migration scripts to avoid the issues the user has faced.
-
-**key api endpoints**
--   : Sends an access code invite email via SendGrid.
--   : Validates and redeems an access code during the signup flow.
--   : Analyzes product assets using Gemini 3 Pro.
--   : Generates product mockups using Nano Banana Pro.
--   : The main intake endpoint for The Brain.
+-   **Primary Logic File:**  (Handles all Retell AI function calls).
+-   **SMS Endpoints:** , .
+-   **Database Migrations:**  (specifically  and  files).
+-   **Chatbot Logic:**  (Connects text chat to the booking system).
+-   **Setup Guide:** .
 
 **Critical Info for New Agent**
-1.  **DATABASE/RLS IS THE #1 BLOCKER:** The user cannot test anything until their database schema is correct and their primary account (, ID: ) has admin privileges (). Your first task is to ensure this is resolved. Provide one clear, final, copy-pasteable SQL script and confirm its success before moving on.
-2.  **THE VISION IS HUGE:** The user has laid out a multi-phase roadmap for an Autonomous Creative Studio. Do not get sidetracked. Follow the recommended build order: Finish Invite Flow -> Build Creative Studio UI -> Build Brain System.
-3.  **USER IS NON-TECHNICAL:** The user does not want to edit SQL or code. Provide simple, complete, copy-paste instructions for any required database actions.
-4.  **USE OPENROUTER:** The user was explicit about using OpenRouter for all LLM calls (Gemini, etc.). Do not deviate.
-5.  **A LOT OF CODE IS UNTESTED:** Many backend APIs and frontend components exist but are not wired into a complete UI. The next phases are heavily focused on building the frontend UIs for the Creative Studio and Onboarding wizard.
+1.  **SYSTEM TIME IS 2026:** All date-related tests (especially for Cal.com) MUST use the year 2026. The agent has already confirmed this is the correct year for which availability is configured.
+2.  **User Manages Vercel/Supabase:** The user is responsible for running SQL migrations in the Supabase Editor and setting environment variables in Vercel. Provide clear, copy-pasteable instructions.
+3.  **DB MIGRATION FRAGILITY:** The user's Supabase instance struggles with large, multi-statement SQL scripts. Always break complex schema changes into smaller, incremental files (, , etc.) that can be run one at a time.
+4.  **Consolidate ENV Variables:** The user frequently asks for a complete list of environment variables. Before finishing a major integration, compile a full list of required keys and values for them to add to Vercel.
 
 **documents and test reports created in this job**
 -   
 -   
--   Multiple other migration/fix/check SQL files in .
+-   
+-   
+-   
+-   
+-   
+-   
+-   
+-   
+-   
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **LATEST:** Asked for a clear, concise overview of all next steps and phases before taking a break. (COMPLETED - Agent provided a full roadmap).
-2.  Requested the addition of a Brain widget to the dashboard and for wall art mockups. (COMPLETED).
-3.  Confirmed the vision and instructed the agent to build, reminding them to use OpenRouter. (ACKNOWLEDGED).
-4.  Provided the comprehensive ArtfulPhusion Autonomous Studio brief. (IN PROGRESS).
-5.  Provided the Content Forge 2.0 brief with a block-based newsletter editor. (UPCOMING).
-6.  Asked for a check on which migrations still need to be run. (COMPLETED).
-7.  Requested conditional feature rendering and a skippable onboarding wizard. (COMPLETED).
-8.  Reported that the invite email worked but identified multiple issues with the signup flow. (PARTIALLY FIXED).
-9.  Asked where the Send Invite button was, as it wasn't visible. (FIXED - Agent added it to a new page and the sidebar).
-10. Confirmed that the RLS policy blocking them was a good sign that security is working. (ACKNOWLEDGED).
+1.  **LATEST:** User asks to go over all of this information, requests all necessary Vercel environment variables, provides their Twilio phone number (), and asks for a webhook URL to use in Twilio for receiving SMS. (PARTIALLY RESOLVED - Agent created the webhook and compiled the env vars, but is now implementing the advanced SMS logic from the user's next message).
+2.  **User provides a detailed prompt/document outlining three advanced SMS use cases for Retell AI:** meeting confirmations, value bomb follow-ups, and data capture. (IN PROGRESS)
+3.  All set. - User confirms they have added the Cal.com environment variables to Vercel. (RESOLVED)
+4.  what is my cal.com api - User asks for their Cal.com API key. (RESOLVED)
+5.  I booked a demo for tomorrow. but there was nothing add to cal.com - User reports that the frontend chat concierge is not creating bookings. (RESOLVED - Agent connected the chat API to the Cal.com booking system).
+6.  User provides text for a Demo Overview and wants it integrated into the Retell voice agent flow. (RESOLVED - Agent created a demo agent and outbound call API).
+7.  how do I set this up - User provides a screenshot of Cal.com and asks for help configuring availability. (RESOLVED)
+8.  check now - User asks the agent to re-check Cal.com availability after they updated their schedule. (RESOLVED)
+9.  User provides their Cal.com username. (RESOLVED)
+10. I want this with 15 minute buffer window - User confirms which Cal.com event type to use and requests a buffer. (RESOLVED)
 
 **Project Health Check:**
--   **Broken:** The core admin functionality is blocked by database/RLS issues. The application was crashing on startup before defensive fixes were added to the . The main user journey (invite -> signup -> onboard) is incomplete and untestable.
--   **Mocked:** The Creative Studio, Brain, and Newsletter Forge are primarily backend APIs with minimal or no UI.
--   **In Progress / Unverified:** The entire multi-tenant architecture and invite system are unverified end-to-end.
+-   **Broken:** No core features are completely broken.
+-   **Mocked:**
+    -   The  Supabase Edge Function has been created but not deployed or scheduled via .
+    -   The Retell  and  agents have prompts but are not fully configured or tested.
+    -   The advanced SMS logic is mid-implementation.
 
 **3rd Party Integrations**
--   **Supabase:** DB, Auth, Storage
--   **SendGrid:** Transactional emails
--   **OpenRouter:** Primary gateway for LLM calls.
--   **Gemini 3 Pro:** (via OpenRouter) For multimodal analysis. Requires .
--   **Nano Banana Pro:** (via integration playbook) For image generation. Requires Emergent LLM Key.
--   **Sora 2:** (Planned) For video generation.
--   **Slack:** (Planned) For The Brain integration.
--   **Firecrawl:** (Planned) For website scraping.
+-   **Supabase:** DB, Auth, Storage, Edge Functions.
+-   **Retell AI:** Voice agents. Requires User API Key () and Agent IDs.
+-   **Cal.com:** Appointment booking. Requires User API Key (), Event Type ID, and Username.
+-   **Twilio:** SMS messaging. Requires User Account SID, Auth Token, and Phone Number.
+-   **OpenWeather:** Weather data. Requires User API Key ().
+-   **Perplexity (via OpenRouter):** LLM for research. Uses existing configuration.
+-   **kie.ai:** AI Image Generation (). Requires User API Key ().
+-   **SendGrid:** Transactional emails.
+-   **Stripe:** Planned for future billing.
 
 **Testing status**
 -   **Testing agent used after significant changes:** NO
--   **Troubleshoot agent used after agent stuck in loop:** YES, for an RLS issue.
+-   **Troubleshoot agent used after agent stuck in loop:** NO
 -   **Test files created:** []
--   **Known regressions:** The login button was briefly broken due to a new security check but has since been fixed.
+-   **Known regressions:** None.
 
 **Credentials to test flow:**
--   **Admin User:** 
--   **User ID:** 
--   **Required State:** This user ID must have  in the  table for any admin functionality to work.
+-   **OpenWeather API Key:** 
+-   **Kie.ai API Key:** 
+-   **Cal.com API Key:** 
+-   **Cal.com Event Type ID:** 
+-   **Cal.com Username:** 
+-   **Twilio Account SID:** 
+-   **Twilio Auth Token:** Available in 
+-   ** Twilio Phone Number:** 
 
 **What agent forgot to execute**
--   The original task of testing the new Navigation System was completely superseded by the user's pivot to multi-tenancy and was never completed or mentioned again.
--   The  from the initial handoff was never integrated into the dashboard.
--   The broken pre-commit hook issue was never addressed.</analysis>
+-   The agent did not complete the implementation of the three advanced SMS use cases requested by the user. The  tool was added to the MCP endpoint, but the specific logic for confirmations, value-bombs, and data capture still needs to be built into the agent prompts and the MCP handler.
+-   The failed database indexes from the Real-Feel migration were noted but never fixed.
+</analysis>
