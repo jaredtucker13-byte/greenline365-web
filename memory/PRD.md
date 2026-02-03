@@ -5,6 +5,23 @@
 2. **For Nano Banana / Image Generation: Use kie.ai** (KIE_API_KEY) - User's preferred provider
 3. **For LLM text analysis: Use OpenRouter with Gemini 3 Pro**
 4. **GreenLine365 = Primary admin account, ArtfulPhusion = White-label test tenant (separate)**
+5. **Florida Two-Party Consent**: Recording disclosure is MANDATORY and non-negotiable
+6. **Master Term**: "Property Intelligence Engine" (NOT "AI Receptionist" or "Booking Bot")
+
+---
+
+## Brand Positioning (Updated February 2026)
+
+### The Pivot
+We are NOT a "chatbot" or "AI receptionist." We are a **Property Intelligence Engine**.
+
+### Tagline
+"We Built the Brain Your Business Was Missing."
+
+### Value Proposition
+- **Property-First**: We anchor data to the Physical Address, not just the customer
+- **Predictive Logic**: Weather awareness, asset decay tracking, relationship scoring
+- **Superhuman Service**: 24/7 availability with the memory of a master technician
 
 ---
 
@@ -12,9 +29,10 @@
 Build a Business Operating System with multi-tenant white-label support, AI-powered creative studio (ArtfulPhusion), and visual content management. The platform serves as infrastructure for local businesses to automate marketing, content creation, and customer engagement.
 
 **Unique Value Proposition**: 
-1. **White-Label Platform**: Agencies and brands can run their own branded instance ($1,200/mo Elite tier)
-2. **AI Creative Studio**: Autonomous product photography and mockup generation using Gemini 3 Pro + **kie.ai**
-3. **Visual Inline Editor**: "God Mode" for admins to edit any public page content without code
+1. **Property Intelligence Engine**: Voice AI that remembers properties, tracks equipment age, and predicts needs
+2. **White-Label Platform**: Agencies and brands can run their own branded instance ($1,200/mo Elite tier)
+3. **AI Creative Studio**: Autonomous product photography and mockup generation using Gemini 3 Pro + **kie.ai**
+4. **Visual Inline Editor**: "God Mode" for admins to edit any public page content without code
 
 ## User Personas
 - **Platform Owner (Jared)**: God Mode admin with full visual editing capabilities
