@@ -1,13 +1,13 @@
 'use client';
 
 /**
- * GL365 Global Directory - Public Business Search
- * Zero-auth public page. Searchable by industry, city, zip.
- * Shows earned badges, ratings, and trust scores.
+ * GL365 Global Directory - Visual-First Public Business Search
+ * Inspired by high-end restaurant directory design.
+ * Sections: Hero, Category Mosaic, Featured Kings, Testimonials, Listing Grid
  */
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 
 interface Listing {
@@ -15,215 +15,366 @@ interface Listing {
   business_name: string;
   slug: string;
   industry: string;
+  subcategories: string[];
   description?: string;
   city?: string;
   state?: string;
   zip_code?: string;
   logo_url?: string;
+  cover_image_url?: string;
   tier: string;
   trust_score: number;
   avg_feedback_rating: number;
   total_feedback_count: number;
-  directory_badges: { id: string; badge_type: string; badge_label: string; badge_color: string; is_active: boolean }[];
+  phone?: string;
+  business_hours?: Record<string, any>;
+  directory_badges: { id: string; badge_type: string; badge_label: string; badge_color: string }[];
 }
 
-const INDUSTRIES = [
-  { value: 'all', label: 'All', icon: 'M4 6h16M4 12h16M4 18h16' },
-  { value: 'hvac', label: 'HVAC', icon: 'M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' },
-  { value: 'plumbing', label: 'Plumbing', icon: 'M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z' },
-  { value: 'roofing', label: 'Roofing', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
-  { value: 'electrical', label: 'Electrical', icon: 'M13 10V3L4 14h7v7l9-11h-7z' },
-  { value: 'barbershop', label: 'Barbers', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
-  { value: 'restaurant', label: 'Restaurants', icon: 'M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z' },
-  { value: 'gym', label: 'Gyms', icon: 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z' },
+const CATEGORIES = [
+  { id: 'hvac', label: 'HVAC', img: 'https://images.unsplash.com/photo-1765634219706-15729e7a3295?w=600&h=400&fit=crop' },
+  { id: 'plumbing', label: 'Plumbing', img: 'https://images.pexels.com/photos/7859953/pexels-photo-7859953.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop' },
+  { id: 'roofing', label: 'Roofing', img: 'https://images.pexels.com/photos/33404248/pexels-photo-33404248.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop' },
+  { id: 'electrical', label: 'Electrical', img: 'https://images.unsplash.com/photo-1467733238130-bb6846885316?w=600&h=400&fit=crop' },
+  { id: 'barbershop', label: 'Barbers', img: 'https://images.pexels.com/photos/18173343/pexels-photo-18173343.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop' },
+  { id: 'bakery', label: 'Bakeries', img: 'https://images.unsplash.com/photo-1736520537688-1f1f06b71605?w=600&h=400&fit=crop' },
+  { id: 'gym', label: 'Fitness', img: 'https://images.unsplash.com/photo-1761971975769-97e598bf526b?w=600&h=400&fit=crop' },
+  { id: 'restaurant', label: 'Dining', img: 'https://images.pexels.com/photos/1860567/pexels-photo-1860567.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop' },
 ];
 
-const TIER_LABELS: Record<string, { label: string; color: string }> = {
-  free: { label: '', color: '' },
-  growth: { label: 'Growth', color: '#00D4FF' },
-  authority: { label: 'Authority', color: '#8B5CF6' },
-  dominator: { label: 'Dominator', color: '#FFB800' },
-};
+const FILTER_SPECIALTIES = ['All Specialties', 'Residential', 'Commercial', 'Emergency', 'Maintenance'];
+const FILTER_PRICE = ['All Price Ranges', '$', '$$', '$$$', '$$$$'];
 
-function StarDisplay({ rating, count }: { rating: number; count: number }) {
+const TESTIMONIALS = [
+  { name: 'Marcus Johnson', role: 'HVAC Business Owner', rating: 5, text: 'Since listing on GL365, our bookings increased 40%. The verified badge gives customers instant trust — they know we\'re the real deal.', img: '' },
+  { name: 'Sarah Chen', role: 'Homeowner, Tampa FL', rating: 5, text: 'I found a certified plumber through the directory in minutes. The Property Passport showed me exactly what work had been done on my home before I even called.', img: '' },
+  { name: 'David Rodriguez', role: 'Bakery Owner', rating: 5, text: 'The AI built our profile in seconds from our website. Now we get foot traffic from people searching the directory. Best marketing investment we\'ve made.', img: '' },
+];
+
+function Stars({ rating, size = 14 }: { rating: number; size?: number }) {
   return (
-    <div className="flex items-center gap-1">
-      {[1, 2, 3, 4, 5].map(s => (
-        <svg key={s} className="w-3.5 h-3.5" fill={s <= Math.round(rating) ? '#FFB800' : 'none'} stroke={s <= Math.round(rating) ? '#FFB800' : '#333'} viewBox="0 0 24 24" strokeWidth={1.5}>
+    <div className="flex gap-0.5">
+      {[1,2,3,4,5].map(s => (
+        <svg key={s} width={size} height={size} viewBox="0 0 24 24" fill={s <= Math.round(rating) ? '#FF8C00' : 'none'} stroke={s <= Math.round(rating) ? '#FF8C00' : '#555'} strokeWidth={1.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
         </svg>
       ))}
-      <span className="text-xs text-zinc-500 ml-1">({count})</span>
     </div>
   );
 }
 
 export default function DirectoryPage() {
   const [listings, setListings] = useState<Listing[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
-  const [industry, setIndustry] = useState('all');
-  const [city, setCity] = useState('');
+  const [activeCategory, setActiveCategory] = useState('');
+  const [specialty, setSpecialty] = useState('All Specialties');
+  const [priceRange, setPriceRange] = useState('All Price Ranges');
+  const [showListings, setShowListings] = useState(false);
+  const [testimonialIdx, setTestimonialIdx] = useState(0);
 
-  useEffect(() => { loadListings(); }, [industry]);
-
-  async function loadListings() {
+  const loadListings = useCallback(async (industry?: string, searchText?: string) => {
     setLoading(true);
+    setShowListings(true);
     const params = new URLSearchParams({ limit: '24' });
-    if (industry !== 'all') params.set('industry', industry);
-    if (search) params.set('search', search);
-    if (city) params.set('city', city);
-
+    if (industry) params.set('industry', industry);
+    if (searchText) params.set('search', searchText);
     const res = await fetch(`/api/directory?${params}`);
     const data = await res.json();
     setListings(Array.isArray(data) ? data : []);
     setLoading(false);
+  }, []);
+
+  function handleCategoryClick(id: string) {
+    setActiveCategory(id);
+    loadListings(id);
   }
 
-  function handleSearch() { loadListings(); }
+  function handleSearch() {
+    loadListings(activeCategory || undefined, search || undefined);
+  }
+
+  // Testimonial auto-rotate
+  useEffect(() => {
+    const t = setInterval(() => setTestimonialIdx(i => (i + 1) % TESTIMONIALS.length), 5000);
+    return () => clearInterval(t);
+  }, []);
 
   return (
-    <div className="min-h-screen" style={{ background: '#080808' }}>
-      {/* Hero */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(57,255,20,0.06) 0%, transparent 60%)' }} />
-        <div className="max-w-6xl mx-auto px-6 pt-12 pb-10 relative">
-          <Link href="/" className="inline-flex items-center gap-2 mb-8">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #39FF14, #0CE293)' }}>
-              <span className="text-black font-bold text-sm">G</span>
+    <div className="min-h-screen bg-white">
+      {/* ======== NAV ======== */}
+      <nav className="sticky top-0 z-50 bg-[#1a1a1a] border-b border-zinc-800">
+        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-16">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #39FF14, #0CE293)' }}>
+              <span className="text-black font-bold text-base">G</span>
             </div>
-            <span className="text-white font-semibold">GreenLine<span style={{ color: '#39FF14' }}>365</span></span>
+            <span className="text-white font-bold text-lg">GL<span style={{ color: '#39FF14' }}>365</span> <span className="text-zinc-400 font-normal text-sm">Directory</span></span>
           </Link>
+          <div className="hidden md:flex items-center gap-8 text-sm">
+            <button onClick={() => { setShowListings(false); window.scrollTo(0, 0); }} className="text-zinc-400 hover:text-white transition">Explore</button>
+            <a href="#categories" className="text-zinc-400 hover:text-white transition">Categories</a>
+            <a href="#testimonials" className="text-zinc-400 hover:text-white transition">Reviews</a>
+          </div>
+          <button onClick={() => loadListings()} className="px-5 py-2 rounded-full text-sm font-semibold text-black" style={{ background: '#FF8C00' }} data-testid="find-business-btn">
+            Find a Business
+          </button>
+        </div>
+      </nav>
 
-          <h1 className="text-3xl lg:text-5xl font-bold text-white mb-3" data-testid="directory-title">
-            Find Trusted Pros
-          </h1>
-          <p className="text-base lg:text-lg text-zinc-400 mb-8 max-w-lg">
-            Every badge is earned, never bought. Real service. Real accountability.
-          </p>
-
-          {/* Search Bar */}
-          <div className="flex flex-col sm:flex-row gap-3 max-w-2xl">
-            <div className="flex-1 relative">
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-              <input
-                type="text" placeholder="Search businesses..." value={search}
-                onChange={e => setSearch(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleSearch()}
-                className="w-full pl-10 pr-4 py-3 rounded-xl text-sm text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-green-500/30"
-                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}
-                data-testid="directory-search"
-              />
+      {!showListings ? (
+        <>
+          {/* ======== HERO ======== */}
+          <section className="relative bg-[#1a1a1a] overflow-hidden">
+            <div className="absolute inset-0 opacity-30" style={{ backgroundImage: 'url(https://images.pexels.com/photos/7859953/pexels-photo-7859953.jpeg?auto=compress&cs=tinysrgb&w=1920)', backgroundSize: 'cover', backgroundPosition: 'center' }} />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#1a1a1a]/80 via-[#1a1a1a]/90 to-[#1a1a1a]" />
+            <div className="relative max-w-4xl mx-auto px-6 py-20 text-center">
+              <p className="text-sm font-semibold uppercase tracking-widest mb-3" style={{ color: '#FF8C00' }}>Find Your Pro</p>
+              <h1 className="text-4xl md:text-6xl font-bold text-white mb-4" data-testid="directory-title">
+                Services Without Borders
+              </h1>
+              <p className="text-base md:text-lg text-zinc-400 max-w-2xl mx-auto mb-10">
+                From trusted HVAC techs to the best local bakeries. Every badge is earned through real service, never bought.
+              </p>
+              {/* Search Bar */}
+              <div className="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto">
+                <input
+                  type="text" placeholder="Search businesses, trades, names..."
+                  value={search} onChange={e => setSearch(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handleSearch()}
+                  className="flex-1 px-5 py-3.5 rounded-full text-sm bg-white/10 text-white placeholder-zinc-500 border border-zinc-700 focus:outline-none focus:border-orange-500/50"
+                  data-testid="hero-search"
+                />
+                <button onClick={handleSearch} className="px-8 py-3.5 rounded-full text-sm font-semibold text-black" style={{ background: '#FF8C00' }} data-testid="hero-search-btn">
+                  Search
+                </button>
+              </div>
             </div>
-            <input
-              type="text" placeholder="City or ZIP" value={city}
-              onChange={e => setCity(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleSearch()}
-              className="w-full sm:w-40 px-4 py-3 rounded-xl text-sm text-white placeholder-zinc-600 focus:outline-none"
-              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}
-              data-testid="directory-city"
-            />
-            <button onClick={handleSearch}
-              className="px-6 py-3 rounded-xl text-sm font-medium text-black"
-              style={{ background: 'linear-gradient(135deg, #39FF14, #0CE293)' }}
-              data-testid="directory-search-btn"
-            >Search</button>
-          </div>
-        </div>
-      </div>
+          </section>
 
-      {/* Industry Filters */}
-      <div className="max-w-6xl mx-auto px-6">
-        <div className="flex gap-2 overflow-x-auto pb-4 -mx-1 px-1">
-          {INDUSTRIES.map(ind => (
-            <button key={ind.value} onClick={() => setIndustry(ind.value)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition ${industry === ind.value ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
-              style={industry === ind.value ? { background: 'rgba(57,255,20,0.1)', color: '#39FF14', border: '1px solid rgba(57,255,20,0.2)' } : { border: '1px solid rgba(255,255,255,0.06)' }}
-              data-testid={`industry-${ind.value}`}
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d={ind.icon} /></svg>
-              {ind.label}
-            </button>
-          ))}
-        </div>
-      </div>
+          {/* ======== CATEGORY MOSAIC ======== */}
+          <section id="categories" className="max-w-7xl mx-auto px-6 py-16">
+            <p className="text-sm font-semibold uppercase tracking-widest text-center mb-2" style={{ color: '#FF8C00' }}>Find Your Trade</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-[#1a1a1a] text-center mb-3">Browse Categories</h2>
+            <p className="text-zinc-500 text-center max-w-lg mx-auto mb-10">
+              From local home services to your favorite neighborhood spots. Your next trusted pro is just a click away.
+            </p>
 
-      {/* Listings Grid */}
-      <div className="max-w-6xl mx-auto px-6 py-8">
-        {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {[1,2,3,4,5,6].map(i => <div key={i} className="h-52 rounded-2xl animate-pulse" style={{ background: 'rgba(255,255,255,0.03)' }} />)}
-          </div>
-        ) : listings.length === 0 ? (
-          <div className="text-center py-20">
-            <svg className="w-16 h-16 mx-auto mb-4 text-zinc-800" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
-            <h3 className="text-lg font-medium text-zinc-400 mb-2">No businesses found</h3>
-            <p className="text-sm text-zinc-600">{search || city ? 'Try a different search' : 'Be the first to add your business'}</p>
-          </div>
-        ) : (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {listings.map((listing, i) => {
-              const tierInfo = TIER_LABELS[listing.tier];
-              return (
-                <motion.div
-                  key={listing.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.04 }}
-                  className="backdrop-blur-xl rounded-2xl border overflow-hidden transition hover:border-green-500/15 group cursor-pointer"
-                  style={{ background: 'rgba(255,255,255,0.02)', borderColor: 'rgba(255,255,255,0.06)' }}
-                  data-testid={`listing-${listing.slug}`}
+            {/* Mosaic Grid — asymmetric like the reference */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+              {/* Large card */}
+              <div
+                className="col-span-2 row-span-2 relative rounded-2xl overflow-hidden cursor-pointer group"
+                style={{ minHeight: 340 }}
+                onClick={() => handleCategoryClick(CATEGORIES[0].id)}
+                data-testid={`cat-${CATEGORIES[0].id}`}
+              >
+                <img src={CATEGORIES[0].img} alt={CATEGORIES[0].label} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                <span className="absolute bottom-5 left-5 text-white text-2xl font-bold">{CATEGORIES[0].label}</span>
+              </div>
+              {/* Smaller cards */}
+              {CATEGORIES.slice(1).map(cat => (
+                <div
+                  key={cat.id}
+                  className="relative rounded-2xl overflow-hidden cursor-pointer group"
+                  style={{ minHeight: 160 }}
+                  onClick={() => handleCategoryClick(cat.id)}
+                  data-testid={`cat-${cat.id}`}
                 >
-                  {/* Header */}
-                  <div className="p-5">
-                    <div className="flex items-start gap-3 mb-3">
-                      {listing.logo_url ? (
-                        <img src={listing.logo_url} alt="" className="w-11 h-11 rounded-xl object-cover flex-shrink-0" />
-                      ) : (
-                        <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(57,255,20,0.08)' }}>
-                          <span className="text-lg font-bold" style={{ color: '#39FF14' }}>{listing.business_name[0]}</span>
-                        </div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <h3 className="text-sm font-semibold text-white truncate">{listing.business_name}</h3>
-                          {tierInfo.label && (
-                            <span className="text-[9px] px-1.5 py-0.5 rounded-full flex-shrink-0" style={{ background: `${tierInfo.color}15`, color: tierInfo.color }}>
-                              {tierInfo.label}
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-xs text-zinc-500 capitalize">{listing.industry.replace('_', ' ')}</p>
-                        {listing.city && <p className="text-[10px] text-zinc-600">{listing.city}, {listing.state}</p>}
-                      </div>
+                  <img src={cat.img} alt={cat.label} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                  <span className="absolute bottom-3 left-3 text-white text-sm md:text-base font-bold">{cat.label}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="text-center mt-8">
+              <button onClick={() => loadListings()} className="px-6 py-3 rounded-full text-sm font-semibold text-white" style={{ background: '#FF8C00' }}>
+                All Categories
+              </button>
+            </div>
+          </section>
+
+          {/* ======== VALUE PROPOSITION ======== */}
+          <section className="bg-[#fafafa] py-16">
+            <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
+              <div>
+                <h2 className="text-3xl font-bold text-[#1a1a1a] mb-4">A Trusted Resource for Finding Local Pros</h2>
+                <p className="text-zinc-500 mb-8 leading-relaxed">
+                  Whether you need emergency plumbing, a master electrician, or the best barber in town — our directory connects you with verified, accountable businesses. Every badge is earned through real work and real feedback.
+                </p>
+                <div className="grid grid-cols-2 gap-4">
+                  {[
+                    { icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', label: 'Verified Pros' },
+                    { icon: 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z', label: 'Transparent Ratings' },
+                    { icon: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z', label: 'Easy Navigation' },
+                    { icon: 'M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z', label: 'Direct Contact' },
+                  ].map(f => (
+                    <div key={f.label} className="flex items-center gap-3">
+                      <svg className="w-6 h-6 flex-shrink-0" style={{ color: '#FF8C00' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d={f.icon} />
+                      </svg>
+                      <span className="text-sm font-medium text-[#1a1a1a]">{f.label}</span>
                     </div>
+                  ))}
+                </div>
+                <button onClick={() => loadListings()} className="mt-8 px-6 py-3 rounded-full text-sm font-semibold text-white" style={{ background: '#FF8C00' }}>
+                  Find a Business
+                </button>
+              </div>
+              <div className="relative rounded-2xl overflow-hidden" style={{ minHeight: 350 }}>
+                <img src="https://images.pexels.com/photos/1860567/pexels-photo-1860567.jpeg?auto=compress&cs=tinysrgb&w=700" alt="Trusted service" className="w-full h-full object-cover rounded-2xl" />
+              </div>
+            </div>
+          </section>
 
-                    {listing.description && (
-                      <p className="text-xs text-zinc-500 line-clamp-2 mb-3">{listing.description}</p>
+          {/* ======== TESTIMONIALS ======== */}
+          <section id="testimonials" className="relative py-16 overflow-hidden">
+            <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'url(https://images.pexels.com/photos/18173343/pexels-photo-18173343.jpeg?auto=compress&cs=tinysrgb&w=1920)', backgroundSize: 'cover' }} />
+            <div className="absolute inset-0 bg-[#1a1a1a]/90" />
+            <div className="relative max-w-4xl mx-auto px-6 text-center">
+              <h2 className="text-3xl font-bold text-white mb-2">Success Stories</h2>
+              <p className="text-zinc-400 mb-10">Hear from business owners and customers who found their perfect match.</p>
+
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={testimonialIdx}
+                  initial={{ opacity: 0, x: 40 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -40 }}
+                  transition={{ duration: 0.4 }}
+                  className="bg-white rounded-2xl p-8 max-w-lg mx-auto shadow-xl"
+                >
+                  <div className="w-14 h-14 rounded-full mx-auto mb-4 flex items-center justify-center text-xl font-bold text-white" style={{ background: '#FF8C00' }}>
+                    {TESTIMONIALS[testimonialIdx].name[0]}
+                  </div>
+                  <h3 className="text-lg font-bold text-[#1a1a1a]">{TESTIMONIALS[testimonialIdx].name}</h3>
+                  <p className="text-sm text-zinc-500 mb-3">{TESTIMONIALS[testimonialIdx].role}</p>
+                  <div className="flex justify-center mb-4"><Stars rating={TESTIMONIALS[testimonialIdx].rating} size={18} /></div>
+                  <p className="text-sm text-zinc-600 leading-relaxed italic">&ldquo;{TESTIMONIALS[testimonialIdx].text}&rdquo;</p>
+                </motion.div>
+              </AnimatePresence>
+
+              <div className="flex justify-center gap-2 mt-6">
+                {TESTIMONIALS.map((_, i) => (
+                  <button key={i} onClick={() => setTestimonialIdx(i)}
+                    className={`w-2.5 h-2.5 rounded-full transition ${i === testimonialIdx ? 'scale-110' : 'opacity-40'}`}
+                    style={{ background: i === testimonialIdx ? '#FF8C00' : '#fff' }}
+                  />
+                ))}
+              </div>
+            </div>
+          </section>
+        </>
+      ) : (
+        /* ======== LISTINGS VIEW ======== */
+        <section className="max-w-7xl mx-auto px-6 py-8">
+          {/* Search + Filters */}
+          <div className="mb-6">
+            <div className="flex flex-col sm:flex-row gap-3 mb-4">
+              <input type="text" placeholder="Search businesses..." value={search} onChange={e => setSearch(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleSearch()}
+                className="flex-1 px-4 py-3 rounded-lg text-sm border border-zinc-200 focus:outline-none focus:border-orange-400" data-testid="list-search" />
+              <button onClick={handleSearch} className="px-6 py-3 rounded-lg text-sm font-semibold text-white" style={{ background: '#FF8C00' }}>Search</button>
+            </div>
+            {/* 3-Filter Row */}
+            <div className="grid grid-cols-3 gap-3">
+              <select value={specialty} onChange={e => setSpecialty(e.target.value)} className="px-3 py-2.5 rounded-lg text-sm border border-zinc-200 focus:outline-none" data-testid="filter-specialty">
+                {FILTER_SPECIALTIES.map(s => <option key={s}>{s}</option>)}
+              </select>
+              <select value={activeCategory || 'All Categories'} onChange={e => { const v = e.target.value; setActiveCategory(v === 'All Categories' ? '' : v); loadListings(v === 'All Categories' ? undefined : v); }}
+                className="px-3 py-2.5 rounded-lg text-sm border border-zinc-200 focus:outline-none" data-testid="filter-category">
+                <option>All Categories</option>
+                {CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
+              </select>
+              <select value={priceRange} onChange={e => setPriceRange(e.target.value)} className="px-3 py-2.5 rounded-lg text-sm border border-zinc-200 focus:outline-none" data-testid="filter-price">
+                {FILTER_PRICE.map(p => <option key={p}>{p}</option>)}
+              </select>
+            </div>
+          </div>
+
+          {/* Back button */}
+          <button onClick={() => setShowListings(false)} className="text-sm text-zinc-500 hover:text-zinc-800 mb-6 flex items-center gap-1">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+            Back to Explore
+          </button>
+
+          {/* Listing Grid */}
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {[1,2,3,4,5,6,7,8].map(i => <div key={i} className="h-64 rounded-2xl animate-pulse bg-zinc-100" />)}
+            </div>
+          ) : listings.length === 0 ? (
+            <div className="text-center py-20">
+              <svg className="w-16 h-16 mx-auto mb-4 text-zinc-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+              <h3 className="text-xl font-bold text-zinc-800 mb-2">No businesses found</h3>
+              <p className="text-sm text-zinc-500">{search ? 'Try a different search term' : 'Be the first to add your business to the directory'}</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {listings.map((l, i) => (
+                <motion.div key={l.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
+                  className="rounded-2xl overflow-hidden border border-zinc-100 bg-white shadow-sm hover:shadow-lg transition group cursor-pointer"
+                  data-testid={`listing-${l.slug}`}>
+                  {/* Image */}
+                  <div className="relative h-44 overflow-hidden bg-zinc-100">
+                    {l.cover_image_url || l.logo_url ? (
+                      <img src={l.cover_image_url || l.logo_url!} alt={l.business_name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #1a1a1a, #333)' }}>
+                        <span className="text-4xl font-bold text-white/20">{l.business_name[0]}</span>
+                      </div>
                     )}
-
-                    {/* Badges */}
-                    {listing.directory_badges.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 mb-3">
-                        {listing.directory_badges.map(badge => (
-                          <span key={badge.id} className="text-[10px] px-2 py-0.5 rounded-full flex items-center gap-1"
-                            style={{ background: `${badge.badge_color}15`, color: badge.badge_color, border: `1px solid ${badge.badge_color}30` }}>
-                            <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
-                            {badge.badge_label}
+                    {/* Category badge */}
+                    <span className="absolute top-3 left-3 text-[10px] px-2 py-1 rounded-full bg-black/60 text-white capitalize backdrop-blur-sm">{l.industry.replace('_', ' ')}</span>
+                    {/* Earned badges */}
+                    {l.directory_badges.length > 0 && (
+                      <div className="absolute top-3 right-3 flex gap-1">
+                        {l.directory_badges.slice(0, 2).map(b => (
+                          <span key={b.id} className="w-6 h-6 rounded-full flex items-center justify-center text-[8px]" style={{ background: b.badge_color, color: '#fff' }}>
+                            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                           </span>
                         ))}
                       </div>
                     )}
-
-                    {/* Rating */}
-                    <StarDisplay rating={listing.avg_feedback_rating} count={listing.total_feedback_count} />
+                  </div>
+                  {/* Info */}
+                  <div className="p-4">
+                    <h3 className="font-bold text-[#1a1a1a] mb-1 truncate" style={{ color: '#FF8C00' }}>{l.business_name}</h3>
+                    {l.city && <p className="text-xs text-zinc-500 flex items-center gap-1 mb-1">
+                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                      {l.city}, {l.state}
+                    </p>}
+                    {l.description && <p className="text-xs text-zinc-400 line-clamp-2 mb-3">{l.description}</p>}
+                    <div className="flex items-center justify-between">
+                      <button className="text-xs font-semibold px-3 py-1.5 rounded-full border transition hover:bg-orange-50" style={{ color: '#FF8C00', borderColor: '#FF8C00' }}>View Details</button>
+                      <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold text-white" style={{ background: '#FF8C00' }}>
+                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
+                        {l.avg_feedback_rating > 0 ? `${l.avg_feedback_rating.toFixed(1)}/5` : 'New'}
+                      </div>
+                    </div>
                   </div>
                 </motion.div>
-              );
-            })}
-          </motion.div>
-        )}
-      </div>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* ======== FOOTER ======== */}
+      <footer className="bg-[#1a1a1a] py-12">
+        <div className="max-w-6xl mx-auto px-6 text-center">
+          <Link href="/" className="inline-flex items-center gap-2 mb-4">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#39FF14' }}>
+              <span className="text-black font-bold text-sm">G</span>
+            </div>
+            <span className="text-white font-semibold">GreenLine<span style={{ color: '#39FF14' }}>365</span></span>
+          </Link>
+          <p className="text-zinc-500 text-sm">Every badge is earned. Every rating is real. Every pro is accountable.</p>
+          <p className="text-zinc-700 text-xs mt-6">2026 GreenLine365. All rights reserved.</p>
+        </div>
+      </footer>
     </div>
   );
 }
