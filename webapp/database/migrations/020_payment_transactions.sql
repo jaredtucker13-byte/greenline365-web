@@ -1,12 +1,11 @@
 -- ============================================
--- MIGRATION 020: Payment Transactions
--- Tracks all Stripe payments for the directory
+-- MIGRATION 020: Payment Transactions (FIXED)
 -- ============================================
 
 CREATE TABLE IF NOT EXISTS payment_transactions (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  session_id TEXT UNIQUE,
-  listing_id UUID REFERENCES directory_listings(id) ON DELETE SET NULL,
+  session_id TEXT,
+  listing_id UUID,
   tier TEXT,
   amount DECIMAL(10,2),
   currency TEXT DEFAULT 'usd',
@@ -24,7 +23,6 @@ CREATE TABLE IF NOT EXISTS payment_transactions (
 CREATE INDEX IF NOT EXISTS idx_payment_session ON payment_transactions(session_id);
 CREATE INDEX IF NOT EXISTS idx_payment_listing ON payment_transactions(listing_id);
 CREATE INDEX IF NOT EXISTS idx_payment_status ON payment_transactions(status);
-CREATE INDEX IF NOT EXISTS idx_payment_email ON payment_transactions(customer_email);
 
 ALTER TABLE payment_transactions ENABLE ROW LEVEL SECURITY;
 
