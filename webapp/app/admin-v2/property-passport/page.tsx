@@ -160,7 +160,7 @@ export default function PropertyPassportPage() {
         assets,
         interactions: interactionsRes.data || [],
         health_score: healthScore,
-        total_maintenance_value: 0,
+        total_maintenance_value: propRes.data.lifetime_value || 0,
       });
     }
     setDetailLoading(false);
