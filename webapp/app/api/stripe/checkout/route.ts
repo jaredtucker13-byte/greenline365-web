@@ -55,22 +55,19 @@ export async function POST(request: NextRequest) {
             name: tierInfo.name,
             description: tierInfo.features.join(' | '),
           },
-          unit_amount: Math.round(tierInfo.price * 100), // cents
+          unit_amount: Math.round(tierInfo.price * 100),
           recurring: { interval: 'month' },
         },
         quantity: 1,
       }],
-      // $0.60 application fee on every payment
       subscription_data: {
-        application_fee_percent: undefined, // We use fixed amount instead
+        application_fee_percent: 0.2, // ~$0.60 on $299 = 0.2%
         metadata: {
           tier,
           listing_id: listing_id || '',
           platform: 'gl365_directory',
+          platform_fee: '0.60',
         },
-      },
-      payment_intent_data: {
-        application_fee_amount: 60, // $0.60 in cents
       },
       success_url: successUrl,
       cancel_url: cancelUrl,
