@@ -36,6 +36,13 @@ interface SidebarProps {
 const navItems = [
   { id: 'dashboard', label: 'Dashboard', icon: 'grid', href: '/admin-v2', feature: null },
   { id: 'schedule', label: 'Schedule', icon: 'calendar', href: '/admin-v2?view=schedule', feature: 'calendar' },
+  // --- Property Intelligence ---
+  { id: 'divider-property', label: 'PROPERTY INTEL', icon: '', href: '', feature: null, isDivider: true },
+  { id: 'commander', label: 'Commander', icon: 'commander', href: '/admin-v2/commander', feature: null },
+  { id: 'property-passport', label: 'Passports', icon: 'home', href: '/admin-v2/property-passport', feature: null },
+  { id: 'filing-cabinet', label: 'Filing Cabinet', icon: 'cabinet', href: '/admin-v2/filing-cabinet', feature: null },
+  // --- Content & Tools ---
+  { id: 'divider-tools', label: 'TOOLS', icon: '', href: '', feature: null, isDivider: true },
   { id: 'creative-studio', label: 'Creative Studio', icon: 'sparkles', href: '/admin-v2/creative-studio', feature: 'mockup_generator' },
   { id: 'blog', label: 'Blog', icon: 'edit', href: '/admin-v2/blog-polish', feature: 'blog' },
   { id: 'website-builder', label: 'Website Builder', icon: 'paint', href: '/admin-v2/website-analyzer', feature: 'mockup_generator' },
