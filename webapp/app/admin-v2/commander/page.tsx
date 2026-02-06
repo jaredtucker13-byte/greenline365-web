@@ -68,13 +68,13 @@ export default function CommanderDashboard() {
     const [propRes, interRes] = await Promise.all([
       supabase
         .from('properties')
-        .select('id, address, city, state, zip, full_address, created_at, contacts(id, first_name, last_name), assets(id, asset_type)')
+        .select('id, address_line1, city, state, zip_code, full_address, created_at, contacts(id, first_name, last_name), assets(id, asset_type)')
         .eq('tenant_id', activeBusiness.id)
         .order('created_at', { ascending: false })
         .limit(20),
       supabase
         .from('interactions')
-        .select('id, type, summary, sentiment_score, property_id, created_at')
+        .select('id, interaction_type, summary, sentiment_score, property_id, created_at')
         .eq('tenant_id', activeBusiness.id)
         .order('created_at', { ascending: false })
         .limit(10),
