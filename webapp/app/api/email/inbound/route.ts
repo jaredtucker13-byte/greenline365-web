@@ -7,94 +7,95 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKey); }
 
 // POST /api/email/inbound - SendGrid Inbound Parse webhook
-// Receives email replies and auto-verifies CRM leads
 export async function POST(request: NextRequest) {
   const supabase = getServiceClient();
 
-  // SendGrid sends form data (multipart/form-data)
-  const formData = await request.formData();
+  let from = '', to = '', subject = '', text = '';
 
-  const from = formData.get('from')?.toString() || '';
-  const to = formData.get('to')?.toString() || '';
-  const subject = formData.get('subject')?.toString() || '';
-  const text = formData.get('text')?.toString() || '';
-  const html = formData.get('html')?.toString() || '';
+  try {
+    // Try multipart form data first (SendGrid default)
+    const formData = await request.formData();
+    from = formData.get('from')?.toString() || '';
+    to = formData.get('to')?.toString() || '';
+    subject = formData.get('subject')?.toString() || '';
+    text = formData.get('text')?.toString() || formData.get('html')?.toString() || '';
+  } catch {
+    try {
+      // Fallback: try JSON
+      const body = await request.json();
+      from = body.from || body.sender || '';
+      to = body.to || '';
+      subject = body.subject || '';
+      text = body.text || body.html || body.body || '';
+    } catch {
+      // Last resort: raw text
+      try {
+        const raw = await request.text();
+        console.log('[INBOUND] Raw body:', raw.slice(0, 500));
+        // Try to extract email from raw data
+        const fromMatch = raw.match(/from["\s:=]+([^\s&"]+@[^\s&"]+)/i);
+        if (fromMatch) from = fromMatch[1];
+        const subjectMatch = raw.match(/subject["\s:=]+([^&"]+)/i);
+        if (subjectMatch) subject = subjectMatch[1];
+        text = raw;
+      } catch {
+        console.log('[INBOUND] Could not parse request body');
+      }
+    }
+  }
 
   // Extract email address from "Name <email>" format
   const emailMatch = from.match(/<([^>]+)>/) || [null, from];
   const senderEmail = (emailMatch[1] || from).toLowerCase().trim();
 
-  console.log(`[INBOUND] Reply from: ${senderEmail} | Subject: ${subject}`);
+  console.log(`[INBOUND] From: ${senderEmail} | Subject: ${subject}`);
   console.log(`[INBOUND] Body: ${text?.slice(0, 200)}`);
 
-  if (!senderEmail) {
-    return NextResponse.json({ error: 'No sender email' }, { status: 400 });
+  if (!senderEmail || !senderEmail.includes('@')) {
+    console.log('[INBOUND] No valid sender email found');
+    return NextResponse.json({ received: true, error: 'no sender' }, { status: 200 });
   }
 
-  // Find matching CRM lead by email
+  // Find matching CRM lead
   const { data: lead } = await supabase
     .from('crm_leads')
     .select('id, name, email, status, tags')
     .eq('email', senderEmail)
-    .single();
+    .maybeSingle();
 
   if (lead) {
-    // Check if reply is a confirmation
     const bodyLower = (text || '').toLowerCase();
     const isConfirmation = bodyLower.includes('looks good') ||
-      bodyLower.includes('correct') ||
-      bodyLower.includes('yes') ||
-      bodyLower.includes('confirm') ||
-      bodyLower.includes('good') ||
-      bodyLower.includes('right') ||
-      bodyLower.includes('accurate');
+      bodyLower.includes('correct') || bodyLower.includes('yes') ||
+      bodyLower.includes('confirm') || bodyLower.includes('good') ||
+      bodyLower.includes('right') || bodyLower.includes('accurate') ||
+      bodyLower.includes('that is correct');
 
     const newStatus = isConfirmation ? 'verified' : 'responded';
-    const updatedTags = [...(lead.tags || [])];
-    if (!updatedTags.includes('email_replied')) updatedTags.push('email_replied');
-    if (isConfirmation && !updatedTags.includes('info_confirmed')) updatedTags.push('info_confirmed');
+    const tags = [...new Set([...(lead.tags || []), 'email_replied', ...(isConfirmation ? ['info_confirmed'] : [])])];
 
-    // Update lead status
     await supabase
       .from('crm_leads')
       .update({
         status: newStatus,
-        tags: updatedTags,
-        notes: `${lead.name || 'Lead'} replied on ${new Date().toLocaleDateString()}: "${(text || '').slice(0, 200)}"`,
+        tags,
+        notes: `Replied ${new Date().toLocaleDateString()}: "${(text || '').slice(0, 200)}"`,
         last_contact_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
       .eq('id', lead.id);
 
-    console.log(`[INBOUND] Lead ${lead.name} (${senderEmail}) → status: ${newStatus}`);
+    console.log(`[INBOUND] Lead "${lead.name}" → ${newStatus}`);
 
-    // Also update directory listing if it exists
-    const { data: listing } = await supabase
+    // Also claim directory listing if email matches
+    await supabase
       .from('directory_listings')
-      .select('id')
-      .eq('email', senderEmail)
-      .single();
-
-    if (listing) {
-      await supabase
-        .from('directory_listings')
-        .update({ is_claimed: true, claimed_at: new Date().toISOString() })
-        .eq('id', listing.id);
-      console.log(`[INBOUND] Directory listing claimed: ${listing.id}`);
-    }
+      .update({ is_claimed: true, claimed_at: new Date().toISOString() })
+      .ilike('website', `%${senderEmail.split('@')[1]}%`);
   } else {
-    console.log(`[INBOUND] No CRM lead found for: ${senderEmail}`);
+    console.log(`[INBOUND] No CRM lead for: ${senderEmail}`);
   }
 
-  // Log the inbound email in audit
-  await supabase.from('audit_logs').insert({
-    tenant_id: (await supabase.from('businesses').select('id').limit(1).single()).data?.id,
-    action: 'email_reply_received',
-    entity_type: 'crm_lead',
-    entity_id: lead?.id || null,
-    details: { from: senderEmail, subject, body_preview: (text || '').slice(0, 300) },
-  });
-
-  // SendGrid expects 200 OK
-  return NextResponse.json({ received: true, lead_updated: !!lead });
+  // Always return 200 to SendGrid
+  return NextResponse.json({ received: true, lead_found: !!lead });
 }
