@@ -16,12 +16,14 @@ import CollapsibleSidebar from '../components/CollapsibleSidebar';
 
 interface Property {
   id: string;
-  address: string;
+  address_line1: string;
+  address_line2?: string;
   city: string;
   state: string;
-  zip: string;
+  zip_code: string;
   full_address: string;
   gate_code?: string;
+  lifetime_value?: number;
   created_at: string;
   contacts: Contact[];
   assets: Asset[];
@@ -43,15 +45,18 @@ interface Asset {
   id: string;
   asset_type: string;
   brand?: string;
-  model?: string;
+  model_number?: string;
+  serial_number?: string;
   install_date?: string;
+  warranty_expiry?: string;
   confidence_score: number;
   metadata: Record<string, any>;
+  status?: string;
 }
 
 interface Interaction {
   id: string;
-  type: string;
+  interaction_type: string;
   summary: string;
   sentiment_score: number;
   created_at: string;
