@@ -77,20 +77,21 @@ export async function POST(request: NextRequest) {
     });
 
     // Create payment transaction record
-    await supabase.from('payment_transactions').insert({
-      session_id: session.id,
-      listing_id: listing_id || null,
-      tier,
-      amount: tierInfo.price,
-      currency: 'usd',
-      platform_fee: 0.60,
-      status: 'pending',
-      metadata: { tier, listing_id, features: tierInfo.features },
-      created_at: new Date().toISOString(),
-    }).select().single().catch(() => {
-      // Table might not exist yet — will be created in migration
+    try {
+      await supabase.from('payment_transactions').insert({
+        session_id: session.id,
+        listing_id: listing_id || null,
+        tier,
+        amount: tierInfo.price,
+        currency: 'usd',
+        platform_fee: 0.60,
+        status: 'pending',
+        metadata: { tier, listing_id, features: tierInfo.features },
+        created_at: new Date().toISOString(),
+      });
+    } catch {
       console.log('[STRIPE] payment_transactions table not ready');
-    });
+    }
 
     return NextResponse.json({ url: session.url, session_id: session.id });
 
