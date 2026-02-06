@@ -137,7 +137,7 @@ export default function PropertyPassportPage() {
       supabase.from('properties').select('*').eq('id', id).eq('tenant_id', activeBusiness.id).single(),
       supabase.from('contacts').select('*').eq('property_id', id).eq('tenant_id', activeBusiness.id),
       supabase.from('assets').select('*').eq('property_id', id).eq('tenant_id', activeBusiness.id),
-      supabase.from('interactions').select('*').eq('property_id', id).eq('tenant_id', activeBusiness.id).order('created_at', { ascending: false }).limit(50),
+      supabase.from('property_interactions').select('*').eq('property_id', id).eq('tenant_id', activeBusiness.id).order('created_at', { ascending: false }).limit(50),
     ]);
 
     if (propRes.data) {

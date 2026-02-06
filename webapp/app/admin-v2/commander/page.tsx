@@ -73,7 +73,7 @@ export default function CommanderDashboard() {
         .order('created_at', { ascending: false })
         .limit(20),
       supabase
-        .from('interactions')
+        .from('property_interactions')
         .select('id, interaction_type, summary, sentiment_score, property_id, created_at')
         .eq('tenant_id', activeBusiness.id)
         .order('created_at', { ascending: false })

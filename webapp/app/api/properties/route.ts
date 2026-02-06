@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     const [contacts, assets, interactions] = await Promise.all([
       supabase.from('contacts').select('*').eq('property_id', propertyId).eq('tenant_id', tenantId),
       supabase.from('assets').select('*').eq('property_id', propertyId).eq('tenant_id', tenantId),
-      supabase.from('interactions').select('*').eq('property_id', propertyId).eq('tenant_id', tenantId).order('created_at', { ascending: false }).limit(50),
+      supabase.from('property_interactions').select('*').eq('property_id', propertyId).eq('tenant_id', tenantId).order('created_at', { ascending: false }).limit(50),
     ]);
 
     // Calculate health score
