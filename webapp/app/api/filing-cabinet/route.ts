@@ -94,11 +94,11 @@ export async function POST(request: NextRequest) {
   // Log audit event
   await supabase.from('audit_logs').insert({
     tenant_id,
-    user_id: uploaded_by,
+    actor_id: uploaded_by,
     action: 'upload',
     entity_type: 'filing_cabinet',
     entity_id: data.id,
-    description: `Uploaded ${file_name} to ${category}`,
+    details: { file_name, category, description: `Uploaded ${file_name} to ${category}` },
     severity: 'info',
   });
 
@@ -131,11 +131,11 @@ export async function DELETE(request: NextRequest) {
   // Log audit event
   await supabase.from('audit_logs').insert({
     tenant_id: tenantId,
-    user_id: userId,
+    actor_id: userId,
     action: 'delete',
     entity_type: 'filing_cabinet',
     entity_id: fileId,
-    description: `Deleted file: ${data.file_name}`,
+    details: { file_name: data.file_name, description: `Deleted file: ${data.file_name}` },
     severity: 'warning',
     old_value: data,
   });
