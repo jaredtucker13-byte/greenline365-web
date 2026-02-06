@@ -17,10 +17,10 @@ import { PageHeader } from '../components/PageHeader';
 
 interface PropertySummary {
   id: string;
-  address: string;
+  address_line1: string;
   city: string;
   state: string;
-  zip: string;
+  zip_code: string;
   full_address: string;
   contacts: { id: string; first_name: string; last_name: string }[];
   assets: { id: string; asset_type: string }[];
