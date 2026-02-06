@@ -311,54 +311,57 @@ export default function DirectoryPage() {
               <h3 className="text-xl font-bold text-zinc-800 mb-2">No businesses found</h3>
               <p className="text-sm text-zinc-500">{search ? 'Try a different search term' : 'Be the first to add your business to the directory'}</p>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              {listings.map((l, i) => (
-                <motion.div key={l.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
-                  className="rounded-2xl overflow-hidden border border-zinc-100 bg-white shadow-sm hover:shadow-lg transition group cursor-pointer"
-                  data-testid={`listing-${l.slug}`}>
-                  {/* Image */}
-                  <div className="relative h-44 overflow-hidden bg-zinc-100">
-                    {l.cover_image_url || l.logo_url ? (
-                      <img src={l.cover_image_url || l.logo_url!} alt={l.business_name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #1a1a1a, #333)' }}>
-                        <span className="text-4xl font-bold text-white/20">{l.business_name[0]}</span>
-                      </div>
-                    )}
-                    {/* Category badge */}
-                    <span className="absolute top-3 left-3 text-[10px] px-2 py-1 rounded-full bg-black/60 text-white capitalize backdrop-blur-sm">{l.industry.replace('_', ' ')}</span>
-                    {/* Earned badges */}
-                    {l.directory_badges.length > 0 && (
-                      <div className="absolute top-3 right-3 flex gap-1">
-                        {l.directory_badges.slice(0, 2).map(b => (
-                          <span key={b.id} className="w-6 h-6 rounded-full flex items-center justify-center text-[8px]" style={{ background: b.badge_color, color: '#fff' }}>
-                            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  {/* Info */}
-                  <div className="p-4">
-                    <h3 className="font-bold text-[#1a1a1a] mb-1 truncate" style={{ color: '#FF8C00' }}>{l.business_name}</h3>
-                    {l.city && <p className="text-xs text-zinc-500 flex items-center gap-1 mb-1">
-                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                      {l.city}, {l.state}
-                    </p>}
-                    {l.description && <p className="text-xs text-zinc-400 line-clamp-2 mb-3">{l.description}</p>}
-                    <div className="flex items-center justify-between">
-                      <button className="text-xs font-semibold px-3 py-1.5 rounded-full border transition hover:bg-orange-50" style={{ color: '#FF8C00', borderColor: '#FF8C00' }}>View Details</button>
-                      <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold text-white" style={{ background: '#FF8C00' }}>
-                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
-                        {l.avg_feedback_rating > 0 ? `${l.avg_feedback_rating.toFixed(1)}/5` : 'New'}
-                      </div>
+          ) : (() => {
+            // Group listings by category sections
+            const SECTION_MAP: Record<string, { label: string; color: string; industries: string[] }> = {
+              services: { label: 'Home Services', color: '#39FF14', industries: ['electrical', 'plumbing', 'hvac'] },
+              dining: { label: 'Dining & Food', color: '#FF8C00', industries: ['restaurant', 'bakery'] },
+              style: { label: 'Style & Grooming', color: '#8B5CF6', industries: ['barbershop'] },
+              fitness: { label: 'Fitness & Wellness', color: '#00D4FF', industries: ['gym', 'spa'] },
+              professional: { label: 'Professional Services', color: '#EC4899', industries: ['general'] },
+              retail: { label: 'Shopping & Retail', color: '#FFB800', industries: ['boutique'] },
+            };
+
+            // If a specific category is selected, show flat grid
+            if (activeCategory) {
+              return (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                  {listings.map((l, i) => <ListingCard key={l.id} listing={l} index={i} />)}
+                </div>
+              );
+            }
+
+            // Otherwise show grouped sections
+            const sections = Object.entries(SECTION_MAP).map(([key, sec]) => {
+              const items = listings.filter(l => sec.industries.includes(l.industry));
+              return { key, ...sec, items };
+            }).filter(s => s.items.length > 0);
+
+            return (
+              <div className="space-y-12">
+                {sections.map(sec => (
+                  <div key={sec.key}>
+                    <div className="flex items-center justify-between mb-4">
+                      <h2 className="text-xl font-bold text-[#1a1a1a] flex items-center gap-2">
+                        <span className="w-1.5 h-6 rounded-full" style={{ background: sec.color }} />
+                        {sec.label}
+                      </h2>
+                      <span className="text-xs text-zinc-400">{sec.items.length} businesses</span>
                     </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                      {sec.items.slice(0, 8).map((l, i) => <ListingCard key={l.id} listing={l} index={i} />)}
+                    </div>
+                    {sec.items.length > 8 && (
+                      <button onClick={() => { setActiveCategory(sec.items[0].industry); loadListings(sec.items[0].industry); }}
+                        className="mt-4 text-sm font-medium transition hover:underline" style={{ color: sec.color }}>
+                        View all {sec.items.length} {sec.label.toLowerCase()} →
+                      </button>
+                    )}
                   </div>
-                </motion.div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            );
+          })()}
         </section>
       )}
 
