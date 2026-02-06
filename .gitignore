@@ -48,3 +48,7 @@ __pycache__/
 # Test artifacts
 test_reports/
 test_result.md
+-e 
+# Environment files
+*.env
+*.env.*
