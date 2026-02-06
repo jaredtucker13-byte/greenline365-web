@@ -498,12 +498,17 @@ function AssetsView({ assets }: { assets: Asset[] }) {
                 <h4 className="text-sm font-semibold text-white capitalize">{asset.asset_type?.replace('_', ' ')}</h4>
                 <p className="text-xs text-zinc-500 mt-0.5">
                   {asset.brand && <span>{asset.brand}</span>}
-                  {asset.model && <span> {asset.model}</span>}
+                  {asset.model_number && <span> {asset.model_number}</span>}
                 </p>
                 <div className="flex items-center gap-4 mt-3 text-[10px]">
                   {ageYears !== null && (
                     <span className={ageYears > 10 ? 'text-red-400' : ageYears > 5 ? 'text-yellow-400' : 'text-green-400'}>
                       {ageYears} years old
+                    </span>
+                  )}
+                  {asset.warranty_expiry && (
+                    <span className={new Date(asset.warranty_expiry) > new Date() ? 'text-green-400' : 'text-red-400'}>
+                      Warranty: {new Date(asset.warranty_expiry) > new Date() ? 'Active' : 'Expired'}
                     </span>
                   )}
                   <span className="text-zinc-600">Confidence: {asset.confidence_score || 0}%</span>
