@@ -210,10 +210,10 @@ export default function PropertyPassportPage() {
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                   <div>
                     <h1 className="text-2xl lg:text-3xl font-bold text-white" data-testid="property-address">
-                      {selectedProperty.full_address || selectedProperty.address}
+                      {selectedProperty.full_address || selectedProperty.address_line1}
                     </h1>
                     <p className="text-sm text-zinc-500 mt-1">
-                      {selectedProperty.city}, {selectedProperty.state} {selectedProperty.zip}
+                      {selectedProperty.city}, {selectedProperty.state} {selectedProperty.zip_code}
                       {selectedProperty.gate_code && <span className="ml-3 text-zinc-600">Gate: {selectedProperty.gate_code}</span>}
                     </p>
                   </div>
