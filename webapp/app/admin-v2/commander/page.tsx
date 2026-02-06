@@ -29,7 +29,7 @@ interface PropertySummary {
 
 interface RecentInteraction {
   id: string;
-  type: string;
+  interaction_type: string;
   summary: string;
   sentiment_score: number;
   property_id: string;
@@ -270,7 +270,7 @@ export default function CommanderDashboard() {
                         background: int.sentiment_score > 0.5 ? '#39FF14' : int.sentiment_score > 0 ? '#FFB800' : '#FF4444'
                       }} />
                       <div className="min-w-0">
-                        <p className="text-xs text-zinc-300 truncate">{int.summary || int.type}</p>
+                        <p className="text-xs text-zinc-300 truncate">{int.summary || int.interaction_type}</p>
                         <p className="text-[10px] text-zinc-600">{new Date(int.created_at).toLocaleDateString()}</p>
                       </div>
                     </div>
