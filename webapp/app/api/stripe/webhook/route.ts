@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
         entity_type: 'directory_listing',
         entity_id: listingId,
         details: { tier, amount: session.amount_total, email: session.customer_details?.email },
-      }).catch(() => {});
+      });
 
       break;
     }

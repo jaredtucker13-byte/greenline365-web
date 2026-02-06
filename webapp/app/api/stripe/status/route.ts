@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
         status: 'paid',
         customer_email: session.customer_details?.email,
         paid_at: new Date().toISOString(),
-      }).eq('session_id', sessionId).catch(() => {});
+      }).eq('session_id', sessionId);
 
       console.log(`[STRIPE] Payment confirmed: ${session.metadata.tier} tier for listing ${session.metadata.listing_id}`);
     }
