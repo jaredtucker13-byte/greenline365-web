@@ -3,34 +3,70 @@
 ## HARD RULES
 1. Badges are EARNED, never bought
 2. Schema: `address_line1`, `zip_code`, `model_number`, `property_interactions`, `actor_id`
-3. **NO campaign emails without explicit approval** — test emails to personal only
-4. Email 1 has ZERO links — reply "STOP" to opt out
-5. Email 2+ can have links (listing URL, unsubscribe)
+3. **NO campaign emails without explicit approval**
+4. Email 1 = ZERO links, reply "STOP" to opt out
+5. Stripe test key active — switch to live when ready
 
 ---
 
-## Email Campaign Architecture
-- **Email 1**: FROM Gmail (warmed) → reply-to `reply@reply.greenline365.com` → no links
-- **Reply "STOP"**: Auto-unsubscribe, remove listing, mark CRM as lost
-- **Reply with corrections**: AI parses → auto-updates listing → sends Email 2 via SendGrid with listing link
-- **Reply "Looks good"**: Mark verified → send Email 2 with listing link
-- **72hr no reply**: Email 1b via Gmail (soft follow-up, still no links)
+## Complete System Built (Feb 6, 2026)
 
-## What's Built
-- Property Intelligence: Commander, Passport, Filing Cabinet, Referral Network
-- Global Directory: 200 businesses scraped, category-organized, public at `/directory`
-- CRM: 200 leads loaded, tagged by industry/city
-- AI Web Scraper: `/api/directory/scrape`
-- Campaign System: `/api/email/campaign` (Gmail SMTP for Email 1, SendGrid for Email 2)
-- Inbound Parse: `reply@reply.greenline365.com` → `/api/email/inbound` → AI + CRM
-- SQL Migrations: 016-019
+### Property Intelligence Module
+- Commander Dashboard (`/admin-v2/commander`)
+- Property Passport (`/admin-v2/property-passport`) — Carfax for Homes
+- Filing Cabinet (`/admin-v2/filing-cabinet`) — secure vault with RBAC
+- Referral Network (`/admin-v2/referral-network`) — contractor directory + ratings
+
+### Global Directory
+- Public page at `/directory` — 200 businesses live
+- AI Web Scraper — any URL → auto-profile
+- Category-organized: Home Services, Dining, Style, Fitness, Professional, Retail
+- Badge system (earned only)
+- QR feedback endpoint
+
+### Email Campaign System
+- Email 1 via Gmail SMTP (warmed personal account) — no links
+- Inbound Parse: `reply@reply.greenline365.com` → AI parses corrections → auto-updates
+- STOP handling → auto-unsubscribe
+- 72-hour follow-up for non-responders
+- 200 CRM leads loaded and ready
+
+### Stripe Payments
+- 3 subscription tiers: Growth $299, Authority $599, Dominator $899
+- Checkout, status, and webhook endpoints
+- Auto-upgrades listing tier on payment
+- Tags "golden_customer" in CRM on purchase
+- Webhook configured at Stripe dashboard
+
+### SQL Migrations (016-020)
+- 016: RBAC, Filing Cabinet, Audit Logs
+- 017: Referral Network + Ratings
+- 018: Property Interactions + Performance Indexes
+- 019: Global Directory (listings, badges, feedback)
+- 020: Payment Transactions
+
+### Key API Endpoints
+| Endpoint | Purpose |
+|----------|---------|
+| `/api/directory` | Public directory CRUD |
+| `/api/directory/scrape` | AI web scraper |
+| `/api/directory/feedback` | QR feedback |
+| `/api/email/campaign` | Email campaign sender |
+| `/api/email/inbound` | Reply webhook |
+| `/api/stripe/checkout` | Subscription checkout |
+| `/api/stripe/status` | Payment status |
+| `/api/stripe/webhook` | Stripe events |
+| `/api/properties` | Property CRUD |
+| `/api/filing-cabinet` | Document vault |
+| `/api/contractors` | Contractor directory |
+| `/api/referrals` | Referral tracking |
 
 ## Upcoming
 - Campaign Dashboard (admin panel)
-- Batch 5+ URL scraping
+- Image upload with auto-compression
 - Individual listing detail pages
-- Claim flow UI
+- Claim Your Listing flow
 - QR code generation
-- Stripe Connect ($0.60 fee)
-- Purchase tracking (golden customers)
-- Domain warming strategy for SendGrid
+- Stripe Connect ($0.60 marketplace fee)
+- Incident → Property Passport RED/GREEN loop
+- Domain warming for SendGrid
