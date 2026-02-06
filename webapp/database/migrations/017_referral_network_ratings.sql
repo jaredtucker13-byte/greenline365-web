@@ -1,37 +1,29 @@
 -- ============================================
 -- MIGRATION 017: Referral Network & Ratings
+-- SAFE-WAY: Creates if not exists, skips if exists
 -- Run this in Supabase SQL Editor AFTER 016
 -- ============================================
 
--- 1. Contractor Directory (Network Members)
+-- 1. Contractor Directory
 -- ============================================
 CREATE TABLE IF NOT EXISTS contractor_directory (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   tenant_id UUID NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
-  
-  -- Business info
   business_name TEXT NOT NULL,
-  industry TEXT NOT NULL, -- 'plumbing', 'roofing', 'hvac', 'electrical', 'lawn_care', 'security', 'painting', 'general'
+  industry TEXT NOT NULL,
   contact_name TEXT,
   phone TEXT,
   email TEXT,
   website TEXT,
-  service_area TEXT[], -- ZIP codes or city names
-  
-  -- Greenline network status
-  is_greenline_member BOOLEAN DEFAULT false, -- Are they a Founding 30 member?
-  greenline_tenant_id UUID REFERENCES businesses(id), -- Link to their Greenline tenant if member
-  
-  -- Ratings
+  service_area TEXT[],
+  is_greenline_member BOOLEAN DEFAULT false,
+  greenline_tenant_id UUID REFERENCES businesses(id),
   avg_rating DECIMAL(3,2) DEFAULT 0,
   total_reviews INTEGER DEFAULT 0,
   total_referrals_received INTEGER DEFAULT 0,
   total_referrals_completed INTEGER DEFAULT 0,
-  
-  -- Preferences
-  is_preferred BOOLEAN DEFAULT false, -- Contractor marked as "my guy" by this tenant
+  is_preferred BOOLEAN DEFAULT false,
   notes TEXT,
-  
   is_active BOOLEAN DEFAULT true,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -46,39 +38,22 @@ CREATE INDEX IF NOT EXISTS idx_contractor_directory_greenline ON contractor_dire
 -- ============================================
 CREATE TABLE IF NOT EXISTS referrals (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  
-  -- Who referred
   referring_tenant_id UUID NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
   referring_user_id UUID REFERENCES auth.users(id),
-  
-  -- Who was referred
   referred_contractor_id UUID NOT NULL REFERENCES contractor_directory(id),
-  
-  -- The property and context
   property_id UUID REFERENCES properties(id),
-  
-  -- What triggered the referral
   trigger_type TEXT NOT NULL DEFAULT 'manual' 
     CHECK (trigger_type IN ('manual', 'ai_suggested', 'asset_age', 'property_passport', 'network_match')),
-  trigger_context JSONB DEFAULT '{}'::jsonb, -- e.g., {"asset_type": "roofing", "asset_age_years": 15, "reason": "Roof is aging"}
-  
-  -- Status tracking
+  trigger_context JSONB DEFAULT '{}'::jsonb,
   status TEXT NOT NULL DEFAULT 'suggested' 
     CHECK (status IN ('suggested', 'sent', 'viewed', 'accepted', 'completed', 'declined', 'expired')),
-  
-  -- Contact info for the referral
   homeowner_name TEXT,
   homeowner_phone TEXT,
   homeowner_email TEXT,
-  
-  -- Outcome
-  job_value DECIMAL(10,2), -- Value of the job if completed
-  referral_fee DECIMAL(10,2), -- Fee earned for the referral
+  job_value DECIMAL(10,2),
+  referral_fee DECIMAL(10,2),
   completed_at TIMESTAMPTZ,
-  
-  -- Notes
   notes TEXT,
-  
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -88,44 +63,36 @@ CREATE INDEX IF NOT EXISTS idx_referrals_contractor ON referrals(referred_contra
 CREATE INDEX IF NOT EXISTS idx_referrals_property ON referrals(property_id);
 CREATE INDEX IF NOT EXISTS idx_referrals_status ON referrals(status);
 
--- 3. Contractor Reviews / Ratings
+-- 3. Contractor Reviews
 -- ============================================
 CREATE TABLE IF NOT EXISTS contractor_reviews (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   contractor_id UUID NOT NULL REFERENCES contractor_directory(id) ON DELETE CASCADE,
-  
-  -- Who reviewed
   reviewer_tenant_id UUID NOT NULL REFERENCES businesses(id),
   reviewer_user_id UUID REFERENCES auth.users(id),
-  
-  -- The review
   rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
   review_text TEXT,
-  
-  -- Context
-  referral_id UUID REFERENCES referrals(id), -- Was this review from a referral?
+  referral_id UUID REFERENCES referrals(id),
   property_id UUID REFERENCES properties(id),
-  job_type TEXT, -- What work was done
-  
-  is_verified BOOLEAN DEFAULT false, -- Verified via completed referral
-  
+  job_type TEXT,
+  is_verified BOOLEAN DEFAULT false,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE INDEX IF NOT EXISTS idx_reviews_contractor ON contractor_reviews(contractor_id);
 CREATE INDEX IF NOT EXISTS idx_reviews_reviewer ON contractor_reviews(reviewer_tenant_id);
 
--- 4. Auto-update avg_rating on contractor_directory
+-- 4. Auto-update avg_rating trigger
 -- ============================================
 CREATE OR REPLACE FUNCTION update_contractor_rating()
 RETURNS TRIGGER AS $$
 BEGIN
   UPDATE contractor_directory SET
-    avg_rating = (SELECT COALESCE(AVG(rating), 0) FROM contractor_reviews WHERE contractor_id = NEW.contractor_id),
-    total_reviews = (SELECT COUNT(*) FROM contractor_reviews WHERE contractor_id = NEW.contractor_id),
+    avg_rating = (SELECT COALESCE(AVG(rating), 0) FROM contractor_reviews WHERE contractor_id = COALESCE(NEW.contractor_id, OLD.contractor_id)),
+    total_reviews = (SELECT COUNT(*) FROM contractor_reviews WHERE contractor_id = COALESCE(NEW.contractor_id, OLD.contractor_id)),
     updated_at = NOW()
-  WHERE id = NEW.contractor_id;
-  RETURN NEW;
+  WHERE id = COALESCE(NEW.contractor_id, OLD.contractor_id);
+  RETURN COALESCE(NEW, OLD);
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
@@ -155,7 +122,7 @@ RETURNS TABLE (
 BEGIN
   RETURN QUERY
   SELECT 
-    cd.id AS contractor_id,
+    cd.id,
     cd.business_name,
     cd.industry,
     cd.avg_rating,
@@ -174,47 +141,50 @@ BEGIN
     AND cd.industry = p_industry
     AND cd.is_active = true
   ORDER BY
-    cd.is_preferred DESC,          -- Preferred contractors first
-    cd.is_greenline_member DESC,   -- Greenline members next
-    cd.avg_rating DESC,            -- Then by rating
-    cd.total_referrals_completed DESC  -- Then by track record
+    cd.is_preferred DESC,
+    cd.is_greenline_member DESC,
+    cd.avg_rating DESC,
+    cd.total_referrals_completed DESC
   LIMIT p_limit;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- 6. RLS Policies
+-- 6. RLS Policies (safe: drop then create)
 -- ============================================
 ALTER TABLE contractor_directory ENABLE ROW LEVEL SECURITY;
 ALTER TABLE referrals ENABLE ROW LEVEL SECURITY;
 ALTER TABLE contractor_reviews ENABLE ROW LEVEL SECURITY;
 
--- Contractor directory: tenant can see their own + all greenline members
+DROP POLICY IF EXISTS "contractor_directory_read" ON contractor_directory;
 CREATE POLICY "contractor_directory_read" ON contractor_directory
   FOR SELECT USING (
     tenant_id IN (SELECT business_id FROM user_businesses WHERE user_id = auth.uid())
     OR is_greenline_member = true
   );
 
+DROP POLICY IF EXISTS "contractor_directory_write" ON contractor_directory;
 CREATE POLICY "contractor_directory_write" ON contractor_directory
   FOR ALL USING (
     tenant_id IN (SELECT business_id FROM user_businesses WHERE user_id = auth.uid())
   );
 
--- Referrals: tenant can see referrals they created
+DROP POLICY IF EXISTS "referrals_read" ON referrals;
 CREATE POLICY "referrals_read" ON referrals
   FOR SELECT USING (
     referring_tenant_id IN (SELECT business_id FROM user_businesses WHERE user_id = auth.uid())
   );
 
+DROP POLICY IF EXISTS "referrals_write" ON referrals;
 CREATE POLICY "referrals_write" ON referrals
   FOR ALL USING (
     referring_tenant_id IN (SELECT business_id FROM user_businesses WHERE user_id = auth.uid())
   );
 
--- Reviews: anyone in the network can read, own tenant can write
+DROP POLICY IF EXISTS "reviews_read" ON contractor_reviews;
 CREATE POLICY "reviews_read" ON contractor_reviews
   FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "reviews_write" ON contractor_reviews;
 CREATE POLICY "reviews_write" ON contractor_reviews
   FOR INSERT WITH CHECK (
     reviewer_tenant_id IN (SELECT business_id FROM user_businesses WHERE user_id = auth.uid())
