@@ -104,7 +104,7 @@ Return ONLY valid JSON with these fields (use null if not found):
 export async function POST(request: NextRequest) {
   const supabase = getServiceClient();
   const body = await request.json();
-  const { url, tier } = body;
+  const { url, tier, fallback_name, fallback_industry, fallback_city, fallback_state } = body;
 
   if (!url) {
     return NextResponse.json({ error: 'url required' }, { status: 400 });
@@ -118,31 +118,31 @@ export async function POST(request: NextRequest) {
     // Step 1: Scrape the website
     const scrapedText = await scrapeWebsite(normalizedUrl);
 
-    if (!scrapedText || scrapedText.length < 50) {
-      return NextResponse.json({ error: 'Could not extract content from URL', scraped_length: scrapedText.length }, { status: 422 });
+    let extracted: any = {};
+
+    if (scrapedText && scrapedText.length > 50) {
+      // Step 2: AI extraction
+      extracted = await extractBusinessInfo(scrapedText, normalizedUrl);
     }
 
-    // Step 2: AI extraction
-    const extracted = await extractBusinessInfo(scrapedText, normalizedUrl);
-
-    if (!extracted.business_name) {
-      return NextResponse.json({ error: 'AI could not identify business name', extracted }, { status: 422 });
-    }
+    // Use fallbacks if AI couldn't extract
+    const businessName = extracted.business_name || fallback_name || new URL(normalizedUrl).hostname.replace('www.', '').split('.')[0];
+    const industry = extracted.industry || fallback_industry || 'general';
 
     // Step 3: Create directory listing
     const { data: listing, error } = await supabase
       .from('directory_listings')
       .insert({
-        business_name: extracted.business_name,
-        industry: extracted.industry || 'general',
+        business_name: businessName,
+        industry: industry,
         subcategories: extracted.subcategories || [],
         description: extracted.description || null,
         phone: extracted.phone || null,
         email: extracted.email || null,
         website: normalizedUrl,
         address_line1: extracted.address_line1 || null,
-        city: extracted.city || null,
-        state: extracted.state || null,
+        city: extracted.city || fallback_city || null,
+        state: extracted.state || fallback_state || null,
         zip_code: extracted.zip_code || null,
         business_hours: extracted.business_hours || {},
         ai_scraped_data: extracted,
@@ -162,7 +162,7 @@ export async function POST(request: NextRequest) {
       success: true,
       listing,
       extracted,
-      message: `Successfully created listing for "${extracted.business_name}"`,
+      message: `Successfully created listing for "${businessName}"`,
     }, { status: 201 });
 
   } catch (err: any) {
