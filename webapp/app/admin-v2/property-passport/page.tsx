@@ -393,8 +393,8 @@ function TimelineView({ interactions, assets }: { interactions: Interaction[]; a
     for (const int of interactions) {
       items.push({
         date: int.created_at,
-        type: int.type || 'interaction',
-        title: int.type || 'Service Call',
+        type: int.interaction_type || 'interaction',
+        title: int.interaction_type || 'Service Call',
         description: int.summary || 'No summary available',
         sentiment: int.sentiment_score,
         icon: 'phone',
@@ -408,7 +408,7 @@ function TimelineView({ interactions, assets }: { interactions: Interaction[]; a
           date: asset.install_date,
           type: 'installation',
           title: `${asset.asset_type} Installed`,
-          description: `${asset.brand || 'Unknown'} ${asset.model || ''} - Confidence: ${asset.confidence_score || 0}%`,
+          description: `${asset.brand || 'Unknown'} ${asset.model_number || ''} - Confidence: ${asset.confidence_score || 0}%`,
           icon: 'wrench',
           color: '#00D4FF',
         });
