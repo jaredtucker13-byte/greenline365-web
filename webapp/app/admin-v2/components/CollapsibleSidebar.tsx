@@ -41,6 +41,7 @@ const navItems = [
   { id: 'commander', label: 'Commander', icon: 'commander', href: '/admin-v2/commander', feature: null },
   { id: 'property-passport', label: 'Passports', icon: 'home', href: '/admin-v2/property-passport', feature: null },
   { id: 'filing-cabinet', label: 'Filing Cabinet', icon: 'cabinet', href: '/admin-v2/filing-cabinet', feature: null },
+  { id: 'referral-network', label: 'Referral Network', icon: 'network', href: '/admin-v2/referral-network', feature: null },
   // --- Content & Tools ---
   { id: 'divider-tools', label: 'TOOLS', icon: '', href: '', feature: null, isDivider: true },
   { id: 'creative-studio', label: 'Creative Studio', icon: 'sparkles', href: '/admin-v2/creative-studio', feature: 'mockup_generator' },
