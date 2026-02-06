@@ -132,6 +132,27 @@ export async function POST(request: NextRequest) {
     .eq('email', senderEmail)
     .maybeSingle();
 
+  // Check for STOP / unsubscribe
+  const bodyLower = (text || '').toLowerCase().trim();
+  if (bodyLower === 'stop' || bodyLower.includes('unsubscribe') || bodyLower.includes('remove me') || bodyLower.includes('opt out')) {
+    if (lead) {
+      await supabase.from('crm_leads').update({
+        status: 'lost',
+        tags: [...new Set([...(lead.tags || []), 'unsubscribed', 'email_replied'])],
+        notes: `Unsubscribed ${new Date().toLocaleDateString()}`,
+        updated_at: new Date().toISOString(),
+      }).eq('id', lead.id);
+    }
+    // Remove from directory
+    const domain = senderEmail.split('@')[1];
+    await supabase.from('directory_listings')
+      .update({ is_published: false, updated_at: new Date().toISOString() })
+      .or(`email.eq.${senderEmail},website.ilike.%${domain}%`);
+    
+    console.log(`[INBOUND] STOP received from ${senderEmail} — unsubscribed`);
+    return NextResponse.json({ received: true, action: 'unsubscribed' });
+  }
+
   // Find directory listing (match by email or website domain)
   const domain = senderEmail.split('@')[1];
   const { data: listing } = await supabase
