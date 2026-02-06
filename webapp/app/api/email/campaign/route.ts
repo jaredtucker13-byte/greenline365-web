@@ -1,67 +1,91 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import nodemailer from 'nodemailer';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const sendgridKey = process.env.SENDGRID_API_KEY!;
+const gmailUser = process.env.GMAIL_USER!;
+const gmailAppPassword = process.env.GMAIL_APP_PASSWORD!;
 
 function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKey); }
 
-// Email 1: Initial confirmation request (no links)
-function buildEmail1(businessName: string, industry: string, city: string, state: string, phone: string, email: string, website: string): string {
-  return `<div style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;max-width:540px;margin:0 auto;"><table width="100%" cellpadding="0" cellspacing="0" style="background:#0d0d0d;border-radius:10px 10px 0 0;"><tr><td style="padding:22px 28px;"><span style="color:#39FF14;font-weight:800;font-size:20px;letter-spacing:-0.5px;">Green</span><span style="color:#ffffff;font-weight:800;font-size:20px;">Line365</span></td><td style="text-align:right;padding:22px 28px;"><span style="color:#555;font-size:11px;">Tampa Bay Directory</span></td></tr></table><div style="padding:30px 28px;background:#ffffff;"><p style="font-size:16px;font-weight:600;color:#111;margin:0 0 14px;">Hi there,</p><p style="font-size:14px;color:#555;line-height:1.7;margin:0 0 22px;">We added your business to the GL365 Tampa Bay Directory. Before it goes live, we want to make sure we got everything right.</p><table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e8e8e8;border-radius:10px;overflow:hidden;"><tr style="background:#f8f8f8;"><td style="padding:12px 18px;font-size:11px;color:#999;text-transform:uppercase;letter-spacing:1px;font-weight:600;" colspan="2">Your Business Info</td></tr><tr><td style="padding:10px 18px;color:#999;font-size:13px;width:120px;border-bottom:1px solid #f0f0f0;">Name</td><td style="padding:10px 18px;color:#111;font-size:14px;font-weight:600;border-bottom:1px solid #f0f0f0;">${businessName}</td></tr><tr><td style="padding:10px 18px;color:#999;font-size:13px;border-bottom:1px solid #f0f0f0;">Industry</td><td style="padding:10px 18px;color:#111;font-size:14px;border-bottom:1px solid #f0f0f0;">${industry}</td></tr><tr><td style="padding:10px 18px;color:#999;font-size:13px;border-bottom:1px solid #f0f0f0;">Location</td><td style="padding:10px 18px;color:#111;font-size:14px;border-bottom:1px solid #f0f0f0;">${city}${state ? ', ' + state : ''}</td></tr>${phone ? `<tr><td style="padding:10px 18px;color:#999;font-size:13px;border-bottom:1px solid #f0f0f0;">Phone</td><td style="padding:10px 18px;color:#111;font-size:14px;border-bottom:1px solid #f0f0f0;">${phone}</td></tr>` : ''}<tr><td style="padding:10px 18px;color:#999;font-size:13px;border-bottom:1px solid #f0f0f0;">Email</td><td style="padding:10px 18px;color:#111;font-size:14px;border-bottom:1px solid #f0f0f0;">${email}</td></tr>${website ? `<tr><td style="padding:10px 18px;color:#999;font-size:13px;">Website</td><td style="padding:10px 18px;color:#111;font-size:14px;"><a href="https://${website.replace('https://','').replace('http://','')}" style="color:#FF8C00;text-decoration:none;">${website.replace('https://','').replace('http://','')}</a></td></tr>` : ''}</table><div style="background:#f0faf0;border-radius:10px;padding:18px 20px;margin:22px 0;border:1px solid #d4eed4;"><p style="margin:0 0 6px;font-size:14px;font-weight:600;color:#1a7a1a;">Just hit reply:</p><p style="margin:0;font-size:13px;color:#2d8a2d;line-height:1.5;">&quot;<strong>Looks good</strong>&quot; if everything is correct<br/>Or tell us what needs to change</p></div><p style="font-size:12px;color:#aaa;line-height:1.5;margin:0;">No login needed. No account required. Just a quick reply.</p></div><table width="100%" cellpadding="0" cellspacing="0" style="background:#0d0d0d;border-radius:0 0 10px 10px;"><tr><td style="padding:14px 28px;text-align:center;"><span style="color:#444;font-size:11px;">GL365 Directory — Every badge is earned, never bought.</span></td></tr></table></div>`;
+// Gmail SMTP transporter (for Email 1 — warmed account)
+function getGmailTransporter() {
+  return nodemailer.createTransport({
+    service: 'gmail',
+    auth: { user: gmailUser, pass: gmailAppPassword },
+  });
 }
 
-// Email 1b: 72-hour follow-up (still no links, softer tone)
-function buildEmail1b(businessName: string): string {
-  return `<div style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;max-width:540px;margin:0 auto;"><table width="100%" cellpadding="0" cellspacing="0" style="background:#0d0d0d;border-radius:10px 10px 0 0;"><tr><td style="padding:22px 28px;"><span style="color:#39FF14;font-weight:800;font-size:20px;">Green</span><span style="color:#ffffff;font-weight:800;font-size:20px;">Line365</span></td></tr></table><div style="padding:30px 28px;background:#ffffff;"><p style="font-size:16px;font-weight:600;color:#111;margin:0 0 14px;">Just checking in</p><p style="font-size:14px;color:#555;line-height:1.7;margin:0 0 18px;">We sent over the listing info for <strong>${businessName}</strong> a few days ago. We want to make sure it&rsquo;s accurate before it goes live in the directory.</p><p style="font-size:14px;color:#555;line-height:1.7;margin:0 0 18px;">If you missed it, no worries &mdash; just reply with:</p><div style="background:#fff8ed;border-radius:10px;padding:16px 20px;margin:0 0 20px;border:1px solid #ffe0a0;"><p style="margin:0;font-size:14px;color:#8a6d00;line-height:1.5;">&quot;<strong>Looks good</strong>&quot; to confirm<br/>Or any corrections you&rsquo;d like us to make</p></div><p style="font-size:12px;color:#aaa;line-height:1.5;margin:0;">We&rsquo;ll take care of the rest. No login, no signup, no hassle.</p></div><table width="100%" cellpadding="0" cellspacing="0" style="background:#0d0d0d;border-radius:0 0 10px 10px;"><tr><td style="padding:14px 28px;text-align:center;"><span style="color:#444;font-size:11px;">GL365 Directory — Tampa Bay</span></td></tr></table></div>`;
+// Send via Gmail (Email 1 — no links, reply only)
+async function sendViaGmail(to: string, subject: string, html: string) {
+  const transporter = getGmailTransporter();
+  await transporter.sendMail({
+    from: `"Jared at GL365" <${gmailUser}>`,
+    to,
+    subject,
+    html,
+    replyTo: 'reply@reply.greenline365.com',
+  });
 }
 
-async function sendEmail(to: string, subject: string, html: string) {
-  const res = await fetch('https://api.sendgrid.com/v3/mail/send', {
+// Send via SendGrid (Email 2+ — has links)
+async function sendViaSendGrid(to: string, subject: string, html: string) {
+  await fetch('https://api.sendgrid.com/v3/mail/send', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${sendgridKey}` },
     body: JSON.stringify({
       personalizations: [{ to: [{ email: to }], subject }],
-      from: { email: 'greenline365help@gmail.com', name: 'GL365 Directory' },
+      from: { email: 'greenline365help@gmail.com', name: 'GreenLine365' },
       reply_to: { email: 'reply@reply.greenline365.com', name: 'GL365 Directory' },
       content: [{ type: 'text/html', value: html }],
     }),
   });
-  return res.status;
 }
 
-// POST /api/email/campaign - Send campaign emails
-// Actions: "send_initial" (Email 1), "send_followup" (Email 1b to non-responders), "send_test"
+// Email 1: Confirm info (NO links, reply "STOP" to opt out)
+function buildEmail1(businessName: string, industry: string, city: string, state: string, phone: string, email: string, website: string): string {
+  return `<div style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;max-width:540px;margin:0 auto;color:#333;"><p style="font-size:15px;margin:0 0 14px;">Hi there,</p><p style="font-size:14px;color:#555;line-height:1.7;margin:0 0 20px;">My name is Jared with GL365. We're building the Tampa Bay area's first badge-verified business directory, and we've added your business to our database.</p><p style="font-size:14px;color:#555;line-height:1.7;margin:0 0 20px;">Before your profile goes live, I wanted to make sure we have the right info:</p><table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e5e5;border-radius:8px;overflow:hidden;margin:0 0 20px;"><tr style="background:#f8f8f8;"><td style="padding:10px 16px;font-size:11px;color:#999;text-transform:uppercase;letter-spacing:1px;font-weight:600;" colspan="2">Your Business</td></tr><tr><td style="padding:8px 16px;color:#999;font-size:13px;width:100px;border-bottom:1px solid #f0f0f0;">Name</td><td style="padding:8px 16px;color:#111;font-size:14px;font-weight:600;border-bottom:1px solid #f0f0f0;">${businessName}</td></tr><tr><td style="padding:8px 16px;color:#999;font-size:13px;border-bottom:1px solid #f0f0f0;">Type</td><td style="padding:8px 16px;color:#111;font-size:14px;border-bottom:1px solid #f0f0f0;">${industry}</td></tr>${city ? `<tr><td style="padding:8px 16px;color:#999;font-size:13px;border-bottom:1px solid #f0f0f0;">Location</td><td style="padding:8px 16px;color:#111;font-size:14px;border-bottom:1px solid #f0f0f0;">${city}${state ? ', ' + state : ''}</td></tr>` : ''}${phone ? `<tr><td style="padding:8px 16px;color:#999;font-size:13px;border-bottom:1px solid #f0f0f0;">Phone</td><td style="padding:8px 16px;color:#111;font-size:14px;border-bottom:1px solid #f0f0f0;">${phone}</td></tr>` : ''}<tr><td style="padding:8px 16px;color:#999;font-size:13px;border-bottom:1px solid #f0f0f0;">Email</td><td style="padding:8px 16px;color:#111;font-size:14px;border-bottom:1px solid #f0f0f0;">${email}</td></tr>${website ? `<tr><td style="padding:8px 16px;color:#999;font-size:13px;">Website</td><td style="padding:8px 16px;color:#111;font-size:14px;">${website.replace('https://','').replace('http://','')}</td></tr>` : ''}</table><p style="font-size:14px;color:#555;line-height:1.7;margin:0 0 6px;">Can you reply with one of the following?</p><ul style="font-size:14px;color:#555;line-height:1.8;padding-left:20px;margin:0 0 20px;"><li><strong>"Looks good"</strong> — if everything is correct</li><li>Any corrections you'd like us to make</li><li><strong>"STOP"</strong> — if you'd like us to remove your listing</li></ul><p style="font-size:14px;color:#555;line-height:1.7;margin:0 0 4px;">Thanks,</p><p style="font-size:14px;color:#111;font-weight:600;margin:0;">Jared Tucker</p><p style="font-size:12px;color:#999;margin:4px 0 0;">GL365 Directory Team</p></div>`;
+}
+
+// Email 1b: 72-hour follow-up (still no links)
+function buildEmail1b(businessName: string): string {
+  return `<div style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;max-width:540px;margin:0 auto;color:#333;"><p style="font-size:15px;margin:0 0 14px;">Hi again,</p><p style="font-size:14px;color:#555;line-height:1.7;margin:0 0 18px;">Just a quick follow-up — I sent over the listing info for <strong>${businessName}</strong> a few days ago and wanted to make sure you saw it.</p><p style="font-size:14px;color:#555;line-height:1.7;margin:0 0 18px;">If everything looked right, just reply <strong>"Looks good"</strong> and we'll get your profile live. If anything needs to change, let me know and I'll fix it.</p><p style="font-size:14px;color:#555;line-height:1.7;margin:0 0 18px;">If you'd rather not be listed, just reply <strong>"STOP"</strong> and I'll remove it right away.</p><p style="font-size:14px;color:#555;line-height:1.7;margin:0 0 4px;">Best,</p><p style="font-size:14px;color:#111;font-weight:600;margin:0;">Jared</p><p style="font-size:12px;color:#999;margin:4px 0 0;">GL365 Directory Team</p></div>`;
+}
+
+// POST /api/email/campaign
 export async function POST(request: NextRequest) {
   const supabase = getServiceClient();
   const body = await request.json();
   const { action, test_email, limit } = body;
 
+  // Send test to personal email
   if (action === 'send_test') {
-    // Send test to a specific email
-    const html = buildEmail1('Test Business', 'General', 'Tampa', 'FL', '(813) 555-0000', test_email || 'test@test.com', 'testbusiness.com');
-    const status = await sendEmail(test_email, 'Quick question — is this info correct?', html);
-    return NextResponse.json({ sent: true, status });
+    const html = buildEmail1('Test Business', 'General Services', 'Tampa', 'FL', '(813) 555-0000', test_email, 'testbusiness.com');
+    try {
+      await sendViaGmail(test_email, 'Quick question — is this info correct?', html);
+      return NextResponse.json({ sent: true, via: 'gmail' });
+    } catch (e: any) {
+      return NextResponse.json({ error: e.message }, { status: 500 });
+    }
   }
 
+  // Send Email 1 to new leads (via Gmail)
   if (action === 'send_initial') {
-    // Send Email 1 to all "new" leads that haven't been emailed yet
     const { data: leads } = await supabase
       .from('crm_leads')
       .select('id, email, name, company, tags, notes')
       .eq('status', 'new')
       .eq('source', 'gl365_directory')
       .not('tags', 'cs', '{"email_1_sent"}')
-      .limit(limit || 50);
+      .not('tags', 'cs', '{"unsubscribed"}')
+      .limit(limit || 20);
 
-    if (!leads || leads.length === 0) {
-      return NextResponse.json({ sent: 0, message: 'No new leads to email' });
-    }
+    if (!leads?.length) return NextResponse.json({ sent: 0, message: 'No new leads' });
 
     let sent = 0, failed = 0;
     for (const lead of leads) {
-      // Get matching directory listing for full info
       const domain = lead.email.split('@')[1];
       const { data: listing } = await supabase
         .from('directory_listings')
@@ -69,34 +93,28 @@ export async function POST(request: NextRequest) {
         .or(`email.eq.${lead.email},website.ilike.%${domain}%`)
         .maybeSingle();
 
-      const info = listing || { business_name: lead.company || lead.name, industry: 'General', city: 'Tampa', state: 'FL', phone: '', email: lead.email, website: '' };
-      const html = buildEmail1(info.business_name, info.industry, info.city || '', info.state || '', info.phone || '', lead.email, info.website || '');
+      const info = listing || { business_name: lead.company || lead.name, industry: 'general', city: 'Tampa', state: 'FL', phone: '', email: lead.email, website: '' };
 
-      const status = await sendEmail(lead.email, 'Quick question — is this info correct?', html);
-
-      if (status === 202) {
+      try {
+        await sendViaGmail(lead.email, 'Quick question — is this info correct?', buildEmail1(info.business_name, info.industry, info.city || '', info.state || '', info.phone || '', lead.email, info.website || ''));
         sent++;
-        const tags = [...new Set([...(lead.tags || []), 'email_1_sent'])];
         await supabase.from('crm_leads').update({
-          tags,
+          tags: [...new Set([...(lead.tags || []), 'email_1_sent'])],
           last_contact_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         }).eq('id', lead.id);
-      } else {
+      } catch {
         failed++;
       }
-
-      // Rate limit: 2 emails per second
-      await new Promise(r => setTimeout(r, 500));
+      await new Promise(r => setTimeout(r, 2000)); // Gmail rate limit: ~30/min
     }
 
-    return NextResponse.json({ sent, failed, total: leads.length });
+    return NextResponse.json({ sent, failed, total: leads.length, via: 'gmail' });
   }
 
+  // Send follow-up to non-responders after 72 hours (via Gmail)
   if (action === 'send_followup') {
-    // Send Email 1b to leads that got Email 1 more than 72 hours ago but never replied
     const cutoff = new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString();
-
     const { data: leads } = await supabase
       .from('crm_leads')
       .select('id, email, name, company, tags')
@@ -104,52 +122,53 @@ export async function POST(request: NextRequest) {
       .contains('tags', ['email_1_sent'])
       .not('tags', 'cs', '{"email_replied"}')
       .not('tags', 'cs', '{"email_1b_sent"}')
+      .not('tags', 'cs', '{"unsubscribed"}')
       .lt('last_contact_at', cutoff)
-      .limit(limit || 50);
+      .limit(limit || 20);
 
-    if (!leads || leads.length === 0) {
-      return NextResponse.json({ sent: 0, message: 'No leads need follow-up yet' });
-    }
+    if (!leads?.length) return NextResponse.json({ sent: 0, message: 'No leads need follow-up' });
 
     let sent = 0, failed = 0;
     for (const lead of leads) {
-      const html = buildEmail1b(lead.company || lead.name || 'your business');
-      const status = await sendEmail(lead.email, `Following up — ${lead.company || 'your business'} on GL365`, html);
-
-      if (status === 202) {
+      try {
+        await sendViaGmail(lead.email, `Following up — ${lead.company || 'your business'} on GL365`, buildEmail1b(lead.company || lead.name || 'your business'));
         sent++;
-        const tags = [...new Set([...(lead.tags || []), 'email_1b_sent'])];
-        await supabase.from('crm_leads').update({ tags, updated_at: new Date().toISOString() }).eq('id', lead.id);
-      } else {
+        await supabase.from('crm_leads').update({
+          tags: [...new Set([...(lead.tags || []), 'email_1b_sent'])],
+          updated_at: new Date().toISOString(),
+        }).eq('id', lead.id);
+      } catch {
         failed++;
       }
-
-      await new Promise(r => setTimeout(r, 500));
+      await new Promise(r => setTimeout(r, 2000));
     }
 
-    return NextResponse.json({ sent, failed, total: leads.length });
+    return NextResponse.json({ sent, failed, total: leads.length, via: 'gmail' });
   }
 
   return NextResponse.json({ error: 'Invalid action. Use: send_test, send_initial, send_followup' }, { status: 400 });
 }
 
-// GET /api/email/campaign - Check campaign status
+// GET /api/email/campaign - Campaign status
 export async function GET(request: NextRequest) {
   const supabase = getServiceClient();
 
-  const [total, emailed, replied, verified, needsFollowup] = await Promise.all([
+  const [total, emailed, followedUp, replied, verified, unsubscribed] = await Promise.all([
     supabase.from('crm_leads').select('id', { count: 'exact' }).eq('source', 'gl365_directory'),
     supabase.from('crm_leads').select('id', { count: 'exact' }).eq('source', 'gl365_directory').contains('tags', ['email_1_sent']),
+    supabase.from('crm_leads').select('id', { count: 'exact' }).eq('source', 'gl365_directory').contains('tags', ['email_1b_sent']),
     supabase.from('crm_leads').select('id', { count: 'exact' }).eq('source', 'gl365_directory').contains('tags', ['email_replied']),
     supabase.from('crm_leads').select('id', { count: 'exact' }).eq('source', 'gl365_directory').eq('status', 'verified'),
-    supabase.from('crm_leads').select('id', { count: 'exact' }).eq('source', 'gl365_directory').contains('tags', ['email_1_sent']).not('tags', 'cs', '{"email_replied"}'),
+    supabase.from('crm_leads').select('id', { count: 'exact' }).eq('source', 'gl365_directory').contains('tags', ['unsubscribed']),
   ]);
 
   return NextResponse.json({
     total_leads: total.count || 0,
     email_1_sent: emailed.count || 0,
+    follow_up_sent: followedUp.count || 0,
     replied: replied.count || 0,
     verified: verified.count || 0,
-    awaiting_reply: needsFollowup.count || 0,
+    unsubscribed: unsubscribed.count || 0,
+    not_yet_emailed: (total.count || 0) - (emailed.count || 0),
   });
 }
