@@ -9,26 +9,45 @@ function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKe
 
 // Scrape a URL and extract text content
 async function scrapeWebsite(url: string): Promise<string> {
-  const res = await fetch(url, {
-    headers: { 'User-Agent': 'GL365-Directory-Bot/1.0 (Business Profile Builder)' },
-    signal: AbortSignal.timeout(15000),
-  });
-  const html = await res.text();
+  try {
+    const res = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; GL365Bot/1.0)',
+        'Accept': 'text/html,application/xhtml+xml',
+      },
+      signal: AbortSignal.timeout(15000),
+    });
+    const html = await res.text();
 
-  // Strip HTML to text, keep useful content
-  const text = html
-    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
-    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
-    .replace(/<nav[^>]*>[\s\S]*?<\/nav>/gi, '')
-    .replace(/<footer[^>]*>[\s\S]*?<\/footer>/gi, '')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .slice(0, 5000); // Limit to 5k chars for AI
+    // Extract title
+    const titleMatch = html.match(/<title[^>]*>([^<]*)<\/title>/i);
+    const title = titleMatch ? titleMatch[1].trim() : '';
 
-  return text;
+    // Extract meta description
+    const metaMatch = html.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']*)["']/i);
+    const metaDesc = metaMatch ? metaMatch[1].trim() : '';
+
+    // Extract og tags
+    const ogTitle = html.match(/<meta[^>]*property=["']og:title["'][^>]*content=["']([^"']*)["']/i)?.[1] || '';
+    const ogDesc = html.match(/<meta[^>]*property=["']og:description["'][^>]*content=["']([^"']*)["']/i)?.[1] || '';
+
+    // Strip HTML to text, keep useful content
+    const bodyText = html
+      .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+      .replace(/<nav[^>]*>[\s\S]*?<\/nav>/gi, '')
+      .replace(/<footer[^>]*>[\s\S]*?<\/footer>/gi, '')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 4000);
+
+    return `TITLE: ${title}\nMETA: ${metaDesc}\nOG_TITLE: ${ogTitle}\nOG_DESC: ${ogDesc}\nBODY: ${bodyText}`;
+  } catch {
+    return '';
+  }
 }
 
 // Use AI to extract business info from scraped text
