@@ -338,6 +338,18 @@ export default function CollapsibleSidebar({
       {/* Navigation */}
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
         {visibleNavItems.map((item) => {
+          // Render divider labels
+          if ((item as any).isDivider) {
+            if (isCollapsed) return <div key={item.id} className="my-2 border-t" style={{ borderColor: 'var(--theme-glass-border)' }} />;
+            return (
+              <div key={item.id} className="pt-4 pb-1 px-3">
+                <span className="text-[9px] font-semibold uppercase tracking-[0.15em]" style={{ color: 'var(--theme-text-muted)' }}>
+                  {item.label}
+                </span>
+              </div>
+            );
+          }
+
           // Use the ID to check active state instead of relying on prop
           const isCurrentActive = activeItem === item.id;
           
