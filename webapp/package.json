@@ -47,6 +47,7 @@
     "react-hook-form": "^7.70.0",
     "react-intersection-observer": "^10.0.0",
     "retell-sdk": "^4.66.0",
+    "sharp": "^0.34.5",
     "stripe": "^20.3.1",
     "swr": "^2.3.8",
     "tailwind-merge": "^3.4.0",
