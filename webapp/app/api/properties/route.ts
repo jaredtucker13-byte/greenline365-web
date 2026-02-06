@@ -32,7 +32,6 @@ export async function GET(request: NextRequest) {
 
     if (error) return NextResponse.json({ error: error.message }, { status: 404 });
 
-    // Get contacts, assets, interactions
     const [contacts, assets, interactions] = await Promise.all([
       supabase.from('contacts').select('*').eq('property_id', propertyId).eq('tenant_id', tenantId),
       supabase.from('assets').select('*').eq('property_id', propertyId).eq('tenant_id', tenantId),
@@ -54,10 +53,7 @@ export async function GET(request: NextRequest) {
     }
     healthScore = Math.max(0, Math.min(100, healthScore));
 
-    // Total maintenance value
-    const totalValue = (interactions.data || [])
-      .filter((i: any) => i.metadata?.cost)
-      .reduce((sum: number, i: any) => sum + (i.metadata.cost || 0), 0);
+    const totalValue = property.lifetime_value || 0;
 
     return NextResponse.json({
       ...property,
@@ -98,23 +94,24 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const supabase = getServiceClient();
   const body = await request.json();
-  const { tenant_id, address, city, state, zip, unit, gate_code, google_place_id } = body;
+  const { tenant_id, address_line1, address_line2, city, state, zip_code, unit_number, gate_code, property_type } = body;
 
-  if (!tenant_id || !address) {
-    return NextResponse.json({ error: 'tenant_id and address required' }, { status: 400 });
+  if (!tenant_id || !address_line1) {
+    return NextResponse.json({ error: 'tenant_id and address_line1 required' }, { status: 400 });
   }
 
   const { data, error } = await supabase
     .from('properties')
     .insert({
       tenant_id,
-      address,
+      address_line1,
+      address_line2: address_line2 || null,
       city: city || '',
       state: state || '',
-      zip: zip || '',
-      unit: unit || null,
+      zip_code: zip_code || '',
+      unit_number: unit_number || null,
       gate_code: gate_code || null,
-      google_place_id: google_place_id || null,
+      property_type: property_type || 'residential',
     })
     .select()
     .single();
