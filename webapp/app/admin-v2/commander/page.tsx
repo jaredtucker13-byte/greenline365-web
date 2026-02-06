@@ -192,7 +192,7 @@ export default function CommanderDashboard() {
                       </svg>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-white truncate">{prop.full_address || `${prop.address}, ${prop.city}`}</p>
+                      <p className="text-sm font-medium text-white truncate">{prop.full_address || `${prop.address_line1}, ${prop.city}`}</p>
                       <p className="text-xs text-zinc-500">
                         {prop.contacts?.length || 0} contacts, {prop.assets?.length || 0} assets
                       </p>
