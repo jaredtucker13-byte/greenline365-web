@@ -61,12 +61,10 @@ export async function POST(request: NextRequest) {
         quantity: 1,
       }],
       subscription_data: {
-        application_fee_percent: 0.2, // ~$0.60 on $299 = 0.2%
         metadata: {
           tier,
           listing_id: listing_id || '',
           platform: 'gl365_directory',
-          platform_fee: '0.60',
         },
       },
       success_url: successUrl,
