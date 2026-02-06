@@ -170,7 +170,7 @@ export default function PropertyPassportPage() {
     if (!searchQuery) return properties;
     const q = searchQuery.toLowerCase();
     return properties.filter((p: any) =>
-      (p.full_address || p.address || '').toLowerCase().includes(q) ||
+      (p.full_address || p.address_line1 || '').toLowerCase().includes(q) ||
       (p.contacts || []).some((c: any) => `${c.first_name} ${c.last_name}`.toLowerCase().includes(q))
     );
   }, [properties, searchQuery]);
@@ -365,8 +365,8 @@ export default function PropertyPassportPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </div>
-                <h3 className="text-sm font-semibold text-white truncate mb-1">{prop.full_address || prop.address}</h3>
-                <p className="text-xs text-zinc-500 mb-3">{prop.city}, {prop.state} {prop.zip}</p>
+                <h3 className="text-sm font-semibold text-white truncate mb-1">{prop.full_address || prop.address_line1}</h3>
+                <p className="text-xs text-zinc-500 mb-3">{prop.city}, {prop.state} {prop.zip_code}</p>
                 <div className="flex items-center gap-3 text-[10px] text-zinc-600">
                   <span>{prop.contacts?.length || 0} contacts</span>
                   <span className="w-1 h-1 rounded-full bg-zinc-700" />
