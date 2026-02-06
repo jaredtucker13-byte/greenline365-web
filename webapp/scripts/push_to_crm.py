@@ -59,6 +59,7 @@ def main():
 
         lead = {
             "email": email.lower().strip(),
+            "user_id": "677b536d-6521-4ac8-a0a5-98278b35f4cc",
             "name": name,
             "phone": phone,
             "company": name,
