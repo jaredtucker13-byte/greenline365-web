@@ -203,6 +203,9 @@ export default function CollapsibleSidebar({
   // Filter nav items based on features
   const visibleNavItems = useMemo(() => {
     return navItems.filter(item => {
+      // Always show dividers
+      if ((item as any).isDivider) return true;
+      
       // Platform owner only items (API Costs, etc.)
       if ((item as any).platformOwnerOnly && !isPlatformOwner) {
         return false;
