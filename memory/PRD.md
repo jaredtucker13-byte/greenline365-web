@@ -50,9 +50,11 @@ GreenLine365 is a directory-first lead generation platform. The initial goal was
 - Removed duplicate inline nav/footer (uses global components)
 - Fixed navbar spacing with dark hero background
 
-### Testing Status
-- All 14 frontend tests passed (iteration_7)
-- Search, category filtering, featured listings, back navigation all verified
+### Color Scheme Update (Feb 2026)
+- Replaced neon green (#00FF00) with **emerald (#10B981)** across entire app
+- Orange (#FF8C00) remains as CTA/accent color — no more green/orange clash
+- "Add Your Business" CTA uses orange gradient (consistent with directory theme)
+- Badge glow, gradients, and CSS variables all updated
 
 ## Known Issues (Prioritized)
 
