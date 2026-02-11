@@ -55,8 +55,8 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/waitlist" className="text-white/50 hover:text-white transition text-sm">
-                  Join Waitlist
+                <Link href="/register-business" className="text-white/50 hover:text-white transition text-sm">
+                  Add Your Business
                 </Link>
               </li>
             </ul>
