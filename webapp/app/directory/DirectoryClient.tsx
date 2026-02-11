@@ -464,7 +464,13 @@ export default function DirectoryPage() {
             <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'url(/images/hero-directory-alt.png)', backgroundSize: 'cover' }} />
             <div className="absolute inset-0 bg-[#1a1a1a]/90" />
             <div className="relative max-w-4xl mx-auto px-6 text-center">
-              <h2 className="text-3xl font-bold text-white mb-2">Success Stories</h2>
+              <h2 className="text-3xl font-bold text-white mb-2">
+                Success{' '}
+                <span className="relative inline-block">
+                  <span style={{ color: '#FF8C00' }}>Stories</span>
+                  <svg className="absolute -bottom-1 left-0 w-full" viewBox="0 0 200 8" fill="none"><path d="M1 5.5Q50 1 100 5T199 3" stroke="#FF8C00" strokeWidth="2" strokeLinecap="round" opacity="0.4" /></svg>
+                </span>
+              </h2>
               <p className="text-zinc-400 mb-10">Hear from business owners and customers who found their perfect match.</p>
 
               <AnimatePresence mode="wait">
