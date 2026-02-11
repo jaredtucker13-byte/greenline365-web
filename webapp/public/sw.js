@@ -51,13 +51,24 @@ self.addEventListener('fetch', (event) => {
   // Skip external requests
   if (url.origin !== self.location.origin) return;
 
+  // Skip navigation requests to avoid redirect loops - let browser handle them
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request).catch(() => {
+        return caches.match(OFFLINE_URL) || new Response('Offline', { status: 503 });
+      })
+    );
+    return;
+  }
+
+  // For non-navigation requests (assets), use cache-first strategy
   event.respondWith(
     caches.match(request).then((cachedResponse) => {
       // Return cached response if available
       if (cachedResponse) {
         // Fetch in background to update cache
         fetch(request).then((response) => {
-          if (response.ok) {
+          if (response.ok && !response.redirected) {
             caches.open(CACHE_NAME).then((cache) => {
               cache.put(request, response);
             });
@@ -69,8 +80,8 @@ self.addEventListener('fetch', (event) => {
       // Otherwise fetch from network
       return fetch(request)
         .then((response) => {
-          // Cache successful responses
-          if (response.ok) {
+          // Only cache successful non-redirected responses
+          if (response.ok && !response.redirected) {
             const responseClone = response.clone();
             caches.open(CACHE_NAME).then((cache) => {
               cache.put(request, responseClone);
@@ -79,10 +90,6 @@ self.addEventListener('fetch', (event) => {
           return response;
         })
         .catch(() => {
-          // Return offline page for navigation requests
-          if (request.mode === 'navigate') {
-            return caches.match(OFFLINE_URL);
-          }
           return new Response('Offline', { status: 503 });
         });
     })
