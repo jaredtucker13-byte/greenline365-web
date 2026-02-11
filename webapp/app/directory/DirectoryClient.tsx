@@ -116,11 +116,11 @@ export default function DirectoryPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white pt-20" data-testid="directory-page">
+    <div className="min-h-screen bg-white" data-testid="directory-page">
       {!showListings ? (
         <>
           {/* ======== HERO ======== */}
-          <section className="relative bg-[#1a1a1a] overflow-hidden" data-testid="directory-hero">
+          <section className="relative bg-[#1a1a1a] overflow-hidden pt-20" data-testid="directory-hero">
             <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1767778080869-4b82b5924c3a?w=1920&q=60)', backgroundSize: 'cover', backgroundPosition: 'center' }} />
             <div className="absolute inset-0 bg-gradient-to-b from-[#1a1a1a]/80 via-[#1a1a1a]/90 to-[#1a1a1a]" />
             <div className="relative max-w-4xl mx-auto px-6 py-20 text-center">
