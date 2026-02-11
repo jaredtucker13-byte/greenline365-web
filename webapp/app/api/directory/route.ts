@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
     if (data.directory_badges) {
       data.directory_badges = data.directory_badges.filter((b: any) => b.is_active);
     }
-    return NextResponse.json(data);
+    return NextResponse.json(applyPhotoGating(data));
   }
 
   // Search/list
