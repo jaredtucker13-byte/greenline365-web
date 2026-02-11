@@ -98,15 +98,8 @@ export default function Navbar() {
   const [industriesOpen, setIndustriesOpen] = useState(false);
 
   const navLinks = [
-    { href: '/', label: 'Home' },
-    { 
-      label: 'Features', 
-      dropdown: [
-        { href: '/features/ai-content-creation', label: 'AI Content Creation' },
-        { href: '/features/automated-scheduling', label: 'Automated Scheduling' },
-        { href: '/features/local-trend-tracking', label: 'Local Trend Tracking' },
-      ]
-    },
+    { href: '/', label: 'Directory' },
+    { href: '/services', label: 'Our Services' },
     { 
       label: 'Industries', 
       dropdown: [
