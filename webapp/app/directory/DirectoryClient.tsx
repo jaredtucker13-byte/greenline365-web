@@ -115,6 +115,7 @@ export default function DirectoryPage() {
             <button onClick={() => { setShowListings(false); window.scrollTo(0, 0); }} className="text-zinc-400 hover:text-white transition">Explore</button>
             <a href="#categories" className="text-zinc-400 hover:text-white transition">Categories</a>
             <a href="#testimonials" className="text-zinc-400 hover:text-white transition">Reviews</a>
+            <Link href="/services" className="text-zinc-400 hover:text-white transition">Our Services</Link>
           </div>
           <button onClick={() => loadListings()} className="px-5 py-2 rounded-full text-sm font-semibold text-black" style={{ background: '#FF8C00' }} data-testid="find-business-btn">
             Find a Business
