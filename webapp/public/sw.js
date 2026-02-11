@@ -1,7 +1,7 @@
 // Service Worker for GreenLine365
 // Provides offline support and caching
 
-const CACHE_NAME = 'greenline365-v1';
+const CACHE_NAME = 'greenline365-v2';
 const OFFLINE_URL = '/offline';
 
 // Assets to cache immediately
