@@ -101,6 +101,9 @@ GreenLine365 is a directory-first lead generation platform. The initial goal was
 - [x] Directory Subscriptions (Stripe Pro $39/Premium $59)
 - [x] Feature Gating (tier-based permissions)
 - [x] Multi-tenancy security fix in CRM
+- [x] Photo Gating by Tier (Free=1 photo, Pro=2, Premium=all) — Feb 2026
+- [x] Stripe Live Mode (sk_live_, webhook signature verification) — Feb 2026
+- [x] CRM Enrichment Pipeline (Google Places, website audit, email scraper) — 80/234 leads done
 
 ### P1 - Next Up
 - [ ] Transaction Fee Logic ($0.60/interaction for non-backend subscribers)
@@ -130,6 +133,6 @@ GreenLine365 is a directory-first lead generation platform. The initial goal was
 - `/app/memory/AUDIT_SYSTEM_SPEC.md` — Audit system spec
 
 ## Testing
-- Test report: /app/test_reports/iteration_8.json
-- Backend: 21/21 tests passed (100%)
-- Frontend: 45/45 UI checks passed (100%)
+- Test report: /app/test_reports/iteration_9.json
+- Backend: 12/12 photo gating + Stripe live tests passed (100%)
+- Previous: /app/test_reports/iteration_8.json — 21/21 backend, 45/45 frontend
