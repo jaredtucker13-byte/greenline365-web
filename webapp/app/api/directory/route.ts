@@ -86,7 +86,7 @@ export async function GET(request: NextRequest) {
   const { data, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  // Filter active badges + apply photo gating
+  // Filter active badges + apply photo gating + weighted ranking
   const listings = (data || []).map((l: any) => {
     const gated = applyPhotoGating(l);
     return {
@@ -95,7 +95,7 @@ export async function GET(request: NextRequest) {
     };
   });
 
-  return NextResponse.json(listings);
+  return NextResponse.json(applyWeightedRanking(listings));
 }
 
 // POST /api/directory - Create listing (AI scraper or manual)
