@@ -175,10 +175,12 @@ async function enrichWithGooglePlaces(businessName: string, location: string) {
 
   const details = detailsData.result;
 
-  // Build photo URLs (first 5)
+  // Build photo URLs — store ALL photos. The first photo from Google is
+  // typically the business's primary/storefront image. We keep the full list
+  // so Premium-tier listings can display all of them.
   const photoUrls: string[] = [];
   if (details.photos) {
-    for (const photo of details.photos.slice(0, 5)) {
+    for (const photo of details.photos) {
       photoUrls.push(
         `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=${photo.photo_reference}&key=${googleApiKey}`
       );
