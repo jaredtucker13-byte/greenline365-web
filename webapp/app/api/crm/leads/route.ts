@@ -121,6 +121,13 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
+    
+    // Auth check
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    
     const body = await request.json();
     
     const {
@@ -141,11 +148,12 @@ export async function POST(request: NextRequest) {
     
     const normalizedEmail = email.toLowerCase().trim();
     
-    // Check for existing lead
+    // Check for existing lead - scoped to this user
     const { data: existing } = await supabase
       .from('crm_leads')
       .select('id')
       .eq('email', normalizedEmail)
+      .eq('user_id', user.id)
       .maybeSingle();
     
     if (existing) {
@@ -154,10 +162,11 @@ export async function POST(request: NextRequest) {
     
     const now = new Date().toISOString();
     
-    // Create lead - only use columns that exist in the actual table
+    // Create lead - associate with current user
     const { data: lead, error } = await supabase
       .from('crm_leads')
       .insert({
+        user_id: user.id,
         email: normalizedEmail,
         name: name || null,
         phone: phone || null,
