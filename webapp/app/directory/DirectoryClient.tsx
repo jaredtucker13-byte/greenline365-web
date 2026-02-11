@@ -166,7 +166,7 @@ export default function DirectoryPage() {
                 transition={{ delay: 0.45, duration: 0.6 }}
                 className="text-lg md:text-xl text-white/70 max-w-2xl mx-auto text-center mb-10 leading-relaxed"
               >
-                Find trusted home services, dining, nightlife, and more — every badge is earned through real work, not ad spend.
+                Find <span style={{ color: '#FF8C00', fontWeight: 600 }}>trusted</span> home services, dining, nightlife, and more — every badge is earned through <span style={{ color: '#FF8C00', fontWeight: 600 }}>real work</span>.
               </motion.p>
 
               {/* Search Bar */}
