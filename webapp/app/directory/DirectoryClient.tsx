@@ -483,47 +483,93 @@ export default function DirectoryPage() {
         </>
       ) : (
         /* ======== LISTINGS VIEW ======== */
-        <section className="max-w-7xl mx-auto px-6 py-8 pt-28" data-testid="listings-view">
-          {/* Search + Filters */}
-          <div className="mb-6">
-            <div className="flex flex-col sm:flex-row gap-3 mb-4">
-              <input type="text" placeholder="Search businesses..." value={search} onChange={e => setSearch(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleSearch()}
-                className="flex-1 px-4 py-3 rounded-lg text-sm border border-zinc-200 focus:outline-none focus:border-orange-400" data-testid="list-search" />
-              <button onClick={handleSearch} className="px-6 py-3 rounded-lg text-sm font-semibold text-white" style={{ background: '#FF8C00' }}>Search</button>
-            </div>
-            {/* 3-Filter Row */}
-            <div className="grid grid-cols-3 gap-3">
-              <select value={specialty} onChange={e => setSpecialty(e.target.value)} className="px-3 py-2.5 rounded-lg text-sm border border-zinc-200 focus:outline-none" data-testid="filter-specialty">
-                {FILTER_SPECIALTIES.map(s => <option key={s}>{s}</option>)}
-              </select>
-              <select value={activeCategory || 'All Categories'} onChange={e => { const v = e.target.value; setActiveCategory(v === 'All Categories' ? '' : v); loadListings(v === 'All Categories' ? undefined : v); }}
-                className="px-3 py-2.5 rounded-lg text-sm border border-zinc-200 focus:outline-none" data-testid="filter-category">
-                <option>All Categories</option>
-                {CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
-              </select>
-              <select value={priceRange} onChange={e => setPriceRange(e.target.value)} className="px-3 py-2.5 rounded-lg text-sm border border-zinc-200 focus:outline-none" data-testid="filter-price">
-                {FILTER_PRICE.map(p => <option key={p}>{p}</option>)}
-              </select>
-            </div>
-          </div>
+        <div data-testid="listings-view">
+          {/* Category Header with Image */}
+          <section className="relative bg-[#0f0f0f] pt-20 pb-10 overflow-hidden">
+            {activeCategory && CATEGORIES.find(c => c.id === activeCategory) && (
+              <div className="absolute inset-0 opacity-25">
+                <img src={CATEGORIES.find(c => c.id === activeCategory)!.img} alt="" className="w-full h-full object-cover" />
+              </div>
+            )}
+            <div className="absolute inset-0 bg-gradient-to-b from-[#0f0f0f]/60 via-[#0f0f0f]/80 to-[#0f0f0f]" />
 
-          {/* Back button */}
-          <button onClick={() => setShowListings(false)} className="text-sm text-zinc-500 hover:text-zinc-800 mb-6 flex items-center gap-1" data-testid="back-to-explore-btn">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-            Back to Explore
-          </button>
+            <div className="relative max-w-7xl mx-auto px-6">
+              {/* Back button */}
+              <button onClick={() => setShowListings(false)} className="text-sm text-white/50 hover:text-white mb-6 flex items-center gap-2 transition" data-testid="back-to-explore-btn">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                Back to Directory
+              </button>
 
-          {/* Listing Grid */}
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">
+                {activeCategory ? CATEGORIES.find(c => c.id === activeCategory)?.label || 'All Businesses' : 'All Businesses'}
+              </h2>
+              <p className="text-white/50 text-sm mb-8">
+                {activeCategory ? CATEGORIES.find(c => c.id === activeCategory)?.sub : 'Browse verified businesses across all categories'}
+              </p>
+
+              {/* Search + Filters - Glass morphism */}
+              <div className="rounded-2xl p-4 backdrop-blur-xl border border-white/10" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                <div className="flex flex-col sm:flex-row gap-3 mb-3">
+                  <div className="flex-1 relative">
+                    <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                    <input type="text" placeholder="Search businesses, trades, services..." value={search} onChange={e => setSearch(e.target.value)}
+                      onKeyDown={e => e.key === 'Enter' && handleSearch()}
+                      className="w-full pl-11 pr-4 py-3 rounded-xl text-sm bg-white/5 text-white placeholder-white/30 border border-white/10 focus:outline-none focus:border-orange-500/40" data-testid="list-search" />
+                  </div>
+                  <button onClick={handleSearch} className="px-8 py-3 rounded-xl text-sm font-bold text-black transition hover:opacity-90" style={{ background: 'linear-gradient(135deg, #FF8C00, #FFB800)' }}>Search</button>
+                </div>
+                {/* Filter chips */}
+                <div className="flex flex-wrap gap-2">
+                  <select value={specialty} onChange={e => setSpecialty(e.target.value)}
+                    className="px-4 py-2 rounded-lg text-xs font-medium bg-white/5 text-white/70 border border-white/10 focus:outline-none focus:border-orange-500/30 appearance-none cursor-pointer" data-testid="filter-specialty"
+                    style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='rgba(255,255,255,0.4)' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E\")", backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', paddingRight: '32px' }}>
+                    {FILTER_SPECIALTIES.map(s => <option key={s} className="bg-[#1a1a1a] text-white">{s}</option>)}
+                  </select>
+                  <select value={activeCategory || 'All Categories'} onChange={e => { const v = e.target.value; setActiveCategory(v === 'All Categories' ? '' : v); loadListings(v === 'All Categories' ? undefined : v); }}
+                    className="px-4 py-2 rounded-lg text-xs font-medium bg-white/5 text-white/70 border border-white/10 focus:outline-none focus:border-orange-500/30 appearance-none cursor-pointer" data-testid="filter-category"
+                    style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='rgba(255,255,255,0.4)' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E\")", backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', paddingRight: '32px' }}>
+                    <option className="bg-[#1a1a1a] text-white">All Categories</option>
+                    {CATEGORIES.map(c => <option key={c.id} value={c.id} className="bg-[#1a1a1a] text-white">{c.label}</option>)}
+                  </select>
+                  <select value={priceRange} onChange={e => setPriceRange(e.target.value)}
+                    className="px-4 py-2 rounded-lg text-xs font-medium bg-white/5 text-white/70 border border-white/10 focus:outline-none focus:border-orange-500/30 appearance-none cursor-pointer" data-testid="filter-price"
+                    style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='rgba(255,255,255,0.4)' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E\")", backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', paddingRight: '32px' }}>
+                    {FILTER_PRICE.map(p => <option key={p} className="bg-[#1a1a1a] text-white">{p}</option>)}
+                  </select>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Listing Results */}
+          <section className="max-w-7xl mx-auto px-6 py-10">
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {[1,2,3,4,5,6,7,8].map(i => <div key={i} className="h-64 rounded-2xl animate-pulse bg-zinc-100" />)}
             </div>
           ) : listings.length === 0 ? (
-            <div className="text-center py-20" data-testid="no-results">
-              <svg className="w-16 h-16 mx-auto mb-4 text-zinc-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
-              <h3 className="text-xl font-bold text-zinc-800 mb-2">No businesses found</h3>
-              <p className="text-sm text-zinc-500">{search ? 'Try a different search term' : 'Be the first to add your business to the directory'}</p>
+            <div className="text-center py-16" data-testid="no-results">
+              <div className="w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, rgba(255,140,0,0.1), rgba(255,184,0,0.1))' }}>
+                <svg className="w-12 h-12" style={{ color: '#FF8C00' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-zinc-800 mb-3">
+                {search ? 'No results found' : 'Be the first in this category'}
+              </h3>
+              <p className="text-sm text-zinc-500 max-w-md mx-auto mb-8">
+                {search
+                  ? `No businesses matched "${search}". Try a different search term or browse categories.`
+                  : 'This category is waiting for its first verified business. Register yours and stand out from day one.'}
+              </p>
+              <div className="flex items-center justify-center gap-3">
+                <Link href="/register-business" className="px-6 py-3 rounded-xl text-sm font-bold text-black" style={{ background: 'linear-gradient(135deg, #FF8C00, #FFB800)' }} data-testid="register-from-empty">
+                  Add Your Business
+                </Link>
+                <button onClick={() => { setSearch(''); setActiveCategory(''); loadListings(); }} className="px-6 py-3 rounded-xl text-sm font-medium text-zinc-600 border border-zinc-200 hover:border-zinc-400 transition">
+                  Browse All
+                </button>
+              </div>
             </div>
           ) : (() => {
             const SECTION_MAP: Record<string, { label: string; color: string; industries: string[] }> = {
