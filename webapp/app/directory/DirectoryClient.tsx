@@ -378,7 +378,7 @@ export default function DirectoryPage() {
         </>
       ) : (
         /* ======== LISTINGS VIEW ======== */
-        <section className="max-w-7xl mx-auto px-6 py-8" data-testid="listings-view">
+        <section className="max-w-7xl mx-auto px-6 py-8 pt-28" data-testid="listings-view">
           {/* Search + Filters */}
           <div className="mb-6">
             <div className="flex flex-col sm:flex-row gap-3 mb-4">
