@@ -79,7 +79,11 @@ GreenLine365 is a directory-first lead generation platform. The initial goal was
 
 ### P1 - Core Features
 - [ ] Fix Knowledge Base saving
-- [ ] Pricing Tiers & Stripe Integration ($0/$30/$50)
+- [ ] Build PUBLIC Pricing Page — Directory tiers ONLY:
+  - Free Tier (Ghost badges, basic listing)
+  - Mid Tier ($30/mo — enhanced listing, map pins, more photos)
+  - Premium Tier ($50/mo — featured placement, premium badges, CTA buttons)
+  - NOTE: Backend service pricing ($1,500-$2,500/mo bundles, $400 audits, setup fees) is INTERNAL ONLY — stored in docs for AI chat widget / sales team reference. NOT displayed on website.
 - [ ] Admin Dashboard (GHL Clone) - listing management, CSV imports, lead tagging
 
 ### P1 - Revenue Features (Documented, Ready to Build)
