@@ -108,7 +108,9 @@ GreenLine365 is a directory-first lead generation platform. The initial goal was
 
 ## Documentation Index
 - `/app/memory/PRD.md` — This file (core product requirements)
-- `/app/memory/OPERATIONAL_BIBLE.md` — Property Intelligence, Badge System, Seal of Approval, Sales Loop
-- `/app/memory/PRICING_STACK.md` — Full tiered pricing, bundles, add-ons, setup fees, marketplace UI spec
+- `/app/memory/OPERATIONAL_BIBLE.md` — Vol 1: Property Intelligence, Badge System, Seal of Approval, Sales Loop
+- `/app/memory/OPERATIONAL_BIBLE_V2.md` — Vol 2: Advanced reputation architecture, sales workflows, financial infrastructure
+- `/app/memory/PRICING_STACK.md` — Full tiered pricing, bundles, milestone setup fees, add-on marketplace
+- `/app/memory/SETUP_MILESTONE_AGREEMENT.md` — Legal template: 50/50 payment milestone agreement with A2P safeguard
 - `/app/memory/MARKETING_DASHBOARD_SPEC.md` — Marketing Command Center spec
 - `/app/memory/AUDIT_SYSTEM_SPEC.md` — $400 Audit System + CRM Enrichment spec
