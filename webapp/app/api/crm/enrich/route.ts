@@ -83,6 +83,74 @@ function mapToGL365Category(googleTypes: string[], crmTags: string[]): string {
   return 'Services'; // Default
 }
 
+// --- Email Classification ---
+const GENERAL_PREFIXES = ['info', 'contact', 'hello', 'inquiries', 'inquiry', 'general', 'office', 'team', 'support', 'help', 'service', 'services'];
+const MARKETING_PREFIXES = ['marketing', 'sales', 'admin', 'advertising', 'pr', 'media', 'press'];
+const PERSONAL_DOMAINS = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'aol.com', 'icloud.com', 'me.com', 'live.com', 'msn.com', 'att.net', 'comcast.net'];
+
+function classifyEmail(email: string): string {
+  if (!email) return 'unknown';
+  const lower = email.toLowerCase();
+  const local = lower.split('@')[0];
+  const domain = lower.split('@')[1] || '';
+  if (PERSONAL_DOMAINS.includes(domain)) return 'owner_personal';
+  if (GENERAL_PREFIXES.includes(local)) return 'general_inbox';
+  if (MARKETING_PREFIXES.includes(local)) return 'marketing_team';
+  if (/^[a-z]+(\.[a-z]+)?$/.test(local) && !GENERAL_PREFIXES.includes(local)) return 'decision_maker';
+  return 'general_inbox';
+}
+
+async function scrapeContactEmails(websiteUrl: string): Promise<{ name: string | null; email: string; role: string | null; source: string }[]> {
+  const contacts: { name: string | null; email: string; role: string | null; source: string }[] = [];
+  if (!websiteUrl) return contacts;
+  const cheerio = await import('cheerio');
+  const paths = ['/contact', '/about', '/contact-us', '/about-us', '/team'];
+  const baseUrl = websiteUrl.replace(/\/$/, '');
+
+  for (const path of paths) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 6000);
+      const res = await fetch(baseUrl + path, {
+        signal: controller.signal,
+        headers: { 'User-Agent': 'GreenLine365-Audit/1.0' },
+        redirect: 'follow',
+      });
+      clearTimeout(timeout);
+      if (!res.ok) continue;
+
+      const html = await res.text();
+      const $ = cheerio.load(html);
+      const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
+      const foundEmails = [...new Set([
+        ...(html.match(emailRegex) || []),
+        ...$('a[href^="mailto:"]').map((_, el) => ($(el).attr('href') || '').replace('mailto:', '').split('?')[0].trim()).get(),
+      ])].filter(e => !e.includes('.png') && !e.includes('.jpg') && !e.includes('example.com') && !e.includes('sentry') && !e.includes('wixpress'));
+
+      for (const email of foundEmails) {
+        const local = email.split('@')[0];
+        let name: string | null = null;
+        if (/^[a-z]+\.[a-z]+$/i.test(local)) {
+          name = local.split('.').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+        }
+        // Detect role from nearby text
+        let role: string | null = null;
+        const textContent = $('body').text().toLowerCase();
+        const idx = textContent.indexOf(email.toLowerCase());
+        if (idx >= 0) {
+          const nearby = textContent.substring(Math.max(0, idx - 200), idx + 200);
+          for (const rp of ['owner', 'founder', 'ceo', 'president', 'manager', 'director']) {
+            if (nearby.includes(rp)) { role = rp.charAt(0).toUpperCase() + rp.slice(1); break; }
+          }
+        }
+        contacts.push({ name, email, role, source: path });
+      }
+      if (contacts.length > 0) break;
+    } catch { continue; }
+  }
+  return contacts;
+}
+
 async function enrichWithGooglePlaces(businessName: string, location: string) {
   // Step 1: Text search to find the place
   const searchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(businessName + ' ' + location)}&key=${googleApiKey}`;
