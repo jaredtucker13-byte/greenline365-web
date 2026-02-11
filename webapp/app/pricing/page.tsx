@@ -268,7 +268,7 @@ export default function PricingPage() {
           </div>
 
           <p className="text-center text-xs text-zinc-600 mt-8">
-            Marketplace add-ons require an active Pro or Premium subscription.
+            Marketplace add-ons require an active Pro or Premium subscription. Transaction fees ($0.60/interaction) apply to directory-only listings.
           </p>
         </div>
       </section>
