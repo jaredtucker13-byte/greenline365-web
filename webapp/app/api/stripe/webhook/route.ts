@@ -11,13 +11,19 @@ function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKe
 export async function POST(request: NextRequest) {
   const supabase = getServiceClient();
   const body = await request.text();
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-  // For now, parse without signature verification (add webhook secret later)
   let event: Stripe.Event;
   try {
-    event = JSON.parse(body) as Stripe.Event;
-  } catch {
-    return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
+    if (webhookSecret) {
+      const sig = request.headers.get('stripe-signature')!;
+      event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
+    } else {
+      event = JSON.parse(body) as Stripe.Event;
+    }
+  } catch (err: any) {
+    console.error('[STRIPE WEBHOOK] Signature verification failed:', err.message);
+    return NextResponse.json({ error: 'Webhook signature verification failed' }, { status: 400 });
   }
 
   console.log(`[STRIPE WEBHOOK] ${event.type}`);
