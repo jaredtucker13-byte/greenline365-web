@@ -187,13 +187,13 @@ export default function Navbar() {
                   {link.dropdown ? (
                     <>
                       <button
-                        className="px-4 py-2 text-sm font-medium text-white/70 hover:text-neon-green-500 transition-all duration-300 relative group flex items-center gap-1"
+                        className="px-4 py-2 text-sm font-medium text-white/70 hover:text-gold transition-all duration-300 relative group flex items-center gap-1"
                       >
                         {link.label}
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                         </svg>
-                        <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-neon-green-500 group-hover:w-full transition-all duration-300" />
+                        <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gold group-hover:w-full transition-all duration-300" />
                       </button>
                       
                       {/* Dropdown Menu */}
@@ -204,13 +204,14 @@ export default function Navbar() {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 10 }}
                             transition={{ duration: 0.2 }}
-                            className="absolute top-full left-0 mt-2 w-56 os-card border border-neon-green-500/20 rounded-lg shadow-xl overflow-hidden"
+                            className="absolute top-full left-0 mt-2 w-56 rounded-xl border border-gold/20 backdrop-blur-2xl shadow-xl overflow-hidden"
+                            style={{ background: 'rgba(28, 28, 30, 0.95)' }}
                           >
                             {link.dropdown.map((item, i) => (
                               <Link
                                 key={item.href}
                                 href={item.href}
-                                className="block px-4 py-3 text-sm text-white/80 hover:text-neon-green-500 hover:bg-white/5 transition-all duration-200"
+                                className="block px-4 py-3 text-sm text-white/80 hover:text-gold hover:bg-white/5 transition-all duration-200"
                               >
                                 {item.label}
                               </Link>
@@ -222,10 +223,10 @@ export default function Navbar() {
                   ) : (
                     <Link
                       href={link.href}
-                      className="px-4 py-2 text-sm font-medium text-white/70 hover:text-neon-green-500 transition-all duration-300 relative group"
+                      className="px-4 py-2 text-sm font-medium text-white/70 hover:text-gold transition-all duration-300 relative group"
                     >
                       {link.label}
-                      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-neon-green-500 group-hover:w-full transition-all duration-300" />
+                      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gold group-hover:w-full transition-all duration-300" />
                     </Link>
                   )}
                 </motion.div>
