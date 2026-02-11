@@ -449,7 +449,7 @@ export default function DirectoryPage() {
                     </div>
                   ))}
                 </div>
-                <button onClick={() => loadListings()} className="mt-8 px-6 py-3 rounded-full text-sm font-semibold text-white" style={{ background: '#FF8C00' }} data-testid="find-business-btn">
+                <button onClick={() => loadListings()} className="mt-8 px-6 py-3 rounded-full text-sm font-semibold text-black hover:scale-105 hover:shadow-[0_4px_20px_rgba(255,140,0,0.35)] transition-all duration-300" style={{ background: '#FF8C00' }} data-testid="find-business-btn">
                   Find a Business
                 </button>
               </div>
