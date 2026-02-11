@@ -73,6 +73,7 @@ const TIERS = [
 ];
 
 const MARKETPLACE = [
+  { name: 'Coupon Engine', price: '$19', unit: '/mo + $0.60/redeem', desc: 'Create trackable QR coupons. Distributed on your listing and via SMS/email. Pay only when customers show up.' },
   { name: 'QR Feedback Kit', price: '$199', unit: 'one-time', desc: 'Branded QR codes for collecting reviews at point of service — doorway, counter, invoice.' },
   { name: 'Custom Poll Template', price: '$150', unit: 'per template', desc: 'Industry-specific feedback polls tied to badge earning. Tailored to your business.' },
   { name: 'Featured Boost', price: '$29', unit: 'per week', desc: 'Temporary homepage spotlight for events, grand openings, or seasonal promotions.' },
