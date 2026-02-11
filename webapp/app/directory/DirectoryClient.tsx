@@ -219,7 +219,13 @@ export default function DirectoryPage() {
           {/* ======== CATEGORY MOSAIC ======== */}
           <section id="categories" className="max-w-7xl mx-auto px-6 py-16" data-testid="categories-section">
             <p className="text-sm font-semibold uppercase tracking-widest text-center mb-2" style={{ color: '#FF8C00' }}>Find Your Trade</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-[#1a1a1a] text-center mb-3">Browse Categories</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-[#1a1a1a] text-center mb-3">
+              Browse{' '}
+              <span className="relative inline-block">
+                <span style={{ color: '#FF8C00' }}>Categories</span>
+                <svg className="absolute -bottom-1 left-0 w-full" viewBox="0 0 200 8" fill="none"><path d="M1 5.5Q50 1 100 5T199 3" stroke="#FF8C00" strokeWidth="2" strokeLinecap="round" opacity="0.4" /></svg>
+              </span>
+            </h2>
             <p className="text-zinc-500 text-center max-w-lg mx-auto mb-10">
               From local home services to your favorite neighborhood spots. Your next trusted pro is just a click away.
             </p>
