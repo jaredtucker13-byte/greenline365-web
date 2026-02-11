@@ -318,23 +318,38 @@ export async function POST(request: NextRequest) {
       }
       result.audit = audit;
 
-      // Step 3: Auto-categorize
+      // Step 3: Email classification + contact scraping
+      const emailClassification = classifyEmail(lead.email);
+      let additionalContacts: { name: string | null; email: string; role: string | null; source: string }[] = [];
+      if (websiteUrl && emailClassification === 'general_inbox') {
+        additionalContacts = await scrapeContactEmails(websiteUrl);
+        // Filter out the lead's own email
+        additionalContacts = additionalContacts.filter(
+          c => c.email.toLowerCase() !== (lead.email || '').toLowerCase()
+        );
+      }
+      result.email_classification = emailClassification;
+      result.additional_contacts = additionalContacts;
+
+      // Step 4: Auto-categorize
       const gl365Category = mapToGL365Category(
         places.found ? (places.types as string[]) : [],
         lead.tags || []
       );
       result.gl365_category = gl365Category;
 
-      // Step 4: Build enriched tags
+      // Step 5: Build enriched tags
       const enrichedTags = [...new Set([
         ...(lead.tags || []),
         ...audit.selling_points,
         `category_${gl365Category.toLowerCase().replace(/\s+/g, '_')}`,
+        `email_type_${emailClassification}`,
+        ...(additionalContacts.length > 0 ? ['has_additional_contacts'] : []),
         places.found ? 'google_verified' : 'google_not_found',
         'enriched',
       ])];
 
-      // Step 5: Build metadata update
+      // Step 6: Build metadata update
       const enrichedMetadata = {
         ...(lead.metadata || {}),
         google_places: places.found ? {
@@ -349,6 +364,12 @@ export async function POST(request: NextRequest) {
         website_audit: audit.audit_details,
         website: websiteUrl,
         gl365_category: gl365Category,
+        email_classification: {
+          primary_email: lead.email,
+          contact_type: emailClassification,
+          additional_contacts: additionalContacts.length > 0 ? additionalContacts : undefined,
+          classified_at: new Date().toISOString(),
+        },
         enriched_at: new Date().toISOString(),
       };
 
