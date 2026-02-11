@@ -285,13 +285,13 @@ export default function DirectoryPage() {
               {[CATEGORIES[5], CATEGORIES[6]].map(cat => (
                 <div
                   key={cat.id}
-                  className="col-span-2 relative rounded-2xl overflow-hidden cursor-pointer group"
+                  className="col-span-2 relative rounded-2xl overflow-hidden cursor-pointer group hover:shadow-[0_0_24px_rgba(255,140,0,0.10)] transition-shadow duration-500"
                   style={{ minHeight: 180 }}
                   onClick={() => handleCategoryClick(cat.id)}
                   data-testid={`cat-${cat.id}`}
                 >
-                  <img src={cat.img} alt={cat.label} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+                  <img src={cat.img} alt={cat.label} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent group-hover:from-black/85 transition-all duration-500" />
                   <div className="absolute bottom-4 left-4">
                     <span className="text-white text-lg md:text-xl font-bold block">{cat.label}</span>
                     <span className="text-zinc-300 text-xs">{cat.sub}</span>
