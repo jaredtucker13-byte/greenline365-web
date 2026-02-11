@@ -74,11 +74,14 @@ export async function GET(request: NextRequest) {
   const { data, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  // Filter active badges
-  const listings = (data || []).map((l: any) => ({
-    ...l,
-    directory_badges: (l.directory_badges || []).filter((b: any) => b.is_active),
-  }));
+  // Filter active badges + apply photo gating
+  const listings = (data || []).map((l: any) => {
+    const gated = applyPhotoGating(l);
+    return {
+      ...gated,
+      directory_badges: (l.directory_badges || []).filter((b: any) => b.is_active),
+    };
+  });
 
   return NextResponse.json(listings);
 }
