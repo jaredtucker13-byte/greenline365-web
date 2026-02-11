@@ -444,7 +444,7 @@ export default function DirectoryPage() {
 
           {/* ======== TESTIMONIALS ======== */}
           <section id="testimonials" className="relative py-16 overflow-hidden" data-testid="testimonials-section">
-            <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1547648946-2b1fd7eab923?w=1920&q=40)', backgroundSize: 'cover' }} />
+            <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'url(/images/hero-directory-alt.png)', backgroundSize: 'cover' }} />
             <div className="absolute inset-0 bg-[#1a1a1a]/90" />
             <div className="relative max-w-4xl mx-auto px-6 text-center">
               <h2 className="text-3xl font-bold text-white mb-2">Success Stories</h2>
