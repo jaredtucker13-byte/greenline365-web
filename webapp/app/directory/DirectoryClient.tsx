@@ -119,31 +119,96 @@ export default function DirectoryPage() {
       {!showListings ? (
         <>
           {/* ======== HERO ======== */}
-          <section className="relative bg-[#1a1a1a] overflow-hidden pt-20" data-testid="directory-hero">
-            <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1767778080869-4b82b5924c3a?w=1920&q=60)', backgroundSize: 'cover', backgroundPosition: 'center' }} />
-            <div className="absolute inset-0 bg-gradient-to-b from-[#1a1a1a]/80 via-[#1a1a1a]/90 to-[#1a1a1a]" />
-            <div className="relative max-w-4xl mx-auto px-6 py-20 text-center">
-              <p className="text-sm font-semibold uppercase tracking-widest mb-3" style={{ color: '#FF8C00' }}>Find Your Pro</p>
-              <h1 className="text-4xl md:text-6xl font-bold text-white mb-4" data-testid="directory-title">
-                Services Without Borders
-              </h1>
-              <p className="text-base md:text-lg text-zinc-400 max-w-2xl mx-auto mb-10">
-                From trusted HVAC techs to the best local bakeries. Every badge is earned through real service, never bought.
-              </p>
-              {/* Search Bar */}
-              <div className="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto">
-                <input
-                  type="text" placeholder="Search businesses, trades, names..."
-                  value={search} onChange={e => setSearch(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && handleSearch()}
-                  className="flex-1 px-5 py-3.5 rounded-full text-sm bg-white/10 text-white placeholder-zinc-500 border border-zinc-700 focus:outline-none focus:border-orange-500/50"
-                  data-testid="hero-search"
-                />
-                <button onClick={handleSearch} className="px-8 py-3.5 rounded-full text-sm font-semibold text-black" style={{ background: '#FF8C00' }} data-testid="hero-search-btn">
-                  Search
-                </button>
-              </div>
+          <section className="relative overflow-hidden pt-16" style={{ minHeight: '85vh' }} data-testid="directory-hero">
+            {/* Nano Banana AI Hero Backdrop */}
+            <div className="absolute inset-0">
+              <img src="/images/hero-directory.png" alt="Vibrant local business community" className="w-full h-full object-cover" />
             </div>
+            {/* Gradient overlays for text readability */}
+            <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a]/70 via-[#0a0a0a]/40 to-[#0a0a0a]/90" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a]/50 via-transparent to-[#0a0a0a]/50" />
+            {/* Subtle animated grain overlay */}
+            <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\'/%3E%3C/svg%3E")' }} />
+
+            <div className="relative max-w-5xl mx-auto px-6 flex flex-col items-center justify-center" style={{ minHeight: '75vh' }}>
+              {/* Trust indicator */}
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 backdrop-blur-sm mb-6"
+                style={{ background: 'rgba(255,140,0,0.1)' }}
+              >
+                <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                <span className="text-xs font-medium text-white/80 tracking-wide">LIVE DIRECTORY</span>
+                <span className="text-xs text-white/40">|</span>
+                <span className="text-xs text-white/60">Trusted by local businesses</span>
+              </motion.div>
+
+              {/* Main headline */}
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.6 }}
+                className="text-5xl sm:text-6xl lg:text-7xl font-black text-white text-center leading-[1.05] mb-5"
+                data-testid="directory-title"
+              >
+                Your City&apos;s Best,{' '}
+                <span className="relative inline-block">
+                  <span style={{ color: '#FF8C00' }}>Verified</span>
+                  <svg className="absolute -bottom-1 left-0 w-full" viewBox="0 0 200 8" fill="none"><path d="M1 5.5Q50 1 100 5T199 3" stroke="#FF8C00" strokeWidth="2" strokeLinecap="round" opacity="0.6" /></svg>
+                </span>
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.45, duration: 0.6 }}
+                className="text-lg md:text-xl text-white/70 max-w-2xl mx-auto text-center mb-10 leading-relaxed"
+              >
+                Find trusted home services, dining, nightlife, and more — every badge is earned through real work, not ad spend.
+              </motion.p>
+
+              {/* Search Bar */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6, duration: 0.6 }}
+                className="w-full max-w-2xl"
+              >
+                <div className="flex flex-col sm:flex-row gap-3 p-2 rounded-2xl backdrop-blur-xl border border-white/10" style={{ background: 'rgba(255,255,255,0.07)' }}>
+                  <div className="flex-1 relative">
+                    <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                    <input
+                      type="text" placeholder="Search businesses, trades, services..."
+                      value={search} onChange={e => setSearch(e.target.value)}
+                      onKeyDown={e => e.key === 'Enter' && handleSearch()}
+                      className="w-full pl-12 pr-4 py-4 rounded-xl text-sm bg-transparent text-white placeholder-white/40 focus:outline-none"
+                      data-testid="hero-search"
+                    />
+                  </div>
+                  <button onClick={handleSearch} className="px-8 py-4 rounded-xl text-sm font-bold text-black transition-all hover:scale-[1.02] hover:shadow-lg" style={{ background: 'linear-gradient(135deg, #FF8C00, #FFB800)' }} data-testid="hero-search-btn">
+                    Search Directory
+                  </button>
+                </div>
+
+                {/* Quick category chips */}
+                <div className="flex flex-wrap justify-center gap-2 mt-5">
+                  {CATEGORIES.slice(0, 5).map(cat => (
+                    <button key={cat.id} onClick={() => handleCategoryClick(cat.id)}
+                      className="px-3 py-1.5 rounded-full text-xs font-medium text-white/60 border border-white/10 hover:border-orange-500/40 hover:text-white transition-all backdrop-blur-sm"
+                      style={{ background: 'rgba(255,255,255,0.05)' }}
+                      data-testid={`hero-chip-${cat.id}`}
+                    >
+                      {cat.label}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Bottom fade to white */}
+            <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white to-transparent" />
           </section>
 
           {/* ======== CATEGORY MOSAIC ======== */}
