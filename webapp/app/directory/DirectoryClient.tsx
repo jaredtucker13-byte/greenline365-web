@@ -575,7 +575,7 @@ export default function DirectoryPage() {
             const SECTION_MAP: Record<string, { label: string; color: string; industries: string[] }> = {
               'family-entertainment': { label: 'Family Entertainment', color: '#FFB800', industries: ['family-entertainment', 'entertainment', 'recreation'] },
               'destinations': { label: 'Destinations', color: '#00D4FF', industries: ['destinations', 'hotel', 'resort', 'lodging'] },
-              'services': { label: 'Services', color: '#39FF14', industries: ['services', 'hvac', 'plumbing', 'electrical', 'roofing'] },
+              'services': { label: 'Services', color: '#10B981', industries: ['services', 'hvac', 'plumbing', 'electrical', 'roofing'] },
               'dining': { label: 'Dining', color: '#FF8C00', industries: ['dining', 'restaurant', 'cafe', 'bakery'] },
               'nightlife': { label: 'Nightlife', color: '#8B5CF6', industries: ['nightlife', 'bar', 'pub', 'club'] },
               'style-shopping': { label: 'Style & Shopping', color: '#EC4899', industries: ['style-shopping', 'boutique', 'salon', 'barbershop', 'retail'] },
