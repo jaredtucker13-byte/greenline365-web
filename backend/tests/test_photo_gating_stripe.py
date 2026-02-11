@@ -201,11 +201,13 @@ class TestFeatureGates:
         
         if response.status_code == 200:
             data = response.json()
-            assert "photos" in data, "Entitlements should include 'photos' limit"
-            photos_limit = data["photos"]
+            assert "entitlements" in data, "Response should include 'entitlements' object"
+            entitlements = data["entitlements"]
+            assert "photos" in entitlements, "Entitlements should include 'photos' limit"
+            photos_limit = entitlements["photos"]
             
             # Free tier should have photos=1
-            tier = listings[0].get("tier", "free")
+            tier = data.get("tier", "free")
             if tier == "free":
                 assert photos_limit == 1, f"Free tier photos should be 1, got {photos_limit}"
             elif tier == "pro":
