@@ -74,6 +74,16 @@ GreenLine365 is a directory-first lead generation platform. The initial goal was
 - Extensive strategic docs in /docs/ and /memory/
 - Operational Bibles V1 & V2, Pricing Stack, Audit System Spec, Marketing Dashboard Spec
 
+### Phase 5: Bentley Standard UI Overhaul (COMPLETED - Feb 2026)
+- **Color Palette**: Midnight blue (#0D1B2A) + champagne gold (#C9A96E) + brushed silver
+- **Typography**: Montserrat (headings) + Inter (body)
+- **Glassmorphism**: backdrop-blur mega-menu dropdowns with animated open/close
+- **Featured Listings Sections**: Premier Partners, Property Intelligence Verified, Recently Added
+- **Property Intelligence Badge**: Metallic shield badge for CRM + Mid-Tier+ subscribers
+- **Weighted Search Ranking**: Property Intel > Paid Tiers > Free listings
+- **Navbar**: Gold accents, "LIVE" indicator, gold CTA buttons
+- **Price Filter**: Toggle button group, Ghost buttons for actions
+
 ## Pricing Structure
 ### Public Directory Tiers (displayed on /pricing)
 - **Free:** $0 — basic listing, grayed badges
@@ -137,3 +147,4 @@ GreenLine365 is a directory-first lead generation platform. The initial goal was
 - Backend: 12/12 photo gating + Stripe live tests passed (100%)
 - Previous: /app/test_reports/iteration_8.json — 21/21 backend, 45/45 frontend
 - Code audit: Feb 2026 — 0 TypeScript errors, removed 3 dead API routes, 2 unused deps, 3 orphan files
+- Bentley UI: /app/test_reports/iteration_10.json — 12/12 backend, 95% frontend (proxy issue)
