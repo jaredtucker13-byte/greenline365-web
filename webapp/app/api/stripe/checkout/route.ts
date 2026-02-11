@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
   const { tier, listing_id, origin_url } = body;
 
   if (!tier || !DIRECTORY_TIERS[tier]) {
-    return NextResponse.json({ error: 'Invalid tier. Use: growth, authority, dominator' }, { status: 400 });
+    return NextResponse.json({ error: 'Invalid tier. Use: pro, premium' }, { status: 400 });
   }
 
   if (!origin_url) {
