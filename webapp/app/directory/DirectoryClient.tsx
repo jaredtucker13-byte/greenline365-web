@@ -338,7 +338,7 @@ export default function DirectoryPage() {
                       initial={{ opacity: 0, y: 30 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.1 }}
-                      className="relative rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800 hover:border-orange-500/40 transition-all group cursor-pointer"
+                      className="relative rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800 hover:border-orange-500/50 hover:shadow-[0_0_24px_rgba(255,140,0,0.12)] transition-all duration-500 group cursor-pointer"
                       data-testid={`featured-${l.slug}`}
                     >
                       {/* Featured Badge */}
