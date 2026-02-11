@@ -234,13 +234,13 @@ export default function DirectoryPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
               {/* Large "Services" card (core moat) */}
               <div
-                className="col-span-2 row-span-2 relative rounded-2xl overflow-hidden cursor-pointer group"
+                className="col-span-2 row-span-2 relative rounded-2xl overflow-hidden cursor-pointer group hover:shadow-[0_0_30px_rgba(255,140,0,0.12)] transition-shadow duration-500"
                 style={{ minHeight: 340 }}
                 onClick={() => handleCategoryClick(CATEGORIES[2].id)}
                 data-testid={`cat-${CATEGORIES[2].id}`}
               >
-                <img src={CATEGORIES[2].img} alt={CATEGORIES[2].label} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                <img src={CATEGORIES[2].img} alt={CATEGORIES[2].label} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent group-hover:from-black/90 transition-all duration-500" />
                 <div className="absolute bottom-5 left-5">
                   <span className="text-white text-2xl font-bold block">{CATEGORIES[2].label}</span>
                   <span className="text-zinc-300 text-xs">{CATEGORIES[2].sub}</span>
