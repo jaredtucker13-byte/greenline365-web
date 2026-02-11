@@ -437,7 +437,7 @@ export default function DirectoryPage() {
                 </button>
               </div>
               <div className="relative rounded-2xl overflow-hidden" style={{ minHeight: 350 }}>
-                <img src="https://images.unsplash.com/photo-1767778080869-4b82b5924c3a?w=700&q=75" alt="Trusted local businesses" className="w-full h-full object-cover rounded-2xl" />
+                <img src="/images/hero-directory-alt.png" alt="Trusted local businesses" className="w-full h-full object-cover rounded-2xl" />
               </div>
             </div>
           </section>
