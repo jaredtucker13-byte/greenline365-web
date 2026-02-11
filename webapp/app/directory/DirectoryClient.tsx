@@ -418,7 +418,7 @@ export default function DirectoryPage() {
               )}
 
               <div className="text-center mt-10">
-                <button onClick={() => loadListings()} className="px-8 py-3 rounded-full text-sm font-semibold text-black" style={{ background: '#FF8C00' }} data-testid="view-all-listings-btn">
+                <button onClick={() => loadListings()} className="px-8 py-3 rounded-full text-sm font-semibold text-black hover:scale-105 hover:shadow-[0_4px_20px_rgba(255,140,0,0.35)] transition-all duration-300" style={{ background: '#FF8C00' }} data-testid="view-all-listings-btn">
                   View All Listings
                 </button>
                 <p className="text-zinc-500 text-xs mt-3">Want your business featured here? <Link href="/pricing" className="underline hover:text-white transition" style={{ color: '#FF8C00' }}>Upgrade your listing</Link></p>
