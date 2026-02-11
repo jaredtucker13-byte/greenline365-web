@@ -35,8 +35,14 @@ GreenLine365 is a directory-first lead generation platform. The initial goal was
 - Homepage (`/`) now renders the business directory
 - Previous homepage moved to `/services`
 - Global Navbar updated: Directory, Our Services, Industries, Pricing
-- Category mosaic with 8 categories (HVAC, Plumbing, Roofing, Electrical, Barbers, Bakeries, Fitness, Dining)
-- Hero with search functionality
+- **7-Category Mosaic** aligned with business model:
+  1. Family Entertainment (Kayak rentals, zoos, mini-golf)
+  2. Destinations (Hotels, resorts, vacation rentals)
+  3. Services (HVAC, Plumbing, Electrical, Roofing) - **Core Moat**
+  4. Dining (Cafes, casual & fine dining)
+  5. Nightlife (Bars, pubs, clubs, lounges)
+  6. Style & Shopping (Boutiques, salons, specialty retail)
+  7. Health & Wellness (Gyms, spas, clinics, wellness centers)
 - **Featured Listings section** (Showcase) - pulls top businesses from Supabase
 - Value Proposition section
 - Testimonials with auto-rotation
