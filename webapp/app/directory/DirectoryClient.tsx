@@ -154,21 +154,25 @@ export default function DirectoryPage() {
               From local home services to your favorite neighborhood spots. Your next trusted pro is just a click away.
             </p>
 
-            {/* Mosaic Grid */}
+            {/* Mosaic Grid - 7 categories */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-              {/* Large card */}
+              {/* Large "Services" card (core moat) */}
               <div
                 className="col-span-2 row-span-2 relative rounded-2xl overflow-hidden cursor-pointer group"
                 style={{ minHeight: 340 }}
-                onClick={() => handleCategoryClick(CATEGORIES[0].id)}
-                data-testid={`cat-${CATEGORIES[0].id}`}
+                onClick={() => handleCategoryClick(CATEGORIES[2].id)}
+                data-testid={`cat-${CATEGORIES[2].id}`}
               >
-                <img src={CATEGORIES[0].img} alt={CATEGORIES[0].label} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                <span className="absolute bottom-5 left-5 text-white text-2xl font-bold">{CATEGORIES[0].label}</span>
+                <img src={CATEGORIES[2].img} alt={CATEGORIES[2].label} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                <div className="absolute bottom-5 left-5">
+                  <span className="text-white text-2xl font-bold block">{CATEGORIES[2].label}</span>
+                  <span className="text-zinc-300 text-xs">{CATEGORIES[2].sub}</span>
+                </div>
+                <span className="absolute top-3 right-3 text-[10px] px-2 py-1 rounded-full bg-green-500/90 text-white font-bold uppercase tracking-wider">Core</span>
               </div>
-              {/* Smaller cards */}
-              {CATEGORIES.slice(1).map(cat => (
+              {/* Top row: Family Entertainment, Destinations */}
+              {[CATEGORIES[0], CATEGORIES[1]].map(cat => (
                 <div
                   key={cat.id}
                   className="relative rounded-2xl overflow-hidden cursor-pointer group"
@@ -177,8 +181,45 @@ export default function DirectoryPage() {
                   data-testid={`cat-${cat.id}`}
                 >
                   <img src={cat.img} alt={cat.label} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-                  <span className="absolute bottom-3 left-3 text-white text-sm md:text-base font-bold">{cat.label}</span>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+                  <div className="absolute bottom-3 left-3">
+                    <span className="text-white text-sm md:text-base font-bold block">{cat.label}</span>
+                    <span className="text-zinc-300 text-[10px] hidden md:block">{cat.sub}</span>
+                  </div>
+                </div>
+              ))}
+              {/* Second row: Dining, Nightlife */}
+              {[CATEGORIES[3], CATEGORIES[4]].map(cat => (
+                <div
+                  key={cat.id}
+                  className="relative rounded-2xl overflow-hidden cursor-pointer group"
+                  style={{ minHeight: 160 }}
+                  onClick={() => handleCategoryClick(cat.id)}
+                  data-testid={`cat-${cat.id}`}
+                >
+                  <img src={cat.img} alt={cat.label} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+                  <div className="absolute bottom-3 left-3">
+                    <span className="text-white text-sm md:text-base font-bold block">{cat.label}</span>
+                    <span className="text-zinc-300 text-[10px] hidden md:block">{cat.sub}</span>
+                  </div>
+                </div>
+              ))}
+              {/* Bottom row: Style & Shopping, Health & Wellness (span full width) */}
+              {[CATEGORIES[5], CATEGORIES[6]].map(cat => (
+                <div
+                  key={cat.id}
+                  className="col-span-2 relative rounded-2xl overflow-hidden cursor-pointer group"
+                  style={{ minHeight: 180 }}
+                  onClick={() => handleCategoryClick(cat.id)}
+                  data-testid={`cat-${cat.id}`}
+                >
+                  <img src={cat.img} alt={cat.label} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+                  <div className="absolute bottom-4 left-4">
+                    <span className="text-white text-lg md:text-xl font-bold block">{cat.label}</span>
+                    <span className="text-zinc-300 text-xs">{cat.sub}</span>
+                  </div>
                 </div>
               ))}
             </div>
