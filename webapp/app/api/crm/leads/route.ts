@@ -199,8 +199,13 @@ export async function PUT(request: NextRequest) {
   try {
     const supabase = await createClient();
     
-    // Skip admin check for now - allow updates
-    // TODO: Re-enable admin check once auth is fully working
+    // Auth check
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    
+    const isAdmin = ADMIN_EMAILS.includes(user.email || '');
     
     const body = await request.json();
     const { id, ...updates } = body;
