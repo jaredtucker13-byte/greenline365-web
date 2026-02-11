@@ -32,13 +32,13 @@ interface Listing {
 }
 
 const CATEGORIES = [
-  { id: 'family-entertainment', label: 'Family Entertainment', sub: 'Kayak rentals, zoos, mini-golf & more', img: 'https://images.unsplash.com/photo-1758278038636-3936fafd057e?w=600&h=400&fit=crop&q=80' },
-  { id: 'destinations', label: 'Destinations', sub: 'Hotels, resorts & vacation rentals', img: 'https://images.unsplash.com/photo-1767285784658-f9311736c569?w=600&h=400&fit=crop&q=80' },
-  { id: 'services', label: 'Services', sub: 'HVAC, Plumbing, Electrical & Roofing', img: 'https://images.unsplash.com/photo-1660330589827-da8ab7dd3c02?w=600&h=400&fit=crop&q=80' },
-  { id: 'dining', label: 'Dining', sub: 'Cafes, casual & fine dining', img: 'https://images.unsplash.com/photo-1737141499770-cd5eda86410d?w=600&h=400&fit=crop&q=80' },
-  { id: 'nightlife', label: 'Nightlife', sub: 'Bars, pubs, clubs & lounges', img: 'https://images.unsplash.com/photo-1698054239312-c452af4f5ab2?w=600&h=400&fit=crop&q=80' },
-  { id: 'style-shopping', label: 'Style & Shopping', sub: 'Boutiques, salons & specialty retail', img: 'https://images.unsplash.com/photo-1606132288185-ae8122b4c3a3?w=600&h=400&fit=crop&q=80' },
-  { id: 'health-wellness', label: 'Health & Wellness', sub: 'Gyms, spas, clinics & wellness centers', img: 'https://images.unsplash.com/photo-1579854602908-ce7e7c29f4fd?w=600&h=400&fit=crop&q=80' },
+  { id: 'family-entertainment', label: 'Family Entertainment', sub: 'Kayak rentals, zoos, mini-golf & more', img: '/images/categories/family-entertainment.png' },
+  { id: 'destinations', label: 'Destinations', sub: 'Hotels, resorts & vacation rentals', img: '/images/categories/destinations.png' },
+  { id: 'services', label: 'Services', sub: 'HVAC, Plumbing, Electrical & Roofing', img: '/images/categories/services.png' },
+  { id: 'dining', label: 'Dining', sub: 'Cafes, casual & fine dining', img: '/images/categories/dining.png' },
+  { id: 'nightlife', label: 'Nightlife', sub: 'Bars, pubs, clubs & lounges', img: '/images/categories/nightlife.png' },
+  { id: 'style-shopping', label: 'Style & Shopping', sub: 'Boutiques, salons & specialty retail', img: '/images/categories/style-shopping.png' },
+  { id: 'health-wellness', label: 'Health & Wellness', sub: 'Gyms, spas, clinics & wellness centers', img: '/images/categories/health-wellness.png' },
 ];
 
 const FILTER_SPECIALTIES = ['All Specialties', 'Residential', 'Commercial', 'Emergency', 'Maintenance'];
