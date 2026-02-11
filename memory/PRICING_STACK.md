@@ -102,42 +102,51 @@
 
 ---
 
-## SETUP FEE STRUCTURE (Sliding Scale)
+## SETUP FEE STRUCTURE (Milestone-Based)
 
-### Base Configuration Fees
+### Base Setup Fees (UPDATED)
 
-| Bundle Tier | Base Setup Fee | Included Labor |
+| Bundle Tier | Total Setup Fee | Initial Payment (Day 1) | Final Payment (Milestone) |
+|---|---|---|---|
+| Tier 1: Booking | $2,500 | $1,250 | $1,250 |
+| Tier 2: Marketing | $3,500 | $1,750 | $1,750 |
+| Tier 3: Intelligence | $5,500 | $2,750 | $2,750 |
+
+### Milestone Definition: "Technical Completion"
+Final 50% is due when Greenline365 has completed:
+1. **AI Persona Programming**: Custom Agent(s) trained on Client's Knowledge Base and Brand Voice
+2. **Dashboard Handover**: Access to CRM, Marketing Hub, and Property Intelligence tools granted
+3. **Directory Activation**: Client's listing is live (Ghost Badge or Active Badge logic)
+4. **Logic Verification**: All workflows (Incident-to-Clearance, Poll Template Engine) verified functional
+
+### A2P 10DLC Safeguard
+- Greenline365 facilitates A2P filing within 48 hours of Technical Completion
+- **Final payment is NOT tied to carrier approval** — carrier delays don't pause milestone payment
+- During carrier review (7+ business days), client has full access to all non-SMS/Voice features
+
+### "Bundle Now" Urgency System (50% Setup Discount at Launch)
+
+| Component Setup | A-La-Carte (Post-Launch) | Bundled (At Launch) |
 |---|---|---|
-| Tier 1: Booking | $500 | Primary Number, Cal.com sync, Basic Knowledge Base |
-| Tier 2: Marketing | $1,000 | Tier 1 + Blog Sync, Newsletter templates, Brand Voice training |
-| Tier 3: Intelligence | $2,500 | Tier 2 + Property Passport architecture, CBoH logic, Seal audit |
+| Additional AI Agent | $700 | $350 |
+| A2P Registration (Per Line) | $300 | $150 |
+| CRM Integration Mapping | $500 | $250 |
+| Property "Deep-Seed" | $500/prop | $250/prop |
+| Custom Poll Templates | $300/each | $150/each |
 
-### Complexity Add-Ons (Sliding Scale)
+**Sales Pitch:** "Add your Sales Agent and ServiceTitan integration today — I cut the technical setup in half. Next month means re-opening the codebase at full $1,200 rate."
 
-| Add-On Component | Additional Setup Fee | Complexity Reason |
-|---|---|---|
-| Additional AI Agent | +$350 per agent | Persona programming, prompt engineering, KB ingestion |
-| A2P 10DLC Registration | +$150 per line | Federal filing fees, carrier compliance review |
-| CRM Integration | +$250 (One-time) | API mapping, webhook testing, data-flow verification |
-| Property "Deep-Seed" | +$250 per property | Manual data entry, high-res media organization |
-| Custom Poll Templates | +$150 per template | Copywriting, AI logic tuning |
+### HITL (Human-in-the-Loop) Pricing Logic
+- **Instant-Toggle ($0 fee)**: Team Seats, Media Storage, White-Label Branding — software switches
+- **Human-Required (Fee Mandatory)**: AI Prompts, API mapping, federal compliance paperwork — sliding scale fee
 
-### Setup Fee Formula
-```
-Total Setup = Base_Fee(Tier) + Sum(Add-On_Setup_Fees)
-```
+### Protection Summary
 
-**Example: "Nightclub Elite" Setup**
-- Tier 2 Marketing Bundle: $1,000 base
-- 1 Additional Sales Agent: +$350
-- A2P Registration (2 lines): +$300
-- 3 Custom Poll Templates (Vibe, Safety, Cleanliness): +$450
-- **TOTAL SETUP: $2,100** (Plus $2,670/mo recurring)
-
-### Closing Strategy
-- Credit $400 Website Audit toward first month's bundle
-- Waive $250 CRM Integration fee for same-day sign
-- These are "chips" to play during the close
+| Feature | Protection/Benefit |
+|---|---|
+| Two-Part Payment | Lowers barrier, secures 50% upfront |
+| Ready-to-Use Trigger | Paid for programming labor regardless of carrier speed |
+| Add-On Urgency | Forces bigger initial commitment to "save" on setup |
 
 ---
 
