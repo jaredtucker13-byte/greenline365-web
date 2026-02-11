@@ -37,8 +37,8 @@ export async function POST(request: NextRequest) {
   }
 
   const tierInfo = DIRECTORY_TIERS[tier];
-  const successUrl = `${origin_url}/directory?payment=success&session_id={CHECKOUT_SESSION_ID}`;
-  const cancelUrl = `${origin_url}/directory?payment=cancelled`;
+  const successUrl = `${origin_url}/register-business/success?payment=success&tier=${tier}&listing=${listing_id || ''}&session_id={CHECKOUT_SESSION_ID}`;
+  const cancelUrl = `${origin_url}/register-business?tier=${tier}`;
 
   try {
     // Create Stripe checkout session with recurring subscription
