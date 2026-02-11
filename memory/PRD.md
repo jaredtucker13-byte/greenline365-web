@@ -86,17 +86,13 @@ GreenLine365 is a directory-first lead generation platform. The initial goal was
   - NOTE: Backend service pricing ($1,500-$2,500/mo bundles, $400 audits, setup fees) is INTERNAL ONLY — stored in docs for AI chat widget / sales team reference. NOT displayed on website.
 - [ ] Admin Dashboard (GHL Clone) - listing management, CSV imports, lead tagging
 
-### P1 - Revenue Features (Documented, Ready to Build)
-- [ ] $400 Digital Infrastructure Audit System (see AUDIT_SYSTEM_SPEC.md)
-  - Dual-search architecture (Google Places + Greenline DB)
-  - Automated PDF generation via Supabase Edge Functions
-  - CRM lead enrichment during scraping
-  - Gap Analysis with Missed Revenue Calculator
-- [ ] Marketing & Reputation Dashboard (see MARKETING_DASHBOARD_SPEC.md)
-  - Reputation & Sentiment Hub (Google + Directory reviews)
-  - Conversion & Lead Engine (Coupons, Bookings, Lead Capture)
-  - Content Pipeline (Blog Sync, Newsletter Archive, Social Schedule)
-  - Property Intelligence Metrics (Command-Tier only)
+### P1 - Revenue Features (INTERNAL DOCS — Not displayed on website)
+These docs power the AI chat widget and sales team. They are reference material, NOT public pages:
+- [x] $400 Digital Infrastructure Audit System (see AUDIT_SYSTEM_SPEC.md)
+- [x] Marketing & Reputation Dashboard (see MARKETING_DASHBOARD_SPEC.md)
+- [x] Backend service bundles $1,500-$2,500/mo (see PRICING_STACK.md)
+- [x] Setup milestone fees & agreement (see SETUP_MILESTONE_AGREEMENT.md)
+- [x] Operational Bibles V1 & V2 (see OPERATIONAL_BIBLE.md, OPERATIONAL_BIBLE_V2.md)
 
 ### P2 - Enhancements
 - [ ] Service Worker permanent fix
