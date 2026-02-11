@@ -187,7 +187,7 @@ export default function DirectoryPage() {
                       data-testid="hero-search"
                     />
                   </div>
-                  <button onClick={handleSearch} className="px-8 py-4 rounded-xl text-sm font-bold text-black transition-all hover:scale-[1.02] hover:shadow-lg" style={{ background: 'linear-gradient(135deg, #FF8C00, #FFB800)' }} data-testid="hero-search-btn">
+                  <button onClick={handleSearch} className="px-8 py-4 rounded-xl text-sm font-bold text-black transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_4px_24px_rgba(255,140,0,0.4)]" style={{ background: 'linear-gradient(135deg, #FF8C00, #FFB800)' }} data-testid="hero-search-btn">
                     Search Directory
                   </button>
                 </div>
