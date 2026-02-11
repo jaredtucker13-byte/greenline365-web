@@ -319,7 +319,13 @@ export default function DirectoryPage() {
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                 </svg>
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-3">Featured Listings</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-3">
+                Featured{' '}
+                <span className="relative inline-block">
+                  <span style={{ color: '#FF8C00' }}>Listings</span>
+                  <svg className="absolute -bottom-1 left-0 w-full" viewBox="0 0 200 8" fill="none"><path d="M1 5.5Q50 1 100 5T199 3" stroke="#FF8C00" strokeWidth="2" strokeLinecap="round" opacity="0.4" /></svg>
+                </span>
+              </h2>
               <p className="text-zinc-400 text-center max-w-lg mx-auto mb-10">
                 Top-rated businesses handpicked for exceptional service and verified trust scores.
               </p>
