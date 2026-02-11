@@ -166,7 +166,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 price: '0',
                 priceCurrency: 'USD',
                 availability: 'https://schema.org/InStock',
-                priceValidUntil: '2025-12-31',
+                'priceValidUntil': '2026-12-31',
               },
               description: 'AI business automation platform for local businesses. Automate content creation, schedule appointments 24/7, and track local trends in real-time.',
               featureList: [
