@@ -9,7 +9,52 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // OS Dark Theme
+        // Bentley Standard: Deep Charcoal + Midnight Blue
+        'midnight': {
+          DEFAULT: '#0D1B2A',
+          950: '#060E17',
+          900: '#0D1B2A',
+          800: '#1B2838',
+          700: '#1B3A4B',
+          600: '#274C63',
+          500: '#3A6B8C',
+        },
+        'charcoal': {
+          DEFAULT: '#1C1C1E',
+          950: '#0E0E0F',
+          900: '#1C1C1E',
+          800: '#2C2C2E',
+          700: '#3A3A3C',
+          600: '#48484A',
+          500: '#636366',
+        },
+        // Champagne Gold (Primary Accent)
+        'gold': {
+          DEFAULT: '#C9A96E',
+          50: '#FAF6ED',
+          100: '#F3ECDA',
+          200: '#E6D8B5',
+          300: '#D9C48F',
+          400: '#C9A96E',
+          500: '#B8944F',
+          600: '#9A7A3E',
+          700: '#7C6232',
+          800: '#5E4A26',
+          900: '#40321A',
+        },
+        // Brushed Silver (Secondary Accent)
+        'silver': {
+          DEFAULT: '#A8A9AD',
+          light: '#C0C0C0',
+          dark: '#808080',
+        },
+        // GreenLine Brand (muted luxury green)
+        'greenline': {
+          DEFAULT: '#5B8A72',
+          light: '#7BAF95',
+          dark: '#3D6B54',
+        },
+        // Legacy compatibility
         'os-dark': {
           DEFAULT: '#0A0A0A',
           950: '#000000',
@@ -18,7 +63,6 @@ module.exports = {
           700: '#1A1A1A',
           600: '#252525',
         },
-        // Emerald Green (Primary) - pairs with orange, no clash
         'neon-green': {
           DEFAULT: '#10B981',
           50: '#ECFDF5',
@@ -32,44 +76,21 @@ module.exports = {
           800: '#065F46',
           900: '#064E3B',
         },
-        // Teal/Cyan (Secondary)
-        'neon-teal': {
-          DEFAULT: '#00FFFF',
-          50: '#E6FFFF',
-          100: '#CCFFFF',
-          200: '#99FFFF',
-          300: '#66FFFF',
-          400: '#33FFFF',
-          500: '#00FFFF',
-          600: '#00E6E6',
-          700: '#00CCCC',
-          800: '#00B3B3',
-          900: '#009999',
-        },
-        // Amber/Orange (Accent/Warning)
-        'neon-amber': {
-          DEFAULT: '#FF9500',
-          50: '#FFF4E6',
-          100: '#FFE9CC',
-          200: '#FFD399',
-          300: '#FFBD66',
-          400: '#FFA733',
-          500: '#FF9500',
-          600: '#E68600',
-          700: '#CC7700',
-          800: '#B36800',
-          900: '#995900',
-        },
+        'neon-teal': { DEFAULT: '#00FFFF' },
+        'neon-amber': { DEFAULT: '#FF9500' },
       },
       fontFamily: {
-        'display': ['Poppins', 'system-ui', 'sans-serif'],
+        'heading': ['Montserrat', 'system-ui', 'sans-serif'],
         'body': ['Inter', 'system-ui', 'sans-serif'],
+        'display': ['Montserrat', 'system-ui', 'sans-serif'],
       },
       backgroundImage: {
         'radial-green': 'radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%)',
         'radial-teal': 'radial-gradient(circle, rgba(0, 255, 255, 0.15) 0%, transparent 70%)',
         'neon-gradient': 'linear-gradient(135deg, #10B981 0%, #00FFFF 100%)',
         'neon-gradient-reverse': 'linear-gradient(135deg, #00FFFF 0%, #10B981 100%)',
+        'gold-gradient': 'linear-gradient(135deg, #C9A96E, #E6D8B5, #C9A96E)',
+        'bentley-gradient': 'linear-gradient(180deg, #0D1B2A 0%, #1C1C1E 100%)',
       },
       boxShadow: {
         'neon-green': '0 0 20px rgba(16, 185, 129, 0.3), 0 0 40px rgba(16, 185, 129, 0.15)',
@@ -77,16 +98,17 @@ module.exports = {
         'neon-amber': '0 0 20px rgba(255, 149, 0, 0.3), 0 0 40px rgba(255, 149, 0, 0.15)',
         'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
         'glass-sm': '0 4px 16px 0 rgba(0, 0, 0, 0.25)',
+        'gold-glow': '0 0 20px rgba(201, 169, 110, 0.25), 0 0 60px rgba(201, 169, 110, 0.1)',
+        'intel-glow': '0 0 24px rgba(91, 138, 114, 0.35), 0 0 64px rgba(91, 138, 114, 0.15)',
       },
-      backdropBlur: {
-        'xs': '2px',
-      },
+      backdropBlur: { 'xs': '2px' },
       animation: {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'float': 'float 6s ease-in-out infinite',
         'glow': 'glow 2s ease-in-out infinite alternate',
         'slide-up': 'slideUp 0.5s ease-out',
         'slide-down': 'slideDown 0.5s ease-out',
+        'shimmer': 'shimmer 3s linear infinite',
       },
       keyframes: {
         float: {
@@ -94,8 +116,8 @@ module.exports = {
           '50%': { transform: 'translateY(-10px)' },
         },
         glow: {
-          '0%': { boxShadow: '0 0 5px rgba(0, 255, 0, 0.2), 0 0 10px rgba(0, 255, 0, 0.1)' },
-          '100%': { boxShadow: '0 0 20px rgba(0, 255, 0, 0.4), 0 0 40px rgba(0, 255, 0, 0.2)' },
+          '0%': { boxShadow: '0 0 5px rgba(201, 169, 110, 0.2)' },
+          '100%': { boxShadow: '0 0 20px rgba(201, 169, 110, 0.4)' },
         },
         slideUp: {
           '0%': { transform: 'translateY(20px)', opacity: '0' },
@@ -105,12 +127,15 @@ module.exports = {
           '0%': { transform: 'translateY(-20px)', opacity: '0' },
           '100%': { transform: 'translateY(0)', opacity: '1' },
         },
+        shimmer: {
+          '0%': { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
+        },
       },
     },
   },
   plugins: [
-    plugin(function({ addUtilities, addComponents, theme }) {
-      // Glassmorphism utilities
+    plugin(function({ addUtilities, addComponents }) {
       addUtilities({
         '.glass': {
           'background': 'rgba(255, 255, 255, 0.05)',
@@ -124,82 +149,62 @@ module.exports = {
           '-webkit-backdrop-filter': 'blur(16px)',
           'border': '1px solid rgba(255, 255, 255, 0.15)',
         },
-        '.glass-green': {
-          'background': 'rgba(0, 255, 0, 0.05)',
-          'backdrop-filter': 'blur(10px)',
-          '-webkit-backdrop-filter': 'blur(10px)',
-          'border': '1px solid rgba(0, 255, 0, 0.2)',
+        '.glass-gold': {
+          'background': 'rgba(201, 169, 110, 0.06)',
+          'backdrop-filter': 'blur(12px)',
+          '-webkit-backdrop-filter': 'blur(12px)',
+          'border': '1px solid rgba(201, 169, 110, 0.2)',
         },
-        '.glass-teal': {
-          'background': 'rgba(0, 255, 255, 0.05)',
+        '.glass-green': {
+          'background': 'rgba(91, 138, 114, 0.08)',
           'backdrop-filter': 'blur(10px)',
           '-webkit-backdrop-filter': 'blur(10px)',
-          'border': '1px solid rgba(0, 255, 255, 0.2)',
+          'border': '1px solid rgba(91, 138, 114, 0.2)',
+        },
+        '.text-gradient-gold': {
+          'background': 'linear-gradient(135deg, #C9A96E 0%, #E6D8B5 50%, #C9A96E 100%)',
+          '-webkit-background-clip': 'text',
+          'background-clip': 'text',
+          '-webkit-text-fill-color': 'transparent',
+        },
+        '.text-gradient-green': {
+          'background': 'linear-gradient(135deg, #5B8A72 0%, #7BAF95 100%)',
+          '-webkit-background-clip': 'text',
+          'background-clip': 'text',
+          '-webkit-text-fill-color': 'transparent',
+        },
+        '.badge-shimmer': {
+          'background-size': '200% auto',
+          'animation': 'shimmer 3s linear infinite',
         },
       });
-
-      // Button components
       addComponents({
         '.btn-primary': {
           'padding': '0.75rem 1.5rem',
-          'background': 'linear-gradient(135deg, #00FF00 0%, #00E600 100%)',
-          'color': '#000000',
+          'background': 'linear-gradient(135deg, #C9A96E 0%, #D9C48F 100%)',
+          'color': '#0D1B2A',
           'font-weight': '600',
           'border-radius': '9999px',
-          'box-shadow': '0 0 20px rgba(0, 255, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+          'box-shadow': '0 0 20px rgba(201, 169, 110, 0.3)',
           'transition': 'all 0.3s ease',
           '&:hover': {
             'transform': 'translateY(-2px)',
-            'box-shadow': '0 0 30px rgba(0, 255, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
-          },
-          '&:active': {
-            'transform': 'translateY(0)',
-          },
-        },
-        '.btn-secondary': {
-          'padding': '0.75rem 1.5rem',
-          'background': 'transparent',
-          'color': '#00FF00',
-          'font-weight': '600',
-          'border-radius': '9999px',
-          'border': '2px solid rgba(0, 255, 0, 0.5)',
-          'backdrop-filter': 'blur(4px)',
-          'transition': 'all 0.3s ease',
-          '&:hover': {
-            'background': 'rgba(0, 255, 0, 0.1)',
-            'border-color': 'rgba(0, 255, 0, 0.8)',
-            'box-shadow': '0 0 20px rgba(0, 255, 0, 0.3)',
+            'box-shadow': '0 0 30px rgba(201, 169, 110, 0.5)',
           },
         },
         '.btn-ghost': {
-          'padding': '0.75rem 1.5rem',
-          'background': 'rgba(255, 255, 255, 0.05)',
-          'color': '#FFFFFF',
+          'padding': '0.625rem 1.25rem',
+          'background': 'transparent',
+          'color': '#C9A96E',
           'font-weight': '500',
-          'border-radius': '0.75rem',
-          'border': '1px solid rgba(255, 255, 255, 0.1)',
-          'backdrop-filter': 'blur(4px)',
+          'border-radius': '9999px',
+          'border': '1px solid rgba(201, 169, 110, 0.4)',
           'transition': 'all 0.3s ease',
           '&:hover': {
-            'background': 'rgba(255, 255, 255, 0.1)',
-            'border-color': 'rgba(255, 255, 255, 0.2)',
+            'background': 'rgba(201, 169, 110, 0.1)',
+            'border-color': 'rgba(201, 169, 110, 0.7)',
+            'box-shadow': '0 0 16px rgba(201, 169, 110, 0.2)',
           },
-        },
-      });
-
-      // Text gradient utilities
-      addUtilities({
-        '.text-gradient-green': {
-          'background': 'linear-gradient(135deg, #00FF00 0%, #00CC00 100%)',
-          '-webkit-background-clip': 'text',
-          'background-clip': 'text',
-          '-webkit-text-fill-color': 'transparent',
-        },
-        '.text-gradient-neon': {
-          'background': 'linear-gradient(135deg, #00FF00 0%, #00FFFF 100%)',
-          '-webkit-background-clip': 'text',
-          'background-clip': 'text',
-          '-webkit-text-fill-color': 'transparent',
         },
       });
     }),
