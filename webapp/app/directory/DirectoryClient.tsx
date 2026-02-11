@@ -32,14 +32,13 @@ interface Listing {
 }
 
 const CATEGORIES = [
-  { id: 'hvac', label: 'HVAC', img: 'https://images.unsplash.com/photo-1758798157512-f0a864c696c9?w=600&h=400&fit=crop&q=80' },
-  { id: 'plumbing', label: 'Plumbing', img: 'https://images.unsplash.com/photo-1542632867-261e4be41c7c?w=600&h=400&fit=crop&q=80' },
-  { id: 'roofing', label: 'Roofing', img: 'https://images.unsplash.com/photo-1553169507-38833977274b?w=600&h=400&fit=crop&q=80' },
-  { id: 'electrical', label: 'Electrical', img: 'https://images.unsplash.com/photo-1754620906571-9ba64bd3ffb4?w=600&h=400&fit=crop&q=80' },
-  { id: 'barbershop', label: 'Barbers', img: 'https://images.unsplash.com/photo-1547648946-2b1fd7eab923?w=600&h=400&fit=crop&q=80' },
-  { id: 'bakery', label: 'Bakeries', img: 'https://images.unsplash.com/photo-1571157577110-493b325fdd3d?w=600&h=400&fit=crop&q=80' },
-  { id: 'gym', label: 'Fitness', img: 'https://images.unsplash.com/photo-1734189605012-f03d97a4d98f?w=600&h=400&fit=crop&q=80' },
-  { id: 'restaurant', label: 'Dining', img: 'https://images.unsplash.com/photo-1767778080869-4b82b5924c3a?w=600&h=400&fit=crop&q=80' },
+  { id: 'family-entertainment', label: 'Family Entertainment', sub: 'Kayak rentals, zoos, mini-golf & more', img: 'https://images.unsplash.com/photo-1758278038636-3936fafd057e?w=600&h=400&fit=crop&q=80' },
+  { id: 'destinations', label: 'Destinations', sub: 'Hotels, resorts & vacation rentals', img: 'https://images.unsplash.com/photo-1767285784658-f9311736c569?w=600&h=400&fit=crop&q=80' },
+  { id: 'services', label: 'Services', sub: 'HVAC, Plumbing, Electrical & Roofing', img: 'https://images.unsplash.com/photo-1660330589827-da8ab7dd3c02?w=600&h=400&fit=crop&q=80' },
+  { id: 'dining', label: 'Dining', sub: 'Cafes, casual & fine dining', img: 'https://images.unsplash.com/photo-1737141499770-cd5eda86410d?w=600&h=400&fit=crop&q=80' },
+  { id: 'nightlife', label: 'Nightlife', sub: 'Bars, pubs, clubs & lounges', img: 'https://images.unsplash.com/photo-1698054239312-c452af4f5ab2?w=600&h=400&fit=crop&q=80' },
+  { id: 'style-shopping', label: 'Style & Shopping', sub: 'Boutiques, salons & specialty retail', img: 'https://images.unsplash.com/photo-1606132288185-ae8122b4c3a3?w=600&h=400&fit=crop&q=80' },
+  { id: 'health-wellness', label: 'Health & Wellness', sub: 'Gyms, spas, clinics & wellness centers', img: 'https://images.unsplash.com/photo-1579854602908-ce7e7c29f4fd?w=600&h=400&fit=crop&q=80' },
 ];
 
 const FILTER_SPECIALTIES = ['All Specialties', 'Residential', 'Commercial', 'Emergency', 'Maintenance'];
