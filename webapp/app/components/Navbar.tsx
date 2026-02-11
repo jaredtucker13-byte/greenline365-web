@@ -130,68 +130,40 @@ export default function Navbar() {
           <div className="flex justify-between items-center h-20">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-3 group">
-              {/* Futuristic Logo Mark */}
               <div className="relative w-10 h-10">
                 <motion.div
-                  className="absolute inset-0 rounded-lg bg-gradient-to-br from-neon-green-500 to-neon-teal-500 opacity-20 blur-sm group-hover:opacity-30 transition-opacity"
-                  animate={{
-                    scale: [1, 1.1, 1],
-                    rotate: [0, 5, 0],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: 'easeInOut',
-                  }}
+                  className="absolute inset-0 rounded-lg bg-gradient-to-br from-gold to-gold-300 opacity-20 blur-sm group-hover:opacity-30 transition-opacity"
+                  animate={{ scale: [1, 1.1, 1], rotate: [0, 5, 0] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
                 />
-                <div className="relative w-full h-full rounded-lg border-2 border-neon-green-500/50 flex items-center justify-center bg-neon-green-500/10 group-hover:border-neon-green-500 group-hover:shadow-neon-green transition-all duration-300">
-                  <svg 
-                    className="w-5 h-5 text-neon-green-500"
-                    viewBox="0 0 24 24" 
-                    fill="none" 
-                    stroke="currentColor"
-                  >
-                    <path 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                      strokeWidth={2} 
-                      d="M13 10V3L4 14h7v7l9-11h-7z"
-                    />
+                <div className="relative w-full h-full rounded-lg border border-gold/40 flex items-center justify-center bg-gold/10 group-hover:border-gold group-hover:shadow-gold-glow transition-all duration-300">
+                  <svg className="w-5 h-5 text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 </div>
               </div>
-              
-              {/* Logo Text */}
-              <div className="font-display">
+              <div className="font-heading">
                 <div className="flex items-baseline">
-                  <span className="text-xl font-bold text-white group-hover:text-neon-green-500 transition-colors duration-300">
-                    GreenLine
-                  </span>
-                  <span className="text-xl font-bold text-neon-green-500 glow-text">
-                    365
-                  </span>
+                  <span className="text-xl font-semibold text-white group-hover:text-gold transition-colors duration-300">GreenLine</span>
+                  <span className="text-xl font-semibold text-gradient-gold">365</span>
                 </div>
-                <div className="text-[10px] text-white/40 tracking-wider uppercase font-medium -mt-1">
-                  Business OS
-                </div>
+                <div className="text-[10px] text-white/40 tracking-wider uppercase font-medium -mt-1">Business Directory</div>
               </div>
             </Link>
 
             {/* System Status Indicator */}
             <motion.div 
-              className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full glass-green border border-neon-green-500/20"
+              className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full glass-gold border border-gold/20"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.3 }}
             >
               <motion.div 
-                className="w-2 h-2 rounded-full bg-neon-green-500 shadow-neon-green"
+                className="w-2 h-2 rounded-full bg-greenline shadow-intel-glow"
                 animate={{ opacity: [1, 0.5, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
               />
-              <span className="text-xs font-semibold text-neon-green-500 tracking-wide">
-                SYSTEM ONLINE
-              </span>
+              <span className="text-xs font-semibold text-gold tracking-wide">LIVE</span>
             </motion.div>
 
             {/* Desktop Navigation */}
