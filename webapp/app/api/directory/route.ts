@@ -1,9 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { getTierLimits } from '@/lib/feature-gates';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKey); }
+
+/** Apply photo gating: limit visible photos based on tier + claim status */
+function applyPhotoGating(listing: any) {
+  const tier = listing.tier || 'free';
+  const isClaimed = listing.is_claimed;
+  const limits = getTierLimits(tier);
+  const allPhotos: string[] = listing.gallery_images || [];
+
+  // Unclaimed listings: show the first photo (storefront) to keep directory attractive
+  // Claimed free listings: 1 photo (the storefront)
+  // Pro: 2 photos, Premium: all
+  const maxPhotos = (!isClaimed) ? 1 : limits.photos;
+  const visiblePhotos = maxPhotos >= 999 ? allPhotos : allPhotos.slice(0, maxPhotos);
+
+  return {
+    ...listing,
+    gallery_images: visiblePhotos,
+    total_photos_available: allPhotos.length,
+    cover_image_url: allPhotos[0] || listing.cover_image_url || null,
+  };
+}
 
 // GET /api/directory - Public search
 export async function GET(request: NextRequest) {
