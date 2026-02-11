@@ -192,7 +192,60 @@ As user toggles add-ons:
 
 ---
 
-## THE SALES NARRATIVE
+## TRANSACTION FEE MODEL ($0.60 per interaction)
+
+### Core Logic
+Directory-only customers pay $0.60 per trackable customer interaction. Backend service subscribers (Tier 1/2/3) have fees **waived** — they're already paying premium monthly rates.
+
+### Fee Schedule
+
+| Directory Action | Trigger | Directory-Only (Free/Pro/Premium) | Backend Subscriber (Tier 1/2/3) |
+|---|---|---|---|
+| "Call Now" click | Customer taps call button | $0.60 | $0.00 (uses AI Booking Agent) |
+| "Book Now" click | Customer initiates booking | $0.60 | $0.00 (uses Cal.com integration) |
+| Coupon redemption | QR scanned at POS | $0.60 | $0.00 (uses Coupon Engine) |
+| Lead form submission | Customer fills contact form | $0.60 | $0.00 (routes to CRM) |
+| Direction/map click | Customer gets directions | $0.60 | $0.00 (included) |
+
+### Why It Works
+- Every $0.60 represents a REAL customer interaction — not impressions, not ad clicks
+- Still far cheaper than Google Ads ($5-15 per click)
+- Creates natural "pain" that makes backend bundles ($1,500-$2,500/mo) look like a better deal
+- Waiving fees becomes a closing incentive for upselling backend services
+
+### The Upsell Pitch
+> "You're paying $0.60 every time a customer interacts with your listing. At 500 interactions/month, that's $300. For $1,500/mo you get our full AI Booking Agent, dedicated phone line, AND all transaction fees disappear. You're basically getting the booking system for what you're already spending on fees."
+
+### Revenue Math at Scale
+- 100 directory-only businesses × 200 interactions/month × $0.60 = **$12,000/mo** in transaction fees
+- Businesses that upgrade to backend tiers = $1,500-$2,500/mo recurring (fees waived)
+- Net effect: transaction fees fund growth, backend subscriptions fund operations
+
+### Three Revenue Streams from One Directory
+1. **Directory Subscriptions**: $39-$59/mo per business (Pro/Premium tiers)
+2. **Transaction Fees**: $0.60/interaction from directory-only users
+3. **Backend Upsells**: $1,500-$2,500/mo (waives transaction fees as closing incentive)
+
+---
+
+## COUPON ENGINE (Marketplace Add-On)
+
+### Pricing
+- **$19/mo** for Coupon Engine access (infrastructure cost)
+- **$0.60 per redemption** (tracked via QR scan at POS)
+- Backend subscribers (Tier 1/2/3): redemption fee waived, $19/mo access included in Tier 2+
+
+### Workflow
+1. Business creates coupon: discount, expiration date, usage limit
+2. Coupon auto-featured on their directory listing
+3. Pushed via Campaign Manager (SMS/Email) if on Tier 2+
+4. Customer scans QR at POS → logs to CRM → tracks ROI
+5. $0.60 charged per redemption (directory-only) or $0.00 (backend subscriber)
+
+### Positioning
+> "You only pay $0.60 when a real customer walks through your door and scans your code. No scan, no fee."
+
+Performance metric, not a tax.
 
 **For Free Tier users:**
 > "Your website audit shows you're losing $10k/month in missed bookings. You can buy our AI Booking Agent for $900 alone, or for just $600 more, get the full Tier 1 bundle that protects your entire reputation."
