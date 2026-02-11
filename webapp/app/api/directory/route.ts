@@ -13,9 +13,6 @@ function applyPhotoGating(listing: any) {
   const limits = getTierLimits(tier);
   const allPhotos: string[] = listing.gallery_images || [];
 
-  // Unclaimed listings: show the first photo (storefront) to keep directory attractive
-  // Claimed free listings: 1 photo (the storefront)
-  // Pro: 2 photos, Premium: all
   const maxPhotos = (!isClaimed) ? 1 : limits.photos;
   const visiblePhotos = maxPhotos >= 999 ? allPhotos : allPhotos.slice(0, maxPhotos);
 
@@ -24,7 +21,22 @@ function applyPhotoGating(listing: any) {
     gallery_images: visiblePhotos,
     total_photos_available: allPhotos.length,
     cover_image_url: allPhotos[0] || listing.cover_image_url || null,
+    has_property_intelligence: limits.hasPropertyIntelligence && isClaimed,
+    search_weight: limits.searchWeight,
   };
+}
+
+/** Sort listings by weighted ranking: Property Intelligence > Paid tiers > Free */
+function applyWeightedRanking(listings: any[]) {
+  return listings.sort((a, b) => {
+    // Property Intelligence badge holders first
+    if (a.has_property_intelligence && !b.has_property_intelligence) return -1;
+    if (!a.has_property_intelligence && b.has_property_intelligence) return 1;
+    // Then by search weight (premium > pro > free)
+    if (a.search_weight !== b.search_weight) return b.search_weight - a.search_weight;
+    // Then by trust score
+    return (b.trust_score || 0) - (a.trust_score || 0);
+  });
 }
 
 // GET /api/directory - Public search
