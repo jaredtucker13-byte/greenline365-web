@@ -194,14 +194,19 @@ export default function DirectoryPage() {
 
                 {/* Quick category chips */}
                 <div className="flex flex-wrap justify-center gap-2 mt-5">
-                  {CATEGORIES.slice(0, 5).map(cat => (
-                    <button key={cat.id} onClick={() => handleCategoryClick(cat.id)}
-                      className="px-3 py-1.5 rounded-full text-xs font-medium text-white/60 border border-white/10 hover:border-orange-500/40 hover:text-white transition-all backdrop-blur-sm"
+                  {CATEGORIES.slice(0, 5).map((cat, i) => (
+                    <motion.button
+                      key={cat.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.8 + i * 0.07 }}
+                      onClick={() => handleCategoryClick(cat.id)}
+                      className="px-4 py-1.5 rounded-full text-xs font-medium text-white/60 border border-white/10 hover:border-orange-500/50 hover:text-orange-300 hover:shadow-[0_0_12px_rgba(255,140,0,0.15)] transition-all duration-300 backdrop-blur-sm"
                       style={{ background: 'rgba(255,255,255,0.05)' }}
                       data-testid={`hero-chip-${cat.id}`}
                     >
                       {cat.label}
-                    </button>
+                    </motion.button>
                   ))}
                 </div>
               </motion.div>
