@@ -620,7 +620,8 @@ export default function DirectoryPage() {
               </div>
             );
           })()}
-        </section>
+          </section>
+        </div>
       )}
     </div>
   );
