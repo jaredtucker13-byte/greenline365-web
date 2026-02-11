@@ -430,7 +430,7 @@ export default function DirectoryPage() {
           <section className="bg-[#fafafa] py-16" data-testid="value-prop-section">
             <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
               <div>
-                <h2 className="text-3xl font-bold text-[#1a1a1a] mb-4">A Trusted Resource for Finding Local Pros</h2>
+                <h2 className="text-3xl font-bold text-[#1a1a1a] mb-4">A <span style={{ color: '#FF8C00' }}>Trusted</span> Resource for Finding Local Pros</h2>
                 <p className="text-zinc-500 mb-8 leading-relaxed">
                   Whether you need emergency plumbing, a master electrician, or the best barber in town — our directory connects you with verified, accountable businesses. Every badge is earned through real work and real feedback.
                 </p>
