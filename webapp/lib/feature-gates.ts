@@ -19,7 +19,9 @@ export interface TierLimits {
   hasMarketplaceAccess: boolean;
   hasPrioritySearch: boolean;
   hasPrioritySupport: boolean;
-  transactionFee: number; // per interaction (calls, bookings, coupon redeems)
+  hasPropertyIntelligence: boolean;
+  searchWeight: number;
+  transactionFee: number;
 }
 
 const TIER_LIMITS: Record<DirectoryTier, TierLimits> = {
@@ -34,6 +36,8 @@ const TIER_LIMITS: Record<DirectoryTier, TierLimits> = {
     hasMarketplaceAccess: false,
     hasPrioritySearch: false,
     hasPrioritySupport: false,
+    hasPropertyIntelligence: false,
+    searchWeight: 1,
     transactionFee: 0.60,
   },
   pro: {
@@ -47,10 +51,12 @@ const TIER_LIMITS: Record<DirectoryTier, TierLimits> = {
     hasMarketplaceAccess: true,
     hasPrioritySearch: true,
     hasPrioritySupport: false,
+    hasPropertyIntelligence: true,
+    searchWeight: 3,
     transactionFee: 0.60,
   },
   premium: {
-    photos: 999, // unlimited (Google sync)
+    photos: 999,
     hasVerifiedBadge: true,
     hasCtaButtons: true,
     hasFeaturedPlacement: true,
@@ -60,6 +66,8 @@ const TIER_LIMITS: Record<DirectoryTier, TierLimits> = {
     hasMarketplaceAccess: true,
     hasPrioritySearch: true,
     hasPrioritySupport: true,
+    hasPropertyIntelligence: true,
+    searchWeight: 5,
     transactionFee: 0.60,
   },
 };
