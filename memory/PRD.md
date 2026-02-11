@@ -72,7 +72,7 @@ GreenLine365 is a directory-first lead generation platform. The initial goal was
 ## Prioritized Backlog
 
 ### P0 - Security
-- [ ] Fix multi-tenancy data leak in CRM
+- [x] Fix multi-tenancy data leak in CRM (FIXED Feb 2026 — added auth + user_id filtering to GET/POST/PUT on /api/crm/leads)
 
 ### P1 - Core Features
 - [ ] Fix Knowledge Base saving
