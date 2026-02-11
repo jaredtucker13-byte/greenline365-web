@@ -79,11 +79,31 @@ GreenLine365 is a directory-first lead generation platform. The initial goal was
 - [ ] Pricing Tiers & Stripe Integration ($0/$30/$50)
 - [ ] Admin Dashboard (GHL Clone) - listing management, CSV imports, lead tagging
 
+### P1 - Revenue Features (Documented, Ready to Build)
+- [ ] $400 Digital Infrastructure Audit System (see AUDIT_SYSTEM_SPEC.md)
+  - Dual-search architecture (Google Places + Greenline DB)
+  - Automated PDF generation via Supabase Edge Functions
+  - CRM lead enrichment during scraping
+  - Gap Analysis with Missed Revenue Calculator
+- [ ] Marketing & Reputation Dashboard (see MARKETING_DASHBOARD_SPEC.md)
+  - Reputation & Sentiment Hub (Google + Directory reviews)
+  - Conversion & Lead Engine (Coupons, Bookings, Lead Capture)
+  - Content Pipeline (Blog Sync, Newsletter Archive, Social Schedule)
+  - Property Intelligence Metrics (Command-Tier only)
+
 ### P2 - Enhancements
 - [ ] Service Worker permanent fix
 - [ ] Outreach & Workflows - email templates, team inbox
 - [ ] AI Helpers - URL scraping, blog generation
 - [ ] Map Integration - tiered pin visuals
+- [ ] Coupon & Deal Engine with QR redemption
+- [ ] AI Review Responder (Brand Voice)
+- [ ] Google Business Profile API integration
 
 ### P3 - Future
 - [ ] Headless WordPress CMS integration
+
+## Documentation Index
+- `/app/memory/PRD.md` — This file (core product requirements)
+- `/app/memory/MARKETING_DASHBOARD_SPEC.md` — Marketing Command Center spec
+- `/app/memory/AUDIT_SYSTEM_SPEC.md` — $400 Audit System + CRM Enrichment spec
