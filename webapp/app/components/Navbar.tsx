@@ -269,11 +269,11 @@ export default function Navbar() {
                     Sign In
                   </Link>
                   <Link
-                    href="/waitlist"
-                    data-testid="nav-waitlist-btn"
+                    href="/register-business"
+                    data-testid="nav-register-btn"
                     className="px-5 py-2.5 text-sm font-bold bg-neon-green-500 text-black rounded-lg hover:bg-neon-green-400 transition-all shadow-neon-green"
                   >
-                    Join Waitlist
+                    Add Your Business
                   </Link>
                 </div>
               ) : user ? (
@@ -310,11 +310,11 @@ export default function Navbar() {
                     Sign In
                   </Link>
                   <Link
-                    href="/waitlist"
-                    data-testid="nav-waitlist-btn"
+                    href="/register-business"
+                    data-testid="nav-register-btn"
                     className="px-5 py-2.5 text-sm font-bold bg-neon-green-500 text-black rounded-lg hover:bg-neon-green-400 transition-all shadow-neon-green"
                   >
-                    Join Waitlist
+                    Add Your Business
                   </Link>
                 </div>
               )}
@@ -443,11 +443,11 @@ export default function Navbar() {
                     ) : (
                       <>
                         <Link
-                          href="/waitlist"
+                          href="/register-business"
                           onClick={() => setMobileMenuOpen(false)}
                           className="block w-full p-4 text-center text-xl font-bold bg-neon-green-500 text-black rounded-xl"
                         >
-                          Join Waitlist
+                          Add Your Business
                         </Link>
                         <Link
                           href="/login"
