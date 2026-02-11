@@ -245,7 +245,7 @@ export default function Navbar() {
                     href="/register-business"
                     data-testid="nav-register-btn"
                     className="px-5 py-2.5 text-sm font-bold text-black rounded-lg transition-all hover:opacity-90"
-                    style={{ background: 'linear-gradient(135deg, #FF8C00, #FFB800)' }}
+                    style={{ background: 'linear-gradient(135deg, #C9A96E, #E6D8B5)' }}
                   >
                     Add Your Business
                   </Link>
@@ -263,7 +263,7 @@ export default function Navbar() {
                   {isAdmin && (
                     <Link
                       href="/dashboard"
-                      className="px-4 py-2 text-sm font-medium text-neon-green-500 hover:text-neon-green-400 transition-colors"
+                      className="px-4 py-2 text-sm font-medium text-gold hover:text-gold-300 transition-colors"
                     >
                       Dashboard
                     </Link>
@@ -287,7 +287,7 @@ export default function Navbar() {
                     href="/register-business"
                     data-testid="nav-register-btn"
                     className="px-5 py-2.5 text-sm font-bold text-black rounded-lg transition-all hover:opacity-90"
-                    style={{ background: 'linear-gradient(135deg, #FF8C00, #FFB800)' }}
+                    style={{ background: 'linear-gradient(135deg, #C9A96E, #E6D8B5)' }}
                   >
                     Add Your Business
                   </Link>
