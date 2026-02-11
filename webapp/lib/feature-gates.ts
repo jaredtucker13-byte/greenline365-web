@@ -24,7 +24,7 @@ export interface TierLimits {
 
 const TIER_LIMITS: Record<DirectoryTier, TierLimits> = {
   free: {
-    photos: 0,
+    photos: 1,
     hasVerifiedBadge: false,
     hasCtaButtons: false,
     hasFeaturedPlacement: false,
