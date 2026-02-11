@@ -64,7 +64,7 @@ async function scrapeContactPage(websiteUrl: string): Promise<ScrapedContact[]> 
 
       // Extract emails from the page
       const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
-      const foundEmails = html.match(emailRegex) || [];
+      const foundEmails: string[] = html.match(emailRegex) || [];
 
       // Also check mailto: links
       $('a[href^="mailto:"]').each((_, el) => {
