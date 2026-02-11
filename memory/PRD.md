@@ -136,3 +136,4 @@ GreenLine365 is a directory-first lead generation platform. The initial goal was
 - Test report: /app/test_reports/iteration_9.json
 - Backend: 12/12 photo gating + Stripe live tests passed (100%)
 - Previous: /app/test_reports/iteration_8.json — 21/21 backend, 45/45 frontend
+- Code audit: Feb 2026 — 0 TypeScript errors, removed 3 dead API routes, 2 unused deps, 3 orphan files
