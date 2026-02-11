@@ -34,7 +34,8 @@ GreenLine365 is a directory-first lead generation platform. The initial goal was
 ### Phase 1: Homepage Pivot to Directory (COMPLETED - Feb 2026)
 - Homepage (`/`) now renders the business directory
 - Previous homepage moved to `/services`
-- Global Navbar updated: Directory, Our Services, Industries, Pricing
+- Global Navbar updated: Directory, Our Services, Industries, Pricing, **"Add Your Business"** CTA
+- Hero section: Nano Banana AI cityscape backdrop (85vh immersive), glass-morphism search, category chips, "LIVE DIRECTORY" trust badge
 - **7-Category Mosaic** with Nano Banana AI-generated images (photorealistic, vibrant):
   1. Family Entertainment (Kayak rentals, zoos, mini-golf)
   2. Destinations (Hotels, resorts, vacation rentals)
