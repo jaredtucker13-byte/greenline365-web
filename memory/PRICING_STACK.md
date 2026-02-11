@@ -175,6 +175,20 @@ Implemented 200ms after click "Apply":
 - Physical QR Asset Pack ($199 + shipping) — 3-5 days delivery
 - Property "Deep-Seed" Service ($250/prop) — 24hr kickoff after upload
 
+### DIRECTORY MARKETPLACE (Public — available to Pro/Premium)
+
+| Add-On | Price | Model |
+|---|---|---|
+| Coupon Engine | $19/mo + $0.60/redemption | Monthly + transaction |
+| QR Feedback Kit | $199 | One-time |
+| Custom Poll Template | $150 | Per template |
+| Featured Boost | $29 | Per week |
+| Additional Photos | $9 | /mo per 5-pack |
+| Analytics Pro | $19 | /mo |
+| Review Response AI | $29 | /mo |
+
+Note: Transaction fees ($0.60/interaction) waived for backend service subscribers (Tier 1/2/3).
+
 ### Deployment Tracker States
 
 | State | UI | Logic |
