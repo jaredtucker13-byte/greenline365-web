@@ -7,22 +7,18 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKey); }
 
-// Directory tier pricing (defined server-side only — never trust frontend amounts)
+// Public directory tier pricing (defined server-side only — never trust frontend amounts)
+// NOTE: Backend service bundles ($1.5k-$2.5k/mo) are INTERNAL ONLY — see /docs/PRICING_STACK.md
 const DIRECTORY_TIERS: Record<string, { name: string; price: number; features: string[] }> = {
-  growth: {
-    name: 'GL365 Growth',
-    price: 299.00,
-    features: ['Multi-category listing', 'Media gallery (15 photos)', '5 AI SEO blogs/mo', 'SMS/Email lead alerts', 'XP tracking dashboard'],
+  pro: {
+    name: 'GL365 Pro',
+    price: 39.00,
+    features: ['2 custom images', 'Verified Business badge', 'CTA buttons (Book/Call)', 'Priority search ranking', 'Marketplace add-on access'],
   },
-  authority: {
-    name: 'GL365 Authority',
-    price: 599.00,
-    features: ['Everything in Growth', 'Neighborhood leaderboard', '15 AI SEO blogs/mo', 'AI sentiment analysis', 'Zip code boost', 'AI auto-responder'],
-  },
-  dominator: {
-    name: 'GL365 Dominator',
-    price: 899.00,
-    features: ['Everything in Authority', 'Unlimited AI SEO blogs', 'Neighborhood King badge', 'AI auto-dispatch', 'Competitor benchmarking', 'VIP featured placement'],
+  premium: {
+    name: 'GL365 Premium',
+    price: 59.00,
+    features: ['All Google photos synced', 'Featured homepage placement', 'Badge earning eligible', 'Analytics dashboard', 'Priority support', 'QR Feedback collection'],
   },
 };
 
