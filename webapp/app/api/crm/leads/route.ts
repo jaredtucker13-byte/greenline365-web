@@ -243,10 +243,17 @@ export async function PUT(request: NextRequest) {
       dbUpdates.last_contact_at = new Date().toISOString();
     }
     
-    const { data: lead, error } = await supabase
+    let updateQuery = supabase
       .from('crm_leads')
       .update(dbUpdates)
-      .eq('id', id)
+      .eq('id', id);
+    
+    // Non-admin users can only update their own leads
+    if (!isAdmin) {
+      updateQuery = updateQuery.eq('user_id', user.id);
+    }
+    
+    const { data: lead, error } = await updateQuery
       .select()
       .single();
     
