@@ -20,7 +20,7 @@ if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-export default function HomePage() {
+export default function ServicesPage() {
   const [showFullForm, setShowFullForm] = useState(false);
   const [showWidget, setShowWidget] = useState(false);
   
