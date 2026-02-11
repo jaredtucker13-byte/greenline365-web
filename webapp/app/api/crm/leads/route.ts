@@ -26,8 +26,13 @@ export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
     
-    // Skip admin check for now - allow viewing leads
-    // TODO: Re-enable admin check once auth is fully working
+    // Auth check - get current user
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    
+    const isAdmin = ADMIN_EMAILS.includes(user.email || '');
     
     const { searchParams } = new URL(request.url);
     
@@ -49,6 +54,11 @@ export async function GET(request: NextRequest) {
     let query = supabase
       .from('crm_leads')
       .select('id, user_id, email, name, phone, company, status, source, value, first_contact_at, last_contact_at, converted_at, lost_at, lost_reason, tags, notes, assigned_to, metadata, created_at, updated_at', { count: 'exact' });
+    
+    // Non-admin users only see their own leads
+    if (!isAdmin) {
+      query = query.eq('user_id', user.id);
+    }
     
     // Apply filters
     if (status) {
@@ -77,10 +87,16 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch leads', details: error.message }, { status: 500 });
     }
     
-    // Get stats
-    const { data: allLeads } = await supabase
+    // Get stats - scoped to user unless admin
+    let statsQuery = supabase
       .from('crm_leads')
       .select('status');
+    
+    if (!isAdmin) {
+      statsQuery = statsQuery.eq('user_id', user.id);
+    }
+    
+    const { data: allLeads } = await statsQuery;
     
     const stats: Record<string, number> = {};
     allLeads?.forEach((lead: any) => {
