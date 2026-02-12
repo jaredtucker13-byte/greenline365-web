@@ -52,10 +52,10 @@ const TIERS = [
   {
     id: 'premium',
     name: 'Premium',
-    price: 59,
+    price: 89,
     period: '/mo',
-    tagline: 'Dominate your market',
-    description: 'Maximum visibility with all the tools to earn elite status.',
+    tagline: 'Get Booked',
+    description: 'Your listing doesn\'t just get seen — it generates revenue you can measure.',
     cta: 'Go Premium',
     ctaHref: '/register-business?tier=premium',
     highlight: true,
