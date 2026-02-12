@@ -11,7 +11,6 @@ import { createClient } from '@/lib/supabase/server';
 // Admin emails that can see all logs
 const ADMIN_EMAILS = [
   'greenline365help@gmail.com',
-  'admin@greenline365.com',
 ];
 
 export async function GET(request: NextRequest) {
