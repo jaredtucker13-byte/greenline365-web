@@ -62,6 +62,12 @@ export default function ListingDetailPage() {
       if (res.ok) {
         const data = await res.json();
         setListing(data);
+        // Track page view
+        fetch('/api/directory/addons/analytics', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ listing_id: data.id, event_type: 'view' }),
+        }).catch(() => {});
       }
       setLoading(false);
     })();
