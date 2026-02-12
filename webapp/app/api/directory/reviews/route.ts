@@ -107,12 +107,16 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { listing_id, reviewer_name, rating, text } = body;
 
-    if (!listing_id || !reviewer_name || !rating || !text) {
+    if (!listing_id || !reviewer_name || rating === undefined || rating === null || !text) {
       return NextResponse.json({ error: 'listing_id, reviewer_name, rating, text required' }, { status: 400 });
     }
 
     if (rating < 1 || rating > 5) {
       return NextResponse.json({ error: 'Rating must be 1-5' }, { status: 400 });
+    }
+
+    if (text.trim().length < 10) {
+      return NextResponse.json({ error: 'Review must be at least 10 characters. Please share why you gave this rating.' }, { status: 400 });
     }
 
     const service = getServiceClient();
