@@ -672,7 +672,7 @@ export default function DirectoryPage() {
           </section>
 
           {/* Listing Results */}
-          <section className="max-w-7xl mx-auto px-6 py-10">
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 py-10 overflow-hidden">
             {loading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                 {[1,2,3,4,5,6,7,8].map(i => <div key={i} className="h-64 rounded-2xl animate-pulse bg-charcoal-800/30" />)}
