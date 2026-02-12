@@ -549,42 +549,44 @@ export default function DirectoryPage() {
 function ListingCard({ listing: l, index: i }: { listing: Listing; index: number }) {
   const hasIntel = l.has_property_intelligence;
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
-      className={`rounded-2xl overflow-hidden border transition-all duration-500 group cursor-pointer ${hasIntel ? 'border-greenline/20 shadow-intel-glow hover:border-greenline/40' : 'border-white/5 hover:border-gold/20 hover:shadow-gold-glow'}`}
-      style={{ background: 'rgba(255,255,255,0.02)' }}
-      data-testid={`listing-${l.slug}`}>
-      <div className="relative h-40 overflow-hidden">
-        {l.cover_image_url || l.logo_url ? (
-          <img src={l.cover_image_url || l.logo_url!} alt={l.business_name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-midnight-800 to-charcoal-800">
-            <span className="text-4xl font-heading font-light text-white/10">{l.business_name[0]}</span>
-          </div>
-        )}
-        <span className="absolute top-3 left-3 text-[10px] px-2 py-1 rounded-full backdrop-blur-sm capitalize font-body" style={{ background: 'rgba(13,27,42,0.7)', color: 'rgba(255,255,255,0.6)' }}>{l.industry.replace(/-/g, ' ')}</span>
-        {hasIntel && <div className="absolute top-3 right-3"><PropertyIntelBadge /></div>}
-        {l.tier !== 'free' && !hasIntel && (
-          <span className="absolute top-3 right-3 text-[10px] px-2 py-0.5 rounded-full font-heading font-semibold uppercase tracking-wider text-midnight-900"
-            style={{ background: l.tier === 'premium' ? 'linear-gradient(135deg, #C9A96E, #E6D8B5)' : 'linear-gradient(135deg, #A8A9AD, #C0C0C0)' }}>
-            {l.tier === 'premium' ? 'Premier' : 'Pro'}
-          </span>
-        )}
-      </div>
-      <div className="p-4">
-        <h3 className="font-heading font-semibold text-sm truncate mb-1 text-gold">{l.business_name}</h3>
-        {l.city && <p className="text-[11px] text-silver/50 flex items-center gap-1 mb-1 font-body">
-          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-          {l.city}, {l.state}
-        </p>}
-        {l.description && <p className="text-xs text-white/35 line-clamp-2 mb-3 font-body">{l.description}</p>}
-        <div className="flex items-center justify-between">
-          <button className="btn-ghost text-xs px-3 py-1.5 rounded-full" data-testid={`view-details-${l.slug}`}>View Details</button>
-          <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold" style={{ background: 'rgba(201,169,110,0.12)', color: '#C9A96E' }}>
-            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
-            {l.avg_feedback_rating > 0 ? l.avg_feedback_rating.toFixed(1) : 'New'}
+    <Link href={`/listing/${l.slug}`}>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
+        className={`rounded-2xl overflow-hidden border transition-all duration-500 group cursor-pointer ${hasIntel ? 'border-greenline/20 shadow-intel-glow hover:border-greenline/40' : 'border-white/5 hover:border-gold/20 hover:shadow-gold-glow'}`}
+        style={{ background: 'rgba(255,255,255,0.02)' }}
+        data-testid={`listing-${l.slug}`}>
+        <div className="relative h-40 overflow-hidden">
+          {l.cover_image_url || l.logo_url ? (
+            <img src={l.cover_image_url || l.logo_url!} alt={`${l.business_name} — ${l.industry.replace(/-/g, ' ')} in ${l.city || 'Florida'}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-midnight-800 to-charcoal-800">
+              <span className="text-4xl font-heading font-light text-white/10">{l.business_name[0]}</span>
+            </div>
+          )}
+          <span className="absolute top-3 left-3 text-[10px] px-2 py-1 rounded-full backdrop-blur-sm capitalize font-body" style={{ background: 'rgba(13,27,42,0.7)', color: 'rgba(255,255,255,0.6)' }}>{l.industry.replace(/-/g, ' ')}</span>
+          {hasIntel && <div className="absolute top-3 right-3"><PropertyIntelBadge /></div>}
+          {l.tier !== 'free' && !hasIntel && (
+            <span className="absolute top-3 right-3 text-[10px] px-2 py-0.5 rounded-full font-heading font-semibold uppercase tracking-wider text-midnight-900"
+              style={{ background: l.tier === 'premium' ? 'linear-gradient(135deg, #C9A96E, #E6D8B5)' : 'linear-gradient(135deg, #A8A9AD, #C0C0C0)' }}>
+              {l.tier === 'premium' ? 'Premier' : 'Pro'}
+            </span>
+          )}
+        </div>
+        <div className="p-4">
+          <h3 className="font-heading font-semibold text-sm truncate mb-1 text-gold">{l.business_name}</h3>
+          {l.city && <p className="text-[11px] text-silver/50 flex items-center gap-1 mb-1 font-body">
+            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+            {l.city}, {l.state}
+          </p>}
+          {l.description && <p className="text-xs text-white/35 line-clamp-2 mb-3 font-body">{l.description}</p>}
+          <div className="flex items-center justify-between">
+            <span className="btn-ghost text-xs px-3 py-1.5 rounded-full" data-testid={`view-details-${l.slug}`}>View Details</span>
+            <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold" style={{ background: 'rgba(201,169,110,0.12)', color: '#C9A96E' }}>
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
+              {l.avg_feedback_rating > 0 ? l.avg_feedback_rating.toFixed(1) : 'New'}
+            </div>
           </div>
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
+    </Link>
   );
 }
