@@ -93,19 +93,19 @@ export async function GET(request: NextRequest) {
 
       const { data: content } = await contentQuery;
       for (const c of content || []) {
-        const type = c.content_type === 'blog' ? 'blog'
-          : c.content_type === 'newsletter' ? 'newsletter'
-          : 'content';
+        // Use display_type from metadata if available, otherwise derive from content_type
+        const displayType = c.metadata?.display_type
+          || (c.content_type === 'blog' ? 'blog' : c.content_type === 'newsletter' ? 'newsletter' : 'content');
         events.push({
           id: c.id,
           source: 'scheduled_content',
-          event_type: type,
+          event_type: displayType,
           title: c.title || `${c.content_type} post`,
           description: c.description || '',
           start_time: c.scheduled_date,
           end_time: null,
-          color: c.color || EVENT_COLORS[type],
-          icon: EVENT_ICONS[type],
+          color: c.color || EVENT_COLORS[displayType] || EVENT_COLORS.content,
+          icon: EVENT_ICONS[displayType] || EVENT_ICONS.content,
           status: c.status,
           metadata: c.metadata,
           editable: c.status === 'draft' || c.status === 'scheduled',
