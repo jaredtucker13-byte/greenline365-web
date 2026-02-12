@@ -119,6 +119,13 @@ export default function DirectoryPage() {
         setFeaturedListings(Array.isArray(data) ? data : []);
       } catch { setFeaturedListings([]); }
     })();
+    (async () => {
+      try {
+        const res = await fetch('/api/directory/stats');
+        const data = await res.json();
+        setStats(data);
+      } catch {}
+    })();
   }, []);
 
   function handleCategoryClick(id: string) {
