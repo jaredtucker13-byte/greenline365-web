@@ -46,8 +46,12 @@ export async function POST(request: NextRequest) {
     const browser = await chromium.launch({ headless: true });
     const page = await browser.newPage({ viewport: { width: 1200, height: 900 } });
 
-    await page.goto(googleMapsUrl, { waitUntil: 'networkidle', timeout: 30000 });
-    await page.waitForTimeout(3000);
+    // Use search URL format — more reliable than CID URLs
+    const searchUrl = `https://www.google.com/maps/search/${encodeURIComponent(businessName + ' ' + (body.city || ''))}`;
+    const targetUrl = googleMapsUrl.includes('cid=') ? searchUrl : googleMapsUrl;
+
+    await page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 20000 });
+    await page.waitForTimeout(5000);
 
     // Try to close any popups/consent dialogs
     try {
