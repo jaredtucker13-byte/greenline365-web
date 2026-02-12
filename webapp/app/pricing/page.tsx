@@ -30,10 +30,10 @@ const TIERS = [
   {
     id: 'pro',
     name: 'Pro',
-    price: 39,
+    price: 45,
     period: '/mo',
-    tagline: 'Stand out locally',
-    description: 'Enhanced listing that builds trust and drives action.',
+    tagline: 'Get Chosen',
+    description: 'When customers compare, you win. Trust signals + direct action buttons.',
     cta: 'Upgrade to Pro',
     ctaHref: '/register-business?tier=pro',
     highlight: false,
