@@ -52,26 +52,30 @@ body::before {
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.035;
+  opacity: 0.03;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
   background-repeat: repeat;
 }
 
-/* ─── ABSTRACT GEOMETRIC WATERMARK (Compass Rose / Navigational) ─── */
+/* ─── AMBIENT GOLD GLOW ORBS ─── */
 body::after {
   content: '';
   position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 900px;
-  height: 900px;
+  inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.018;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400' fill='none' stroke='%23C9A96E' stroke-width='0.5'%3E%3Ccircle cx='200' cy='200' r='180'/%3E%3Ccircle cx='200' cy='200' r='140'/%3E%3Ccircle cx='200' cy='200' r='100'/%3E%3Ccircle cx='200' cy='200' r='60'/%3E%3Cline x1='200' y1='10' x2='200' y2='390'/%3E%3Cline x1='10' y1='200' x2='390' y2='200'/%3E%3Cline x1='60' y1='60' x2='340' y2='340'/%3E%3Cline x1='340' y1='60' x2='60' y2='340'/%3E%3Cpolygon points='200,20 210,180 200,200 190,180' fill='%23C9A96E' opacity='0.3'/%3E%3Cpolygon points='380,200 220,210 200,200 220,190' fill='%23C9A96E' opacity='0.3'/%3E%3Cpolygon points='200,380 190,220 200,200 210,220' fill='%23C9A96E' opacity='0.3'/%3E%3Cpolygon points='20,200 180,190 200,200 180,210' fill='%23C9A96E' opacity='0.3'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-size: contain;
+  background:
+    radial-gradient(800px circle at 15% 25%, rgba(201, 169, 110, 0.04) 0%, transparent 70%),
+    radial-gradient(600px circle at 85% 15%, rgba(201, 169, 110, 0.03) 0%, transparent 60%),
+    radial-gradient(700px circle at 75% 80%, rgba(201, 169, 110, 0.035) 0%, transparent 65%),
+    radial-gradient(500px circle at 25% 85%, rgba(91, 138, 114, 0.025) 0%, transparent 60%);
+  animation: ambientShift 20s ease-in-out infinite alternate;
+}
+
+@keyframes ambientShift {
+  0% { opacity: 0.7; }
+  50% { opacity: 1; }
+  100% { opacity: 0.8; }
 }
 
 /* Ensure all page content sits above the body pseudo-elements */
