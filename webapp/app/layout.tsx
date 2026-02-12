@@ -125,26 +125,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               alternateName: 'GreenLine365 Business OS',
               url: siteUrl,
               logo: `${siteUrl}/logo.png`,
-              description: 'AI-powered business automation platform that connects local businesses with their community through automated scheduling, content creation, and intelligent booking systems.',
+              description: 'Local business directory connecting consumers with verified businesses across Florida. Find dining, services, nightlife, wellness, and more.',
               foundingDate: '2024',
-              sameAs: [
-                'https://twitter.com/greenline365',
-                'https://facebook.com/greenline365',
-                'https://instagram.com/greenline365',
-                'https://linkedin.com/company/greenline365',
-              ],
               contactPoint: {
                 '@type': 'ContactPoint',
                 contactType: 'customer service',
+                email: 'greenline365help@gmail.com',
                 availableLanguage: ['English'],
                 areaServed: 'US',
-              },
-              aggregateRating: {
-                '@type': 'AggregateRating',
-                ratingValue: '4.8',
-                ratingCount: '500',
-                bestRating: '5',
-                worstRating: '1',
               },
             }),
           }}
