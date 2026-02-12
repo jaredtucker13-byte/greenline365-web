@@ -578,9 +578,9 @@ export default function DirectoryPage() {
             <div className="absolute inset-0 bg-gradient-to-b from-midnight-950/60 via-midnight-950/80 to-midnight-950" />
 
             <div className="relative max-w-7xl mx-auto px-6">
-              <button onClick={() => { setShowListings(false); setActiveCategory(''); }} className="text-sm text-silver/50 hover:text-white mb-6 flex items-center gap-2 transition font-body" data-testid="back-to-explore-btn">
+              <button onClick={() => { setShowListings(false); setShowGroupedBrowse(true); setActiveCategory(''); }} className="text-sm text-silver/50 hover:text-white mb-6 flex items-center gap-2 transition font-body" data-testid="back-to-explore-btn">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-                Back to Directory
+                Back to All Categories
               </button>
 
               <h2 className="text-3xl md:text-4xl font-heading font-light text-white mb-2 tracking-tight">
