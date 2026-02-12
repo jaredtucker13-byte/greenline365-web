@@ -573,7 +573,7 @@ function CreateEventModal({ date, onClose, onSuccess }: {
               <label className="block text-xs text-white/50 mb-1">Event Type</label>
               <div className="grid grid-cols-3 gap-2">
                 {['content', 'blog', 'newsletter'].map(type => (
-                  <button key={type} onClick={() => setForm({ ...form, event_type: type, content_type: type === 'blog' ? 'blog' : type === 'newsletter' ? 'newsletter' : 'photo' })} className={`px-3 py-2 rounded-lg text-xs font-medium border transition ${form.event_type === type ? 'border-[#39FF14]/50 bg-[#39FF14]/10 text-[#39FF14]' : 'border-white/10 text-white/40 hover:text-white'}`}>
+                  <button key={type} onClick={() => setForm({ ...form, event_type: type, content_type: 'photo' })} className={`px-3 py-2 rounded-lg text-xs font-medium border transition ${form.event_type === type ? 'border-[#39FF14]/50 bg-[#39FF14]/10 text-[#39FF14]' : 'border-white/10 text-white/40 hover:text-white'}`}>
                     {EVENT_TYPE_CONFIG[type]?.label || type}
                   </button>
                 ))}
