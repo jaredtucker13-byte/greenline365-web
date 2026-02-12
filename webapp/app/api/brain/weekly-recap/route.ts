@@ -93,10 +93,22 @@ export async function POST(request: NextRequest) {
         model: 'anthropic/claude-opus-4.6',
         messages: [{
           role: 'system',
-          content: `You are a strategic business advisor writing a weekly recap for a business owner. Be concise, specific, and actionable. Use the marketing frameworks provided to inform your recommendations.${marketingContext}`,
+          content: `You are a strategic business advisor writing a weekly recap email for a business owner. Be concise, specific, and actionable. Use the marketing frameworks provided to inform your recommendations.
+
+CRITICAL FORMATTING RULES:
+- Output clean HTML only. No markdown. No asterisks. No hashtags.
+- Use <h3> for section headers (not # or ##)
+- Use <p> tags for paragraphs
+- Use <ul><li> for lists
+- Use <strong> for emphasis (not ** or __)
+- Use <span style="color:#C9A96E"> for highlighting key numbers
+- Keep paragraphs to 1-2 sentences max
+- Use plenty of spacing between sections
+- Write like you're texting a friend who runs a business — casual, direct, no corporate speak
+${marketingContext}`,
         }, {
           role: 'user',
-          content: `Generate a weekly recap and action plan for GreenLine365 (Florida business directory platform). Here's the data from this past week:\n\n${JSON.stringify(weekData, null, 2)}\n\nFormat the recap as:\n1. WINS THIS WEEK (what went well, even small)\n2. KEY NUMBERS (the most important metrics)\n3. ATTENTION NEEDED (things that need fixing or follow-up)\n4. ACTION ITEMS FOR THIS WEEK (5 specific, prioritized tasks with deadlines)\n5. STRATEGIC THOUGHT (one bigger-picture insight)\n\nKeep it to ~400 words. Be direct, not fluffy.`,
+          content: `Generate a weekly recap for GreenLine365 (Florida business directory). Here's this week's data:\n\n${JSON.stringify(weekData, null, 2)}\n\nSections (use <h3> tags):\n1. Wins This Week\n2. The Numbers\n3. Needs Attention\n4. This Week's Game Plan (5 specific tasks, numbered)\n5. Big Picture Thought\n\nKeep it under 400 words. Output clean HTML only.`,
         }],
         max_tokens: 1000,
         temperature: 0.6,
