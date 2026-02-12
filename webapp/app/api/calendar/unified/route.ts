@@ -176,17 +176,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Cannot create events for past dates' }, { status: 400 });
     }
 
+    // Map content_type to valid database values
+    // Valid content_types: photo, product, video, reel, story
+    const validContentTypes = ['photo', 'product', 'video', 'reel', 'story'];
+    const safeContentType = validContentTypes.includes(content_type || '') ? content_type : 'photo';
+
     const { data, error } = await supabase
       .from('scheduled_content')
       .insert({
         title,
-        description: description || '',
-        content_type: content_type || 'photo',
+        description: description || null,
+        content_type: safeContentType,
         event_type: event_type || 'content',
         scheduled_date,
         status: status || 'draft',
-        color: color || EVENT_COLORS[event_type || 'custom'],
-        metadata: metadata || {},
+        color: color || EVENT_COLORS[event_type || 'custom'] || '#6366F1',
+        metadata: metadata || null,
       })
       .select()
       .single();
