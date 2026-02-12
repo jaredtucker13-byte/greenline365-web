@@ -213,7 +213,13 @@ export default function BusinessDashboard() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
           <div className="flex items-start justify-between flex-wrap gap-4">
             <div>
-              <p className="text-xs font-heading font-semibold uppercase tracking-[0.2em] text-gold mb-1">Business Dashboard</p>
+              <div className="flex items-center gap-3">
+                <p className="text-xs font-heading font-semibold uppercase tracking-[0.2em] text-gold mb-1">Business Dashboard</p>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-[10px] font-bold text-emerald-400 tracking-wider uppercase">Beta</span>
+                </span>
+              </div>
               <h1 className="text-2xl sm:text-3xl font-heading font-light text-white" data-testid="dashboard-title">
                 {activeListing?.business_name}
               </h1>
