@@ -634,6 +634,7 @@ function ListingCard({ listing: l, index: i }: { listing: Listing; index: number
           {l.city && <p className="text-[11px] text-silver/50 flex items-center gap-1 mb-1 font-body">
             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
             {l.city}, {l.state}
+            {l.distance != null && <span className="text-gold/60 ml-1">({l.distance} mi)</span>}
           </p>}
           {l.description && <p className="text-xs text-white/35 line-clamp-2 mb-3 font-body">{l.description}</p>}
           <div className="flex items-center justify-between">
