@@ -134,9 +134,40 @@ export default function DirectoryPage() {
     const params = new URLSearchParams();
     if (activeCategory) params.set('category', activeCategory);
     if (search) params.set('q', search);
+    if (showGroupedBrowse) params.set('view', 'browse');
+    if (showListings) params.set('view', 'listings');
     const newUrl = params.toString() ? `/?${params.toString()}` : '/';
-    window.history.replaceState({}, '', newUrl);
-  }, [activeCategory, search]);
+    // Only push if URL actually changed (avoid duplicate entries)
+    if (window.location.search !== `?${params.toString()}` && window.location.pathname === '/') {
+      window.history.pushState({ category: activeCategory, browse: showGroupedBrowse, listings: showListings }, '', newUrl);
+    }
+  }, [activeCategory, showGroupedBrowse, showListings]);
+
+  // Listen for browser back/forward buttons
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handlePopState = () => {
+      const params = new URLSearchParams(window.location.search);
+      const cat = params.get('category');
+      const view = params.get('view');
+      if (view === 'browse') {
+        setShowGroupedBrowse(true);
+        setShowListings(false);
+        setActiveCategory(cat || '');
+      } else if (view === 'listings') {
+        setShowListings(true);
+        setShowGroupedBrowse(false);
+        setActiveCategory(cat || '');
+      } else {
+        // Back to homepage
+        setShowGroupedBrowse(false);
+        setShowListings(false);
+        setActiveCategory('');
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   // Request geolocation on mount
   useEffect(() => {
