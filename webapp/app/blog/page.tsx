@@ -2,6 +2,9 @@ import { createClient } from '@supabase/supabase-js';
 import Link from 'next/link';
 import { Metadata } from 'next';
 
+// Don't try to statically generate this page — fetch blog data on each request
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Blog | GreenLine365 - Marketing Insights for Local Businesses',
   description: 'Expert marketing tips, automation strategies, and business growth insights for local businesses. Stay ahead with the latest trends.',
