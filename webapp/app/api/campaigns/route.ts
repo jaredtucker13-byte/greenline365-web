@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
       subject: subject || '',
       template_id: template_id || null,
       html_content: html_content || '',
-      recipient_list: 'campaign_manager',
+      recipient_list: 'custom',
       custom_recipients: {
         sequence: sequence || [],
         audience_filter: audience_filter || {},
