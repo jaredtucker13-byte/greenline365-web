@@ -32,17 +32,19 @@ function applyPhotoGating(listing: any) {
   }
 
   // Claimable businesses — photos gated by tier
-  // Free + unclaimed: placeholder only, photos locked in library
+  // Free + unclaimed: show ONE real business photo (best available)
   if (tier === 'free' || !isClaimed) {
+    // Use their real business photo — first gallery image or cover image
+    const bestPhoto = allPhotos[0] || listing.cover_image_url || placeholder;
     return {
       ...listing,
       gallery_images: [],
-      cover_image_url: placeholder,
+      cover_image_url: bestPhoto,
       total_photos_available: allPhotos.length,
-      locked_photos_count: allPhotos.length,
+      locked_photos_count: Math.max(0, allPhotos.length - 1),
       has_property_intelligence: false,
       search_weight: limits.searchWeight,
-      is_placeholder_image: true,
+      is_placeholder_image: !allPhotos[0] && !listing.cover_image_url,
       is_claimable: true,
     };
   }
