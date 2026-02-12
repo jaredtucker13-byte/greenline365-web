@@ -190,19 +190,24 @@ export default function DirectoryPage() {
 
   function handleCategoryClick(id: string) {
     setActiveCategory(id);
-    // Map category IDs to the industry slugs used in the database
+    setShowGroupedBrowse(false);
     const industryMap: Record<string, string> = {
-      'services': 'services',
-      'dining': 'dining',
-      'health-wellness': 'health-wellness',
-      'style-shopping': 'style-shopping',
-      'nightlife': 'nightlife',
-      'family-entertainment': 'family-entertainment',
-      'destinations': 'destinations',
-      'hotels-lodging': 'destinations', // shares data for now
-      'professional-services': 'services', // shares data for now
+      'services': 'services', 'dining': 'dining', 'health-wellness': 'health-wellness',
+      'style-shopping': 'style-shopping', 'nightlife': 'nightlife',
+      'family-entertainment': 'family-entertainment', 'destinations': 'destinations',
+      'hotels-lodging': 'destinations', 'professional-services': 'services',
     };
     loadListings(industryMap[id] || id);
+  }
+
+  function handleBrowseAll() {
+    setShowGroupedBrowse(true);
+    setShowListings(false);
+    setActiveCategory('');
+  }
+
+  function handleViewAllFromCarousel(categoryId: string) {
+    handleCategoryClick(categoryId);
   }
 
   function handleSearch() {
