@@ -464,7 +464,7 @@ export default function DirectoryPage() {
           <section className="relative bg-midnight-950 pt-20 pb-8 overflow-hidden">
             {currentCat && (
               <div className="absolute inset-0 opacity-20">
-                <img src={currentCat.img} alt="" className="w-full h-full object-cover" />
+                <img src={currentCat.img} alt={`${currentCat.label} category background`} className="w-full h-full object-cover" />
               </div>
             )}
             <div className="absolute inset-0 bg-gradient-to-b from-midnight-950/60 via-midnight-950/80 to-midnight-950" />
