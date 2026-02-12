@@ -49,6 +49,7 @@ const navItems = [
   { id: 'website-builder', label: 'Website Builder', icon: 'paint', href: '/admin-v2/website-analyzer', feature: 'mockup_generator' },
   { id: 'code-studio', label: 'Code Studio', icon: 'code', href: '/admin-v2/code-studio', feature: 'mockup_generator' },
   { id: 'incidents', label: 'Incidents', icon: 'alert', href: '/admin-v2/incidents', feature: null },
+  { id: 'campaigns', label: 'Campaigns', icon: 'campaign', href: '/admin-v2/campaigns', feature: null },
   { id: 'email', label: 'Email', icon: 'mail', href: '/admin-v2/email', feature: 'email' },
   { id: 'sms', label: 'SMS', icon: 'phone', href: '/admin-v2/sms', feature: 'sms' },
   { id: 'crm', label: 'CRM', icon: 'users', href: '/admin-v2/crm-dashboard', feature: 'crm' },
