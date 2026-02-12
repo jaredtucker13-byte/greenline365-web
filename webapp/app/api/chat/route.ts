@@ -239,6 +239,13 @@ async function searchDirectory(query: string): Promise<string> {
     if (lower.includes(city)) { detectedCity = city; break; }
   }
 
+  // Detect specific service type for narrower search
+  const serviceKeywords = ['plumber', 'plumbing', 'roofer', 'roofing', 'hvac', 'ac repair', 'electrician', 'electrical', 'landscap', 'painter', 'pest control'];
+  let specificService = '';
+  for (const kw of serviceKeywords) {
+    if (lower.includes(kw)) { specificService = kw; break; }
+  }
+
   // Build query
   let dbQuery = supabase
     .from('directory_listings')
@@ -248,6 +255,18 @@ async function searchDirectory(query: string): Promise<string> {
 
   if (detectedCategory) dbQuery = dbQuery.eq('industry', detectedCategory);
   if (detectedCity) dbQuery = dbQuery.ilike('city', `%${detectedCity}%`);
+
+  // If specific service type, add text search to narrow results
+  if (specificService && detectedCategory === 'services') {
+    dbQuery = supabase
+      .from('directory_listings')
+      .select('business_name, slug, industry, city, state, phone, website, avg_feedback_rating, metadata')
+      .eq('industry', 'services')
+      .or(`business_name.ilike.%${specificService}%,description.ilike.%${specificService}%`)
+      .order('avg_feedback_rating', { ascending: false })
+      .limit(6);
+    if (detectedCity) dbQuery = dbQuery.ilike('city', `%${detectedCity}%`);
+  }
 
   // If no category detected, try text search
   if (!detectedCategory && !detectedCity) {
