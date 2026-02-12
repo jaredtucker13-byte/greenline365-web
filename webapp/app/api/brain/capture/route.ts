@@ -13,7 +13,9 @@ import { createClient } from '@/lib/supabase/server';
  */
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const GEMINI_3_PRO = 'google/gemini-2.5-pro-preview';
+
+// Use Opus 4.6 for better classification
+const CLASSIFIER_MODEL = 'anthropic/claude-opus-4.6';
 
 interface CaptureThoughtRequest {
   businessId: string;
