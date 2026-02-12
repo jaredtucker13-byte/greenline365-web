@@ -96,6 +96,25 @@ Ran GreenLine365's own `/api/crawl-website` and `/api/analyze-website` tools aga
 - Charcoal sections now have subtle gold border inset shadows for visual separation
 - Search bar background opacity increased from 0.05 to 0.07
 
+### Business Owner Dashboard — Phase 1 (Feb 12, 2026)
+Built the core directory listing management experience for business owners:
+
+**New APIs:**
+- `GET /api/directory/my-listing` — returns authenticated user's claimed listing(s)
+- `PATCH /api/directory/my-listing` — update listing details (name, description, phone, website, email, location) with field whitelisting
+- `POST /api/directory/claim` — claim an auto-discovered listing (sets is_claimed=true, claimed_by=user.id)
+
+**Business Dashboard Page (`/business-dashboard`):**
+- Auth-gated: redirects to `/login?redirect=/business-dashboard` when unauthenticated
+- Shows listing preview with cover image, business details, rating, Google reviews
+- Inline edit form for all basic fields
+- Photo gallery with tier-based gating (Free: 1 visible, Pro: 2, Premium: unlimited) with lock overlays
+- Tier status panel showing current features (green checks) and locked features (lock icons)
+- Upgrade buttons wired to existing Stripe checkout (Pro $39/mo, Premium $59/mo)
+- Quick stats panel (Google reviews, rating, photos, trust score)
+- Property Intelligence CTA linking to /services for backend CRM upsell
+- "No listing found" state with links to directory search and registration
+
 ## Backlog
 
 ### P0 — Immediate
