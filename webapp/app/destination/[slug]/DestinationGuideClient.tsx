@@ -120,7 +120,7 @@ export default function DestinationGuideClient({ slug }: { slug: string }) {
   const currentSection = SECTIONS.find(s => s.id === activeSection);
 
   return (
-    <div className="min-h-screen bg-midnight-900" data-testid="destination-guide">
+    <div className="min-h-screen bg-midnight-900 pt-20" data-testid="destination-guide">
       {/* ─── Hero ─── */}
       <section className="relative overflow-hidden" style={{ minHeight: '50vh' }} data-testid="destination-hero">
         <div className={`absolute inset-0 bg-gradient-to-b ${dest.heroGradient}`} />
