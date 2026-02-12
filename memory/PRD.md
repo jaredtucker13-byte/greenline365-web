@@ -64,6 +64,11 @@ Build a premium business directory platform ("Bentley Standard") for Florida wit
 | Miami | Neon Nights & Coastal Luxury | 24 |
 | Jacksonville | Gridiron Grit & Riverfront Views | 27 |
 
+### Build Fix (Feb 12, 2026)
+- Fixed TypeScript error in `Navbar.tsx` — added proper type annotation for `navLinks` array to include optional `dropdown` property
+- Build was failing on Vercel with: `Property 'dropdown' does not exist on type '{ href: string; label: string; }'`
+- `tsc --noEmit` now passes cleanly
+
 ## Backlog
 
 ### P0 — Immediate
