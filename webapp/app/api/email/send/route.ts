@@ -8,7 +8,7 @@ const supabase = createClient(
 
 // SendGrid API
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
-const SENDER_EMAIL = process.env.SENDER_EMAIL || 'hello@greenline365.com';
+const SENDER_EMAIL = process.env.SENDER_EMAIL || 'greenline365help@gmail.com';
 
 interface SendEmailRequest {
   to: string | string[];

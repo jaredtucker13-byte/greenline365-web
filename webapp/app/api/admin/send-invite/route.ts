@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { nanoid } from 'nanoid';
 
-const SENDER_EMAIL = process.env.SENDER_EMAIL || 'hello@greenline365.com';
+const SENDER_EMAIL = process.env.SENDER_EMAIL || 'greenline365help@gmail.com';
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://greenline365.com';
 

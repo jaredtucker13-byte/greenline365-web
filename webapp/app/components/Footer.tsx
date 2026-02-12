@@ -104,9 +104,9 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <Link href="/support" className="text-white/50 hover:text-white transition text-sm">
+                <a href="mailto:greenline365help@gmail.com" className="text-white/50 hover:text-white transition text-sm">
                   Contact Us
-                </Link>
+                </a>
               </li>
             </ul>
           </div>
