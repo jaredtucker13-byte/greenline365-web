@@ -73,6 +73,15 @@ export default function ListingDetailPage() {
     })();
   }, [slug]);
 
+  const trackEvent = (eventType: string) => {
+    if (!listing) return;
+    fetch('/api/directory/addons/analytics', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ listing_id: listing.id, event_type: eventType }),
+    }).catch(() => {});
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-midnight-900 flex items-center justify-center pt-20">
