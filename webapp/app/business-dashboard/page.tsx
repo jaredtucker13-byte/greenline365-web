@@ -574,7 +574,7 @@ export default function BusinessDashboard() {
                     style={{ background: 'linear-gradient(135deg, #C9A96E, #E6D8B5)' }}
                     data-testid="upgrade-premium-btn"
                   >
-                    {tier === 'free' ? 'Upgrade to Premium — $59/mo' : 'Upgrade to Premium — $59/mo'}
+                    {tier === 'free' ? 'Upgrade to Premium — $89/mo' : 'Upgrade to Premium — $89/mo'}
                   </button>
                 </div>
               )}
