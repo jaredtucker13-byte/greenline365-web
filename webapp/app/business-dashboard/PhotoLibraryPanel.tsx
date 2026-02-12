@@ -215,7 +215,7 @@ export default function PhotoLibraryPanel({ listingId }: PhotoLibraryProps) {
                 {library.length} photos waiting for you
               </p>
               <p className="text-xs text-white/40 font-body mb-3">
-                Upgrade to Pro ($39/mo) to choose any 2 photos, or Premium ($59/mo) for up to 10.
+                Upgrade to Pro ($45/mo) to choose any 2 photos, or Premium ($89/mo) for up to 10.
               </p>
               <button className="px-4 py-2 rounded-lg text-xs font-bold font-heading text-midnight-900" style={{ background: 'linear-gradient(135deg, #C9A96E, #E6D8B5)' }}>
                 Upgrade Now
