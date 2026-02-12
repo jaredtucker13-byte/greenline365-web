@@ -542,9 +542,9 @@ function CampaignDrawer({ campaign, onClose, onUpdateStage, onRefresh, onShowImp
 
         {/* Tabs */}
         <div className="flex border-b border-white/10">
-          {(['overview', 'contacts', 'sequence'] as const).map(t => (
+          {(['overview', 'contacts', 'sequence', 'send'] as const).map(t => (
             <button key={t} onClick={() => setTab(t)} className={`flex-1 py-3 text-sm font-medium capitalize transition ${tab === t ? 'text-[#39FF14] border-b-2 border-[#39FF14]' : 'text-white/40 hover:text-white'}`}>
-              {t}
+              {t === 'send' ? 'Send' : t}
             </button>
           ))}
         </div>
