@@ -375,7 +375,7 @@ export default function ListingDetailPage() {
             )}
 
 
-            {/* ─── GL365 REVIEWS ─── */}
+            {/* ─── GL365 REVIEWS — Google-Style ─── */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -384,22 +384,8 @@ export default function ListingDetailPage() {
               style={{ background: 'rgba(255,255,255,0.03)' }}
               data-testid="gl365-reviews-section"
             >
-              <div className="flex items-center justify-between mb-5">
-                <div>
-                  <h3 className="text-sm font-heading font-semibold text-white uppercase tracking-wider">GL365 Reviews</h3>
-                  {reviewStats.total > 0 && (
-                    <div className="flex items-center gap-2 mt-1">
-                      <div className="flex gap-0.5">
-                        {[1,2,3,4,5].map(s => (
-                          <svg key={s} className="w-3.5 h-3.5" fill={s <= Math.round(reviewStats.average_rating) ? '#C9A96E' : 'none'} stroke={s <= Math.round(reviewStats.average_rating) ? '#C9A96E' : '#555'} strokeWidth={1.5} viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                          </svg>
-                        ))}
-                      </div>
-                      <span className="text-xs text-white/50 font-body">{reviewStats.average_rating} ({reviewStats.total} review{reviewStats.total !== 1 ? 's' : ''})</span>
-                    </div>
-                  )}
-                </div>
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-sm font-heading font-semibold text-white uppercase tracking-wider">GL365 Reviews</h3>
                 <button
                   onClick={() => setShowReviewForm(!showReviewForm)}
                   className="px-4 py-2 rounded-lg text-xs font-semibold text-gold border border-gold/30 hover:bg-gold/5 transition-all font-heading"
@@ -408,6 +394,49 @@ export default function ListingDetailPage() {
                   Write a Review
                 </button>
               </div>
+
+              {/* Rating Summary — Google Style */}
+              {reviewStats.total > 0 && (() => {
+                const ratingCounts = [5,4,3,2,1].map(star => ({
+                  star,
+                  count: reviews.filter(r => r.rating === star).length,
+                }));
+                const maxCount = Math.max(...ratingCounts.map(r => r.count), 1);
+                return (
+                  <div className="flex gap-6 mb-6 pb-6 border-b border-white/5">
+                    {/* Big number */}
+                    <div className="text-center flex-shrink-0" data-testid="rating-summary">
+                      <span className="text-4xl font-heading font-bold text-white block">{reviewStats.average_rating}</span>
+                      <div className="flex gap-0.5 justify-center mt-1">
+                        {[1,2,3,4,5].map(s => (
+                          <svg key={s} className="w-3.5 h-3.5" fill={s <= Math.round(reviewStats.average_rating) ? '#C9A96E' : 'none'} stroke={s <= Math.round(reviewStats.average_rating) ? '#C9A96E' : '#555'} strokeWidth={1.5} viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                          </svg>
+                        ))}
+                      </div>
+                      <span className="text-[10px] text-white/30 font-body mt-1 block">{reviewStats.total} review{reviewStats.total !== 1 ? 's' : ''}</span>
+                    </div>
+                    {/* Bar breakdown */}
+                    <div className="flex-1 space-y-1.5">
+                      {ratingCounts.map(({ star, count }) => (
+                        <div key={star} className="flex items-center gap-2" data-testid={`rating-bar-${star}`}>
+                          <span className="text-[11px] text-white/40 font-body w-3 text-right">{star}</span>
+                          <svg className="w-3 h-3 flex-shrink-0" fill="#C9A96E" viewBox="0 0 24 24">
+                            <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                          </svg>
+                          <div className="flex-1 h-2 rounded-full bg-white/5 overflow-hidden">
+                            <div
+                              className="h-full rounded-full bg-gold/70 transition-all duration-500"
+                              style={{ width: `${(count / maxCount) * 100}%` }}
+                            />
+                          </div>
+                          <span className="text-[10px] text-white/25 font-body w-6 text-right">{count}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* Review message */}
               {reviewMessage && (
@@ -431,7 +460,7 @@ export default function ListingDetailPage() {
                     <div className="flex gap-1">
                       {[1,2,3,4,5].map(s => (
                         <button key={s} onClick={() => setReviewForm({ ...reviewForm, rating: s })} className="p-1" data-testid={`star-${s}`}>
-                          <svg className="w-6 h-6 transition-colors" fill={s <= reviewForm.rating ? '#C9A96E' : 'none'} stroke={s <= reviewForm.rating ? '#C9A96E' : '#555'} strokeWidth={1.5} viewBox="0 0 24 24">
+                          <svg className="w-7 h-7 transition-colors" fill={s <= reviewForm.rating ? '#C9A96E' : 'none'} stroke={s <= reviewForm.rating ? '#C9A96E' : '#555'} strokeWidth={1.5} viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                           </svg>
                         </button>
@@ -441,7 +470,7 @@ export default function ListingDetailPage() {
                   <textarea
                     value={reviewForm.text}
                     onChange={e => setReviewForm({ ...reviewForm, text: e.target.value })}
-                    placeholder="Share your experience..."
+                    placeholder="Share your experience (at least 10 characters)..."
                     rows={3}
                     className="w-full px-4 py-3 rounded-xl text-sm bg-white/5 text-white border border-white/10 focus:outline-none focus:border-gold/30 font-body resize-none placeholder-white/30"
                     data-testid="review-text-input"
@@ -461,10 +490,40 @@ export default function ListingDetailPage() {
                 </div>
               )}
 
+              {/* Sort Filter — Google Style */}
+              {reviews.length > 1 && (
+                <div className="flex items-center gap-2 mb-4" data-testid="review-sort">
+                  {[
+                    { id: 'newest' as const, label: 'Newest' },
+                    { id: 'highest' as const, label: 'Highest' },
+                    { id: 'lowest' as const, label: 'Lowest' },
+                  ].map(s => (
+                    <button
+                      key={s.id}
+                      onClick={() => setReviewSort(s.id)}
+                      className={`px-3 py-1.5 rounded-full text-[11px] font-medium transition-all font-body ${
+                        reviewSort === s.id
+                          ? 'bg-gold/15 text-gold border border-gold/25'
+                          : 'text-white/35 border border-white/10 hover:text-white/50 hover:border-white/20'
+                      }`}
+                      data-testid={`sort-${s.id}`}
+                    >
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+
               {/* Reviews List */}
               {reviews.length > 0 ? (
                 <div className="space-y-4">
-                  {reviews.slice(0, 5).map((review) => (
+                  {[...reviews]
+                    .sort((a, b) => {
+                      if (reviewSort === 'highest') return b.rating - a.rating;
+                      if (reviewSort === 'lowest') return a.rating - b.rating;
+                      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+                    })
+                    .map((review) => (
                     <div key={review.id} className="border-b border-white/5 pb-4 last:border-0 last:pb-0">
                       <div className="flex items-center justify-between mb-1">
                         <div className="flex items-center gap-2">
@@ -473,16 +532,18 @@ export default function ListingDetailPage() {
                           </div>
                           <div>
                             <span className="text-sm font-heading font-semibold text-white">{review.reviewer_name}</span>
-                            <div className="flex gap-0.5">
-                              {[1,2,3,4,5].map((s: number) => (
-                                <svg key={s} className="w-3 h-3" fill={s <= review.rating ? '#C9A96E' : 'none'} stroke={s <= review.rating ? '#C9A96E' : '#555'} strokeWidth={1.5} viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                                </svg>
-                              ))}
+                            <div className="flex items-center gap-2">
+                              <div className="flex gap-0.5">
+                                {[1,2,3,4,5].map((s: number) => (
+                                  <svg key={s} className="w-3 h-3" fill={s <= review.rating ? '#C9A96E' : 'none'} stroke={s <= review.rating ? '#C9A96E' : '#555'} strokeWidth={1.5} viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                                  </svg>
+                                ))}
+                              </div>
+                              <span className="text-[10px] text-white/20 font-body">{new Date(review.created_at).toLocaleDateString()}</span>
                             </div>
                           </div>
                         </div>
-                        <span className="text-[10px] text-white/20 font-body">{new Date(review.created_at).toLocaleDateString()}</span>
                       </div>
                       <p className="text-xs text-white/60 font-body leading-relaxed mt-2 pl-10">{review.text}</p>
                       {review.response && (
