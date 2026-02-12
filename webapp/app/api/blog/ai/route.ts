@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSkillContext, getCoreMarketingContext } from '@/lib/marketing-skills-loader';
+import { CHAT_FORMAT_DIRECTIVE } from '@/lib/format-standards';
 
 /**
  * Blog AI Enhancement API
