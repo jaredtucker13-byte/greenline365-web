@@ -49,11 +49,11 @@ const CATEGORIES = [
     subcategories: ['All', 'Bars & Pubs', 'Clubs', 'Cigar Lounges', 'Wine Bars', 'Live Music'] },
   { id: 'family-entertainment', label: 'Family Entertainment', sub: 'Theme parks, racing & fun', img: '/images/categories/family-entertainment.png',
     subcategories: ['All', 'Theme Parks', 'Bowling', 'Mini-Golf', 'Go-Karts & Racing', 'Arcades', 'Water Parks', 'Movie Theaters'] },
-  { id: 'destinations', label: 'Destinations', sub: 'Tourist attractions & experiences', img: '/images/categories/destinations.png',
+  { id: 'destinations', label: 'Destinations', sub: 'Tourist attractions & experiences', img: 'https://static.prod-images.emergentagent.com/jobs/b5fc704f-5976-4877-a35c-beeb0ec1a989/images/29e93c3535729786b87cb3a6b9e6704d67060ce6c3c8e63eb2c2645463cc9cb1.png',
     subcategories: ['All', 'Museums', 'Parks', 'Tourist Attractions', 'Beaches', 'Historic Sites', 'Nature Trails'] },
   { id: 'hotels-lodging', label: 'Hotels & Lodging', sub: 'Hotels, resorts & vacation rentals', img: '/images/categories/destinations.png',
     subcategories: ['All', 'Hotels', 'Resorts', 'Vacation Rentals', 'B&Bs'] },
-  { id: 'professional-services', label: 'Professional Services', sub: 'Lawyers, accountants & advisors', img: '/images/categories/services.png',
+  { id: 'professional-services', label: 'Professional Services', sub: 'Lawyers, accountants & advisors', img: 'https://static.prod-images.emergentagent.com/jobs/b5fc704f-5976-4877-a35c-beeb0ec1a989/images/2c684194c3673f42b840849471a761dd0f4fcbb3004807729e893f5dc2dc9dab.png',
     subcategories: ['All', 'Lawyers', 'Accountants', 'Insurance', 'Real Estate', 'Financial Advisors', 'Marketing Agencies'] },
 ];
 
