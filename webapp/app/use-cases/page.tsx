@@ -56,7 +56,7 @@ const useCases = [
 
 export default function UseCasesPage() {
   return (
-    <div className="py-12">
+    <div className="pt-24 py-12">
       <div className="max-w-6xl mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-16">

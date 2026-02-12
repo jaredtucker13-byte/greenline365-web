@@ -41,7 +41,7 @@ export default async function PrivacyPage() {
   const customContent = await getPrivacyContent();
 
   return (
-    <div className="py-12 md:py-16">
+    <div className="pt-24 py-12 md:py-16">
       <div className="max-w-5xl mx-auto px-6">
         {/* Header */}
         <header className="mb-10 md:mb-14">

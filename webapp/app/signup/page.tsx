@@ -175,7 +175,7 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="py-12">
+    <div className="pt-24 py-12">
       <div className="max-w-md mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
