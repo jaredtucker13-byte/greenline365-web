@@ -627,6 +627,8 @@ export default function BusinessDashboard() {
             </motion.div>
           </div>
         </div>
+        </>
+        )}
       </div>
     </div>
   );
