@@ -239,14 +239,16 @@ export async function POST(
       const result = await sendEmail({ to: contact.email, subject, html });
 
       // Log in email_sends
-      await supabase.from('email_sends').insert({
-        campaign_id: id,
-        recipient_email: contact.email,
-        recipient_name: contact.business_name,
-        status: result.success ? 'sent' : 'failed',
-        error_message: result.error || null,
-        sent_at: result.success ? new Date().toISOString() : null,
-      }).catch(() => {});
+      try {
+        await supabase.from('email_sends').insert({
+          campaign_id: id,
+          recipient_email: contact.email,
+          recipient_name: contact.business_name,
+          status: result.success ? 'sent' : 'failed',
+          error_message: result.error || null,
+          sent_at: result.success ? new Date().toISOString() : null,
+        });
+      } catch (_) { /* non-critical logging */ }
 
       if (result.success) {
         sent++;
