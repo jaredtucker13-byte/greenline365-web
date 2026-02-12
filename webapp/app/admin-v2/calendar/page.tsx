@@ -472,7 +472,7 @@ function EventDetailDrawer({ event, onClose, onDelete, onRefresh }: {
           {event.metadata && Object.keys(event.metadata).length > 0 && (
             <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5">
               <p className="text-white/40 text-xs mb-2">Details</p>
-              {Object.entries(event.metadata).map(([k, v]) => (
+              {Object.entries(event.metadata as Record<string, unknown>).map(([k, v]) => (
                 v && (
                   <div key={k} className="flex justify-between text-sm py-1">
                     <span className="text-white/40 capitalize">{k.replace(/_/g, ' ')}</span>
