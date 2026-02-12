@@ -34,12 +34,14 @@ const DESTINATIONS: Record<string, {
   lat: number;
   lng: number;
 }> = {
-  'st-pete-beach':  { label: 'St. Pete Beach',  tagline: 'Sun-kissed shores & Gulf Coast charm',       heroGradient: 'from-sky-900/80 via-blue-900/60 to-midnight-900', lat: 27.7253, lng: -82.7412 },
-  'key-west':       { label: 'Key West',         tagline: 'Where the road ends and paradise begins',    heroGradient: 'from-teal-900/80 via-emerald-900/60 to-midnight-900', lat: 24.5551, lng: -81.7800 },
-  'sarasota':       { label: 'Sarasota',         tagline: 'Culture, coastline & natural beauty',        heroGradient: 'from-indigo-900/80 via-purple-900/60 to-midnight-900', lat: 27.3364, lng: -82.5307 },
-  'ybor-city':      { label: 'Ybor City',        tagline: "Tampa's historic Latin quarter",             heroGradient: 'from-red-900/80 via-orange-900/60 to-midnight-900', lat: 27.9617, lng: -82.4369 },
-  'daytona':        { label: 'Daytona Beach',    tagline: 'Speed, surf & endless summer',               heroGradient: 'from-amber-900/80 via-yellow-900/60 to-midnight-900', lat: 29.2108, lng: -81.0228 },
-  'orlando':        { label: 'Orlando',          tagline: 'Theme park capital of the world',            heroGradient: 'from-violet-900/80 via-fuchsia-900/60 to-midnight-900', lat: 28.5383, lng: -81.3792 },
+  'st-pete-beach':  { label: 'St. Pete Beach',  tagline: "Florida's Sunshine City",             heroGradient: 'from-sky-900/80 via-blue-900/60 to-midnight-900', lat: 27.7253, lng: -82.7412 },
+  'key-west':       { label: 'Key West',         tagline: 'Close to Perfect, Far from Normal',   heroGradient: 'from-teal-900/80 via-emerald-900/60 to-midnight-900', lat: 24.5551, lng: -81.7800 },
+  'sarasota':       { label: 'Sarasota',         tagline: 'Where Arts Meet the Gulf',            heroGradient: 'from-indigo-900/80 via-purple-900/60 to-midnight-900', lat: 27.3364, lng: -82.5307 },
+  'ybor-city':      { label: 'Ybor City',        tagline: "Tampa's Historic Latin Quarter",      heroGradient: 'from-red-900/80 via-orange-900/60 to-midnight-900', lat: 27.9617, lng: -82.4369 },
+  'daytona':        { label: 'Daytona Beach',    tagline: "World's Most Famous Beach",           heroGradient: 'from-amber-900/80 via-yellow-900/60 to-midnight-900', lat: 29.2108, lng: -81.0228 },
+  'orlando':        { label: 'Orlando',          tagline: 'The City Beautiful',                  heroGradient: 'from-violet-900/80 via-fuchsia-900/60 to-midnight-900', lat: 28.5383, lng: -81.3792 },
+  'miami':          { label: 'Miami',            tagline: 'Neon Nights & Coastal Luxury',        heroGradient: 'from-cyan-900/80 via-blue-900/60 to-midnight-900', lat: 25.7617, lng: -80.1918 },
+  'jacksonville':   { label: 'Jacksonville',     tagline: 'Gridiron Grit & Riverfront Views',    heroGradient: 'from-slate-900/80 via-stone-900/60 to-midnight-900', lat: 30.3322, lng: -81.6557 },
 };
 
 // ─── Tourism Sections ───
