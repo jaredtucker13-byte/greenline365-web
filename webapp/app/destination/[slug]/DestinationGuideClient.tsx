@@ -362,6 +362,7 @@ function GuideListingCard({ listing: l, index: i }: { listing: Listing; index: n
             </a>
           )}
         </div>
+      </div>
       </motion.div>
     </Link>
   );
