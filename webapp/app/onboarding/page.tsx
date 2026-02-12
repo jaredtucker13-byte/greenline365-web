@@ -69,6 +69,8 @@ export default function OnboardingPage() {
   const [mode, setMode] = useState<'choice' | 'wizard' | 'longform'>('choice');
   const [currentStep, setCurrentStep] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
+  const [saveError, setSaveError] = useState('');
   
   // Form data
   const [formData, setFormData] = useState({
