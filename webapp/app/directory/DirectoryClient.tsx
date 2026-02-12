@@ -208,11 +208,11 @@ export default function DirectoryPage() {
     return [...result].sort((a, b) => {
       switch (sortBy) {
         case 'highest':
-          return (b.avg_feedback_rating || (b as any).metadata?.google_rating || 0) - (a.avg_feedback_rating || (a as any).metadata?.google_rating || 0);
+          return (b.avg_feedback_rating || b.metadata?.google_rating || 0) - (a.avg_feedback_rating || a.metadata?.google_rating || 0);
         case 'lowest':
-          return (a.avg_feedback_rating || (a as any).metadata?.google_rating || 0) - (b.avg_feedback_rating || (b as any).metadata?.google_rating || 0);
+          return (a.avg_feedback_rating || a.metadata?.google_rating || 0) - (b.avg_feedback_rating || b.metadata?.google_rating || 0);
         case 'most-reviews':
-          return ((b as any).metadata?.google_review_count || b.total_feedback_count || 0) - ((a as any).metadata?.google_review_count || a.total_feedback_count || 0);
+          return (b.metadata?.google_review_count || b.total_feedback_count || 0) - (a.metadata?.google_review_count || a.total_feedback_count || 0);
         case 'nearest':
         default:
           if (a.distance != null && b.distance != null) return a.distance - b.distance;
