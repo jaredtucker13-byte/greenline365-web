@@ -265,7 +265,7 @@ export default async function PrivacyPage() {
                 {/* Section 6 - How We Use Your Data */}
                 <section id="data-usage" className="scroll-mt-24">
                   <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                    <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">3</span>
+                    <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">6</span>
                     How We Use Your Data
                   </h2>
                   <p className="text-white/70 leading-relaxed mb-4">
