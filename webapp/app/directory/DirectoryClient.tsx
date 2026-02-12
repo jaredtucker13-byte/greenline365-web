@@ -298,6 +298,46 @@ export default function DirectoryPage() {
             </div>
           </section>
 
+          {/* ─── DESTINATION GUIDES ─── */}
+          <section className="bg-midnight-900 py-20" data-testid="destination-guides-section">
+            <div className="max-w-7xl mx-auto px-6">
+              <p className="text-xs font-heading font-semibold uppercase tracking-[0.2em] text-center mb-3 text-gold">Trip Planner</p>
+              <h2 className="text-3xl md:text-4xl font-heading font-light text-white text-center mb-3 tracking-tight">
+                Explore <span className="font-semibold text-gradient-gold">Destinations</span>
+              </h2>
+              <p className="text-silver text-center max-w-lg mx-auto mb-12 font-body">Curated guides for Florida&apos;s top tourist spots — where to stay, eat, play, and more.</p>
+
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                {[
+                  { slug: 'st-pete-beach',  label: 'St. Pete Beach',  tagline: 'Gulf Coast charm', gradient: 'from-sky-900/60 to-blue-950/90' },
+                  { slug: 'key-west',       label: 'Key West',         tagline: 'Island paradise',  gradient: 'from-teal-900/60 to-emerald-950/90' },
+                  { slug: 'sarasota',       label: 'Sarasota',         tagline: 'Culture & coast',   gradient: 'from-indigo-900/60 to-purple-950/90' },
+                  { slug: 'ybor-city',      label: 'Ybor City',        tagline: 'Historic quarter',  gradient: 'from-red-900/60 to-orange-950/90' },
+                  { slug: 'daytona',        label: 'Daytona Beach',    tagline: 'Speed & surf',      gradient: 'from-amber-900/60 to-yellow-950/90' },
+                  { slug: 'orlando',        label: 'Orlando',          tagline: 'Theme park capital', gradient: 'from-violet-900/60 to-fuchsia-950/90' },
+                ].map((d, i) => (
+                  <motion.div key={d.slug} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + i * 0.06 }}>
+                    <Link href={`/destination/${d.slug}`}
+                      className={`relative block rounded-2xl overflow-hidden group cursor-pointer hover:shadow-gold-glow transition-all duration-500 ${i < 2 ? 'lg:col-span-1' : ''}`}
+                      style={{ minHeight: i < 2 ? 200 : 160 }}
+                      data-testid={`dest-card-${d.slug}`}>
+                      <div className={`absolute inset-0 bg-gradient-to-br ${d.gradient}`} />
+                      <div className="absolute inset-0 bg-gradient-to-t from-midnight-900/80 via-transparent to-transparent group-hover:from-midnight-900/90 transition-all duration-500" />
+                      <div className="relative flex flex-col justify-end h-full p-5" style={{ minHeight: i < 2 ? 200 : 160 }}>
+                        <span className="text-lg font-heading font-semibold text-white tracking-tight">{d.label}</span>
+                        <span className="text-xs text-white/50 font-body">{d.tagline}</span>
+                        <span className="inline-flex items-center gap-1 mt-2 text-[10px] text-gold font-medium font-body group-hover:translate-x-1 transition-transform duration-300">
+                          View Guide
+                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+                        </span>
+                      </div>
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </section>
+
           {/* ─── VALUE PROPOSITION ─── */}
           <section className="bg-midnight-900 py-20" data-testid="value-prop-section">
             <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
