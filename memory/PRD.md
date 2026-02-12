@@ -69,6 +69,33 @@ Build a premium business directory platform ("Bentley Standard") for Florida wit
 - Build was failing on Vercel with: `Property 'dropdown' does not exist on type '{ href: string; label: string; }'`
 - `tsc --noEmit` now passes cleanly
 
+### Website Audit Implementation (Feb 12, 2026)
+Ran GreenLine365's own `/api/crawl-website` and `/api/analyze-website` tools against greenline365.com. Implemented all audit findings:
+
+**Hero Section Overhaul:**
+- New headline: "The Gold Standard for Local Discovery" (replacing generic "Your City's Best, Verified")
+- New subheadline: "Verified businesses across dining, services, nightlife & more — every listing earned its place."
+- High-contrast "Search Directory" CTA button with bold gold gradient and box shadow (was nearly invisible before)
+
+**Live Trust Counter Bar:**
+- New `/api/directory/stats` endpoint queries Supabase for real-time counts
+- Displays: 450+ Verified Businesses | 8+ Destinations | 13+ Categories
+- Numbers grow automatically as data is added — no manual updates needed
+
+**SEO & Accessibility Fixes:**
+- Fixed all 19 images with descriptive alt text (was: empty alt="" on every image)
+- Hero, category, destination, and value prop images all have keyword-rich alt tags
+
+**Contrast & Readability Improvements:**
+- Hero background overlay increased from 80%/50% to 90%/70% for better text legibility
+- Subheadline text bumped from white/60 to white/70
+- Category description text bumped from text-silver to text-white/50
+- Category chips borders increased from white/10 to white/15 with gold hover state
+
+**Dark Theme Depth:**
+- Charcoal sections now have subtle gold border inset shadows for visual separation
+- Search bar background opacity increased from 0.05 to 0.07
+
 ## Backlog
 
 ### P0 — Immediate
