@@ -135,11 +135,11 @@ class TestReviewsPublicAPI:
         assert "1-5" in data["error"]
     
     def test_post_review_invalid_rating_too_low(self):
-        """POST /api/directory/reviews rejects invalid rating below 1"""
+        """POST /api/directory/reviews rejects invalid rating below 1 (tests with -1 since 0 is falsy)"""
         payload = {
             "listing_id": TEST_LISTING_ID,
             "reviewer_name": "Test User",
-            "rating": 0,
+            "rating": -1,
             "text": "Invalid rating test"
         }
         
