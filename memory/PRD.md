@@ -10,7 +10,7 @@ Build a premium business directory platform ("Bentley Standard") for Florida wit
 - Stripe payments, tier-based features, weighted ranking
 
 ## Architecture
-- **Framework:** Next.js 14 (App Router) on port 3000
+- **Framework:** Next.js 16 (App Router) on port 3000
 - **Backend Proxy:** FastAPI on port 8001 → forwards /api/* to Next.js
 - **Database:** PostgreSQL via Supabase
 - **Payments:** Stripe (live keys)
@@ -22,250 +22,117 @@ Build a premium business directory platform ("Bentley Standard") for Florida wit
 
 ### Phase 1 — Directory & UI Overhaul (Complete)
 - "Bentley Standard" dark theme with gold accents
-- Simplified Navbar (Directory | Our Services | Add Your Business)
 - 9-category homepage grid with sub-category pill tabs
 - Weighted ranking for paid tier businesses
 - Stripe live integration with webhook verification
 
-### Phase 2A — Discovery Pipeline (Complete — Feb 12, 2026)
-- 3-stage pipeline: Perplexity discovery → Google Places enrichment → Directory + CRM population
-- "Closed After Hours" CRM tagging for AI agent upsell targeting
-- 8 destinations populated: ~203 total listings, ~195 CRM leads, ~99 after-hours targets
+### Phase 2A — Discovery Pipeline (Complete)
+- 3-stage pipeline: Perplexity → Google Places → Directory + CRM
+- "Closed After Hours" CRM tagging
+- 8 destinations: ~542 total listings, ~195 CRM leads
 
-### Phase 2B — Destination Guide UI (Complete — Feb 12, 2026)
-- Dedicated guide pages at `/destination/[slug]` for all 8 destinations
+### Phase 2B — Destination Guide UI (Complete)
+- Dedicated guide pages at `/destination/[slug]`
 - 10 tourism section tabs per destination
-- Cross-destination navigation
 
-### Phase 2C — Bentley Standard Visual Overhaul (Complete — Feb 12, 2026)
-**Global Background System:**
-- Deep midnight blue gradient base (#050B18 → #0B132B) with gold accent radials
-- Micro film grain texture overlay (CSS SVG noise)
-- Abstract compass rose watermark (fixed, 1.8% opacity)
-- Gold filigree corner accents framing content sections
-- Gold section divider lines with diamond accent
+### Phase 2C — Bentley Standard Visual Overhaul (Complete)
+- Deep midnight blue gradient base with gold accent radials
+- 8-Card Destination Grid with AI-generated photography
+- Gold filigree corner accents, section dividers
 
-**8-Card Destination Grid:**
-- 4x2 balanced grid layout (Row 1: St. Pete Beach, Key West, Sarasota, Daytona / Row 2: Ybor City, Orlando, Miami, Jacksonville)
-- Metallic gold 3px border frames with gradient shimmer effect
-- AI-generated hyper-realistic golden hour photography for all 8 destinations
-- Glassmorphism text labels with destination name + tagline
-- Hover: scale(1.02) + gold border glow intensification
+### Business Owner Dashboard (Complete)
+- Listing management, Stripe tier upgrades, photo management
+- Secure claim flow with manual verification
+- GL365 Reviews with AI-drafted responses
 
-**8 Destinations:**
-| Destination | Tagline | Listings |
-|---|---|---|
-| St. Pete Beach | Florida's Sunshine City | 32 |
-| Key West | Close to Perfect, Far from Normal | 26 |
-| Sarasota | Where Arts Meet the Gulf | 26 |
-| Daytona Beach | World's Most Famous Beach | 25 |
-| Ybor City | Tampa's Historic Latin Quarter | 19 |
-| Orlando | The City Beautiful | 24 |
-| Miami | Neon Nights & Coastal Luxury | 24 |
-| Jacksonville | Gridiron Grit & Riverfront Views | 27 |
+### Maps, Filtering & SEO (Complete)
+- Google Maps embed + directions on all listings
+- Geolocation-based sorting, city/rating/distance filters
+- Dynamic sitemap.xml, robots.txt, Google Search Console verified
 
-### Build Fix (Feb 12, 2026)
-- Fixed TypeScript error in `Navbar.tsx` — added proper type annotation for `navLinks` array to include optional `dropdown` property
-- Build was failing on Vercel with: `Property 'dropdown' does not exist on type '{ href: string; label: string; }'`
-- `tsc --noEmit` now passes cleanly
+### Lead Generation Pipeline (Complete)
+- 92+ targeted service business leads with sales briefs
+- Google Maps "Closed After Hours" screenshots
+- Chat widget wired to directory data as concierge
 
-### Website Audit Implementation (Feb 12, 2026)
-Ran GreenLine365's own `/api/crawl-website` and `/api/analyze-website` tools against greenline365.com. Implemented all audit findings:
+### Marketplace Add-ons (Complete)
+- Coupon Engine, Custom Polls, Featured Boost, Analytics Pro, Photo Library
+- Review Response AI with autopilot mode
 
-**Hero Section Overhaul:**
-- New headline: "The Gold Standard for Local Discovery" (replacing generic "Your City's Best, Verified")
-- New subheadline: "Verified businesses across dining, services, nightlife & more — every listing earned its place."
-- High-contrast "Search Directory" CTA button with bold gold gradient and box shadow (was nearly invisible before)
+### Campaign Manager — Phase 1 (Feb 12, 2026)
+Built the Campaign Manager and Unified Calendar:
 
-**Live Trust Counter Bar:**
-- New `/api/directory/stats` endpoint queries Supabase for real-time counts
-- Displays: 450+ Verified Businesses | 8+ Destinations | 13+ Categories
-- Numbers grow automatically as data is added — no manual updates needed
+**Campaign Manager (`/admin-v2/campaigns`):**
+- Campaign CRUD (create, edit, save as draft, delete)
+- Kanban pipeline view: New → Contacted → Replied → Claimed → Upgraded → Gold
+- Audience segmentation (filter by city, industry, after-hours status)
+- Import contacts from directory listings (auto-deduplication)
+- Multi-step email sequence builder (initial outreach, value bomb/audit, demo invite, follow-up, final offer)
+- Pipeline stage management with auto-CRM lead creation on "replied"
+- Campaign list view with status tabs (All, Drafts, Active, Scheduled, Sent, Paused)
 
-**SEO & Accessibility Fixes:**
-- Fixed all 19 images with descriptive alt text (was: empty alt="" on every image)
-- Hero, category, destination, and value prop images all have keyword-rich alt tags
+**APIs Built:**
+- `GET/POST /api/campaigns` — List and create campaigns
+- `GET/PATCH/DELETE /api/campaigns/[id]` — Single campaign CRUD
+- `GET/POST/PATCH /api/campaigns/[id]/contacts` — Import from directory, manual add, pipeline stage updates
 
-**Contrast & Readability Improvements:**
-- Hero background overlay increased from 80%/50% to 90%/70% for better text legibility
-- Subheadline text bumped from white/60 to white/70
-- Category description text bumped from text-silver to text-white/50
-- Category chips borders increased from white/10 to white/15 with gold hover state
+**Unified Calendar (`/admin-v2/calendar`):**
+- Multi-source: bookings (blue), content (green), campaigns (amber), newsletters (purple), blogs (pink)
+- Color-coded dot markers per event type
+- Past days = review only (can see what was posted)
+- Today/future = can create new events
+- Full CRUD on events until sent
+- Filter legend to toggle event types
+- Month and Week view modes
+- Event detail drawer with links to Campaign Manager or Content Forge
+- Create event modal with type selector and time picker
 
-**Dark Theme Depth:**
-- Charcoal sections now have subtle gold border inset shadows for visual separation
-- Search bar background opacity increased from 0.05 to 0.07
+**APIs Built:**
+- `GET /api/calendar/unified` — Unified events from bookings, scheduled_content, email_campaigns
+- `POST /api/calendar/unified` — Create calendar events (blocks past dates)
+- `PATCH /api/calendar/unified` — Update events across tables
+- `DELETE /api/calendar/unified` — Delete events across tables
 
-### Business Owner Dashboard — Phase 1 (Feb 12, 2026)
-Built the core directory listing management experience for business owners:
-
-**New APIs:**
-- `GET /api/directory/my-listing` — returns authenticated user's claimed listing(s)
-- `PATCH /api/directory/my-listing` — update listing details (name, description, phone, website, email, location) with field whitelisting
-- `POST /api/directory/claim` — claim an auto-discovered listing (sets is_claimed=true, claimed_by=user.id)
-
-**Business Dashboard Page (`/business-dashboard`):**
-- Auth-gated: redirects to `/login?redirect=/business-dashboard` when unauthenticated
-- Shows listing preview with cover image, business details, rating, Google reviews
-- Inline edit form for all basic fields
-- Photo gallery with tier-based gating (Free: 1 visible, Pro: 2, Premium: unlimited) with lock overlays
-- Tier status panel showing current features (green checks) and locked features (lock icons)
-- Upgrade buttons wired to existing Stripe checkout (Pro $39/mo, Premium $59/mo)
-- Quick stats panel (Google reviews, rating, photos, trust score)
-- Property Intelligence CTA linking to /services for backend CRM upsell
-- "No listing found" state with links to directory search and registration
-
-### Individual Listing Detail Pages (Feb 12, 2026)
-Built `/listing/[slug]` pages for all 450+ businesses — each is now SEO-indexable:
-
-**New API:** `GET /api/directory/[slug]` — returns full listing with photo gating + 4 related businesses (same city & industry)
-
-**Detail Page Features:**
-- Hero cover image with back-to-directory navigation
-- Business header: name, category badge, location, subcategory tags
-- Google rating + review count from Places data
-- Photo gallery with tier-based gating
-- Contact sidebar: Phone (clickable tel:), Website (external link), Google Maps directions
-- "Is this your business?" claim section → reveals greenline365help@gmail.com mailto with pre-filled subject
-- "More [category] in [city]" related businesses grid with clickable cards
-- Claimed/Unclaimed status indicator
-
-**Also updated:**
-- Listing cards in directory now wrapped in `<Link>` to `/listing/[slug]`
-- Updated all @greenline365.com email references to greenline365help@gmail.com (privacy, trust, terms, footer, email sender, admin lists, incident reports)
-
-### Production Readiness Cleanup (Feb 12, 2026)
-Made the site honest and production-ready:
-
-**False Claims Removed:**
-- Removed all fabricated Schema.org aggregateRating blocks (fake 4.8/500 reviews)
-- Removed fake social media sameAs links (twitter, facebook, instagram, linkedin)
-- Removed fake testimonial on services page ("10 to 50 leads" by "Michael K, CEO TechFlow") → replaced with honest "Early Adopter" quote
-- Rewrote FAQ schema to reflect actual directory functionality, not promised CRM features
-- Removed false claims about "50+ integrations" and "40% lead conversion increase"
-
-**Coming Soon Labels:**
-- All 7 marketplace add-ons on pricing page now show "Coming Soon" badge (Coupon Engine, QR Feedback Kit, Featured Boost, Analytics Pro, Review Response AI, etc.)
-
-**Footer Cleanup:**
-- Removed placeholder Twitter/LinkedIn links (no accounts exist yet)
-- "Contact Us" now links to mailto:greenline365help@gmail.com
-
-**Revenue-Enabling Features:**
-- Added Verified badge on listing detail pages for Pro/Premium claimed listings
-- Added CTA buttons (Call Now / Visit Website) for Pro/Premium claimed listings — this is what makes paid tiers visually deliver value
-
-### Marketplace Add-ons — Live (Feb 12, 2026)
-Built 5 functional marketplace add-on APIs with Stripe checkout:
-
-| Add-on | Price | API | Status |
-|---|---|---|---|
-| Coupon Engine | $19/mo + $0.60/redeem | `/api/directory/addons/coupons` (GET/POST/PATCH) | LIVE |
-| Custom Poll Template | $150/template | `/api/directory/addons/polls` (GET/POST/PATCH) | LIVE |
-| Featured Boost | $29/week | `/api/directory/addons/featured` (GET) | LIVE |
-| Additional Photos | $9/mo per 5-pack | Via addons API | LIVE |
-| Analytics Pro | $19/mo | `/api/directory/addons/analytics` (GET/POST) | LIVE |
-| QR Feedback Kit | $199 | — | Coming Soon |
-| Review Response AI | $29/mo | — | Coming Soon |
-
-**Infrastructure:** `/api/directory/addons` (GET/POST/PATCH) — purchase, activate, manage add-ons. State stored in `directory_listings.metadata.addons` JSONB.
-
-**Analytics tracking:** Every listing detail page view, phone call, website click, and map click is now tracked via `/api/directory/addons/analytics` POST endpoint. Transaction fees ($0.60) logged per interaction.
-
-### GL365 Reviews System + Review Response AI (Feb 12, 2026)
-Built native review system with AI-powered response management:
-
-**Consumer-Facing:**
-- GL365 Reviews section on every listing detail page
-- Star rating (1-5), reviewer name, text input
-- Reviews display with date, rating, and business response (if any)
-- Average rating and total review count shown
-
-**AI Response Engine:**
-- Auto-generates draft responses via OpenRouter (gpt-4o-mini) for every new review
-- Drafts are business-name-aware, rating-aware, and reference specific review content
-- If autopilot ON: auto-publishes AI response immediately
-- If autopilot OFF: drafts wait for owner approval
-
-**Business Owner Management (via /api/directory/reviews):**
-- `approve_draft` — publish AI draft as-is
-- `respond` — write/edit custom response (manual)
-- `reject_draft` — discard AI suggestion
-- `regenerate` — request new AI draft with feedback/tone guidance
-- `toggle_auto` — switch between autopilot and human-in-the-loop
-- `update_tone` — set preferred response tone
-
-**Activity Journaling:**
-- Every action timestamped: review submitted, draft generated, approved, rejected, autopilot toggled
-- Tracks when autopilot was enabled/disabled for stats ("X% enable autopilot within 3 weeks")
-
-**APIs:**
-- `GET /api/directory/reviews?listing_id=xxx` — public reviews
-- `POST /api/directory/reviews` — submit review (public)
-- `PATCH /api/directory/reviews` — owner management (auth)
-- `GET /api/directory/reviews/manage?listing_id=xxx` — owner view with AI drafts + stats (auth)
-
-**Pricing Update:** Review Response AI moved from Coming Soon to LIVE ($29/mo). Only QR Feedback Kit remains Coming Soon.
-
-### Chat Widget Wired to Directory (Feb 12, 2026)
-Chat concierge now searches the real directory when users ask about businesses:
-- Detects category (dining, services, nightlife, etc.) and city from natural language
-- Queries `directory_listings` table, returns real results with links, ratings, phone numbers
-- Specific service search: "find me a roofer" narrows within services by business name
-- Business owner queries: returns claim instructions, tier pricing, dashboard link
-- Updated quick actions: "Find a business near me", "Best restaurants in Tampa", "I need a plumber", "How do I claim my listing?"
-
-### Photo Library + Menu Upload (Feb 12, 2026)
-Built photo management for business dashboard:
-
-**Photo Library API** (`/api/directory/photos` GET/POST/PATCH):
-- `GET` — returns full library (all Google photos), selected photos, cover, menu images, tier limits
-- `POST` — upload photo URL to gallery or menu
-- `PATCH` — select_photos (choose which to display), set_cover, remove_photo, remove_menu
-
-**Photo Library Panel** (`PhotoLibraryPanel.tsx`):
-- Grid view of all photos in library with selection checkmarks
-- Tier-gated: Free sees locked overlay, Pro selects 2, Premium selects 10
-- Cover photo setter (click "Set as Cover" on hover)
-- Menu tab for restaurant menu image uploads
-- Upsell prompt for free tier: "X photos waiting for you — upgrade to unlock"
-
-**Business Dashboard** now has 3 tabs: My Listing | Reviews | Photos & Menu
+**Sidebar Updated:**
+- Added "Campaigns" entry with megaphone icon in CollapsibleSidebar.tsx
 
 ## Backlog
 
-### P0 — Immediate
-- Expand discovery limits (currently 3/category → target 25/category per destination)
+### P0 — Immediate (Next Session)
+- Wire email sending to Campaign Manager (Gmail SMTP / multi-sender rotation)
+- Calendar integration for campaign scheduled sends (auto-appear on calendar)
+- Content Forge accessible from calendar day click
+- Webhook triggers for self-signups and paid upgrades
+
+### P1 — Coupon & Poll Frontend UI
+- Display coupons on listing pages + redemption flow
+- Display poll widgets on listings + results in dashboard
+
+### P2 — Property Intelligence Badge
+- Visual badge for high-tier CRM subscribers
+
+### P3 — Expansion
+- Expand discovery limits (25/category per destination)
 - Add more Florida destinations (Tampa, Naples, Clearwater, Fort Lauderdale)
-
-### P1 — Data & Content
-- Classify pre-discovery listings with destination_zone tags
-- Run Supabase SQL migration for dedicated `destination_zone` column
-
-### P2 — Events & Festivals
-- Schema for event-specific data (dates, tickets, location)
-- UI for events within destination guides
-- Link businesses to events (Daytona 500, F1, etc.)
-
-### P3 — Monetization
-- Destination Sponsorship feature
-- "Local's Pick" badge for premium businesses
-- Featured placement within destination guides
+- Events & Festivals schema + UI
 
 ## Key API Endpoints
 - `GET /api/directory` — Main directory with destination/tourism_category filters
+- `GET/POST /api/campaigns` — Campaign management
+- `GET /api/calendar/unified` — Unified calendar events
 - `GET /api/directory/discover` — List 8 destinations & 10 categories
 - `POST /api/directory/discover` — Run discovery pipeline
-- `GET /api/directory/guide?destination={slug}` — All guide data for a destination
 
 ## Key Files
-- `/app/webapp/app/globals.css` — Global background system, metallic frames, glassmorphism
-- `/app/webapp/app/directory/DirectoryClient.tsx` — Homepage with 8-card destination grid
-- `/app/webapp/app/destination/[slug]/DestinationGuideClient.tsx` — Guide page UI
+- `/app/webapp/app/admin-v2/campaigns/page.tsx` — Campaign Manager UI
+- `/app/webapp/app/admin-v2/calendar/page.tsx` — Unified Calendar UI
+- `/app/webapp/app/api/campaigns/route.ts` — Campaign CRUD API
+- `/app/webapp/app/api/campaigns/[id]/route.ts` — Single campaign API
+- `/app/webapp/app/api/campaigns/[id]/contacts/route.ts` — Contact management API
+- `/app/webapp/app/api/calendar/unified/route.ts` — Unified calendar API
+- `/app/webapp/app/admin-v2/components/CollapsibleSidebar.tsx` — Sidebar with Campaigns entry
+- `/app/webapp/app/directory/DirectoryClient.tsx` — Homepage
 - `/app/webapp/app/api/directory/discover/route.ts` — Discovery pipeline
-- `/app/webapp/app/api/directory/guide/route.ts` — Guide data endpoint
-- `/app/backend/server.py` — FastAPI proxy (8001 → 3000)
 
 ## Test Reports
-- `/app/test_reports/iteration_12.json` — Phase 2A/B: 100% pass
-- `/app/test_reports/iteration_13.json` — Phase 2C: 100% pass (21/21 backend, 100% frontend)
+- `/app/test_reports/iteration_22.json` — Campaign Manager & Calendar API: 100% pass (28/28)
