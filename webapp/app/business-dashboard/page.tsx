@@ -248,6 +248,31 @@ export default function BusinessDashboard() {
           </motion.div>
         )}
 
+        {/* Tab Navigation */}
+        <div className="flex gap-1 p-1 rounded-xl bg-white/5 border border-white/10 mb-6 w-fit" data-testid="dashboard-tabs">
+          {[
+            { id: 'listing' as const, label: 'My Listing' },
+            { id: 'reviews' as const, label: 'Reviews' },
+          ].map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`px-5 py-2.5 rounded-lg text-xs font-heading font-semibold transition-all ${
+                activeTab === tab.id
+                  ? 'bg-gold/15 text-gold border border-gold/20'
+                  : 'text-white/40 hover:text-white/60'
+              }`}
+              data-testid={`tab-${tab.id}`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {activeTab === 'reviews' && activeListing ? (
+          <ReviewsPanel listingId={activeListing.id} />
+        ) : (
+        <>
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Main Content — 2 cols */}
           <div className="lg:col-span-2 space-y-6">
