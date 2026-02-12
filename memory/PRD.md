@@ -207,6 +207,31 @@ Built native review system with AI-powered response management:
 
 **Pricing Update:** Review Response AI moved from Coming Soon to LIVE ($29/mo). Only QR Feedback Kit remains Coming Soon.
 
+### Chat Widget Wired to Directory (Feb 12, 2026)
+Chat concierge now searches the real directory when users ask about businesses:
+- Detects category (dining, services, nightlife, etc.) and city from natural language
+- Queries `directory_listings` table, returns real results with links, ratings, phone numbers
+- Specific service search: "find me a roofer" narrows within services by business name
+- Business owner queries: returns claim instructions, tier pricing, dashboard link
+- Updated quick actions: "Find a business near me", "Best restaurants in Tampa", "I need a plumber", "How do I claim my listing?"
+
+### Photo Library + Menu Upload (Feb 12, 2026)
+Built photo management for business dashboard:
+
+**Photo Library API** (`/api/directory/photos` GET/POST/PATCH):
+- `GET` — returns full library (all Google photos), selected photos, cover, menu images, tier limits
+- `POST` — upload photo URL to gallery or menu
+- `PATCH` — select_photos (choose which to display), set_cover, remove_photo, remove_menu
+
+**Photo Library Panel** (`PhotoLibraryPanel.tsx`):
+- Grid view of all photos in library with selection checkmarks
+- Tier-gated: Free sees locked overlay, Pro selects 2, Premium selects 10
+- Cover photo setter (click "Set as Cover" on hover)
+- Menu tab for restaurant menu image uploads
+- Upsell prompt for free tier: "X photos waiting for you — upgrade to unlock"
+
+**Business Dashboard** now has 3 tabs: My Listing | Reviews | Photos & Menu
+
 ## Backlog
 
 ### P0 — Immediate
