@@ -216,7 +216,7 @@ export default async function TermsPage() {
                 <div className="bg-white/5 border border-white/10 rounded-lg p-5">
                   <h3 className="font-semibold text-white mb-2">Directory Tiers</h3>
                   <p className="text-white/60 text-sm leading-relaxed">
-                    Directory listings are available in three tiers: Free, Pro ($39/month), and Premium ($59/month). Each tier provides different features as detailed on our Pricing page. Tier subscriptions are billed monthly via Stripe and may be cancelled at any time. Downgrading or cancelling will take effect at the end of the current billing period.
+                    Directory listings are available in three tiers: Free, Pro ($45/month), and Premium ($89/month). Each tier provides different features as detailed on our Pricing page. Tier subscriptions are billed monthly via Stripe and may be cancelled at any time. Downgrading or cancelling will take effect at the end of the current billing period.
                   </p>
                 </div>
                 <div className="bg-white/5 border border-white/10 rounded-lg p-5">
