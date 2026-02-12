@@ -135,6 +135,36 @@ export function getSkillContextForIntent(userMessage: string): string {
 export function getSkillSummary(skillName: string): string {
   const content = loadSkillContent(skillName);
   if (!content) return '';
-  // Just the first 500 chars - the core principles
   return content.slice(0, 500);
+}
+
+/**
+ * Load a tool integration guide
+ */
+export function getToolGuide(toolName: string): string {
+  const toolFile = join(SKILLS_DIR, 'tools', 'integrations', `${toolName}.md`);
+  if (!existsSync(toolFile)) return '';
+  return readFileSync(toolFile, 'utf-8');
+}
+
+/**
+ * Get the core marketing psychology principles (always useful)
+ * This is the "always-on" context that makes every AI response smarter
+ */
+export function getCoreMarketingContext(): string {
+  const psychology = loadSkillContent('marketing-psychology');
+  const copyFrameworks = (() => {
+    const file = join(SKILLS_DIR, 'copywriting', 'references', 'copy-frameworks.md');
+    return existsSync(file) ? readFileSync(file, 'utf-8') : '';
+  })();
+
+  if (!psychology && !copyFrameworks) return '';
+
+  return `\n\n--- CORE MARKETING INTELLIGENCE ---
+Apply these principles in all marketing-related responses:
+
+${psychology ? `[KEY PSYCHOLOGY PRINCIPLES]\n${psychology.slice(0, 2000)}` : ''}
+
+${copyFrameworks ? `[COPYWRITING FRAMEWORKS]\n${copyFrameworks.slice(0, 1500)}` : ''}
+--- END MARKETING INTELLIGENCE ---`;
 }
