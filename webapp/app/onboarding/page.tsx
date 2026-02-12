@@ -634,10 +634,29 @@ export default function OnboardingPage() {
                     <button
                       onClick={handleSave}
                       disabled={saving}
-                      className="px-8 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-blue-500 text-white font-bold hover:from-emerald-600 hover:to-blue-600 transition-all disabled:opacity-50"
+                      className={`px-8 py-3 rounded-xl font-bold transition-all disabled:cursor-wait ${
+                        saveStatus === 'success' ? 'bg-emerald-500 text-white' :
+                        saveStatus === 'error' ? 'bg-red-500 text-white' :
+                        saving ? 'bg-gradient-to-r from-emerald-500 to-blue-500 text-white animate-pulse' :
+                        'bg-gradient-to-r from-emerald-500 to-blue-500 text-white hover:from-emerald-600 hover:to-blue-600'
+                      }`}
                     >
-                      {saving ? 'Saving...' : 'Complete Setup'}
+                      {saveStatus === 'success' ? 'Saved!' :
+                       saveStatus === 'error' ? 'Failed — Tap to Retry' :
+                       saving ? (
+                        <span className="flex items-center gap-2">
+                          <span className="inline-flex gap-1">
+                            <span className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                            <span className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                            <span className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                          </span>
+                          Saving
+                        </span>
+                      ) : 'Complete Setup'}
                     </button>
+                    {saveStatus === 'error' && saveError && (
+                      <p className="text-red-400 text-sm mt-2 text-center">{saveError}</p>
+                    )}
                   ) : (
                     <button
                       onClick={() => setCurrentStep(prev => prev + 1)}
