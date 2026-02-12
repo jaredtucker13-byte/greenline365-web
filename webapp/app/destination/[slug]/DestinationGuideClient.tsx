@@ -78,36 +78,27 @@ export default function DestinationGuideClient({ slug }: { slug: string }) {
 
   useEffect(() => {
     if (!dest) return;
-    loadAllSections();
+    loadGuideData();
   }, [slug]);
 
-  async function loadAllSections() {
+  async function loadGuideData() {
     setLoading(true);
-    const allListings: Record<string, Listing[]> = {};
-    let total = 0;
-
-    // Fetch all tourism categories for this destination in parallel
-    const fetches = SECTIONS.map(async (section) => {
-      const params = new URLSearchParams({
-        destination: slug,
-        tourism_category: section.id,
-        limit: '50',
-      });
-      const res = await fetch(`/api/directory?${params}`);
+    try {
+      const res = await fetch(`/api/directory/guide?destination=${slug}`);
       const data = await res.json();
-      const list = Array.isArray(data) ? data : [];
-      allListings[section.id] = list;
-      total += list.length;
-    });
 
-    await Promise.all(fetches);
-    setListings(allListings);
-    setAllCount(total);
+      if (data.sections) {
+        setListings(data.sections);
+        setAllCount(data.totalCount || 0);
 
-    // Auto-select first section with data
-    const firstWithData = SECTIONS.find(s => (allListings[s.id] || []).length > 0);
-    if (firstWithData) setActiveSection(firstWithData.id);
-
+        // Auto-select first section with data
+        const firstWithData = SECTIONS.find(s => (data.sections[s.id] || []).length > 0);
+        if (firstWithData) setActiveSection(firstWithData.id);
+      }
+    } catch {
+      setListings({});
+      setAllCount(0);
+    }
     setLoading(false);
   }
 
