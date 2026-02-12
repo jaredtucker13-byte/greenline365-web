@@ -35,12 +35,13 @@ export async function GET(
   const allPhotos: string[] = listing.gallery_images || [];
   const industry = listing.industry || 'services';
   const placeholder = getPlaceholderImage(industry);
+  const claimable = isClaimable(listing.business_name || '');
 
-  // Free/unclaimed: placeholder only
-  const isFreeOrUnclaimed = tier === 'free' || !isClaimed;
-  const maxPhotos = isFreeOrUnclaimed ? 0 : limits.photos;
+  // Non-claimable: show photos freely
+  const isFreeOrUnclaimed = claimable && (tier === 'free' || !isClaimed);
+  const maxPhotos = !claimable ? 10 : (isFreeOrUnclaimed ? 0 : limits.photos);
   const visiblePhotos = isFreeOrUnclaimed ? [] : allPhotos.slice(0, maxPhotos);
-  const coverImage = isFreeOrUnclaimed ? placeholder : (visiblePhotos[0] || listing.cover_image_url || placeholder);
+  const coverImage = (isFreeOrUnclaimed && claimable) ? placeholder : (visiblePhotos[0] || allPhotos[0] || listing.cover_image_url || placeholder);
 
   // Get related listings (same city + industry, limit 4)
   const { data: related } = await supabase
