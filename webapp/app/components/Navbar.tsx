@@ -227,14 +227,17 @@ export default function Navbar() {
                 <div className="flex items-center gap-2 ml-2">
                   <Link
                     href="/login"
-                    className="px-4 py-2 text-sm font-medium text-white/70 hover:text-white transition-colors"
+                    className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center hover:border-gold/40 transition-all"
+                    title="Sign In"
                   >
-                    Sign In
+                    <svg className="w-4 h-4 text-silver" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                    </svg>
                   </Link>
                   <Link
                     href="/register-business"
                     data-testid="nav-register-btn"
-                    className="px-5 py-2.5 text-sm font-bold text-black rounded-lg transition-all hover:opacity-90"
+                    className="px-5 py-2.5 text-sm font-bold text-midnight-900 rounded-full transition-all hover:opacity-90 font-heading"
                     style={{ background: 'linear-gradient(135deg, #C9A96E, #E6D8B5)' }}
                   >
                     Add Your Business
