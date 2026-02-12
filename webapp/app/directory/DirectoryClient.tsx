@@ -97,6 +97,7 @@ export default function DirectoryPage() {
   const [activeCategory, setActiveCategory] = useState('');
   const [activeSubcategory, setActiveSubcategory] = useState('All');
   const [showListings, setShowListings] = useState(false);
+  const [showGroupedBrowse, setShowGroupedBrowse] = useState(false);
   const [testimonialIdx, setTestimonialIdx] = useState(0);
   const [stats, setStats] = useState({ totalBusinesses: 0, totalDestinations: 0, totalCategories: 0 });
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
