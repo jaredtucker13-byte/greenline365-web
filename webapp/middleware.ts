@@ -4,26 +4,40 @@ import { updateSession } from '@/lib/supabase/middleware';
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Update the Supabase session and get the user
-  const { user, supabaseResponse } = await updateSession(request);
+  // Define protected routes that need auth
+  const isProtectedRoute = pathname.startsWith('/admin-v2') || pathname.startsWith('/admin') || pathname === '/business-dashboard' || pathname === '/onboarding';
+  const isLoginPage = pathname === '/login';
 
-  // Define protected routes
-  const isProtectedRoute = pathname.startsWith('/admin-v2') || pathname.startsWith('/admin');
-
-  // If accessing a protected route without being authenticated, redirect to login
-  if (isProtectedRoute && !user) {
-    const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('redirectTo', pathname);
-    return NextResponse.redirect(loginUrl);
+  // Public pages: skip Supabase entirely — never block public access
+  if (!isProtectedRoute && !isLoginPage) {
+    return NextResponse.next();
   }
 
-  // If user is logged in and trying to access login page, redirect to dashboard
-  if (pathname === '/login' && user) {
-    const redirectTo = request.nextUrl.searchParams.get('redirectTo') || '/admin-v2';
-    return NextResponse.redirect(new URL(redirectTo, request.url));
-  }
+  // Protected routes + login page: check auth via Supabase
+  try {
+    const { user, supabaseResponse } = await updateSession(request);
 
-  return supabaseResponse;
+    if (isProtectedRoute && !user) {
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('redirectTo', pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+
+    if (isLoginPage && user) {
+      const redirectTo = request.nextUrl.searchParams.get('redirectTo') || '/admin-v2';
+      return NextResponse.redirect(new URL(redirectTo, request.url));
+    }
+
+    return supabaseResponse;
+  } catch {
+    // If Supabase times out, let the request through rather than 504
+    if (isProtectedRoute) {
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('redirectTo', pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+    return NextResponse.next();
+  }
 }
 
 export const config = {
