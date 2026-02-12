@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { createClient, createServerClient } from '@/lib/supabase/server';
 import { MemoryBucketService, AIContext } from '@/lib/memory-bucket-service';
+import { getSkillContextForIntent } from '@/lib/marketing-skills-loader';
 
 type Msg = { role: 'user' | 'assistant' | 'system'; content: string };
 
