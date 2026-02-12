@@ -429,10 +429,34 @@ function CampaignDrawer({ campaign, onClose, onUpdateStage, onRefresh, onShowImp
   onRefresh: () => void;
   onShowImport: () => void;
 }) {
-  const [tab, setTab] = useState<'overview' | 'contacts' | 'sequence'>('overview');
+  const [tab, setTab] = useState<'overview' | 'contacts' | 'sequence' | 'send'>('overview');
   const [editing, setEditing] = useState(false);
   const [editName, setEditName] = useState(campaign.name);
   const [editDesc, setEditDesc] = useState(campaign.description);
+  const [sending, setSending] = useState(false);
+  const [sendResult, setSendResult] = useState<any>(null);
+  const [testEmail, setTestEmail] = useState('');
+
+  const sendStep = async (stepNumber: number, testTo?: string) => {
+    setSending(true);
+    setSendResult(null);
+    try {
+      const body: any = { step_number: stepNumber };
+      if (testTo) body.test_email = testTo;
+      const res = await fetch(`/api/campaigns/${campaign.id}/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      setSendResult(data);
+      if (data.sent > 0) onRefresh();
+    } catch (err) {
+      setSendResult({ error: 'Send failed' });
+    } finally {
+      setSending(false);
+    }
+  };
 
   const saveEdits = async () => {
     await fetch(`/api/campaigns/${campaign.id}`, {
