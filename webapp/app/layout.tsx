@@ -227,7 +227,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   name: 'What do the directory tiers include?',
                   acceptedAnswer: {
                     '@type': 'Answer',
-                    text: 'Free listings include basic business info. Pro ($39/mo) adds a Verified badge, CTA buttons, and priority search. Premium ($59/mo) includes featured placement, all photos, analytics, and badge earning.',
+                    text: 'Free listings include basic business info. Pro ($45/mo) adds a Verified badge, CTA buttons, and priority search. Premium ($89/mo) includes featured placement, all photos, analytics, and lead capture.',
                   },
                 },
                 {
