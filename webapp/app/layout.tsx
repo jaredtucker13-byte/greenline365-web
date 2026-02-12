@@ -2,6 +2,7 @@ import './globals.css';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ChatWidget from './components/ChatWidget';
+import ScrollToTop from './components/ScrollToTop';
 import { ServiceWorkerProvider } from '@/lib/use-service-worker';
 import { AdminEditModeProvider } from '@/components/editor';
 import type { Metadata } from 'next';
