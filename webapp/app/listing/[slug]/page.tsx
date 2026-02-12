@@ -373,6 +373,39 @@ export default function ListingDetailPage() {
             >
               <h3 className="text-sm font-heading font-semibold text-white uppercase tracking-wider mb-5">Contact</h3>
 
+              {/* CTA Buttons — Pro/Premium only */}
+              {listing.tier !== 'free' && listing.is_claimed && (
+                <div className="space-y-2 mb-5" data-testid="cta-buttons">
+                  {listing.phone && (
+                    <a
+                      href={`tel:${listing.phone}`}
+                      className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-bold font-heading text-midnight-900 transition-all hover:scale-[1.02]"
+                      style={{ background: 'linear-gradient(135deg, #C9A96E, #E6D8B5)', boxShadow: '0 0 16px rgba(201,169,110,0.3)' }}
+                      data-testid="cta-call-now"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                      </svg>
+                      Call Now
+                    </a>
+                  )}
+                  {listing.website && (
+                    <a
+                      href={listing.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold font-heading text-gold border border-gold/30 hover:bg-gold/5 transition-all"
+                      data-testid="cta-visit-website"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                      </svg>
+                      Visit Website
+                    </a>
+                  )}
+                </div>
+              )}
+
               <div className="space-y-3">
                 {/* Phone */}
                 {listing.phone && (
