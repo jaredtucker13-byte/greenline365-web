@@ -94,7 +94,15 @@ export default function ListingDetailPage() {
   };
 
   const submitReview = async () => {
-    if (!listing || !reviewForm.reviewer_name || !reviewForm.text) return;
+    if (!listing) return;
+    if (!reviewForm.reviewer_name.trim()) {
+      setReviewMessage('Please enter your name.');
+      return;
+    }
+    if (reviewForm.text.trim().length < 10) {
+      setReviewMessage('Please share more detail — reviews need at least 10 characters explaining your experience.');
+      return;
+    }
     setSubmittingReview(true);
     setReviewMessage('');
     const res = await fetch('/api/directory/reviews', {
