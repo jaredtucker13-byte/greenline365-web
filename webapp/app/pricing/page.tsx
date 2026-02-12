@@ -79,7 +79,7 @@ const MARKETPLACE = [
   { name: 'Featured Boost', price: '$29', unit: 'per week', desc: 'Temporary homepage spotlight for events, grand openings, or seasonal promotions.', comingSoon: false },
   { name: 'Additional Photos', price: '$9', unit: '/mo per 5-pack', desc: 'Expand beyond your tier limit with extra photos from Google or uploaded.', comingSoon: false },
   { name: 'Analytics Pro', price: '$19', unit: '/mo', desc: 'Deep insights: competitor comparison, search ranking trends, and click heatmaps.', comingSoon: false },
-  { name: 'Review Response AI', price: '$29', unit: '/mo', desc: 'AI drafts professional responses to reviews matching your brand voice.', comingSoon: true },
+  { name: 'Review Response AI', price: '$29', unit: '/mo', desc: 'AI drafts professional responses to reviews matching your brand voice. Approve, edit, or set to autopilot.', comingSoon: false },
 ];
 
 export default function PricingPage() {
