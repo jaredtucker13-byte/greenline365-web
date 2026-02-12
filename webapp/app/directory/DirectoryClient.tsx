@@ -273,14 +273,15 @@ export default function DirectoryPage() {
       {showGroupedBrowse ? (
         /* ─── GROUPED BROWSE VIEW (All categories with carousels) ─── */
         <GroupedBrowseView
+          activeCategory={activeCategory}
           sortBy={sortBy}
           setSortBy={setSortBy}
           cityFilter={cityFilter}
           setCityFilter={setCityFilter}
           availableCities={availableCities}
           userLocation={userLocation}
-          onViewAll={handleViewAllFromCarousel}
-          onBack={() => { setShowGroupedBrowse(false); }}
+          onViewAll={handleViewAllSubcategory}
+          onBack={() => { setShowGroupedBrowse(false); setActiveCategory(''); }}
         />
       ) : !showListings ? (
         <>
