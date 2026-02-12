@@ -172,6 +172,41 @@ Built 5 functional marketplace add-on APIs with Stripe checkout:
 
 **Analytics tracking:** Every listing detail page view, phone call, website click, and map click is now tracked via `/api/directory/addons/analytics` POST endpoint. Transaction fees ($0.60) logged per interaction.
 
+### GL365 Reviews System + Review Response AI (Feb 12, 2026)
+Built native review system with AI-powered response management:
+
+**Consumer-Facing:**
+- GL365 Reviews section on every listing detail page
+- Star rating (1-5), reviewer name, text input
+- Reviews display with date, rating, and business response (if any)
+- Average rating and total review count shown
+
+**AI Response Engine:**
+- Auto-generates draft responses via OpenRouter (gpt-4o-mini) for every new review
+- Drafts are business-name-aware, rating-aware, and reference specific review content
+- If autopilot ON: auto-publishes AI response immediately
+- If autopilot OFF: drafts wait for owner approval
+
+**Business Owner Management (via /api/directory/reviews):**
+- `approve_draft` — publish AI draft as-is
+- `respond` — write/edit custom response (manual)
+- `reject_draft` — discard AI suggestion
+- `regenerate` — request new AI draft with feedback/tone guidance
+- `toggle_auto` — switch between autopilot and human-in-the-loop
+- `update_tone` — set preferred response tone
+
+**Activity Journaling:**
+- Every action timestamped: review submitted, draft generated, approved, rejected, autopilot toggled
+- Tracks when autopilot was enabled/disabled for stats ("X% enable autopilot within 3 weeks")
+
+**APIs:**
+- `GET /api/directory/reviews?listing_id=xxx` — public reviews
+- `POST /api/directory/reviews` — submit review (public)
+- `PATCH /api/directory/reviews` — owner management (auth)
+- `GET /api/directory/reviews/manage?listing_id=xxx` — owner view with AI drafts + stats (auth)
+
+**Pricing Update:** Review Response AI moved from Coming Soon to LIVE ($29/mo). Only QR Feedback Kit remains Coming Soon.
+
 ## Backlog
 
 ### P0 — Immediate
