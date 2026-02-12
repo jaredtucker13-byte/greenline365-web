@@ -526,7 +526,7 @@ export default async function TrustPage() {
                     </div>
                     <div>
                       <p className="text-white/40 text-sm">Security Contact</p>
-                      <p className="text-emerald-400 font-medium">security@greenline365.com</p>
+                      <p className="text-emerald-400 font-medium">greenline365help@gmail.com</p>
                     </div>
                   </div>
                 </a>

@@ -470,7 +470,7 @@ export default async function TermsPage() {
                   If you have any questions about these Terms, please contact us at:
                 </p>
                 <a 
-                  href="mailto:legal@greenline365.com" 
+                  href="mailto:greenline365help@gmail.com" 
                   className="inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300 transition font-medium"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
