@@ -47,7 +47,7 @@ Output ONLY the code, no explanations. Start with the import statements.`;
         'X-Title': 'GreenLine365 Code Generator',
       },
       body: JSON.stringify({
-        model: 'anthropic/claude-sonnet-4', // Claude 4.5 Sonnet - best for code
+        model: 'anthropic/claude-opus-4.6', // Claude Opus 4.6 - best for code generation
         messages: [
           {
             role: 'system',
