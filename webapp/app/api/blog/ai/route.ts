@@ -63,7 +63,7 @@ const getSystemPrompt = (action: AIAction): string => {
 - An engaging introduction hook
 - 4-6 main sections with subpoints
 - A compelling conclusion with CTA
-Format as markdown with ## for sections and bullet points for subpoints.${contentSkill}`;
+Format as markdown with ## for sections and bullet points for subpoints.${CHAT_FORMAT_DIRECTIVE}${contentSkill}`;
 
     case 'enhance_content':
       return `You are an expert editor and content enhancer. Improve the given blog content by:
