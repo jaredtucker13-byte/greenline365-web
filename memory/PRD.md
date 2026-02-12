@@ -74,7 +74,18 @@ GreenLine365 is a directory-first lead generation platform. The initial goal was
 - Extensive strategic docs in /docs/ and /memory/
 - Operational Bibles V1 & V2, Pricing Stack, Audit System Spec, Marketing Dashboard Spec
 
-### Phase 5: Bentley Standard UI Overhaul (COMPLETED - Feb 2026)
+### Phase 6: Directory Restructure — 9 Categories + Subcategories (COMPLETED - Feb 2026)
+- **Navbar Simplified**: Directory | Our Services | Person Icon (sign-in) | Add Your Business
+- **9 Top-level Categories**: Services, Dining, Health & Wellness, Style & Shopping, Nightlife, Family Entertainment, Destinations, Hotels & Lodging, Professional Services
+- **Subcategory Pill Tabs**: Each category has 6-9 subcategory filters (e.g., Services → HVAC, Plumbing, Electrical, Roofing...)
+- **Removed**: Industries dropdown, Pricing link, Sign In text, Price filter, Specialty dropdown
+- **Database prep**: destination_zone and subcategory fields ready for Phase 2
+
+## Upcoming Phases
+### Phase 2: Destination Guides (PLANNED)
+- Mini-directories per destination (St. Pete Beach, Sarasota, Ybor City, Clearwater, Key West)
+- Sections: Stay, Eat & Drink, Things To Do, Beaches & Nature, Family Fun, Shopping, Nightlife, Getting Around, Events & Festivals, Local Essentials, Insider Tips
+- Businesses can appear in both main directory AND destination guides
 - **Color Palette**: Midnight blue (#0D1B2A) + champagne gold (#C9A96E) + brushed silver
 - **Typography**: Montserrat (headings) + Inter (body)
 - **Glassmorphism**: backdrop-blur mega-menu dropdowns with animated open/close
