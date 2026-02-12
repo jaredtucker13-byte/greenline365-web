@@ -351,7 +351,7 @@ export default function DirectoryPage() {
                 <h2 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-light text-white tracking-tight mb-4">
                   Explore <span className="font-semibold text-gradient-gold">Destinations</span>
                 </h2>
-                <p className="text-sm text-silver/60 max-w-lg mx-auto font-body leading-relaxed">
+                <p className="text-sm text-white/50 max-w-lg mx-auto font-body leading-relaxed">
                   Your personal concierge to Florida&apos;s finest — where to stay, dine, explore, and unwind.
                 </p>
               </div>
