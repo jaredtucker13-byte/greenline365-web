@@ -98,7 +98,7 @@ async function generateDesignWithOpenRouter(prompt: string): Promise<string> {
       'X-Title': 'GreenLine365 Website Builder',
     },
     body: JSON.stringify({
-      model: 'anthropic/claude-sonnet-4', // Claude 4.5 Sonnet
+      model: 'anthropic/claude-opus-4.6', // Claude Opus 4.6 - best for complex analysis
       messages: [
         {
           role: 'system',
