@@ -426,6 +426,7 @@ export default function ListingDetailPage() {
                 {listing.phone && (
                   <a
                     href={`tel:${listing.phone}`}
+                    onClick={() => trackEvent('call')}
                     className="flex items-center gap-3 w-full p-3 rounded-xl border border-white/10 hover:border-gold/30 hover:bg-gold/5 transition-all group"
                     data-testid="contact-phone"
                   >
