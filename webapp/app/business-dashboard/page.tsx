@@ -565,7 +565,7 @@ export default function BusinessDashboard() {
                       style={{ background: 'linear-gradient(135deg, rgba(59,130,246,0.2), rgba(96,165,250,0.1))' }}
                       data-testid="upgrade-pro-btn"
                     >
-                      Upgrade to Pro — $39/mo
+                      Upgrade to Pro — $45/mo
                     </button>
                   )}
                   <button
