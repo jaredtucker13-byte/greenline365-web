@@ -153,7 +153,7 @@ ${marketingContext}`,
     </div>
 
     <!-- AI Recap -->
-    <div style="color:#ccc;font-size:14px;line-height:1.8;white-space:pre-wrap;">${recapText.replace(/\n/g, '<br>')}</div>
+    <div style="color:#ccc;font-size:14px;line-height:1.8;">${recapText}</div>
   </div>
 
   <div style="text-align:center;margin-top:24px;">
