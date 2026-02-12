@@ -134,6 +134,27 @@ Built `/listing/[slug]` pages for all 450+ businesses — each is now SEO-indexa
 - Listing cards in directory now wrapped in `<Link>` to `/listing/[slug]`
 - Updated all @greenline365.com email references to greenline365help@gmail.com (privacy, trust, terms, footer, email sender, admin lists, incident reports)
 
+### Production Readiness Cleanup (Feb 12, 2026)
+Made the site honest and production-ready:
+
+**False Claims Removed:**
+- Removed all fabricated Schema.org aggregateRating blocks (fake 4.8/500 reviews)
+- Removed fake social media sameAs links (twitter, facebook, instagram, linkedin)
+- Removed fake testimonial on services page ("10 to 50 leads" by "Michael K, CEO TechFlow") → replaced with honest "Early Adopter" quote
+- Rewrote FAQ schema to reflect actual directory functionality, not promised CRM features
+- Removed false claims about "50+ integrations" and "40% lead conversion increase"
+
+**Coming Soon Labels:**
+- All 7 marketplace add-ons on pricing page now show "Coming Soon" badge (Coupon Engine, QR Feedback Kit, Featured Boost, Analytics Pro, Review Response AI, etc.)
+
+**Footer Cleanup:**
+- Removed placeholder Twitter/LinkedIn links (no accounts exist yet)
+- "Contact Us" now links to mailto:greenline365help@gmail.com
+
+**Revenue-Enabling Features:**
+- Added Verified badge on listing detail pages for Pro/Premium claimed listings
+- Added CTA buttons (Call Now / Visit Website) for Pro/Premium claimed listings — this is what makes paid tiers visually deliver value
+
 ## Backlog
 
 ### P0 — Immediate
