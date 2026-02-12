@@ -613,6 +613,66 @@ function CampaignDrawer({ campaign, onClose, onUpdateStage, onRefresh, onShowImp
               onRefresh={onRefresh}
             />
           )}
+
+          {tab === 'send' && (
+            <div className="space-y-6" data-testid="send-tab">
+              {/* Test Email */}
+              <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5">
+                <h3 className="text-sm font-medium text-white mb-3">Send Test Email</h3>
+                <p className="text-xs text-white/30 mb-3">Preview how the email looks before sending to real contacts.</p>
+                <div className="flex gap-2">
+                  <input value={testEmail} onChange={(e) => setTestEmail(e.target.value)} placeholder="your@email.com" className="flex-1 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:border-[#39FF14] outline-none placeholder:text-white/20" data-testid="test-email-input" />
+                  <select id="test-step" className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:border-[#39FF14] outline-none">
+                    {campaign.sequence.map(s => <option key={s.step} value={s.step}>Step {s.step}: {s.type.replace(/_/g, ' ')}</option>)}
+                  </select>
+                  <button onClick={() => { const sel = document.getElementById('test-step') as HTMLSelectElement; sendStep(parseInt(sel?.value || '1'), testEmail); }} disabled={sending || !testEmail} className="px-4 py-2 rounded-lg bg-amber-500/10 text-amber-400 text-sm font-medium hover:bg-amber-500/20 disabled:opacity-50 transition whitespace-nowrap" data-testid="send-test-btn">
+                    {sending ? 'Sending...' : 'Send Test'}
+                  </button>
+                </div>
+              </div>
+
+              {/* Send to Contacts */}
+              <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5">
+                <h3 className="text-sm font-medium text-white mb-3">Send to Contacts</h3>
+                {campaign.sequence.map(step => {
+                  const targetStage = step.step === 1 ? 'new' : 'contacted';
+                  const eligible = (campaign.contacts || []).filter(c => c.pipeline_stage === targetStage).length;
+                  return (
+                    <div key={step.step} className="flex items-center justify-between p-3 rounded-lg bg-white/[0.02] border border-white/5 mb-2">
+                      <div>
+                        <p className="text-sm text-white">Step {step.step}: <span className="text-white/60">{step.type.replace(/_/g, ' ')}</span></p>
+                        <p className="text-xs text-white/30">{step.subject} &middot; {eligible} contacts eligible ({targetStage} stage)</p>
+                      </div>
+                      <button onClick={() => sendStep(step.step)} disabled={sending || eligible === 0} className={`px-4 py-2 rounded-lg text-sm font-semibold transition whitespace-nowrap ${eligible > 0 ? 'bg-[#39FF14] text-black hover:bg-[#32E012]' : 'bg-white/5 text-white/20 cursor-not-allowed'}`} data-testid={`send-step-${step.step}`}>
+                        {sending ? 'Sending...' : `Send to ${eligible}`}
+                      </button>
+                    </div>
+                  );
+                })}
+                {campaign.sequence.length === 0 && (
+                  <p className="text-white/30 text-sm text-center py-4">No sequence steps defined. Go to the Sequence tab to add steps.</p>
+                )}
+              </div>
+
+              {/* Send Result */}
+              {sendResult && (
+                <div className={`p-4 rounded-xl border ${sendResult.success || sendResult.test ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-red-500/10 border-red-500/30'}`} data-testid="send-result">
+                  {sendResult.test ? (
+                    <p className="text-emerald-400 text-sm">Test email {sendResult.success ? 'sent' : 'failed'} to {sendResult.recipient}{sendResult.error ? `: ${sendResult.error}` : ''}</p>
+                  ) : sendResult.sent !== undefined ? (
+                    <div>
+                      <p className="text-emerald-400 text-sm font-medium">{sendResult.sent} sent, {sendResult.failed} failed (Step {sendResult.step}: {sendResult.step_type?.replace(/_/g, ' ')})</p>
+                      {sendResult.results?.filter((r: any) => !r.success).slice(0, 3).map((r: any, i: number) => (
+                        <p key={i} className="text-red-400/70 text-xs mt-1">{r.email}: {r.error}</p>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-red-400 text-sm">{sendResult.error}</p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </motion.div>
     </>
