@@ -98,7 +98,7 @@ export default async function PrivacyPage() {
 
           {/* Main Content */}
           <main className="lg:col-span-3 space-y-10">
-            {customContent ? (
+            {customContent && !customContent.includes('placeholder') ? (
               <div 
                 className="prose prose-invert max-w-none"
                 dangerouslySetInnerHTML={{ __html: customContent }}
