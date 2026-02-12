@@ -921,8 +921,9 @@ function ChatContent({
                   </>
                 ) : (
                   <>
-                    I&apos;m here to help you explore GreenLine365 and find exactly what you need. 
-                    Ask me anything about our features, pricing, or how to get started.
+                    I&apos;m your local business concierge. I can help you find restaurants, services, 
+                    nightlife, and more across Florida — or help you manage your business listing.
+                    What are you looking for?
                   </>
                 )}
               </div>
