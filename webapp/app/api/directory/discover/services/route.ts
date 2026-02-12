@@ -164,10 +164,10 @@ Write it as a concise internal brief, not a customer-facing description. Be spec
           'X-Title': 'GL365 Brief Generator',
         },
         body: JSON.stringify({
-          model: 'openai/gpt-4o-mini',
+          model: 'anthropic/claude-opus-4.6',
           messages: [{ role: 'user', content: briefPrompt }],
           temperature: 0.5,
-          max_tokens: 200,
+          max_tokens: 300,
         }),
       });
 
