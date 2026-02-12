@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSkillContext, getCoreMarketingContext } from '@/lib/marketing-skills-loader';
+import { HTML_FORMAT_DIRECTIVE } from '@/lib/format-standards';
 
 interface AnalyzeRequest {
   mode: 'analyze' | 'scratch';
