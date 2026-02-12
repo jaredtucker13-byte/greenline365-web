@@ -180,10 +180,10 @@ export default function DirectoryPage() {
           {/* ─── HERO ─── */}
           <section className="relative overflow-hidden pt-16" style={{ minHeight: '85vh' }} data-testid="directory-hero">
             <div className="absolute inset-0">
-              <img src="/images/hero-directory.png" alt="" className="w-full h-full object-cover" />
+              <img src="/images/hero-directory.png" alt="GreenLine365 business directory — discover local businesses across dining, services, nightlife and more" className="w-full h-full object-cover" />
             </div>
-            <div className="absolute inset-0 bg-gradient-to-b from-midnight-900/80 via-midnight-900/50 to-midnight-900" />
-            <div className="absolute inset-0 bg-gradient-to-r from-midnight-900/60 via-transparent to-midnight-900/60" />
+            <div className="absolute inset-0 bg-gradient-to-b from-midnight-900/90 via-midnight-900/70 to-midnight-900" />
+            <div className="absolute inset-0 bg-gradient-to-r from-midnight-900/70 via-transparent to-midnight-900/70" />
 
             <div className="relative max-w-5xl mx-auto px-6 flex flex-col items-center justify-center" style={{ minHeight: '75vh' }}>
               <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
@@ -196,37 +196,70 @@ export default function DirectoryPage() {
               <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
                 className="text-5xl sm:text-6xl lg:text-7xl font-heading font-light text-white text-center leading-[1.05] mb-5 tracking-tight"
                 data-testid="directory-title">
-                Your City&apos;s Best,{' '}
-                <span className="font-semibold text-gradient-gold">Verified</span>
+                The <span className="font-semibold text-gradient-gold">Gold Standard</span>{' '}
+                for Local Discovery
               </motion.h1>
 
               <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}
-                className="text-lg md:text-xl text-white/60 max-w-2xl mx-auto text-center mb-10 leading-relaxed font-body">
-                Find <span className="text-gold font-medium">trusted</span> local businesses — every badge is earned through <span className="text-gold font-medium">real work</span>.
+                className="text-lg md:text-xl text-white/70 max-w-2xl mx-auto text-center mb-10 leading-relaxed font-body">
+                Verified businesses across dining, services, nightlife &amp; more — every listing <span className="text-gold font-medium">earned its place</span>.
               </motion.p>
 
               {/* Search Bar */}
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="w-full max-w-2xl">
-                <div className="flex flex-col sm:flex-row gap-3 p-2 rounded-2xl backdrop-blur-xl border border-white/10" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                <div className="flex flex-col sm:flex-row gap-3 p-2 rounded-2xl backdrop-blur-xl border border-white/10" style={{ background: 'rgba(255,255,255,0.07)' }}>
                   <div className="flex-1 relative">
-                    <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-silver" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                    <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                     <input type="text" placeholder="Search businesses, trades, services..." value={search} onChange={e => setSearch(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && handleSearch()}
-                      className="w-full pl-12 pr-4 py-4 rounded-xl text-sm bg-transparent text-white placeholder-white/30 focus:outline-none font-body"
+                      className="w-full pl-12 pr-4 py-4 rounded-xl text-sm bg-transparent text-white placeholder-white/40 focus:outline-none font-body"
                       data-testid="hero-search" />
                   </div>
-                  <button onClick={handleSearch} className="btn-primary px-8 py-4 rounded-xl text-sm" data-testid="hero-search-btn">Search</button>
+                  <button onClick={handleSearch}
+                    className="px-10 py-4 rounded-xl text-sm font-bold font-heading tracking-wide text-midnight-900 transition-all duration-300 hover:scale-[1.02]"
+                    style={{ background: 'linear-gradient(135deg, #C9A96E 0%, #E6D8B5 50%, #C9A96E 100%)', boxShadow: '0 0 24px rgba(201,169,110,0.5), 0 4px 12px rgba(0,0,0,0.3)' }}
+                    data-testid="hero-search-btn">
+                    Search Directory
+                  </button>
                 </div>
                 <div className="flex flex-wrap justify-center gap-2 mt-5">
                   {CATEGORIES.slice(0, 6).map((cat, i) => (
                     <motion.button key={cat.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 + i * 0.06 }}
                       onClick={() => handleCategoryClick(cat.id)}
-                      className="px-4 py-1.5 rounded-full text-xs font-medium text-white/50 border border-white/10 hover:border-gold/40 hover:text-gold transition-all duration-300 backdrop-blur-sm font-body"
+                      className="px-4 py-1.5 rounded-full text-xs font-medium text-white/60 border border-white/15 hover:border-gold/50 hover:text-gold hover:bg-gold/5 transition-all duration-300 backdrop-blur-sm font-body"
                       data-testid={`hero-chip-${cat.id}`}>
                       {cat.label}
                     </motion.button>
                   ))}
                 </div>
+              </motion.div>
+
+              {/* ─── TRUST COUNTER BAR ─── */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.0 }}
+                className="mt-12 flex items-center gap-6 sm:gap-10"
+                data-testid="trust-counter-bar"
+              >
+                {[
+                  { value: stats.totalBusinesses, label: 'Verified Businesses', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4' },
+                  { value: stats.totalDestinations, label: 'Destinations', icon: 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z' },
+                  { value: stats.totalCategories, label: 'Categories', icon: 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z' },
+                ].map((stat, i) => (
+                  <div key={stat.label} className="flex items-center gap-2.5 group" data-testid={`trust-stat-${i}`}>
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center border border-gold/20 bg-gold/5">
+                      <svg className="w-4 h-4 text-gold/70" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d={stat.icon} />
+                      </svg>
+                    </div>
+                    <div>
+                      <span className="block text-lg font-heading font-bold text-white">{stat.value > 0 ? `${stat.value}+` : '...'}</span>
+                      <span className="block text-[10px] text-white/40 uppercase tracking-wider font-heading">{stat.label}</span>
+                    </div>
+                    {i < 2 && <div className="hidden sm:block w-px h-8 bg-white/10 ml-4 sm:ml-6" />}
+                  </div>
+                ))}
               </motion.div>
             </div>
             <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-midnight-900 to-transparent" />
