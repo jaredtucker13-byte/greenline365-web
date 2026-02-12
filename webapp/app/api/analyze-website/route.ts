@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSkillContext, getCoreMarketingContext } from '@/lib/marketing-skills-loader';
+import { HTML_FORMAT_DIRECTIVE } from '@/lib/format-standards';
 
 // Website Analyzer API - Premium Feature
 // Uses Gemini 3 Pro for vision analysis and Claude Opus 4.6 for suggestions
