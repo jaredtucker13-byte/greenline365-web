@@ -155,6 +155,23 @@ Made the site honest and production-ready:
 - Added Verified badge on listing detail pages for Pro/Premium claimed listings
 - Added CTA buttons (Call Now / Visit Website) for Pro/Premium claimed listings — this is what makes paid tiers visually deliver value
 
+### Marketplace Add-ons — Live (Feb 12, 2026)
+Built 5 functional marketplace add-on APIs with Stripe checkout:
+
+| Add-on | Price | API | Status |
+|---|---|---|---|
+| Coupon Engine | $19/mo + $0.60/redeem | `/api/directory/addons/coupons` (GET/POST/PATCH) | LIVE |
+| Custom Poll Template | $150/template | `/api/directory/addons/polls` (GET/POST/PATCH) | LIVE |
+| Featured Boost | $29/week | `/api/directory/addons/featured` (GET) | LIVE |
+| Additional Photos | $9/mo per 5-pack | Via addons API | LIVE |
+| Analytics Pro | $19/mo | `/api/directory/addons/analytics` (GET/POST) | LIVE |
+| QR Feedback Kit | $199 | — | Coming Soon |
+| Review Response AI | $29/mo | — | Coming Soon |
+
+**Infrastructure:** `/api/directory/addons` (GET/POST/PATCH) — purchase, activate, manage add-ons. State stored in `directory_listings.metadata.addons` JSONB.
+
+**Analytics tracking:** Every listing detail page view, phone call, website click, and map click is now tracked via `/api/directory/addons/analytics` POST endpoint. Transaction fees ($0.60) logged per interaction.
+
 ## Backlog
 
 ### P0 — Immediate
