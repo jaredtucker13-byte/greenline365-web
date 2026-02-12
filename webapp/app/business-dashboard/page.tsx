@@ -9,6 +9,7 @@ import type { User } from '@supabase/supabase-js';
 import { TIER_PRICES, TIER_NAMES } from '@/lib/feature-gates';
 import type { DirectoryTier } from '@/lib/feature-gates';
 import ReviewsPanel from './ReviewsPanel';
+import PhotoLibraryPanel from './PhotoLibraryPanel';
 
 interface Listing {
   id: string;
