@@ -6,7 +6,7 @@ const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 
 // HVAC-specific analysis prompt
 const HVAC_ANALYSIS_PROMPT = `You are an expert HVAC inspector and liability documentation specialist. Analyze this image for an incident report.
-
+${HTML_FORMAT_DIRECTIVE}
 IDENTIFY AND REPORT ON:
 
 1. **Biological Growth & Contamination:**
