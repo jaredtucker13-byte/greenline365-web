@@ -181,7 +181,7 @@ export async function POST(request: NextRequest) {
       .insert({
         title,
         description: description || '',
-        content_type: content_type || 'custom',
+        content_type: content_type || 'photo',
         event_type: event_type || 'content',
         scheduled_date,
         status: status || 'draft',
