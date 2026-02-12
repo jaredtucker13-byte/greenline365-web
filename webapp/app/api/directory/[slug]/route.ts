@@ -41,7 +41,10 @@ export async function GET(
   const isFreeOrUnclaimed = claimable && (tier === 'free' || !isClaimed);
   const maxPhotos = !claimable ? 10 : (isFreeOrUnclaimed ? 0 : limits.photos);
   const visiblePhotos = isFreeOrUnclaimed ? [] : allPhotos.slice(0, maxPhotos);
-  const coverImage = (isFreeOrUnclaimed && claimable) ? placeholder : (visiblePhotos[0] || allPhotos[0] || listing.cover_image_url || placeholder);
+
+  // Free tier: use their real business photo (best available), same photo as backdrop
+  const bestBusinessPhoto = allPhotos[0] || listing.cover_image_url || placeholder;
+  const coverImage = (isFreeOrUnclaimed && claimable) ? bestBusinessPhoto : (visiblePhotos[0] || allPhotos[0] || listing.cover_image_url || placeholder);
 
   // Get related listings (same city + industry, limit 4)
   const { data: related } = await supabase
