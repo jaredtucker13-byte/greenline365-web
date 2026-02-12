@@ -12,13 +12,13 @@ function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKe
 const DIRECTORY_TIERS: Record<string, { name: string; price: number; features: string[] }> = {
   pro: {
     name: 'GL365 Pro',
-    price: 39.00,
-    features: ['2 custom images', 'Verified Business badge', 'CTA buttons (Book/Call)', 'Priority search ranking', 'Marketplace add-on access'],
+    price: 45.00,
+    features: ['Verified Business badge', 'CTA buttons (Book/Call)', 'Priority search ranking', 'Unlimited photos', 'Marketplace add-on access'],
   },
   premium: {
     name: 'GL365 Premium',
-    price: 59.00,
-    features: ['All Google photos synced', 'Featured homepage placement', 'Badge earning eligible', 'Analytics dashboard', 'Priority support', 'QR Feedback collection'],
+    price: 89.00,
+    features: ['All Google photos synced', 'Featured homepage placement', 'Badge earning eligible', 'Analytics dashboard', 'Lead capture forms', 'Priority support'],
   },
 };
 
