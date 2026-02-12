@@ -436,7 +436,7 @@ export default function DirectoryPage() {
             <div className="absolute inset-0 bg-charcoal-900/95" />
             <div className="relative max-w-4xl mx-auto px-6 text-center">
               <h2 className="text-3xl font-heading font-light text-white mb-2 tracking-tight">Success <span className="font-semibold text-gradient-gold">Stories</span></h2>
-              <p className="text-silver mb-12 font-body">Hear from business owners and customers.</p>
+              <p className="text-white/50 mb-12 font-body">Hear from business owners and customers.</p>
               <AnimatePresence mode="wait">
                 <motion.div key={testimonialIdx} initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.4 }}
                   className="rounded-2xl p-8 max-w-lg mx-auto border border-white/10 backdrop-blur-xl" style={{ background: 'rgba(255,255,255,0.04)' }}>
