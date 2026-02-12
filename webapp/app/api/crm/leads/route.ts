@@ -13,8 +13,6 @@ import { createClient } from '@/lib/supabase/server';
 // Allowed admin emails (should match your admin list)
 const ADMIN_EMAILS = [
   'greenline365help@gmail.com',
-  'admin@greenline365.com',
-  'admin@greenline365.com',
 ];
 
 async function checkAdmin(supabase: any) {
