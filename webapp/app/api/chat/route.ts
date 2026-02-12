@@ -194,11 +194,11 @@ function parseUserTime(timeStr: string): string {
 const getModel = (mode?: string): string => {
   switch (mode) {
     case 'creative':
-      return 'anthropic/claude-3.5-sonnet';
+      return 'anthropic/claude-opus-4.6';
     case 'support':
-      return 'openai/gpt-4o-mini';
+      return 'anthropic/claude-opus-4.6';
     default:
-      return 'openai/gpt-4o-mini';
+      return 'anthropic/claude-opus-4.6';
   }
 };
 
