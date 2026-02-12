@@ -879,7 +879,7 @@ function SubcategoryCarouselRow({ label, subtitle, industry, searchTerm, sortBy,
         <button
           onClick={() => scroll('left')}
           className="absolute left-1 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-midnight-900/90 border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:border-gold/30 transition opacity-0 group-hover:opacity-100 backdrop-blur-sm"
-          data-testid={`scroll-left-${category.id}`}
+          data-testid={`scroll-left-${label}`}
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
         </button>
