@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     if (listing_id) {
       const { data: listing } = await supabase
         .from('directory_listings')
-        .select('id, business_name, metadata')
+        .select('id, business_name, city, metadata')
         .eq('id', listing_id)
         .single();
 
@@ -35,6 +35,8 @@ export async function POST(request: NextRequest) {
 
       googleMapsUrl = listing.metadata?.google_maps_url;
       businessName = listing.business_name;
+      body.city = listing.city || 'Tampa FL';
+      listingDbId = listing_id;
     }
 
     if (!googleMapsUrl) {
