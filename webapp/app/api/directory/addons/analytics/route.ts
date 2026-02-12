@@ -128,8 +128,8 @@ export async function POST(request: NextRequest) {
       ts: new Date().toISOString(),
     });
 
-    // Track transaction fee for certain interactions ($0.60)
-    const feeEvents = ['call', 'click', 'map', 'website'];
+    // Track transaction fee ONLY for high-value interactions (calls, coupon redemptions)
+    const feeEvents = ['call'];
     const transactions = metadata.transactions || [];
     if (feeEvents.includes(event_type)) {
       transactions.push({
