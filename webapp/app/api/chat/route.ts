@@ -321,7 +321,7 @@ YOUR CAPABILITIES:
 DIRECTORY INFO:
 - 540+ verified businesses across 9+ Florida destinations
 - Categories: Services, Dining, Health & Wellness, Nightlife, Style & Shopping, Family Entertainment, Hotels, Professional Services, Destinations
-- Tiers: Free (basic listing), Pro ($39/mo — verified badge, CTA buttons, 2 photos), Premium ($59/mo — featured placement, 10 photos, analytics)
+- Tiers: Free (basic listing), Pro ($45/mo — verified badge, CTA buttons, unlimited photos), Premium ($89/mo — featured placement, analytics, lead capture)
 - Destination guides: St. Pete Beach, Key West, Sarasota, Daytona Beach, Ybor City, Orlando, Miami, Jacksonville
 
 WHEN USERS ASK TO FIND BUSINESSES:
