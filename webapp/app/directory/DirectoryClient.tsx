@@ -336,24 +336,18 @@ export default function DirectoryPage() {
                     <Link href={`/destination/${d.slug}`} className="block dest-card-frame group" data-testid={`dest-card-${d.slug}`}>
                       <div className="dest-card-inner">
                         {/* Image */}
-                        <div className="relative overflow-hidden golden-hour-filter" style={{ aspectRatio: '4/3' }}>
+                        <div className="relative overflow-hidden" style={{ aspectRatio: '4/3' }}>
                           <img
                             src={d.image}
                             alt={d.label}
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                             loading="lazy"
                           />
-                          {/* Bottom gradient overlay — darker for text readability */}
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                         </div>
-                        {/* Glassmorphism Label */}
-                        <div className="absolute bottom-0 left-0 right-0 dest-glass-label px-4 py-3 sm:px-4 sm:py-4">
-                          <h3 className="text-sm sm:text-base font-heading font-bold text-white tracking-tight leading-tight drop-shadow-lg">{d.label}</h3>
-                          <p className="text-[10px] sm:text-xs text-gold-200/70 font-body mt-0.5 drop-shadow">{d.tagline}</p>
-                          <span className="inline-flex items-center gap-1 mt-2 text-[10px] sm:text-[11px] text-gold font-semibold font-body group-hover:translate-x-1 transition-all duration-300">
-                            View Guide
-                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
-                          </span>
+                        {/* Text Label Bar */}
+                        <div className="dest-glass-label px-4 py-3">
+                          <h3 className="text-sm sm:text-base font-heading font-bold text-white tracking-tight leading-tight">{d.label}</h3>
+                          <p className="text-[10px] sm:text-xs text-gold/60 font-body mt-0.5">{d.tagline}</p>
                         </div>
                       </div>
                     </Link>
