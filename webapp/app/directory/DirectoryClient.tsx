@@ -185,16 +185,42 @@ export default function DirectoryPage() {
   const subcategories = currentCat?.subcategories || ['All'];
 
   // Filter listings by subcategory (simple keyword match on business_name, description, industry)
-  const filteredListings = activeSubcategory === 'All'
-    ? listings
-    : listings.filter(l => {
-        const sub = activeSubcategory.toLowerCase();
-        const name = (l.business_name || '').toLowerCase();
-        const desc = (l.description || '').toLowerCase();
-        const ind = (l.industry || '').toLowerCase();
-        const subs = (l.subcategories || []).map(s => s.toLowerCase());
-        return name.includes(sub) || desc.includes(sub) || ind.includes(sub) || subs.some(s => s.includes(sub));
-      });
+  const filteredListings = (() => {
+    // Step 1: Subcategory filter
+    let result = activeSubcategory === 'All'
+      ? listings
+      : listings.filter(l => {
+          const sub = activeSubcategory.toLowerCase();
+          const name = (l.business_name || '').toLowerCase();
+          const desc = (l.description || '').toLowerCase();
+          const ind = (l.industry || '').toLowerCase();
+          const subs = (l.subcategories || []).map(s => s.toLowerCase());
+          return name.includes(sub) || desc.includes(sub) || ind.includes(sub) || subs.some(s => s.includes(sub));
+        });
+
+    // Step 2: Distance radius filter
+    if (maxDistance > 0 && userLocation) {
+      result = result.filter(l => l.distance != null && l.distance <= maxDistance);
+    }
+
+    // Step 3: Sort
+    return [...result].sort((a, b) => {
+      switch (sortBy) {
+        case 'highest':
+          return (b.avg_feedback_rating || (b as any).metadata?.google_rating || 0) - (a.avg_feedback_rating || (a as any).metadata?.google_rating || 0);
+        case 'lowest':
+          return (a.avg_feedback_rating || (a as any).metadata?.google_rating || 0) - (b.avg_feedback_rating || (b as any).metadata?.google_rating || 0);
+        case 'most-reviews':
+          return ((b as any).metadata?.google_review_count || b.total_feedback_count || 0) - ((a as any).metadata?.google_review_count || a.total_feedback_count || 0);
+        case 'nearest':
+        default:
+          if (a.distance != null && b.distance != null) return a.distance - b.distance;
+          if (a.distance != null) return -1;
+          if (b.distance != null) return 1;
+          return 0;
+      }
+    });
+  })();
 
   // Section featured listings into tiers
   const premierPartners = featuredListings.filter(l => l.tier === 'premium' || l.has_property_intelligence);
