@@ -125,12 +125,16 @@ export default function OnboardingPage() {
 
   const handleSave = async () => {
     setSaving(true);
+    setSaveStatus('saving');
+    setSaveError('');
     try {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
-        alert('Please log in first');
+        setSaveStatus('error');
+        setSaveError('Please log in first');
+        setSaving(false);
         router.push('/login');
         return;
       }
@@ -200,6 +204,11 @@ export default function OnboardingPage() {
       }
 
       if (knowledgeChunks.length > 0) {
+        // Delete old onboarding knowledge first to avoid duplicates
+        await supabase.from('memory_knowledge_chunks')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('source', 'onboarding');
         await supabase.from('memory_knowledge_chunks').insert(knowledgeChunks);
       }
 
@@ -215,6 +224,8 @@ export default function OnboardingPage() {
         },
       });
 
+      setSaveStatus('success');
+
       // Celebrate!
       confetti({
         particleCount: 100,
@@ -223,15 +234,18 @@ export default function OnboardingPage() {
         colors: ['#10B981', '#3B82F6', '#8B5CF6'],
       });
 
-      // Move to completion step or redirect
-      if (mode === 'wizard') {
-        setCurrentStep(WIZARD_STEPS.length - 1);
-      } else {
-        setTimeout(() => router.push('/admin-v2'), 2000);
-      }
-    } catch (e) {
+      // Move to completion step or redirect after brief success display
+      setTimeout(() => {
+        if (mode === 'wizard') {
+          setCurrentStep(WIZARD_STEPS.length - 1);
+        } else {
+          router.push('/admin-v2');
+        }
+      }, 1500);
+    } catch (e: any) {
       console.error('Onboarding error:', e);
-      alert('Something went wrong. Please try again.');
+      setSaveStatus('error');
+      setSaveError(e?.message || 'Something went wrong. Please try again.');
     } finally {
       setSaving(false);
     }
