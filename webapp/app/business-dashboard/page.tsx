@@ -254,6 +254,7 @@ export default function BusinessDashboard() {
           {[
             { id: 'listing' as const, label: 'My Listing' },
             { id: 'reviews' as const, label: 'Reviews' },
+            { id: 'photos' as const, label: 'Photos & Menu' },
           ].map(tab => (
             <button
               key={tab.id}
