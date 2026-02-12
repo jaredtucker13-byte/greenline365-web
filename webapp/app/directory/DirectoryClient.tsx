@@ -429,7 +429,7 @@ export default function DirectoryPage() {
               )}
 
               <div className="text-center mt-12">
-                <button onClick={() => loadListings()} className="btn-primary px-8 py-3 rounded-full text-sm" data-testid="view-all-listings-btn">View All Listings</button>
+                <button onClick={handleBrowseAll} className="btn-primary px-8 py-3 rounded-full text-sm" data-testid="view-all-listings-btn">View All Listings</button>
                 <p className="text-silver/50 text-xs mt-3 font-body">Want your business featured? <Link href="/register-business" className="underline hover:text-gold transition text-gold/70">Upgrade your listing</Link></p>
               </div>
             </div>
