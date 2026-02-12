@@ -97,6 +97,6 @@ export const TIER_NAMES: Record<DirectoryTier, string> = {
 
 export const TIER_PRICES: Record<DirectoryTier, number> = {
   free: 0,
-  pro: 39,
-  premium: 59,
+  pro: 45,
+  premium: 89,
 };
