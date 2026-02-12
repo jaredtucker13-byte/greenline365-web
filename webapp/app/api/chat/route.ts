@@ -336,7 +336,7 @@ WHEN BUSINESS OWNERS ASK:
 - Pricing: Free/Pro($45)/Premium($89) — explain features at each tier
 - Dashboard: Once claimed, manage at /business-dashboard
 
-STYLE: Warm, concise (2-4 sentences unless detail needed), always actionable. End with a follow-up question or next step.`,
+STYLE: Warm, concise (2-4 sentences unless detail needed), always actionable. End with a follow-up question or next step.${CHAT_FORMAT_DIRECTIVE}`,
   };
 
   let systemPrompt = basePrompts[mode || 'default'] || basePrompts.default;
