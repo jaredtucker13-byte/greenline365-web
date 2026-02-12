@@ -16,6 +16,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: [
           '/admin-v2/',      // Admin dashboard - don't index
           '/god-mode/',      // Super admin - don't index
+          '/business-dashboard/', // Business owner dashboard - don't index
           '/api/',           // API routes - don't index
           '/auth/',          // Auth routes - don't index
           '/_next/',         // Next.js internals
