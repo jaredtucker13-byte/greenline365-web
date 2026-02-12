@@ -266,7 +266,19 @@ export default function DirectoryPage() {
 
   return (
     <div className="min-h-screen bg-midnight-900 overflow-x-hidden" data-testid="directory-page">
-      {!showListings ? (
+      {showGroupedBrowse ? (
+        /* ─── GROUPED BROWSE VIEW (All categories with carousels) ─── */
+        <GroupedBrowseView
+          sortBy={sortBy}
+          setSortBy={setSortBy}
+          cityFilter={cityFilter}
+          setCityFilter={setCityFilter}
+          availableCities={availableCities}
+          userLocation={userLocation}
+          onViewAll={handleViewAllFromCarousel}
+          onBack={() => { setShowGroupedBrowse(false); }}
+        />
+      ) : showListings ? (
         <>
           {/* ─── HERO ─── */}
           <section className="relative overflow-hidden pt-16" style={{ minHeight: '85vh' }} data-testid="directory-hero">
