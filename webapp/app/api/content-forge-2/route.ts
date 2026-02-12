@@ -60,7 +60,7 @@ async function generateWithAI(prompt: string, maxTokens: number = 1000): Promise
       messages: [
         {
           role: 'system',
-          content: `You are a world-class content strategist from 15 years in the future. You write content that converts readers into customers. Your writing is clear, punchy, and valuable. You avoid fluff, jargon, and generic advice. Every sentence earns its place.${getSkillContextForIntent(prompt)}${getCoreMarketingContext()}`
+          content: `You are a world-class content strategist from 15 years in the future. You write content that converts readers into customers. Your writing is clear, punchy, and valuable. You avoid fluff, jargon, and generic advice. Every sentence earns its place.${CHAT_FORMAT_DIRECTIVE}${getSkillContextForIntent(prompt)}${getCoreMarketingContext()}`
         },
         { role: 'user', content: prompt }
       ],
