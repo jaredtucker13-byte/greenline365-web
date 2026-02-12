@@ -735,7 +735,7 @@ function ListingCard({ listing: l, index: i }: { listing: Listing; index: number
           )}
         </div>
         <div className="p-4">
-          <h3 className="font-heading font-semibold text-sm truncate mb-1 text-gold">{l.business_name}</h3>
+          <h3 className="font-heading font-semibold text-sm truncate mb-1 text-gold" title={l.business_name}>{l.business_name}</h3>
           {l.city && <p className="text-[11px] text-silver/50 flex items-center gap-1 mb-1 font-body">
             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
             {l.city}, {l.state}
