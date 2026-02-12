@@ -54,6 +54,12 @@ export default function ListingDetailPage() {
   const [loading, setLoading] = useState(true);
   const [activePhoto, setActivePhoto] = useState(0);
   const [showClaimInfo, setShowClaimInfo] = useState(false);
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [reviewStats, setReviewStats] = useState({ total: 0, average_rating: 0 });
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewForm, setReviewForm] = useState({ reviewer_name: '', rating: 5, text: '' });
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [reviewMessage, setReviewMessage] = useState('');
 
   useEffect(() => {
     if (!slug) return;
