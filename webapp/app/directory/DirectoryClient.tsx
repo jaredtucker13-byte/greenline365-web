@@ -515,6 +515,39 @@ export default function DirectoryPage() {
                 <button onClick={handleSearch} className="btn-primary px-8 py-3 rounded-xl text-sm">Search</button>
               </div>
 
+              {/* Location Filter + Near Me */}
+              <div className="flex flex-wrap items-center gap-3 mb-4" data-testid="location-filter">
+                {userLocation && !cityFilter && (
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs bg-greenline/10 text-greenline border border-greenline/20 font-body">
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                    </svg>
+                    Sorted by nearest
+                  </div>
+                )}
+                <select
+                  value={cityFilter}
+                  onChange={e => { setCityFilter(e.target.value); loadListings(activeCategory || undefined, search || undefined); }}
+                  className="px-3 py-2 rounded-xl text-xs bg-white/5 text-white border border-white/10 focus:outline-none focus:border-gold/30 font-body appearance-none cursor-pointer"
+                  style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%23888\' stroke-width=\'2\'%3E%3Cpath d=\'M6 9l6 6 6-6\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center', paddingRight: '28px' }}
+                  data-testid="city-filter-select"
+                >
+                  <option value="">All Locations</option>
+                  {availableCities.map(c => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+                {cityFilter && (
+                  <button
+                    onClick={() => { setCityFilter(''); loadListings(activeCategory || undefined, search || undefined); }}
+                    className="text-[10px] text-white/40 hover:text-gold transition font-body"
+                  >
+                    Clear filter
+                  </button>
+                )}
+              </div>
+
               {/* Subcategory Pill Tabs */}
               <div className="flex flex-wrap gap-2" data-testid="subcategory-tabs">
                 {subcategories.map(sub => (
