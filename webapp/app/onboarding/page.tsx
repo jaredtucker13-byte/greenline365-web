@@ -657,6 +657,7 @@ export default function OnboardingPage() {
                     {saveStatus === 'error' && saveError && (
                       <p className="text-red-400 text-sm mt-2 text-center">{saveError}</p>
                     )}
+                  </>
                   ) : (
                     <button
                       onClick={() => setCurrentStep(prev => prev + 1)}
