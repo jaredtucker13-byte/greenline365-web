@@ -207,42 +207,34 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               mainEntity: [
                 {
                   '@type': 'Question',
-                  name: 'How does GreenLine365 work?',
+                  name: 'What is GreenLine365?',
                   acceptedAnswer: {
                     '@type': 'Answer',
-                    text: 'GreenLine365 is an AI-powered business operating system that connects your business with the local economy through automated scheduling and smart marketing. It provides AI-powered insights, 24/7 automation, and lead tracking to help local businesses grow.',
+                    text: 'GreenLine365 is a local business directory that helps consumers find verified, trusted businesses across Florida. We cover dining, services, nightlife, health & wellness, and more across 8+ destinations.',
                   },
                 },
                 {
                   '@type': 'Question',
-                  name: 'What makes GreenLine365 different from other tools?',
+                  name: 'How do businesses get listed?',
                   acceptedAnswer: {
                     '@type': 'Answer',
-                    text: 'GreenLine365 is built specifically for local businesses. Our AI understands local markets and optimizes for real-world foot traffic, making it community-focused and designed for local success.',
+                    text: 'Businesses are discovered through our data enrichment process using Google Places data. Business owners can then claim and manage their listing through our business dashboard.',
                   },
                 },
                 {
                   '@type': 'Question',
-                  name: 'How quickly can I start using GreenLine365?',
+                  name: 'What do the directory tiers include?',
                   acceptedAnswer: {
                     '@type': 'Answer',
-                    text: 'Most businesses are fully onboarded within 24 hours. Our AI handles the heavy lifting with quick onboarding, simple setup, and instant results.',
+                    text: 'Free listings include basic business info. Pro ($39/mo) adds a Verified badge, CTA buttons, and priority search. Premium ($59/mo) includes featured placement, all photos, analytics, and badge earning.',
                   },
                 },
                 {
                   '@type': 'Question',
-                  name: 'Does GreenLine365 integrate with my existing tools?',
+                  name: 'How do I claim my business listing?',
                   acceptedAnswer: {
                     '@type': 'Answer',
-                    text: 'Yes! GreenLine365 integrates with Google Calendar, Facebook, Instagram, Yelp, and 50+ other platforms with universal compatibility and one-click sync.',
-                  },
-                },
-                {
-                  '@type': 'Question',
-                  name: 'What is the ROI of using GreenLine365?',
-                  acceptedAnswer: {
-                    '@type': 'Answer',
-                    text: 'Customers see an average 40% increase in lead conversion within the first 60 days, with most achieving first-month payback on their investment.',
+                    text: 'Contact our team at greenline365help@gmail.com to verify your ownership and receive a claim code. Once verified, you can manage your listing through the business dashboard.',
                   },
                 },
                 {
@@ -250,7 +242,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   name: 'Is there a contract or commitment required?',
                   acceptedAnswer: {
                     '@type': 'Answer',
-                    text: 'No long-term contracts required. GreenLine365 offers monthly billing with the flexibility to cancel anytime. We don\'t lock you in.',
+                    text: 'No long-term contracts required. Directory subscriptions are monthly billing with the flexibility to cancel anytime.',
                   },
                 },
               ],
