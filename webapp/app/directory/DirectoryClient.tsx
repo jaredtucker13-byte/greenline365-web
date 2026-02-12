@@ -106,6 +106,29 @@ export default function DirectoryPage() {
   const [sortBy, setSortBy] = useState<'nearest' | 'highest' | 'lowest' | 'most-reviews'>('nearest');
   const [maxDistance, setMaxDistance] = useState<number>(0);
 
+  // Restore state from URL on mount (breadcrumb support)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const cat = params.get('category');
+    const q = params.get('q');
+    if (cat) {
+      setActiveCategory(cat);
+      setShowListings(true);
+    }
+    if (q) setSearch(q);
+  }, []);
+
+  // Persist category/search to URL when they change (without full navigation)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams();
+    if (activeCategory) params.set('category', activeCategory);
+    if (search) params.set('q', search);
+    const newUrl = params.toString() ? `/?${params.toString()}` : '/';
+    window.history.replaceState({}, '', newUrl);
+  }, [activeCategory, search]);
+
   // Request geolocation on mount
   useEffect(() => {
     if (typeof navigator !== 'undefined' && navigator.geolocation) {
