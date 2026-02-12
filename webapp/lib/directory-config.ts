@@ -29,6 +29,10 @@ const NON_CLAIMABLE_KEYWORDS = [
   'shell', 'bp', 'chevron', 'exxon', '7-eleven', 'circle k',
   'dollar general', 'dollar tree', 'family dollar',
   'starbucks', 'dunkin',
+  'hospital', 'police', 'fire station', 'fire department',
+  'post office', 'usps', 'library', 'dmv',
+  'costco', 'sam\'s club', 'aldi', 'trader joe',
+  'home depot', 'lowe\'s', 'lowes',
 ];
 
 export function isClaimable(businessName: string): boolean {
