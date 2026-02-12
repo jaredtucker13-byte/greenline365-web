@@ -60,7 +60,7 @@ export default function BusinessDashboard() {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
-  const [activeTab, setActiveTab] = useState<'listing' | 'reviews'>('listing');
+  const [activeTab, setActiveTab] = useState<'listing' | 'reviews' | 'photos'>('listing');
   const [editForm, setEditForm] = useState({
     business_name: '',
     description: '',
