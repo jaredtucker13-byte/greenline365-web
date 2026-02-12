@@ -128,17 +128,25 @@ async function classifyThought(text: string): Promise<{
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: GEMINI_3_PRO,
+        model: CLASSIFIER_MODEL,
         messages: [{
           role: 'system',
-          content: `You are an intelligent thought router. Classify thoughts into one of these buckets:
-- people: Mentions a person, follow-up needed, relationship context
-- projects: Active work, tasks, goals, next actions
-- ideas: Insights, concepts, future possibilities
-- admin: Errands, todos, deadlines, administrative tasks
+          content: `You are an intelligent thought router for a business owner's "Second Brain." Classify incoming thoughts into the correct bucket.
 
-Return ONLY valid JSON:
-{"bucket": "people|projects|ideas|admin", "confidence": 0.0-1.0, "reasoning": "brief explanation"}`
+BUCKETS:
+- people: Mentions a specific person by name, relationship context, follow-up reminders, networking notes. Examples: "Follow up with Mike about the proposal", "Sarah's birthday is next week"
+- projects: Active work items, business goals, tasks with deliverables, things being built. Examples: "Finish the campaign manager", "Launch the email sequence by Friday"
+- ideas: Insights, concepts, future possibilities, brainstorms, strategies. Examples: "What if we offered a referral program?", "The pricing should include analytics"
+- admin: Errands, todos, deadlines, bills, scheduling, operational tasks. Examples: "Pay the hosting bill", "Renew domain before March", "Schedule dentist appointment"
+
+RULES:
+- If it mentions a person's name → people
+- If it has an action verb + deliverable → projects
+- If it's speculative or starts with "what if" → ideas
+- If it's a routine task or errand → admin
+- When unsure, choose the most actionable bucket
+
+Return ONLY valid JSON: {"bucket": "people|projects|ideas|admin", "confidence": 0.0-1.0, "title": "short 5-8 word title", "reasoning": "brief explanation"}`
         }, {
           role: 'user',
           content: `Classify this thought:\n\n"${text}"`
