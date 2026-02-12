@@ -100,16 +100,6 @@ export default function Navbar() {
   const navLinks = [
     { href: '/', label: 'Directory' },
     { href: '/services', label: 'Our Services' },
-    { 
-      label: 'Industries', 
-      dropdown: [
-        { href: '/industries/restaurants', label: 'Restaurants' },
-        { href: '/industries/retail', label: 'Retail' },
-        { href: '/industries/professional-services', label: 'Professional Services' },
-        { href: '/industries/healthcare', label: 'Healthcare' },
-      ]
-    },
-    { href: '/pricing', label: 'Pricing' },
   ];
 
   // Don't render navbar on dashboard routes
