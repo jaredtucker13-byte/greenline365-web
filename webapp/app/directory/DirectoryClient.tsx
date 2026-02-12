@@ -380,7 +380,7 @@ export default function DirectoryPage() {
                         <div className="relative overflow-hidden" style={{ aspectRatio: '4/3' }}>
                           <img
                             src={d.image}
-                            alt={d.label}
+                            alt={`${d.label} destination guide — ${d.tagline}`}
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                             loading="lazy"
                           />
