@@ -507,7 +507,7 @@ export async function POST(req: NextRequest) {
         messages: messagesWithSystem,
         stream: false,
         temperature: mode === 'creative' ? 0.8 : 0.7,
-        max_tokens: mode === 'creative' ? 1000 : 500,
+        max_tokens: mode === 'creative' ? 1000 : (directoryContext ? 800 : 500),
       }),
     });
 
