@@ -937,31 +937,52 @@ function CategoryCarouselRow({ category, sortBy, cityFilter, userLocation, onVie
   );
 }
 
-// ─── Grouped Browse View (All Categories with carousels) ───────────
-function GroupedBrowseView({ sortBy, setSortBy, cityFilter, setCityFilter, availableCities, userLocation, onViewAll, onBack }: {
+// ─── Grouped Browse View (Categories OR Subcategories with carousels) ───────────
+function GroupedBrowseView({ activeCategory, sortBy, setSortBy, cityFilter, setCityFilter, availableCities, userLocation, onViewAll, onBack }: {
+  activeCategory: string;
   sortBy: string;
   setSortBy: (s: any) => void;
   cityFilter: string;
   setCityFilter: (s: string) => void;
   availableCities: string[];
   userLocation: { lat: number; lng: number } | null;
-  onViewAll: (categoryId: string) => void;
+  onViewAll: (sub: string) => void;
   onBack: () => void;
 }) {
+  const currentCat = CATEGORIES.find(c => c.id === activeCategory);
+  // If inside a category, show subcategory carousels. Otherwise show main category carousels.
+  const rows = currentCat
+    ? currentCat.subcategories.filter(s => s !== 'All').map(sub => ({ id: sub, label: sub, sub: '', searchTerm: sub }))
+    : CATEGORIES.map(c => ({ id: c.id, label: c.label, sub: c.sub, searchTerm: '' }));
+
+  const industryMap: Record<string, string> = {
+    'services': 'services', 'dining': 'dining', 'health-wellness': 'health-wellness',
+    'style-shopping': 'style-shopping', 'nightlife': 'nightlife',
+    'family-entertainment': 'family-entertainment', 'destinations': 'destinations',
+    'hotels-lodging': 'destinations', 'professional-services': 'services',
+  };
+
   return (
     <div data-testid="grouped-browse-view">
       {/* Header */}
       <section className="relative bg-midnight-950 pt-20 pb-6 overflow-hidden">
+        {currentCat && (
+          <div className="absolute inset-0 opacity-15">
+            <img src={currentCat.img} alt="" className="w-full h-full object-cover" />
+          </div>
+        )}
         <div className="absolute inset-0 bg-gradient-to-b from-midnight-900/60 to-midnight-950" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
           <button onClick={onBack} className="text-sm text-silver/50 hover:text-white mb-4 flex items-center gap-2 transition font-body" data-testid="back-from-grouped">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
             Back to Directory
           </button>
-          <h2 className="text-3xl md:text-4xl font-heading font-light text-white mb-2 tracking-tight">Browse <span className="font-semibold text-gradient-gold">All Businesses</span></h2>
-          <p className="text-silver/50 text-sm mb-6 font-body">Verified businesses across all categories</p>
+          <h2 className="text-3xl md:text-4xl font-heading font-light text-white mb-2 tracking-tight">
+            {currentCat ? currentCat.label : 'Browse'} <span className="font-semibold text-gradient-gold">{currentCat ? '' : 'All Businesses'}</span>
+          </h2>
+          <p className="text-silver/50 text-sm mb-6 font-body">{currentCat?.sub || 'Verified businesses across all categories'}</p>
 
-          {/* Filter Bar — Location + Sort only */}
+          {/* Filter Bar */}
           <div className="flex flex-wrap items-center gap-3">
             <select
               value={cityFilter}
@@ -996,16 +1017,19 @@ function GroupedBrowseView({ sortBy, setSortBy, cityFilter, setCityFilter, avail
         </div>
       </section>
 
-      {/* Category Carousel Rows */}
+      {/* Carousel Rows */}
       <section className="max-w-7xl mx-auto py-8">
-        {CATEGORIES.map(cat => (
-          <CategoryCarouselRow
-            key={`${cat.id}-${sortBy}-${cityFilter}`}
-            category={cat}
+        {rows.map(row => (
+          <SubcategoryCarouselRow
+            key={`${row.id}-${sortBy}-${cityFilter}`}
+            label={row.label}
+            subtitle={row.sub}
+            industry={currentCat ? (industryMap[activeCategory] || activeCategory) : (industryMap[row.id] || row.id)}
+            searchTerm={row.searchTerm}
             sortBy={sortBy}
             cityFilter={cityFilter}
             userLocation={userLocation}
-            onViewAll={onViewAll}
+            onViewAll={() => onViewAll(row.id)}
           />
         ))}
       </section>
