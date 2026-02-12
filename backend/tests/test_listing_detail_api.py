@@ -6,7 +6,7 @@ import pytest
 import requests
 import os
 
-BASE_URL = "https://florida-tourism-crm.preview.emergentagent.com"
+BASE_URL = "https://lead-pipeline-23.preview.emergentagent.com"
 
 
 class TestListingDetailAPI:

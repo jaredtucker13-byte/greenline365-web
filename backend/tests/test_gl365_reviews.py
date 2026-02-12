@@ -8,7 +8,7 @@ import os
 import random
 import string
 
-BASE_URL = "https://florida-tourism-crm.preview.emergentagent.com"
+BASE_URL = "https://lead-pipeline-23.preview.emergentagent.com"
 TEST_LISTING_ID = "5813b912-d37f-4c2c-b5d8-17964e5a728a"  # La Segunda Bakery
 
 

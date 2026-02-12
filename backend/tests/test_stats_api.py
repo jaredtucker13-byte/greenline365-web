@@ -8,7 +8,7 @@ import requests
 import os
 
 # Use the public URL for testing
-BASE_URL = os.environ.get('BASE_URL', 'https://florida-tourism-crm.preview.emergentagent.com')
+BASE_URL = os.environ.get('BASE_URL', 'https://lead-pipeline-23.preview.emergentagent.com')
 
 class TestStatsAPI:
     """Tests for /api/directory/stats endpoint"""

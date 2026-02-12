@@ -9,7 +9,7 @@ import requests
 import os
 import time
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://florida-tourism-crm.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://lead-pipeline-23.preview.emergentagent.com').rstrip('/')
 
 class TestChatDirectorySearch:
     """Test Chat API with Directory Search Integration"""

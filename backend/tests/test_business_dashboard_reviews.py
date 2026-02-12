@@ -7,7 +7,7 @@ import requests
 import os
 
 # Use production URL from iteration reports
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://florida-tourism-crm.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://lead-pipeline-23.preview.emergentagent.com').rstrip('/')
 
 # Test listing ID: La Segunda Bakery
 TEST_LISTING_ID = "5813b912-d37f-4c2c-b5d8-17964e5a728a"

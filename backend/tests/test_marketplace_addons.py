@@ -15,7 +15,7 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://florida-tourism-crm.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://lead-pipeline-23.preview.emergentagent.com')
 TEST_LISTING_ID = "a635441b-b03d-4886-b740-e62106a3c99d"  # Tampa General Hospital (unclaimed free listing)
 
 

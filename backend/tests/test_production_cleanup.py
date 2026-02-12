@@ -7,7 +7,7 @@ import requests
 import os
 
 # Use the public URL from environment or test reports
-BASE_URL = "https://florida-tourism-crm.preview.emergentagent.com"
+BASE_URL = "https://lead-pipeline-23.preview.emergentagent.com"
 
 
 class TestListingDetailAPI:
