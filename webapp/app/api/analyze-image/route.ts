@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
         'X-Title': 'GreenLine365 Image Analyzer',
       },
       body: JSON.stringify({
-        model: 'openai/gpt-4o', // GPT-4o has vision capabilities
+        model: 'anthropic/claude-opus-4.6', // Claude Opus 4.6 - best vision analysis
         messages: [
           {
             role: 'system',
