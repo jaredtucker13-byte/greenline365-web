@@ -645,11 +645,11 @@ export default function ServicesPage() {
                   ))}
                 </div>
                 <p className="text-white/90 text-base leading-relaxed mb-3 max-w-lg mx-auto">
-                  &ldquo;GreenLine365 transformed our lead generation. We went from 10 qualified leads per month to over 50.&rdquo;
+                  &ldquo;We joined GreenLine365 to get our business discovered by more local customers. The directory puts us right where people are looking.&rdquo;
                 </p>
                 <div className="text-sm">
-                  <span className="text-white font-semibold">Michael K.</span>
-                  <span className="text-white/50"> · CEO, TechFlow Solutions</span>
+                  <span className="text-white font-semibold">Early Adopter</span>
+                  <span className="text-white/50"> · Local Business Owner</span>
                 </div>
               </div>
             </div>
