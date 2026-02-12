@@ -33,8 +33,14 @@ export async function GET(
   const isClaimed = listing.is_claimed;
   const limits = getTierLimits(tier);
   const allPhotos: string[] = listing.gallery_images || [];
-  const maxPhotos = (!isClaimed) ? 1 : limits.photos;
-  const visiblePhotos = maxPhotos >= 999 ? allPhotos : allPhotos.slice(0, maxPhotos);
+  const industry = listing.industry || 'services';
+  const placeholder = getPlaceholderImage(industry);
+
+  // Free/unclaimed: placeholder only
+  const isFreeOrUnclaimed = tier === 'free' || !isClaimed;
+  const maxPhotos = isFreeOrUnclaimed ? 0 : limits.photos;
+  const visiblePhotos = isFreeOrUnclaimed ? [] : allPhotos.slice(0, maxPhotos);
+  const coverImage = isFreeOrUnclaimed ? placeholder : (visiblePhotos[0] || listing.cover_image_url || placeholder);
 
   // Get related listings (same city + industry, limit 4)
   const { data: related } = await supabase
@@ -49,9 +55,11 @@ export async function GET(
     ...listing,
     gallery_images: visiblePhotos,
     total_photos_available: allPhotos.length,
-    cover_image_url: allPhotos[0] || listing.cover_image_url || null,
+    cover_image_url: coverImage,
     has_property_intelligence: limits.hasPropertyIntelligence && isClaimed,
     search_weight: limits.searchWeight,
+    is_placeholder_image: isFreeOrUnclaimed,
+    is_claimable: isClaimable(listing.business_name || ''),
     directory_badges: (listing.directory_badges || []).filter((b: any) => b.is_active),
     related: related || [],
   });
