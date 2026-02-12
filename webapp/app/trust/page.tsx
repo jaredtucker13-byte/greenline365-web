@@ -515,7 +515,7 @@ export default async function TrustPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <a 
-                  href="mailto:security@greenline365.com"
+                  href="mailto:greenline365help@gmail.com"
                   className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-500/20 rounded-xl p-5 hover:border-emerald-500/40 transition group"
                 >
                   <div className="flex items-center gap-4">
