@@ -176,7 +176,14 @@ export default function ListingDetailPage() {
         {/* Back button + Directory home */}
         <div className="absolute top-4 left-4 flex items-center gap-2">
           <button
-            onClick={() => router.back()}
+            onClick={() => {
+              // Safe back: only go back if there's internal history, otherwise go to directory
+              if (window.history.length > 1 && document.referrer.includes(window.location.host)) {
+                router.back();
+              } else {
+                router.push('/');
+              }
+            }}
             className="inline-flex items-center gap-2 px-3 py-2 rounded-lg backdrop-blur-sm text-sm text-white/70 hover:text-white border border-white/10 hover:border-white/20 transition-all font-body"
             style={{ background: 'rgba(13,27,42,0.7)' }}
             data-testid="back-button"
