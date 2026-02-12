@@ -254,6 +254,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen bg-midnight-900">
         <ServiceWorkerProvider>
           <AdminEditModeProvider>
+            <ScrollToTop />
             <Navbar />
             <main>{children}</main>
             <ChatWidget />
