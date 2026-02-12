@@ -491,11 +491,13 @@ class TestUnifiedCalendarAPI:
         # Schedule for tomorrow to avoid past date validation
         tomorrow = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%dT10:00:00Z")
         
+        # NOTE: content_type must be a valid value (photo, product, blog, newsletter)
+        # The API default 'custom' is not in the database check constraint
         event_payload = {
             "title": f"TEST_CalendarEvent_{uuid.uuid4().hex[:8]}",
             "description": "Test calendar event from automated testing",
-            "event_type": "custom",
-            "content_type": "custom",
+            "event_type": "content",
+            "content_type": "photo",  # Must be valid: photo, product, blog, newsletter
             "scheduled_date": tomorrow,
             "status": "draft"
         }
@@ -542,7 +544,8 @@ class TestUnifiedCalendarAPI:
             tomorrow = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%dT10:00:00Z")
             create_response = api_client.post(f"{BASE_URL}/api/calendar/unified", json={
                 "title": f"TEST_ToUpdate_{uuid.uuid4().hex[:8]}",
-                "scheduled_date": tomorrow
+                "scheduled_date": tomorrow,
+                "content_type": "photo"  # Must use valid content_type
             })
             if create_response.status_code == 200:
                 event_id = create_response.json()["event"]["id"]
@@ -570,7 +573,8 @@ class TestUnifiedCalendarAPI:
         tomorrow = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%dT10:00:00Z")
         create_response = api_client.post(f"{BASE_URL}/api/calendar/unified", json={
             "title": f"TEST_ToDelete_{uuid.uuid4().hex[:8]}",
-            "scheduled_date": tomorrow
+            "scheduled_date": tomorrow,
+            "content_type": "photo"  # Must use valid content_type
         })
         
         assert create_response.status_code == 200, f"Could not create event for delete test: {create_response.text}"
