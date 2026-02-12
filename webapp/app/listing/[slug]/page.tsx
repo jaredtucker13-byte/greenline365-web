@@ -325,7 +325,7 @@ export default function ListingDetailPage() {
             )}
 
             {/* Is This Your Business? */}
-            {!listing.is_claimed && (
+            {!listing.is_claimed && (listing as any).is_claimable !== false && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
