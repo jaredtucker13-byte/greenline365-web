@@ -66,7 +66,10 @@ class TestHomepage:
         
         data = response.json()
         # Should have counts for businesses, destinations, categories
-        assert "total_listings" in data or "business_count" in data or "businesses" in data
+        assert "totalBusinesses" in data, f"Expected totalBusinesses in stats: {data}"
+        assert "totalDestinations" in data, f"Expected totalDestinations in stats"
+        assert "totalCategories" in data, f"Expected totalCategories in stats"
+        assert data["totalBusinesses"] >= 400, "Expected 400+ businesses"
         print(f"✓ Stats endpoint returns data: {data}")
     
     def test_directory_listings_endpoint(self):
