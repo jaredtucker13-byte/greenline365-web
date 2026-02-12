@@ -97,19 +97,43 @@ export default function DirectoryPage() {
   const [showListings, setShowListings] = useState(false);
   const [testimonialIdx, setTestimonialIdx] = useState(0);
   const [stats, setStats] = useState({ totalBusinesses: 0, totalDestinations: 0, totalCategories: 0 });
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [locationCity, setLocationCity] = useState('');
+  const [cityFilter, setCityFilter] = useState('');
+  const [availableCities, setAvailableCities] = useState<string[]>([]);
+
+  // Request geolocation on mount
+  useEffect(() => {
+    if (typeof navigator !== 'undefined' && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        () => {},
+        { enableHighAccuracy: false, timeout: 5000 }
+      );
+    }
+  }, []);
 
   const loadListings = useCallback(async (industry?: string, searchText?: string) => {
     setLoading(true);
     setShowListings(true);
     setActiveSubcategory('All');
-    const params = new URLSearchParams({ limit: '100' });
+    const params = new URLSearchParams({ limit: '200' });
     if (industry) params.set('industry', industry);
     if (searchText) params.set('search', searchText);
+    if (cityFilter) params.set('city', cityFilter);
+    if (userLocation && !cityFilter) {
+      params.set('lat', String(userLocation.lat));
+      params.set('lng', String(userLocation.lng));
+    }
     const res = await fetch(`/api/directory?${params}`);
     const data = await res.json();
-    setListings(Array.isArray(data) ? data : []);
+    const items = Array.isArray(data) ? data : [];
+    setListings(items);
+    // Extract unique cities for the filter
+    const cities = [...new Set(items.map((l: Listing) => l.city).filter(Boolean))] as string[];
+    setAvailableCities(cities.sort());
     setLoading(false);
-  }, []);
+  }, [userLocation, cityFilter]);
 
   useEffect(() => {
     (async () => {
