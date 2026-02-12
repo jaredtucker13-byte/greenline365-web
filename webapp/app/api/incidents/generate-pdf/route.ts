@@ -10,7 +10,7 @@ const DEFAULT_COMPANY = {
   name: 'GreenLine365',
   address: '123 Business Park, Suite 100, City, ST 12345',
   phone: '(555) 123-4567',
-  email: 'reports@greenline365.com',
+  email: 'greenline365help@gmail.com',
   website: 'www.greenline365.com'
 };
 
