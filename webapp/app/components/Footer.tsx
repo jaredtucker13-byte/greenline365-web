@@ -94,16 +94,6 @@ export default function Footer() {
             <h4 className="text-white font-semibold mb-4">Connect</h4>
             <ul className="space-y-2">
               <li>
-                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-white/50 hover:text-white transition text-sm">
-                  Twitter
-                </a>
-              </li>
-              <li>
-                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-white/50 hover:text-white transition text-sm">
-                  LinkedIn
-                </a>
-              </li>
-              <li>
                 <a href="mailto:greenline365help@gmail.com" className="text-white/50 hover:text-white transition text-sm">
                   Contact Us
                 </a>
