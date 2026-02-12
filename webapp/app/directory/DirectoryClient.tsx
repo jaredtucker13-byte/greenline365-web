@@ -259,7 +259,7 @@ export default function DirectoryPage() {
   const recentListings = featuredListings.filter(l => !l.has_property_intelligence || l.tier === 'free');
 
   return (
-    <div className="min-h-screen bg-midnight-900" data-testid="directory-page">
+    <div className="min-h-screen bg-midnight-900 overflow-x-hidden" data-testid="directory-page">
       {!showListings ? (
         <>
           {/* ─── HERO ─── */}
