@@ -52,6 +52,8 @@ export async function GET(request: NextRequest) {
   const destination = searchParams.get('destination');
   const tourismCategory = searchParams.get('tourism_category');
   const limit = parseInt(searchParams.get('limit') || '24');
+  const userLat = parseFloat(searchParams.get('lat') || '0');
+  const userLng = parseFloat(searchParams.get('lng') || '0');
 
   // Single listing by slug
   if (slug) {
