@@ -365,6 +365,131 @@ export default function ListingDetailPage() {
               </motion.div>
             )}
 
+
+            {/* ─── GL365 REVIEWS ─── */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.25 }}
+              className="rounded-2xl border border-white/10 p-6"
+              style={{ background: 'rgba(255,255,255,0.03)' }}
+              data-testid="gl365-reviews-section"
+            >
+              <div className="flex items-center justify-between mb-5">
+                <div>
+                  <h3 className="text-sm font-heading font-semibold text-white uppercase tracking-wider">GL365 Reviews</h3>
+                  {reviewStats.total > 0 && (
+                    <div className="flex items-center gap-2 mt-1">
+                      <div className="flex gap-0.5">
+                        {[1,2,3,4,5].map(s => (
+                          <svg key={s} className="w-3.5 h-3.5" fill={s <= Math.round(reviewStats.average_rating) ? '#C9A96E' : 'none'} stroke={s <= Math.round(reviewStats.average_rating) ? '#C9A96E' : '#555'} strokeWidth={1.5} viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                          </svg>
+                        ))}
+                      </div>
+                      <span className="text-xs text-white/50 font-body">{reviewStats.average_rating} ({reviewStats.total} review{reviewStats.total !== 1 ? 's' : ''})</span>
+                    </div>
+                  )}
+                </div>
+                <button
+                  onClick={() => setShowReviewForm(!showReviewForm)}
+                  className="px-4 py-2 rounded-lg text-xs font-semibold text-gold border border-gold/30 hover:bg-gold/5 transition-all font-heading"
+                  data-testid="write-review-btn"
+                >
+                  Write a Review
+                </button>
+              </div>
+
+              {/* Review message */}
+              {reviewMessage && (
+                <div className={`mb-4 px-3 py-2 rounded-lg text-xs font-body ${reviewMessage.includes('Thank') ? 'bg-greenline/10 text-greenline border border-greenline/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
+                  {reviewMessage}
+                </div>
+              )}
+
+              {/* Review Form */}
+              {showReviewForm && (
+                <div className="mb-6 p-4 rounded-xl border border-gold/10 bg-midnight-900/50 space-y-3" data-testid="review-form">
+                  <input
+                    value={reviewForm.reviewer_name}
+                    onChange={e => setReviewForm({ ...reviewForm, reviewer_name: e.target.value })}
+                    placeholder="Your name"
+                    className="w-full px-4 py-3 rounded-xl text-sm bg-white/5 text-white border border-white/10 focus:outline-none focus:border-gold/30 font-body placeholder-white/30"
+                    data-testid="review-name-input"
+                  />
+                  <div>
+                    <label className="text-xs text-white/40 font-heading uppercase tracking-wider mb-1 block">Rating</label>
+                    <div className="flex gap-1">
+                      {[1,2,3,4,5].map(s => (
+                        <button key={s} onClick={() => setReviewForm({ ...reviewForm, rating: s })} className="p-1" data-testid={`star-${s}`}>
+                          <svg className="w-6 h-6 transition-colors" fill={s <= reviewForm.rating ? '#C9A96E' : 'none'} stroke={s <= reviewForm.rating ? '#C9A96E' : '#555'} strokeWidth={1.5} viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                          </svg>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <textarea
+                    value={reviewForm.text}
+                    onChange={e => setReviewForm({ ...reviewForm, text: e.target.value })}
+                    placeholder="Share your experience..."
+                    rows={3}
+                    className="w-full px-4 py-3 rounded-xl text-sm bg-white/5 text-white border border-white/10 focus:outline-none focus:border-gold/30 font-body resize-none placeholder-white/30"
+                    data-testid="review-text-input"
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      onClick={submitReview}
+                      disabled={submittingReview || !reviewForm.reviewer_name || !reviewForm.text}
+                      className="px-5 py-2.5 rounded-xl text-xs font-bold font-heading text-midnight-900 transition-all hover:scale-[1.02] disabled:opacity-50"
+                      style={{ background: 'linear-gradient(135deg, #C9A96E, #E6D8B5)' }}
+                      data-testid="submit-review-btn"
+                    >
+                      {submittingReview ? 'Submitting...' : 'Submit Review'}
+                    </button>
+                    <button onClick={() => setShowReviewForm(false)} className="px-4 py-2.5 text-xs text-white/40 hover:text-white/60 transition font-body">Cancel</button>
+                  </div>
+                </div>
+              )}
+
+              {/* Reviews List */}
+              {reviews.length > 0 ? (
+                <div className="space-y-4">
+                  {reviews.slice(0, 5).map((review) => (
+                    <div key={review.id} className="border-b border-white/5 pb-4 last:border-0 last:pb-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-full bg-gold/10 flex items-center justify-center text-xs font-heading font-bold text-gold">
+                            {review.reviewer_name[0]?.toUpperCase()}
+                          </div>
+                          <div>
+                            <span className="text-sm font-heading font-semibold text-white">{review.reviewer_name}</span>
+                            <div className="flex gap-0.5">
+                              {[1,2,3,4,5].map((s: number) => (
+                                <svg key={s} className="w-3 h-3" fill={s <= review.rating ? '#C9A96E' : 'none'} stroke={s <= review.rating ? '#C9A96E' : '#555'} strokeWidth={1.5} viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                                </svg>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                        <span className="text-[10px] text-white/20 font-body">{new Date(review.created_at).toLocaleDateString()}</span>
+                      </div>
+                      <p className="text-xs text-white/60 font-body leading-relaxed mt-2 pl-10">{review.text}</p>
+                      {review.response && (
+                        <div className="mt-3 ml-10 pl-3 border-l-2 border-gold/20">
+                          <p className="text-[10px] text-gold/50 font-heading uppercase tracking-wider mb-1">Business Response</p>
+                          <p className="text-xs text-white/50 font-body leading-relaxed">{review.response.text}</p>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-white/30 font-body text-center py-6">No GL365 reviews yet. Be the first to share your experience!</p>
+              )}
+            </motion.div>
+
             {/* Related Businesses */}
             {listing.related?.length > 0 && (
               <motion.div
