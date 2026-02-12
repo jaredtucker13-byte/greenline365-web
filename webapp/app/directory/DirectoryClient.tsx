@@ -271,7 +271,7 @@ export default function DirectoryPage() {
             <h2 className="text-3xl md:text-4xl font-heading font-light text-white text-center mb-3 tracking-tight">
               Explore <span className="font-semibold text-gradient-gold">Categories</span>
             </h2>
-            <p className="text-silver text-center max-w-lg mx-auto mb-12 font-body">From home services to nightlife — find exactly what you need.</p>
+            <p className="text-white/50 text-center max-w-lg mx-auto mb-12 font-body">From home services to nightlife — find exactly what you need.</p>
 
             {/* 9-Category Grid */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -280,7 +280,7 @@ export default function DirectoryPage() {
                   className={`relative rounded-2xl overflow-hidden cursor-pointer group hover:shadow-gold-glow transition-all duration-500 ${i === 0 ? 'md:col-span-2 md:row-span-2' : ''}`}
                   style={{ minHeight: i === 0 ? 320 : 180 }}
                   onClick={() => handleCategoryClick(cat.id)} data-testid={`cat-${cat.id}`}>
-                  <img src={cat.img} alt={cat.label} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <img src={cat.img} alt={`${cat.label} — ${cat.sub}`} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                   <div className="absolute inset-0 bg-gradient-to-t from-midnight-900/90 via-midnight-900/40 to-transparent group-hover:from-midnight-900/95 transition-all duration-500" />
                   <div className="absolute bottom-4 left-4">
                     <span className={`text-white font-heading font-semibold block tracking-tight ${i === 0 ? 'text-2xl' : 'text-base'}`}>{cat.label}</span>
