@@ -273,6 +273,8 @@ export default function BusinessDashboard() {
 
         {activeTab === 'reviews' && activeListing ? (
           <ReviewsPanel listingId={activeListing.id} />
+        ) : activeTab === 'photos' && activeListing ? (
+          <PhotoLibraryPanel listingId={activeListing.id} />
         ) : (
         <>
         <div className="grid lg:grid-cols-3 gap-6">
