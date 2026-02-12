@@ -15,18 +15,35 @@ function applyPhotoGating(listing: any) {
   const allPhotos: string[] = listing.gallery_images || [];
   const industry = listing.industry || 'services';
   const placeholder = getPlaceholderImage(industry);
+  const claimable = isClaimable(listing.business_name || '');
 
-  // Free tier: placeholder only, no real photos shown
+  // Non-claimable businesses (chains, hospitals, etc): show photos freely
+  if (!claimable) {
+    return {
+      ...listing,
+      gallery_images: allPhotos.slice(0, 10),
+      cover_image_url: allPhotos[0] || listing.cover_image_url || placeholder,
+      total_photos_available: allPhotos.length,
+      has_property_intelligence: false,
+      search_weight: 1,
+      is_placeholder_image: !allPhotos.length,
+      is_claimable: false,
+    };
+  }
+
+  // Claimable businesses — photos gated by tier
+  // Free + unclaimed: placeholder only, photos locked in library
   if (tier === 'free' || !isClaimed) {
     return {
       ...listing,
       gallery_images: [],
       cover_image_url: placeholder,
       total_photos_available: allPhotos.length,
+      locked_photos_count: allPhotos.length,
       has_property_intelligence: false,
       search_weight: limits.searchWeight,
       is_placeholder_image: true,
-      is_claimable: isClaimable(listing.business_name || ''),
+      is_claimable: true,
     };
   }
 
@@ -38,11 +55,12 @@ function applyPhotoGating(listing: any) {
     ...listing,
     gallery_images: visiblePhotos,
     total_photos_available: allPhotos.length,
+    locked_photos_count: Math.max(0, allPhotos.length - maxPhotos),
     cover_image_url: visiblePhotos[0] || listing.cover_image_url || placeholder,
     has_property_intelligence: limits.hasPropertyIntelligence && isClaimed,
     search_weight: limits.searchWeight,
     is_placeholder_image: false,
-    is_claimable: isClaimable(listing.business_name || ''),
+    is_claimable: true,
   };
 }
 
