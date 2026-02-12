@@ -19,8 +19,8 @@ const INDUSTRIES = [
 
 const TIER_INFO: Record<string, { name: string; price: string; color: string }> = {
   free: { name: 'Free', price: '$0', color: '#10B981' },
-  pro: { name: 'Pro', price: '$39/mo', color: '#3B82F6' },
-  premium: { name: 'Premium', price: '$59/mo', color: '#FF8C00' },
+  pro: { name: 'Pro', price: '$45/mo', color: '#3B82F6' },
+  premium: { name: 'Premium', price: '$89/mo', color: '#FF8C00' },
 };
 
 function RegisterForm() {
