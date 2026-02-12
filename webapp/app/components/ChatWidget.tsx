@@ -199,10 +199,10 @@ const QUICK_ACTIONS: Record<AssistantMode, Array<{ text: string; icon: string }>
     { text: 'Generate hashtags', icon: '#️⃣' },
   ],
   concierge: [
-    { text: 'Book a Demo', icon: '📅' },
-    { text: 'How does it work?', icon: '🤔' },
-    { text: 'View Pricing', icon: '💎' },
-    { text: 'Get Started', icon: '🚀' },
+    { text: 'Find a business near me', icon: '📍' },
+    { text: 'Best restaurants in Tampa', icon: '🍽' },
+    { text: 'I need a plumber', icon: '🔧' },
+    { text: 'How do I claim my listing?', icon: '🏢' },
   ],
   support: [
     { text: 'I have a problem', icon: '🔧' },
