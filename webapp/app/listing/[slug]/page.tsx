@@ -93,6 +93,31 @@ export default function ListingDetailPage() {
     }).catch(() => {});
   };
 
+  const submitReview = async () => {
+    if (!listing || !reviewForm.reviewer_name || !reviewForm.text) return;
+    setSubmittingReview(true);
+    setReviewMessage('');
+    const res = await fetch('/api/directory/reviews', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ listing_id: listing.id, ...reviewForm }),
+    });
+    if (res.ok) {
+      setReviewMessage('Review submitted! Thank you for your feedback.');
+      setShowReviewForm(false);
+      setReviewForm({ reviewer_name: '', rating: 5, text: '' });
+      // Reload reviews
+      const r = await fetch(`/api/directory/reviews?listing_id=${listing.id}`);
+      const d = await r.json();
+      setReviews(d.reviews || []);
+      setReviewStats({ total: d.total, average_rating: d.average_rating });
+    } else {
+      setReviewMessage('Failed to submit review. Please try again.');
+    }
+    setSubmittingReview(false);
+    setTimeout(() => setReviewMessage(''), 4000);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-midnight-900 flex items-center justify-center pt-20">
