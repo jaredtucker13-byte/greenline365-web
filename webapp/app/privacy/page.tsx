@@ -307,7 +307,7 @@ export default async function PrivacyPage() {
                 {/* Section 4 - Sharing, Storage & Retention */}
                 <section id="sharing-storage" className="scroll-mt-24">
                   <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                    <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">4</span>
+                    <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">7</span>
                     Sharing, Storage & Retention
                   </h2>
                   <div className="space-y-4">
