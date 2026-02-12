@@ -251,12 +251,17 @@ export default function PricingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.08 }}
-                className="rounded-2xl border border-zinc-800 p-6 hover:border-orange-500/30 transition-all group"
+                className={`rounded-2xl border p-6 transition-all group ${item.comingSoon ? 'border-zinc-800/50 opacity-60' : 'border-zinc-800 hover:border-orange-500/30'}`}
                 style={{ background: 'rgba(255,255,255,0.03)' }}
                 data-testid={`marketplace-${item.name.toLowerCase().replace(/\s/g, '-')}`}
               >
                 <div className="flex items-baseline justify-between mb-3">
-                  <h3 className="text-sm font-bold text-white">{item.name}</h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-bold text-white">{item.name}</h3>
+                    {item.comingSoon && (
+                      <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-orange-500/10 text-orange-400 border border-orange-500/20">Coming Soon</span>
+                    )}
+                  </div>
                   <div className="text-right">
                     <span className="text-lg font-bold" style={{ color: '#FF8C00' }}>{item.price}</span>
                     <span className="text-[10px] text-zinc-500 block">{item.unit}</span>
