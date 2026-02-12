@@ -1,743 +1,560 @@
 /**
- * Calendar/Booking Management Page
- * Full calendar view with booking management
- * Hub-and-Spoke: This is the "Spoke" - dedicated full page
+ * Unified Calendar - Multi-functional hub
  * 
- * TIER REQUIREMENT: Tier 3 (Enterprise)
+ * Shows all event types from multiple sources:
+ * - Bookings (blue marker)
+ * - Content/Social posts (green marker)
+ * - Campaign emails (amber marker)
+ * - Blog posts (pink marker)
+ * - Newsletters (purple marker)
+ * 
+ * Rules:
+ * - Past days: review only (can click to see what was posted)
+ * - Today/Future: can create new events
+ * - Full CRUD until event is actually sent
+ * - Color-coded markers per event type
  */
 
 'use client';
 
-import { FeatureGate } from '../components/FeatureGate';
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 
-interface Booking {
+// ============ TYPES ============
+
+interface CalendarEvent {
   id: string;
-  full_name: string;
-  email: string;
-  phone?: string;
-  service_type?: string;
-  service_id?: string;
+  source: string;
+  event_type: string;
+  title: string;
+  description: string;
   start_time: string;
-  end_time?: string;
-  duration_minutes: number;
-  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
-  confirmation_number?: string;
-  notes?: string;
-  booked_by: string;
-  created_at: string;
-}
-
-interface Service {
-  id: string;
-  name: string;
-  duration_minutes: number;
-  price?: number;
-  price_type: string;
+  end_time: string | null;
   color: string;
+  icon: string;
+  status: string;
+  metadata: any;
+  editable: boolean;
 }
 
-interface TimeSlot {
-  time: string;
-  available: boolean;
-  booking?: Booking;
-}
+// ============ CONSTANTS ============
 
-type ViewMode = 'month' | 'week' | 'day';
-
-const STATUS_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  pending: { bg: 'bg-yellow-500/20', text: 'text-yellow-400', border: 'border-yellow-500/50' },
-  confirmed: { bg: 'bg-emerald-500/20', text: 'text-emerald-400', border: 'border-emerald-500/50' },
-  cancelled: { bg: 'bg-red-500/20', text: 'text-red-400', border: 'border-red-500/50' },
-  completed: { bg: 'bg-blue-500/20', text: 'text-blue-400', border: 'border-blue-500/50' },
+const EVENT_TYPE_CONFIG: Record<string, { label: string; color: string; dotColor: string }> = {
+  booking: { label: 'Booking', color: '#3B82F6', dotColor: 'bg-blue-500' },
+  content: { label: 'Content', color: '#10B981', dotColor: 'bg-emerald-500' },
+  campaign_email: { label: 'Campaign', color: '#F59E0B', dotColor: 'bg-amber-500' },
+  newsletter: { label: 'Newsletter', color: '#8B5CF6', dotColor: 'bg-purple-500' },
+  blog: { label: 'Blog', color: '#EC4899', dotColor: 'bg-pink-500' },
+  custom: { label: 'Custom', color: '#6366F1', dotColor: 'bg-indigo-500' },
 };
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-export default function CalendarPage() {
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [viewMode, setViewMode] = useState<ViewMode>('month');
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [services, setServices] = useState<Service[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
-  const [showNewBooking, setShowNewBooking] = useState(false);
+type ViewMode = 'month' | 'week';
 
-  // Fetch bookings for current view
-  const fetchBookings = useCallback(async () => {
+// ============ MAIN ============
+
+export default function UnifiedCalendar() {
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [viewMode, setViewMode] = useState<ViewMode>('month');
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
+  const [showCreate, setShowCreate] = useState(false);
+  const [createDate, setCreateDate] = useState<Date | null>(null);
+  const [filters, setFilters] = useState<string[]>([]);
+
+  const fetchEvents = useCallback(async () => {
     setLoading(true);
     try {
-      // Calculate date range based on view
       let startDate: Date, endDate: Date;
-      
       if (viewMode === 'month') {
         startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-        endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
-      } else if (viewMode === 'week') {
+        endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 2, 0);
+      } else {
         const dayOfWeek = currentDate.getDay();
         startDate = new Date(currentDate);
         startDate.setDate(currentDate.getDate() - dayOfWeek);
         endDate = new Date(startDate);
-        endDate.setDate(startDate.getDate() + 6);
-      } else {
-        startDate = new Date(currentDate);
-        endDate = new Date(currentDate);
+        endDate.setDate(startDate.getDate() + 7);
       }
 
-      const response = await fetch(
-        `/api/bookings?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`
-      );
-      const data = await response.json();
-      
-      if (response.ok) {
-        setBookings(data.bookings || []);
-      }
-    } catch (error) {
-      console.error('Failed to fetch bookings:', error);
+      const typeParam = filters.length > 0 ? `&type=${filters[0]}` : '';
+      const res = await fetch(`/api/calendar/unified?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}${typeParam}`);
+      const data = await res.json();
+      setEvents(data.events || []);
+    } catch (err) {
+      console.error('Failed to fetch events:', err);
     } finally {
       setLoading(false);
     }
-  }, [currentDate, viewMode]);
+  }, [currentDate, viewMode, filters]);
 
-  // Fetch services
-  const fetchServices = async () => {
-    try {
-      const response = await fetch('/api/services');
-      const data = await response.json();
-      if (response.ok) {
-        setServices(data.services || []);
-      }
-    } catch (error) {
-      console.error('Failed to fetch services:', error);
-    }
+  useEffect(() => { fetchEvents(); }, [fetchEvents]);
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const isPast = (date: Date) => {
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    return d < today;
   };
 
-  useEffect(() => {
-    fetchBookings();
-    fetchServices();
-  }, [fetchBookings]);
+  const isToday = (date: Date) => date.toDateString() === new Date().toDateString();
 
-  // Navigation
-  const navigatePrev = () => {
-    const newDate = new Date(currentDate);
-    if (viewMode === 'month') newDate.setMonth(newDate.getMonth() - 1);
-    else if (viewMode === 'week') newDate.setDate(newDate.getDate() - 7);
-    else newDate.setDate(newDate.getDate() - 1);
-    setCurrentDate(newDate);
-  };
-
-  const navigateNext = () => {
-    const newDate = new Date(currentDate);
-    if (viewMode === 'month') newDate.setMonth(newDate.getMonth() + 1);
-    else if (viewMode === 'week') newDate.setDate(newDate.getDate() + 7);
-    else newDate.setDate(newDate.getDate() + 1);
-    setCurrentDate(newDate);
-  };
-
-  const goToToday = () => setCurrentDate(new Date());
-
-  // Get bookings for a specific date
-  const getBookingsForDate = (date: Date): Booking[] => {
-    return bookings.filter(b => {
-      const bookingDate = new Date(b.start_time);
-      return bookingDate.toDateString() === date.toDateString();
+  const getEventsForDate = (date: Date) => {
+    return events.filter(e => {
+      const eDate = new Date(e.start_time);
+      return eDate.toDateString() === date.toDateString();
     });
   };
 
-  // Generate calendar days for month view
+  const handleDayClick = (date: Date) => {
+    setSelectedDate(date);
+    if (!isPast(date)) {
+      setCreateDate(date);
+    }
+  };
+
+  const navigatePrev = () => {
+    const d = new Date(currentDate);
+    if (viewMode === 'month') d.setMonth(d.getMonth() - 1);
+    else d.setDate(d.getDate() - 7);
+    setCurrentDate(d);
+  };
+
+  const navigateNext = () => {
+    const d = new Date(currentDate);
+    if (viewMode === 'month') d.setMonth(d.getMonth() + 1);
+    else d.setDate(d.getDate() + 7);
+    setCurrentDate(d);
+  };
+
   const generateMonthDays = () => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
-    const startPadding = firstDay.getDay();
     const days: (Date | null)[] = [];
-
-    // Add padding for days before the 1st
-    for (let i = 0; i < startPadding; i++) {
-      days.push(null);
-    }
-
-    // Add all days of the month
-    for (let i = 1; i <= lastDay.getDate(); i++) {
-      days.push(new Date(year, month, i));
-    }
-
+    for (let i = 0; i < firstDay.getDay(); i++) days.push(null);
+    for (let i = 1; i <= lastDay.getDate(); i++) days.push(new Date(year, month, i));
     return days;
   };
 
-  // Generate week days
   const generateWeekDays = () => {
     const dayOfWeek = currentDate.getDay();
     const startOfWeek = new Date(currentDate);
     startOfWeek.setDate(currentDate.getDate() - dayOfWeek);
-    
-    const days: Date[] = [];
-    for (let i = 0; i < 7; i++) {
-      const day = new Date(startOfWeek);
-      day.setDate(startOfWeek.getDate() + i);
-      days.push(day);
-    }
-    return days;
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(startOfWeek);
+      d.setDate(startOfWeek.getDate() + i);
+      return d;
+    });
   };
 
-  // Generate time slots for day view
-  const generateTimeSlots = (): string[] => {
-    const slots: string[] = [];
-    for (let hour = 0; hour < 24; hour++) {
-      slots.push(`${hour.toString().padStart(2, '0')}:00`);
-      slots.push(`${hour.toString().padStart(2, '0')}:30`);
-    }
-    return slots;
+  const deleteEvent = async (event: CalendarEvent) => {
+    if (!confirm('Delete this event?')) return;
+    await fetch(`/api/calendar/unified?id=${event.id}&source=${event.source}`, { method: 'DELETE' });
+    setSelectedEvent(null);
+    fetchEvents();
   };
 
-  // Update booking status
-  const updateBookingStatus = async (bookingId: string, status: string) => {
-    try {
-      const response = await fetch('/api/bookings', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: bookingId, status }),
-      });
-      
-      if (response.ok) {
-        fetchBookings();
-        if (selectedBooking?.id === bookingId) {
-          setSelectedBooking({ ...selectedBooking, status: status as Booking['status'] });
-        }
-      }
-    } catch (error) {
-      console.error('Failed to update booking:', error);
-    }
+  const toggleFilter = (type: string) => {
+    setFilters(prev => prev.includes(type) ? prev.filter(f => f !== type) : [...prev, type]);
   };
-
-  const isToday = (date: Date | null) => date ? date.toDateString() === new Date().toDateString() : false;
-  const isSelected = (date: Date | null) => date && selectedDate ? selectedDate.toDateString() === date.toDateString() : false;
 
   return (
-    <FeatureGate feature="calendar">
-      <div className="min-h-screen bg-[#0a0a0a]">
-        {/* Header */}
-        <header className="border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-xl sticky top-0 z-40">
-          <div className="max-w-7xl mx-auto px-6 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <Link href="/admin-v2" className="text-white/50 hover:text-white transition">
-                  ← Command Center
-                </Link>
-                <div className="h-6 w-px bg-white/20" />
+    <div className="min-h-screen bg-[#0a0a0a]" data-testid="unified-calendar">
+      {/* Header */}
+      <header className="sticky top-0 z-40 bg-[#0a0a0a]/95 backdrop-blur border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Link href="/admin-v2" className="text-white/50 hover:text-white transition">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+              </Link>
+              <div>
                 <h1 className="text-xl font-bold text-white flex items-center gap-2">
-                  <span className="text-2xl">📅</span> Calendar
+                  <svg className="w-6 h-6 text-[#39FF14]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                  Calendar
                 </h1>
+                <p className="text-sm text-white/40">Bookings, content, campaigns - all in one place</p>
               </div>
-            
+            </div>
             <div className="flex items-center gap-3">
-              {/* View Mode Toggle */}
               <div className="flex rounded-lg border border-white/10 overflow-hidden">
-                {(['month', 'week', 'day'] as ViewMode[]).map((mode) => (
-                  <button
-                    key={mode}
-                    onClick={() => setViewMode(mode)}
-                    className={`px-4 py-2 text-sm capitalize transition ${
-                      viewMode === mode
-                        ? 'bg-[#39FF14] text-black font-medium'
-                        : 'text-white/60 hover:text-white hover:bg-white/5'
-                    }`}
-                  >
+                {(['month', 'week'] as ViewMode[]).map(mode => (
+                  <button key={mode} onClick={() => setViewMode(mode)} className={`px-4 py-2 text-sm capitalize ${viewMode === mode ? 'bg-[#39FF14] text-black font-medium' : 'text-white/60 hover:text-white'}`}>
                     {mode}
                   </button>
                 ))}
               </div>
-              
-              <button
-                onClick={() => setShowNewBooking(true)}
-                className="px-4 py-2 rounded-lg bg-[#39FF14] text-black font-medium hover:bg-[#32E012] transition"
-              >
-                + New Booking
-              </button>
+              <button onClick={() => setCurrentDate(new Date())} className="px-3 py-2 rounded-lg border border-white/10 text-white/60 hover:text-white text-sm">Today</button>
             </div>
           </div>
         </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-6 py-6">
-        {/* Navigation */}
+        {/* Navigation + Filter Legend */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
-            <button
-              onClick={navigatePrev}
-              className="p-2 rounded-lg border border-white/10 text-white/60 hover:text-white hover:bg-white/5 transition"
-            >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
+            <button onClick={navigatePrev} className="p-2 rounded-lg border border-white/10 text-white/60 hover:text-white transition">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
             </button>
-            
-            <h2 className="text-2xl font-bold text-white">
-              {viewMode === 'month' && `${MONTHS[currentDate.getMonth()]} ${currentDate.getFullYear()}`}
-              {viewMode === 'week' && `Week of ${currentDate.toLocaleDateString()}`}
-              {viewMode === 'day' && currentDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+            <h2 className="text-2xl font-bold text-white" data-testid="calendar-title">
+              {viewMode === 'month' ? `${MONTHS[currentDate.getMonth()]} ${currentDate.getFullYear()}` : `Week of ${currentDate.toLocaleDateString()}`}
             </h2>
-            
-            <button
-              onClick={navigateNext}
-              className="p-2 rounded-lg border border-white/10 text-white/60 hover:text-white hover:bg-white/5 transition"
-            >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-            
-            <button
-              onClick={goToToday}
-              className="px-3 py-1 rounded-lg border border-white/10 text-white/60 hover:text-white hover:bg-white/5 transition text-sm"
-            >
-              Today
+            <button onClick={navigateNext} className="p-2 rounded-lg border border-white/10 text-white/60 hover:text-white transition">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
             </button>
           </div>
 
-          {/* Stats */}
-          <div className="flex gap-4">
-            <div className="px-4 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/30">
-              <span className="text-emerald-400 font-bold">{bookings.filter(b => b.status === 'confirmed').length}</span>
-              <span className="text-emerald-400/70 text-sm ml-2">Confirmed</span>
-            </div>
-            <div className="px-4 py-2 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
-              <span className="text-yellow-400 font-bold">{bookings.filter(b => b.status === 'pending').length}</span>
-              <span className="text-yellow-400/70 text-sm ml-2">Pending</span>
-            </div>
+          {/* Color Legend / Filters */}
+          <div className="flex items-center gap-2" data-testid="event-type-filters">
+            {Object.entries(EVENT_TYPE_CONFIG).map(([type, cfg]) => (
+              <button
+                key={type}
+                onClick={() => toggleFilter(type)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition border ${
+                  filters.length === 0 || filters.includes(type)
+                    ? 'opacity-100 border-white/20'
+                    : 'opacity-30 border-transparent'
+                }`}
+                style={{ background: `${cfg.color}15`, color: cfg.color }}
+              >
+                <span className={`w-2 h-2 rounded-full ${cfg.dotColor}`} />
+                {cfg.label}
+              </button>
+            ))}
           </div>
         </div>
 
         {/* Calendar Grid */}
-        <div className="rounded-2xl border border-white/10 bg-white/5 overflow-hidden">
+        <div className="rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden" data-testid="calendar-grid">
+          {/* Day Headers */}
+          <div className="grid grid-cols-7 border-b border-white/10">
+            {DAYS.map(day => (
+              <div key={day} className="px-4 py-3 text-center text-white/50 text-sm font-medium">{day}</div>
+            ))}
+          </div>
+
           {/* Month View */}
           {viewMode === 'month' && (
-            <>
-              {/* Day Headers */}
-              <div className="grid grid-cols-7 border-b border-white/10">
-                {DAYS.map((day) => (
-                  <div key={day} className="px-4 py-3 text-center text-white/60 text-sm font-medium">
-                    {day}
-                  </div>
-                ))}
-              </div>
-              
-              {/* Days Grid */}
-              <div className="grid grid-cols-7">
-                {generateMonthDays().map((date, index) => {
-                  const dayBookings = date ? getBookingsForDate(date) : [];
-                  
-                  return (
-                    <div
-                      key={index}
-                      onClick={() => date && setSelectedDate(date)}
-                      className={`min-h-[120px] p-2 border-b border-r border-white/5 cursor-pointer transition ${
-                        date ? 'hover:bg-white/5' : 'bg-white/2'
-                      } ${isToday(date!) ? 'bg-[#39FF14]/5' : ''} ${isSelected(date!) ? 'ring-2 ring-[#39FF14] ring-inset' : ''}`}
-                    >
-                      {date && (
-                        <>
-                          <div className={`text-sm mb-2 ${isToday(date) ? 'text-[#39FF14] font-bold' : 'text-white/60'}`}>
+            <div className="grid grid-cols-7">
+              {generateMonthDays().map((date, idx) => {
+                const dayEvents = date ? getEventsForDate(date) : [];
+                const past = date ? isPast(date) : false;
+                const todayClass = date && isToday(date);
+                const selected = date && selectedDate?.toDateString() === date.toDateString();
+
+                return (
+                  <div
+                    key={idx}
+                    onClick={() => date && handleDayClick(date)}
+                    className={`min-h-[110px] p-2 border-b border-r border-white/5 cursor-pointer transition ${
+                      !date ? 'bg-white/[0.01]' : past ? 'bg-white/[0.01] hover:bg-white/[0.03]' : 'hover:bg-[#39FF14]/5'
+                    } ${todayClass ? 'bg-[#39FF14]/[0.04] ring-1 ring-inset ring-[#39FF14]/20' : ''}
+                    ${selected ? 'ring-2 ring-inset ring-[#39FF14]' : ''}`}
+                    data-testid={date ? `cal-day-${date.getDate()}` : `cal-empty-${idx}`}
+                  >
+                    {date && (
+                      <>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className={`text-sm font-medium ${todayClass ? 'text-[#39FF14] font-bold' : past ? 'text-white/30' : 'text-white/60'}`}>
                             {date.getDate()}
-                          </div>
-                          
-                          {/* Booking indicators */}
-                          <div className="space-y-1">
-                            {dayBookings.slice(0, 3).map((booking) => (
-                              <div
-                                key={booking.id}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSelectedBooking(booking);
-                                }}
-                                className={`px-2 py-1 rounded text-xs truncate ${STATUS_COLORS[booking.status]?.bg} ${STATUS_COLORS[booking.status]?.text}`}
-                              >
-                                {new Date(booking.start_time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })} - {booking.full_name}
-                              </div>
-                            ))}
-                            {dayBookings.length > 3 && (
-                              <div className="text-xs text-white/40 px-2">
-                                +{dayBookings.length - 3} more
-                              </div>
-                            )}
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </>
+                          </span>
+                          {!past && dayEvents.length === 0 && (
+                            <span className="text-white/10 text-xs opacity-0 group-hover:opacity-100">+</span>
+                          )}
+                        </div>
+                        <div className="space-y-0.5">
+                          {dayEvents.slice(0, 3).map(event => (
+                            <div
+                              key={event.id}
+                              onClick={(e) => { e.stopPropagation(); setSelectedEvent(event); }}
+                              className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] truncate cursor-pointer hover:opacity-80 transition"
+                              style={{ background: `${event.color}20`, color: event.color }}
+                              data-testid={`cal-event-${event.id}`}
+                            >
+                              <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: event.color }} />
+                              <span className="truncate">{event.title.replace(/^(Booking|Campaign): /, '')}</span>
+                            </div>
+                          ))}
+                          {dayEvents.length > 3 && (
+                            <span className="text-[10px] text-white/30 pl-1">+{dayEvents.length - 3} more</span>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           )}
 
           {/* Week View */}
           {viewMode === 'week' && (
-            <div className="flex">
-              {/* Time column */}
-              <div className="w-20 border-r border-white/10 flex-shrink-0">
-                <div className="h-12 border-b border-white/10" /> {/* Header spacer */}
-                {generateTimeSlots().filter((_, i) => i % 2 === 0).map((time) => (
-                  <div key={time} className="h-16 px-2 py-1 text-xs text-white/40 border-b border-white/5">
-                    {time}
-                  </div>
-                ))}
-              </div>
-              
-              {/* Days columns */}
-              <div className="flex-1 grid grid-cols-7">
-                {generateWeekDays().map((date) => {
-                  const dayBookings = getBookingsForDate(date);
-                  
-                  return (
-                    <div key={date.toISOString()} className="border-r border-white/5">
-                      {/* Day header */}
-                      <div className={`h-12 px-2 py-2 border-b border-white/10 text-center ${isToday(date) ? 'bg-[#39FF14]/10' : ''}`}>
-                        <div className="text-xs text-white/40">{DAYS[date.getDay()]}</div>
-                        <div className={`text-sm font-medium ${isToday(date) ? 'text-[#39FF14]' : 'text-white'}`}>
-                          {date.getDate()}
-                        </div>
-                      </div>
-                      
-                      {/* Time slots */}
-                      <div className="relative">
-                        {generateTimeSlots().filter((_, i) => i % 2 === 0).map((time) => (
-                          <div key={time} className="h-16 border-b border-white/5" />
-                        ))}
-                        
-                        {/* Booking overlays */}
-                        {dayBookings.map((booking) => {
-                          const startTime = new Date(booking.start_time);
-                          const hours = startTime.getHours();
-                          const minutes = startTime.getMinutes();
-                          const top = (hours * 64) + (minutes / 60 * 64); // 64px per hour
-                          const height = (booking.duration_minutes / 60) * 64;
-                          
-                          return (
-                            <div
-                              key={booking.id}
-                              onClick={() => setSelectedBooking(booking)}
-                              style={{ top: `${top}px`, height: `${height}px` }}
-                              className={`absolute left-1 right-1 rounded px-2 py-1 cursor-pointer overflow-hidden ${STATUS_COLORS[booking.status]?.bg} ${STATUS_COLORS[booking.status]?.border} border`}
-                            >
-                              <div className={`text-xs font-medium truncate ${STATUS_COLORS[booking.status]?.text}`}>
-                                {booking.full_name}
-                              </div>
-                              <div className="text-xs text-white/40 truncate">
-                                {booking.service_type}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+            <div className="grid grid-cols-7">
+              {generateWeekDays().map(date => {
+                const dayEvents = getEventsForDate(date);
+                const past = isPast(date);
+                const todayClass = isToday(date);
 
-          {/* Day View */}
-          {viewMode === 'day' && (
-            <div className="flex">
-              {/* Time column */}
-              <div className="w-20 border-r border-white/10 flex-shrink-0">
-                {generateTimeSlots().map((time) => (
-                  <div key={time} className="h-12 px-2 py-1 text-xs text-white/40 border-b border-white/5">
-                    {time}
-                  </div>
-                ))}
-              </div>
-              
-              {/* Day content */}
-              <div className="flex-1 relative">
-                {generateTimeSlots().map((time) => (
-                  <div key={time} className="h-12 border-b border-white/5 hover:bg-white/5 cursor-pointer" />
-                ))}
-                
-                {/* Booking overlays */}
-                {getBookingsForDate(currentDate).map((booking) => {
-                  const startTime = new Date(booking.start_time);
-                  const hours = startTime.getHours();
-                  const minutes = startTime.getMinutes();
-                  const top = (hours * 48) + (minutes / 60 * 48); // 48px per hour (12px per 15min slot)
-                  const height = (booking.duration_minutes / 60) * 48;
-                  
-                  return (
-                    <div
-                      key={booking.id}
-                      onClick={() => setSelectedBooking(booking)}
-                      style={{ top: `${top}px`, height: `${Math.max(height, 40)}px` }}
-                      className={`absolute left-2 right-2 rounded-lg p-3 cursor-pointer ${STATUS_COLORS[booking.status]?.bg} ${STATUS_COLORS[booking.status]?.border} border`}
-                    >
-                      <div className={`font-medium ${STATUS_COLORS[booking.status]?.text}`}>
-                        {booking.full_name}
-                      </div>
-                      <div className="text-white/60 text-sm">
-                        {new Date(booking.start_time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })} - {booking.service_type || 'Appointment'}
-                      </div>
+                return (
+                  <div
+                    key={date.toISOString()}
+                    onClick={() => handleDayClick(date)}
+                    className={`min-h-[400px] p-3 border-r border-white/5 cursor-pointer transition ${
+                      todayClass ? 'bg-[#39FF14]/[0.04]' : past ? 'bg-white/[0.01]' : ''
+                    }`}
+                  >
+                    <div className={`text-center mb-3 ${todayClass ? 'text-[#39FF14]' : 'text-white/60'}`}>
+                      <div className="text-xs">{DAYS[date.getDay()]}</div>
+                      <div className={`text-lg font-bold ${todayClass ? 'text-[#39FF14]' : past ? 'text-white/30' : 'text-white'}`}>{date.getDate()}</div>
                     </div>
-                  );
-                })}
-              </div>
+                    <div className="space-y-1">
+                      {dayEvents.map(event => (
+                        <div
+                          key={event.id}
+                          onClick={(e) => { e.stopPropagation(); setSelectedEvent(event); }}
+                          className="p-2 rounded-lg text-xs cursor-pointer hover:opacity-80 transition border"
+                          style={{ background: `${event.color}10`, borderColor: `${event.color}30`, color: event.color }}
+                        >
+                          <div className="flex items-center gap-1.5 mb-0.5">
+                            <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: event.color }} />
+                            <span className="font-medium truncate">{event.title.replace(/^(Booking|Campaign): /, '')}</span>
+                          </div>
+                          <p className="text-white/30 truncate">{new Date(event.start_time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
 
         {/* Selected Date Panel */}
-        {selectedDate && viewMode === 'month' && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-6 p-6 rounded-2xl border border-white/10 bg-white/5"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-white">
-                {selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-              </h3>
-              <button
-                onClick={() => setSelectedDate(null)}
-                className="text-white/40 hover:text-white"
-              >
-                ✕
-              </button>
-            </div>
-            
-            {getBookingsForDate(selectedDate).length === 0 ? (
-              <p className="text-white/40">No bookings for this day.</p>
-            ) : (
-              <div className="space-y-3">
-                {getBookingsForDate(selectedDate).map((booking) => (
-                  <div
-                    key={booking.id}
-                    onClick={() => setSelectedBooking(booking)}
-                    className={`p-4 rounded-xl cursor-pointer transition hover:scale-[1.02] ${STATUS_COLORS[booking.status]?.bg} ${STATUS_COLORS[booking.status]?.border} border`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className={`font-medium ${STATUS_COLORS[booking.status]?.text}`}>
-                          {booking.full_name}
-                        </div>
-                        <div className="text-white/60 text-sm">
-                          {new Date(booking.start_time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })} • {booking.service_type || 'Appointment'} • {booking.duration_minutes} min
-                        </div>
-                      </div>
-                      <span className={`px-2 py-1 rounded text-xs capitalize ${STATUS_COLORS[booking.status]?.bg} ${STATUS_COLORS[booking.status]?.text}`}>
-                        {booking.status}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </motion.div>
-        )}
-      </main>
-
-      {/* Booking Detail Drawer */}
-      <AnimatePresence>
-        {selectedBooking && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 z-40"
-              onClick={() => setSelectedBooking(null)}
-            />
-            <motion.div
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-[#0a0a0a] border-l border-white/10 z-50 overflow-y-auto"
-            >
-              <div className="p-6">
-                <div className="flex items-start justify-between mb-6">
-                  <div>
-                    <h2 className="text-2xl font-bold text-white">{selectedBooking.full_name}</h2>
-                    <p className="text-white/50">
-                      {new Date(selectedBooking.start_time).toLocaleDateString('en-US', { 
-                        weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
-                      })}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => setSelectedBooking(null)}
-                    className="p-2 rounded-lg bg-white/10 text-white hover:bg-white/20"
-                  >
-                    ✕
+        <AnimatePresence>
+          {selectedDate && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="mt-6 p-6 rounded-2xl border border-white/10 bg-white/[0.02]" data-testid="selected-date-panel">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-lg font-bold text-white">{selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</h3>
+                  <p className="text-white/40 text-sm">{getEventsForDate(selectedDate).length} events {isPast(selectedDate) ? '(past - read only)' : ''}</p>
+                </div>
+                <div className="flex gap-2">
+                  {!isPast(selectedDate) && (
+                    <button onClick={() => { setCreateDate(selectedDate); setShowCreate(true); }} className="px-4 py-2 rounded-lg bg-[#39FF14] text-black text-sm font-semibold hover:bg-[#32E012] transition" data-testid="create-event-btn">
+                      + New Event
+                    </button>
+                  )}
+                  <button onClick={() => setSelectedDate(null)} className="p-2 rounded-lg bg-white/5 text-white/40 hover:text-white">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                   </button>
                 </div>
-
-                {/* Status Badge */}
-                <div className={`inline-block px-3 py-1 rounded-full text-sm font-medium mb-6 ${STATUS_COLORS[selectedBooking.status]?.bg} ${STATUS_COLORS[selectedBooking.status]?.text}`}>
-                  {selectedBooking.status.charAt(0).toUpperCase() + selectedBooking.status.slice(1)}
-                </div>
-
-                {/* Details */}
-                <div className="space-y-4 mb-6">
-                  <div className="p-4 rounded-xl bg-white/5">
-                    <div className="text-white/50 text-sm mb-1">Time</div>
-                    <div className="text-white font-medium">
-                      {new Date(selectedBooking.start_time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
-                      {' '}({selectedBooking.duration_minutes} minutes)
-                    </div>
-                  </div>
-                  
-                  {selectedBooking.service_type && (
-                    <div className="p-4 rounded-xl bg-white/5">
-                      <div className="text-white/50 text-sm mb-1">Service</div>
-                      <div className="text-white font-medium">{selectedBooking.service_type}</div>
-                    </div>
-                  )}
-                  
-                  {selectedBooking.email && (
-                    <div className="p-4 rounded-xl bg-white/5">
-                      <div className="text-white/50 text-sm mb-1">Email</div>
-                      <a href={`mailto:${selectedBooking.email}`} className="text-[#39FF14] hover:underline">
-                        {selectedBooking.email}
-                      </a>
-                    </div>
-                  )}
-                  
-                  {selectedBooking.phone && (
-                    <div className="p-4 rounded-xl bg-white/5">
-                      <div className="text-white/50 text-sm mb-1">Phone</div>
-                      <a href={`tel:${selectedBooking.phone}`} className="text-[#39FF14] hover:underline">
-                        {selectedBooking.phone}
-                      </a>
-                    </div>
-                  )}
-                  
-                  {selectedBooking.confirmation_number && (
-                    <div className="p-4 rounded-xl bg-white/5">
-                      <div className="text-white/50 text-sm mb-1">Confirmation #</div>
-                      <div className="text-white font-mono">{selectedBooking.confirmation_number}</div>
-                    </div>
-                  )}
-                  
-                  {selectedBooking.notes && (
-                    <div className="p-4 rounded-xl bg-white/5">
-                      <div className="text-white/50 text-sm mb-1">Notes</div>
-                      <div className="text-white">{selectedBooking.notes}</div>
-                    </div>
-                  )}
-                  
-                  <div className="p-4 rounded-xl bg-white/5">
-                    <div className="text-white/50 text-sm mb-1">Booked By</div>
-                    <div className="text-white capitalize">{selectedBooking.booked_by || 'AI'}</div>
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="space-y-3">
-                  <div className="text-white/50 text-sm mb-2">Update Status</div>
-                  <div className="grid grid-cols-2 gap-2">
-                    {selectedBooking.status !== 'confirmed' && (
-                      <button
-                        onClick={() => updateBookingStatus(selectedBooking.id, 'confirmed')}
-                        className="py-2 px-4 rounded-lg bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 transition"
-                      >
-                        Confirm
-                      </button>
-                    )}
-                    {selectedBooking.status !== 'completed' && (
-                      <button
-                        onClick={() => updateBookingStatus(selectedBooking.id, 'completed')}
-                        className="py-2 px-4 rounded-lg bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition"
-                      >
-                        Complete
-                      </button>
-                    )}
-                    {selectedBooking.status !== 'cancelled' && (
-                      <button
-                        onClick={() => updateBookingStatus(selectedBooking.id, 'cancelled')}
-                        className="py-2 px-4 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition"
-                      >
-                        Cancel
-                      </button>
-                    )}
-                  </div>
-                </div>
               </div>
+
+              {getEventsForDate(selectedDate).length === 0 ? (
+                <p className="text-white/25 text-center py-4">
+                  {isPast(selectedDate) ? 'No events on this day.' : 'No events yet. Click "New Event" to add one.'}
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  {getEventsForDate(selectedDate).map(event => (
+                    <div
+                      key={event.id}
+                      onClick={() => setSelectedEvent(event)}
+                      className="flex items-center justify-between p-4 rounded-xl cursor-pointer transition hover:bg-white/[0.03] border border-white/5"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: event.color }} />
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-white truncate">{event.title}</p>
+                          <p className="text-xs text-white/40">
+                            {new Date(event.start_time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+                            {' '}&middot;{' '}
+                            {EVENT_TYPE_CONFIG[event.event_type]?.label || event.event_type}
+                            {' '}&middot;{' '}
+                            <span className={event.status === 'draft' ? 'text-gray-400' : event.status === 'sent' ? 'text-emerald-400' : 'text-white/40'}>{event.status}</span>
+                          </p>
+                        </div>
+                      </div>
+                      {event.editable && !isPast(selectedDate) && (
+                        <button onClick={(e) => { e.stopPropagation(); deleteEvent(event); }} className="p-1.5 rounded text-white/20 hover:text-red-400 hover:bg-red-500/10 transition">
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </motion.div>
-          </>
+          )}
+        </AnimatePresence>
+      </main>
+
+      {/* Event Detail Drawer */}
+      <AnimatePresence>
+        {selectedEvent && (
+          <EventDetailDrawer
+            event={selectedEvent}
+            onClose={() => setSelectedEvent(null)}
+            onDelete={() => deleteEvent(selectedEvent)}
+            onRefresh={fetchEvents}
+          />
         )}
       </AnimatePresence>
 
-      {/* New Booking Modal (placeholder) */}
+      {/* Create Event Modal */}
       <AnimatePresence>
-        {showNewBooking && (
-          <NewBookingModal
-            services={services}
-            onClose={() => setShowNewBooking(false)}
-            onSuccess={() => {
-              setShowNewBooking(false);
-              fetchBookings();
-            }}
+        {showCreate && createDate && (
+          <CreateEventModal
+            date={createDate}
+            onClose={() => setShowCreate(false)}
+            onSuccess={() => { setShowCreate(false); fetchEvents(); }}
           />
         )}
       </AnimatePresence>
     </div>
-    </FeatureGate>
   );
 }
 
-// New Booking Modal Component
-function NewBookingModal({ 
-  services, 
-  onClose, 
-  onSuccess 
-}: { 
-  services: Service[];
+// ============ EVENT DETAIL DRAWER ============
+
+function EventDetailDrawer({ event, onClose, onDelete, onRefresh }: {
+  event: CalendarEvent;
+  onClose: () => void;
+  onDelete: () => void;
+  onRefresh: () => void;
+}) {
+  const typeConfig = EVENT_TYPE_CONFIG[event.event_type] || EVENT_TYPE_CONFIG.custom;
+
+  return (
+    <>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/60 z-40" onClick={onClose} />
+      <motion.div initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ type: 'spring', damping: 25 }} className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-[#0a0a0a] border-l border-white/10 z-50 flex flex-col" data-testid="event-detail-drawer">
+        <div className="p-6 border-b border-white/10">
+          <div className="flex items-start justify-between mb-4">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="w-3 h-3 rounded-full" style={{ background: typeConfig.color }} />
+                <span className="text-xs font-medium px-2 py-0.5 rounded-full" style={{ background: `${typeConfig.color}20`, color: typeConfig.color }}>{typeConfig.label}</span>
+                <span className={`text-xs px-2 py-0.5 rounded-full ${event.status === 'draft' ? 'bg-gray-500/20 text-gray-400' : 'bg-emerald-500/20 text-emerald-400'}`}>{event.status}</span>
+              </div>
+              <h2 className="text-xl font-bold text-white">{event.title}</h2>
+            </div>
+            <button onClick={onClose} className="p-2 rounded-lg bg-white/5 text-white/60 hover:text-white">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5">
+            <p className="text-white/40 text-xs mb-1">Date & Time</p>
+            <p className="text-white">{new Date(event.start_time).toLocaleString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })}</p>
+          </div>
+
+          {event.description && (
+            <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5">
+              <p className="text-white/40 text-xs mb-1">Description</p>
+              <p className="text-white/80 text-sm">{event.description}</p>
+            </div>
+          )}
+
+          {event.metadata && Object.keys(event.metadata).length > 0 && (
+            <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5">
+              <p className="text-white/40 text-xs mb-2">Details</p>
+              {Object.entries(event.metadata).map(([k, v]) => (
+                v && (
+                  <div key={k} className="flex justify-between text-sm py-1">
+                    <span className="text-white/40 capitalize">{k.replace(/_/g, ' ')}</span>
+                    <span className="text-white">{String(v)}</span>
+                  </div>
+                )
+              ))}
+            </div>
+          )}
+
+          {/* Links */}
+          {event.event_type === 'campaign_email' && (
+            <Link href={`/admin-v2/campaigns`} className="block p-4 rounded-xl bg-amber-500/5 border border-amber-500/20 text-amber-400 text-sm hover:bg-amber-500/10 transition text-center">
+              Open in Campaign Manager →
+            </Link>
+          )}
+          {event.source === 'scheduled_content' && (
+            <Link href="/admin-v2/content-forge" className="block p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/20 text-emerald-400 text-sm hover:bg-emerald-500/10 transition text-center">
+              Open in Content Forge →
+            </Link>
+          )}
+        </div>
+
+        {/* Actions */}
+        {event.editable && (
+          <div className="p-6 border-t border-white/10">
+            <button onClick={onDelete} className="w-full py-3 rounded-lg bg-red-500/10 text-red-400 font-medium hover:bg-red-500/20 transition text-sm" data-testid="delete-event-btn">
+              Delete Event
+            </button>
+          </div>
+        )}
+      </motion.div>
+    </>
+  );
+}
+
+// ============ CREATE EVENT MODAL ============
+
+function CreateEventModal({ date, onClose, onSuccess }: {
+  date: Date;
   onClose: () => void;
   onSuccess: () => void;
 }) {
-  const [formData, setFormData] = useState({
-    full_name: '',
-    email: '',
-    phone: '',
-    service_id: '',
-    date: '',
-    time: '',
-    notes: '',
+  const [form, setForm] = useState({
+    title: '',
+    description: '',
+    event_type: 'content',
+    content_type: 'photo',
+    time: '09:00',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const create = async () => {
+    if (!form.title.trim()) { setError('Title required'); return; }
     setLoading(true);
     setError('');
-
     try {
-      const selectedService = services.find(s => s.id === formData.service_id);
-      const startTime = new Date(`${formData.date}T${formData.time}`);
-      
-      const response = await fetch('/api/bookings', {
+      const scheduledDate = new Date(date);
+      const [h, m] = form.time.split(':');
+      scheduledDate.setHours(parseInt(h), parseInt(m), 0, 0);
+
+      const res = await fetch('/api/calendar/unified', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...formData,
-          start_time: startTime.toISOString(),
-          duration_minutes: selectedService?.duration_minutes || 30,
-          service_type: selectedService?.name,
-          booked_by: 'human',
+          title: form.title,
+          description: form.description,
+          event_type: form.event_type,
+          content_type: form.content_type,
+          scheduled_date: scheduledDate.toISOString(),
+          status: 'draft',
         }),
       });
-
-      if (response.ok) {
+      const data = await res.json();
+      if (data.success) {
         onSuccess();
       } else {
-        const data = await response.json();
-        setError(data.error || 'Failed to create booking');
+        setError(data.error || 'Failed to create event');
       }
     } catch (err) {
-      setError('Failed to create booking');
+      setError('Failed to create event');
     } finally {
       setLoading(false);
     }
@@ -745,126 +562,48 @@ function NewBookingModal({
 
   return (
     <>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/50 z-40"
-        onClick={onClose}
-      />
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      >
-        <div className="w-full max-w-lg bg-[#0a0a0a] border border-white/10 rounded-2xl p-6 max-h-[90vh] overflow-y-auto">
-          <h2 className="text-2xl font-bold text-white mb-6">New Booking</h2>
-          
-          <form onSubmit={handleSubmit} className="space-y-4">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/60 z-50" onClick={onClose} />
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="w-full max-w-md bg-[#0a0a0a] border border-white/10 rounded-2xl p-6" data-testid="create-event-modal">
+          <h2 className="text-lg font-bold text-white mb-1">New Event</h2>
+          <p className="text-sm text-white/40 mb-4">{date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+
+          <div className="space-y-4">
             <div>
-              <label className="block text-sm text-white/60 mb-2">Customer Name *</label>
-              <input
-                type="text"
-                required
-                value={formData.full_name}
-                onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:border-[#39FF14] outline-none"
-              />
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm text-white/60 mb-2">Email</label>
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:border-[#39FF14] outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-white/60 mb-2">Phone</label>
-                <input
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:border-[#39FF14] outline-none"
-                />
-              </div>
-            </div>
-            
-            <div>
-              <label className="block text-sm text-white/60 mb-2">Service *</label>
-              <select
-                required
-                value={formData.service_id}
-                onChange={(e) => setFormData({ ...formData, service_id: e.target.value })}
-                className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:border-[#39FF14] outline-none"
-              >
-                <option value="">Select a service...</option>
-                {services.map((service) => (
-                  <option key={service.id} value={service.id}>
-                    {service.name} ({service.duration_minutes} min)
-                  </option>
+              <label className="block text-xs text-white/50 mb-1">Event Type</label>
+              <div className="grid grid-cols-3 gap-2">
+                {['content', 'blog', 'newsletter'].map(type => (
+                  <button key={type} onClick={() => setForm({ ...form, event_type: type, content_type: type === 'blog' ? 'blog' : type === 'newsletter' ? 'newsletter' : 'photo' })} className={`px-3 py-2 rounded-lg text-xs font-medium border transition ${form.event_type === type ? 'border-[#39FF14]/50 bg-[#39FF14]/10 text-[#39FF14]' : 'border-white/10 text-white/40 hover:text-white'}`}>
+                    {EVENT_TYPE_CONFIG[type]?.label || type}
+                  </button>
                 ))}
-              </select>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm text-white/60 mb-2">Date *</label>
-                <input
-                  type="date"
-                  required
-                  value={formData.date}
-                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                  className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:border-[#39FF14] outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-white/60 mb-2">Time *</label>
-                <input
-                  type="time"
-                  required
-                  value={formData.time}
-                  onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                  className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:border-[#39FF14] outline-none"
-                />
               </div>
             </div>
-            
+
             <div>
-              <label className="block text-sm text-white/60 mb-2">Notes</label>
-              <textarea
-                value={formData.notes}
-                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                rows={3}
-                className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:border-[#39FF14] outline-none resize-none"
-              />
+              <label className="block text-xs text-white/50 mb-1">Title *</label>
+              <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="e.g. Weekly Newsletter" className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:border-[#39FF14] outline-none placeholder:text-white/20" data-testid="event-title-input" />
             </div>
 
-            {error && (
-              <p className="text-red-400 text-sm">{error}</p>
-            )}
+            <div>
+              <label className="block text-xs text-white/50 mb-1">Time</label>
+              <input type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:border-[#39FF14] outline-none" />
+            </div>
 
-            <div className="flex gap-3 pt-4">
-              <button
-                type="button"
-                onClick={onClose}
-                className="flex-1 py-3 rounded-lg bg-white/5 text-white/70 hover:bg-white/10 transition"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex-1 py-3 rounded-lg bg-[#39FF14] text-black font-medium hover:bg-[#32E012] disabled:opacity-50 transition"
-              >
-                {loading ? 'Creating...' : 'Create Booking'}
+            <div>
+              <label className="block text-xs text-white/50 mb-1">Description</label>
+              <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={2} placeholder="Add details..." className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:border-[#39FF14] outline-none resize-none placeholder:text-white/20" />
+            </div>
+
+            {error && <p className="text-red-400 text-sm">{error}</p>}
+
+            <div className="flex gap-3">
+              <button onClick={onClose} className="flex-1 py-2.5 rounded-lg bg-white/5 text-white/60 text-sm">Cancel</button>
+              <button onClick={create} disabled={loading} className="flex-1 py-2.5 rounded-lg bg-[#39FF14] text-black text-sm font-semibold disabled:opacity-50" data-testid="create-event-submit">
+                {loading ? 'Creating...' : 'Create Event'}
               </button>
             </div>
-          </form>
+          </div>
         </div>
       </motion.div>
     </>
