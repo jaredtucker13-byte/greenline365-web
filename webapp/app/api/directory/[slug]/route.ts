@@ -63,7 +63,7 @@ export async function GET(
     cover_image_url: coverImage,
     has_property_intelligence: limits.hasPropertyIntelligence && isClaimed,
     search_weight: limits.searchWeight,
-    is_placeholder_image: isFreeOrUnclaimed && claimable,
+    is_placeholder_image: isFreeOrUnclaimed && claimable && !allPhotos[0] && !listing.cover_image_url,
     is_claimable: claimable,
     directory_badges: (listing.directory_badges || []).filter((b: any) => b.is_active),
     related: related || [],
