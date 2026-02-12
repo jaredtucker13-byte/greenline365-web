@@ -826,12 +826,12 @@ function SubcategoryCarouselRow({ label, subtitle, industry, searchTerm, sortBy,
           data.sort((a: any, b: any) => (a.distance ?? 9999) - (b.distance ?? 9999));
         }
 
-        setItems(data);
+        setItems(data.slice(0, 10));
       } catch { setItems([]); }
       setLoading(false);
     };
-    fetchCategory();
-  }, [category.id, sortBy, cityFilter, userLocation?.lat]);
+    fetchData();
+  }, [industry, searchTerm, sortBy, cityFilter, userLocation?.lat]);
 
   const scroll = (dir: 'left' | 'right') => {
     if (!scrollRef.current) return;
