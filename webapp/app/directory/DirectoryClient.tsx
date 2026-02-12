@@ -350,7 +350,7 @@ export default function DirectoryPage() {
                         <div className="absolute bottom-0 left-0 right-0 dest-glass-label px-4 py-3 sm:px-4 sm:py-4">
                           <h3 className="text-sm sm:text-base font-heading font-bold text-white tracking-tight leading-tight drop-shadow-lg">{d.label}</h3>
                           <p className="text-[10px] sm:text-xs text-gold-200/70 font-body mt-0.5 drop-shadow">{d.tagline}</p>
-                          <span className="inline-flex items-center gap-1 mt-2 text-[10px] sm:text-[11px] text-gold font-semibold font-body opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-300">
+                          <span className="inline-flex items-center gap-1 mt-2 text-[10px] sm:text-[11px] text-gold font-semibold font-body group-hover:translate-x-1 transition-all duration-300">
                             View Guide
                             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
                           </span>
