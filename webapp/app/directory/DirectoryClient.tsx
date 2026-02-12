@@ -190,14 +190,8 @@ export default function DirectoryPage() {
 
   function handleCategoryClick(id: string) {
     setActiveCategory(id);
-    setShowGroupedBrowse(false);
-    const industryMap: Record<string, string> = {
-      'services': 'services', 'dining': 'dining', 'health-wellness': 'health-wellness',
-      'style-shopping': 'style-shopping', 'nightlife': 'nightlife',
-      'family-entertainment': 'family-entertainment', 'destinations': 'destinations',
-      'hotels-lodging': 'destinations', 'professional-services': 'services',
-    };
-    loadListings(industryMap[id] || id);
+    setShowGroupedBrowse(true);
+    setShowListings(false);
   }
 
   function handleBrowseAll() {
@@ -206,8 +200,18 @@ export default function DirectoryPage() {
     setActiveCategory('');
   }
 
-  function handleViewAllFromCarousel(categoryId: string) {
-    handleCategoryClick(categoryId);
+  // When "View All" is clicked on a subcategory carousel row
+  function handleViewAllSubcategory(subcategory: string) {
+    // Load all listings for the active category, filtered by subcategory
+    setActiveSubcategory(subcategory);
+    setShowGroupedBrowse(false);
+    const industryMap: Record<string, string> = {
+      'services': 'services', 'dining': 'dining', 'health-wellness': 'health-wellness',
+      'style-shopping': 'style-shopping', 'nightlife': 'nightlife',
+      'family-entertainment': 'family-entertainment', 'destinations': 'destinations',
+      'hotels-lodging': 'destinations', 'professional-services': 'services',
+    };
+    loadListings(industryMap[activeCategory] || activeCategory);
   }
 
   function handleSearch() {
