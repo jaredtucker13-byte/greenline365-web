@@ -566,11 +566,6 @@ export default function DirectoryPage() {
           </section>
         </>
       ) : (
-        /* ─── HOMEPAGE ─── */
-        <>
-          {/* This branch intentionally left as a safety fallback */}
-        </>
-      )}
         /* ─── CATEGORY BROWSE VIEW ─── */
         <div data-testid="listings-view">
           {/* Category Header */}
