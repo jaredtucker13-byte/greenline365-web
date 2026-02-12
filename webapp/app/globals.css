@@ -676,6 +676,13 @@ select {
   );
 }
 
+/* Charcoal sections get subtle depth via inner shadow */
+.bg-charcoal-900 {
+  position: relative;
+  background: #0E0E0F;
+  box-shadow: inset 0 1px 0 rgba(201, 169, 110, 0.06), inset 0 -1px 0 rgba(201, 169, 110, 0.06);
+}
+
 /* Subtle gold accent strips in background */
 .bg-gold-accent-top {
   position: relative;
