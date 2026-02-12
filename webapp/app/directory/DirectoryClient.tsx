@@ -299,7 +299,7 @@ export default function DirectoryPage() {
               <h2 className="text-3xl md:text-4xl font-heading font-light text-white text-center mb-3 tracking-tight">
                 Featured <span className="font-semibold text-gradient-gold">Listings</span>
               </h2>
-              <p className="text-silver text-center max-w-lg mx-auto mb-12 font-body">Top-rated businesses handpicked for exceptional service.</p>
+              <p className="text-white/50 text-center max-w-lg mx-auto mb-12 font-body">Top-rated businesses handpicked for exceptional service.</p>
 
               {featuredListings.length > 0 ? (
                 <div className="space-y-14">
