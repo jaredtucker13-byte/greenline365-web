@@ -52,13 +52,17 @@ const getModel = (action: AIAction): string => {
 
 // System prompts for each action
 const getSystemPrompt = (action: AIAction): string => {
+  const contentSkill = getSkillContext('content-strategy');
+  const copySkill = getSkillContext('copywriting');
+  const seoSkill = getSkillContext('seo-audit');
+  
   switch (action) {
     case 'generate_outline':
       return `You are a professional content strategist. Generate a detailed blog post outline with:
 - An engaging introduction hook
 - 4-6 main sections with subpoints
 - A compelling conclusion with CTA
-Format as markdown with ## for sections and bullet points for subpoints.`;
+Format as markdown with ## for sections and bullet points for subpoints.${contentSkill}`;
 
     case 'enhance_content':
       return `You are an expert editor and content enhancer. Improve the given blog content by:
@@ -67,7 +71,7 @@ Format as markdown with ## for sections and bullet points for subpoints.`;
 - Improving flow and transitions
 - Keeping the original voice and message
 - Optimizing for web readability (short paragraphs, subheadings)
-Return the enhanced content in markdown format.`;
+Return the enhanced content in markdown format.${copySkill}`;
 
     case 'enhance_content_with_title':
       return `You are an expert editor and content enhancer. Your task is to:
