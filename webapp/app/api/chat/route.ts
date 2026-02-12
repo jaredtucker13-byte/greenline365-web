@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { createClient, createServerClient } from '@/lib/supabase/server';
 import { MemoryBucketService, AIContext } from '@/lib/memory-bucket-service';
 import { getSkillContextForIntent, getCoreMarketingContext } from '@/lib/marketing-skills-loader';
+import { CHAT_FORMAT_DIRECTIVE } from '@/lib/format-standards';
 
 type Msg = { role: 'user' | 'assistant' | 'system'; content: string };
 
