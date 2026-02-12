@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
         'X-Title': 'GreenLine365 Incident Analysis'
       },
       body: JSON.stringify({
-        model: 'openai/gpt-4o',
+        model: 'anthropic/claude-opus-4.6',
         messages: [
           {
             role: 'system',
