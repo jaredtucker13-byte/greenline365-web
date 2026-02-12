@@ -338,28 +338,28 @@ function GuideListingCard({ listing: l, index: i }: { listing: Listing; index: n
 
         {l.description && <p className="text-xs text-white/35 line-clamp-2 mb-3 font-body">{l.description}</p>}
 
-        {/* Actions */}
+        {/* Actions — use onClick+stopPropagation to avoid nested <a> */}
         <div className="flex items-center gap-2 mt-auto">
           {l.phone && (
-            <a href={`tel:${l.phone}`} className="btn-ghost text-xs px-3 py-1.5 rounded-full flex items-center gap-1" data-testid={`guide-call-${l.slug}`}>
+            <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.location.href = `tel:${l.phone}`; }} className="btn-ghost text-xs px-3 py-1.5 rounded-full flex items-center gap-1" data-testid={`guide-call-${l.slug}`}>
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
               </svg>
               Call
-            </a>
+            </button>
           )}
           {l.website && (
-            <a href={l.website} target="_blank" rel="noopener noreferrer" className="btn-ghost text-xs px-3 py-1.5 rounded-full flex items-center gap-1" data-testid={`guide-web-${l.slug}`}>
+            <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.open(l.website!, '_blank'); }} className="btn-ghost text-xs px-3 py-1.5 rounded-full flex items-center gap-1" data-testid={`guide-web-${l.slug}`}>
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
               Visit
-            </a>
+            </button>
           )}
           {googleMapsUrl && (
-            <a href={googleMapsUrl} target="_blank" rel="noopener noreferrer" className="ml-auto text-[10px] text-silver/40 hover:text-gold transition font-body" data-testid={`guide-maps-${l.slug}`}>
+            <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.open(googleMapsUrl, '_blank'); }} className="ml-auto text-[10px] text-silver/40 hover:text-gold transition font-body" data-testid={`guide-maps-${l.slug}`}>
               Google Maps
-            </a>
+            </button>
           )}
         </div>
       </div>
