@@ -102,6 +102,8 @@ export default function DirectoryPage() {
   const [locationCity, setLocationCity] = useState('');
   const [cityFilter, setCityFilter] = useState('');
   const [availableCities, setAvailableCities] = useState<string[]>([]);
+  const [sortBy, setSortBy] = useState<'nearest' | 'highest' | 'lowest' | 'most-reviews'>('nearest');
+  const [maxDistance, setMaxDistance] = useState<number>(0);
 
   // Request geolocation on mount
   useEffect(() => {
