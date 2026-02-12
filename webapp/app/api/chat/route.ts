@@ -504,7 +504,8 @@ export async function POST(req: NextRequest) {
 
     // Prepare messages with system prompt + directory context + marketing skills
     const skillContext = getSkillContextForIntent(message);
-    const systemContent = [systemPrompt, directoryContext, skillContext].filter(Boolean).join('\n\n');
+    const coreMarketing = getCoreMarketingContext();
+    const systemContent = [systemPrompt, directoryContext, skillContext || coreMarketing].filter(Boolean).join('\n\n');
 
     const messagesWithSystem: Msg[] = [
       { role: 'system', content: systemContent },
