@@ -19,6 +19,8 @@ const DESTINATIONS: Record<string, { label: string; lat: number; lng: number; st
   'ybor-city':      { label: 'Ybor City',        lat: 27.9617, lng: -82.4369, state: 'FL' },
   'daytona':        { label: 'Daytona Beach',    lat: 29.2108, lng: -81.0228, state: 'FL' },
   'orlando':        { label: 'Orlando',          lat: 28.5383, lng: -81.3792, state: 'FL' },
+  'miami':          { label: 'Miami',            lat: 25.7617, lng: -80.1918, state: 'FL' },
+  'jacksonville':   { label: 'Jacksonville',     lat: 30.3322, lng: -81.6557, state: 'FL' },
 };
 
 // ─── Tourism categories for discovery ───
