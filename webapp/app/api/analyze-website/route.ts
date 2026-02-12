@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getSkillContext } from '@/lib/marketing-skills-loader';
 
 // Website Analyzer API - Premium Feature
-// Uses Gemini 3 Pro for vision analysis and Claude 4.5 Sonnet for suggestions
+// Uses Gemini 3 Pro for vision analysis and Claude Opus 4.6 for suggestions
 
 interface AnalysisRequest {
   url?: string;
