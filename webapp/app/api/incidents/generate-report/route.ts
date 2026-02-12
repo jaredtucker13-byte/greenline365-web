@@ -101,7 +101,7 @@ Generate a professional incident report with these EXACT sections in JSON format
         'X-Title': 'GreenLine365 Report Generation'
       },
       body: JSON.stringify({
-        model: 'openai/gpt-4o',
+        model: 'anthropic/claude-opus-4.6',
         messages: [
           { role: 'system', content: 'You are a professional incident documentation specialist. Always respond with valid JSON only.' },
           { role: 'user', content: reportPrompt }
