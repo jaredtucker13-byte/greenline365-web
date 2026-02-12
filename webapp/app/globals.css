@@ -645,15 +645,10 @@ select {
 
 /* Glassmorphism text label */
 .dest-glass-label {
-  background: linear-gradient(
-    180deg,
-    rgba(5, 11, 24, 0.1) 0%,
-    rgba(5, 11, 24, 0.7) 40%,
-    rgba(5, 11, 24, 0.92) 100%
-  );
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-top: 1px solid rgba(201, 169, 110, 0.08);
+  background: rgba(5, 11, 24, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(201, 169, 110, 0.15);
 }
 
 /* Shimmering gold border animation on hover */
