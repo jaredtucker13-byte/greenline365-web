@@ -194,10 +194,100 @@ export default async function TermsPage() {
               </div>
             </section>
 
-            {/* Section 3 - AI Disclaimer */}
-            <section id="ai-disclaimer" className="scroll-mt-24">
+            {/* Section 3 - Directory Listing Terms */}
+            <section id="directory-terms" className="scroll-mt-24">
               <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
                 <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">3</span>
+                Directory Listing Terms
+              </h2>
+              <div className="space-y-4">
+                <div className="bg-white/5 border border-white/10 rounded-lg p-5">
+                  <h3 className="font-semibold text-white mb-2">Business Listing Creation</h3>
+                  <p className="text-white/60 text-sm leading-relaxed">
+                    GreenLine365 creates business listings using publicly available information from Google Places API and other public data sources. Business listings are created to provide consumers with a comprehensive local business directory. If you are a business owner and wish to have your listing removed, please contact us at greenline365help@gmail.com.
+                  </p>
+                </div>
+                <div className="bg-white/5 border border-white/10 rounded-lg p-5">
+                  <h3 className="font-semibold text-white mb-2">Claiming a Listing</h3>
+                  <p className="text-white/60 text-sm leading-relaxed">
+                    Business owners may claim their listing by contacting our team and completing a verification process. Claiming a listing grants the ability to edit business information, upload photos, and access the business dashboard. GreenLine365 reserves the right to verify ownership before granting claim access. Fraudulent claims may result in account termination.
+                  </p>
+                </div>
+                <div className="bg-white/5 border border-white/10 rounded-lg p-5">
+                  <h3 className="font-semibold text-white mb-2">Directory Tiers</h3>
+                  <p className="text-white/60 text-sm leading-relaxed">
+                    Directory listings are available in three tiers: Free, Pro ($39/month), and Premium ($59/month). Each tier provides different features as detailed on our Pricing page. Tier subscriptions are billed monthly via Stripe and may be cancelled at any time. Downgrading or cancelling will take effect at the end of the current billing period.
+                  </p>
+                </div>
+                <div className="bg-white/5 border border-white/10 rounded-lg p-5">
+                  <h3 className="font-semibold text-white mb-2">Marketplace Add-Ons</h3>
+                  <p className="text-white/60 text-sm leading-relaxed">
+                    Additional features (such as Coupon Engine, Featured Boost, Analytics Pro, Custom Poll Templates, and Review Response AI) are available as paid add-ons. Add-on availability may require an active Pro or Premium subscription. Pricing and features for add-ons are detailed on our Pricing page and may be updated from time to time.
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            {/* Section 4 - Reviews Policy */}
+            <section id="reviews-policy" className="scroll-mt-24">
+              <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
+                <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">4</span>
+                Reviews Policy
+              </h2>
+              <div className="space-y-4">
+                <div className="bg-white/5 border border-white/10 rounded-lg p-5">
+                  <h3 className="font-semibold text-white mb-2">Submitting Reviews</h3>
+                  <p className="text-white/60 text-sm leading-relaxed">
+                    GL365 Reviews are user-generated content. By submitting a review, you represent that your review is based on a genuine experience, is truthful to the best of your knowledge, and does not contain defamatory, abusive, or fraudulent content. Reviews must include at least 10 characters of descriptive text explaining the rating.
+                  </p>
+                </div>
+                <div className="bg-white/5 border border-white/10 rounded-lg p-5">
+                  <h3 className="font-semibold text-white mb-2">Review Moderation</h3>
+                  <p className="text-white/60 text-sm leading-relaxed">
+                    GreenLine365 reserves the right to remove reviews that violate these terms, contain hate speech, spam, or personally identifiable information of third parties, or that we reasonably believe to be fraudulent. We do not verify the accuracy of reviews and they represent the opinions of individual reviewers.
+                  </p>
+                </div>
+                <div className="bg-white/5 border border-white/10 rounded-lg p-5">
+                  <h3 className="font-semibold text-white mb-2">Business Responses</h3>
+                  <p className="text-white/60 text-sm leading-relaxed">
+                    Business owners may respond to reviews manually or with AI-assisted drafting. AI-generated responses are always subject to business owner review and approval, unless the owner explicitly enables automatic response mode. Business owners are responsible for the content of their responses, whether manually written or AI-assisted.
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            {/* Section 5 - Transaction & Interaction Fees */}
+            <section id="transaction-fees" className="scroll-mt-24">
+              <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
+                <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">5</span>
+                Transaction & Interaction Fees
+              </h2>
+              <div className="space-y-4">
+                <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-5">
+                  <h3 className="font-semibold text-amber-400 mb-2">Per-Interaction Fees</h3>
+                  <p className="text-white/60 text-sm leading-relaxed">
+                    Directory-only business listings (Free, Pro, and Premium tiers) are subject to a $0.60 per-interaction fee for certain high-value customer interactions that occur through the directory. Currently, this applies to phone calls initiated via the &ldquo;Call Now&rdquo; button and coupon redemptions. Page views, map clicks, website visits, and directions requests are tracked for analytics but do not incur fees.
+                  </p>
+                </div>
+                <div className="bg-white/5 border border-white/10 rounded-lg p-5">
+                  <h3 className="font-semibold text-white mb-2">Fee Transparency</h3>
+                  <p className="text-white/60 text-sm leading-relaxed">
+                    All interaction fees are visible to business owners in their dashboard analytics. Consumers are never charged for interacting with listings. Transaction fee rates may be updated with 30 days notice to affected business owners.
+                  </p>
+                </div>
+                <div className="bg-white/5 border border-white/10 rounded-lg p-5">
+                  <h3 className="font-semibold text-white mb-2">Backend Service Subscribers</h3>
+                  <p className="text-white/60 text-sm leading-relaxed">
+                    Businesses subscribed to GreenLine365 backend service bundles (Booking Foundation, Marketing Engine, or Intelligence Command) have all directory transaction fees waived as part of their subscription.
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            {/* Section 6 - AI Disclaimer */}
+            <section id="ai-disclaimer" className="scroll-mt-24">
+              <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
+                <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">6</span>
                 Artificial Intelligence & Automation Disclaimer
               </h2>
               <p className="text-white/70 leading-relaxed mb-5">
