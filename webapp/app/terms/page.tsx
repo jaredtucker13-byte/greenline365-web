@@ -50,7 +50,7 @@ async function getTermsContent() {
 
 export default async function TermsPage() {
   const customContent = await getTermsContent();
-  const useCustomContent = customContent && customContent.length > 200; // Only use if admin has added substantial content
+  const useCustomContent = customContent && customContent.length > 200 && !customContent.includes('placeholder');
 
   return (
     <div className="pt-24 py-12 md:py-16">
