@@ -631,6 +631,7 @@ export default function OnboardingPage() {
                     Back
                   </button>
                   {currentStep === WIZARD_STEPS.length - 2 ? (
+                  <>
                     <button
                       onClick={handleSave}
                       disabled={saving}
