@@ -171,6 +171,8 @@ ${marketingContext}`,
       to: OWNER_EMAIL,
       subject: `Weekly Recap — ${weekEndStr} | GreenLine365`,
       html,
+      fromName: 'GreenLine365 Help',
+      fromEmail: 'greenline365help@gmail.com',
     });
 
     return NextResponse.json({
