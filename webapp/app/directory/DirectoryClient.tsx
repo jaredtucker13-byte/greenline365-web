@@ -278,7 +278,9 @@ export default function DirectoryPage() {
           onViewAll={handleViewAllFromCarousel}
           onBack={() => { setShowGroupedBrowse(false); }}
         />
-      ) : showListings ? (
+      ) : !showListings ? (
+        <>
+          {/* ─── HERO ─── */}
           <section className="relative overflow-hidden pt-16" style={{ minHeight: '85vh' }} data-testid="directory-hero">
             <div className="absolute inset-0">
               <img src="/images/hero-directory.png" alt="GreenLine365 business directory — discover local businesses across dining, services, nightlife and more" className="w-full h-full object-cover" />
