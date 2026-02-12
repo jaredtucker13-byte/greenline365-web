@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
           to: [{ email: incident.customer_email, name: incident.customer_name }]
         }],
         from: {
-          email: 'reports@greenline365.com',
+          email: 'greenline365help@gmail.com',
           name: 'GreenLine365 Reports'
         },
         subject: `Incident Report Ready for Review: ${incident.title}`,
