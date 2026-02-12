@@ -855,17 +855,17 @@ function SubcategoryCarouselRow({ label, subtitle, industry, searchTerm, sortBy,
   if (items.length === 0) return null;
 
   return (
-    <div className="mb-10" data-testid={`carousel-${category.id}`}>
-      {/* Category Header */}
+    <div className="mb-10" data-testid={`carousel-${label.toLowerCase().replace(/\s+/g, '-')}`}>
+      {/* Subcategory Header */}
       <div className="flex items-center justify-between mb-4 px-4 sm:px-6">
         <div>
-          <h3 className="text-xl font-heading font-semibold text-white">{category.label}</h3>
-          <p className="text-xs text-white/40 font-body">{category.sub}</p>
+          <h3 className="text-xl font-heading font-semibold text-white">{label}</h3>
+          {subtitle && <p className="text-xs text-white/40 font-body">{subtitle}</p>}
         </div>
         <button
-          onClick={() => onViewAll(category.id)}
+          onClick={onViewAll}
           className="text-sm text-gold/70 hover:text-gold font-medium font-body flex items-center gap-1 transition"
-          data-testid={`view-all-${category.id}`}
+          data-testid={`view-all-${label.toLowerCase().replace(/\s+/g, '-')}`}
         >
           View All
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
