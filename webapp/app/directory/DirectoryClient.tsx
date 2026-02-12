@@ -778,31 +778,27 @@ function ListingCard({ listing: l, index: i }: { listing: Listing; index: number
 }
 
 
-// ─── Category Carousel Row ─────────────────────────────────────────
-// Fetches 10 listings for a single category, displays as scrollable carousel
-function CategoryCarouselRow({ category, sortBy, cityFilter, userLocation, onViewAll }: {
-  category: typeof CATEGORIES[0];
+// ─── Subcategory Carousel Row ──────────────────────────────────────
+// Fetches listings for a category, optionally filtered by subcategory search term
+function SubcategoryCarouselRow({ label, subtitle, industry, searchTerm, sortBy, cityFilter, userLocation, onViewAll }: {
+  label: string;
+  subtitle: string;
+  industry: string;
+  searchTerm: string; // e.g. "HVAC", "Plumbing" — used to filter within the industry
   sortBy: string;
   cityFilter: string;
   userLocation: { lat: number; lng: number } | null;
-  onViewAll: (categoryId: string) => void;
+  onViewAll: () => void;
 }) {
   const [items, setItems] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Industry mapping
-  const industryMap: Record<string, string> = {
-    'services': 'services', 'dining': 'dining', 'health-wellness': 'health-wellness',
-    'style-shopping': 'style-shopping', 'nightlife': 'nightlife',
-    'family-entertainment': 'family-entertainment', 'destinations': 'destinations',
-    'hotels-lodging': 'destinations', 'professional-services': 'services',
-  };
-
   useEffect(() => {
-    const fetchCategory = async () => {
+    const fetchData = async () => {
       setLoading(true);
-      const params = new URLSearchParams({ limit: '10', industry: industryMap[category.id] || category.id });
+      const params = new URLSearchParams({ limit: '20', industry });
+      if (searchTerm) params.set('search', searchTerm);
       if (cityFilter) params.set('city', cityFilter);
       if (userLocation) {
         params.set('lat', String(userLocation.lat));
