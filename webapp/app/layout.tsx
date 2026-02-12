@@ -182,23 +182,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               '@type': 'ProfessionalService',
               name: 'GreenLine365',
               image: `${siteUrl}/logo.png`,
-              description: 'AI-powered business automation platform serving local businesses across the United States.',
+              description: 'Local business directory serving businesses and consumers across Florida.',
               areaServed: {
                 '@type': 'Country',
                 name: 'United States',
               },
               serviceType: [
-                'Business Automation',
-                'AI Content Creation',
-                'Appointment Scheduling',
-                'Marketing Automation',
+                'Local Business Directory',
+                'Business Listings',
+                'Destination Guides',
               ],
-              priceRange: '$$',
-              aggregateRating: {
-                '@type': 'AggregateRating',
-                ratingValue: '4.8',
-                reviewCount: '500',
-              },
+              priceRange: '$',
             }),
           }}
         />
