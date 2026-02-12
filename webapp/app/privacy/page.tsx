@@ -21,9 +21,12 @@ export const metadata: Metadata = {
 const sections = [
   { id: 'overview', title: '1. Overview' },
   { id: 'data-collection', title: '2. Data We Collect' },
-  { id: 'data-usage', title: '3. How We Use Your Data' },
-  { id: 'sharing-storage', title: '4. Sharing, Storage & Retention' },
-  { id: 'your-choices', title: '5. Your Choices & Contact' },
+  { id: 'directory-data', title: '3. Directory & Business Data' },
+  { id: 'reviews-ai', title: '4. Reviews & AI Responses' },
+  { id: 'analytics-tracking', title: '5. Analytics & Interaction Tracking' },
+  { id: 'data-usage', title: '6. How We Use Your Data' },
+  { id: 'sharing-storage', title: '7. Sharing, Storage & Retention' },
+  { id: 'your-choices', title: '8. Your Choices & Contact' },
 ];
 
 async function getPrivacyContent() {
