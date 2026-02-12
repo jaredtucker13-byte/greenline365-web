@@ -60,6 +60,7 @@ export default function ListingDetailPage() {
   const [reviewForm, setReviewForm] = useState({ reviewer_name: '', rating: 5, text: '' });
   const [submittingReview, setSubmittingReview] = useState(false);
   const [reviewMessage, setReviewMessage] = useState('');
+  const [reviewSort, setReviewSort] = useState<'newest' | 'highest' | 'lowest'>('newest');
 
   useEffect(() => {
     if (!slug) return;
