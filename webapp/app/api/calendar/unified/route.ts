@@ -181,17 +181,22 @@ export async function POST(request: NextRequest) {
     const validContentTypes = ['photo', 'product', 'video', 'reel', 'story'];
     const safeContentType = validContentTypes.includes(content_type || '') ? content_type : 'photo';
 
+    // Valid event_types in scheduled_content: content, booking
+    // Store the actual type (blog, newsletter, etc.) in metadata
+    const validEventTypes = ['content', 'booking'];
+    const safeEventType = validEventTypes.includes(event_type || '') ? event_type : 'content';
+
     const { data, error } = await supabase
       .from('scheduled_content')
       .insert({
         title,
         description: description || null,
         content_type: safeContentType,
-        event_type: event_type || 'content',
+        event_type: safeEventType,
         scheduled_date,
         status: status || 'draft',
-        color: color || EVENT_COLORS[event_type || 'custom'] || '#6366F1',
-        metadata: metadata || null,
+        color: color || EVENT_COLORS[event_type || 'content'] || '#10B981',
+        metadata: { ...(metadata || {}), display_type: event_type || 'content' },
       })
       .select()
       .single();
