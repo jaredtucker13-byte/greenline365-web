@@ -3,6 +3,14 @@ import { updateSession } from '@/lib/supabase/middleware';
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const host = request.headers.get('host') || '';
+
+  // Redirect www to non-www (Supabase CORS only allows greenline365.com)
+  if (host.startsWith('www.')) {
+    const newUrl = new URL(request.url);
+    newUrl.host = host.replace('www.', '');
+    return NextResponse.redirect(newUrl, 301);
+  }
 
   // Define protected routes that need auth
   const isProtectedRoute = pathname.startsWith('/admin-v2') || pathname.startsWith('/admin') || pathname === '/business-dashboard' || pathname === '/onboarding';
