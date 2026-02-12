@@ -467,10 +467,29 @@ export async function POST(req: NextRequest) {
     // Build system prompt with brand voice injection
     const systemPrompt = buildSystemPromptWithBrandVoice(aiContext, mode);
 
-    // Prepare messages with system prompt
+    // ========================================
+    // DIRECTORY SEARCH INJECTION
+    // ========================================
+    let directoryContext = '';
+    if (isDirectoryQuery(message)) {
+      try {
+        directoryContext = await searchDirectory(message);
+        if (directoryContext) {
+          console.log(`[Chat] Directory search returned results for: "${message.slice(0, 50)}"`);
+        }
+      } catch (e) {
+        console.warn('[Chat] Directory search failed:', e);
+      }
+    }
+
+    // Prepare messages with system prompt + directory context
+    const systemContent = directoryContext
+      ? `${systemPrompt}\n\n${directoryContext}`
+      : systemPrompt;
+
     const messagesWithSystem: Msg[] = [
-      { role: 'system', content: systemPrompt },
-      ...messages.filter(m => m.role !== 'system'), // Remove any existing system messages
+      { role: 'system', content: systemContent },
+      ...messages.filter(m => m.role !== 'system'),
     ];
 
     console.log(`[Chat] Session: ${sessionId || 'anonymous'}, Mode: ${mode || 'default'}, Model: ${model}, HasMemory: ${!!aiContext}`);
