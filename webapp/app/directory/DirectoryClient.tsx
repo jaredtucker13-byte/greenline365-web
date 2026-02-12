@@ -754,3 +754,239 @@ function ListingCard({ listing: l, index: i }: { listing: Listing; index: number
     </Link>
   );
 }
+
+
+// ─── Category Carousel Row ─────────────────────────────────────────
+// Fetches 10 listings for a single category, displays as scrollable carousel
+function CategoryCarouselRow({ category, sortBy, cityFilter, userLocation, onViewAll }: {
+  category: typeof CATEGORIES[0];
+  sortBy: string;
+  cityFilter: string;
+  userLocation: { lat: number; lng: number } | null;
+  onViewAll: (categoryId: string) => void;
+}) {
+  const [items, setItems] = useState<Listing[]>([]);
+  const [loading, setLoading] = useState(true);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Industry mapping
+  const industryMap: Record<string, string> = {
+    'services': 'services', 'dining': 'dining', 'health-wellness': 'health-wellness',
+    'style-shopping': 'style-shopping', 'nightlife': 'nightlife',
+    'family-entertainment': 'family-entertainment', 'destinations': 'destinations',
+    'hotels-lodging': 'destinations', 'professional-services': 'services',
+  };
+
+  useEffect(() => {
+    const fetchCategory = async () => {
+      setLoading(true);
+      const params = new URLSearchParams({ limit: '10', industry: industryMap[category.id] || category.id });
+      if (cityFilter) params.set('city', cityFilter);
+      if (userLocation) {
+        params.set('lat', String(userLocation.lat));
+        params.set('lng', String(userLocation.lng));
+      }
+      try {
+        const res = await fetch(`/api/directory?${params}`);
+        let data = await res.json();
+        if (!Array.isArray(data)) data = [];
+
+        // Sort based on current filter
+        if (sortBy === 'highest') {
+          data.sort((a: any, b: any) => {
+            const rA = a.metadata?.google_rating || a.avg_feedback_rating || 0;
+            const rB = b.metadata?.google_rating || b.avg_feedback_rating || 0;
+            return rB - rA;
+          });
+        } else if (sortBy === 'most-reviews') {
+          data.sort((a: any, b: any) => {
+            const rA = a.metadata?.google_review_count || a.total_feedback_count || 0;
+            const rB = b.metadata?.google_review_count || b.total_feedback_count || 0;
+            return rB - rA;
+          });
+        } else if (sortBy === 'nearest' && userLocation) {
+          data.sort((a: any, b: any) => (a.distance ?? 9999) - (b.distance ?? 9999));
+        }
+
+        setItems(data);
+      } catch { setItems([]); }
+      setLoading(false);
+    };
+    fetchCategory();
+  }, [category.id, sortBy, cityFilter, userLocation?.lat]);
+
+  const scroll = (dir: 'left' | 'right') => {
+    if (!scrollRef.current) return;
+    const cardWidth = scrollRef.current.firstElementChild?.clientWidth || 280;
+    scrollRef.current.scrollBy({ left: dir === 'left' ? -cardWidth * 2 : cardWidth * 2, behavior: 'smooth' });
+  };
+
+  if (loading) {
+    return (
+      <div className="mb-10">
+        <div className="flex items-center justify-between mb-4 px-4 sm:px-6">
+          <div className="h-6 w-40 rounded bg-white/5 animate-pulse" />
+        </div>
+        <div className="flex gap-4 px-4 sm:px-6">
+          {[1,2,3,4,5].map(i => <div key={i} className="flex-shrink-0 w-56 sm:w-64 h-52 rounded-2xl bg-white/5 animate-pulse" />)}
+        </div>
+      </div>
+    );
+  }
+
+  if (items.length === 0) return null;
+
+  return (
+    <div className="mb-10" data-testid={`carousel-${category.id}`}>
+      {/* Category Header */}
+      <div className="flex items-center justify-between mb-4 px-4 sm:px-6">
+        <div>
+          <h3 className="text-xl font-heading font-semibold text-white">{category.label}</h3>
+          <p className="text-xs text-white/40 font-body">{category.sub}</p>
+        </div>
+        <button
+          onClick={() => onViewAll(category.id)}
+          className="text-sm text-gold/70 hover:text-gold font-medium font-body flex items-center gap-1 transition"
+          data-testid={`view-all-${category.id}`}
+        >
+          View All
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+        </button>
+      </div>
+
+      {/* Carousel Container */}
+      <div className="relative group">
+        {/* Left Arrow */}
+        <button
+          onClick={() => scroll('left')}
+          className="absolute left-1 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-midnight-900/90 border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:border-gold/30 transition opacity-0 group-hover:opacity-100 backdrop-blur-sm"
+          data-testid={`scroll-left-${category.id}`}
+        >
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+        </button>
+
+        {/* Scrollable Cards */}
+        <div
+          ref={scrollRef}
+          className="flex gap-4 overflow-x-auto px-4 sm:px-6 pb-2 snap-x snap-mandatory scrollbar-hide"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          {items.map((l, i) => (
+            <Link key={l.id} href={`/listing/${l.slug}`} className="flex-shrink-0 w-[45%] sm:w-[30%] md:w-[22%] lg:w-[18.5%] snap-start">
+              <div
+                className="rounded-2xl overflow-hidden border border-white/5 hover:border-gold/20 transition-all duration-300 group/card cursor-pointer h-full"
+                style={{ background: 'rgba(255,255,255,0.02)' }}
+                data-testid={`carousel-card-${l.slug}`}
+              >
+                <div className="relative h-32 sm:h-36 overflow-hidden">
+                  {l.cover_image_url ? (
+                    <img src={l.cover_image_url} alt={l.business_name} className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500" loading="lazy" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-midnight-800 to-charcoal-800">
+                      <span className="text-3xl font-heading text-white/10">{l.business_name[0]}</span>
+                    </div>
+                  )}
+                  {l.metadata?.google_rating && (
+                    <span className="absolute top-2 right-2 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold" style={{ background: 'rgba(201,169,110,0.9)', color: '#1a1a1a' }}>
+                      <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
+                      {l.metadata.google_rating}
+                    </span>
+                  )}
+                </div>
+                <div className="p-3">
+                  <h4 className="text-sm font-heading font-semibold text-gold truncate">{l.business_name}</h4>
+                  <p className="text-[11px] text-white/40 font-body truncate">{l.city}{l.distance != null ? ` · ${l.distance} mi` : ''}</p>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        {/* Right Arrow */}
+        <button
+          onClick={() => scroll('right')}
+          className="absolute right-1 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-midnight-900/90 border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:border-gold/30 transition opacity-0 group-hover:opacity-100 backdrop-blur-sm"
+          data-testid={`scroll-right-${category.id}`}
+        >
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Grouped Browse View (All Categories with carousels) ───────────
+function GroupedBrowseView({ sortBy, setSortBy, cityFilter, setCityFilter, availableCities, userLocation, onViewAll, onBack }: {
+  sortBy: string;
+  setSortBy: (s: any) => void;
+  cityFilter: string;
+  setCityFilter: (s: string) => void;
+  availableCities: string[];
+  userLocation: { lat: number; lng: number } | null;
+  onViewAll: (categoryId: string) => void;
+  onBack: () => void;
+}) {
+  return (
+    <div data-testid="grouped-browse-view">
+      {/* Header */}
+      <section className="relative bg-midnight-950 pt-20 pb-6 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-midnight-900/60 to-midnight-950" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
+          <button onClick={onBack} className="text-sm text-silver/50 hover:text-white mb-4 flex items-center gap-2 transition font-body" data-testid="back-from-grouped">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+            Back to Directory
+          </button>
+          <h2 className="text-3xl md:text-4xl font-heading font-light text-white mb-2 tracking-tight">Browse <span className="font-semibold text-gradient-gold">All Businesses</span></h2>
+          <p className="text-silver/50 text-sm mb-6 font-body">Verified businesses across all categories</p>
+
+          {/* Filter Bar — Location + Sort only */}
+          <div className="flex flex-wrap items-center gap-3">
+            <select
+              value={cityFilter}
+              onChange={e => setCityFilter(e.target.value)}
+              className="px-4 py-2.5 rounded-xl text-sm bg-white/5 text-white border border-white/10 focus:outline-none focus:border-gold/30 font-body appearance-none cursor-pointer"
+              style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%23C9A96E\' stroke-width=\'2\'%3E%3Cpath d=\'M6 9l6 6 6-6\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', paddingRight: '32px' }}
+              data-testid="grouped-city-filter"
+            >
+              <option value="">All Locations</option>
+              {availableCities.filter(c => c !== 'Nashville').map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+
+            <div className="flex items-center gap-1 border border-white/10 rounded-xl overflow-hidden">
+              {[
+                { id: 'nearest', label: 'Nearest' },
+                { id: 'highest', label: 'Top Rated' },
+                { id: 'most-reviews', label: 'Most Reviews' },
+              ].map(s => (
+                <button
+                  key={s.id}
+                  onClick={() => setSortBy(s.id)}
+                  className={`px-4 py-2.5 text-sm font-medium transition-all font-body ${
+                    sortBy === s.id ? 'bg-gold/15 text-gold' : 'text-white/40 hover:text-white'
+                  }`}
+                  data-testid={`grouped-sort-${s.id}`}
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Category Carousel Rows */}
+      <section className="max-w-7xl mx-auto py-8">
+        {CATEGORIES.map(cat => (
+          <CategoryCarouselRow
+            key={`${cat.id}-${sortBy}-${cityFilter}`}
+            category={cat}
+            sortBy={sortBy}
+            cityFilter={cityFilter}
+            userLocation={userLocation}
+            onViewAll={onViewAll}
+          />
+        ))}
+      </section>
+    </div>
+  );
+}
