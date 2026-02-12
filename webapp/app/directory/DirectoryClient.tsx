@@ -33,6 +33,7 @@ interface Listing {
   total_feedback_count: number;
   phone?: string;
   directory_badges: { id: string; badge_type: string; badge_label: string; badge_color: string }[];
+  distance?: number | null;
 }
 
 // ─── Category & Subcategory Map ────────────────────────────────────
