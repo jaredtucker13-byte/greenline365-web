@@ -95,11 +95,39 @@ export async function GET(request: NextRequest) {
   // Filter active badges + apply photo gating + weighted ranking
   const listings = (data || []).map((l: any) => {
     const gated = applyPhotoGating(l);
+    const lat = l.metadata?.latitude;
+    const lng = l.metadata?.longitude;
+    let distance: number | null = null;
+
+    // Calculate distance if user location provided and listing has coordinates
+    if (userLat && userLng && lat && lng) {
+      const R = 3959; // Earth radius in miles
+      const dLat = (lat - userLat) * Math.PI / 180;
+      const dLng = (lng - userLng) * Math.PI / 180;
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(userLat * Math.PI / 180) * Math.cos(lat * Math.PI / 180) *
+        Math.sin(dLng/2) * Math.sin(dLng/2);
+      distance = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      distance = Math.round(distance * 10) / 10;
+    }
+
     return {
       ...gated,
       directory_badges: (l.directory_badges || []).filter((b: any) => b.is_active),
+      distance,
     };
   });
+
+  // Sort: if user location provided, sort by distance first (then weighted ranking)
+  if (userLat && userLng) {
+    listings.sort((a: any, b: any) => {
+      if (a.distance !== null && b.distance !== null) return a.distance - b.distance;
+      if (a.distance !== null) return -1;
+      if (b.distance !== null) return 1;
+      return 0;
+    });
+    return NextResponse.json(listings);
+  }
 
   return NextResponse.json(applyWeightedRanking(listings));
 }
