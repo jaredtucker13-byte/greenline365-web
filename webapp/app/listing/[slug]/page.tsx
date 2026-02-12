@@ -173,15 +173,24 @@ export default function ListingDetailPage() {
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-midnight-900 via-midnight-900/40 to-transparent" />
 
-        {/* Back button */}
-        <div className="absolute top-4 left-4">
-          <Link
-            href="/"
+        {/* Back button + Directory home */}
+        <div className="absolute top-4 left-4 flex items-center gap-2">
+          <button
+            onClick={() => router.back()}
             className="inline-flex items-center gap-2 px-3 py-2 rounded-lg backdrop-blur-sm text-sm text-white/70 hover:text-white border border-white/10 hover:border-white/20 transition-all font-body"
             style={{ background: 'rgba(13,27,42,0.7)' }}
-            data-testid="back-to-directory"
+            data-testid="back-button"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+            Back
+          </button>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1 px-3 py-2 rounded-lg backdrop-blur-sm text-sm text-white/40 hover:text-white border border-white/5 hover:border-white/15 transition-all font-body"
+            style={{ background: 'rgba(13,27,42,0.5)' }}
+            data-testid="back-to-directory"
+          >
+            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
             Directory
           </Link>
         </div>
