@@ -30,14 +30,95 @@ body {
 
 body {
   min-height: 100vh;
-  background: #0D1B2A;
+  background: #050B18;
   background-image: 
-    radial-gradient(ellipse at 20% 30%, rgba(201, 169, 110, 0.04) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 70%, rgba(91, 138, 114, 0.03) 0%, transparent 50%);
+    linear-gradient(180deg, #050B18 0%, #0B132B 30%, #0D1B2A 60%, #0A1628 100%),
+    radial-gradient(ellipse at 15% 20%, rgba(201, 169, 110, 0.06) 0%, transparent 40%),
+    radial-gradient(ellipse at 85% 80%, rgba(201, 169, 110, 0.04) 0%, transparent 40%),
+    radial-gradient(ellipse at 50% 50%, rgba(91, 138, 114, 0.025) 0%, transparent 60%);
   color: var(--foreground);
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  position: relative;
+}
+
+/* ─── GLOBAL FILM GRAIN TEXTURE ─── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
+/* ─── ABSTRACT GEOMETRIC WATERMARK (Compass Rose / Navigational) ─── */
+body::after {
+  content: '';
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 900px;
+  height: 900px;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.018;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400' fill='none' stroke='%23C9A96E' stroke-width='0.5'%3E%3Ccircle cx='200' cy='200' r='180'/%3E%3Ccircle cx='200' cy='200' r='140'/%3E%3Ccircle cx='200' cy='200' r='100'/%3E%3Ccircle cx='200' cy='200' r='60'/%3E%3Cline x1='200' y1='10' x2='200' y2='390'/%3E%3Cline x1='10' y1='200' x2='390' y2='200'/%3E%3Cline x1='60' y1='60' x2='340' y2='340'/%3E%3Cline x1='340' y1='60' x2='60' y2='340'/%3E%3Cpolygon points='200,20 210,180 200,200 190,180' fill='%23C9A96E' opacity='0.3'/%3E%3Cpolygon points='380,200 220,210 200,200 220,190' fill='%23C9A96E' opacity='0.3'/%3E%3Cpolygon points='200,380 190,220 200,200 210,220' fill='%23C9A96E' opacity='0.3'/%3E%3Cpolygon points='20,200 180,190 200,200 180,210' fill='%23C9A96E' opacity='0.3'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+/* Ensure all page content sits above the body pseudo-elements */
+body > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── GOLD FILIGREE SECTION DIVIDERS ─── */
+.section-divider-gold {
+  position: relative;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(201,169,110,0.05) 15%, rgba(201,169,110,0.3) 50%, rgba(201,169,110,0.05) 85%, transparent 100%);
+}
+.section-divider-gold::before,
+.section-divider-gold::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  width: 7px;
+  height: 7px;
+  border: 1px solid rgba(201,169,110,0.4);
+  transform: rotate(45deg);
+  background: #050B18;
+}
+.section-divider-gold::before { left: calc(50% - 3.5px); }
+.section-divider-gold::after { display: none; }
+
+/* ─── GOLD CORNER FILIGREE ACCENT ─── */
+.corner-filigree {
+  position: relative;
+}
+.corner-filigree::before,
+.corner-filigree::after {
+  content: '';
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border-color: rgba(201,169,110,0.15);
+  border-style: solid;
+  pointer-events: none;
+}
+.corner-filigree::before {
+  top: 0; left: 0;
+  border-width: 1px 0 0 1px;
+}
+.corner-filigree::after {
+  bottom: 0; right: 0;
+  border-width: 0 1px 1px 0;
 }
 
 /* Performance optimizations */
