@@ -202,6 +202,84 @@ const getModel = (mode?: string): string => {
   }
 };
 
+// ========================================
+// DIRECTORY SEARCH FOR CHAT
+// ========================================
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+async function searchDirectory(query: string): Promise<string> {
+  const { createClient: createSupabase } = await import('@supabase/supabase-js');
+  const supabase = createSupabase(supabaseUrl, supabaseServiceKey);
+
+  // Detect intent from the query
+  const lower = query.toLowerCase();
+  const categories = ['dining', 'services', 'health-wellness', 'nightlife', 'style-shopping', 'family-entertainment', 'hotels-lodging', 'professional-services', 'destinations'];
+  const categoryMap: Record<string, string> = {
+    'restaurant': 'dining', 'food': 'dining', 'eat': 'dining', 'dinner': 'dining', 'lunch': 'dining', 'breakfast': 'dining', 'cafe': 'dining', 'bakery': 'dining',
+    'plumber': 'services', 'plumbing': 'services', 'roofer': 'services', 'roofing': 'services', 'hvac': 'services', 'ac': 'services', 'electrician': 'services', 'electrical': 'services', 'contractor': 'services', 'landscap': 'services', 'pest': 'services', 'cleaning': 'services',
+    'doctor': 'health-wellness', 'dentist': 'health-wellness', 'gym': 'health-wellness', 'spa': 'health-wellness', 'clinic': 'health-wellness', 'wellness': 'health-wellness', 'fitness': 'health-wellness',
+    'bar': 'nightlife', 'club': 'nightlife', 'lounge': 'nightlife', 'nightlife': 'nightlife', 'music': 'nightlife',
+    'salon': 'style-shopping', 'barber': 'style-shopping', 'boutique': 'style-shopping', 'shop': 'style-shopping',
+    'hotel': 'hotels-lodging', 'resort': 'hotels-lodging', 'stay': 'hotels-lodging', 'lodging': 'hotels-lodging',
+    'lawyer': 'professional-services', 'attorney': 'professional-services', 'accountant': 'professional-services',
+    'fun': 'family-entertainment', 'theme park': 'family-entertainment', 'arcade': 'family-entertainment', 'kids': 'family-entertainment',
+  };
+
+  let detectedCategory = '';
+  for (const [keyword, cat] of Object.entries(categoryMap)) {
+    if (lower.includes(keyword)) { detectedCategory = cat; break; }
+  }
+
+  // Detect city
+  const cities = ['tampa', 'st pete', 'st. pete', 'key west', 'sarasota', 'daytona', 'orlando', 'miami', 'jacksonville', 'ybor'];
+  let detectedCity = '';
+  for (const city of cities) {
+    if (lower.includes(city)) { detectedCity = city; break; }
+  }
+
+  // Build query
+  let dbQuery = supabase
+    .from('directory_listings')
+    .select('business_name, slug, industry, city, state, phone, website, avg_feedback_rating, metadata')
+    .order('avg_feedback_rating', { ascending: false })
+    .limit(6);
+
+  if (detectedCategory) dbQuery = dbQuery.eq('industry', detectedCategory);
+  if (detectedCity) dbQuery = dbQuery.ilike('city', `%${detectedCity}%`);
+
+  // If no category detected, try text search
+  if (!detectedCategory && !detectedCity) {
+    dbQuery = supabase
+      .from('directory_listings')
+      .select('business_name, slug, industry, city, state, phone, website, avg_feedback_rating, metadata')
+      .or(`business_name.ilike.%${query}%,industry.ilike.%${query}%,description.ilike.%${query}%`)
+      .order('avg_feedback_rating', { ascending: false })
+      .limit(6);
+  }
+
+  const { data: listings } = await dbQuery;
+  if (!listings || listings.length === 0) return '';
+
+  const results = listings.map(l => {
+    const rating = l.metadata?.google_rating || l.avg_feedback_rating || 0;
+    const reviews = l.metadata?.google_review_count || 0;
+    return `- **${l.business_name}** (${l.city}, ${l.state}) — ${l.industry.replace(/-/g, ' ')} | Rating: ${rating}/5 (${reviews} reviews) | Phone: ${l.phone || 'N/A'} | [View Listing](/listing/${l.slug})`;
+  });
+
+  return `\n\nDIRECTORY SEARCH RESULTS (${listings.length} found):\n${results.join('\n')}`;
+}
+
+function isDirectoryQuery(message: string): boolean {
+  const keywords = ['find', 'looking for', 'where', 'recommend', 'best', 'near', 'close to', 'search', 'show me',
+    'plumber', 'roofer', 'restaurant', 'hotel', 'bar', 'salon', 'dentist', 'electrician', 'hvac', 'gym',
+    'directions', 'navigate', 'how do i get to', 'take me to',
+    'claim', 'list my', 'add my business', 'pricing', 'tier', 'upgrade', 'how much'];
+  const lower = message.toLowerCase();
+  return keywords.some(kw => lower.includes(kw));
+}
+
 // Build system prompt with brand voice from Memory Bucket Layer 1
 function buildSystemPromptWithBrandVoice(context: AIContext | null, mode?: string): string {
   // Base prompts per mode
