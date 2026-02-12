@@ -49,6 +49,8 @@ export async function GET(request: NextRequest) {
   const zip = searchParams.get('zip');
   const tier = searchParams.get('tier');
   const slug = searchParams.get('slug');
+  const destination = searchParams.get('destination');
+  const tourismCategory = searchParams.get('tourism_category');
   const limit = parseInt(searchParams.get('limit') || '24');
 
   // Single listing by slug
