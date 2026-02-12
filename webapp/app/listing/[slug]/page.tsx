@@ -61,6 +61,7 @@ export default function ListingDetailPage() {
   const [submittingReview, setSubmittingReview] = useState(false);
   const [reviewMessage, setReviewMessage] = useState('');
   const [reviewSort, setReviewSort] = useState<'newest' | 'highest' | 'lowest'>('newest');
+  const router = useRouter();
 
   useEffect(() => {
     if (!slug) return;
