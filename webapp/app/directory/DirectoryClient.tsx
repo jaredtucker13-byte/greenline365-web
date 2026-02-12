@@ -298,44 +298,72 @@ export default function DirectoryPage() {
             </div>
           </section>
 
-          {/* ─── DESTINATION GUIDES ─── */}
-          <section className="bg-midnight-900 py-20" data-testid="destination-guides-section">
-            <div className="max-w-7xl mx-auto px-6">
-              <p className="text-xs font-heading font-semibold uppercase tracking-[0.2em] text-center mb-3 text-gold">Trip Planner</p>
-              <h2 className="text-3xl md:text-4xl font-heading font-light text-white text-center mb-3 tracking-tight">
-                Explore <span className="font-semibold text-gradient-gold">Destinations</span>
-              </h2>
-              <p className="text-silver text-center max-w-lg mx-auto mb-12 font-body">Curated guides for Florida&apos;s top tourist spots — where to stay, eat, play, and more.</p>
+          {/* ─── DESTINATION GUIDES — BENTLEY STANDARD 8-CARD GRID ─── */}
+          <section className="section-gradient-blue-gold py-24 bg-gold-accent-top" data-testid="destination-guides-section">
+            {/* Section Divider Top */}
+            <div className="section-divider-gold max-w-5xl mx-auto mb-16" />
 
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="max-w-7xl mx-auto px-6">
+              {/* Section Header */}
+              <div className="text-center mb-14 corner-filigree py-8 px-4">
+                <p className="text-xs font-heading font-semibold uppercase tracking-[0.25em] mb-4 text-gold/70">Curated Travel Guides</p>
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-light text-white tracking-tight mb-4">
+                  Explore <span className="font-semibold text-gradient-gold">Destinations</span>
+                </h2>
+                <p className="text-sm text-silver/60 max-w-lg mx-auto font-body leading-relaxed">
+                  Your personal concierge to Florida&apos;s finest — where to stay, dine, explore, and unwind.
+                </p>
+              </div>
+
+              {/* 8-Card Grid: 4 columns, 2 rows */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
                 {[
-                  { slug: 'st-pete-beach',  label: 'St. Pete Beach',  tagline: 'Gulf Coast charm', gradient: 'from-sky-900/60 to-blue-950/90' },
-                  { slug: 'key-west',       label: 'Key West',         tagline: 'Island paradise',  gradient: 'from-teal-900/60 to-emerald-950/90' },
-                  { slug: 'sarasota',       label: 'Sarasota',         tagline: 'Culture & coast',   gradient: 'from-indigo-900/60 to-purple-950/90' },
-                  { slug: 'ybor-city',      label: 'Ybor City',        tagline: 'Historic quarter',  gradient: 'from-red-900/60 to-orange-950/90' },
-                  { slug: 'daytona',        label: 'Daytona Beach',    tagline: 'Speed & surf',      gradient: 'from-amber-900/60 to-yellow-950/90' },
-                  { slug: 'orlando',        label: 'Orlando',          tagline: 'Theme park capital', gradient: 'from-violet-900/60 to-fuchsia-950/90' },
+                  { slug: 'st-pete-beach',  label: 'St. Pete Beach',  tagline: "Florida's Sunshine City",            image: 'https://static.prod-images.emergentagent.com/jobs/2e119e5c-5e48-4af9-82e4-b66cfaef75d6/images/9f172c3ec8da33810bf5add7045d45d50c2a74434222d8de43496ad9db498e6a.png' },
+                  { slug: 'key-west',       label: 'Key West',         tagline: 'Close to Perfect, Far from Normal', image: 'https://static.prod-images.emergentagent.com/jobs/2e119e5c-5e48-4af9-82e4-b66cfaef75d6/images/b6b16b8cb4d3ffcf8519f33cf4b55a5bab86a4fe22034d203f002c4c56c417ae.png' },
+                  { slug: 'sarasota',       label: 'Sarasota',         tagline: 'Where Arts Meet the Gulf',          image: 'https://static.prod-images.emergentagent.com/jobs/2e119e5c-5e48-4af9-82e4-b66cfaef75d6/images/bcf15606c765a234387200867704b62f95d72f13b52b57617bd1e1810147c927.png' },
+                  { slug: 'daytona',        label: 'Daytona Beach',    tagline: "World's Most Famous Beach",         image: 'https://static.prod-images.emergentagent.com/jobs/2e119e5c-5e48-4af9-82e4-b66cfaef75d6/images/3b8b96e8031137b53c6837161306bded80db78b6f40ed95d30571e38c37eb6d9.png' },
+                  { slug: 'ybor-city',      label: 'Ybor City',        tagline: "Tampa's Historic Latin Quarter",    image: 'https://static.prod-images.emergentagent.com/jobs/2e119e5c-5e48-4af9-82e4-b66cfaef75d6/images/c7604a02b5c81fa3394e0179f29ec3cccc68231efa06b8aacae7704b37277e97.png' },
+                  { slug: 'orlando',        label: 'Orlando',          tagline: 'The City Beautiful',                image: 'https://static.prod-images.emergentagent.com/jobs/2e119e5c-5e48-4af9-82e4-b66cfaef75d6/images/5cc70d6507deeac4bf77f056c8f676e444f65bec8a857795608ebeaafd9af536.png' },
+                  { slug: 'miami',          label: 'Miami',            tagline: 'Neon Nights & Coastal Luxury',      image: 'https://static.prod-images.emergentagent.com/jobs/2e119e5c-5e48-4af9-82e4-b66cfaef75d6/images/d771f9ed035f4fcd5df359e8bb0dd78ec2b6e5a9d6446dbd07377a903fa3945f.png' },
+                  { slug: 'jacksonville',   label: 'Jacksonville',     tagline: 'Gridiron Grit & Riverfront Views',  image: 'https://static.prod-images.emergentagent.com/jobs/2e119e5c-5e48-4af9-82e4-b66cfaef75d6/images/3044a5e13c46207922e088bcb878b0ded80dcf0c9ca1d9c15c08586ac85cd2e3.png' },
                 ].map((d, i) => (
-                  <motion.div key={d.slug} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + i * 0.06 }}>
-                    <Link href={`/destination/${d.slug}`}
-                      className={`relative block rounded-2xl overflow-hidden group cursor-pointer hover:shadow-gold-glow transition-all duration-500 ${i < 2 ? 'lg:col-span-1' : ''}`}
-                      style={{ minHeight: i < 2 ? 200 : 160 }}
-                      data-testid={`dest-card-${d.slug}`}>
-                      <div className={`absolute inset-0 bg-gradient-to-br ${d.gradient}`} />
-                      <div className="absolute inset-0 bg-gradient-to-t from-midnight-900/80 via-transparent to-transparent group-hover:from-midnight-900/90 transition-all duration-500" />
-                      <div className="relative flex flex-col justify-end h-full p-5" style={{ minHeight: i < 2 ? 200 : 160 }}>
-                        <span className="text-lg font-heading font-semibold text-white tracking-tight">{d.label}</span>
-                        <span className="text-xs text-white/50 font-body">{d.tagline}</span>
-                        <span className="inline-flex items-center gap-1 mt-2 text-[10px] text-gold font-medium font-body group-hover:translate-x-1 transition-transform duration-300">
-                          View Guide
-                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
-                        </span>
+                  <motion.div
+                    key={d.slug}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.15 + i * 0.07, duration: 0.5 }}
+                  >
+                    <Link href={`/destination/${d.slug}`} className="block dest-card-frame group" data-testid={`dest-card-${d.slug}`}>
+                      <div className="dest-card-inner">
+                        {/* Image */}
+                        <div className="relative overflow-hidden golden-hour-filter" style={{ aspectRatio: '4/3' }}>
+                          <img
+                            src={d.image}
+                            alt={d.label}
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                            loading="lazy"
+                          />
+                          {/* Bottom gradient overlay */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                        </div>
+                        {/* Glassmorphism Label */}
+                        <div className="absolute bottom-0 left-0 right-0 dest-glass-label p-3 sm:p-4">
+                          <h3 className="text-sm sm:text-base font-heading font-semibold text-white tracking-tight leading-tight">{d.label}</h3>
+                          <p className="text-[10px] sm:text-xs text-white/50 font-body mt-0.5">{d.tagline}</p>
+                          <span className="inline-flex items-center gap-1 mt-1.5 text-[9px] sm:text-[10px] text-gold font-medium font-body opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-300">
+                            View Guide
+                            <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+                          </span>
+                        </div>
                       </div>
                     </Link>
                   </motion.div>
                 ))}
               </div>
             </div>
+
+            {/* Section Divider Bottom */}
+            <div className="section-divider-gold max-w-5xl mx-auto mt-16" />
           </section>
 
           {/* ─── VALUE PROPOSITION ─── */}
