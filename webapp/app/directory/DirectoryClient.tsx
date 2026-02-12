@@ -96,6 +96,7 @@ export default function DirectoryPage() {
   const [activeSubcategory, setActiveSubcategory] = useState('All');
   const [showListings, setShowListings] = useState(false);
   const [testimonialIdx, setTestimonialIdx] = useState(0);
+  const [stats, setStats] = useState({ totalBusinesses: 0, totalDestinations: 0, totalCategories: 0 });
 
   const loadListings = useCallback(async (industry?: string, searchText?: string) => {
     setLoading(true);
