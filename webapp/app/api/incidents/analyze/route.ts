@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { HTML_FORMAT_DIRECTIVE } from '@/lib/format-standards';
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 
