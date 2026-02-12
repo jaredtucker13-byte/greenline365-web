@@ -284,14 +284,15 @@ function GuideListingCard({ listing: l, index: i }: { listing: Listing; index: n
   const googleMapsUrl = l.metadata?.google_maps_url;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 15 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: i * 0.04 }}
-      className="rounded-2xl overflow-hidden border border-white/5 hover:border-gold/20 transition-all duration-500 group"
-      style={{ background: 'rgba(255,255,255,0.02)' }}
-      data-testid={`guide-listing-${l.slug}`}
-    >
+    <Link href={`/listing/${l.slug}`}>
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: i * 0.04 }}
+        className="rounded-2xl overflow-hidden border border-white/5 hover:border-gold/20 hover:shadow-gold-glow transition-all duration-500 group cursor-pointer"
+        style={{ background: 'rgba(255,255,255,0.02)' }}
+        data-testid={`guide-listing-${l.slug}`}
+      >
       {/* Image */}
       <div className="relative h-44 overflow-hidden">
         {l.cover_image_url ? (
