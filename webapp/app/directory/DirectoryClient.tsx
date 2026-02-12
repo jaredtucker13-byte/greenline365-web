@@ -112,11 +112,19 @@ export default function DirectoryPage() {
     const params = new URLSearchParams(window.location.search);
     const cat = params.get('category');
     const q = params.get('q');
+    if (q) setSearch(q);
     if (cat) {
       setActiveCategory(cat);
       setShowListings(true);
+      // Trigger the load with the restored category
+      const industryMap: Record<string, string> = {
+        'services': 'services', 'dining': 'dining', 'health-wellness': 'health-wellness',
+        'style-shopping': 'style-shopping', 'nightlife': 'nightlife',
+        'family-entertainment': 'family-entertainment', 'destinations': 'destinations',
+        'hotels-lodging': 'destinations', 'professional-services': 'services',
+      };
+      loadListings(industryMap[cat] || cat, q || undefined);
     }
-    if (q) setSearch(q);
   }, []);
 
   // Persist category/search to URL when they change (without full navigation)
