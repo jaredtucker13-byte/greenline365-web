@@ -54,7 +54,7 @@ async function generateWithAI(prompt: string, maxTokens: number = 1000): Promise
       'X-Title': 'GreenLine365 Content Forge'
     },
     body: JSON.stringify({
-      model: 'anthropic/claude-3.5-sonnet',
+      model: 'anthropic/claude-opus-4.6',
       messages: [
         {
           role: 'system',
