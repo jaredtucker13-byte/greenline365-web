@@ -115,6 +115,25 @@ Built the core directory listing management experience for business owners:
 - Property Intelligence CTA linking to /services for backend CRM upsell
 - "No listing found" state with links to directory search and registration
 
+### Individual Listing Detail Pages (Feb 12, 2026)
+Built `/listing/[slug]` pages for all 450+ businesses — each is now SEO-indexable:
+
+**New API:** `GET /api/directory/[slug]` — returns full listing with photo gating + 4 related businesses (same city & industry)
+
+**Detail Page Features:**
+- Hero cover image with back-to-directory navigation
+- Business header: name, category badge, location, subcategory tags
+- Google rating + review count from Places data
+- Photo gallery with tier-based gating
+- Contact sidebar: Phone (clickable tel:), Website (external link), Google Maps directions
+- "Is this your business?" claim section → reveals greenline365help@gmail.com mailto with pre-filled subject
+- "More [category] in [city]" related businesses grid with clickable cards
+- Claimed/Unclaimed status indicator
+
+**Also updated:**
+- Listing cards in directory now wrapped in `<Link>` to `/listing/[slug]`
+- Updated all @greenline365.com email references to greenline365help@gmail.com (privacy, trust, terms, footer, email sender, admin lists, incident reports)
+
 ## Backlog
 
 ### P0 — Immediate
