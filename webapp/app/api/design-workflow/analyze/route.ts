@@ -103,7 +103,7 @@ async function generateDesignWithOpenRouter(prompt: string): Promise<string> {
       messages: [
         {
           role: 'system',
-          content: `You are a world-class web designer who creates stunning, conversion-optimized websites.${getSkillContext('page-cro')}`,
+          content: `You are a world-class web designer who creates stunning, conversion-optimized websites.${getSkillContext('page-cro')}${getCoreMarketingContext()}`,
         },
         {
           role: 'user',
