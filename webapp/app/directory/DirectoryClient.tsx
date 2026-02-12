@@ -553,6 +553,18 @@ export default function DirectoryPage() {
             </div>
           </section>
         </>
+      ) : showGroupedBrowse ? (
+        /* ─── GROUPED BROWSE VIEW (All categories with carousels) ─── */
+        <GroupedBrowseView
+          sortBy={sortBy}
+          setSortBy={setSortBy}
+          cityFilter={cityFilter}
+          setCityFilter={setCityFilter}
+          availableCities={availableCities}
+          userLocation={userLocation}
+          onViewAll={handleViewAllFromCarousel}
+          onBack={() => { setShowGroupedBrowse(false); }}
+        />
       ) : (
         /* ─── CATEGORY BROWSE VIEW ─── */
         <div data-testid="listings-view">
