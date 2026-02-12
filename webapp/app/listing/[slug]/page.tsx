@@ -74,6 +74,11 @@ export default function ListingDetailPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ listing_id: data.id, event_type: 'view' }),
         }).catch(() => {});
+        // Load reviews
+        fetch(`/api/directory/reviews?listing_id=${data.id}`)
+          .then(r => r.json())
+          .then(d => { setReviews(d.reviews || []); setReviewStats({ total: d.total, average_rating: d.average_rating }); })
+          .catch(() => {});
       }
       setLoading(false);
     })();
