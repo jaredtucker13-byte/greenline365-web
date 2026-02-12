@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSkillContext } from '@/lib/marketing-skills-loader';
+import { getSkillContext, getCoreMarketingContext } from '@/lib/marketing-skills-loader';
 
 interface AnalyzeRequest {
   mode: 'analyze' | 'scratch';
