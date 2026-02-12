@@ -97,7 +97,7 @@ export default function Navbar() {
   const [featuresOpen, setFeaturesOpen] = useState(false);
   const [industriesOpen, setIndustriesOpen] = useState(false);
 
-  const navLinks = [
+  const navLinks: { href: string; label: string; dropdown?: { href: string; label: string }[] }[] = [
     { href: '/', label: 'Directory' },
     { href: '/services', label: 'Our Services' },
   ];
