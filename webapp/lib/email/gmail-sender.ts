@@ -35,6 +35,8 @@ interface EmailOptions {
   subject: string;
   html: string;
   text?: string;
+  fromName?: string;
+  fromEmail?: string;
 }
 
 export async function sendEmail(options: EmailOptions): Promise<{ success: boolean; error?: string }> {
@@ -45,13 +47,16 @@ export async function sendEmail(options: EmailOptions): Promise<{ success: boole
     return { success: false, error: 'Email service not configured' };
   }
 
-  // Log the recipient for debugging
+  const fromName = options.fromName || 'GreenLine365';
+  const fromEmail = options.fromEmail || GMAIL_USER;
+
   console.log('[Email] Attempting to send to:', options.to);
-  console.log('[Email] From:', GMAIL_USER);
+  console.log('[Email] From:', `${fromName} <${fromEmail}>`);
 
   try {
     const info = await transporter.sendMail({
-      from: `"GreenLine365" <${GMAIL_USER}>`,
+      from: `"${fromName}" <${fromEmail}>`,
+      replyTo: fromEmail !== GMAIL_USER ? fromEmail : undefined,
       to: options.to,
       subject: options.subject,
       html: options.html,
