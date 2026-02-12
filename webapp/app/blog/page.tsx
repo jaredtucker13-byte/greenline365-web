@@ -106,7 +106,7 @@ export default async function BlogListingPage() {
   const categories = [...new Set(posts.map(p => p.category).filter(Boolean))];
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 pt-20">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         {/* Background decorations */}
