@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { getTierLimits } from '@/lib/feature-gates';
+import { getPlaceholderImage, isClaimable } from '@/lib/directory-config';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -12,17 +13,36 @@ function applyPhotoGating(listing: any) {
   const isClaimed = listing.is_claimed;
   const limits = getTierLimits(tier);
   const allPhotos: string[] = listing.gallery_images || [];
+  const industry = listing.industry || 'services';
+  const placeholder = getPlaceholderImage(industry);
 
-  const maxPhotos = (!isClaimed) ? 1 : limits.photos;
-  const visiblePhotos = maxPhotos >= 999 ? allPhotos : allPhotos.slice(0, maxPhotos);
+  // Free tier: placeholder only, no real photos shown
+  if (tier === 'free' || !isClaimed) {
+    return {
+      ...listing,
+      gallery_images: [],
+      cover_image_url: placeholder,
+      total_photos_available: allPhotos.length,
+      has_property_intelligence: false,
+      search_weight: limits.searchWeight,
+      is_placeholder_image: true,
+      is_claimable: isClaimable(listing.business_name || ''),
+    };
+  }
+
+  // Pro/Premium: show photos up to tier limit
+  const maxPhotos = limits.photos;
+  const visiblePhotos = allPhotos.slice(0, maxPhotos);
 
   return {
     ...listing,
     gallery_images: visiblePhotos,
     total_photos_available: allPhotos.length,
-    cover_image_url: allPhotos[0] || listing.cover_image_url || null,
+    cover_image_url: visiblePhotos[0] || listing.cover_image_url || placeholder,
     has_property_intelligence: limits.hasPropertyIntelligence && isClaimed,
     search_weight: limits.searchWeight,
+    is_placeholder_image: false,
+    is_claimable: isClaimable(listing.business_name || ''),
   };
 }
 
