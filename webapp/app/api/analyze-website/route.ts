@@ -159,7 +159,7 @@ Be brutally honest - this is for internal optimization only.`,
         messages: [
           {
             role: 'system',
-            content: `You are a creative marketing strategist. Generate fresh, innovative ideas. Apply proven CRO frameworks and marketing psychology.${getSkillContext('page-cro')}${getSkillContext('marketing-psychology')}`
+            content: `You are a creative marketing strategist. Generate fresh, innovative ideas. Apply proven CRO frameworks and marketing psychology.${getSkillContext('page-cro')}${getSkillContext('marketing-psychology')}${getCoreMarketingContext()}`
           },
           {
             role: 'user',
