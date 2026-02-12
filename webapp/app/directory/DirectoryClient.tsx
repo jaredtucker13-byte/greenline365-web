@@ -518,7 +518,7 @@ export default function DirectoryPage() {
                     </div>
                   ))}
                 </div>
-                <button onClick={() => loadListings()} className="mt-10 btn-primary px-8 py-3 rounded-full text-sm" data-testid="find-business-btn">Find a Business</button>
+                <button onClick={handleBrowseAll} className="mt-10 btn-primary px-8 py-3 rounded-full text-sm" data-testid="find-business-btn">Find a Business</button>
               </div>
               <div className="relative">
                 <img src="/images/hero-directory-alt.png" alt="GreenLine365 connects you with trusted, verified local businesses" className="w-full rounded-2xl object-cover" style={{ maxHeight: 400 }} />
