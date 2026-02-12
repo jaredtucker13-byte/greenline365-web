@@ -671,21 +671,25 @@ select {
 
 /* ─── SECTION BACKGROUND GRADIENTS ─── */
 .section-gradient-blue-gold {
-  background: linear-gradient(
-    180deg,
-    #050B18 0%,
-    #0A1628 20%,
-    rgba(13, 27, 42, 1) 40%,
-    rgba(10, 18, 32, 0.97) 60%,
-    #0B132B 80%,
-    #050B18 100%
-  );
+  background: 
+    linear-gradient(
+      180deg,
+      #050B18 0%,
+      #0A1628 15%,
+      rgba(13, 27, 42, 0.98) 30%,
+      rgba(15, 22, 38, 0.97) 50%,
+      rgba(12, 20, 35, 0.98) 70%,
+      #0B132B 85%,
+      #050B18 100%
+    ),
+    radial-gradient(ellipse at 30% 40%, rgba(201, 169, 110, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 60%, rgba(201, 169, 110, 0.04) 0%, transparent 50%);
 }
 
-/* Charcoal sections get subtle depth via inner shadow */
+/* Charcoal sections get subtle depth via inner shadow + gradient */
 .bg-charcoal-900 {
   position: relative;
-  background: #0E0E0F;
+  background: linear-gradient(180deg, #0C0C0E 0%, #0E0E0F 50%, #0C0C0E 100%);
   box-shadow: inset 0 1px 0 rgba(201, 169, 110, 0.06), inset 0 -1px 0 rgba(201, 169, 110, 0.06);
 }
 
