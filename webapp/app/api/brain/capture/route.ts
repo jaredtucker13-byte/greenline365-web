@@ -178,23 +178,25 @@ async function routeThought(
   thoughtId: string,
   businessId: string,
   text: string,
-  classification: { bucket: string; confidence: number }
+  classification: { bucket: string; confidence: number; title?: string }
 ): Promise<boolean> {
   try {
+    const title = classification.title || text.substring(0, 100);
+    
     switch (classification.bucket) {
       case 'people':
-        // Extract person details and save
         await supabase.from('brain_people').insert({
           business_id: businessId,
-          name: 'Extracted from thought', // Would need better extraction
+          name: title,
           notes: text,
+          context: 'Captured from Second Brain',
         });
         break;
         
       case 'projects':
         await supabase.from('brain_projects').insert({
           business_id: businessId,
-          title: text.substring(0, 100),
+          title,
           next_action: text,
           status: 'active',
         });
@@ -203,7 +205,7 @@ async function routeThought(
       case 'ideas':
         await supabase.from('brain_ideas').insert({
           business_id: businessId,
-          title: text.substring(0, 100),
+          title,
           description: text,
         });
         break;
