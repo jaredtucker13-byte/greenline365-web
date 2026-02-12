@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
   // Search/list
   let query = supabase
     .from('directory_listings')
-    .select('id, business_name, slug, industry, subcategories, description, phone, website, city, state, zip_code, logo_url, cover_image_url, gallery_images, tier, is_claimed, trust_score, avg_feedback_rating, total_feedback_count, directory_badges(id, badge_type, badge_label, badge_color, is_active)')
+    .select('id, business_name, slug, industry, subcategories, description, phone, website, city, state, zip_code, logo_url, cover_image_url, gallery_images, tier, is_claimed, trust_score, avg_feedback_rating, total_feedback_count, tags, metadata, directory_badges(id, badge_type, badge_label, badge_color, is_active)')
     .eq('is_published', true)
     .order('trust_score', { ascending: false })
     .limit(limit);
@@ -84,6 +84,8 @@ export async function GET(request: NextRequest) {
   if (zip) query = query.eq('zip_code', zip);
   if (tier && tier !== 'all') query = query.eq('tier', tier);
   if (search) query = query.or(`business_name.ilike.%${search}%,description.ilike.%${search}%,industry.ilike.%${search}%`);
+  if (destination) query = query.contains('tags', [`destination:${destination}`]);
+  if (tourismCategory) query = query.contains('tags', [`tourism:${tourismCategory}`]);
 
   const { data, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
