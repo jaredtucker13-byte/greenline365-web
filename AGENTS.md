@@ -223,6 +223,7 @@ Task Received → Search .claude/skills/ → Skill Found? → Follow SKILL.md Pr
 | **SaaS Biller** | `.claude/skills/saas-biller/` | "Add billing feature", "Implement subscriptions", "Credit metering" | Implementer, Architect |
 | **Social Manager** | `.claude/skills/social-manager/` | "Create business page", "Post to social", "Directory listing" | Implementer, Scout |
 | **PDF Architect** | `.claude/skills/pdf-architect/` | "Generate Clean Bill of Health", "Create property PDF" | Implementer, Auditor |
+| **Executive Opus Supervisor** | `.claude/skills/executive-opus-supervisor/` | "Run Opus audit", "Process through intelligence stack" | Auditor, Implementer |
 
 ### Skill File Standard
 
@@ -255,9 +256,9 @@ Skills accelerate specific steps within each phase:
 | Phase | Applicable Skills |
 |-------|-------------------|
 | Research | Repo Navigator, Security Auditor |
-| Planning | Repo Navigator |
-| Implementation | Test Engineer, Repo Navigator |
-| Audit | Security Auditor, Test Engineer |
+| Planning | Repo Navigator, SaaS Biller, PDF Architect |
+| Implementation | Test Engineer, Repo Navigator, SaaS Biller, Social Manager, PDF Architect |
+| Audit | Security Auditor, Test Engineer, Executive Opus Supervisor |
 
 ---
 
