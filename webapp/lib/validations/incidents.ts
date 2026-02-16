@@ -22,8 +22,8 @@ export const UpdateIncidentSchema = z.object({
   property_address: z.string().min(1).max(500).optional(),
   severity: z.enum(['low', 'medium', 'high', 'critical']).optional(),
   status: z.enum(['draft', 'documented', 'pending_signature', 'signed', 'refused', 'resolved']).optional(),
-  report_sections: z.record(z.unknown()).optional(),
-  ai_analysis: z.record(z.unknown()).optional(),
+    report_sections: z.record(z.string(), z.unknown()).optional(),
+    ai_analysis: z.record(z.string(), z.unknown()).optional(),
 });
 
 // POST /api/incidents/sign — Acknowledge or Refuse (The Shield)
