@@ -199,6 +199,65 @@ No code merges to production without passing ALL gates:
 | Security Review | Auditor | Manual checklist | No CRITICAL/HIGH |
 | Code Review | Auditor | Manual review | Approved |
 
+## Skills Registry
+
+Agents have access to a **Skills Registry** at `.claude/skills/`. Skills are reusable, structured protocols that standardize complex tasks across the team.
+
+### Discovery Mandate
+
+**Before attempting any complex task, agents MUST search `.claude/skills/` for an applicable skill.** If a matching skill exists, the agent must follow its documented procedure rather than improvising.
+
+```
+Task Received → Search .claude/skills/ → Skill Found? → Follow SKILL.md Procedure
+                                        → No Skill?   → Proceed with standard workflow
+```
+
+### Active Skills
+
+| Skill | Directory | Trigger | Used By |
+|-------|-----------|---------|---------|
+| **Skill Builder** | `.claude/skills/skill-builder/` | "Create a new skill" | Any agent encountering a recurring complex task |
+| **Repo Navigator** | `.claude/skills/repo-navigator/` | "Find patterns", "Map the codebase" | Scout, Architect |
+| **Test Engineer** | `.claude/skills/test-engineer/` | "Write E2E tests", "Add test coverage" | Implementer, Auditor |
+| **Security Auditor** | `.claude/skills/security-auditor/` | "Scan for tenant leaks", "Audit multi-tenant security" | Auditor, Scout |
+
+### Skill File Standard
+
+Every skill lives in its own directory under `.claude/skills/{skill-name}/` and must contain a `SKILL.md` file with:
+
+1. **YAML frontmatter** — `name`, `description`, `version`, `triggers`, `inputs`, `outputs`
+2. **Purpose** — Why the skill exists
+3. **When to Use** — Trigger scenarios
+4. **Procedure** — Step-by-step instructions
+5. **Validation** — How to verify the skill executed correctly
+
+### Creating New Skills
+
+When an agent encounters a recurring complex task with no existing skill:
+
+1. Search `.claude/skills/` to confirm no overlap
+2. Use the **Skill Builder** skill to author the new `SKILL.md`
+3. Commit the new skill with message: `feat(skills): add {skill-name} skill`
+
+### Skills + Agent Integration
+
+Skills augment but do not replace agents. The workflow remains:
+
+```
+Research → Plan → Implement → Audit → Ship
+```
+
+Skills accelerate specific steps within each phase:
+
+| Phase | Applicable Skills |
+|-------|-------------------|
+| Research | Repo Navigator, Security Auditor |
+| Planning | Repo Navigator |
+| Implementation | Test Engineer, Repo Navigator |
+| Audit | Security Auditor, Test Engineer |
+
+---
+
 ## Anti-Patterns
 
 These behaviors are explicitly prohibited:
@@ -210,3 +269,4 @@ These behaviors are explicitly prohibited:
 5. **Test Skipping** — Shipping code without Playwright coverage
 6. **Context Dumping** — Reading entire codebase when only specific files are needed
 7. **Assumption Coding** — Making guesses instead of researching existing patterns
+8. **Skill Ignorance** — Attempting a complex task without first checking `.claude/skills/` for an applicable skill
