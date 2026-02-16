@@ -21,6 +21,16 @@ function getAdminClient() {
   });
 }
 
+/** Validate the incoming request carries the service role key. */
+function isAuthorized(req: NextRequest): boolean {
+  const authHeader = req.headers.get('authorization');
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!serviceKey) return false;
+  if (authHeader === `Bearer ${serviceKey}`) return true;
+  if (authHeader === serviceKey) return true;
+  return false;
+}
+
 // ---------------------------------------------------------------------------
 // Vibe Command parser — turns natural language into structured intent
 // ---------------------------------------------------------------------------
@@ -140,6 +150,10 @@ function parseVibeCommand(command: string): ParsedVibeCommand {
 
 export async function POST(req: NextRequest) {
   try {
+    if (!isAuthorized(req)) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await req.json();
     const { command, priority: overridePriority, target_role: overrideRole } = body;
 
@@ -224,6 +238,10 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   try {
+    if (!isAuthorized(req)) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const url = new URL(req.url);
     const limit = parseInt(url.searchParams.get('limit') ?? '50', 10);
     const status = url.searchParams.get('status');
