@@ -5,7 +5,7 @@ export const CreateIncidentSchema = z.object({
   title: z.string().min(1, 'Title is required').max(500).optional(),
   description: z.string().min(1, 'Description is required'),
   customer_name: z.string().min(1, 'Customer name is required').max(255),
-  customer_email: z.string().email('Valid email is required'),
+  customer_email: z.email('Valid email is required'),
   customer_phone: z.string().max(20).optional(),
   property_address: z.string().min(1, 'Property address is required').max(500),
   severity: z.enum(['low', 'medium', 'high', 'critical']).optional().default('medium'),
@@ -13,11 +13,11 @@ export const CreateIncidentSchema = z.object({
 
 // PUT /api/incidents — Update incident
 export const UpdateIncidentSchema = z.object({
-  id: z.string().uuid('Valid incident ID is required'),
+  id: z.uuid('Valid incident ID is required'),
   title: z.string().min(1).max(500).optional(),
   description: z.string().min(1).optional(),
   customer_name: z.string().min(1).max(255).optional(),
-  customer_email: z.string().email().optional(),
+  customer_email: z.email().optional(),
   customer_phone: z.string().max(20).optional(),
   property_address: z.string().min(1).max(500).optional(),
   severity: z.enum(['low', 'medium', 'high', 'critical']).optional(),
@@ -41,7 +41,7 @@ export const SignIncidentSchema = z.object({
 
 // POST /api/incidents/send-for-signature — Send signature request email
 export const SendForSignatureSchema = z.object({
-  incident_id: z.string().uuid('Valid incident ID is required'),
+  incident_id: z.uuid('Valid incident ID is required'),
 });
 
 export type CreateIncidentInput = z.infer<typeof CreateIncidentSchema>;

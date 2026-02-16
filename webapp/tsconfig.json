@@ -31,5 +31,5 @@
     "**/*.mts",
     "app/components"
   ],
-  "exclude": ["node_modules", "supabase", "scripts"]
+  "exclude": ["node_modules", "supabase", "scripts", "tests", "playwright.config.ts"]
 }
