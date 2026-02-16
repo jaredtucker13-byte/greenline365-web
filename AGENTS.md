@@ -220,6 +220,9 @@ Task Received → Search .claude/skills/ → Skill Found? → Follow SKILL.md Pr
 | **Repo Navigator** | `.claude/skills/repo-navigator/` | "Find patterns", "Map the codebase" | Scout, Architect |
 | **Test Engineer** | `.claude/skills/test-engineer/` | "Write E2E tests", "Add test coverage" | Implementer, Auditor |
 | **Security Auditor** | `.claude/skills/security-auditor/` | "Scan for tenant leaks", "Audit multi-tenant security" | Auditor, Scout |
+| **SaaS Biller** | `.claude/skills/saas-biller/` | "Add billing feature", "Implement subscriptions", "Credit metering" | Implementer, Architect |
+| **Social Manager** | `.claude/skills/social-manager/` | "Create business page", "Post to social", "Directory listing" | Implementer, Scout |
+| **PDF Architect** | `.claude/skills/pdf-architect/` | "Generate Clean Bill of Health", "Create property PDF" | Implementer, Auditor |
 
 ### Skill File Standard
 
