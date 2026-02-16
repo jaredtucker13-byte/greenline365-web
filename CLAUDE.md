@@ -10,6 +10,43 @@ This file is the authoritative reference for all AI agents and developers workin
 - **Primary Stack:** Next.js 16 (App Router) + React 19 + TypeScript + Supabase
 - **Architecture:** Multi-tenant with Row Level Security (RLS) enforced at the database layer
 
+## The Property Passport — Address-Centric Security Model
+
+The Property Passport is a **Permanent Digital Ledger** keyed to a physical address. It serves as a "Carfax for Homes" — an immutable record of a property's safety and maintenance history.
+
+### Core Concepts
+
+| Concept | Definition | Database State |
+|---------|-----------|----------------|
+| **The Stain (Incident)** | A contractor-documented safety or environmental risk (HVAC freon leaks, mold, biological growth, structural damage) that the homeowner has been notified about | `incidents` table, `status: 'documented'` |
+| **The Shield (Liability Transfer)** | When a homeowner is sent the incident report and either acknowledges or **refuses** to act, liability officially transfers to them. Digital signature with IP, timestamp, and PDF hash provides legal evidence | `incidents` table, `signature_type: 'refused'`, `liability_transferred: true` |
+| **The Clear (Remediation)** | A stain is removed ONLY when a verified contractor provides "After" evidence proving the issue was resolved | `incidents` table, `status: 'resolved'`, `resolution_verified: true` |
+| **Clean Bill of Health** | When ALL stains on a property are cleared, a printable PDF certificate can be generated for home sales, preserving property value | Generated via `/api/incidents/generate-pdf` |
+
+### Address-Centric Rules
+
+1. **Properties are keyed by physical address** — the address is the permanent identifier
+2. **Incidents are stains on the address** — they persist across ownership changes
+3. **Liability transfers are immutable** — once recorded, a refusal cannot be deleted or edited
+4. **Evidence chains are tamper-proof** — SHA-256 hashes, IP/UA logging, `signature_events` audit trail
+5. **Only verified contractors can clear stains** — no self-service remediation
+6. **The Auditor verifies the full chain** — no code ships without passing the Stain/Shield/Clear audit
+
+### Incident API Endpoints
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/incidents` | GET | List/fetch incidents |
+| `/api/incidents` | POST | Create new incident (The Stain) |
+| `/api/incidents` | PUT | Update incident |
+| `/api/incidents/upload` | POST | Upload evidence photos |
+| `/api/incidents/analyze` | POST | AI analysis of incident |
+| `/api/incidents/generate-report` | POST | Generate incident report |
+| `/api/incidents/generate-pdf` | POST | Generate PDF document |
+| `/api/incidents/send-for-signature` | POST | Email signature request (The Shield) |
+| `/api/incidents/sign` | GET | View incident by token (public) |
+| `/api/incidents/sign` | POST | Submit signature or refusal (The Shield) |
+
 ## Repository Structure
 
 ```

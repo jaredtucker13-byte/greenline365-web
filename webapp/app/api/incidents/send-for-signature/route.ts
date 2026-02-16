@@ -1,25 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { z } from 'zod';
+import { SendForSignatureSchema } from '@/lib/validations/incidents';
 
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com';
 
-// Send signing request email
+// Send signing request email (The Shield — initiate liability transfer)
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
-    
+
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
-    const { incident_id } = body;
-
-    if (!incident_id) {
-      return NextResponse.json({ error: 'Missing incident_id' }, { status: 400 });
-    }
+    const validated = SendForSignatureSchema.parse(body);
+    const { incident_id } = validated;
 
     // Get incident
     const { data: incident, error: incidentError } = await supabase
@@ -144,8 +143,15 @@ export async function POST(request: NextRequest) {
       sign_link: signLink
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Validation failed', details: error.errors },
+        { status: 400 }
+      );
+    }
+    const message = error instanceof Error ? error.message : 'Internal server error';
     console.error('POST /api/incidents/send-for-signature error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

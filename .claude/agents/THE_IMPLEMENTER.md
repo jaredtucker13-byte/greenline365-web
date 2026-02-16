@@ -256,6 +256,53 @@ CREATE POLICY "business_isolation_insert"
 COMMIT;
 ```
 
+## Address-Centric Security Model — Implementation Patterns
+
+### Zod Schemas for Incident Lifecycle
+
+```typescript
+import { z } from 'zod';
+
+// POST /api/incidents — Create new incident (The Stain)
+export const CreateIncidentSchema = z.object({
+  title: z.string().min(1).max(500),
+  description: z.string().min(1),
+  customer_name: z.string().min(1).max(255),
+  customer_email: z.string().email(),
+  customer_phone: z.string().optional(),
+  property_address: z.string().min(1).max(500),
+  severity: z.enum(['low', 'medium', 'high', 'critical']).default('medium'),
+});
+
+// POST /api/incidents/sign — Acknowledge or Refuse (The Shield)
+export const SignIncidentSchema = z.object({
+  token: z.string().min(1),
+  action: z.enum(['acknowledge', 'refuse']),
+  signer_name: z.string().min(1).max(255),
+  refusal_reason: z.string().min(1).optional(),
+}).refine(
+  (data) => data.action !== 'refuse' || !!data.refusal_reason,
+  { message: 'Refusal reason required when refusing', path: ['refusal_reason'] }
+);
+```
+
+### Liability Transfer Logic
+
+When a homeowner refuses to sign:
+1. `signature_type` → `'refused'`
+2. `status` → `'refused'`
+3. `liability_transferred` → `true` (explicit flag)
+4. `refusal_reason` recorded verbatim
+5. `signature_events` entry logged with full metadata
+6. PDF hash locks the document state — no retroactive changes
+
+### Evidence Chain Requirements
+
+Every mutation to an incident MUST be accompanied by:
+- Timestamp (`signed_at`, `finalized_at`, `updated_at`)
+- Actor identification (IP address, user agent, user ID or signer name)
+- Document integrity (SHA-256 hash of report content at time of action)
+
 ## Security Guardrails
 
 1. **Never** commit secrets, API keys, or credentials

@@ -197,6 +197,46 @@ pytest tests/ -v
 3. **MEDIUM findings** — Log in audit report, track as follow-up task.
 4. **LOW findings** — Note in audit report for continuous improvement.
 
+## Address-Centric Security — Auditor Checklist
+
+### Incident Lifecycle Integrity (Stain → Shield → Clear)
+
+- [ ] Incidents are created with valid `property_address` (not null/empty)
+- [ ] Signature tokens are cryptographically random (32+ bytes)
+- [ ] Signature links expire after 30 days
+- [ ] Refused signatures explicitly set `liability_transferred = true`
+- [ ] `signature_events` table logs EVERY step: `email_sent`, `viewed`, `signed`, `refused`
+- [ ] PDF hash is computed BEFORE signature, not after
+- [ ] Signed/refused incidents cannot be modified (immutability enforced)
+- [ ] Only verified contractors can clear a "stain" (remediation gate)
+- [ ] "Clean Bill of Health" is only issued when ALL stains are cleared
+
+### Liability Transfer Verification
+
+| Check | Verify |
+|-------|--------|
+| Token uniqueness | `signature_token` is unique per incident |
+| Expiry enforcement | Expired tokens return 404, not the document |
+| Double-sign prevention | `signed_at IS NULL` check before accepting signature |
+| IP/UA recording | Both captured from request headers |
+| Refusal reason | Required when `action = 'refuse'`, validated by Zod |
+| Hash integrity | SHA-256 of `report_sections` at signature time |
+| Event trail | `signature_events` has continuous chain for every incident |
+
+### Playwright MCP Audit Tools
+
+For automated auditing via Playwright MCP (Snapshot Mode):
+
+```
+1. browser_navigate → /admin-v2/incidents
+2. browser_snapshot → Verify incident list renders
+3. browser_click → Open an incident
+4. browser_snapshot → Verify status, severity, property_address visible
+5. browser_evaluate → Extract liability_transferred value
+6. browser_take_screenshot → Capture evidence
+7. browser_console_messages → Check for runtime errors
+```
+
 ## Common Failure Patterns to Watch For
 
 1. **The Leaky Tenant** — Missing `business_id` filter allowing cross-tenant data access

@@ -73,6 +73,33 @@ When researching any feature touching data:
 4. **Audit API routes** — verify `createClient()` from `@supabase/ssr` is used (server-side), never the anon key directly
 5. **Document gaps** — any missing RLS policy is a blocking finding
 
+## Address-Centric Security Model — Domain Context
+
+The Property Passport is a **Permanent Digital Ledger** keyed to a physical address. When scouting any feature related to properties, incidents, or liability, understand this lifecycle:
+
+### The Stain (Incident)
+A contractor identifies a safety or environmental risk (HVAC freon leaks, biological growth, structural damage, etc.) that the homeowner **refuses to fix**. This is logged as a "stain" on the property's permanent record.
+
+### The Shield (Liability Transfer)
+When a homeowner refuses remediation, the contractor sends a digital signature request. If the homeowner **refuses to sign** or **acknowledges and declines repair**, liability officially transfers to the homeowner. Evidence includes:
+- Incident report with AI analysis and photos
+- Digital signature (acknowledge/refuse) with IP, user agent, timestamp
+- SHA-256 hash of the PDF report for tamper detection
+- Full audit trail in `signature_events` table
+
+### The Clear (Remediation)
+A stain can only be cleared when a **verified contractor** provides "After" evidence proving the issue was resolved. The clear must include photo evidence and contractor verification.
+
+### The Goal
+A printable **"Clean Bill of Health" PDF** for home sales that proves the property has no outstanding safety issues, preserving property value.
+
+### Scout Research Focus for Address-Centric Features
+- [ ] Is the data keyed to `property_address` or `property_id`?
+- [ ] Does the incident flow include the full Stain → Shield → Clear lifecycle?
+- [ ] Are `signature_events` logged for every step (email_sent, viewed, signed, refused)?
+- [ ] Is the liability transfer explicitly recorded with timestamp and evidence hash?
+- [ ] Can a "stain" be cleared without verified contractor evidence?
+
 ## Key File Locations
 
 | Area | Path |

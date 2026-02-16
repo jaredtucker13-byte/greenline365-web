@@ -164,6 +164,71 @@ export async function GET(request: NextRequest) {
 }
 ```
 
+## Address-Centric Security Model — Architecture Standards
+
+The Property Passport is a **Permanent Digital Ledger** keyed to a physical address. All architecture involving properties, incidents, or liability MUST follow this model:
+
+### Domain Lifecycle: Stain → Shield → Clear
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  INCIDENT CREATED (The Stain)                                    │
+│  Contractor documents safety/environmental risk                  │
+│  Photos uploaded, AI analysis generated                          │
+│  Status: draft → documented                                      │
+├──────────────────────────┬──────────────────────────────────────┤
+│                          ▼                                       │
+│  SIGNATURE REQUESTED (The Shield)                                │
+│  Email sent to homeowner with token-gated link                   │
+│  Status: pending_signature                                       │
+├──────────────┬───────────────────────┬──────────────────────────┤
+│              ▼                       ▼                           │
+│  ACKNOWLEDGED                   REFUSED                          │
+│  Homeowner signs,               Homeowner declines,              │
+│  accepts findings               liability TRANSFERS              │
+│  Status: signed                 Status: refused                  │
+│  liability_transferred: false   liability_transferred: true      │
+├──────────────┴───────────────────────┴──────────────────────────┤
+│                          ▼                                       │
+│  REMEDIATION (The Clear)                                         │
+│  Verified contractor provides "After" evidence                   │
+│  Status: resolved                                                │
+│  resolution_verified: true                                       │
+├─────────────────────────────────────────────────────────────────┤
+│                          ▼                                       │
+│  CLEAN BILL OF HEALTH                                            │
+│  All stains cleared → property eligible for PDF certificate      │
+│  Property health score: 100                                      │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Architecture Rules for Address-Centric Features
+
+1. **Address is the primary key** — Properties are keyed by normalized physical address, not user ID
+2. **Incidents belong to properties** — Every incident MUST reference a `property_address`
+3. **Liability is immutable** — Once a refusal is recorded, it cannot be deleted or modified
+4. **Evidence chain is tamper-proof** — SHA-256 hashes on PDF reports, IP/UA on signatures
+5. **Only verified contractors clear stains** — No self-service clearing by homeowners or admins
+6. **RLS enforces business isolation** — Adapted from MakerKit's `has_role_on_account()` pattern
+
+### RLS Template (Adapted from MakerKit)
+
+```sql
+-- Central function: check business membership
+CREATE OR REPLACE FUNCTION public.has_role_on_business(
+  p_business_id UUID,
+  p_role VARCHAR(50) DEFAULT NULL
+) RETURNS BOOLEAN
+LANGUAGE SQL SECURITY DEFINER SET search_path = ''
+AS $$
+  SELECT EXISTS(
+    SELECT 1 FROM public.profiles p
+    WHERE p.id = (SELECT auth.uid())
+      AND p.business_id = has_role_on_business.p_business_id
+  );
+$$;
+```
+
 ## Design Principles
 
 1. **Least Privilege** — Every component gets minimum required access

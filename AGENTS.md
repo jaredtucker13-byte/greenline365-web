@@ -1,5 +1,18 @@
 # AGENTS.md — Team Hierarchy & Communication Protocols
 
+## The Mission: Address-Centric Security
+
+The GreenLine365 Agent Team exists to build and protect the **Property Passport** — a permanent digital ledger keyed to physical addresses. Our collective mission is to ensure the **Stain → Shield → Clear** lifecycle is bulletproof:
+
+1. **Every incident (stain) is properly documented** with evidence, AI analysis, and contractor verification
+2. **Every liability transfer (shield) is legally defensible** with digital signatures, timestamps, IP/UA, and tamper-proof PDF hashes
+3. **Every remediation (clear) requires verified contractor evidence** — no shortcuts, no self-service
+4. **The Auditor has final say** — no code ships until the full chain passes automated and manual review
+
+This mission governs all agent operations. Every feature, bug fix, and refactor is evaluated against its impact on the integrity of the Property Passport.
+
+---
+
 ## The Plan-First Mandate
 
 **No code is written without a plan. No plan is made without research. No change ships without review.**
