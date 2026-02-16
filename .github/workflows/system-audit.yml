@@ -1,0 +1,238 @@
+# GreenLine365 System Audit & Parallel Sub-Agent Testing
+# Testing Trifecta: TypeCheck -> Lint -> Build -> Test (Parallel)
+
+name: "System Audit - Testing Trifecta"
+
+on:
+  push:
+    branches: [main, develop, "feature/**"]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+    inputs:
+      run_e2e:
+        description: "Run E2E Playwright tests"
+        required: false
+        default: "false"
+        type: choice
+        options:
+          - "true"
+          - "false"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "20"
+  WORKING_DIR: "./webapp"
+
+jobs:
+  typecheck:
+    name: "Agent: AUDITOR - TypeScript Check"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: "${{ env.WORKING_DIR }}/package-lock.json"
+      - name: Install dependencies
+        run: npm ci --ignore-scripts || npm install
+      - name: Run TypeScript compiler (tsc --noEmit)
+        run: npm run typecheck
+
+  lint:
+    name: "Agent: AUDITOR-LINT - Code Quality"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: "${{ env.WORKING_DIR }}/package-lock.json"
+      - name: Install dependencies
+        run: npm ci --ignore-scripts || npm install
+      - name: Run ESLint
+        run: npm run lint
+
+  build:
+    name: "Agent: SAYA - Build Verification"
+    runs-on: ubuntu-latest
+    needs: [typecheck, lint]
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: "${{ env.WORKING_DIR }}/package-lock.json"
+      - name: Install dependencies
+        run: npm ci --ignore-scripts || npm install
+      - name: Build Next.js application
+        run: npm run build
+      - name: Verify build output exists
+        run: |
+          if [ -d ".next" ]; then
+            echo "Build output verified"
+            du -sh .next/
+          else
+            echo "Build failed"
+            exit 1
+          fi
+
+  env-audit:
+    name: "Agent: SYNC - Env & Integration Audit"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Audit required environment variables
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          echo "SYNC Agent - Environment Variable Audit"
+          MISSING=0
+          if [ -z "$NEXT_PUBLIC_SUPABASE_URL" ]; then
+            echo "MISSING: NEXT_PUBLIC_SUPABASE_URL"; MISSING=$((MISSING+1))
+          else
+            echo "OK: NEXT_PUBLIC_SUPABASE_URL is set"
+          fi
+          if [ -z "$NEXT_PUBLIC_SUPABASE_ANON_KEY" ]; then
+            echo "MISSING: NEXT_PUBLIC_SUPABASE_ANON_KEY"; MISSING=$((MISSING+1))
+          else
+            echo "OK: NEXT_PUBLIC_SUPABASE_ANON_KEY is set"
+          fi
+          if [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
+            echo "MISSING: SUPABASE_SERVICE_ROLE_KEY"; MISSING=$((MISSING+1))
+          else
+            echo "OK: SUPABASE_SERVICE_ROLE_KEY is set"
+          fi
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "Preview Branch Security Check"
+            if [ -z "$NEXT_PUBLIC_SUPABASE_URL" ]; then
+              echo "WARNING: Preview branch has no Supabase URL"
+            fi
+          fi
+          echo "Audit Summary: $MISSING variable(s) missing"
+
+  supabase-check:
+    name: "Agent: PASSPORT - Migration Validation"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Validate migration files exist
+        run: |
+          echo "PASSPORT Agent - Supabase Migration Audit"
+          if [ -d "supabase/migrations" ]; then
+            ls -la supabase/migrations/*.sql 2>/dev/null || true
+          fi
+          if [ -f "database/schema.sql" ]; then
+            echo "Found database/schema.sql"
+            wc -l < database/schema.sql
+          fi
+      - name: Check for RLS policy definitions
+        run: |
+          echo "Scanning for RLS policies..."
+          RLS_COUNT=0
+          for f in supabase/migrations/*.sql database/schema.sql; do
+            if [ -f "$f" ]; then
+              POLICIES=$(grep -ci "CREATE POLICY" "$f" 2>/dev/null || echo "0")
+              if [ "$POLICIES" -gt 0 ] 2>/dev/null; then
+                echo "$f: $POLICIES RLS reference(s)"
+                RLS_COUNT=$((RLS_COUNT + POLICIES))
+              fi
+            fi
+          done
+          echo "Total RLS references: $RLS_COUNT"
+
+  e2e-tests:
+    name: "Agent: E2E - Playwright Tests"
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: >-
+      github.event_name == 'workflow_dispatch' && github.event.inputs.run_e2e == 'true'
+      || (github.ref == 'refs/heads/main' && github.event_name == 'push')
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: "${{ env.WORKING_DIR }}/package-lock.json"
+      - name: Install dependencies
+        run: npm ci --ignore-scripts || npm install
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+      - name: Check for test files
+        id: check_tests
+        run: |
+          if ls tests/**/*.spec.ts 1>/dev/null 2>&1 || ls tests/**/*.test.ts 1>/dev/null 2>&1; then
+            echo "has_tests=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_tests=false" >> $GITHUB_OUTPUT
+          fi
+      - name: Run Playwright tests
+        if: steps.check_tests.outputs.has_tests == 'true'
+        run: npx playwright test
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+
+  audit-report:
+    name: "Supervisor - Trifecta Audit Report"
+    runs-on: ubuntu-latest
+    needs: [typecheck, lint, build, env-audit, supabase-check]
+    if: always()
+    steps:
+      - name: Generate Testing Trifecta Report
+        run: |
+          echo "======================================================="
+          echo "  GreenLine365 - Testing Trifecta Audit Report"
+          echo "======================================================="
+          echo "SECTION 1 BASELINE: TypeCheck=${{ needs.typecheck.result }} Lint=${{ needs.lint.result }}"
+          echo "SECTION 2 IMPROVEMENT: Build=${{ needs.build.result }} Migrations=${{ needs.supabase-check.result }}"
+          echo "SECTION 3 EFFICIENCY: EnvAudit=${{ needs.env-audit.result }}"
+          echo "Commit: ${{ github.sha }} Branch: ${{ github.ref_name }}"
+          echo "======================================================="
+          if [ "${{ needs.typecheck.result }}" = "success" ] && [ "${{ needs.lint.result }}" = "success" ] && [ "${{ needs.build.result }}" = "success" ]; then
+            echo "TRIFECTA STATUS: ALL CORE CHECKS PASSED"
+          else
+            echo "TRIFECTA STATUS: ISSUES DETECTED"
+            exit 1
+          fi
