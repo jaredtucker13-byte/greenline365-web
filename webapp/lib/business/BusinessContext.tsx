@@ -27,6 +27,12 @@ export interface Business {
   is_white_label?: boolean;
   can_edit_site?: boolean;
   monthly_price?: number;
+  has_booking_suite?: boolean;
+  plan_level?: string;
+  business_email?: string;
+  domain?: string;
+  test_mode?: boolean;
+  booking_buffer_minutes?: number;
   settings: {
     features: {
       content_forge: boolean;
