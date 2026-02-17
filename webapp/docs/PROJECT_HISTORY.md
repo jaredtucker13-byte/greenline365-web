@@ -173,15 +173,7 @@
 
 ## CREDENTIALS ON FILE
 
-| Service | Key/ID | Status |
-|---------|--------|--------|
-| OpenWeather API | `01c4fcd1427b885071211a7d50dca7bd` | ✅ Working |
-| Kie.ai (Images) | `1f1d2d3eed99f294339cb1f17b5bc743` | ✅ Working |
-| Cal.com API | `cal_live_843dbf42ad7ffb4447d3abbc97fcf664` | ✅ Working |
-| Cal.com Event Type | `4233765` | ✅ Configured |
-| Cal.com Username | `jared-tucker-2gdr7e` | ✅ Configured |
-| Twilio Account SID | `AC7cee85afe226dba0d82cfe68e4a9c890` | ✅ Working |
-| Twilio Phone | `+18777804236` | ✅ Working |
+> All credentials are managed via environment variables. See `webapp/.env.example` for the full list.
 
 ---
 

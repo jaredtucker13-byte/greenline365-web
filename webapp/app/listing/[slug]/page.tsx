@@ -788,7 +788,7 @@ export default function ListingDetailPage() {
                       style={{ border: 0 }}
                       loading="lazy"
                       referrerPolicy="no-referrer-when-downgrade"
-                      src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyDJ5FY_ZL1pqN3lsERdgi9NiuwK_DYcfTo&q=${encodeURIComponent([listing.business_name, listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', '))}`}
+                      src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${encodeURIComponent([listing.business_name, listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', '))}`}
                       title={`Map showing ${listing.business_name} location`}
                     />
                   </div>

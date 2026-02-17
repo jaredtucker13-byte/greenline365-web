@@ -113,8 +113,11 @@ BATCH_4 = [
 ALL = BATCH_3 + BATCH_4
 
 # Also push to CRM
-SUPABASE_URL = "https://rawlqwjdfzicjepzmcng.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJhd2xxd2pkZnppY2plcHptY25nIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NDE5NTIwMSwiZXhwIjoyMDc5NzcxMjAxfQ.O2as6N-_5ZcboDVn2AF1rBkGm3yUlaRZ0lfvK3REYIM"
+import os
+SUPABASE_URL = os.environ.get('NEXT_PUBLIC_SUPABASE_URL')
+SUPABASE_KEY = os.environ.get('SUPABASE_SERVICE_ROLE_KEY')
+if not SUPABASE_URL or not SUPABASE_KEY:
+    raise RuntimeError("Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY environment variables")
 CRM_HEADERS = {"apikey": SUPABASE_KEY, "Authorization": f"Bearer {SUPABASE_KEY}", "Content-Type": "application/json", "Prefer": "return=representation"}
 USER_ID = "677b536d-6521-4ac8-a0a5-98278b35f4cc"
 

@@ -24,7 +24,7 @@ supabase init  # Skip if already initialized
 
 ### 2. Set Environment Secrets
 ```bash
-supabase secrets set OPENWEATHER_API_KEY=01c4fcd1427b885071211a7d50dca7bd
+supabase secrets set OPENWEATHER_API_KEY=<your-openweather-api-key>
 ```
 
 ### 3. Deploy the Function
