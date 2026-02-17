@@ -15,18 +15,22 @@ const RETELL_API_KEY = process.env.RETELL_API_KEY || '';
 
 export async function POST(request: NextRequest) {
   try {
+    // Reject requests if RETELL_API_KEY is not configured
+    if (!RETELL_API_KEY) {
+      console.error('[Retell Webhook] RETELL_API_KEY not configured — rejecting request');
+      return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 });
+    }
+
     const body = await request.json();
     const signature = request.headers.get('x-retell-signature') || '';
-    
-    // Verify webhook signature
-    if (RETELL_API_KEY) {
-      const bodyString = JSON.stringify(body);
-      const isValid = Retell.verify(bodyString, RETELL_API_KEY, signature);
-      
-      if (!isValid) {
-        console.error('[Retell Webhook] Invalid signature');
-        return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
-      }
+
+    // Verify webhook signature (mandatory)
+    const bodyString = JSON.stringify(body);
+    const isValid = Retell.verify(bodyString, RETELL_API_KEY, signature);
+
+    if (!isValid) {
+      console.error('[Retell Webhook] Invalid signature');
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
     }
     
     const event = body.event;

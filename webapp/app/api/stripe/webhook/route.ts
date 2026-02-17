@@ -26,6 +26,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Webhook signature verification failed' }, { status: 400 });
   }
 
+  // Idempotency check — skip already-processed events
+  const { data: existing } = await supabase
+    .from('processed_webhook_events')
+    .select('id')
+    .eq('event_id', event.id)
+    .maybeSingle();
+
+  if (existing) {
+    console.log(`[STRIPE WEBHOOK] Skipping duplicate event: ${event.id}`);
+    return NextResponse.json({ received: true, duplicate: true });
+  }
+
   console.log(`[STRIPE WEBHOOK] ${event.type}`);
 
   switch (event.type) {
@@ -88,6 +100,13 @@ export async function POST(request: NextRequest) {
       break;
     }
   }
+
+  // Record event as processed for idempotency
+  await supabase.from('processed_webhook_events').insert({
+    event_id: event.id,
+    source: 'stripe',
+    event_type: event.type,
+  });
 
   return NextResponse.json({ received: true });
 }
