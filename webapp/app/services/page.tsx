@@ -117,19 +117,6 @@ export default function ServicesPage() {
         immediateRender: false,
       });
 
-      // Progress bars grow animation
-      gsap.from('.gsap-progress-bar', {
-        scrollTrigger: {
-          trigger: '.gsap-progress-bar',
-          start: 'top 85%',
-        },
-        scaleX: 0,
-        transformOrigin: 'left',
-        duration: 1,
-        stagger: 0.2,
-        ease: 'power2.out',
-      });
-
       // Testimonial card
       gsap.from('[data-testimonial]', {
         scrollTrigger: {

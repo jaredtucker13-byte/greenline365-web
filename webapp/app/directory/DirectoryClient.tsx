@@ -203,20 +203,35 @@ export default function DirectoryPage() {
   }, [userLocation, cityFilter]);
 
   useEffect(() => {
+    const controller = new AbortController();
+
     (async () => {
       try {
-        const res = await fetch('/api/directory?limit=12');
+        const res = await fetch('/api/directory?limit=12', { signal: controller.signal });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         setFeaturedListings(Array.isArray(data) ? data : []);
-      } catch { setFeaturedListings([]); }
+      } catch (err) {
+        if (!controller.signal.aborted) {
+          console.error('[Directory] Failed to load featured listings:', err);
+          setFeaturedListings([]);
+        }
+      }
     })();
     (async () => {
       try {
-        const res = await fetch('/api/directory/stats');
+        const res = await fetch('/api/directory/stats', { signal: controller.signal });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         setStats(data);
-      } catch {}
+      } catch (err) {
+        if (!controller.signal.aborted) {
+          console.error('[Directory] Failed to load stats:', err);
+        }
+      }
     })();
+
+    return () => controller.abort();
   }, []);
 
   function handleCategoryClick(id: string) {

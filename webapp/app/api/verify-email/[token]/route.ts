@@ -74,9 +74,48 @@ export async function POST(
 
     console.log('[Verify Token] Successfully verified:', entry.email);
 
+    // Sync to CRM (mirrors verify-code route behavior)
+    let crmSynced = false;
+    try {
+      const now = new Date().toISOString();
+      const { data: existingLead } = await supabase
+        .from('crm_leads')
+        .select('id')
+        .eq('email', entry.email)
+        .maybeSingle();
+
+      if (existingLead) {
+        await supabase
+          .from('crm_leads')
+          .update({ status: 'verified', last_contact_at: now, updated_at: now })
+          .eq('id', existingLead.id);
+      } else {
+        const insertData: Record<string, any> = {
+          email: entry.email,
+          status: 'verified',
+          source: 'waitlist',
+          first_contact_at: now,
+          last_contact_at: now,
+          created_at: now,
+          updated_at: now,
+          tags: ['waitlist'],
+        };
+        if (entry.name) insertData.name = entry.name;
+        if (entry.company) insertData.company = entry.company;
+        if (entry.industry) insertData.metadata = { industry: entry.industry };
+
+        await supabase.from('crm_leads').insert(insertData);
+      }
+      crmSynced = true;
+      console.log('[Verify Token] CRM sync completed for:', entry.email);
+    } catch (crmError) {
+      console.error('[Verify Token] CRM sync failed (non-blocking):', crmError);
+    }
+
     return NextResponse.json({
       success: true,
       message: 'Email verified successfully! Welcome to GreenLine365.',
+      crmSynced,
     });
 
   } catch (error: any) {
