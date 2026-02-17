@@ -99,7 +99,6 @@ export default function Navbar() {
 
   const navLinks: { href: string; label: string; dropdown?: { href: string; label: string }[] }[] = [
     { href: '/', label: 'Directory' },
-    { href: '/services', label: 'Our Services' },
   ];
 
   // Don't render navbar on dashboard routes
@@ -109,8 +108,9 @@ export default function Navbar() {
 
   return (
     <>
-      <nav 
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+      <nav
+          aria-label="Main navigation"
+          className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           scrolled 
             ? 'glass-strong shadow-glass border-b border-white/10' 
             : 'bg-transparent border-b border-white/5'
