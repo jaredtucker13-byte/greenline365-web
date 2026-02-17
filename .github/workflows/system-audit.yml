@@ -233,10 +233,6 @@ jobs:
           echo "======================================================="
           if [ "${{ needs.typecheck.result }}" = "success" ] && [ "${{ needs.lint.result }}" = "success" ] && [ "${{ needs.build.result }}" = "success" ]; then
             echo "TRIFECTA STATUS: ALL CORE CHECKS PASSED"
-                      else
-                                  echo "TRIFECTA STATUS: ISSUES DETECTED"
-                                              exit 1
-                                                        fi
           else
             echo "TRIFECTA STATUS: ISSUES DETECTED"
             exit 1
