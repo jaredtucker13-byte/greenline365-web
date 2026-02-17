@@ -328,7 +328,7 @@ function BookingRow({ booking, isNew }: { booking: Booking; isNew: boolean }) {
       {/* Source */}
       <div className="flex items-center">
         <span className="text-xs text-white/50 bg-white/5 px-2 py-0.5 rounded">
-          {sourceLabels[booking.booked_by || booking.source || 'unknown'] || booking.booked_by || '—'}
+          {sourceLabels[booking.booked_by || 'unknown'] || booking.booked_by || '—'}
         </span>
       </div>
     </motion.div>
