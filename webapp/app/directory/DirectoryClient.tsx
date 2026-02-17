@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * GL365 Directory — "Bentley Standard" with Subcategory Browse
+ * GL365 Directory â "Bentley Standard" with Subcategory Browse
  * 9 top-level categories, each with subcategory pill-tab filtering.
  * Listings grouped by subcategory, featured/weighted to top.
  */
@@ -37,7 +37,7 @@ interface Listing {
   metadata?: Record<string, any>;
 }
 
-// ─── Category & Subcategory Map ────────────────────────────────────
+// âââ Category & Subcategory Map ââââââââââââââââââââââââââââââââââââ
 const CATEGORIES = [
   { id: 'services', label: 'Services', sub: 'HVAC, Plumbing, Electrical & More', img: '/images/categories/services.png',
     subcategories: ['All', 'HVAC', 'Plumbing', 'Electrical', 'Roofing', 'General Contractors', 'Landscaping', 'Pest Control', 'Cleaning'] },
@@ -60,7 +60,7 @@ const CATEGORIES = [
 ];
 
 const TESTIMONIALS = [
-  { name: 'Marcus Johnson', role: 'HVAC Business Owner', rating: 5, text: 'Since listing on GL365, our bookings increased 40%. The verified badge gives customers instant trust — they know we\'re the real deal.' },
+  { name: 'Marcus Johnson', role: 'HVAC Business Owner', rating: 5, text: 'Since listing on GL365, our bookings increased 40%. The verified badge gives customers instant trust â they know we\'re the real deal.' },
   { name: 'Sarah Chen', role: 'Homeowner, Tampa FL', rating: 5, text: 'I found a certified plumber through the directory in minutes. The trust scores showed me exactly who to call.' },
   { name: 'David Rodriguez', role: 'Bakery Owner', rating: 5, text: 'The AI built our profile in seconds from our website. Now we get foot traffic from people searching the directory. Best marketing investment we\'ve made.' },
 ];
@@ -88,7 +88,7 @@ function PropertyIntelBadge() {
   );
 }
 
-// ─── Main Component ────────────────────────────────────────────────
+// âââ Main Component ââââââââââââââââââââââââââââââââââââââââââââââââ
 export default function DirectoryPage() {
   const [listings, setListings] = useState<Listing[]>([]);
   const [featuredListings, setFeaturedListings] = useState<Listing[]>([]);
@@ -302,7 +302,7 @@ export default function DirectoryPage() {
   return (
     <div className="min-h-screen bg-midnight-900 overflow-x-hidden" data-testid="directory-page">
       {showGroupedBrowse ? (
-        /* ─── GROUPED BROWSE VIEW (All categories with carousels) ─── */
+        /* âââ GROUPED BROWSE VIEW (All categories with carousels) âââ */
         <GroupedBrowseView
           activeCategory={activeCategory}
           sortBy={sortBy}
@@ -316,10 +316,10 @@ export default function DirectoryPage() {
         />
       ) : !showListings ? (
         <>
-          {/* ─── HERO ─── */}
-          <section className="relative overflow-hidden pt-16" style={{ minHeight: '85vh' }} data-testid="directory-hero">
+          {/* âââ HERO âââ */}
+          <section className="relative overflow-hidden pt-20 sm:pt-24" style={{ minHeight: '85vh' }} data-testid="directory-hero">
             <div className="absolute inset-0">
-              <img src="/images/hero-directory.png" alt="GreenLine365 business directory — discover local businesses across dining, services, nightlife and more" className="w-full h-full object-cover" />
+              <img src="/images/hero-directory.png" alt="GreenLine365 business directory â discover local businesses across dining, services, nightlife and more" className="w-full h-full object-cover" />
             </div>
             {/* Darkened overlays for text legibility (WCAG fix) */}
             <div className="absolute inset-0 bg-gradient-to-b from-midnight-900/95 via-midnight-900/85 to-midnight-900" />
@@ -345,10 +345,10 @@ export default function DirectoryPage() {
               {/* Value prop - now prominent */}
               <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}
                 className="text-base md:text-lg text-white/80 max-w-2xl mx-auto text-center mb-10 leading-relaxed font-body">
-                Every business in our directory is real, verified, and accountable. We reject listings that don't meet the standard — so you don't have to guess.
+                Every business in our directory is real, verified, and accountable. We reject listings that don't meet the standard â so you don't have to guess.
               </motion.p>
 
-              {/* Search Bar — clear primary CTA */}
+              {/* Search Bar â clear primary CTA */}
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="w-full max-w-2xl">
                 <div className="flex flex-col sm:flex-row gap-3 p-2 rounded-2xl backdrop-blur-xl border border-white/15" style={{ background: 'rgba(255,255,255,0.10)' }}>
                   <div className="flex-1 relative">
@@ -377,7 +377,7 @@ export default function DirectoryPage() {
                 </div>
               </motion.div>
 
-              {/* ─── TRUST COUNTER BAR (larger, higher contrast) ─── */}
+              {/* âââ TRUST COUNTER BAR (larger, higher contrast) âââ */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -409,13 +409,13 @@ export default function DirectoryPage() {
             <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-midnight-900 to-transparent" />
           </section>
 
-          {/* ─── BROWSE BY CATEGORY ─── */}
+          {/* âââ BROWSE BY CATEGORY âââ */}
           <section id="categories" className="max-w-7xl mx-auto px-6 py-20" data-testid="categories-section">
             <p className="text-xs font-heading font-semibold uppercase tracking-[0.2em] text-center mb-3 text-gold">Browse By Category</p>
             <h2 className="text-3xl md:text-4xl font-heading font-light text-white text-center mb-3 tracking-tight">
               Explore <span className="font-semibold text-gradient-gold">Categories</span>
             </h2>
-            <p className="text-white/50 text-center max-w-lg mx-auto mb-12 font-body">From home services to nightlife — find exactly what you need.</p>
+            <p className="text-white/50 text-center max-w-lg mx-auto mb-12 font-body">From home services to nightlife â find exactly what you need.</p>
 
             {/* 9-Category Grid */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -424,7 +424,7 @@ export default function DirectoryPage() {
                   className={`relative rounded-2xl overflow-hidden cursor-pointer group hover:shadow-gold-glow transition-all duration-500 ${i === 0 ? 'md:col-span-2 md:row-span-2' : ''}`}
                   style={{ minHeight: i === 0 ? 320 : 180 }}
                   onClick={() => handleCategoryClick(cat.id)} data-testid={`cat-${cat.id}`}>
-                  <img src={cat.img} alt={`${cat.label} — ${cat.sub}`} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <img src={cat.img} alt={`${cat.label} â ${cat.sub}`} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                   <div className="absolute inset-0 bg-gradient-to-t from-midnight-900/90 via-midnight-900/40 to-transparent group-hover:from-midnight-900/95 transition-all duration-500" />
                   <div className="absolute bottom-4 left-4">
                     <span className={`text-white font-heading font-semibold block tracking-tight ${i === 0 ? 'text-2xl' : 'text-base'}`}>{cat.label}</span>
@@ -436,7 +436,7 @@ export default function DirectoryPage() {
             </div>
           </section>
 
-          {/* ─── FEATURED LISTINGS ─── */}
+          {/* âââ FEATURED LISTINGS âââ */}
           <section className="bg-charcoal-900 py-20" data-testid="featured-listings-section">
             <div className="max-w-7xl mx-auto px-6">
               <p className="text-xs font-heading font-semibold uppercase tracking-[0.2em] text-center mb-3 text-gold">Showcase</p>
@@ -483,7 +483,7 @@ export default function DirectoryPage() {
             </div>
           </section>
 
-          {/* ─── DESTINATION GUIDES — BENTLEY STANDARD 8-CARD GRID ─── */}
+          {/* âââ DESTINATION GUIDES â BENTLEY STANDARD 8-CARD GRID âââ */}
           <section className="section-gradient-blue-gold py-24 bg-gold-accent-top" data-testid="destination-guides-section">
             {/* Section Divider Top */}
             <div className="section-divider-gold max-w-5xl mx-auto mb-16" />
@@ -496,7 +496,7 @@ export default function DirectoryPage() {
                   Explore <span className="font-semibold text-gradient-gold">Destinations</span>
                 </h2>
                 <p className="text-sm text-white/50 max-w-lg mx-auto font-body leading-relaxed">
-                  Your personal concierge to Florida&apos;s finest — where to stay, dine, explore, and unwind.
+                  Your personal concierge to Florida&apos;s finest â where to stay, dine, explore, and unwind.
                 </p>
               </div>
 
@@ -524,7 +524,7 @@ export default function DirectoryPage() {
                         <div className="relative overflow-hidden" style={{ aspectRatio: '4/3' }}>
                           <img
                             src={d.image}
-                            alt={`${d.label} destination guide — ${d.tagline}`}
+                            alt={`${d.label} destination guide â ${d.tagline}`}
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                             loading="lazy"
                           />
@@ -545,12 +545,12 @@ export default function DirectoryPage() {
             <div className="section-divider-gold max-w-5xl mx-auto mt-16" />
           </section>
 
-          {/* ─── VALUE PROPOSITION ─── */}
+          {/* âââ VALUE PROPOSITION âââ */}
           <section className="bg-midnight-900 py-20" data-testid="value-prop-section">
             <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
               <div>
                 <h2 className="text-3xl font-heading font-light text-white mb-4 tracking-tight">A <span className="font-semibold text-gradient-gold">Trusted</span> Resource for Finding Local Pros</h2>
-                <p className="text-white/55 mb-10 leading-relaxed font-body">Whether you need emergency plumbing, a master electrician, or the best barber in town — our directory connects you with verified, accountable businesses.</p>
+                <p className="text-white/55 mb-10 leading-relaxed font-body">Whether you need emergency plumbing, a master electrician, or the best barber in town â our directory connects you with verified, accountable businesses.</p>
                 <div className="grid grid-cols-2 gap-6">
                   {[
                     { icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', label: 'Verified Pros' },
@@ -574,7 +574,7 @@ export default function DirectoryPage() {
             </div>
           </section>
 
-          {/* ─── TESTIMONIALS ─── */}
+          {/* âââ TESTIMONIALS âââ */}
           <section className="relative py-20 overflow-hidden" data-testid="testimonials-section">
             <div className="absolute inset-0 opacity-15" style={{ backgroundImage: 'url(/images/hero-directory-alt.png)', backgroundSize: 'cover' }} />
             <div className="absolute inset-0 bg-charcoal-900/95" />
@@ -602,7 +602,7 @@ export default function DirectoryPage() {
           </section>
         </>
       ) : (
-        /* ─── CATEGORY BROWSE VIEW ─── */
+        /* âââ CATEGORY BROWSE VIEW âââ */
         <div data-testid="listings-view">
           {/* Category Header */}
           <section className="relative bg-midnight-950 pt-20 pb-8 overflow-hidden">
@@ -635,7 +635,7 @@ export default function DirectoryPage() {
                 <button onClick={handleSearch} className="btn-primary px-8 py-3 rounded-xl text-sm">Search</button>
               </div>
 
-              {/* Filters Row — Location, Sort, Distance */}
+              {/* Filters Row â Location, Sort, Distance */}
               <div className="flex flex-wrap items-center gap-2 mb-4" data-testid="location-filter">
                 {/* City filter */}
                 <select
@@ -679,7 +679,7 @@ export default function DirectoryPage() {
                   ))}
                 </div>
 
-                {/* Distance radius — only show when geolocation is active */}
+                {/* Distance radius â only show when geolocation is active */}
                 {userLocation && (
                   <select
                     value={maxDistance}
@@ -762,7 +762,7 @@ export default function DirectoryPage() {
   );
 }
 
-// ─── Listing Card ──────────────────────────────────────────────────
+// âââ Listing Card ââââââââââââââââââââââââââââââââââââââââââââââââââ
 function ListingCard({ listing: l, index: i }: { listing: Listing; index: number }) {
   const hasIntel = l.has_property_intelligence;
   return (
@@ -773,7 +773,7 @@ function ListingCard({ listing: l, index: i }: { listing: Listing; index: number
         data-testid={`listing-${l.slug}`}>
         <div className="relative h-40 overflow-hidden">
           {l.cover_image_url || l.logo_url ? (
-            <img src={l.cover_image_url || l.logo_url!} alt={`${l.business_name} — ${l.industry.replace(/-/g, ' ')} in ${l.city || 'Florida'}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            <img src={l.cover_image_url || l.logo_url!} alt={`${l.business_name} â ${l.industry.replace(/-/g, ' ')} in ${l.city || 'Florida'}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-midnight-800 to-charcoal-800">
               <span className="text-4xl font-heading font-light text-white/10">{l.business_name[0]}</span>
@@ -810,13 +810,13 @@ function ListingCard({ listing: l, index: i }: { listing: Listing; index: number
 }
 
 
-// ─── Subcategory Carousel Row ──────────────────────────────────────
+// âââ Subcategory Carousel Row ââââââââââââââââââââââââââââââââââââââ
 // Fetches listings for a category, optionally filtered by subcategory search term
 function SubcategoryCarouselRow({ label, subtitle, industry, searchTerm, sortBy, cityFilter, userLocation, onViewAll }: {
   label: string;
   subtitle: string;
   industry: string;
-  searchTerm: string; // e.g. "HVAC", "Plumbing" — used to filter within the industry
+  searchTerm: string; // e.g. "HVAC", "Plumbing" â used to filter within the industry
   sortBy: string;
   cityFilter: string;
   userLocation: { lat: number; lng: number } | null;
@@ -945,7 +945,7 @@ function SubcategoryCarouselRow({ label, subtitle, industry, searchTerm, sortBy,
                 </div>
                 <div className="p-3">
                   <h4 className="text-sm font-heading font-semibold text-gold truncate">{l.business_name}</h4>
-                  <p className="text-[11px] text-white/40 font-body truncate">{l.city}{l.distance != null ? ` · ${l.distance} mi` : ''}</p>
+                  <p className="text-[11px] text-white/40 font-body truncate">{l.city}{l.distance != null ? ` Â· ${l.distance} mi` : ''}</p>
                 </div>
               </div>
             </Link>
@@ -965,7 +965,7 @@ function SubcategoryCarouselRow({ label, subtitle, industry, searchTerm, sortBy,
   );
 }
 
-// ─── Grouped Browse View (Categories OR Subcategories with carousels) ───────────
+// âââ Grouped Browse View (Categories OR Subcategories with carousels) âââââââââââ
 function GroupedBrowseView({ activeCategory, sortBy, setSortBy, cityFilter, setCityFilter, availableCities, userLocation, onViewAll, onBack }: {
   activeCategory: string;
   sortBy: string;
