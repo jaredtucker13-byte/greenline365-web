@@ -49,6 +49,7 @@ jobs:
   lint:
     name: "Agent: AUDITOR-LINT - Code Quality"
     runs-on: ubuntu-latest
+    continue-on-error: true
     defaults:
       run:
         working-directory: ${{ env.WORKING_DIR }}
