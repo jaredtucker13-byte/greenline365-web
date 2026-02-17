@@ -25,6 +25,8 @@ type Tab = 'command-center' | 'retell' | 'calcom' | 'analytics' | 'endpoints';
 
 export default function BookingSuitePage() {
   const [activeTab, setActiveTab] = useState<Tab>('command-center');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const tabs = [
     { id: 'command-center' as Tab, label: 'Command Center', icon: <Activity className="w-4 h-4" /> },
@@ -35,49 +37,62 @@ export default function BookingSuitePage() {
   ];
 
   return (
-    <CollapsibleSidebar>
-      <div className="p-6 max-w-7xl mx-auto">
-        {/* Page Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-white">Booking Suite</h1>
-          <p className="text-sm text-white/50 mt-1">AI-powered booking management with multi-sync orchestration</p>
-        </div>
+    <div className="flex min-h-screen">
+      <CollapsibleSidebar
+        activeItem="booking-suite"
+        onNewBooking={() => {}}
+        onNewContent={() => {}}
+        pendingCount={0}
+        isCollapsed={sidebarCollapsed}
+        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        isMobileOpen={mobileMenuOpen}
+        onMobileToggle={() => setMobileMenuOpen(!mobileMenuOpen)}
+      />
 
-        <BookingSuiteGate>
-          {/* Tab Navigation */}
-          <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-xl p-1 mb-6 overflow-x-auto">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm whitespace-nowrap transition-all ${
-                  activeTab === tab.id
-                    ? 'bg-[#39FF14]/20 text-[#39FF14] font-medium'
-                    : 'text-white/50 hover:text-white/70 hover:bg-white/5'
-                }`}
-              >
-                {tab.icon}
-                {tab.label}
-              </button>
-            ))}
+      <div className="flex-1 min-w-0">
+        <div className="p-6 max-w-7xl mx-auto">
+          {/* Page Header */}
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-white">Booking Suite</h1>
+            <p className="text-sm text-white/50 mt-1">AI-powered booking management with multi-sync orchestration</p>
           </div>
 
-          {/* Tab Content */}
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            {activeTab === 'command-center' && <BookingCommandCenter />}
-            {activeTab === 'retell' && <RetellSettingsTab />}
-            {activeTab === 'calcom' && <CalcomIntegrationTab />}
-            {activeTab === 'analytics' && <BookingAnalyticsTab />}
-            {activeTab === 'endpoints' && <EndpointStatusTab />}
-          </motion.div>
-        </BookingSuiteGate>
+          <BookingSuiteGate>
+            {/* Tab Navigation */}
+            <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-xl p-1 mb-6 overflow-x-auto">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm whitespace-nowrap transition-all ${
+                    activeTab === tab.id
+                      ? 'bg-[#39FF14]/20 text-[#39FF14] font-medium'
+                      : 'text-white/50 hover:text-white/70 hover:bg-white/5'
+                  }`}
+                >
+                  {tab.icon}
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Tab Content */}
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              {activeTab === 'command-center' && <BookingCommandCenter />}
+              {activeTab === 'retell' && <RetellSettingsTab />}
+              {activeTab === 'calcom' && <CalcomIntegrationTab />}
+              {activeTab === 'analytics' && <BookingAnalyticsTab />}
+              {activeTab === 'endpoints' && <EndpointStatusTab />}
+            </motion.div>
+          </BookingSuiteGate>
+        </div>
       </div>
-    </CollapsibleSidebar>
+    </div>
   );
 }
 
