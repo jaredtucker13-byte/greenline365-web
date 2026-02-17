@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
       // --- RECURRING INVOICE PAID ---
     case 'invoice.payment_succeeded': {
             const invoice = event.data.object as Stripe.Invoice;
-            const subscriptionId = invoice.subscription as string;
+                    const subscriptionId = (invoice as any).subscription as string;
             console.log(`[STRIPE] Invoice paid: $${(invoice.amount_paid || 0) / 100} for subscription ${subscriptionId}`);
 
             // Update billing status to active (in case it was past_due)
@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
       // --- RECURRING INVOICE FAILED ---
     case 'invoice.payment_failed': {
             const invoice = event.data.object as Stripe.Invoice;
-            const subscriptionId = invoice.subscription as string;
+                    const subscriptionId = (invoice as any).subscription as string;
             console.error(`[STRIPE] Invoice payment FAILED: $${(invoice.amount_due || 0) / 100} for subscription ${subscriptionId}`);
 
             // Mark billing as past_due - Stripe will retry per your dashboard retry settings
