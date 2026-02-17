@@ -1,0 +1,172 @@
+name: CI — Integration Sync
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+# Cancel in-progress runs on the same branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "20"
+  WORKING_DIR: ./webapp
+
+jobs:
+  # ─────────────────────────────────────────────────────────
+  # Job 1: TypeScript Type Check (parallel with lint + audit)
+  # ─────────────────────────────────────────────────────────
+  typecheck:
+    name: TypeScript Type Check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: TypeScript type check
+        run: yarn typecheck
+
+  # ─────────────────────────────────────────────────────────
+  # Job 2: ESLint (parallel with typecheck + audit)
+  # ─────────────────────────────────────────────────────────
+  lint:
+    name: ESLint
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Lint
+        run: yarn lint
+
+  # ─────────────────────────────────────────────────────────
+  # Job 3: Environment Variable Audit (parallel)
+  # ─────────────────────────────────────────────────────────
+  env-audit:
+    name: Environment Variable Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Audit environment variables
+        run: |
+          echo "=== Environment Variable Audit ==="
+          echo ""
+
+          # Extract all process.env references from the codebase
+          echo "--- Variables referenced in code ---"
+          grep -roh 'process\.env\.\w\+' webapp/app webapp/lib webapp/middleware.ts 2>/dev/null \
+            | sort -u \
+            | sed 's/process\.env\.//' \
+            > /tmp/code_vars.txt
+          cat /tmp/code_vars.txt
+          echo ""
+          echo "Total: $(wc -l < /tmp/code_vars.txt) unique variables"
+          echo ""
+
+          # Compare against .env.example if it exists
+          if [ -f webapp/.env.example ]; then
+            echo "--- Variables documented in .env.example ---"
+            grep -oP '^\w+' webapp/.env.example | sort -u > /tmp/example_vars.txt
+            cat /tmp/example_vars.txt
+            echo ""
+
+            echo "--- Missing from .env.example (undocumented) ---"
+            MISSING=$(comm -23 /tmp/code_vars.txt /tmp/example_vars.txt)
+            if [ -z "$MISSING" ]; then
+              echo "  All variables are documented!"
+            else
+              echo "$MISSING"
+              echo ""
+              echo "::warning::Some environment variables are not documented in .env.example"
+            fi
+          else
+            echo "::error::No .env.example file found! All variables are undocumented."
+            exit 1
+          fi
+
+          echo ""
+          echo "--- Breakdown ---"
+          echo "Public (NEXT_PUBLIC_*):"
+          grep '^NEXT_PUBLIC' /tmp/code_vars.txt | sed 's/^/  /' || echo "  (none)"
+          echo ""
+          echo "Server-only (sensitive):"
+          grep -v '^NEXT_PUBLIC' /tmp/code_vars.txt | sed 's/^/  /' || echo "  (none)"
+
+  # ─────────────────────────────────────────────────────────
+  # Job 4: Build Verification (gated on typecheck + lint)
+  # ─────────────────────────────────────────────────────────
+  build:
+    name: Build Verification
+    runs-on: ubuntu-latest
+    needs: [typecheck, lint]
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
+    env:
+      # Dummy env vars for build — Next.js needs NEXT_PUBLIC_* at compile time.
+      # These are NOT real secrets; Vercel handles production builds with real values.
+      NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
+      NEXT_PUBLIC_SITE_URL: https://greenline365.com
+      NEXT_PUBLIC_APP_URL: https://greenline365.com
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Build
+        run: yarn build
+
+  # ─────────────────────────────────────────────────────────
+  # Job 5: Supabase Migration (production deploys only)
+  # ─────────────────────────────────────────────────────────
+  supabase-migrate:
+    name: Supabase Migration
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    needs: [build]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Link Supabase project
+        run: supabase link --project-ref ${{ secrets.SUPABASE_PROJECT_REF }}
+        working-directory: webapp
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+      - name: Push migrations
+        run: supabase db push
+        working-directory: webapp
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
