@@ -23,7 +23,7 @@ export default function Footer() {
           <div className="md:col-span-1">
             <Link href="/" className="text-2xl font-bold">
               <span className="text-white">Green</span>
-              <span className="text-emerald-400">Line365</span>
+              <span className="text-gold">Line365</span>
             </Link>
             <p className="mt-4 text-white/50 text-sm">
               Your AI-assisted planning and accountability partner.
@@ -67,6 +67,11 @@ export default function Footer() {
             <h4 className="text-white font-semibold mb-4">Company</h4>
             <ul className="space-y-2">
               <li>
+                <Link href="/services" className="text-white/50 hover:text-white transition text-sm">
+                  Our Services
+                </Link>
+              </li>
+              <li>
                 <Link href="/about" className="text-white/50 hover:text-white transition text-sm">
                   About
                 </Link>
@@ -103,17 +108,17 @@ export default function Footer() {
         </div>
 
         <div className="mt-12 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-white/40 text-sm">
-            © {new Date().getFullYear()} GreenLine365. All rights reserved.
+          <p className="text-white/50 text-sm">
+            Â© {new Date().getFullYear()} GreenLine365. All rights reserved.
           </p>
           <div className="flex gap-6">
-            <Link href="/privacy" className="text-white/40 hover:text-white/60 transition text-sm">
+            <Link href="/privacy" className="text-white/50 hover:text-white/70 transition text-sm">
               Privacy Policy
             </Link>
-            <Link href="/terms" className="text-white/40 hover:text-white/60 transition text-sm">
+            <Link href="/terms" className="text-white/50 hover:text-white/70 transition text-sm">
               Terms of Service
             </Link>
-            <Link href="/trust" className="text-white/40 hover:text-white/60 transition text-sm">
+            <Link href="/trust" className="text-white/50 hover:text-white/70 transition text-sm">
               Trust & Security
             </Link>
           </div>
