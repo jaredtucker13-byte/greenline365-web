@@ -141,7 +141,7 @@
 | **kie.ai** | AI image generation (Nano Banana) | Professional+ | ✅ Active |
 | **Slack** | Brain integration webhook | Professional+ | 🔄 Planned |
 | **Google Calendar** | Calendar sync | All | 🔄 Planned |
-| **Stripe** | Payment processing | All | 🔄 Planned |
+| **Stripe** | Payment processing (checkout, subscriptions, webhooks, customer portal) | All | ✅ Active |
 
 ---
 
