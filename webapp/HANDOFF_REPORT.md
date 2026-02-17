@@ -129,7 +129,106 @@ curl -X POST https://YOUR_DEPLOYMENT_URL/api/webhooks/booking-sync \
 
 ---
 
-## 5. Required Environment Variables
+## 5. 5-Persona Test Script (for the Tester)
+
+Execute these tests after deployment to validate the full booking flow.
+
+### Pre-requisites
+- Log into `{DEPLOYMENT_URL}/admin-v2/booking-suite` as Business Owner
+- Keep the Command Center tab open to watch for real-time updates
+- Have your personal email inbox open
+
+### Test Sequence
+
+| # | Persona | Action | API Payload | Validation |
+|---|---------|--------|-------------|------------|
+| 1 | **Marcus** | Book 10:00 AM Standard Diagnostic | `event_type: "booking.created", start_time: "2026-02-18T10:00:00Z", duration_minutes: 60, service_type: "Standard Diagnostic"` | Email received? Marcus appears on Dashboard? Google Calendar shows `[Volt-Amps] - Marcus Sterling`? |
+| 2 | **Elena** | Try to book 11:10 AM (within buffer) | `event_type: "booking.created", start_time: "2026-02-18T11:10:00Z"` | Should get **409 Conflict** with buffer message. Marcus's booking ends at 11:00 AM + 15-min buffer = blocked until 11:15 AM. |
+| 3 | **David** | Try to book 10:00 AM via Cal.com | Use Cal.com booking link | Slot should be greyed out / unavailable because of Marcus. |
+| 4 | **Sarah** | Reschedule from 2:00 PM to 4:00 PM | `event_type: "booking.updated", booking_id: "{SARAH_BOOKING_ID}", new_start_time: "2026-02-18T16:00:00Z"` | Dashboard **updates the existing row** (not new one). Google Calendar event moves. Old buffers deleted, new buffers created. |
+| 5 | **Arthur** | Cancel his Friday appointment | `event_type: "booking.cancelled", booking_id: "{ARTHUR_BOOKING_ID}"` | Slot instantly available on Cal.com. All Google Calendar events (main + buffers) deleted. |
+
+### Test Curl Commands
+
+**Marcus - Create booking:**
+```bash
+curl -X POST {DEPLOYMENT_URL}/api/webhooks/booking-sync \
+  -H "Content-Type: application/json" \
+  -d '{
+    "event_type": "booking.created",
+    "source": "retell",
+    "tenant_id": "{TENANT_ID}",
+    "customer_name": "Marcus Sterling",
+    "customer_email": "marcus@example.com",
+    "customer_phone": "+15551234567",
+    "service_type": "Standard Diagnostic",
+    "start_time": "2026-02-18T10:00:00-06:00",
+    "duration_minutes": 60,
+    "staff_assigned": "Mike (Lead Tech)"
+  }'
+```
+
+**Elena - Buffer conflict test:**
+```bash
+curl -X POST {DEPLOYMENT_URL}/api/webhooks/booking-sync \
+  -H "Content-Type: application/json" \
+  -d '{
+    "event_type": "booking.created",
+    "source": "retell",
+    "tenant_id": "{TENANT_ID}",
+    "customer_name": "Elena Vasquez",
+    "customer_email": "elena@example.com",
+    "service_type": "Panel Upgrade Consultation",
+    "start_time": "2026-02-18T11:10:00-06:00",
+    "duration_minutes": 30
+  }'
+```
+
+**Sarah - Reschedule:**
+```bash
+curl -X POST {DEPLOYMENT_URL}/api/webhooks/booking-sync \
+  -H "Content-Type: application/json" \
+  -d '{
+    "event_type": "booking.updated",
+    "source": "retell",
+    "tenant_id": "{TENANT_ID}",
+    "booking_id": "{SARAH_BOOKING_ID}",
+    "customer_name": "Sarah Chen",
+    "customer_email": "sarah@example.com",
+    "service_type": "EV Charger Installation",
+    "start_time": "2026-02-18T14:00:00-06:00",
+    "new_start_time": "2026-02-18T16:00:00-06:00",
+    "duration_minutes": 45
+  }'
+```
+
+**Arthur - Cancel:**
+```bash
+curl -X POST {DEPLOYMENT_URL}/api/webhooks/booking-sync \
+  -H "Content-Type: application/json" \
+  -d '{
+    "event_type": "booking.cancelled",
+    "source": "retell",
+    "tenant_id": "{TENANT_ID}",
+    "booking_id": "{ARTHUR_BOOKING_ID}",
+    "customer_name": "Arthur Williams",
+    "customer_email": "arthur@example.com",
+    "service_type": "General Electrical Work"
+  }'
+```
+
+### Final Verification Checklist
+
+- [ ] Google Calendar shows events in format: `[Volt-Amps] - Marcus Sterling`
+- [ ] 15-minute buffer blocks appear as separate `[Travel/Buffer]` events (gray)
+- [ ] Elena's 11:10 AM request returned 409 Conflict
+- [ ] David's Cal.com attempt showed 10:00 AM as unavailable
+- [ ] Sarah's reschedule UPDATED the existing row (not a new booking)
+- [ ] Arthur's cancellation freed the slot (check Cal.com availability)
+
+---
+
+## 6. Required Environment Variables
 
 ```env
 # Supabase
@@ -186,21 +285,40 @@ STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret
 
 ---
 
-## 7. Architecture Overview
+## 8. Architecture Overview
 
 ```
 Cal.com Webhook ──┐
                   │
 Retell AI Call ───┤──→ /api/webhooks/booking-sync (Orchestrator)
                   │         │
-Manual API Call ──┘         ├─→ 1. Validate signature
-                            ├─→ 2. Google Calendar Free/Busy check
-                            ├─→ 3. Supabase conflict check (+ 15-min buffer)
-                            ├─→ 4. Write to Supabase bookings table
-                            ├─→ 5. Sync to Google Calendar event
-                            ├─→ 6. Sync to Cal.com (if not origin)
-                            ├─→ 7. Send email (test mode routing)
-                            └─→ 8. Log to booking_sync_log
+Manual API Call ──┘         ├─→ 1. Validate signature (Retell x-retell-signature / Cal.com x-cal-signature)
+                            │
+                            ├── booking.created (Marcus):
+                            │   ├─→ 2. Google Calendar Free/Busy check (buffer window)
+                            │   ├─→ 3. Supabase conflict check (+ 15-min buffer)
+                            │   ├─→ 4. Write to Supabase bookings table
+                            │   ├─→ 5. Create Google Calendar event: [Volt-Amps] - Customer Name
+                            │   ├─→ 5b. Create buffer-before event (15 min, gray)
+                            │   ├─→ 5c. Create buffer-after event (15 min, gray)
+                            │   ├─→ 6. Sync to Cal.com (if not origin)
+                            │   ├─→ 7. Send email (test mode → TEST_PERSONAL_EMAIL)
+                            │   └─→ 8. Log to booking_sync_log
+                            │
+                            ├── booking.updated (Sarah - Reschedule):
+                            │   ├─→ Conflict check for NEW time (excluding self)
+                            │   ├─→ UPDATE existing booking row (not insert new)
+                            │   ├─→ Delete old Google Calendar buffer events
+                            │   ├─→ PATCH main Google Calendar event with new time
+                            │   └─→ Create new buffer events for new time
+                            │
+                            └── booking.cancelled (Arthur):
+                                ├─→ Set status = 'cancelled' (slot freed instantly)
+                                ├─→ Delete ALL Google Calendar events (main + buffers)
+                                └─→ Cancel on Cal.com if applicable
 
                    Supabase Realtime ──→ Command Center Dashboard (live updates)
+
+Elena scenario: booking.created at 11:10 AM → 409 Conflict (within Marcus's buffer)
+David scenario: Cal.com availability check → slot shows unavailable
 ```

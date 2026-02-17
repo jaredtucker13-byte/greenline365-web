@@ -45,6 +45,13 @@ CREATE INDEX IF NOT EXISTS idx_tenants_domain ON tenants(domain);
 CREATE INDEX IF NOT EXISTS idx_businesses_business_email ON businesses(business_email);
 CREATE INDEX IF NOT EXISTS idx_businesses_domain ON businesses(domain);
 
+-- Add staff_assigned and calcom_booking_id to bookings table
+ALTER TABLE bookings
+ADD COLUMN IF NOT EXISTS staff_assigned TEXT,
+ADD COLUMN IF NOT EXISTS calcom_booking_id TEXT;
+
+CREATE INDEX IF NOT EXISTS idx_bookings_calcom ON bookings(calcom_booking_id);
+
 -- ============================================
 -- 2. BOOKING SYNC LOG TABLE
 -- Tracks every sync event from the orchestrator
