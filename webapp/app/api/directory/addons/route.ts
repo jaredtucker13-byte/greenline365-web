@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { createClient as createServerClient } from '@/lib/supabase/server';
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+function getStripe() { return new Stripe(process.env.STRIPE_SECRET_KEY!); }
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKey); }
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
     const cancelUrl = `${origin_url}/business-dashboard`;
 
     if (addon.mode === 'subscription') {
-      const session = await stripe.checkout.sessions.create({
+      const session = await getStripe().checkout.sessions.create({
         mode: 'subscription',
         line_items: [{
           price_data: {
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({ url: session.url });
     } else {
-      const session = await stripe.checkout.sessions.create({
+      const session = await getStripe().checkout.sessions.create({
         mode: 'payment',
         line_items: [{
           price_data: {

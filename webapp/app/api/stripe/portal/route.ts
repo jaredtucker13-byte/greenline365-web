@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+function getStripe() { return new Stripe(process.env.STRIPE_SECRET_KEY!); }
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKey); }
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Create a Customer Portal session
-      const portalSession = await stripe.billingPortal.sessions.create({
+      const portalSession = await getStripe().billingPortal.sessions.create({
               customer: stripeCustomerId,
               return_url: return_url,
       });
