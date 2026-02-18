@@ -382,7 +382,7 @@ export default function DirectoryPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 1.0 }}
-                className="mt-14 flex items-center gap-8 sm:gap-12 px-8 py-5 rounded-2xl border border-white/10 backdrop-blur-sm"
+                className="mt-14 flex flex-wrap items-center justify-center gap-4 sm:gap-8 md:gap-12 px-4 sm:px-8 py-5 rounded-2xl border border-white/10 backdrop-blur-sm max-w-full box-border"
                 style={{ background: 'rgba(255,255,255,0.05)' }}
                 data-testid="trust-counter-bar"
               >
@@ -391,8 +391,8 @@ export default function DirectoryPage() {
                   { value: stats.totalDestinations, label: 'Destinations', icon: 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z' },
                   { value: stats.totalCategories, label: 'Categories', icon: 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z' },
                 ].map((stat, i) => (
-                  <div key={stat.label} className="flex items-center gap-3 group" data-testid={`trust-stat-${i}`}>
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center border border-gold/30 bg-gold/10">
+                  <div key={stat.label} className="flex items-center gap-3 group min-w-0" data-testid={`trust-stat-${i}`}>
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center border border-gold/30 bg-gold/10 flex-shrink-0">
                       <svg className="w-5 h-5 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d={stat.icon} />
                       </svg>
