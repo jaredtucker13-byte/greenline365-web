@@ -1,10 +1,5 @@
-import { createClient } from '@supabase/supabase-js';
+import { createServerClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 // Utility function to generate slug
 function generateSlug(title: string): string {
@@ -54,6 +49,8 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '10');
     const offset = parseInt(searchParams.get('offset') || '0');
     
+    const supabase = createServerClient();
+
     let query = supabase
       .from('blog_posts')
       .select('*, blog_analytics(*)')
@@ -84,7 +81,9 @@ export async function POST(request: NextRequest) {
     if (!title || !content) {
       return NextResponse.json({ error: 'Title and content are required' }, { status: 400 });
     }
-    
+
+    const supabase = createServerClient();
+
     // Generate slug
     const slug = generateSlug(title);
     

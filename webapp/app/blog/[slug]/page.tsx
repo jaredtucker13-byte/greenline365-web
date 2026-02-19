@@ -1,8 +1,6 @@
-import { createServerClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-
-const supabase = createServerClient();
 
 interface StyleGuide {
   themeName?: string;
@@ -36,7 +34,8 @@ interface StyleGuide {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  
+  const supabase = await createClient();
+
   const { data: post } = await supabase
     .from('blog_posts')
     .select('*')
@@ -116,7 +115,8 @@ function getTextureStyle(texture?: { type: string; opacity: number }): string {
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  
+  const supabase = await createClient();
+
   // Fetch post - allow both published and draft for preview
   const { data: post } = await supabase
     .from('blog_posts')

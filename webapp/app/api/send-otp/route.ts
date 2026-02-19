@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
+import { rateLimit, rateLimitResponse } from '@/lib/rate-limit';
 import crypto from 'crypto';
 
 // N8N Webhook URL - Production
@@ -16,6 +17,9 @@ function hashOTP(code: string): string {
 }
 
 export async function POST(request: NextRequest) {
+  const rl = rateLimit(request, { max: 10 }); // 10 requests/min
+  if (!rl.allowed) return rateLimitResponse(rl.retryAfter);
+
   try {
     const body = await request.json();
     const { email, phone } = body;
