@@ -3,6 +3,7 @@ import { createClient, createServerClient } from '@/lib/supabase/server';
 import { MemoryBucketService, AIContext } from '@/lib/memory-bucket-service';
 import { getSkillContextForIntent, getCoreMarketingContext } from '@/lib/marketing-skills-loader';
 import { CHAT_FORMAT_DIRECTIVE } from '@/lib/format-standards';
+import { rateLimit, rateLimitResponse } from '@/lib/rate-limit';
 
 type Msg = { role: 'user' | 'assistant' | 'system'; content: string };
 
@@ -414,6 +415,9 @@ BUSINESS KNOWLEDGE BASE
 }
 
 export async function POST(req: NextRequest) {
+  const rl = rateLimit(req, { max: 20 }); // 20 requests/min
+  if (!rl.allowed) return rateLimitResponse(rl.retryAfter);
+
   try {
     const body = await req.json().catch(() => ({} as Record<string, unknown>));
 

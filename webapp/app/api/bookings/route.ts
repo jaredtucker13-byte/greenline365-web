@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
+import { rateLimit, rateLimitResponse } from '@/lib/rate-limit';
 
 // Simple input sanitization to prevent XSS
 function sanitizeInput(str: string | undefined): string {
@@ -19,6 +20,9 @@ function isValidEmail(email: string): boolean {
 }
 
 export async function POST(req: NextRequest) {
+  const rl = rateLimit(req, { max: 30 }); // 30 requests/min
+  if (!rl.allowed) return rateLimitResponse(rl.retryAfter);
+
   try {
     const body = await req.json();
     const supabase = createServerClient();

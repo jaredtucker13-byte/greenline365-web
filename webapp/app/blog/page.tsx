@@ -1,4 +1,4 @@
-import { createServerClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { Metadata } from 'next';
 
@@ -14,8 +14,6 @@ export const metadata: Metadata = {
     type: 'website',
   },
 };
-
-const supabase = createServerClient();
 
 interface StyleGuide {
   themeName?: string;
@@ -44,6 +42,8 @@ interface BlogPost {
 }
 
 async function getBlogPosts(): Promise<BlogPost[]> {
+  const supabase = await createClient();
+
   // First try published posts
   const { data: publishedPosts } = await supabase
     .from('blog_posts')
@@ -61,7 +61,7 @@ async function getBlogPosts(): Promise<BlogPost[]> {
     .select('*')
     .order('created_at', { ascending: false })
     .limit(12);
-    
+
   return allPosts || [];
 }
 
