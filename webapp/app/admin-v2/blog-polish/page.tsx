@@ -420,6 +420,10 @@ export default function BlogPolishPage() {
         }),
       });
       
+      if (!response.ok) {
+        console.error('SEO analysis failed:', response.status);
+        return;
+      }
       const data = await response.json();
       setSeoAnalysis(data);
     } catch (error) {

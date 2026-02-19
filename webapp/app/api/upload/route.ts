@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createServerClient } from '@/lib/supabase/server';
 import sharp from 'sharp';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 const BUCKET_NAME = 'blog-images';
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -85,6 +81,8 @@ export async function POST(req: NextRequest) {
     const randomStr = Math.random().toString(36).substring(2, 8);
     const fileName = `${folder}/${timestamp}-${randomStr}.${extension}`;
 
+    const supabase = createServerClient();
+
     // Ensure bucket exists
     const { data: buckets } = await supabase.storage.listBuckets();
     const bucketExists = buckets?.some(b => b.name === BUCKET_NAME);
@@ -136,6 +134,7 @@ export async function DELETE(req: NextRequest) {
     const path = searchParams.get('path');
     if (!path) return NextResponse.json({ error: 'Path is required' }, { status: 400 });
 
+    const supabase = createServerClient();
     const { error } = await supabase.storage.from(BUCKET_NAME).remove([path]);
     if (error) return NextResponse.json({ error: 'Failed to delete image' }, { status: 500 });
 
@@ -154,6 +153,8 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const folder = searchParams.get('folder') || 'uploads';
     const limit = parseInt(searchParams.get('limit') || '50');
+
+    const supabase = createServerClient();
 
     const { data, error } = await supabase.storage
       .from(BUCKET_NAME)
