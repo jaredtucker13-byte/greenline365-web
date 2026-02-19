@@ -9,7 +9,8 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "prebuild:check": "npm run typecheck && npm run lint",
-    "supabase:seed": "node scripts/seed-simple.js"
+    "supabase:seed": "node scripts/seed-simple.js",
+        "analyze": "ANALYZE=true next build"
   },
   "dependencies": {
     "@fullcalendar/core": "^6.1.20",
@@ -54,6 +55,7 @@
     "zod": "^4.3.5"
   },
   "devDependencies": {
+        "@next/bundle-analyzer": "^15.0.0",
     "@types/node": "^20",
     "@types/nodemailer": "^7.0.5",
     "@types/react": "^19",
