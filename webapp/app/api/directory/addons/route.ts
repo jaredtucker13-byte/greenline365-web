@@ -25,7 +25,17 @@ function getServiceClient() {
  * PATCH /api/directory/addons                — Manage add-on (activate/deactivate after payment)
  */
 
-const ADDON_CATALOG: Record<string, { name: string; price: number; mode: 'subscription' | 'payment'; interval?: 'week' | 'month'; description: string }> = {
+const VALID_ADDON_TYPES = [
+    'coupon_engine',
+    'custom_poll',
+    'featured_boost',
+    'additional_photos',
+    'analytics_pro',
+] as const;
+
+type AddonType = typeof VALID_ADDON_TYPES[number];
+
+const ADDON_CATALOG: Record<AddonType, { name: string; price: number; mode: 'subscription' | 'payment'; interval?: 'week' | 'month'; description: string }> = {
     coupon_engine: {
           name: 'Coupon Engine',
           price: 19,
@@ -96,9 +106,11 @@ export async function POST(request: NextRequest) {
       const body = await request.json();
           const { addon_type, listing_id, origin_url } = body;
 
-      if (!addon_type || !ADDON_CATALOG[addon_type]) {
+      if (!addon_type || !VALID_ADDON_TYPES.includes(addon_type)) {
               return NextResponse.json({ error: 'Invalid addon_type' }, { status: 400 });
       }
+
+      const validatedAddonType = addon_type as AddonType;
 
       if (!listing_id || !origin_url) {
               return NextResponse.json({ error: 'listing_id and origin_url required' }, { status: 400 });
@@ -123,7 +135,7 @@ export async function POST(request: NextRequest) {
                       );
       }
 
-      const addon = ADDON_CATALOG[addon_type];
+      const addon = ADDON_CATALOG[validatedAddonType];
           const stripe = getStripe();
           const successUrl = `${origin_url}/business-dashboard?addon_success=${addon_type}&listing=${listing_id}&session_id={CHECKOUT_SESSION_ID}`;
           const cancelUrl = `${origin_url}/business-dashboard`;
@@ -184,6 +196,12 @@ export async function PATCH(request: NextRequest) {
               return NextResponse.json({ error: 'listing_id and addon_type required' }, { status: 400 });
       }
 
+      if (!VALID_ADDON_TYPES.includes(addon_type)) {
+              return NextResponse.json({ error: 'Invalid addon_type' }, { status: 400 });
+      }
+
+      const validatedType = addon_type as AddonType;
+
       const service = getServiceClient();
           const { data: listing } = await service
             .from('directory_listings')
@@ -199,18 +217,18 @@ export async function PATCH(request: NextRequest) {
           const addons = metadata.addons || {};
 
       if (action === 'activate') {
-              addons[addon_type] = {
+              addons[validatedType] = {
                         active: true,
                         purchased_at: new Date().toISOString(),
-                        ...(addon_type === 'featured_boost'
+                        ...(validatedType === 'featured_boost'
                                       ? { expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() }
                                       : {}),
-                        ...(addon_type === 'additional_photos'
+                        ...(validatedType === 'additional_photos'
                                       ? { extra_photos: 5 }
                                       : {}),
               };
       } else if (action === 'deactivate') {
-              if (addons[addon_type]) addons[addon_type].active = false;
+              if (addons[validatedType]) addons[validatedType].active = false;
       }
 
       const { error } = await service
