@@ -136,3 +136,125 @@ Built the Campaign Manager and Unified Calendar:
 
 ## Test Reports
 - `/app/test_reports/iteration_22.json` — Campaign Manager & Calendar API: 100% pass (28/28)
+
+## Hub-and-Spoke Subscription Tier System — Sprint 1 (Complete ✅)
+**Merged:** February 20, 2026 — PR #10 (`claude/help-coding-task-lI7i8` → `main`)
+**Branch deleted after merge ✅**
+
+### What Was Built
+
+#### Database Schema (Migrations 028–031)
+- **028:** Core subscription tables — `plans`, `subscriptions`, `feature_flags`, `plan_feature_overrides`, `roles`, `permissions`, `role_permissions`, `account_members`, `payment_events` with full RLS policies, indexes, and `updated_at` auto-triggers
+- - **029:** Seed data — 4 plans (free, directory_pro, command_center, bundle), 15 feature flags, plan overrides, 4 roles (owner, manager, staff, viewer), 22 permissions with role-permission mappings
+  - - **030:** `listing_photos`, `listing_menus`, `listing_stats` tables with RLS for the Owner Portal
+    - - **031:** Extended `payment_events` with `stripe_event_id` (unique, for idempotency), `raw_payload` (JSONB), nullable `subscription_id`, and expanded CHECK constraints
+     
+      - #### Feature Resolution Service (`lib/services/feature-resolution.ts`)
+      - - "Most permissive wins" merge strategy: booleans (true wins), integers (max wins), strings (latest wins)
+        - - 5-minute in-memory cache with `bustFeatureCache()` on subscription changes
+          - - Supports account-level and listing-scoped feature resolution
+           
+            - #### Auth Middleware (`lib/auth/middleware.ts`)
+            - - `requireAuth()` — Basic authentication check
+              - - `requireAdmin()` — Admin-only route protection
+                - - `requireSubscription()` — Product-type-aware validation with bundle support
+                  - - `requirePermission()` — Role-based checking with account owner bypass
+                    - - `requireFeature()` — Feature flag validation with listing-scoped resolution
+                     
+                      - #### API Routes
+                      - - `GET/POST /api/subscriptions`, `PATCH/DELETE /api/subscriptions/[id]`
+                        - - `GET /api/plans`, `GET /api/features/resolved`, `GET /api/roles`
+                          - - `POST /api/billing/checkout` — Stripe checkout session creation with trial support
+                            - - `POST /api/billing/portal` — Stripe customer portal access
+                              - - `GET/POST /api/team`, `PATCH/DELETE /api/team/[id]` — Team member management
+                               
+                                - #### Owner Listing Portal (`/portal/`) — Sprint 2 (bundled in same PR)
+                                - - Dashboard with quick stats, onboarding checklist, upgrade CTAs
+                                  - - Edit Listing form with tier-gated fields (description length, category, tags)
+                                    - - Photo Manager — drag-to-reorder, cover photo, upload limits per tier
+                                      - - Business Hours editor — 7-day grid, closed toggle, copy-to-all
+                                        - - Menu Editor (Pro-gated) — section/item CRUD, stored as JSONB
+                                          - - Stats page — basic metrics for all, advanced analytics blurred for free tier
+                                            - - Settings — plan info, Stripe portal link, team management (invite/role/revoke)
+                                              - - Upgrade page — plan comparison table, billing toggle, FAQ, Stripe checkout
+                                                - - **Shared components:** `FeatureGate`, `TierBadge`, `UpgradeCTA`, `StatsCard`, `OnboardingChecklist`, `PlanComparisonTable`, `PortalSidebar`
+                                                  - - **Hooks:** `usePortalContext`, `useFeatureGate`
+                                                   
+                                                    - #### Security Hardening (bundled in same PR)
+                                                    - - Stripe webhook: enforced signature verification — removed unsafe JSON.parse fallback
+                                                      - - Stripe webhook: idempotency via `payment_events.stripe_event_id` dedup check
+                                                        - - Stripe webhook: full subscription state sync (checkout→active, updated→sync, deleted→canceled, invoice.succeeded→active, invoice.failed→past_due, paused, resumed)
+                                                          - - Stripe webhook: busts `feature-resolution` in-memory cache on every subscription state change
+                                                            - - Directory addons route: replaced dynamic `addons[addon_type]` key assignment with `VALID_ADDON_TYPES` allowlist — prevents prototype-pollution vulnerability
+                                                              - - All Stripe client calls converted to lazy-init singleton pattern (`getStripe()`) to prevent build-time crashes
+                                                               
+                                                                - #### TypeScript Types (`lib/types/subscription.ts`)
+                                                                - - Comprehensive interfaces for plans, subscriptions, feature flags, roles, permissions, team members, billing events
+                                                                 
+                                                                  - ### Key Files Added/Modified
+                                                                  - - `webapp/app/portal/` — Full portal UI (dashboard, edit, photos, hours, menu, stats, settings, upgrade)
+                                                                    - - `webapp/app/api/portal/` — Portal API routes
+                                                                      - - `webapp/app/api/subscriptions/`, `/plans/`, `/roles/`, `/features/`, `/billing/`, `/team/`
+                                                                        - - `webapp/lib/services/feature-resolution.ts`
+                                                                          - - `webapp/lib/auth/middleware.ts`
+                                                                            - - `webapp/lib/types/subscription.ts`
+                                                                              - - `webapp/database/migrations/028_*.sql` through `031_*.sql`
+                                                                               
+                                                                                - ---
+
+                                                                                ## ✅ FEATURE LIST STATUS UPDATES (Post Sprint 1 Merge)
+
+                                                                                The following items in `webapp/FEATURE_LIST_FOR_PM.md` are now complete:
+
+                                                                                | Feature | Was | Now |
+                                                                                |---|---|---|
+                                                                                | Stripe — Subscription checkout | ✅ Active (partial) | ✅ Full hub-and-spoke billing |
+                                                                                | Subscription tier enforcement | 🔄 Planned | ✅ Built (feature flags + middleware) |
+                                                                                | Role-based access control | 🔄 Planned | ✅ Built (owner/manager/staff/viewer) |
+                                                                                | Owner Listing Portal | 🔄 Planned | ✅ Built (/portal/) |
+                                                                                | Team management | 🔄 Planned | ✅ Built (invite/role/revoke) |
+                                                                                | Feature flag system | 🔄 Planned | ✅ Built (15 flags, plan overrides) |
+                                                                                | Stripe Customer Portal | 🔄 Planned | ✅ Built (billing/portal API) |
+                                                                                | Payment event audit trail | 🔄 Planned | ✅ Built (payment_events table) |
+
+                                                                                ---
+
+                                                                                ## 🔜 NEXT STEPS — Pick Up From Here
+
+                                                                                ### P0 — Wire Stripe to Vercel (Immediate)
+                                                                                - [ ] Fix Vercel deployment — `NEXT_PUBLIC_ENVIRONMENT` secret is missing (deployment fails with "references Secret 'environment-name', which does not exist")
+                                                                                - [ ] - [ ] Confirm all Stripe env vars are set in Vercel: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRO_PRICE_ID`, `STRIPE_PREMIUM_PRICE_ID`
+                                                                                - [ ] - [ ] Test end-to-end Stripe checkout → webhook → subscription active flow in staging
+                                                                               
+                                                                                - [ ] ### P1 — Connect Portal to Live Data
+                                                                                - [ ] - [ ] Wire `/portal/` dashboard to real Supabase data (currently may use mock/placeholder data)
+                                                                                - [ ] - [ ] Test `usePortalContext` hook with real user sessions
+                                                                                - [ ] - [ ] Validate tier-gated feature enforcement (e.g., description length limits, photo upload caps)
+                                                                                - [ ] - [ ] Test team invitation flow (invite → accept → role assignment)
+                                                                               
+                                                                                - [ ] ### P2 — Campaign Manager Email Sending (from previous backlog)
+                                                                                - [ ] - [ ] Wire email sending to Campaign Manager (Gmail SMTP / multi-sender rotation)
+                                                                                - [ ] - [ ] Calendar integration for campaign scheduled sends (auto-appear on calendar)
+                                                                                - [ ] - [ ] Content Forge accessible from calendar day click
+                                                                                - [ ] - [ ] Webhook triggers for self-signups and paid upgrades
+                                                                               
+                                                                                - [ ] ### P3 — Coupon & Poll Frontend UI
+                                                                                - [ ] - [ ] Display coupons on listing pages with redemption flow
+                                                                                - [ ] - [ ] Display poll widgets on listings with results shown in dashboard
+                                                                               
+                                                                                - [ ] ### P4 — Subscription UI in Command Center
+                                                                                - [ ] - [ ] Build plan upgrade/downgrade UI inside the main command center (/admin-v2/)
+                                                                                - [ ] - [ ] Show locked/unlocked features based on active subscription tier
+                                                                                - [ ] - [ ] Integrate `FeatureGate` component pattern into existing command center pages
+                                                                               
+                                                                                - [ ] ### P5 — Custom Domains Backend
+                                                                                - [ ] - [ ] CNAME setup API (point custom domain → platform)
+                                                                                - [ ] - [ ] Automatic SSL certificate provisioning
+                                                                               
+                                                                                - [ ] ### Known Issues / Tech Debt
+                                                                                - [ ] - Vercel deployment: `NEXT_PUBLIC_ENVIRONMENT` secret missing — causes deploy failure (non-blocking for dev, must fix before production)
+                                                                                - [ ] - CodeQL warning: `webapp/app/api/directory/addons/route.ts` prototype-pollution risk was addressed in Sprint 1 (allowlist added), but should be re-verified in next security scan
+                                                                                - [ ] - All 6 Vercel checks passed on final commit (2d20691) before merge conflict resolution — re-verify checks post-merge
+                                                                               
+                                                                                - [ ] ---
+                                                                                - [ ] *Last updated: February 20, 2026 — Post PR #10 merge*
