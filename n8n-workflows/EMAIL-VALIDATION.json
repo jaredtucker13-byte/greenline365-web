@@ -1,0 +1,215 @@
+{
+  "updatedAt": "2026-01-11T23:09:56.182Z",
+  "createdAt": "2026-01-08T21:55:11.981Z",
+  "id": "cL8fbGg16ZLvEU8E",
+  "name": "EMAIL-VALIDATION",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ab195f12-f784-4317-a7b7-66b0c0361e6f",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "faa99d17-01b7-46c3-bfc3-9a885a9a3990",
+      "name": "Webhook",
+      "webhookId": "ab195f12-f784-4317-a7b7-66b0c0361e6f"
+    },
+    {
+      "parameters": {
+        "from": "+1 813 540 9691",
+        "to": "={{ $json.body.phone }}",
+        "message": "=HiHey Jared, Quick input needed :\nAsk Question\nAgent will continue working after your reply\n✅ Sent!\n\nCheck your phone 518-879-9207! 📱\n\nAlso, quick fix for your Message field - change it to:\n\n",
+        "options": {
+          "statusCallback": ""
+        }
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "0bce9de0-ddf8-4127-a8b9-6f63dbbae831",
+      "name": "Send an SMS/MMS/WhatsApp message",
+      "credentials": {
+        "twilioApi": {
+          "id": "EGa4mX0TBpSMgi9E",
+          "name": "Twilio account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Send an SMS/MMS/WhatsApp message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": true,
+    "errorWorkflow": "tQkR5bqvq8Y1oLaF"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "7aed6e36-a1f2-4fd3-8188-bd6d82fcf6c8",
+  "activeVersionId": "aa23aa84-7c6e-42a3-aaef-ffa3bc397bc9",
+  "versionCounter": 15,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-01-08T21:55:11.985Z",
+      "createdAt": "2026-01-08T21:55:11.985Z",
+      "role": "workflow:owner",
+      "workflowId": "cL8fbGg16ZLvEU8E",
+      "projectId": "CA2oX8JE8b4ELWzN",
+      "project": {
+        "updatedAt": "2025-11-26T23:39:45.565Z",
+        "createdAt": "2025-11-26T23:20:18.633Z",
+        "id": "CA2oX8JE8b4ELWzN",
+        "name": "jared tucker <jared.tucker13@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "projectRelations": [
+          {
+            "updatedAt": "2025-11-26T23:20:18.633Z",
+            "createdAt": "2025-11-26T23:20:18.633Z",
+            "userId": "08f0a56f-35d1-45de-ba8d-11e1f3f7c4cd",
+            "projectId": "CA2oX8JE8b4ELWzN",
+            "user": {
+              "updatedAt": "2026-02-20T18:18:04.769Z",
+              "createdAt": "2025-11-26T23:20:18.176Z",
+              "id": "08f0a56f-35d1-45de-ba8d-11e1f3f7c4cd",
+              "email": "jared.tucker13@gmail.com",
+              "firstName": "jared",
+              "lastName": "tucker",
+              "personalizationAnswers": {
+                "version": "v4",
+                "personalization_survey_submitted_at": "2025-11-26T23:41:07.799Z",
+                "personalization_survey_n8n_version": "1.121.3",
+                "companySize": "<20",
+                "companyType": "education",
+                "role": "business-owner",
+                "reportedSource": "youtube"
+              },
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "eANVAv2WVioSXMXW",
+                "userActivatedAt": 1766878669831,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1771611441895
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-02-20",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-01-11T20:59:16.000Z",
+    "createdAt": "2026-01-11T20:58:28.627Z",
+    "versionId": "aa23aa84-7c6e-42a3-aaef-ffa3bc397bc9",
+    "workflowId": "cL8fbGg16ZLvEU8E",
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "ab195f12-f784-4317-a7b7-66b0c0361e6f",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "faa99d17-01b7-46c3-bfc3-9a885a9a3990",
+        "name": "Webhook",
+        "webhookId": "ab195f12-f784-4317-a7b7-66b0c0361e6f"
+      },
+      {
+        "parameters": {
+          "from": "18777804236",
+          "to": "= (E.164 format: +1234567890)",
+          "message": "=Your GreenLine365 verification code is: {{$json.code}}. This code expires in 10 minutes.",
+          "options": {
+            "statusCallback": ""
+          }
+        },
+        "type": "n8n-nodes-base.twilio",
+        "typeVersion": 1,
+        "position": [
+          208,
+          0
+        ],
+        "id": "0bce9de0-ddf8-4127-a8b9-6f63dbbae831",
+        "name": "Send an SMS/MMS/WhatsApp message",
+        "credentials": {
+          "twilioApi": {
+            "id": "EGa4mX0TBpSMgi9E",
+            "name": "Twilio account"
+          }
+        },
+        "disabled": true
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          []
+        ]
+      }
+    },
+    "authors": "jared tucker",
+    "name": "verification",
+    "description": "",
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-01-11T20:59:16.409Z",
+        "id": 29,
+        "workflowId": "cL8fbGg16ZLvEU8E",
+        "versionId": "aa23aa84-7c6e-42a3-aaef-ffa3bc397bc9",
+        "event": "activated",
+        "userId": "08f0a56f-35d1-45de-ba8d-11e1f3f7c4cd"
+      },
+      {
+        "createdAt": "2026-01-11T20:59:42.184Z",
+        "id": 30,
+        "workflowId": "cL8fbGg16ZLvEU8E",
+        "versionId": "aa23aa84-7c6e-42a3-aaef-ffa3bc397bc9",
+        "event": "activated",
+        "userId": "08f0a56f-35d1-45de-ba8d-11e1f3f7c4cd"
+      }
+    ]
+  }
+}
