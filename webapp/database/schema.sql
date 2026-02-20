@@ -638,3 +638,101 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 --    - Type: AFTER
 --    - Orientation: ROW
 --    - Function: public.handle_new_user()
+
+-- ============================================
+-- CRM LEADS TABLE (Unified Lead Management)
+-- ============================================
+CREATE TABLE IF NOT EXISTS crm_leads (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+  -- Contact Info
+  email TEXT NOT NULL,
+  name TEXT,
+  phone TEXT,
+  company TEXT,
+  role TEXT,
+  country TEXT,
+  timezone TEXT,
+
+  -- Source & Attribution
+  source TEXT DEFAULT 'website',
+  source_detail TEXT,
+  utm_source TEXT,
+  utm_medium TEXT,
+  utm_campaign TEXT,
+  utm_content TEXT,
+  utm_term TEXT,
+  referrer_url TEXT,
+
+  -- Interest & Segmentation
+  interest_type TEXT,
+  desired_plan TEXT,
+  use_case TEXT,
+  company_size TEXT,
+  priority TEXT DEFAULT 'medium' CHECK (priority IN ('low', 'medium', 'high', 'urgent')),
+  tags TEXT[] DEFAULT '{}',
+
+  -- Status & Verification
+  status TEXT DEFAULT 'new' CHECK (status IN ('new', 'unverified', 'verified', 'invited', 'onboarded', 'converted', 'churned', 'unsubscribed', 'archived')),
+  verification_token TEXT,
+  verification_code TEXT,
+  verification_expires TIMESTAMPTZ,
+  verification_attempts INTEGER DEFAULT 0,
+  last_verification_sent_at TIMESTAMPTZ,
+  verified_at TIMESTAMPTZ,
+
+  -- Email Flags
+  email_opt_in BOOLEAN DEFAULT TRUE,
+  email_opt_out BOOLEAN DEFAULT FALSE,
+  newsletter_opt_in BOOLEAN DEFAULT FALSE,
+  bounce_flag BOOLEAN DEFAULT FALSE,
+  spam_flag BOOLEAN DEFAULT FALSE,
+  unsubscribed_at TIMESTAMPTZ,
+
+  -- Assignment & Ownership
+  owner_id UUID REFERENCES auth.users(id),
+  assigned_at TIMESTAMPTZ,
+
+  -- Lead Scoring
+  lead_score INTEGER DEFAULT 0,
+
+  -- Consent & Compliance
+  consent_given BOOLEAN DEFAULT FALSE,
+  consent_timestamp TIMESTAMPTZ,
+  consent_ip TEXT,
+  gdpr_consent BOOLEAN DEFAULT FALSE,
+
+  -- Notes & Custom Data
+  notes TEXT,
+  custom_fields JSONB DEFAULT '{}',
+
+  -- Timestamps
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  last_activity_at TIMESTAMPTZ DEFAULT NOW(),
+  invited_at TIMESTAMPTZ,
+  onboarded_at TIMESTAMPTZ,
+  converted_at TIMESTAMPTZ,
+  archived_at TIMESTAMPTZ,
+
+  UNIQUE(email)
+);
+
+CREATE INDEX IF NOT EXISTS idx_crm_leads_email ON crm_leads(email);
+CREATE INDEX IF NOT EXISTS idx_crm_leads_status ON crm_leads(status);
+CREATE INDEX IF NOT EXISTS idx_crm_leads_source ON crm_leads(source);
+CREATE INDEX IF NOT EXISTS idx_crm_leads_priority ON crm_leads(priority);
+CREATE INDEX IF NOT EXISTS idx_crm_leads_created_at ON crm_leads(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_crm_leads_owner ON crm_leads(owner_id);
+
+ALTER TABLE crm_leads ENABLE ROW LEVEL SECURITY;
+
+-- User isolation: each user sees only their own leads
+CREATE POLICY "crm_leads_user_isolation" ON crm_leads FOR ALL TO authenticated
+  USING (owner_id = auth.uid());
+-- Service role: full access for API/backend operations
+CREATE POLICY "crm_leads_service_role" ON crm_leads FOR ALL TO service_role
+  USING (true);
+
+GRANT ALL ON crm_leads TO authenticated;
+GRANT ALL ON crm_leads TO service_role;

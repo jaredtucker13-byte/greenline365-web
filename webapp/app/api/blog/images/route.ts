@@ -368,7 +368,10 @@ async function generateImages(body: GenerateRequest) {
 
   // Use enriched prompt for Nano Banana, or create one
   const finalPrompt = enrichedPrompt || enrichPromptWithCinematicDetails(prompt, style);
-  const apiKey = process.env.KIE_API_KEY || '1f1d2d3eed99f294339cb1f17b5bc743';
+  const apiKey = process.env.KIE_API_KEY;
+  if (!apiKey) {
+    throw new Error('KIE_API_KEY environment variable is not set');
+  }
   const generateCount = Math.min(count, 2); // Always generate 2 images
   const imageSize = getAspectRatioSize(aspectRatio);
 
@@ -614,7 +617,10 @@ async function generateCustomImage(body: GenerateCustomRequest) {
   // Enrich the user prompt with cinematic details
   const enrichedPrompt = enrichPromptWithCinematicDetails(userPrompt, 'cinematic');
   
-  const apiKey = process.env.KIE_API_KEY || '1f1d2d3eed99f294339cb1f17b5bc743';
+  const apiKey = process.env.KIE_API_KEY;
+  if (!apiKey) {
+    throw new Error('KIE_API_KEY environment variable is not set');
+  }
   const imageSize = getAspectRatioSize(aspectRatio);
 
   console.log('[Blog Images] Generating custom image from user prompt...');

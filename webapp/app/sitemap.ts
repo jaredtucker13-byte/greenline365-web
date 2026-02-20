@@ -24,6 +24,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/trust`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.3 },
   ];
 
+  // Feature pages (Hub & Spoke SEO architecture)
+  const featurePages: MetadataRoute.Sitemap = [
+    { url: `${baseUrl}/features/ai-content-creation`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${baseUrl}/features/automated-scheduling`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${baseUrl}/features/local-trend-tracking`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${baseUrl}/features/ai-assistant`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${baseUrl}/features/calendar-integration`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+  ];
+
   // Destination guide pages
   const destinations = ['st-pete-beach', 'key-west', 'sarasota', 'daytona', 'ybor-city', 'orlando', 'miami', 'jacksonville'];
   const destPages: MetadataRoute.Sitemap = destinations.map(dest => ({
@@ -46,5 +55,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  return [...staticPages, ...destPages, ...listingPages];
+  return [...staticPages, ...featurePages, ...destPages, ...listingPages];
 }
