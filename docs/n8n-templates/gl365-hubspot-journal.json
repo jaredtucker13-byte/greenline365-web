@@ -1,0 +1,102 @@
+{
+  "name": "GL365 HubSpot — Auto-Journal",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "gl365-hubspot-webhook",
+        "options": {
+          "responseMode": "onReceived"
+        }
+      },
+      "id": "hubspot-webhook",
+      "name": "HubSpot Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "notes": "Receives HubSpot webhook events. Configure in HubSpot > Settings > Integrations > Webhooks. Subscription types: contact.creation, contact.propertyChange, deal.creation, deal.propertyChange, meeting.creation, engagement.creation"
+    },
+    {
+      "parameters": {
+        "functionCode": "// ========================================\n// GL365 HubSpot Event Normalizer\n// ========================================\n// Maps HubSpot webhook payloads to GL365 journal format.\n//\n// HubSpot subscription types:\n//   contact.creation       → new_customer\n//   contact.propertyChange → contact_updated\n//   deal.creation          → deal_created\n//   deal.propertyChange    → deal_updated\n//   meeting.creation       → booking_created\n//   engagement.creation    → engagement_logged\n\nconst input = $input.first().json;\n\n// HubSpot sends arrays of events\nconst events = Array.isArray(input) ? input : [input];\nconst event = events[0] || {};\n\nconst subscriptionType = event.subscriptionType || event.type || '';\nconst objectId = event.objectId || '';\nconst propertyName = event.propertyName || '';\nconst propertyValue = event.propertyValue || '';\n\nconst eventMap = {\n  'contact.creation': 'new_customer',\n  'contact.propertyChange': 'contact_updated',\n  'deal.creation': 'deal_created',\n  'deal.propertyChange': 'deal_updated',\n  'meeting.creation': 'booking_created',\n  'engagement.creation': 'engagement_logged'\n};\n\nlet importance = 'normal';\nif (subscriptionType === 'deal.creation') importance = 'high';\nif (propertyName === 'dealstage' && propertyValue === 'closedwon') importance = 'critical';\nif (propertyName === 'dealstage' && propertyValue === 'closedlost') importance = 'high';\n\nlet sentiment = 'neutral';\nif (propertyName === 'dealstage' && propertyValue === 'closedwon') sentiment = 'positive';\nif (propertyName === 'dealstage' && propertyValue === 'closedlost') sentiment = 'negative';\nif (subscriptionType === 'meeting.creation') sentiment = 'positive';\n\n// HubSpot doesn't include full contact data in webhooks —\n// in production, you'd fetch from HubSpot API: GET /crm/v3/objects/contacts/{objectId}\nconst contact = event.properties || {};\n\nconst normalized = {\n  tenant_id: event.metadata?.tenant_id || '',\n  contact_phone: contact.phone || '',\n  contact_email: contact.email || '',\n  contact_name: [contact.firstname, contact.lastname].filter(Boolean).join(' ') || '',\n  source: 'hubspot',\n  event_type: eventMap[subscriptionType] || subscriptionType || 'unknown',\n  raw_summary: `HubSpot ${subscriptionType}: objectId=${objectId}${propertyName ? `, ${propertyName}=${propertyValue}` : ''}`,\n  raw_data: input,\n  sentiment,\n  importance,\n  hubspot_object_id: objectId,\n  hubspot_property: propertyName,\n  hubspot_value: propertyValue\n};\n\nreturn [{ json: normalized }];"
+      },
+      "id": "hubspot-normalize",
+      "name": "Normalize HubSpot Event",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [470, 300],
+      "notes": "Maps HubSpot contact/deal/meeting events. Note: HubSpot webhooks don't include full object data — add a 'Fetch Contact from HubSpot API' node between this and AI Summary for production use."
+    },
+    {
+      "parameters": {
+        "url": "https://api.openrouter.ai/api/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer {{$credentials.openrouterApiKey}}" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "model", "value": "anthropic/claude-haiku-3.5" },
+            { "name": "messages", "value": "=[{\"role\":\"user\",\"content\":\"Write ONE concise sentence for a CRM journal entry. HubSpot event: {{$json.event_type}}. Contact: {{$json.contact_name}}. Object ID: {{$json.hubspot_object_id}}. Property changed: {{$json.hubspot_property}} = {{$json.hubspot_value}}. Context: {{$json.raw_summary}}\"}]" },
+            { "name": "max_tokens", "value": "100" },
+            { "name": "temperature", "value": "0.2" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "hubspot-ai",
+      "name": "AI Summary",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [690, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const input = $input.first().json;\nconst prevData = $('Normalize HubSpot Event').first().json;\nlet summary = '';\ntry { summary = input.choices?.[0]?.message?.content || prevData.raw_summary; } catch { summary = prevData.raw_summary; }\nreturn [{ json: { ...prevData, summary: summary.trim().replace(/^[\"']|[\"']$/g, '') } }];"
+      },
+      "id": "hubspot-extract",
+      "name": "Extract Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [910, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/customer_journal",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{$env.SUPABASE_SERVICE_ROLE_KEY}}" },
+            { "name": "Authorization", "value": "=Bearer {{$env.SUPABASE_SERVICE_ROLE_KEY}}" },
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "Prefer", "value": "return=representation" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"tenant_id\": \"{{$json.tenant_id}}\",\n  \"contact_phone\": \"{{$json.contact_phone}}\",\n  \"contact_email\": \"{{$json.contact_email}}\",\n  \"contact_name\": \"{{$json.contact_name}}\",\n  \"source\": \"hubspot\",\n  \"event_type\": \"{{$json.event_type}}\",\n  \"summary\": \"{{$json.summary}}\",\n  \"raw_data\": {{JSON.stringify($json.raw_data)}},\n  \"sentiment\": \"{{$json.sentiment}}\",\n  \"importance\": \"{{$json.importance}}\"\n}",
+        "options": {}
+      },
+      "id": "hubspot-write",
+      "name": "Write to Journal",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1130, 300]
+    }
+  ],
+  "connections": {
+    "HubSpot Webhook": { "main": [[{ "node": "Normalize HubSpot Event", "type": "main", "index": 0 }]] },
+    "Normalize HubSpot Event": { "main": [[{ "node": "AI Summary", "type": "main", "index": 0 }]] },
+    "AI Summary": { "main": [[{ "node": "Extract Summary", "type": "main", "index": 0 }]] },
+    "Extract Summary": { "main": [[{ "node": "Write to Journal", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "tags": [{ "name": "gl365" }, { "name": "hubspot" }, { "name": "auto-journal" }]
+}
