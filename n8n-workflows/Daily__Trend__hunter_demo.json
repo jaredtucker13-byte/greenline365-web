@@ -1,0 +1,1003 @@
+{
+  "updatedAt": "2026-02-20T18:32:22.874Z",
+  "createdAt": "2026-01-04T07:20:45.618Z",
+  "id": "8T9YxHw4mBMNQYJX",
+  "name": "Daily_ Trend_ hunter_demo",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 3
+            },
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        -144
+      ],
+      "id": "7f6215c0-11cc-4c8e-af1c-9ac25cf1a84e",
+      "name": "Run every day at 7AM",
+      "notesInFlow": true,
+      "alwaysOutputData": false,
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 5000,
+      "notes": "Double-click to open"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "{{$node[\"Workflow Configuration\"].json.clientBusinessName}}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        800,
+        176
+      ],
+      "id": "86a48b58-4246-4bdf-8efb-469fd06ef02c",
+      "name": "Simple Memory",
+      "notesInFlow": true,
+      "notes": "Simple Memory for content agent. Stores only the last 5–10 interactions for this client: name, city, tone, and explicit content preferences (e.g., caption length, emoji yes/no, A/B choice). No long‑term data or sensitive PII; Supabase is the source of truth. Do not change session key or context length without updating the SOP.\n\n{\n  \"memory_summary\": {\n    \"client_name\": \"<CLIENT_NAME>\",\n    \"client_city\": \"<CLIENT_CITY>\",\n    \"preferred_tone\": \"<PREFERRED_TONE>\",\n    \"content_mode\": \"<CONTENT_MODE>\",\n    \"recent_preferences\": [\n      \"Prefers short captions without emojis\",\n      \"Likes 2 options (A/B) per email\"\n    ],\n    \"last_generated_type\": \"photo_to_post\"\n  }\n}"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bc0832bc-6592-467d-ae1e-fb158d43c539",
+              "leftValue": "={{ $json.vibeCheck.approved }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1296,
+        48
+      ],
+      "id": "71636e7b-b1b5-4ac7-b6cc-4fc5c7f47c4a",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Search the web using Perplexity Sonar via OpenRouter for real-time, up-to-date information",
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openRouterApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: \"perplexity/sonar-online\", messages: [{ role: \"user\", content: \"Search for the top 3 local news events, weather, and community trends happening right now in \" + $json.city + \". Then write an HTML newsletter draft for \" + $json.name + \" with headings and short paragraphs. Return only HTML.\" }], max_tokens: 1024, temperature: 0.7 }) }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        1008,
+        176
+      ],
+      "id": "b6b8ae6c-1475-41bf-bbb4-a804629fa625",
+      "name": "Message a model in Perplexity",
+      "credentials": {
+        "openRouterApi": {
+          "id": "BgQfIS3XySiOhMjo",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "organizations",
+        "returnAll": true,
+        "filterType": "none"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        208,
+        32
+      ],
+      "id": "11d8f77f-0914-4422-9310-80875792e719",
+      "name": "GL365 Brain",
+      "credentials": {
+        "supabaseApi": {
+          "id": "m9mbFt3ANaSacO5C",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// IRON DOME VIBE CHECK PROTOCOL (v2.0)\n\n// 1. Get the text from the AI Agent\nconst generatedText =\n  $input.item.json.output ||\n  $input.item.json.text ||\n  \"\";\n\n// 2. Define the rules\nconst constraints = {\n  forbidden_words: [\n    \"synergy\",\n    \"blast\",\n    \"skyrocket\",\n    \"guaranteed\",\n    \"100%\",\n    \"crypto\",\n    \"investment\"\n  ],\n  copyright_risks: [\n    \"disney\",\n    \"marvel\",\n    \"star wars\",\n    \"mickey mouse\",\n    \"nike\",\n    \"nintendo\"\n  ]\n};\n\n// 3. Scan the text\nlet violations = [];\nconst textLower = generatedText.toLowerCase();\n\n// Scan for forbidden words\nfor (const word of constraints.forbidden_words) {\n  if (textLower.includes(word.toLowerCase())) {\n    violations.push(`Forbidden Word: \"${word}\"`);\n  }\n}\n\n// Scan for copyright risks\nfor (const brand of constraints.copyright_risks) {\n  if (textLower.includes(brand)) {\n    violations.push(`Copyright Risk: \"${brand}\"`);\n  }\n}\n\n// 4. Decision logic\nconst hasViolations = violations.length > 0;\n\n// 5. Build base payload (keep everything that came in)\nconst base = {\n  ...$json,\n  generatedText\n};\n\nif (hasViolations) {\n  // REJECT\n  return {\n    json: {\n      ...base,\n      status: \"REJECTED\",\n      reason: violations.join(\", \"),\n      original_text: generatedText,\n      vibeCheck: {\n        approved: false,\n        violations\n      }\n    }\n  };\n} else {\n  // APPROVE\n  return {\n    json: {\n      ...base,\n      status: \"APPROVED\",\n      final_text: generatedText,\n      timestamp: new Date().toISOString(),\n      vibeCheck: {\n        approved: true,\n        violations: []\n      }\n    }\n  };\n}"
+      },
+      "id": "8dc711e4-38e2-463e-8a90-08daa46127ce",
+      "name": "Vibe rules",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1088,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.canonical.location_data.city }} {{ $json.uardrailsInput }}",
+        "options": {
+          "systemMessage": "=YOUR TASK:\n1. Use the 'perplexity' tool to search: \"Top 3 interesting news stories or events in {{ $json.canonical.location_data.city }} today\".\n2. Ignore crime or bad news. Look for festivals, sports, business openings, or weather.\n3. Output the answer in this simple email format:\n\nSubject: 🏙️ City Pulse: Top stories for {{ $json.canonical.location_data.city }}\n\nHi Neighbor,\n\nHere is what is happening in {{ $json.canonical.location_data.city }} today:\n\n{{ $json.uardrailsInput }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        752,
+        48
+      ],
+      "id": "a37d4d9b-9daf-4466-ace1-027e0c42a36c",
+      "name": "Daily Trend Hunter",
+      "notesInFlow": true,
+      "retryOnFail": true,
+      "waitBetweenTries": 2000,
+      "notes": "Daily trend agent for Greenline365. If this node fails repeatedly, check API keys, Perplexity tool, and JSON format in System Message.”"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "541823c5-6e43-4559-979c-a8cd70329498",
+              "name": "=={{ {\n  canonical: {\n    id: $json.id || $uuidv4(),\n    trace_id: $json.trace_id || $uuidv4(),\n    event_id: $json.event_id || $uuidv4(),\n    source: \"vibe\",\n    name: $json.name,\n    email: $json.email,\n    phone: $json.phone,\n    company: $json.company,\n    consent: {\n      marketing: true,\n      timestamp: new Date().toISOString()\n    },\n    stage: \"mini_dump\",\n    score: null,\n    intent: null,\n    created_at: new Date().toISOString(),\n    updated_at: new Date().toISOString()\n  }\n} }}",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1472,
+        208
+      ],
+      "id": "14eb8924-2e26-4b78-bdb2-076a27f94ec6",
+      "name": "GL365 Mini Dump"
+    },
+    {
+      "parameters": {
+        "batchSize": 10,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        544,
+        32
+      ],
+      "id": "317bbe1f-507b-4e3c-a4e5-55a9e7b3960a",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d458255d-3ab8-43d2-a277-a498a368d567",
+              "name": "=canonical",
+              "value": "={{$json}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        352,
+        32
+      ],
+      "id": "2c4faf72-3b9f-4ad6-a886-44f41642e2b3",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "options": {
+          "temperature": 0.5
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        640,
+        176
+      ],
+      "id": "0cee27b0-7e94-44b9-ac82-d9154077e915",
+      "name": "OpenRouter Chat Model10",
+      "credentials": {
+        "openRouterApi": {
+          "id": "BgQfIS3XySiOhMjo",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "d25b2519-f339-49a2-be95-c7faafa9242a",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -176,
+        32
+      ],
+      "id": "2ddfc83a-45c0-416a-9992-04a1a59b0f7a",
+      "name": "Webhook",
+      "webhookId": "d25b2519-f339-49a2-be95-c7faafa9242a"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1504,
+        -48
+      ],
+      "id": "6b3a7b5c-ceb0-48e8-927f-0ddafaef65fb",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1712,
+        -48
+      ],
+      "id": "a156f6a2-324d-4a74-a525-55f44b624b15",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "Run every day at 7AM": {
+      "main": [
+        [
+          {
+            "node": "GL365 Brain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Daily Trend Hunter",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "GL365 Mini Dump",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model in Perplexity": {
+      "ai_tool": [
+        [
+          {
+            "node": "Daily Trend Hunter",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GL365 Brain": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vibe rules": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Trend Hunter": {
+      "main": [
+        [
+          {
+            "node": "Vibe rules",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GL365 Mini Dump": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Daily Trend Hunter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model10": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Daily Trend Hunter",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "GL365 Brain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timeSavedMode": "fixed",
+    "timezone": "America/New_York",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "tQkR5bqvq8Y1oLaF"
+  },
+  "staticData": {
+    "node:Run every day at 7AM": {
+      "recurrenceRules": [
+        15
+      ]
+    }
+  },
+  "meta": null,
+  "pinData": {},
+  "versionId": "73ac8a56-fb4d-4264-b729-5078b73ce028",
+  "activeVersionId": "73ac8a56-fb4d-4264-b729-5078b73ce028",
+  "versionCounter": 360,
+  "triggerCount": 2,
+  "shared": [
+    {
+      "updatedAt": "2026-01-04T07:20:45.624Z",
+      "createdAt": "2026-01-04T07:20:45.624Z",
+      "role": "workflow:owner",
+      "workflowId": "8T9YxHw4mBMNQYJX",
+      "projectId": "CA2oX8JE8b4ELWzN",
+      "project": {
+        "updatedAt": "2025-11-26T23:39:45.565Z",
+        "createdAt": "2025-11-26T23:20:18.633Z",
+        "id": "CA2oX8JE8b4ELWzN",
+        "name": "jared tucker <jared.tucker13@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "projectRelations": [
+          {
+            "updatedAt": "2025-11-26T23:20:18.633Z",
+            "createdAt": "2025-11-26T23:20:18.633Z",
+            "userId": "08f0a56f-35d1-45de-ba8d-11e1f3f7c4cd",
+            "projectId": "CA2oX8JE8b4ELWzN",
+            "user": {
+              "updatedAt": "2026-02-20T18:18:04.769Z",
+              "createdAt": "2025-11-26T23:20:18.176Z",
+              "id": "08f0a56f-35d1-45de-ba8d-11e1f3f7c4cd",
+              "email": "jared.tucker13@gmail.com",
+              "firstName": "jared",
+              "lastName": "tucker",
+              "personalizationAnswers": {
+                "version": "v4",
+                "personalization_survey_submitted_at": "2025-11-26T23:41:07.799Z",
+                "personalization_survey_n8n_version": "1.121.3",
+                "companySize": "<20",
+                "companyType": "education",
+                "role": "business-owner",
+                "reportedSource": "youtube"
+              },
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "eANVAv2WVioSXMXW",
+                "userActivatedAt": 1766878669831,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1771611441895
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-02-20",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-02-20T18:32:22.875Z",
+    "createdAt": "2026-02-20T18:32:22.875Z",
+    "versionId": "73ac8a56-fb4d-4264-b729-5078b73ce028",
+    "workflowId": "8T9YxHw4mBMNQYJX",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "hours",
+                "hoursInterval": 3
+              },
+              {
+                "field": "weeks",
+                "triggerAtDay": [
+                  1
+                ],
+                "triggerAtHour": 7
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          0,
+          -144
+        ],
+        "id": "7f6215c0-11cc-4c8e-af1c-9ac25cf1a84e",
+        "name": "Run every day at 7AM",
+        "notesInFlow": true,
+        "alwaysOutputData": false,
+        "retryOnFail": true,
+        "maxTries": 2,
+        "waitBetweenTries": 5000,
+        "notes": "Double-click to open"
+      },
+      {
+        "parameters": {
+          "sessionIdType": "customKey",
+          "sessionKey": "{{$node[\"Workflow Configuration\"].json.clientBusinessName}}"
+        },
+        "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+        "typeVersion": 1.3,
+        "position": [
+          800,
+          176
+        ],
+        "id": "86a48b58-4246-4bdf-8efb-469fd06ef02c",
+        "name": "Simple Memory",
+        "notesInFlow": true,
+        "notes": "Simple Memory for content agent. Stores only the last 5–10 interactions for this client: name, city, tone, and explicit content preferences (e.g., caption length, emoji yes/no, A/B choice). No long‑term data or sensitive PII; Supabase is the source of truth. Do not change session key or context length without updating the SOP.\n\n{\n  \"memory_summary\": {\n    \"client_name\": \"<CLIENT_NAME>\",\n    \"client_city\": \"<CLIENT_CITY>\",\n    \"preferred_tone\": \"<PREFERRED_TONE>\",\n    \"content_mode\": \"<CONTENT_MODE>\",\n    \"recent_preferences\": [\n      \"Prefers short captions without emojis\",\n      \"Likes 2 options (A/B) per email\"\n    ],\n    \"last_generated_type\": \"photo_to_post\"\n  }\n}"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "bc0832bc-6592-467d-ae1e-fb158d43c539",
+                "leftValue": "={{ $json.vibeCheck.approved }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          1296,
+          48
+        ],
+        "id": "71636e7b-b1b5-4ac7-b6cc-4fc5c7f47c4a",
+        "name": "If"
+      },
+      {
+        "parameters": {
+          "toolDescription": "Search the web using Perplexity Sonar via OpenRouter for real-time, up-to-date information",
+          "method": "POST",
+          "url": "https://openrouter.ai/api/v1/chat/completions",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "openRouterApi",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ model: \"perplexity/sonar-online\", messages: [{ role: \"user\", content: \"Search for the top 3 local news events, weather, and community trends happening right now in \" + $json.city + \". Then write an HTML newsletter draft for \" + $json.name + \" with headings and short paragraphs. Return only HTML.\" }], max_tokens: 1024, temperature: 0.7 }) }}",
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+        "typeVersion": 1.1,
+        "position": [
+          1008,
+          176
+        ],
+        "id": "b6b8ae6c-1475-41bf-bbb4-a804629fa625",
+        "name": "Message a model in Perplexity",
+        "credentials": {
+          "openRouterApi": {
+            "id": "BgQfIS3XySiOhMjo",
+            "name": "OpenRouter account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "getAll",
+          "tableId": "organizations",
+          "returnAll": true,
+          "filterType": "none"
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          208,
+          32
+        ],
+        "id": "11d8f77f-0914-4422-9310-80875792e719",
+        "name": "GL365 Brain",
+        "credentials": {
+          "supabaseApi": {
+            "id": "m9mbFt3ANaSacO5C",
+            "name": "Supabase account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForEachItem",
+          "jsCode": "// IRON DOME VIBE CHECK PROTOCOL (v2.0)\n\n// 1. Get the text from the AI Agent\nconst generatedText =\n  $input.item.json.output ||\n  $input.item.json.text ||\n  \"\";\n\n// 2. Define the rules\nconst constraints = {\n  forbidden_words: [\n    \"synergy\",\n    \"blast\",\n    \"skyrocket\",\n    \"guaranteed\",\n    \"100%\",\n    \"crypto\",\n    \"investment\"\n  ],\n  copyright_risks: [\n    \"disney\",\n    \"marvel\",\n    \"star wars\",\n    \"mickey mouse\",\n    \"nike\",\n    \"nintendo\"\n  ]\n};\n\n// 3. Scan the text\nlet violations = [];\nconst textLower = generatedText.toLowerCase();\n\n// Scan for forbidden words\nfor (const word of constraints.forbidden_words) {\n  if (textLower.includes(word.toLowerCase())) {\n    violations.push(`Forbidden Word: \"${word}\"`);\n  }\n}\n\n// Scan for copyright risks\nfor (const brand of constraints.copyright_risks) {\n  if (textLower.includes(brand)) {\n    violations.push(`Copyright Risk: \"${brand}\"`);\n  }\n}\n\n// 4. Decision logic\nconst hasViolations = violations.length > 0;\n\n// 5. Build base payload (keep everything that came in)\nconst base = {\n  ...$json,\n  generatedText\n};\n\nif (hasViolations) {\n  // REJECT\n  return {\n    json: {\n      ...base,\n      status: \"REJECTED\",\n      reason: violations.join(\", \"),\n      original_text: generatedText,\n      vibeCheck: {\n        approved: false,\n        violations\n      }\n    }\n  };\n} else {\n  // APPROVE\n  return {\n    json: {\n      ...base,\n      status: \"APPROVED\",\n      final_text: generatedText,\n      timestamp: new Date().toISOString(),\n      vibeCheck: {\n        approved: true,\n        violations: []\n      }\n    }\n  };\n}"
+        },
+        "id": "8dc711e4-38e2-463e-8a90-08daa46127ce",
+        "name": "Vibe rules",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1088,
+          48
+        ]
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "={{ $json.canonical.location_data.city }} {{ $json.uardrailsInput }}",
+          "options": {
+            "systemMessage": "=YOUR TASK:\n1. Use the 'perplexity' tool to search: \"Top 3 interesting news stories or events in {{ $json.canonical.location_data.city }} today\".\n2. Ignore crime or bad news. Look for festivals, sports, business openings, or weather.\n3. Output the answer in this simple email format:\n\nSubject: 🏙️ City Pulse: Top stories for {{ $json.canonical.location_data.city }}\n\nHi Neighbor,\n\nHere is what is happening in {{ $json.canonical.location_data.city }} today:\n\n{{ $json.uardrailsInput }}"
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 2.2,
+        "position": [
+          752,
+          48
+        ],
+        "id": "a37d4d9b-9daf-4466-ace1-027e0c42a36c",
+        "name": "Daily Trend Hunter",
+        "notesInFlow": true,
+        "retryOnFail": true,
+        "waitBetweenTries": 2000,
+        "notes": "Daily trend agent for Greenline365. If this node fails repeatedly, check API keys, Perplexity tool, and JSON format in System Message.”"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "541823c5-6e43-4559-979c-a8cd70329498",
+                "name": "=={{ {\n  canonical: {\n    id: $json.id || $uuidv4(),\n    trace_id: $json.trace_id || $uuidv4(),\n    event_id: $json.event_id || $uuidv4(),\n    source: \"vibe\",\n    name: $json.name,\n    email: $json.email,\n    phone: $json.phone,\n    company: $json.company,\n    consent: {\n      marketing: true,\n      timestamp: new Date().toISOString()\n    },\n    stage: \"mini_dump\",\n    score: null,\n    intent: null,\n    created_at: new Date().toISOString(),\n    updated_at: new Date().toISOString()\n  }\n} }}",
+                "value": "",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1472,
+          208
+        ],
+        "id": "14eb8924-2e26-4b78-bdb2-076a27f94ec6",
+        "name": "GL365 Mini Dump"
+      },
+      {
+        "parameters": {
+          "batchSize": 10,
+          "options": {}
+        },
+        "type": "n8n-nodes-base.splitInBatches",
+        "typeVersion": 3,
+        "position": [
+          544,
+          32
+        ],
+        "id": "317bbe1f-507b-4e3c-a4e5-55a9e7b3960a",
+        "name": "Loop Over Items"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "d458255d-3ab8-43d2-a277-a498a368d567",
+                "name": "=canonical",
+                "value": "={{$json}}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          352,
+          32
+        ],
+        "id": "2c4faf72-3b9f-4ad6-a886-44f41642e2b3",
+        "name": "Edit Fields"
+      },
+      {
+        "parameters": {
+          "options": {
+            "temperature": 0.5
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+        "typeVersion": 1,
+        "position": [
+          640,
+          176
+        ],
+        "id": "0cee27b0-7e94-44b9-ac82-d9154077e915",
+        "name": "OpenRouter Chat Model10",
+        "credentials": {
+          "openRouterApi": {
+            "id": "BgQfIS3XySiOhMjo",
+            "name": "OpenRouter account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "d25b2519-f339-49a2-be95-c7faafa9242a",
+          "responseMode": "lastNode",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          -176,
+          32
+        ],
+        "id": "2ddfc83a-45c0-416a-9992-04a1a59b0f7a",
+        "name": "Webhook",
+        "webhookId": "d25b2519-f339-49a2-be95-c7faafa9242a"
+      },
+      {
+        "parameters": {
+          "mode": "raw",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1504,
+          -48
+        ],
+        "id": "6b3a7b5c-ceb0-48e8-927f-0ddafaef65fb",
+        "name": "Edit Fields1"
+      },
+      {
+        "parameters": {
+          "respondWith": "json",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.5,
+        "position": [
+          1712,
+          -48
+        ],
+        "id": "a156f6a2-324d-4a74-a525-55f44b624b15",
+        "name": "Respond to Webhook"
+      }
+    ],
+    "connections": {
+      "Run every day at 7AM": {
+        "main": [
+          [
+            {
+              "node": "GL365 Brain",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Simple Memory": {
+        "ai_memory": [
+          [
+            {
+              "node": "Daily Trend Hunter",
+              "type": "ai_memory",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields1",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "GL365 Mini Dump",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Message a model in Perplexity": {
+        "ai_tool": [
+          [
+            {
+              "node": "Daily Trend Hunter",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "GL365 Brain": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Vibe rules": {
+        "main": [
+          [
+            {
+              "node": "If",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Daily Trend Hunter": {
+        "main": [
+          [
+            {
+              "node": "Vibe rules",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "GL365 Mini Dump": {
+        "main": [
+          [
+            {
+              "node": "Loop Over Items",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Loop Over Items": {
+        "main": [
+          [],
+          [
+            {
+              "node": "Daily Trend Hunter",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields": {
+        "main": [
+          [
+            {
+              "node": "Loop Over Items",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenRouter Chat Model10": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Daily Trend Hunter",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "GL365 Brain",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields1": {
+        "main": [
+          [
+            {
+              "node": "Respond to Webhook",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "jared tucker",
+    "name": null,
+    "description": null,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-02-20T18:32:23.048Z",
+        "id": 34,
+        "workflowId": "8T9YxHw4mBMNQYJX",
+        "versionId": "73ac8a56-fb4d-4264-b729-5078b73ce028",
+        "event": "activated",
+        "userId": "08f0a56f-35d1-45de-ba8d-11e1f3f7c4cd"
+      }
+    ]
+  }
+}
