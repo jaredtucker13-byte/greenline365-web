@@ -1,0 +1,513 @@
+{
+  "updatedAt": "2025-12-25T22:14:10.957Z",
+  "createdAt": "2025-12-25T02:09:46.950Z",
+  "id": "bta8r4fLhCHOGvZx",
+  "name": "Leads-Enrich",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "path": "b3a0989f-4172-45d5-ab8d-9aba66d45d23",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -992,
+        320
+      ],
+      "id": "8976a6dc-5731-46c1-88d6-ff2f1eee0a6b",
+      "name": "Webhook",
+      "webhookId": "b3a0989f-4172-45d5-ab8d-9aba66d45d23"
+    },
+    {
+      "parameters": {
+        "model": "perplexity/sonar-pro-search",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -672,
+        160
+      ],
+      "id": "07f86798-2af4-4652-ab8a-6df623de07aa",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "BgQfIS3XySiOhMjo",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        32,
+        -16
+      ],
+      "id": "f966f9ae-4e61-4dbb-a53f-fe2d154f4f25",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        640
+      ],
+      "id": "ae74a183-3d40-4151-9b6c-a8fbdafc9e4d",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "m9mbFt3ANaSacO5C",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        640
+      ],
+      "id": "31f5d4f1-c301-41d9-889c-4a0f36f27984",
+      "name": "Update a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "m9mbFt3ANaSacO5C",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        32,
+        640
+      ],
+      "id": "1d38d473-353b-4059-a556-8a1247990bd7",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "content": "GL365-LeadIntake-VoiceCall\n\nReceives inbound lead submissions from custom web forms,\n   normalizes data to canonical format, \n   writes to Supabase database with full audit trail, \n   enriches context using AI, \n   triggers immediate outbound voice call via Retell AI, \n   and returns call tracking ID to the submitter.",
+        "height": 1136,
+        "width": 1872
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1216,
+        -304
+      ],
+      "typeVersion": 1,
+      "id": "0ca6c091-3ae5-462b-8a1d-6cefe282932a",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "height": 496,
+        "width": 1872,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1216,
+        560
+      ],
+      "typeVersion": 1,
+      "id": "a6cc4d1d-8116-4d33-a62a-bdb7e6e510cf",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        256,
+        -16
+      ],
+      "id": "24311d73-b572-43f7-99d8-38d7c3f67c4e",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "path": "b3a0989f-4172-45d5-ab8d-9aba66d45d23",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -992,
+        640
+      ],
+      "id": "7f50208e-99cb-42e6-ac21-292bf1f02f83",
+      "name": "Webhook1",
+      "webhookId": "b3a0989f-4172-45d5-ab8d-9aba66d45d23"
+    },
+    {
+      "parameters": {
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        -768,
+        640
+      ],
+      "id": "c563ce19-9b32-482d-a31f-76754ffd4caa",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -704,
+        864
+      ],
+      "id": "534892d6-63ab-4989-9d1e-b26aa65705df",
+      "name": "OpenRouter Chat Model1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "BgQfIS3XySiOhMjo",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -592,
+        192
+      ],
+      "id": "c650f300-9a41-4421-8d9f-50374c59205a",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -640,
+        -32
+      ],
+      "id": "ec6290fb-1338-4dee-be3d-8bcba98ec237",
+      "name": "Preparation, agent."
+    },
+    {
+      "parameters": {
+        "operation": "getAll"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        -16
+      ],
+      "id": "7e29b1a8-481d-4ebb-88e9-e7926e47eb06",
+      "name": "L",
+      "credentials": {
+        "supabaseApi": {
+          "id": "m9mbFt3ANaSacO5C",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"canonical\": {\n    \"id\": \"={{ $now.toISO() + '-' + $('Webhook').item.json.body.email.split('@')[0] }}\",\n    \"trace_id\": \"={{ $uuid() }}\",\n    \"event_id\": \"={{ $uuid() }}\",\n    \"tenant_id\": \"={{ $('Webhook').item.json.body.tenant_id }}\",\n    \"source\": \"web_form\",\n    \"name\": \"={{ $('Webhook').item.json.body.name }}\",\n    \"first_name\": \"={{ $('Webhook').item.json.body.name.split(' ')[0] }}\",\n    \"email\": \"={{ $('Webhook').item.json.body.email }}\",\n    \"phone\": \"={{ $('Webhook').item.json.body.phone }}\",\n    \"company\": \"={{ $('Webhook').item.json.body.company }}\",\n    \"industry\": \"={{ $('Webhook').item.json.body.industry || 'General' }}\",\n    \"location\": {\n      \"zip_code\": \"={{ $('Webhook').item.json.body.zip_code || '' }}\",\n      \"city\": \"={{ $('Webhook').item.json.body.city || '' }}\",\n      \"state\": \"={{ $('Webhook').item.json.body.state || '' }}\",\n      \"lat\": null,\n      \"lng\": null,\n      \"timezone\": null\n    },\n    \"consent\": {\n      \"marketing\": \"={{ $('Webhook').item.json.body.consent_marketing === true || $('Webhook').item.json.body.consent_marketing === 'yes' }}\",\n      \"timestamp\": \"={{ $now.toISO() }}\"\n    },\n    \"stage\": \"New\",\n    \"score\": 0,\n    \"intent\": \"={{ $('Webhook').item.json.body.message || '' }}\",\n    \"created_at\": \"={{ $now.toISO() }}\",\n    \"updated_at\": \"={{ $now.toISO() }}\"\n  },\n  \"enrichment\": {\n    \"weather\": null,\n    \"local_events\": null,\n    \"persona_hints\": null,\n    \"school_calendar\": null,\n    \"confidence_scores\": {}\n  },\n  \"_raw\": \"={{ $('Webhook').item.json }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -992,
+        -16
+      ],
+      "id": "91b6445c-b010-4e11-9125-a194e46b4920",
+      "name": "GL365 Brain"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"required\": [\"tenant_id\", \"lead_id\", \"dynamic_variables\"],\n  \"properties\": {\n    \"tenant_id\": { \"type\": \"string\" },\n    \"lead_id\": { \"type\": \"string\" },\n\n    \"company\": {\n      \"type\": \"object\",\n      \"required\": [\"name\", \"website_url\", \"phone\", \"email\", \"location\", \"industry\"],\n      \"properties\": {\n        \"name\": { \"type\": [\"string\", \"null\"] },\n        \"website_url\": { \"type\": [\"string\", \"null\"] },\n        \"phone\": { \"type\": [\"string\", \"null\"] },\n        \"email\": { \"type\": [\"string\", \"null\"] },\n        \"industry\": { \"type\": [\"string\", \"null\"] },\n        \"location\": {\n          \"type\": \"object\",\n          \"required\": [\"city\", \"state\", \"zip_code\"],\n          \"properties\": {\n            \"city\": { \"type\": [\"string\", \"null\"] },\n            \"state\": { \"type\": [\"string\", \"null\"] },\n            \"zip_code\": { \"type\": [\"string\", \"null\"] }\n          }\n        }\n      }\n    },\n\n    \"enrichment\": {\n      \"type\": \"object\",\n      \"required\": [\"weather\", \"local_intel\", \"common_pain_points\"],\n      \"properties\": {\n        \"weather\": {\n          \"type\": \"object\",\n          \"required\": [\"summary\", \"temp_f\", \"source\", \"as_of\"],\n          \"properties\": {\n            \"summary\": { \"type\": [\"string\", \"null\"] },\n            \"temp_f\": { \"type\": [\"number\", \"null\"] },\n            \"source\": { \"type\": [\"string\", \"null\"] },\n            \"as_of\": { \"type\": [\"string\", \"null\"] }\n          }\n        },\n        \"local_intel\": {\n          \"type\": \"object\",\n          \"required\": [\"area_summary\", \"top_topics\", \"sources\"],\n          \"properties\": {\n            \"area_summary\": { \"type\": [\"string\", \"null\"] },\n            \"top_topics\": {\n              \"type\": \"array\",\n              \"items\": { \"type\": \"string\" }\n            },\n            \"sources\": {\n              \"type\": \"array\",\n              \"items\": {\n                \"type\": \"object\",\n                \"required\": [\"title\", \"publisher\", \"url\", \"published_at\", \"evidence_snippet\"],\n                \"properties\": {\n                  \"title\": { \"type\": [\"string\", \"null\"] },\n                  \"publisher\": { \"type\": [\"string\", \"null\"] },\n                  \"url\": { \"type\": [\"string\", \"null\"] },\n                  \"published_at\": { \"type\": [\"string\", \"null\"] },\n                  \"evidence_snippet\": { \"type\": [\"string\", \"null\"] }\n                }\n              }\n            }\n          }\n        },\n        \"common_pain_points\": {\n          \"type\": \"array\",\n          \"minItems\": 3,\n          \"items\": {\n            \"type\": \"object\",\n            \"required\": [\"pain_key\", \"pain_title\", \"why_it_matters\", \"evidence\"],\n            \"properties\": {\n              \"pain_key\": { \"type\": \"string\" },\n              \"pain_title\": { \"type\": \"string\" },\n              \"why_it_matters\": { \"type\": \"string\" },\n              \"evidence\": {\n                \"type\": \"array\",\n                \"items\": {\n                  \"type\": \"object\",\n                  \"required\": [\"title\", \"publisher\", \"url\", \"published_at\", \"metric_or_finding\", \"evidence_snippet\"],\n                  \"properties\": {\n                    \"title\": { \"type\": [\"string\", \"null\"] },\n                    \"publisher\": { \"type\": [\"string\", \"null\"] },\n                    \"url\": { \"type\": [\"string\", \"null\"] },\n                    \"published_at\": { \"type\": [\"string\", \"null\"] },\n                    \"metric_or_finding\": { \"type\": [\"string\", \"null\"] },\n                    \"evidence_snippet\": { \"type\": [\"string\", \"null\"] }\n                  }\n                }\n              }\n            }\n          }\n        }\n      }\n    },\n\n    \"dynamic_variables\": {\n      \"type\": \"object\",\n      \"required\": [\"self_reference\", \"confirmation_script\", \"opener\", \"pain_point_hooks\", \"nepq_questions\", \"cta\"],\n      \"properties\": {\n        \"self_reference\": { \"type\": \"string\" },\n        \"confirmation_script\": { \"type\": \"string\" },\n        \"opener\": { \"type\": \"string\" },\n        \"pain_point_hooks\": {\n          \"type\": \"array\",\n          \"minItems\": 3,\n          \"items\": {\n            \"type\": \"object\",\n            \"required\": [\"pain_key\", \"one_liner\"],\n            \"properties\": {\n              \"pain_key\": { \"type\": \"string\" },\n              \"one_liner\": { \"type\": \"string\" }\n            }\n          }\n        },\n        \"nepq_questions\": {\n          \"type\": \"array\",\n          \"items\": {\n            \"type\": \"object\",\n            \"required\": [\"type\", \"question\"],\n            \"properties\": {\n              \"type\": { \"type\": \"string\" },\n              \"question\": { \"type\": \"string\" }\n            }\n          }\n        },\n        \"cta\": { \"type\": \"string\" }\n      }\n    }\n  }\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -416,
+        160
+      ],
+      "id": "8dde293a-d667-4ffe-a3ba-38453c9e345a",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "format": "imperial",
+        "cityName": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('City', ``, 'string') }}",
+        "language": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Language', ``, 'string') }}"
+      },
+      "type": "n8n-nodes-base.openWeatherMapTool",
+      "typeVersion": 1,
+      "position": [
+        -512,
+        192
+      ],
+      "id": "01bb3b16-e557-45b7-9f07-a4395a0c7ac3",
+      "name": "OpenWeatherMap1",
+      "credentials": {
+        "openWeatherMapApi": {
+          "id": "gAZKghCXd0yYgQD3",
+          "name": "OpenWeatherMap account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        []
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Preparation, agent.",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row": {
+      "main": [
+        [
+          {
+            "node": "Update a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a row": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Preparation, agent.",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparation, agent.": {
+      "main": [
+        [
+          {
+            "node": "L",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "L": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GL365 Brain": {
+      "main": [
+        [
+          {
+            "node": "Preparation, agent.",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Preparation, agent.",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenWeatherMap1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Preparation, agent.",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "500bff7b-f9a3-430e-bb32-a0680d2aa401",
+  "activeVersionId": null,
+  "versionCounter": 22,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-12-25T02:09:46.954Z",
+      "createdAt": "2025-12-25T02:09:46.954Z",
+      "role": "workflow:owner",
+      "workflowId": "bta8r4fLhCHOGvZx",
+      "projectId": "CA2oX8JE8b4ELWzN",
+      "project": {
+        "updatedAt": "2025-11-26T23:39:45.565Z",
+        "createdAt": "2025-11-26T23:20:18.633Z",
+        "id": "CA2oX8JE8b4ELWzN",
+        "name": "jared tucker <jared.tucker13@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "projectRelations": [
+          {
+            "updatedAt": "2025-11-26T23:20:18.633Z",
+            "createdAt": "2025-11-26T23:20:18.633Z",
+            "userId": "08f0a56f-35d1-45de-ba8d-11e1f3f7c4cd",
+            "projectId": "CA2oX8JE8b4ELWzN",
+            "user": {
+              "updatedAt": "2026-02-20T18:18:04.769Z",
+              "createdAt": "2025-11-26T23:20:18.176Z",
+              "id": "08f0a56f-35d1-45de-ba8d-11e1f3f7c4cd",
+              "email": "jared.tucker13@gmail.com",
+              "firstName": "jared",
+              "lastName": "tucker",
+              "personalizationAnswers": {
+                "version": "v4",
+                "personalization_survey_submitted_at": "2025-11-26T23:41:07.799Z",
+                "personalization_survey_n8n_version": "1.121.3",
+                "companySize": "<20",
+                "companyType": "education",
+                "role": "business-owner",
+                "reportedSource": "youtube"
+              },
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "eANVAv2WVioSXMXW",
+                "userActivatedAt": 1766878669831,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1771611441895
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-02-20",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}
