@@ -1,0 +1,202 @@
+{
+  "updatedAt": "2025-12-23T01:35:44.026Z",
+  "createdAt": "2025-12-23T00:55:01.930Z",
+  "id": "mzVHFev8W43bwfyg",
+  "name": "GL365 SOP nodes",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"canonical\": {\n    \"id\": \"{{$json.body.id || $execution.id}}\",\n    \"trace_id\": \"{{$execution.id}}\",\n    \"event_id\": \"{{$now.toISO()}}\",\n    \"tenant_id\": \"greenline365\",\n    \"source\": \"website_form\",\n    \"mode\": \"production\",\n    \"name\": \"{{$json.body.name || 'Unknown'}}\",\n    \"email\": \"{{$json.body.email}}\",\n    \"phone\": \"{{$json.body.phone || ''}}\",\n    \"company\": \"{{$json.body.company || ''}}\",\n    \"consent\": {\n      \"marketing\": true,\n      \"timestamp\": \"{{$now.toISO()}}\"\n    },\n    \"stage\": \"new_lead\",\n    \"created_at\": \"{{$now.toISO()}}\",\n    \"updated_at\": \"{{$now.toISO()}}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -272,
+        16
+      ],
+      "id": "6588de57-28a0-4067-9a5e-4cdc733ee901",
+      "name": "NTC"
+    },
+    {
+      "parameters": {
+        "useCustomSchema": true,
+        "operation": "getAll",
+        "tableId": "leads",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "email",
+              "condition": "eq",
+              "keyValue": "={{ $json.canonical.email }}"
+            },
+            {
+              "keyName": "phone",
+              "condition": "eq",
+              "keyValue": "={{ $json.canonical.phone }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        16
+      ],
+      "id": "68cd999e-e856-4b57-980b-58c3cc177b27",
+      "name": "GL365-brain",
+      "credentials": {
+        "supabaseApi": {
+          "id": "m9mbFt3ANaSacO5C",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "useCustomSchema": true,
+        "operation": "getAll",
+        "tableId": "leads",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "email",
+              "condition": "eq",
+              "keyValue": "={{ $json.canonical.email }}"
+            },
+            {
+              "keyName": "phone",
+              "condition": "eq",
+              "keyValue": "={{ $json.canonical.phone }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        0,
+        16
+      ],
+      "id": "57cbcad5-2050-4c9f-a463-e4642f8f9a2e",
+      "name": "AUDIT",
+      "credentials": {
+        "supabaseApi": {
+          "id": "m9mbFt3ANaSacO5C",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        176,
+        16
+      ],
+      "id": "427fd2f0-6f6a-4b36-8980-2b6d324dfb38",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "GL365-brain": {
+      "main": [
+        [
+          {
+            "node": "NTC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AUDIT": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "0a1918be-1b62-4b7f-9bd8-5810cc5a0a06",
+  "activeVersionId": null,
+  "versionCounter": 6,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-12-23T00:55:01.932Z",
+      "createdAt": "2025-12-23T00:55:01.932Z",
+      "role": "workflow:owner",
+      "workflowId": "mzVHFev8W43bwfyg",
+      "projectId": "CA2oX8JE8b4ELWzN",
+      "project": {
+        "updatedAt": "2025-11-26T23:39:45.565Z",
+        "createdAt": "2025-11-26T23:20:18.633Z",
+        "id": "CA2oX8JE8b4ELWzN",
+        "name": "jared tucker <jared.tucker13@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "projectRelations": [
+          {
+            "updatedAt": "2025-11-26T23:20:18.633Z",
+            "createdAt": "2025-11-26T23:20:18.633Z",
+            "userId": "08f0a56f-35d1-45de-ba8d-11e1f3f7c4cd",
+            "projectId": "CA2oX8JE8b4ELWzN",
+            "user": {
+              "updatedAt": "2026-02-20T18:18:04.769Z",
+              "createdAt": "2025-11-26T23:20:18.176Z",
+              "id": "08f0a56f-35d1-45de-ba8d-11e1f3f7c4cd",
+              "email": "jared.tucker13@gmail.com",
+              "firstName": "jared",
+              "lastName": "tucker",
+              "personalizationAnswers": {
+                "version": "v4",
+                "personalization_survey_submitted_at": "2025-11-26T23:41:07.799Z",
+                "personalization_survey_n8n_version": "1.121.3",
+                "companySize": "<20",
+                "companyType": "education",
+                "role": "business-owner",
+                "reportedSource": "youtube"
+              },
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "eANVAv2WVioSXMXW",
+                "userActivatedAt": 1766878669831,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1771611441895
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-02-20",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}
