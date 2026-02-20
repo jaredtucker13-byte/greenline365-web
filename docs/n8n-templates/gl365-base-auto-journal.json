@@ -1,0 +1,211 @@
+{
+  "name": "GL365 Base — Auto-Journal to Supabase",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "gl365-journal-webhook",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "notes": "Receives events from any GL365-integrated platform. Replace this node with the platform-specific trigger (e.g., Cal.com webhook, ServiceTitan webhook, etc.) when cloning this template."
+    },
+    {
+      "parameters": {
+        "functionCode": "// ========================================\n// GL365 Auto-Journal: Event Normalizer\n// ========================================\n// Takes raw platform data and normalizes it into\n// a standard GL365 journal entry format.\n//\n// Required output fields:\n//   tenant_id, contact_phone, contact_email, contact_name,\n//   source, event_type, raw_summary, raw_data\n//\n// This node should be customized per platform integration.\n\nconst input = $input.first().json;\n\n// Default normalization — override per platform\nconst normalized = {\n  tenant_id: input.tenant_id || input.metadata?.tenant_id || '',\n  contact_phone: input.phone || input.customer_phone || input.attendee_phone || '',\n  contact_email: input.email || input.customer_email || input.attendee_email || '',\n  contact_name: input.name || input.customer_name || input.attendee_name || '',\n  source: input.source || 'webhook',\n  event_type: input.event_type || input.type || 'unknown',\n  raw_summary: input.summary || input.description || JSON.stringify(input).substring(0, 200),\n  raw_data: input,\n  sentiment: input.sentiment || 'neutral',\n  importance: input.importance || 'normal'\n};\n\nreturn [{ json: normalized }];"
+      },
+      "id": "normalize-event",
+      "name": "Normalize Event",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [470, 300],
+      "notes": "Normalizes raw platform data into GL365 journal format. Customize the field mapping for each platform."
+    },
+    {
+      "parameters": {
+        "url": "https://api.openrouter.ai/api/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{$credentials.openrouterApiKey}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "anthropic/claude-haiku-3.5"
+            },
+            {
+              "name": "messages",
+              "value": "=[{\"role\":\"user\",\"content\":\"Write a single, concise sentence summarizing this customer event for a service business CRM journal. Be specific, include names and key details. Event type: {{$json.event_type}}. Source: {{$json.source}}. Customer: {{$json.contact_name}}. Raw data: {{JSON.stringify($json.raw_data).substring(0, 500)}}\"}]"
+            },
+            {
+              "name": "max_tokens",
+              "value": "100"
+            },
+            {
+              "name": "temperature",
+              "value": "0.2"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ai-summarize",
+      "name": "AI Summary Generator",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [690, 300],
+      "notes": "Generates a 1-sentence human-readable summary of the event using Claude Haiku via OpenRouter. This is what the Retell agent reads via get_memory — it needs to be natural language, not raw JSON."
+    },
+    {
+      "parameters": {
+        "functionCode": "// Extract the AI-generated summary from OpenRouter response\nconst input = $input.first().json;\nconst prevData = $('Normalize Event').first().json;\n\nlet summary = '';\ntry {\n  const choices = input.choices || [];\n  summary = choices[0]?.message?.content || prevData.raw_summary;\n} catch {\n  summary = prevData.raw_summary;\n}\n\n// Clean up the summary\nsummary = summary.trim().replace(/^[\"']|[\"']$/g, '');\n\nreturn [{\n  json: {\n    ...prevData,\n    summary: summary\n  }\n}];"
+      },
+      "id": "extract-summary",
+      "name": "Extract Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [910, 300],
+      "notes": "Extracts the AI summary from the OpenRouter response and merges it with the normalized event data."
+    },
+    {
+      "parameters": {
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/customer_journal",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{$env.SUPABASE_SERVICE_ROLE_KEY}}"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$env.SUPABASE_SERVICE_ROLE_KEY}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"tenant_id\": \"{{$json.tenant_id}}\",\n  \"contact_phone\": \"{{$json.contact_phone}}\",\n  \"contact_email\": \"{{$json.contact_email}}\",\n  \"contact_name\": \"{{$json.contact_name}}\",\n  \"source\": \"{{$json.source}}\",\n  \"event_type\": \"{{$json.event_type}}\",\n  \"summary\": \"{{$json.summary}}\",\n  \"raw_data\": {{JSON.stringify($json.raw_data)}},\n  \"sentiment\": \"{{$json.sentiment}}\",\n  \"importance\": \"{{$json.importance}}\"\n}",
+        "options": {}
+      },
+      "id": "write-journal",
+      "name": "Write to Customer Journal",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1130, 300],
+      "notes": "Inserts the journal entry into Supabase customer_journal table. Uses the service role key for server-side access through RLS."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.importance}}",
+              "operation": "equals",
+              "value2": "critical"
+            }
+          ]
+        }
+      },
+      "id": "check-critical",
+      "name": "Is Critical?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1350, 300],
+      "notes": "Routes critical events (emergencies, negative reviews, cancellations) to the alert notification path."
+    },
+    {
+      "parameters": {
+        "url": "https://hooks.slack.com/services/YOUR_WEBHOOK_URL",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"🚨 *Critical Event* for {{$('Normalize Event').first().json.contact_name}} ({{$('Normalize Event').first().json.tenant_id}})\\n{{$('Extract Summary').first().json.summary}}\\nSource: {{$('Normalize Event').first().json.source}} | Type: {{$('Normalize Event').first().json.event_type}}\"\n}",
+        "options": {}
+      },
+      "id": "slack-alert",
+      "name": "Slack Alert (Critical)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1570, 200],
+      "notes": "Sends a Slack notification for critical events. Replace the webhook URL with your Slack incoming webhook."
+    },
+    {
+      "parameters": {},
+      "id": "noop-normal",
+      "name": "Normal Event (Done)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1570, 400],
+      "notes": "Non-critical events are simply journaled. No additional action needed."
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [{ "node": "Normalize Event", "type": "main", "index": 0 }]
+      ]
+    },
+    "Normalize Event": {
+      "main": [
+        [{ "node": "AI Summary Generator", "type": "main", "index": 0 }]
+      ]
+    },
+    "AI Summary Generator": {
+      "main": [
+        [{ "node": "Extract Summary", "type": "main", "index": 0 }]
+      ]
+    },
+    "Extract Summary": {
+      "main": [
+        [{ "node": "Write to Customer Journal", "type": "main", "index": 0 }]
+      ]
+    },
+    "Write to Customer Journal": {
+      "main": [
+        [{ "node": "Is Critical?", "type": "main", "index": 0 }]
+      ]
+    },
+    "Is Critical?": {
+      "main": [
+        [{ "node": "Slack Alert (Critical)", "type": "main", "index": 0 }],
+        [{ "node": "Normal Event (Done)", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    { "name": "gl365" },
+    { "name": "auto-journal" },
+    { "name": "base-template" }
+  ],
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": "gl365-base"
+  }
+}

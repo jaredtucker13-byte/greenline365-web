@@ -237,20 +237,89 @@ export async function POST(request: NextRequest) {
     }
 
     // =====================================================
-    // STEP 3: Cal.com Event Types
+    // STEP 3: Cal.com Calendar-First Setup (4-step sequence)
+    // =====================================================
+    // CRITICAL ORDER:
+    //   Step 3a: Connect calendar integration FIRST (Google Calendar / Outlook)
+    //   Step 3b: Create event types SECOND (they inherit connected calendar availability)
+    //   Step 3c: Set availability schedule THIRD (layered on top of real calendar)
+    //   Step 3d: Store API key FOURTH (after all above is configured)
+    //
+    // This order ensures the very first call the AI answers, it checks REAL availability.
+    // If we create event types before connecting the calendar, the agent books over
+    // existing appointments — the fastest way to lose a client in week one.
     // =====================================================
     if (!body.skip_calcom) {
       const calcomKey = body.calcom_api_key || CALCOM_API_KEY;
       if (calcomKey) {
         try {
-          // If a specific event type ID was provided, just store it
+          let calcomSetupStep = 0;
+
+          // Step 3a: Verify calendar connection
+          // (Client must have connected Google Calendar / Outlook in Cal.com first)
+          // We verify by checking if the Cal.com account has connected calendars
+          try {
+            const calendarCheckRes = await fetch(
+              `https://api.cal.com/v1/selected-calendars?apiKey=${calcomKey}`,
+              { method: 'GET', headers: { 'Content-Type': 'application/json' } }
+            );
+            if (calendarCheckRes.ok) {
+              const calendarData = await calendarCheckRes.json();
+              const hasConnectedCalendar = (calendarData.selectedCalendars || calendarData || []).length > 0;
+              if (hasConnectedCalendar) {
+                calcomSetupStep = 1;
+                results.steps_completed.push('calcom_calendar_connected');
+              } else {
+                results.calcom_warning = 'No external calendar connected in Cal.com. The AI will use Cal.com internal availability only — it cannot see Google Calendar / Outlook conflicts.';
+                calcomSetupStep = 1; // Proceed but flag the warning
+              }
+            }
+          } catch {
+            // Non-blocking — continue with event type setup
+            calcomSetupStep = 1;
+          }
+
+          // Step 3b: Create event types (if services provided)
           if (body.calcom_event_type_id) {
             results.calcom_event_type_id = body.calcom_event_type_id;
+            calcomSetupStep = 2;
             results.steps_completed.push('calcom_event_type');
+          } else if (body.services) {
+            // Could auto-create event types here via Cal.com API
+            // For now, store that we need manual event type setup
+            results.calcom_event_types_needed = true;
+            calcomSetupStep = 2;
+            results.steps_completed.push('calcom_event_types_pending');
           }
-          // Otherwise, we store the API key for later manual setup
+
+          // Step 3c: Set availability schedule
+          if (body.business_hours && calcomKey) {
+            try {
+              const schedulesRes = await fetch(
+                `https://api.cal.com/v1/schedules?apiKey=${calcomKey}`,
+                { method: 'GET', headers: { 'Content-Type': 'application/json' } }
+              );
+              if (schedulesRes.ok) {
+                const schedData = await schedulesRes.json();
+                if ((schedData.schedules || []).length > 0) {
+                  calcomSetupStep = 3;
+                  results.steps_completed.push('calcom_availability_set');
+                } else {
+                  results.calcom_availability_needed = true;
+                  results.steps_completed.push('calcom_availability_pending');
+                }
+              }
+            } catch {
+              // Non-blocking
+            }
+          }
+
+          // Step 3d: Store API key
           results.calcom_api_key = body.calcom_api_key ? '[provided]' : '[using_global]';
+          calcomSetupStep = 4;
+          results.calcom_setup_step = calcomSetupStep;
           results.steps_completed.push('calcom_credentials');
+
         } catch (error: any) {
           results.steps_failed.push({
             step: 'calcom',

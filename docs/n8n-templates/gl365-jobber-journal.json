@@ -1,0 +1,102 @@
+{
+  "name": "GL365 Jobber — Auto-Journal",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "gl365-jobber-webhook",
+        "options": {
+          "responseMode": "onReceived"
+        }
+      },
+      "id": "jobber-webhook",
+      "name": "Jobber Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "notes": "Receives Jobber App webhook events. Configure in Jobber > App Center > Webhooks. Events: job_created, job_updated, job_completed, job_cancelled, client_created, invoice_created, payment_received, visit_completed, quote_created, quote_approved"
+    },
+    {
+      "parameters": {
+        "functionCode": "// ========================================\n// GL365 Jobber Event Normalizer\n// ========================================\n// Maps Jobber webhook payloads to GL365 journal format.\n//\n// Jobber events:\n//   job_created     → booking_created\n//   job_completed   → job_completed\n//   job_cancelled   → booking_cancelled\n//   client_created  → new_customer\n//   invoice_created → invoice_created\n//   payment_received → payment_received\n//   visit_completed → visit_completed\n//   quote_created   → estimate_sent\n//   quote_approved  → estimate_approved\n\nconst input = $input.first().json;\nconst event = input.event || input.topic || '';\nconst data = input.data || input.webHookEvent?.data || input;\n\nconst eventMap = {\n  'job_created': 'booking_created',\n  'job_updated': 'job_updated',\n  'job_completed': 'job_completed',\n  'job_cancelled': 'booking_cancelled',\n  'client_created': 'new_customer',\n  'invoice_created': 'invoice_created',\n  'payment_received': 'payment_received',\n  'visit_completed': 'visit_completed',\n  'quote_created': 'estimate_sent',\n  'quote_approved': 'estimate_approved'\n};\n\nlet importance = 'normal';\nif (event === 'job_cancelled') importance = 'high';\nif (event === 'quote_approved') importance = 'high';\n\nlet sentiment = 'neutral';\nif (['job_completed', 'payment_received', 'quote_approved'].includes(event)) sentiment = 'positive';\nif (event === 'job_cancelled') sentiment = 'negative';\n\nconst client = data.client || data.customer || {};\nconst job = data.job || data;\nconst property = data.property || job.property || {};\n\nconst normalized = {\n  tenant_id: input.metadata?.tenant_id || '',\n  contact_phone: client.phone || client.phones?.[0]?.number || '',\n  contact_email: client.email || client.emails?.[0]?.address || '',\n  contact_name: client.name || [client.first_name, client.last_name].filter(Boolean).join(' ') || '',\n  source: 'jobber',\n  event_type: eventMap[event] || event || 'unknown',\n  raw_summary: `Jobber ${event}: ${job.title || job.description || ''} for ${client.name || 'client'} at ${property.address?.street || ''}`.trim(),\n  raw_data: input,\n  sentiment,\n  importance,\n  job_title: job.title || job.description || '',\n  job_total: job.total || '',\n  job_address: property.address ? [property.address.street, property.address.city].filter(Boolean).join(', ') : '',\n  assigned_to: job.assigned_to?.name || ''\n};\n\nreturn [{ json: normalized }];"
+      },
+      "id": "jobber-normalize",
+      "name": "Normalize Jobber Event",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [470, 300],
+      "notes": "Maps Jobber job/client/quote/invoice events to GL365 journal format."
+    },
+    {
+      "parameters": {
+        "url": "https://api.openrouter.ai/api/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer {{$credentials.openrouterApiKey}}" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "model", "value": "anthropic/claude-haiku-3.5" },
+            { "name": "messages", "value": "=[{\"role\":\"user\",\"content\":\"Write ONE concise sentence for a service business CRM journal entry. Include names, job details, amounts where available. Jobber event: {{$json.event_type}}. Customer: {{$json.contact_name}}. Job: {{$json.job_title}}. Address: {{$json.job_address}}. Total: {{$json.job_total}}. Assigned to: {{$json.assigned_to}}.\"}]" },
+            { "name": "max_tokens", "value": "100" },
+            { "name": "temperature", "value": "0.2" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "jobber-ai",
+      "name": "AI Summary",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [690, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const input = $input.first().json;\nconst prevData = $('Normalize Jobber Event').first().json;\nlet summary = '';\ntry { summary = input.choices?.[0]?.message?.content || prevData.raw_summary; } catch { summary = prevData.raw_summary; }\nreturn [{ json: { ...prevData, summary: summary.trim().replace(/^[\"']|[\"']$/g, '') } }];"
+      },
+      "id": "jobber-extract",
+      "name": "Extract Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [910, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/customer_journal",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{$env.SUPABASE_SERVICE_ROLE_KEY}}" },
+            { "name": "Authorization", "value": "=Bearer {{$env.SUPABASE_SERVICE_ROLE_KEY}}" },
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "Prefer", "value": "return=representation" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"tenant_id\": \"{{$json.tenant_id}}\",\n  \"contact_phone\": \"{{$json.contact_phone}}\",\n  \"contact_email\": \"{{$json.contact_email}}\",\n  \"contact_name\": \"{{$json.contact_name}}\",\n  \"source\": \"jobber\",\n  \"event_type\": \"{{$json.event_type}}\",\n  \"summary\": \"{{$json.summary}}\",\n  \"raw_data\": {{JSON.stringify($json.raw_data)}},\n  \"sentiment\": \"{{$json.sentiment}}\",\n  \"importance\": \"{{$json.importance}}\"\n}",
+        "options": {}
+      },
+      "id": "jobber-write",
+      "name": "Write to Journal",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1130, 300]
+    }
+  ],
+  "connections": {
+    "Jobber Webhook": { "main": [[{ "node": "Normalize Jobber Event", "type": "main", "index": 0 }]] },
+    "Normalize Jobber Event": { "main": [[{ "node": "AI Summary", "type": "main", "index": 0 }]] },
+    "AI Summary": { "main": [[{ "node": "Extract Summary", "type": "main", "index": 0 }]] },
+    "Extract Summary": { "main": [[{ "node": "Write to Journal", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "tags": [{ "name": "gl365" }, { "name": "jobber" }, { "name": "auto-journal" }]
+}

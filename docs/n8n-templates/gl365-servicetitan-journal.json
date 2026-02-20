@@ -1,0 +1,119 @@
+{
+  "name": "GL365 ServiceTitan — Auto-Journal",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "gl365-servicetitan-webhook",
+        "options": {
+          "responseMode": "onReceived",
+          "responseData": "allEntries"
+        }
+      },
+      "id": "st-webhook",
+      "name": "ServiceTitan Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "notes": "Receives webhook events from ServiceTitan. Configure in ServiceTitan > Settings > Integrations > Webhooks. Events: job.scheduled, job.dispatched, job.completed, job.cancelled, customer.created, estimate.sent, invoice.created, payment.received"
+    },
+    {
+      "parameters": {
+        "functionCode": "// ========================================\n// GL365 ServiceTitan Event Normalizer\n// ========================================\n// Maps ServiceTitan webhook payloads to GL365 journal format.\n//\n// ServiceTitan events:\n//   job.scheduled    → booking_created\n//   job.dispatched   → tech_dispatched\n//   job.completed    → job_completed\n//   job.cancelled    → booking_cancelled\n//   customer.created → new_customer\n//   estimate.sent    → estimate_sent\n//   invoice.created  → invoice_created\n//   payment.received → payment_received\n\nconst input = $input.first().json;\nconst event = input.event || input.type || '';\nconst data = input.data || input;\n\n// Map ServiceTitan events to GL365 event types\nconst eventMap = {\n  'job.scheduled': 'booking_created',\n  'job.dispatched': 'tech_dispatched',\n  'job.completed': 'job_completed',\n  'job.cancelled': 'booking_cancelled',\n  'customer.created': 'new_customer',\n  'estimate.sent': 'estimate_sent',\n  'invoice.created': 'invoice_created',\n  'payment.received': 'payment_received'\n};\n\n// Determine importance\nlet importance = 'normal';\nif (event === 'job.cancelled') importance = 'high';\nif (event === 'payment.received') importance = 'normal';\nif (event === 'job.completed') importance = 'normal';\n\n// Determine sentiment\nlet sentiment = 'neutral';\nif (event === 'job.completed') sentiment = 'positive';\nif (event === 'payment.received') sentiment = 'positive';\nif (event === 'job.cancelled') sentiment = 'negative';\n\n// Extract customer info from ServiceTitan payload\nconst customer = data.customer || data.contact || {};\nconst job = data.job || data;\n\nconst normalized = {\n  tenant_id: input.metadata?.tenant_id || '',\n  contact_phone: customer.phone || customer.phoneNumber || customer.mobilePhone || '',\n  contact_email: customer.email || '',\n  contact_name: customer.name || [customer.firstName, customer.lastName].filter(Boolean).join(' ') || '',\n  source: 'servicetitan',\n  event_type: eventMap[event] || event || 'unknown',\n  raw_summary: `ServiceTitan ${event}: ${job.summary || job.type || ''} for ${customer.name || 'customer'} at ${job.location?.address || ''}`.trim(),\n  raw_data: input,\n  sentiment,\n  importance,\n  // ServiceTitan-specific fields for the AI summary\n  job_type: job.type || job.businessUnit || '',\n  technician: job.technician?.name || job.assignedTo || '',\n  job_total: job.total || job.invoiceTotal || '',\n  job_address: job.location?.address || job.serviceAddress || '',\n  job_id: job.id || job.jobNumber || ''\n};\n\nreturn [{ json: normalized }];"
+      },
+      "id": "st-normalize",
+      "name": "Normalize ServiceTitan Event",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [470, 300],
+      "notes": "Maps ServiceTitan job/customer/payment events to GL365 journal format. Extracts customer phone, email, name, job details, technician info."
+    },
+    {
+      "parameters": {
+        "url": "https://api.openrouter.ai/api/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{$credentials.openrouterApiKey}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "anthropic/claude-haiku-3.5"
+            },
+            {
+              "name": "messages",
+              "value": "=[{\"role\":\"user\",\"content\":\"Write ONE concise sentence for a service business CRM journal. Be specific with names, dates, amounts. ServiceTitan event: {{$json.event_type}}. Customer: {{$json.contact_name}}. Job type: {{$json.job_type}}. Technician: {{$json.technician}}. Address: {{$json.job_address}}. Total: {{$json.job_total}}. Job ID: {{$json.job_id}}. Raw: {{$json.raw_summary}}\"}]"
+            },
+            {
+              "name": "max_tokens",
+              "value": "100"
+            },
+            {
+              "name": "temperature",
+              "value": "0.2"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "st-ai-summary",
+      "name": "AI Summary",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [690, 300],
+      "notes": "Generates context-rich summary including technician name, job type, and address."
+    },
+    {
+      "parameters": {
+        "functionCode": "const input = $input.first().json;\nconst prevData = $('Normalize ServiceTitan Event').first().json;\n\nlet summary = '';\ntry {\n  summary = input.choices?.[0]?.message?.content || prevData.raw_summary;\n} catch {\n  summary = prevData.raw_summary;\n}\n\nreturn [{ json: { ...prevData, summary: summary.trim().replace(/^[\"']|[\"']$/g, '') } }];"
+      },
+      "id": "st-extract",
+      "name": "Extract Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [910, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/customer_journal",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{$env.SUPABASE_SERVICE_ROLE_KEY}}" },
+            { "name": "Authorization", "value": "=Bearer {{$env.SUPABASE_SERVICE_ROLE_KEY}}" },
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "Prefer", "value": "return=representation" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"tenant_id\": \"{{$json.tenant_id}}\",\n  \"contact_phone\": \"{{$json.contact_phone}}\",\n  \"contact_email\": \"{{$json.contact_email}}\",\n  \"contact_name\": \"{{$json.contact_name}}\",\n  \"source\": \"servicetitan\",\n  \"event_type\": \"{{$json.event_type}}\",\n  \"summary\": \"{{$json.summary}}\",\n  \"raw_data\": {{JSON.stringify($json.raw_data)}},\n  \"sentiment\": \"{{$json.sentiment}}\",\n  \"importance\": \"{{$json.importance}}\"\n}",
+        "options": {}
+      },
+      "id": "st-write-journal",
+      "name": "Write to Journal",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1130, 300]
+    }
+  ],
+  "connections": {
+    "ServiceTitan Webhook": { "main": [[{ "node": "Normalize ServiceTitan Event", "type": "main", "index": 0 }]] },
+    "Normalize ServiceTitan Event": { "main": [[{ "node": "AI Summary", "type": "main", "index": 0 }]] },
+    "AI Summary": { "main": [[{ "node": "Extract Summary", "type": "main", "index": 0 }]] },
+    "Extract Summary": { "main": [[{ "node": "Write to Journal", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "tags": [{ "name": "gl365" }, { "name": "servicetitan" }, { "name": "auto-journal" }]
+}

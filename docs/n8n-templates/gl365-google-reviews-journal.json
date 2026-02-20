@@ -1,0 +1,177 @@
+{
+  "name": "GL365 Google Reviews — Auto-Journal + Thank-You SMS",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 30
+            }
+          ]
+        }
+      },
+      "id": "review-poll",
+      "name": "Poll Every 30 Min",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "notes": "Google doesn't offer real-time review webhooks. This polls the Google Business Profile API every 30 minutes for new reviews. Alternative: Use a Google Reviews RSS feed or Google My Business API v4.9 accounts.locations.reviews.list"
+    },
+    {
+      "parameters": {
+        "url": "=https://mybusiness.googleapis.com/v4/accounts/{{$env.GOOGLE_BUSINESS_ACCOUNT_ID}}/locations/{{$env.GOOGLE_BUSINESS_LOCATION_ID}}/reviews",
+        "authentication": "oAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "options": {
+          "response": { "response": { "responseFormat": "json" } }
+        }
+      },
+      "id": "fetch-reviews",
+      "name": "Fetch Google Reviews",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [470, 300],
+      "notes": "Fetches reviews from Google Business Profile API. Requires OAuth2 credentials with Google My Business scope. In production, add pagination and only process reviews newer than the last poll timestamp."
+    },
+    {
+      "parameters": {
+        "functionCode": "// ========================================\n// GL365 Google Reviews Normalizer\n// ========================================\n// Filters to only NEW reviews (since last poll) and normalizes.\n\nconst input = $input.first().json;\nconst reviews = input.reviews || [];\n\n// Get the last poll timestamp from static data (or default to 1 hour ago)\nconst lastPoll = $getWorkflowStaticData('global').lastPollTime || new Date(Date.now() - 3600000).toISOString();\n\n// Filter to only new reviews\nconst newReviews = reviews.filter(r => {\n  const reviewTime = r.updateTime || r.createTime;\n  return reviewTime && new Date(reviewTime) > new Date(lastPoll);\n});\n\n// Update last poll timestamp\n$getWorkflowStaticData('global').lastPollTime = new Date().toISOString();\n\nif (newReviews.length === 0) {\n  // No new reviews — stop the workflow\n  return [];\n}\n\n// Normalize each new review\nreturn newReviews.map(review => {\n  const rating = review.starRating || '';\n  const ratingNum = { 'ONE': 1, 'TWO': 2, 'THREE': 3, 'FOUR': 4, 'FIVE': 5 }[rating] || 0;\n  const reviewerName = review.reviewer?.displayName || 'Anonymous';\n  const comment = review.comment || '(no text)';\n  \n  let sentiment = 'neutral';\n  if (ratingNum >= 4) sentiment = 'positive';\n  if (ratingNum <= 2) sentiment = 'negative';\n  \n  let importance = 'normal';\n  if (ratingNum <= 2) importance = 'critical'; // Bad reviews need attention\n  if (ratingNum === 5 && comment.length > 50) importance = 'high'; // Great reviews worth noting\n  \n  return {\n    json: {\n      tenant_id: '', // Set per client deployment\n      contact_phone: '',\n      contact_email: '',\n      contact_name: reviewerName,\n      source: 'google_reviews',\n      event_type: 'review_posted',\n      raw_summary: `${ratingNum}-star Google review by ${reviewerName}: \"${comment.substring(0, 150)}\"`,\n      raw_data: review,\n      sentiment,\n      importance,\n      rating: ratingNum,\n      review_text: comment,\n      reviewer_name: reviewerName,\n      review_id: review.reviewId || review.name\n    }\n  };\n});"
+      },
+      "id": "reviews-normalize",
+      "name": "Filter & Normalize New Reviews",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [690, 300],
+      "notes": "Filters to only reviews posted since the last poll. Determines sentiment from star rating. Marks 1-2 star reviews as critical importance for immediate attention."
+    },
+    {
+      "parameters": {
+        "url": "https://api.openrouter.ai/api/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer {{$credentials.openrouterApiKey}}" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "model", "value": "anthropic/claude-haiku-3.5" },
+            { "name": "messages", "value": "=[{\"role\":\"user\",\"content\":\"Write ONE concise sentence for a service business CRM journal about this Google review. Rating: {{$json.rating}}/5 stars. Reviewer: {{$json.reviewer_name}}. Review text: {{$json.review_text}}\"}]" },
+            { "name": "max_tokens", "value": "100" },
+            { "name": "temperature", "value": "0.2" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "reviews-ai",
+      "name": "AI Summary",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [910, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const input = $input.first().json;\nconst prevData = $('Filter & Normalize New Reviews').first().json;\nlet summary = '';\ntry { summary = input.choices?.[0]?.message?.content || prevData.raw_summary; } catch { summary = prevData.raw_summary; }\nreturn [{ json: { ...prevData, summary: summary.trim().replace(/^[\"']|[\"']$/g, '') } }];"
+      },
+      "id": "reviews-extract",
+      "name": "Extract Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1130, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/customer_journal",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{$env.SUPABASE_SERVICE_ROLE_KEY}}" },
+            { "name": "Authorization", "value": "=Bearer {{$env.SUPABASE_SERVICE_ROLE_KEY}}" },
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "Prefer", "value": "return=representation" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"tenant_id\": \"{{$json.tenant_id}}\",\n  \"contact_phone\": \"{{$json.contact_phone}}\",\n  \"contact_email\": \"{{$json.contact_email}}\",\n  \"contact_name\": \"{{$json.contact_name}}\",\n  \"source\": \"google_reviews\",\n  \"event_type\": \"review_posted\",\n  \"summary\": \"{{$json.summary}}\",\n  \"raw_data\": {{JSON.stringify($json.raw_data)}},\n  \"sentiment\": \"{{$json.sentiment}}\",\n  \"importance\": \"{{$json.importance}}\"\n}",
+        "options": {}
+      },
+      "id": "reviews-write",
+      "name": "Write to Journal",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1350, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json.rating}}",
+              "operation": "smallerEqual",
+              "value2": 2
+            }
+          ]
+        }
+      },
+      "id": "reviews-check-bad",
+      "name": "Bad Review?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1570, 300],
+      "notes": "Routes 1-2 star reviews to the Slack alert for immediate owner notification."
+    },
+    {
+      "parameters": {
+        "url": "https://hooks.slack.com/services/YOUR_WEBHOOK_URL",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"⚠️ *Negative Google Review* ({{$('Extract Summary').first().json.rating}}/5 stars)\\nBy: {{$('Extract Summary').first().json.reviewer_name}}\\n\\\"{{$('Extract Summary').first().json.review_text}}\\\"\\n\\nRecommended: Reply publicly within 24 hours.\"\n}",
+        "options": {}
+      },
+      "id": "reviews-slack-bad",
+      "name": "Slack Alert — Bad Review",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1790, 200],
+      "notes": "Immediately notifies the business owner of a bad review so they can respond quickly."
+    },
+    {
+      "parameters": {},
+      "id": "reviews-good-done",
+      "name": "Good Review (Done)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1790, 400],
+      "notes": "Positive reviews are journaled. A future enhancement can send a 'Thank you for the review!' SMS if we have the reviewer's phone number matched in our contacts."
+    }
+  ],
+  "connections": {
+    "Poll Every 30 Min": { "main": [[{ "node": "Fetch Google Reviews", "type": "main", "index": 0 }]] },
+    "Fetch Google Reviews": { "main": [[{ "node": "Filter & Normalize New Reviews", "type": "main", "index": 0 }]] },
+    "Filter & Normalize New Reviews": { "main": [[{ "node": "AI Summary", "type": "main", "index": 0 }]] },
+    "AI Summary": { "main": [[{ "node": "Extract Summary", "type": "main", "index": 0 }]] },
+    "Extract Summary": { "main": [[{ "node": "Write to Journal", "type": "main", "index": 0 }]] },
+    "Write to Journal": { "main": [[{ "node": "Bad Review?", "type": "main", "index": 0 }]] },
+    "Bad Review?": {
+      "main": [
+        [{ "node": "Slack Alert — Bad Review", "type": "main", "index": 0 }],
+        [{ "node": "Good Review (Done)", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "tags": [{ "name": "gl365" }, { "name": "google-reviews" }, { "name": "auto-journal" }]
+}
