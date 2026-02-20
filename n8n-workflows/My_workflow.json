@@ -1,0 +1,206 @@
+{
+  "updatedAt": "2026-02-20T18:03:35.335Z",
+  "createdAt": "2025-11-30T10:49:07.741Z",
+  "id": "fogPQgNrNmoVQqG6",
+  "name": "My workflow",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "path": "ea225dc4-0043-4ef8-8736-064ce83e1387",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "892c404e-1887-43d3-8f70-c7a325159969",
+      "name": "Webhook",
+      "webhookId": "ea225dc4-0043-4ef8-8736-064ce83e1387"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openRouterApi",
+        "sendBody": true,
+        "contentType": "json",
+        "body": "{\"model\":\"perplexity/sonar-online\",\"messages\":[{\"role\":\"user\",\"content\":\"\"}],\"max_tokens\":1024,\"temperature\":0.7}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "8ea53f09-9eb5-46f5-b6b8-a5ffde4f504d",
+      "name": "Message a model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "BgQfIS3XySiOhMjo",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        480,
+        272
+      ],
+      "id": "2a6206e5-08df-499e-9bb8-0c56158b2c02",
+      "name": "When chat message received",
+      "webhookId": "77d6800c-76a4-4995-9af5-48d97c7e9eb9"
+    },
+    {
+      "parameters": {
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        688,
+        272
+      ],
+      "id": "744d98a3-c73d-477e-956b-b7d89bacb566",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        896,
+        272
+      ],
+      "id": "ba0835f2-d46f-4d1f-9dee-e06623546a92",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "ttGteHuCmdznioJv",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "e62a3f1e-60db-46e1-9c14-f45a8aff51f2",
+  "activeVersionId": null,
+  "versionCounter": 3,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-11-30T10:49:07.744Z",
+      "createdAt": "2025-11-30T10:49:07.744Z",
+      "role": "workflow:owner",
+      "workflowId": "fogPQgNrNmoVQqG6",
+      "projectId": "CA2oX8JE8b4ELWzN",
+      "project": {
+        "updatedAt": "2025-11-26T23:39:45.565Z",
+        "createdAt": "2025-11-26T23:20:18.633Z",
+        "id": "CA2oX8JE8b4ELWzN",
+        "name": "jared tucker <jared.tucker13@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "projectRelations": [
+          {
+            "updatedAt": "2025-11-26T23:20:18.633Z",
+            "createdAt": "2025-11-26T23:20:18.633Z",
+            "userId": "08f0a56f-35d1-45de-ba8d-11e1f3f7c4cd",
+            "projectId": "CA2oX8JE8b4ELWzN",
+            "user": {
+              "updatedAt": "2026-02-20T18:18:04.769Z",
+              "createdAt": "2025-11-26T23:20:18.176Z",
+              "id": "08f0a56f-35d1-45de-ba8d-11e1f3f7c4cd",
+              "email": "jared.tucker13@gmail.com",
+              "firstName": "jared",
+              "lastName": "tucker",
+              "personalizationAnswers": {
+                "version": "v4",
+                "personalization_survey_submitted_at": "2025-11-26T23:41:07.799Z",
+                "personalization_survey_n8n_version": "1.121.3",
+                "companySize": "<20",
+                "companyType": "education",
+                "role": "business-owner",
+                "reportedSource": "youtube"
+              },
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "eANVAv2WVioSXMXW",
+                "userActivatedAt": 1766878669831,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1771611441895
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-02-20",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}
