@@ -1,0 +1,899 @@
+{
+  "updatedAt": "2026-02-20T22:14:19.774Z",
+  "createdAt": "2026-02-20T22:14:19.774Z",
+  "id": "gO4UxCnIyLK6Hydz",
+  "name": "🔄 GL365 Auto-Backup to Supabase + GitHub",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "id": "n1",
+      "name": "Every 5 Minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -400,
+        300
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 5
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "n2",
+      "name": "Fetch All Workflows",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -180,
+        300
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://n8n.srv1156042.hstgr.cloud/api/v1/workflows?limit=100",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-N8N-API-KEY",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwOGYwYTU2Zi0zNWQxLTQ1ZGUtYmE4ZC0xMWUxZjNmN2M0Y2QiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzcxNjIyNzk4LCJleHAiOjE3NzQxMzQwMDB9.lqz-bjvo44HzWJ7p913fhcdIwmuPNjQHfI2cSAJiVx4"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "n3",
+      "name": "Extract Workflow List",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        40,
+        300
+      ],
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "const workflows = $input.first().json.data || [];\nreturn workflows.map(wf => ({ json: { id: wf.id, name: wf.name, updatedAt: wf.updatedAt } }));"
+      }
+    },
+    {
+      "id": "n4",
+      "name": "Fetch Full Workflow JSON",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        300
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ 'https://n8n.srv1156042.hstgr.cloud/api/v1/workflows/' + $json.id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-N8N-API-KEY",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwOGYwYTU2Zi0zNWQxLTQ1ZGUtYmE4ZC0xMWUxZjNmN2M0Y2QiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzcxNjIyNzk4LCJleHAiOjE3NzQxMzQwMDB9.lqz-bjvo44HzWJ7p913fhcdIwmuPNjQHfI2cSAJiVx4"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "n5",
+      "name": "Check Last Backup",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        300
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ 'https://rawlqwjdfzicjepzmcng.supabase.co/rest/v1/n8n_workflow_backups?workflow_id=eq.' + $json.id + '&select=workflow_id,updated_at' }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pj6KKUoQ3pp9H4Jv",
+          "name": "Supabase Service Key (n8n Backup)"
+        }
+      }
+    },
+    {
+      "id": "n6",
+      "name": "Has Workflow Changed?",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        700,
+        300
+      ],
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "const existing = $input.first().json;\nconst wfData = $('Fetch Full Workflow JSON').first().json;\nconst record = Array.isArray(existing) ? existing[0] : null;\nconst changed = !record || record.updated_at !== wfData.updatedAt;\nreturn [{ json: { needsBackup: changed, id: wfData.id, name: wfData.name, updatedAt: wfData.updatedAt, workflowJson: wfData } }];"
+      }
+    },
+    {
+      "id": "n7",
+      "name": "Needs Backup?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        920,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.needsBackup }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "n8",
+      "name": "Get GitHub File SHA",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1140,
+        180
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ 'https://api.github.com/repos/jaredtucker13-byte/greenline365-web/contents/n8n-workflows/' + $json.name.replace(/[^a-zA-Z0-9_-]/g, '_') + '.json' }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github.v3+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2022-11-28"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "0ZEvPONRUc7v1SA9",
+          "name": "GitHub Token (n8n Backup)"
+        }
+      }
+    },
+    {
+      "id": "n9",
+      "name": "Commit to GitHub",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1360,
+        180
+      ],
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ 'https://api.github.com/repos/jaredtucker13-byte/greenline365-web/contents/n8n-workflows/' + $('Has Workflow Changed?').first().json.name.replace(/[^a-zA-Z0-9_-]/g, '_') + '.json' }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github.v3+json"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2022-11-28"
+            }
+          ]
+        },
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ message: 'auto-backup: ' + $('Has Workflow Changed?').first().json.name + ' [' + new Date().toISOString().substring(0,10) + ']', content: btoa(unescape(encodeURIComponent(JSON.stringify($('Has Workflow Changed?').first().json.workflowJson, null, 2)))), sha: $json.sha || undefined }) }}",
+        "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "0ZEvPONRUc7v1SA9",
+          "name": "GitHub Token (n8n Backup)"
+        }
+      }
+    },
+    {
+      "id": "n10",
+      "name": "Upsert to Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1580,
+        180
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://rawlqwjdfzicjepzmcng.supabase.co/rest/v1/n8n_workflow_backups",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $credentials.value }}"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates"
+            }
+          ]
+        },
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ workflow_id: $('Has Workflow Changed?').first().json.id, workflow_name: $('Has Workflow Changed?').first().json.name, workflow_json: $('Has Workflow Changed?').first().json.workflowJson, updated_at: $('Has Workflow Changed?').first().json.updatedAt, commit_sha: $json.commit ? $json.commit.sha : null, backed_up_at: new Date().toISOString() }) }}",
+        "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pj6KKUoQ3pp9H4Jv",
+          "name": "Supabase Service Key (n8n Backup)"
+        }
+      }
+    },
+    {
+      "id": "n11",
+      "name": "No Change - Skip",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1140,
+        420
+      ],
+      "parameters": {}
+    }
+  ],
+  "connections": {
+    "Every 5 Minutes": {
+      "main": [
+        [
+          {
+            "node": "Fetch All Workflows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch All Workflows": {
+      "main": [
+        [
+          {
+            "node": "Extract Workflow List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Workflow List": {
+      "main": [
+        [
+          {
+            "node": "Fetch Full Workflow JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Full Workflow JSON": {
+      "main": [
+        [
+          {
+            "node": "Check Last Backup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Last Backup": {
+      "main": [
+        [
+          {
+            "node": "Has Workflow Changed?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Workflow Changed?": {
+      "main": [
+        [
+          {
+            "node": "Needs Backup?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Needs Backup?": {
+      "main": [
+        [
+          {
+            "node": "Get GitHub File SHA",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Change - Skip",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get GitHub File SHA": {
+      "main": [
+        [
+          {
+            "node": "Commit to GitHub",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Commit to GitHub": {
+      "main": [
+        [
+          {
+            "node": "Upsert to Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": {
+    "node:Every 5 Minutes": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": null,
+  "pinData": null,
+  "versionId": "95c71db4-0f77-4d45-a7af-bda937e799bc",
+  "activeVersionId": "95c71db4-0f77-4d45-a7af-bda937e799bc",
+  "versionCounter": 4,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-02-20T22:14:19.776Z",
+      "createdAt": "2026-02-20T22:14:19.776Z",
+      "role": "workflow:owner",
+      "workflowId": "gO4UxCnIyLK6Hydz",
+      "projectId": "CA2oX8JE8b4ELWzN",
+      "project": {
+        "updatedAt": "2025-11-26T23:39:45.565Z",
+        "createdAt": "2025-11-26T23:20:18.633Z",
+        "id": "CA2oX8JE8b4ELWzN",
+        "name": "jared tucker <jared.tucker13@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "projectRelations": [
+          {
+            "updatedAt": "2025-11-26T23:20:18.633Z",
+            "createdAt": "2025-11-26T23:20:18.633Z",
+            "userId": "08f0a56f-35d1-45de-ba8d-11e1f3f7c4cd",
+            "projectId": "CA2oX8JE8b4ELWzN",
+            "user": {
+              "updatedAt": "2026-02-20T18:18:04.769Z",
+              "createdAt": "2025-11-26T23:20:18.176Z",
+              "id": "08f0a56f-35d1-45de-ba8d-11e1f3f7c4cd",
+              "email": "jared.tucker13@gmail.com",
+              "firstName": "jared",
+              "lastName": "tucker",
+              "personalizationAnswers": {
+                "version": "v4",
+                "personalization_survey_submitted_at": "2025-11-26T23:41:07.799Z",
+                "personalization_survey_n8n_version": "1.121.3",
+                "companySize": "<20",
+                "companyType": "education",
+                "role": "business-owner",
+                "reportedSource": "youtube"
+              },
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "eANVAv2WVioSXMXW",
+                "userActivatedAt": 1766878669831,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1771611441895
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-02-20",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-02-20T22:14:19.783Z",
+    "createdAt": "2026-02-20T22:14:19.783Z",
+    "versionId": "95c71db4-0f77-4d45-a7af-bda937e799bc",
+    "workflowId": "gO4UxCnIyLK6Hydz",
+    "nodes": [
+      {
+        "id": "n1",
+        "name": "Every 5 Minutes",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          -400,
+          300
+        ],
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "minutes",
+                "minutesInterval": 5
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "n2",
+        "name": "Fetch All Workflows",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          -180,
+          300
+        ],
+        "parameters": {
+          "method": "GET",
+          "url": "https://n8n.srv1156042.hstgr.cloud/api/v1/workflows?limit=100",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "X-N8N-API-KEY",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwOGYwYTU2Zi0zNWQxLTQ1ZGUtYmE4ZC0xMWUxZjNmN2M0Y2QiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzcxNjIyNzk4LCJleHAiOjE3NzQxMzQwMDB9.lqz-bjvo44HzWJ7p913fhcdIwmuPNjQHfI2cSAJiVx4"
+              }
+            ]
+          },
+          "options": {}
+        }
+      },
+      {
+        "id": "n3",
+        "name": "Extract Workflow List",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          40,
+          300
+        ],
+        "parameters": {
+          "language": "javaScript",
+          "jsCode": "const workflows = $input.first().json.data || [];\nreturn workflows.map(wf => ({ json: { id: wf.id, name: wf.name, updatedAt: wf.updatedAt } }));"
+        }
+      },
+      {
+        "id": "n4",
+        "name": "Fetch Full Workflow JSON",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          260,
+          300
+        ],
+        "parameters": {
+          "method": "GET",
+          "url": "={{ 'https://n8n.srv1156042.hstgr.cloud/api/v1/workflows/' + $json.id }}",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "X-N8N-API-KEY",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwOGYwYTU2Zi0zNWQxLTQ1ZGUtYmE4ZC0xMWUxZjNmN2M0Y2QiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzcxNjIyNzk4LCJleHAiOjE3NzQxMzQwMDB9.lqz-bjvo44HzWJ7p913fhcdIwmuPNjQHfI2cSAJiVx4"
+              }
+            ]
+          },
+          "options": {}
+        }
+      },
+      {
+        "id": "n5",
+        "name": "Check Last Backup",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          480,
+          300
+        ],
+        "parameters": {
+          "method": "GET",
+          "url": "={{ 'https://rawlqwjdfzicjepzmcng.supabase.co/rest/v1/n8n_workflow_backups?workflow_id=eq.' + $json.id + '&select=workflow_id,updated_at' }}",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "httpHeaderAuth",
+          "options": {}
+        },
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "pj6KKUoQ3pp9H4Jv",
+            "name": "Supabase Service Key (n8n Backup)"
+          }
+        }
+      },
+      {
+        "id": "n6",
+        "name": "Has Workflow Changed?",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          700,
+          300
+        ],
+        "parameters": {
+          "language": "javaScript",
+          "jsCode": "const existing = $input.first().json;\nconst wfData = $('Fetch Full Workflow JSON').first().json;\nconst record = Array.isArray(existing) ? existing[0] : null;\nconst changed = !record || record.updated_at !== wfData.updatedAt;\nreturn [{ json: { needsBackup: changed, id: wfData.id, name: wfData.name, updatedAt: wfData.updatedAt, workflowJson: wfData } }];"
+        }
+      },
+      {
+        "id": "n7",
+        "name": "Needs Backup?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2,
+        "position": [
+          920,
+          300
+        ],
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose"
+            },
+            "conditions": [
+              {
+                "id": "c1",
+                "leftValue": "={{ $json.needsBackup }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          }
+        }
+      },
+      {
+        "id": "n8",
+        "name": "Get GitHub File SHA",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1140,
+          180
+        ],
+        "parameters": {
+          "method": "GET",
+          "url": "={{ 'https://api.github.com/repos/jaredtucker13-byte/greenline365-web/contents/n8n-workflows/' + $json.name.replace(/[^a-zA-Z0-9_-]/g, '_') + '.json' }}",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "httpHeaderAuth",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Accept",
+                "value": "application/vnd.github.v3+json"
+              },
+              {
+                "name": "X-GitHub-Api-Version",
+                "value": "2022-11-28"
+              }
+            ]
+          },
+          "options": {
+            "response": {
+              "response": {
+                "neverError": true
+              }
+            }
+          }
+        },
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "0ZEvPONRUc7v1SA9",
+            "name": "GitHub Token (n8n Backup)"
+          }
+        }
+      },
+      {
+        "id": "n9",
+        "name": "Commit to GitHub",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1360,
+          180
+        ],
+        "parameters": {
+          "method": "PUT",
+          "url": "={{ 'https://api.github.com/repos/jaredtucker13-byte/greenline365-web/contents/n8n-workflows/' + $('Has Workflow Changed?').first().json.name.replace(/[^a-zA-Z0-9_-]/g, '_') + '.json' }}",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "httpHeaderAuth",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Accept",
+                "value": "application/vnd.github.v3+json"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "name": "X-GitHub-Api-Version",
+                "value": "2022-11-28"
+              }
+            ]
+          },
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ message: 'auto-backup: ' + $('Has Workflow Changed?').first().json.name + ' [' + new Date().toISOString().substring(0,10) + ']', content: btoa(unescape(encodeURIComponent(JSON.stringify($('Has Workflow Changed?').first().json.workflowJson, null, 2)))), sha: $json.sha || undefined }) }}",
+          "options": {}
+        },
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "0ZEvPONRUc7v1SA9",
+            "name": "GitHub Token (n8n Backup)"
+          }
+        }
+      },
+      {
+        "id": "n10",
+        "name": "Upsert to Supabase",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1580,
+          180
+        ],
+        "parameters": {
+          "method": "POST",
+          "url": "https://rawlqwjdfzicjepzmcng.supabase.co/rest/v1/n8n_workflow_backups",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "httpHeaderAuth",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "name": "Authorization",
+                "value": "={{ 'Bearer ' + $credentials.value }}"
+              },
+              {
+                "name": "Prefer",
+                "value": "resolution=merge-duplicates"
+              }
+            ]
+          },
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ workflow_id: $('Has Workflow Changed?').first().json.id, workflow_name: $('Has Workflow Changed?').first().json.name, workflow_json: $('Has Workflow Changed?').first().json.workflowJson, updated_at: $('Has Workflow Changed?').first().json.updatedAt, commit_sha: $json.commit ? $json.commit.sha : null, backed_up_at: new Date().toISOString() }) }}",
+          "options": {}
+        },
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "pj6KKUoQ3pp9H4Jv",
+            "name": "Supabase Service Key (n8n Backup)"
+          }
+        }
+      },
+      {
+        "id": "n11",
+        "name": "No Change - Skip",
+        "type": "n8n-nodes-base.noOp",
+        "typeVersion": 1,
+        "position": [
+          1140,
+          420
+        ],
+        "parameters": {}
+      }
+    ],
+    "connections": {
+      "Every 5 Minutes": {
+        "main": [
+          [
+            {
+              "node": "Fetch All Workflows",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Fetch All Workflows": {
+        "main": [
+          [
+            {
+              "node": "Extract Workflow List",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract Workflow List": {
+        "main": [
+          [
+            {
+              "node": "Fetch Full Workflow JSON",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Fetch Full Workflow JSON": {
+        "main": [
+          [
+            {
+              "node": "Check Last Backup",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Check Last Backup": {
+        "main": [
+          [
+            {
+              "node": "Has Workflow Changed?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Has Workflow Changed?": {
+        "main": [
+          [
+            {
+              "node": "Needs Backup?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Needs Backup?": {
+        "main": [
+          [
+            {
+              "node": "Get GitHub File SHA",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "No Change - Skip",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get GitHub File SHA": {
+        "main": [
+          [
+            {
+              "node": "Commit to GitHub",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Commit to GitHub": {
+        "main": [
+          [
+            {
+              "node": "Upsert to Supabase",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "jared tucker",
+    "name": null,
+    "description": null,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-02-20T22:17:20.697Z",
+        "id": 37,
+        "workflowId": "gO4UxCnIyLK6Hydz",
+        "versionId": "95c71db4-0f77-4d45-a7af-bda937e799bc",
+        "event": "activated",
+        "userId": "08f0a56f-35d1-45de-ba8d-11e1f3f7c4cd"
+      }
+    ]
+  }
+}
