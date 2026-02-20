@@ -1,0 +1,197 @@
+{
+  "updatedAt": "2025-12-23T01:27:40.164Z",
+  "createdAt": "2025-12-23T01:21:20.552Z",
+  "id": "tQkR5bqvq8Y1oLaF",
+  "name": "Error Handler",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        -16
+      ],
+      "id": "62b2c548-168b-41c7-8067-9287433a69be",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "sendTo": "j.tucker.hvac.sales@gmai.com",
+        "subject": "={{ \"Greenline Update: Action Required for \" + $json.canonical.name }}",
+        "message": "==`\n<!DOCTYPE html>\n<html>\n<head>\n<style>\n  body {\n    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;\n    background-color: #f4f7f6;\n    margin: 0;\n    padding: 0;\n    color: #333;\n  }\n  .container {\n    max-width: 640px;\n    margin: 30px auto;\n    background: #ffffff;\n    border-radius: 8px;\n    overflow: hidden;\n    box-shadow: 0 5px 20px rgba(0,0,0,0.15);\n  }\n  .header {\n    background: linear-gradient(135deg, #1a5c5c 0%, #2d7a7a 100%);\n    padding: 32px;\n    text-align: center;\n    border-top: 5px solid #b88a4d;\n  }\n  .header h1 {\n    color: #b88a4d;\n    margin: 0 0 4px 0;\n    font-size: 26px;\n    letter-spacing: 1px;\n    font-family: 'Georgia', serif;\n    text-transform: uppercase;\n    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);\n  }\n  .header p {\n    color: #c8e6e6;\n    margin: 0;\n    font-size: 12px;\n    letter-spacing: 2px;\n    text-transform: uppercase;\n  }\n\n  .content {\n    padding: 32px 36px 40px 36px;\n    font-size: 15px;\n    line-height: 1.9;\n    color: #444;\n  }\n\n  .meta {\n    font-size: 13px;\n    color: #666;\n    margin-bottom: 18px;\n  }\n\n  h2 {\n    color: #1a5c5c;\n    font-size: 20px;\n    margin: 0 0 10px 0;\n  }\n  h3 {\n    color: #1a5c5c;\n    font-size: 17px;\n    margin: 26px 0 8px 0;\n  }\n  ol {\n    padding-left: 18px;\n    margin: 14px 0 6px 0;\n  }\n  ol li {\n    margin-bottom: 14px;\n  }\n\n  .bonus {\n    margin-top: 26px;\n  }\n  .bonus-label {\n    font-size: 14px;\n    font-weight: 600;\n    color: #1a5c5c;\n    margin-bottom: 8px;\n  }\n  .caption-box {\n    background: #f0f3f4;\n    border-radius: 6px;\n    padding: 14px 16px;\n    font-size: 14px;\n    line-height: 1.7;\n  }\n\n  .btn-box {\n    text-align: center;\n    margin-top: 32px;\n  }\n  .btn-approve {\n    display: inline-block;\n    background: linear-gradient(135deg, #1a5c5c 0%, #2d7a7a 100%);\n    color: #1a5c5c;\n    padding: 14px 40px;\n    text-decoration: none;\n    border-radius: 4px;\n    font-weight: bold;\n    font-size: 15px;\n    letter-spacing: 1px;\n    border-bottom: 4px solid #b88a4d;\n    box-shadow: 0 4px 6px rgba(0,0,0,0.2);\n  }\n\n  .footer {\n    background: linear-gradient(135deg, #1a5c5c 0%, #2d7a7a 100%);\n    text-align: center;\n    padding: 20px 10px;\n    font-size: 12px;\n    color: #c8e6e6;\n    border-bottom: 5px solid #b88a4d;\n  }\n  .footer span {\n    color: #b88a4d;\n  }\n</style>\n</head>\n<body>\n\n<div class=\"container\">\n  <div class=\"header\">\n    <h1>GREENLINE 365</h1>\n    <p>GLOBAL SUSTAINABLE SOLUTIONS</p>\n  </div>\n\n  <div class=\"content\">\n    ${ $('AI Summary Agent').item.json.output || $('AI Summary Agent').item.json.text || \"⚠️ Waiting for AI Content...\" }\n\n    <div class=\"btn-box\">\n      <a href=\"#\" class=\"btn-approve\">APPROVE POST</a>\n    </div>\n  </div>\n\n  <div class=\"footer\">\n    <p>Powered by <span>GreenLine365</span> | Local Business Intelligence</p>\n  </div>\n</div>\n\n</body>\n</html>\n`\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        144,
+        -16
+      ],
+      "id": "23362f9f-53c6-4bea-ade1-4e874e3c4663",
+      "name": "GL365 messenger",
+      "webhookId": "a2004d51-ea5a-4785-a4bd-ab728c26d902",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "W1JpJM1HWOweUpzX",
+          "name": "Gmail account 2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timeSavedMode": "fixed",
+    "timezone": "America/New_York",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "tQkR5bqvq8Y1oLaF"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "2ee8f554-9971-4d9e-a721-a663cadc6cd0",
+  "activeVersionId": "2ee8f554-9971-4d9e-a721-a663cadc6cd0",
+  "versionCounter": 7,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-12-23T01:21:20.555Z",
+      "createdAt": "2025-12-23T01:21:20.555Z",
+      "role": "workflow:owner",
+      "workflowId": "tQkR5bqvq8Y1oLaF",
+      "projectId": "CA2oX8JE8b4ELWzN",
+      "project": {
+        "updatedAt": "2025-11-26T23:39:45.565Z",
+        "createdAt": "2025-11-26T23:20:18.633Z",
+        "id": "CA2oX8JE8b4ELWzN",
+        "name": "jared tucker <jared.tucker13@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "projectRelations": [
+          {
+            "updatedAt": "2025-11-26T23:20:18.633Z",
+            "createdAt": "2025-11-26T23:20:18.633Z",
+            "userId": "08f0a56f-35d1-45de-ba8d-11e1f3f7c4cd",
+            "projectId": "CA2oX8JE8b4ELWzN",
+            "user": {
+              "updatedAt": "2026-02-20T18:18:04.769Z",
+              "createdAt": "2025-11-26T23:20:18.176Z",
+              "id": "08f0a56f-35d1-45de-ba8d-11e1f3f7c4cd",
+              "email": "jared.tucker13@gmail.com",
+              "firstName": "jared",
+              "lastName": "tucker",
+              "personalizationAnswers": {
+                "version": "v4",
+                "personalization_survey_submitted_at": "2025-11-26T23:41:07.799Z",
+                "personalization_survey_n8n_version": "1.121.3",
+                "companySize": "<20",
+                "companyType": "education",
+                "role": "business-owner",
+                "reportedSource": "youtube"
+              },
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "eANVAv2WVioSXMXW",
+                "userActivatedAt": 1766878669831,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1771611441895
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-02-20",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2025-12-23T01:26:25.000Z",
+    "createdAt": "2025-12-23T01:25:36.067Z",
+    "versionId": "2ee8f554-9971-4d9e-a721-a663cadc6cd0",
+    "workflowId": "tQkR5bqvq8Y1oLaF",
+    "nodes": [
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.errorTrigger",
+        "typeVersion": 1,
+        "position": [
+          -176,
+          -16
+        ],
+        "id": "62b2c548-168b-41c7-8067-9287433a69be",
+        "name": "Error Trigger"
+      },
+      {
+        "parameters": {
+          "sendTo": "j.tucker.hvac.sales@gmai.com",
+          "subject": "={{ \"Greenline Update: Action Required for \" + $json.canonical.name }}",
+          "message": "==`\n<!DOCTYPE html>\n<html>\n<head>\n<style>\n  body {\n    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;\n    background-color: #f4f7f6;\n    margin: 0;\n    padding: 0;\n    color: #333;\n  }\n  .container {\n    max-width: 640px;\n    margin: 30px auto;\n    background: #ffffff;\n    border-radius: 8px;\n    overflow: hidden;\n    box-shadow: 0 5px 20px rgba(0,0,0,0.15);\n  }\n  .header {\n    background: linear-gradient(135deg, #1a5c5c 0%, #2d7a7a 100%);\n    padding: 32px;\n    text-align: center;\n    border-top: 5px solid #b88a4d;\n  }\n  .header h1 {\n    color: #b88a4d;\n    margin: 0 0 4px 0;\n    font-size: 26px;\n    letter-spacing: 1px;\n    font-family: 'Georgia', serif;\n    text-transform: uppercase;\n    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);\n  }\n  .header p {\n    color: #c8e6e6;\n    margin: 0;\n    font-size: 12px;\n    letter-spacing: 2px;\n    text-transform: uppercase;\n  }\n\n  .content {\n    padding: 32px 36px 40px 36px;\n    font-size: 15px;\n    line-height: 1.9;\n    color: #444;\n  }\n\n  .meta {\n    font-size: 13px;\n    color: #666;\n    margin-bottom: 18px;\n  }\n\n  h2 {\n    color: #1a5c5c;\n    font-size: 20px;\n    margin: 0 0 10px 0;\n  }\n  h3 {\n    color: #1a5c5c;\n    font-size: 17px;\n    margin: 26px 0 8px 0;\n  }\n  ol {\n    padding-left: 18px;\n    margin: 14px 0 6px 0;\n  }\n  ol li {\n    margin-bottom: 14px;\n  }\n\n  .bonus {\n    margin-top: 26px;\n  }\n  .bonus-label {\n    font-size: 14px;\n    font-weight: 600;\n    color: #1a5c5c;\n    margin-bottom: 8px;\n  }\n  .caption-box {\n    background: #f0f3f4;\n    border-radius: 6px;\n    padding: 14px 16px;\n    font-size: 14px;\n    line-height: 1.7;\n  }\n\n  .btn-box {\n    text-align: center;\n    margin-top: 32px;\n  }\n  .btn-approve {\n    display: inline-block;\n    background: linear-gradient(135deg, #1a5c5c 0%, #2d7a7a 100%);\n    color: #1a5c5c;\n    padding: 14px 40px;\n    text-decoration: none;\n    border-radius: 4px;\n    font-weight: bold;\n    font-size: 15px;\n    letter-spacing: 1px;\n    border-bottom: 4px solid #b88a4d;\n    box-shadow: 0 4px 6px rgba(0,0,0,0.2);\n  }\n\n  .footer {\n    background: linear-gradient(135deg, #1a5c5c 0%, #2d7a7a 100%);\n    text-align: center;\n    padding: 20px 10px;\n    font-size: 12px;\n    color: #c8e6e6;\n    border-bottom: 5px solid #b88a4d;\n  }\n  .footer span {\n    color: #b88a4d;\n  }\n</style>\n</head>\n<body>\n\n<div class=\"container\">\n  <div class=\"header\">\n    <h1>GREENLINE 365</h1>\n    <p>GLOBAL SUSTAINABLE SOLUTIONS</p>\n  </div>\n\n  <div class=\"content\">\n    ${ $('AI Summary Agent').item.json.output || $('AI Summary Agent').item.json.text || \"⚠️ Waiting for AI Content...\" }\n\n    <div class=\"btn-box\">\n      <a href=\"#\" class=\"btn-approve\">APPROVE POST</a>\n    </div>\n  </div>\n\n  <div class=\"footer\">\n    <p>Powered by <span>GreenLine365</span> | Local Business Intelligence</p>\n  </div>\n</div>\n\n</body>\n</html>\n`\n",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.1,
+        "position": [
+          144,
+          -16
+        ],
+        "id": "23362f9f-53c6-4bea-ade1-4e874e3c4663",
+        "name": "GL365 messenger",
+        "webhookId": "a2004d51-ea5a-4785-a4bd-ab728c26d902",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "W1JpJM1HWOweUpzX",
+            "name": "Gmail account 2"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Error Trigger": {
+        "main": [
+          []
+        ]
+      }
+    },
+    "authors": "jared tucker",
+    "name": "Version 2ee8f554",
+    "description": "",
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2025-12-23T01:26:25.178Z",
+        "id": 1,
+        "workflowId": "tQkR5bqvq8Y1oLaF",
+        "versionId": "2ee8f554-9971-4d9e-a721-a663cadc6cd0",
+        "event": "activated",
+        "userId": "08f0a56f-35d1-45de-ba8d-11e1f3f7c4cd"
+      },
+      {
+        "createdAt": "2025-12-23T01:27:40.189Z",
+        "id": 2,
+        "workflowId": "tQkR5bqvq8Y1oLaF",
+        "versionId": "2ee8f554-9971-4d9e-a721-a663cadc6cd0",
+        "event": "activated",
+        "userId": "08f0a56f-35d1-45de-ba8d-11e1f3f7c4cd"
+      }
+    ]
+  }
+}
