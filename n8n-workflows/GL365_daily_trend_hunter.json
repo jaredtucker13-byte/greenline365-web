@@ -1,0 +1,1897 @@
+{
+  "updatedAt": "2026-02-20T18:32:23.045Z",
+  "createdAt": "2025-12-22T03:52:41.530Z",
+  "id": "6JynQddvtLWlPFbm",
+  "name": "GL365 daily trend hunter",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -4912,
+        2192
+      ],
+      "id": "02123386-61c3-431d-af5f-ea04a577172b",
+      "name": "Run every day at 7AM",
+      "notesInFlow": true,
+      "alwaysOutputData": false,
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 5000,
+      "notes": "Double-click to open"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "{{$node[\"Workflow Configuration\"].json.clientBusinessName}}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -4112,
+        2336
+      ],
+      "id": "f0fe7abd-93d0-4810-9961-96753cf17a19",
+      "name": "Simple Memory",
+      "notesInFlow": true,
+      "notes": "Simple Memory for content agent. Stores only the last 5–10 interactions for this client: name, city, tone, and explicit content preferences (e.g., caption length, emoji yes/no, A/B choice). No long‑term data or sensitive PII; Supabase is the source of truth. Do not change session key or context length without updating the SOP.\n\n{\n  \"memory_summary\": {\n    \"client_name\": \"<CLIENT_NAME>\",\n    \"client_city\": \"<CLIENT_CITY>\",\n    \"preferred_tone\": \"<PREFERRED_TONE>\",\n    \"content_mode\": \"<CONTENT_MODE>\",\n    \"recent_preferences\": [\n      \"Prefers short captions without emojis\",\n      \"Likes 2 options (A/B) per email\"\n    ],\n    \"last_generated_type\": \"photo_to_post\"\n  }\n}"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bc0832bc-6592-467d-ae1e-fb158d43c539",
+              "leftValue": "={{ $json.vibeCheck.approved }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -3616,
+        2208
+      ],
+      "id": "2756c98f-38c4-43af-89da-74408858d4d0",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Search the web using Perplexity Sonar via OpenRouter for real-time, up-to-date information",
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openRouterApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: \"perplexity/sonar-online\", messages: [{ role: \"user\", content: \"Search for the top 3 local news events, weather, and community trends happening right now in \" + $json.city + \". Then write an HTML newsletter draft for \" + $json.name + \" with headings and short paragraphs. Return only HTML.\" }], max_tokens: 1024, temperature: 0.7 }) }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        -3904,
+        2336
+      ],
+      "id": "f1f92092-4520-4ff9-b68b-eaec5b82783f",
+      "name": "Message a model in Perplexity",
+      "credentials": {
+        "openRouterApi": {
+          "id": "BgQfIS3XySiOhMjo",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Tampa,fl\nDaily trend hunter",
+        "height": 1024,
+        "width": 2720
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -3104,
+        1888
+      ],
+      "typeVersion": 1,
+      "id": "e7e9fec9-fef1-4795-a680-c3daf55c472c",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "organizations",
+        "returnAll": true,
+        "filterType": "none"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -4704,
+        2192
+      ],
+      "id": "6e89b461-4c81-4d57-b0e1-f988840d14d6",
+      "name": "GL365 Brain",
+      "credentials": {
+        "supabaseApi": {
+          "id": "m9mbFt3ANaSacO5C",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// IRON DOME VIBE CHECK PROTOCOL (v2.0)\n\n// 1. Get the text from the AI Agent\nconst generatedText =\n  $input.item.json.output ||\n  $input.item.json.text ||\n  \"\";\n\n// 2. Define the rules\nconst constraints = {\n  forbidden_words: [\n    \"synergy\",\n    \"blast\",\n    \"skyrocket\",\n    \"guaranteed\",\n    \"100%\",\n    \"crypto\",\n    \"investment\"\n  ],\n  copyright_risks: [\n    \"disney\",\n    \"marvel\",\n    \"star wars\",\n    \"mickey mouse\",\n    \"nike\",\n    \"nintendo\"\n  ]\n};\n\n// 3. Scan the text\nlet violations = [];\nconst textLower = generatedText.toLowerCase();\n\n// Scan for forbidden words\nfor (const word of constraints.forbidden_words) {\n  if (textLower.includes(word.toLowerCase())) {\n    violations.push(`Forbidden Word: \"${word}\"`);\n  }\n}\n\n// Scan for copyright risks\nfor (const brand of constraints.copyright_risks) {\n  if (textLower.includes(brand)) {\n    violations.push(`Copyright Risk: \"${brand}\"`);\n  }\n}\n\n// 4. Decision logic\nconst hasViolations = violations.length > 0;\n\n// 5. Build base payload (keep everything that came in)\nconst base = {\n  ...$json,\n  generatedText\n};\n\nif (hasViolations) {\n  // REJECT\n  return {\n    json: {\n      ...base,\n      status: \"REJECTED\",\n      reason: violations.join(\", \"),\n      original_text: generatedText,\n      vibeCheck: {\n        approved: false,\n        violations\n      }\n    }\n  };\n} else {\n  // APPROVE\n  return {\n    json: {\n      ...base,\n      status: \"APPROVED\",\n      final_text: generatedText,\n      timestamp: new Date().toISOString(),\n      vibeCheck: {\n        approved: true,\n        violations: []\n      }\n    }\n  };\n}"
+      },
+      "id": "c1da9c99-c717-4243-9294-8ade81169f94",
+      "name": "Vibe rules",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3824,
+        2208
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.canonical.location_data.city }} {{ $json.uardrailsInput }}",
+        "options": {
+          "systemMessage": "=YOUR TASK:\n1. Use the 'perplexity' tool to search: \"Top 3 interesting news stories or events in {{ $json.canonical.location_data.city }} today\".\n2. Ignore crime or bad news. Look for festivals, sports, business openings, or weather.\n3. Output the answer in this simple email format:\n\nSubject: 🏙️ City Pulse: Top stories for {{ $json.canonical.location_data.city }}\n\nHi Neighbor,\n\nHere is what is happening in {{ $json.canonical.location_data.city }} today:\n\n{{ $json.uardrailsInput }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -4160,
+        2208
+      ],
+      "id": "5b6609db-89d9-42c0-ac01-87319e31ab19",
+      "name": "Daily Trend Hunter",
+      "notesInFlow": true,
+      "retryOnFail": true,
+      "waitBetweenTries": 2000,
+      "notes": "Daily trend agent for Greenline365. If this node fails repeatedly, check API keys, Perplexity tool, and JSON format in System Message.”"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "541823c5-6e43-4559-979c-a8cd70329498",
+              "name": "=={{ {\n  canonical: {\n    id: $json.id || $uuidv4(),\n    trace_id: $json.trace_id || $uuidv4(),\n    event_id: $json.event_id || $uuidv4(),\n    source: \"vibe\",\n    name: $json.name,\n    email: $json.email,\n    phone: $json.phone,\n    company: $json.company,\n    consent: {\n      marketing: true,\n      timestamp: new Date().toISOString()\n    },\n    stage: \"mini_dump\",\n    score: null,\n    intent: null,\n    created_at: new Date().toISOString(),\n    updated_at: new Date().toISOString()\n  }\n} }}",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3440,
+        2368
+      ],
+      "id": "6eba2257-2ef5-424d-8b92-5161d5719be7",
+      "name": "GL365 Mini Dump"
+    },
+    {
+      "parameters": {
+        "jsCode": "function uuidv4() {\n  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {\n    const r = Math.random() * 16 | 0;\n    const v = c === 'x' ? r : (r & 0x3 | 0x8);\n    return v.toString(16);\n  });\n}\nconst canonical = {\n  id: uuidv4(),\n  trace_id: uuidv4(),\n  event_id: uuidv4(),\n  source: \"gl365_daily_content\",\n  tenant_id: \"greenline365\",\n  environment: \"production\",\n  business: {\n    id: \"greenline365\",\n    owner_name: \"Jared L Tucker\",\n    name: \"GreenLine365\",\n    street: \"722 S 57th St\",\n    city: \"Tampa\",\n    state: \"FL\",\n    zip: \"33619\",\n    country: \"USA\"\n  },\n  name: \"GreenLine365\",\n  email: \"info@greenline365.local\",\n  phone: null,\n  company: \"GreenLine365\",\n  consent: {\n    marketing: true,\n    timestamp: new Date().toISOString()\n  },\n  content_strategy: {\n    primary_goal: \"foot_traffic\",\n    priority_offers: [],\n    seasonal_theme: \"early summer freshness\",\n    urgency_level: \"soft\",\n    posting_cadence: \"daily\"\n  },\n  offers: [],\n  context: {\n    iso_date: new Date().toISOString().slice(0,10),\n    day_of_week: [\"Sunday\",\"Monday\",\"Tuesday\",\"Wednesday\",\"Thursday\",\"Friday\",\"Saturday\"][new Date().getDay()],\n    is_weekend: [0,6].includes(new Date().getDay()),\n    is_holiday: false\n  },\n  guardrails: {\n    brand_voice: {\n      tone: \"friendly\",\n      energy: \"mid\",\n      persona: \"local neighborhood marketing expert\",\n      reading_level: \"general_audience\",\n      allowed_phrases: [\"GreenLine365\"],\n      banned_phrases: []\n    },\n    risk: {\n      max_claim_strength: \"moderate\",\n      avoid_topics: [\"politics\", \"religion\", \"medical_claims\", \"financial_promises\"],\n      requires_disclaimer: false,\n      age_restricted: false\n    },\n    legal_notes: \"No guarantees of results; avoid specific earnings or health claims.\"\n  },\n  seo: {\n    primary_keywords: [\"Tampa local marketing\", \"small business content\"],\n    secondary_keywords: [\"social media automation\", \"daily content ideas\"]\n  },\n  channel_prefs: {\n    facebook: { max_chars: 2200, max_hashtags: 3, emojis_allowed: true, cta_style: \"clear_and_direct\" },\n    instagram_reel: { max_chars: 2200, max_hashtags: 10, emojis_allowed: true, cta_style: \"punchy_spoken\" },\n    youtube_short: { max_chars: 5000, max_hashtags: 8, emojis_allowed: true, cta_style: \"spoken_hook_then_cta\" }\n  },\n  trends: { themes: [], audio: [], memes: [] },\n  content_request: {\n    mode: \"use_existing_photo\",\n    overlay_style: \"simple_caption\",\n    requires_reference: false,\n    channels: [\"facebook\", \"instagram_reel\"],\n    original_image_url: \"\",\n    usage_reference_url: \"\",\n    notes_from_user: \"\"\n  },\n  stage: \"active_client\",\n  score: null,\n  intent: null,\n  created_at: new Date().toISOString(),\n  updated_at: new Date().toISOString()\n};\n\nreturn { json: { canonical } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2176,
+        2240
+      ],
+      "id": "e69029a5-0759-4e06-9b8c-2b840a1b8044",
+      "name": "GL365 Canonical1"
+    },
+    {
+      "parameters": {
+        "height": 1024,
+        "width": 2832,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -5872,
+        3968
+      ],
+      "typeVersion": 1,
+      "id": "c024f433-9526-4913-aa8a-ed37101a1ab8",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -2832,
+        2240
+      ],
+      "id": "cad3a468-968e-4404-b5f3-244eb8c88bbd",
+      "name": "When chat message received",
+      "webhookId": "fe042140-86fa-41b4-9bc6-fa5b0aabb66c"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -2480,
+        2448
+      ],
+      "id": "b70ab715-ce87-4bb5-a0bf-049766e20fbb",
+      "name": "Simple Memory1"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -2304,
+        2672
+      ],
+      "id": "ca5376a8-5279-455c-b640-9c407969ca98",
+      "name": "Simple Memory2"
+    },
+    {
+      "parameters": {
+        "model": "anthropic/claude-opus-4.5",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -2608,
+        2432
+      ],
+      "id": "0bcd3648-ad61-4d27-a719-be8981baf374",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "BgQfIS3XySiOhMjo",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "anthropic/claude-sonnet-4.5",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -2400,
+        2592
+      ],
+      "id": "29137d23-ff03-4afe-b6c5-1c1838a321e6",
+      "name": "OpenRouter Chat Model1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "BgQfIS3XySiOhMjo",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Generate static ad images",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Prompt__User_Message_', ``, 'string') }}",
+        "options": {
+          "systemMessage": "You are writing prompts for an AI image generation model that will create product advertisements. Once you create the prompt, call the ad generation tool.\n\nIMPORTANT CONTEXT:\n- You cannot see any images\n- The image generation model will receive:\n  1. PRODUCT REFERENCE IMAGE (always provided): Shows the product itself\n  2. USAGE REFERENCE IMAGE (sometimes provided): Shows the product being worn or used by a person\n- Your prompt must instruct the model to use these references faithfully\n\nPROMPT REQUIREMENTS:\n\n1. REFERENCE FIDELITY INSTRUCTIONS (include in every prompt):\n\n   For product reference:\n   \"Study the provided product reference image carefully. Reproduce the product exactly as shown - same shape, structure, materials, colors, proportions, and mechanical details. Do not stylize, abstract, or reinterpret the product design.\"\n\n   If usage reference is provided, also include:\n   \"Study the provided usage reference image to understand exactly how the product is worn/held/used on the body. Match this positioning, fit, and interaction precisely in the generated image.\"\n\n2. SCENE DESCRIPTION:\n   - Setting, background, surfaces, props\n   - Lighting style and mood\n   - Product arrangement or positioning\n\n3. PHOTOGRAPHY STYLE:\n   - Camera angle\n   - Depth of field\n   - Overall aesthetic\n\n4. TEXT SPECIFICATIONS:\n   - Exact text content (verify completeness before output)\n   - Font characteristics: color, serif/sans-serif, weight, and case\n   - Text placement within the image\n   - Any shapes or banners containing text\n\n5. COMPOSITION:\n   - 1:1 aspect ratio\n   - Element placement in frame\n\nINPUT YOU WILL RECEIVE:\n- Ad concept description (theme, target audience, messaging)\n- Ad style notes (photography style, mood, text content)\n- Confirmation of whether a usage reference image is included\n\nOUTPUT FORMAT TO SEND TO AD GENERATION TOOL:\nprompt = \"single JSON-friendly string...\"\nrequires_usage_reference = true/false\n\nSet \"requires_usage_reference\" to true if you receive multiple URLs for reference\n\nCRITICAL REMINDERS:\n- Verify all text is complete (no cut-off words or sentences)\n- Verify that the prompt only contains JSON-friendly characters as the ENTIRE prompt will be wrapped in a SINGLE JSON string. Use single quotes ' ' instead of double \" \" where required. NO LINE BREAKS.\n\nTEXT FORMATTING FOR JSON COMPATIBILITY:\n- Do not use curly quotes (‘ ’ “ ”) - use straight quotes or omit\n- Do not use bullet points (•) - use dashes (-) or commas\n- Do not use special symbols for units - spell them out (inch not \")\n- Avoid apostrophes in contractions - use full words (it is, do not) or omit\n- Do not use ampersands (&) - spell out \"and\"t"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 2.2,
+      "position": [
+        -2368,
+        2464
+      ],
+      "id": "38c67edf-6e86-40a9-85a0-b9e5ff8110f2",
+      "name": "image generation"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=You are a professional static ad expert for e-commerce stores.Your job is to help me.Come up with add variations for my product.\n\nI will provide you with a product image URL and tell you what the product is you are to help me come up with five at angles and target audiences. Once I approve of an angle, you are to help me brainstorm.Add styles in the text.\n\nOnce I approve call the image generation agent tool with the ad concept, the original image URL, the usage reference URL(if applicable). The agent will return a Google Drive URL which you are to provide to me.",
+          "maxIterations": 10
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -2528,
+        2208
+      ],
+      "id": "142a9051-5f02-406b-89e4-a405bdfe09a3",
+      "name": "brainstorm agent"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        672,
+        816
+      ],
+      "id": "635bec60-c0dd-4e4d-910e-8af184c9286a",
+      "name": "Simple Memory3"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        752,
+        608
+      ],
+      "id": "c001fd52-13e4-4c6b-b90d-81c76357b6e3",
+      "name": "Simple Memory4"
+    },
+    {
+      "parameters": {
+        "model": "anthropic/claude-opus-4.5",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        448,
+        368
+      ],
+      "id": "d27c2a7a-18ec-4cdc-8e06-48eafeb68063",
+      "name": "OpenRouter Chat Model2",
+      "credentials": {
+        "openRouterApi": {
+          "id": "BgQfIS3XySiOhMjo",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "anthropic/claude-sonnet-4.5",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        656,
+        528
+      ],
+      "id": "f16f10c8-5676-41f7-9ce2-94ed2be2f5b8",
+      "name": "OpenRouter Chat Model3",
+      "credentials": {
+        "openRouterApi": {
+          "id": "BgQfIS3XySiOhMjo",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Generate static ad images",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Prompt__User_Message_', ``, 'string') }}",
+        "options": {
+          "systemMessage": "You are writing prompts for an AI image generation model that will create product advertisements. Once you create the prompt, call the ad generation tool.\n\nIMPORTANT CONTEXT:\n- You cannot see any images\n- The image generation model will receive:\n  1. PRODUCT REFERENCE IMAGE (always provided): Shows the product itself\n  2. USAGE REFERENCE IMAGE (sometimes provided): Shows the product being worn or used by a person\n- Your prompt must instruct the model to use these references faithfully\n\nPROMPT REQUIREMENTS:\n\n1. REFERENCE FIDELITY INSTRUCTIONS (include in every prompt):\n\n   For product reference:\n   \"Study the provided product reference image carefully. Reproduce the product exactly as shown - same shape, structure, materials, colors, proportions, and mechanical details. Do not stylize, abstract, or reinterpret the product design.\"\n\n   If usage reference is provided, also include:\n   \"Study the provided usage reference image to understand exactly how the product is worn/held/used on the body. Match this positioning, fit, and interaction precisely in the generated image.\"\n\n2. SCENE DESCRIPTION:\n   - Setting, background, surfaces, props\n   - Lighting style and mood\n   - Product arrangement or positioning\n\n3. PHOTOGRAPHY STYLE:\n   - Camera angle\n   - Depth of field\n   - Overall aesthetic\n\n4. TEXT SPECIFICATIONS:\n   - Exact text content (verify completeness before output)\n   - Font characteristics: color, serif/sans-serif, weight, and case\n   - Text placement within the image\n   - Any shapes or banners containing text\n\n5. COMPOSITION:\n   - 1:1 aspect ratio\n   - Element placement in frame\n\nINPUT YOU WILL RECEIVE:\n- Ad concept description (theme, target audience, messaging)\n- Ad style notes (photography style, mood, text content)\n- Confirmation of whether a usage reference image is included\n\nOUTPUT FORMAT TO SEND TO AD GENERATION TOOL:\nprompt = \"single JSON-friendly string...\"\nrequires_usage_reference = true/false\n\nSet \"requires_usage_reference\" to true if you receive multiple URLs for reference\n\nCRITICAL REMINDERS:\n- Verify all text is complete (no cut-off words or sentences)\n- Verify that the prompt only contains JSON-friendly characters as the ENTIRE prompt will be wrapped in a SINGLE JSON string. Use single quotes ' ' instead of double \" \" where required. NO LINE BREAKS.\n\nTEXT FORMATTING FOR JSON COMPATIBILITY:\n- Do not use curly quotes (‘ ’ “ ”) - use straight quotes or omit\n- Do not use bullet points (•) - use dashes (-) or commas\n- Do not use special symbols for units - spell them out (inch not \")\n- Avoid apostrophes in contractions - use full words (it is, do not) or omit\n- Do not use ampersands (&) - spell out \"and\"t"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 2.2,
+      "position": [
+        688,
+        400
+      ],
+      "id": "38a8ca4b-59cd-4d9a-9672-72bdb1a79880",
+      "name": "image generation1"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=You are a professional static ad expert for e-commerce stores.Your job is to help me.Come up with add variations for my product.\n\nI will provide you with a product image URL and tell you what the product is you are to help me come up with five at angles and target audiences. Once I approve of an angle, you are to help me brainstorm.Add styles in the text.\n\nOnce I approve call the image generation agent tool with the ad concept, the original image URL, the usage reference URL(if applicable). The agent will return a Google Drive URL which you are to provide to me.",
+          "maxIterations": 10
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        528,
+        144
+      ],
+      "id": "aa814832-b732-42b9-9b3b-e79b7216901b",
+      "name": "brainstorm agent1"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        960,
+        464
+      ],
+      "id": "bf8873a5-b1ed-48eb-99c2-12a34b0df485",
+      "name": "Simple Memory5"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1136,
+        688
+      ],
+      "id": "bdc7b935-e47a-4e94-a020-d60186cab6cf",
+      "name": "Simple Memory6"
+    },
+    {
+      "parameters": {
+        "model": "anthropic/claude-opus-4.5",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        832,
+        448
+      ],
+      "id": "1fd3a680-1b72-4849-857b-0d3f17c02c8f",
+      "name": "OpenRouter Chat Model4",
+      "credentials": {
+        "openRouterApi": {
+          "id": "BgQfIS3XySiOhMjo",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "anthropic/claude-sonnet-4.5",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        608
+      ],
+      "id": "b080d8ee-7cfc-4f41-ab41-8826499e6028",
+      "name": "OpenRouter Chat Model5",
+      "credentials": {
+        "openRouterApi": {
+          "id": "BgQfIS3XySiOhMjo",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Generate static ad images",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Prompt__User_Message_', ``, 'string') }}",
+        "options": {
+          "systemMessage": "You are writing prompts for an AI image generation model that will create product advertisements. Once you create the prompt, call the ad generation tool.\n\nIMPORTANT CONTEXT:\n- You cannot see any images\n- The image generation model will receive:\n  1. PRODUCT REFERENCE IMAGE (always provided): Shows the product itself\n  2. USAGE REFERENCE IMAGE (sometimes provided): Shows the product being worn or used by a person\n- Your prompt must instruct the model to use these references faithfully\n\nPROMPT REQUIREMENTS:\n\n1. REFERENCE FIDELITY INSTRUCTIONS (include in every prompt):\n\n   For product reference:\n   \"Study the provided product reference image carefully. Reproduce the product exactly as shown - same shape, structure, materials, colors, proportions, and mechanical details. Do not stylize, abstract, or reinterpret the product design.\"\n\n   If usage reference is provided, also include:\n   \"Study the provided usage reference image to understand exactly how the product is worn/held/used on the body. Match this positioning, fit, and interaction precisely in the generated image.\"\n\n2. SCENE DESCRIPTION:\n   - Setting, background, surfaces, props\n   - Lighting style and mood\n   - Product arrangement or positioning\n\n3. PHOTOGRAPHY STYLE:\n   - Camera angle\n   - Depth of field\n   - Overall aesthetic\n\n4. TEXT SPECIFICATIONS:\n   - Exact text content (verify completeness before output)\n   - Font characteristics: color, serif/sans-serif, weight, and case\n   - Text placement within the image\n   - Any shapes or banners containing text\n\n5. COMPOSITION:\n   - 1:1 aspect ratio\n   - Element placement in frame\n\nINPUT YOU WILL RECEIVE:\n- Ad concept description (theme, target audience, messaging)\n- Ad style notes (photography style, mood, text content)\n- Confirmation of whether a usage reference image is included\n\nOUTPUT FORMAT TO SEND TO AD GENERATION TOOL:\nprompt = \"single JSON-friendly string...\"\nrequires_usage_reference = true/false\n\nSet \"requires_usage_reference\" to true if you receive multiple URLs for reference\n\nCRITICAL REMINDERS:\n- Verify all text is complete (no cut-off words or sentences)\n- Verify that the prompt only contains JSON-friendly characters as the ENTIRE prompt will be wrapped in a SINGLE JSON string. Use single quotes ' ' instead of double \" \" where required. NO LINE BREAKS.\n\nTEXT FORMATTING FOR JSON COMPATIBILITY:\n- Do not use curly quotes (‘ ’ “ ”) - use straight quotes or omit\n- Do not use bullet points (•) - use dashes (-) or commas\n- Do not use special symbols for units - spell them out (inch not \")\n- Avoid apostrophes in contractions - use full words (it is, do not) or omit\n- Do not use ampersands (&) - spell out \"and\"t"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 2.2,
+      "position": [
+        1072,
+        480
+      ],
+      "id": "2e79a3f2-13a4-4edc-8ddd-a2af5486c7c0",
+      "name": "image generation2"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=You are a professional static ad expert for e-commerce stores.Your job is to help me.Come up with add variations for my product.\n\nI will provide you with a product image URL and tell you what the product is you are to help me come up with five at angles and target audiences. Once I approve of an angle, you are to help me brainstorm.Add styles in the text.\n\nOnce I approve call the image generation agent tool with the ad concept, the original image URL, the usage reference URL(if applicable). The agent will return a Google Drive URL which you are to provide to me.",
+          "maxIterations": 10
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        912,
+        224
+      ],
+      "id": "c5223c68-56bc-427f-82cb-d482e564bc71",
+      "name": "brainstorm agent2"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        48,
+        240
+      ],
+      "id": "0a4b89b5-2de3-4cfe-aead-ff67ad47ba98",
+      "name": "Simple Memory7"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        464
+      ],
+      "id": "f4bb4d5b-d019-4bee-8cf0-4e0a888a8789",
+      "name": "Simple Memory8"
+    },
+    {
+      "parameters": {
+        "model": "anthropic/claude-opus-4.5",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        224
+      ],
+      "id": "6bcd88cb-8832-4ecd-839f-2115973685b2",
+      "name": "OpenRouter Chat Model6",
+      "credentials": {
+        "openRouterApi": {
+          "id": "BgQfIS3XySiOhMjo",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "anthropic/claude-sonnet-4.5",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        128,
+        384
+      ],
+      "id": "f363b872-2829-4630-9816-67a30bf6e88e",
+      "name": "OpenRouter Chat Model7",
+      "credentials": {
+        "openRouterApi": {
+          "id": "BgQfIS3XySiOhMjo",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Generate static ad images",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Prompt__User_Message_', ``, 'string') }}",
+        "options": {
+          "systemMessage": "You are writing prompts for an AI image generation model that will create product advertisements. Once you create the prompt, call the ad generation tool.\n\nIMPORTANT CONTEXT:\n- You cannot see any images\n- The image generation model will receive:\n  1. PRODUCT REFERENCE IMAGE (always provided): Shows the product itself\n  2. USAGE REFERENCE IMAGE (sometimes provided): Shows the product being worn or used by a person\n- Your prompt must instruct the model to use these references faithfully\n\nPROMPT REQUIREMENTS:\n\n1. REFERENCE FIDELITY INSTRUCTIONS (include in every prompt):\n\n   For product reference:\n   \"Study the provided product reference image carefully. Reproduce the product exactly as shown - same shape, structure, materials, colors, proportions, and mechanical details. Do not stylize, abstract, or reinterpret the product design.\"\n\n   If usage reference is provided, also include:\n   \"Study the provided usage reference image to understand exactly how the product is worn/held/used on the body. Match this positioning, fit, and interaction precisely in the generated image.\"\n\n2. SCENE DESCRIPTION:\n   - Setting, background, surfaces, props\n   - Lighting style and mood\n   - Product arrangement or positioning\n\n3. PHOTOGRAPHY STYLE:\n   - Camera angle\n   - Depth of field\n   - Overall aesthetic\n\n4. TEXT SPECIFICATIONS:\n   - Exact text content (verify completeness before output)\n   - Font characteristics: color, serif/sans-serif, weight, and case\n   - Text placement within the image\n   - Any shapes or banners containing text\n\n5. COMPOSITION:\n   - 1:1 aspect ratio\n   - Element placement in frame\n\nINPUT YOU WILL RECEIVE:\n- Ad concept description (theme, target audience, messaging)\n- Ad style notes (photography style, mood, text content)\n- Confirmation of whether a usage reference image is included\n\nOUTPUT FORMAT TO SEND TO AD GENERATION TOOL:\nprompt = \"single JSON-friendly string...\"\nrequires_usage_reference = true/false\n\nSet \"requires_usage_reference\" to true if you receive multiple URLs for reference\n\nCRITICAL REMINDERS:\n- Verify all text is complete (no cut-off words or sentences)\n- Verify that the prompt only contains JSON-friendly characters as the ENTIRE prompt will be wrapped in a SINGLE JSON string. Use single quotes ' ' instead of double \" \" where required. NO LINE BREAKS.\n\nTEXT FORMATTING FOR JSON COMPATIBILITY:\n- Do not use curly quotes (‘ ’ “ ”) - use straight quotes or omit\n- Do not use bullet points (•) - use dashes (-) or commas\n- Do not use special symbols for units - spell them out (inch not \")\n- Avoid apostrophes in contractions - use full words (it is, do not) or omit\n- Do not use ampersands (&) - spell out \"and\"t"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 2.2,
+      "position": [
+        160,
+        256
+      ],
+      "id": "2f320624-cc12-4262-b3bd-8e403563ba8b",
+      "name": "image generation3"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=You are a professional static ad expert for e-commerce stores.Your job is to help me.Come up with add variations for my product.\n\nI will provide you with a product image URL and tell you what the product is you are to help me come up with five at angles and target audiences. Once I approve of an angle, you are to help me brainstorm.Add styles in the text.\n\nOnce I approve call the image generation agent tool with the ad concept, the original image URL, the usage reference URL(if applicable). The agent will return a Google Drive URL which you are to provide to me.",
+          "maxIterations": 10
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "13184265-5cbb-40bb-8655-46baae29aa33",
+      "name": "brainstorm agent3"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1648,
+        272
+      ],
+      "id": "a16bc02e-b8b8-489b-94f1-f2402a8ce464",
+      "name": "Simple Memory9"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1824,
+        496
+      ],
+      "id": "9baa3c45-4ff8-4bee-b2ec-7f87f8198e61",
+      "name": "Simple Memory10"
+    },
+    {
+      "parameters": {
+        "model": "anthropic/claude-opus-4.5",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1520,
+        256
+      ],
+      "id": "810c72c8-c2f2-472a-b5f6-f294d68c43c0",
+      "name": "OpenRouter Chat Model8",
+      "credentials": {
+        "openRouterApi": {
+          "id": "BgQfIS3XySiOhMjo",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "anthropic/claude-sonnet-4.5",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1728,
+        416
+      ],
+      "id": "64adcc2f-c89e-4d91-b2b2-f72c2bc4bd49",
+      "name": "OpenRouter Chat Model9",
+      "credentials": {
+        "openRouterApi": {
+          "id": "BgQfIS3XySiOhMjo",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Generate static ad images",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Prompt__User_Message_', ``, 'string') }}",
+        "options": {
+          "systemMessage": "You are writing prompts for an AI image generation model that will create product advertisements. Once you create the prompt, call the ad generation tool.\n\nIMPORTANT CONTEXT:\n- You cannot see any images\n- The image generation model will receive:\n  1. PRODUCT REFERENCE IMAGE (always provided): Shows the product itself\n  2. USAGE REFERENCE IMAGE (sometimes provided): Shows the product being worn or used by a person\n- Your prompt must instruct the model to use these references faithfully\n\nPROMPT REQUIREMENTS:\n\n1. REFERENCE FIDELITY INSTRUCTIONS (include in every prompt):\n\n   For product reference:\n   \"Study the provided product reference image carefully. Reproduce the product exactly as shown - same shape, structure, materials, colors, proportions, and mechanical details. Do not stylize, abstract, or reinterpret the product design.\"\n\n   If usage reference is provided, also include:\n   \"Study the provided usage reference image to understand exactly how the product is worn/held/used on the body. Match this positioning, fit, and interaction precisely in the generated image.\"\n\n2. SCENE DESCRIPTION:\n   - Setting, background, surfaces, props\n   - Lighting style and mood\n   - Product arrangement or positioning\n\n3. PHOTOGRAPHY STYLE:\n   - Camera angle\n   - Depth of field\n   - Overall aesthetic\n\n4. TEXT SPECIFICATIONS:\n   - Exact text content (verify completeness before output)\n   - Font characteristics: color, serif/sans-serif, weight, and case\n   - Text placement within the image\n   - Any shapes or banners containing text\n\n5. COMPOSITION:\n   - 1:1 aspect ratio\n   - Element placement in frame\n\nINPUT YOU WILL RECEIVE:\n- Ad concept description (theme, target audience, messaging)\n- Ad style notes (photography style, mood, text content)\n- Confirmation of whether a usage reference image is included\n\nOUTPUT FORMAT TO SEND TO AD GENERATION TOOL:\nprompt = \"single JSON-friendly string...\"\nrequires_usage_reference = true/false\n\nSet \"requires_usage_reference\" to true if you receive multiple URLs for reference\n\nCRITICAL REMINDERS:\n- Verify all text is complete (no cut-off words or sentences)\n- Verify that the prompt only contains JSON-friendly characters as the ENTIRE prompt will be wrapped in a SINGLE JSON string. Use single quotes ' ' instead of double \" \" where required. NO LINE BREAKS.\n\nTEXT FORMATTING FOR JSON COMPATIBILITY:\n- Do not use curly quotes (‘ ’ “ ”) - use straight quotes or omit\n- Do not use bullet points (•) - use dashes (-) or commas\n- Do not use special symbols for units - spell them out (inch not \")\n- Avoid apostrophes in contractions - use full words (it is, do not) or omit\n- Do not use ampersands (&) - spell out \"and\"t"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 2.2,
+      "position": [
+        1760,
+        288
+      ],
+      "id": "678d945a-94f9-44a4-a221-b1573ec40541",
+      "name": "image generation4"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=You are a professional static ad expert for e-commerce stores.Your job is to help me.Come up with add variations for my product.\n\nI will provide you with a product image URL and tell you what the product is you are to help me come up with five at angles and target audiences. Once I approve of an angle, you are to help me brainstorm.Add styles in the text.\n\nOnce I approve call the image generation agent tool with the ad concept, the original image URL, the usage reference URL(if applicable). The agent will return a Google Drive URL which you are to provide to me.",
+          "maxIterations": 10
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        1600,
+        32
+      ],
+      "id": "39566672-5c53-45f4-b289-768a69f933c9",
+      "name": "brainstorm agent4"
+    },
+    {
+      "parameters": {
+        "batchSize": 10,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -4368,
+        2192
+      ],
+      "id": "a606072e-574d-42f9-963a-99dd6bd64b78",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {
+          "maxTokens": 2500
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -3936,
+        592
+      ],
+      "id": "e4081ea4-399a-4a67-8272-3f89ce506d1e",
+      "name": "OpenAI Model1",
+      "notesInFlow": true,
+      "notes": "Daily trend agent for Greenline365. If this node fails repeatedly, check API keys, Perplexity tool configuration,"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "{{$node[\"Workflow Configuration\"].json.clientBusinessName}}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -3824,
+        592
+      ],
+      "id": "ec95ae76-cf50-458e-a4d3-1debc9d72daf",
+      "name": "Simple Memory11",
+      "notesInFlow": true,
+      "notes": "Simple Memory for content agent. Stores only the last 5–10 interactions for this client: name, city, tone, and explicit content preferences (e.g., caption length, emoji yes/no, A/B choice). No long‑term data or sensitive PII; Supabase is the source of truth. Do not change session key or context length without updating the SOP.\n\n{\n  \"memory_summary\": {\n    \"client_name\": \"<CLIENT_NAME>\",\n    \"client_city\": \"<CLIENT_CITY>\",\n    \"preferred_tone\": \"<PREFERRED_TONE>\",\n    \"content_mode\": \"<CONTENT_MODE>\",\n    \"recent_preferences\": [\n      \"Prefers short captions without emojis\",\n      \"Likes 2 options (A/B) per email\"\n    ],\n    \"last_generated_type\": \"photo_to_post\"\n  }\n}"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bc0832bc-6592-467d-ae1e-fb158d43c539",
+              "leftValue": "={{ $json.vibeCheck.approved }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -3584,
+        416
+      ],
+      "id": "0b6269cf-ef79-43ee-ba06-5b27ce0e9e18",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Search the web using Perplexity Sonar via OpenRouter for real-time, up-to-date information",
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openRouterApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: \"perplexity/sonar-online\", messages: [{ role: \"user\", content: \"Search for the top 3 local news events, weather, and community trends happening right now in \" + $json.city + \". Then write an HTML newsletter draft for \" + $json.name + \" with headings and short paragraphs. Return only HTML.\" }], max_tokens: 1024, temperature: 0.7 }) }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        -3712,
+        592
+      ],
+      "id": "72780bdb-5c37-49f3-a07f-f4796b3f2f7b",
+      "name": "Message a model in Perplexity1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "BgQfIS3XySiOhMjo",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "organizations",
+        "returnAll": true,
+        "filterType": "none"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -4304,
+        576
+      ],
+      "id": "bf5b13f7-9472-4b4b-90e9-670162f6b3cd",
+      "name": "GL365 Brain1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "m9mbFt3ANaSacO5C",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// IRON DOME VIBE CHECK PROTOCOL (v2.0)\n\n// 1. Get the text from the AI Agent\nconst generatedText =\n  $input.item.json.output ||\n  $input.item.json.text ||\n  \"\";\n\n// 2. Define the rules\nconst constraints = {\n  forbidden_words: [\n    \"synergy\",\n    \"blast\",\n    \"skyrocket\",\n    \"guaranteed\",\n    \"100%\",\n    \"crypto\",\n    \"investment\"\n  ],\n  copyright_risks: [\n    \"disney\",\n    \"marvel\",\n    \"star wars\",\n    \"mickey mouse\",\n    \"nike\",\n    \"nintendo\"\n  ]\n};\n\n// 3. Scan the text\nlet violations = [];\nconst textLower = generatedText.toLowerCase();\n\n// Scan for forbidden words\nfor (const word of constraints.forbidden_words) {\n  if (textLower.includes(word.toLowerCase())) {\n    violations.push(`Forbidden Word: \"${word}\"`);\n  }\n}\n\n// Scan for copyright risks\nfor (const brand of constraints.copyright_risks) {\n  if (textLower.includes(brand)) {\n    violations.push(`Copyright Risk: \"${brand}\"`);\n  }\n}\n\n// 4. Decision logic\nconst hasViolations = violations.length > 0;\n\n// 5. Build base payload (keep everything that came in)\nconst base = {\n  ...$json,\n  generatedText\n};\n\nif (hasViolations) {\n  // REJECT\n  return {\n    json: {\n      ...base,\n      status: \"REJECTED\",\n      reason: violations.join(\", \"),\n      original_text: generatedText,\n      vibeCheck: {\n        approved: false,\n        violations\n      }\n    }\n  };\n} else {\n  // APPROVE\n  return {\n    json: {\n      ...base,\n      status: \"APPROVED\",\n      final_text: generatedText,\n      timestamp: new Date().toISOString(),\n      vibeCheck: {\n        approved: true,\n        violations: []\n      }\n    }\n  };\n}"
+      },
+      "id": "e0442d01-9235-464a-b27f-90a0db420ca0",
+      "name": "Vibe rules1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3712,
+        416
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "jared.tucker13@gmai.com",
+        "subject": "={{ \"Greenline Update: Action Required for \" + $json.name }}",
+        "message": "==`\n<!DOCTYPE html>\n<html>\n<head>\n<style>\n  body {\n    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;\n    background-color: #f4f7f6;\n    margin: 0;\n    padding: 0;\n    color: #333;\n  }\n  .container {\n    max-width: 640px;\n    margin: 30px auto;\n    background: #ffffff;\n    border-radius: 8px;\n    overflow: hidden;\n    box-shadow: 0 5px 20px rgba(0,0,0,0.15);\n  }\n  .header {\n    background: linear-gradient(135deg, #1a5c5c 0%, #2d7a7a 100%);\n    padding: 32px;\n    text-align: center;\n    border-top: 5px solid #b88a4d;\n  }\n  .header h1 {\n    color: #b88a4d;\n    margin: 0 0 4px 0;\n    font-size: 26px;\n    letter-spacing: 1px;\n    font-family: 'Georgia', serif;\n    text-transform: uppercase;\n    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);\n  }\n  .header p {\n    color: #c8e6e6;\n    margin: 0;\n    font-size: 12px;\n    letter-spacing: 2px;\n    text-transform: uppercase;\n  }\n\n  .content {\n    padding: 32px 36px 40px 36px;\n    font-size: 15px;\n    line-height: 1.9;\n    color: #444;\n  }\n\n  .meta {\n    font-size: 13px;\n    color: #666;\n    margin-bottom: 18px;\n  }\n\n  h2 {\n    color: #1a5c5c;\n    font-size: 20px;\n    margin: 0 0 10px 0;\n  }\n  h3 {\n    color: #1a5c5c;\n    font-size: 17px;\n    margin: 26px 0 8px 0;\n  }\n  ol {\n    padding-left: 18px;\n    margin: 14px 0 6px 0;\n  }\n  ol li {\n    margin-bottom: 14px;\n  }\n\n  .bonus {\n    margin-top: 26px;\n  }\n  .bonus-label {\n    font-size: 14px;\n    font-weight: 600;\n    color: #1a5c5c;\n    margin-bottom: 8px;\n  }\n  .caption-box {\n    background: #f0f3f4;\n    border-radius: 6px;\n    padding: 14px 16px;\n    font-size: 14px;\n    line-height: 1.7;\n  }\n\n  .btn-box {\n    text-align: center;\n    margin-top: 32px;\n  }\n  .btn-approve {\n    display: inline-block;\n    background: linear-gradient(135deg, #1a5c5c 0%, #2d7a7a 100%);\n    color: #1a5c5c;\n    padding: 14px 40px;\n    text-decoration: none;\n    border-radius: 4px;\n    font-weight: bold;\n    font-size: 15px;\n    letter-spacing: 1px;\n    border-bottom: 4px solid #b88a4d;\n    box-shadow: 0 4px 6px rgba(0,0,0,0.2);\n  }\n\n  .footer {\n    background: linear-gradient(135deg, #1a5c5c 0%, #2d7a7a 100%);\n    text-align: center;\n    padding: 20px 10px;\n    font-size: 12px;\n    color: #c8e6e6;\n    border-bottom: 5px solid #b88a4d;\n  }\n  .footer span {\n    color: #b88a4d;\n  }\n</style>\n</head>\n<body>\n\n<div class=\"container\">\n  <div class=\"header\">\n    <h1>GREENLINE 365</h1>\n    <p>GLOBAL SUSTAINABLE SOLUTIONS</p>\n  </div>\n\n  <div class=\"content\">\n    ${ $('AI Summary Agent').item.json.output || $('AI Summary Agent').item.json.text || \"⚠️ Waiting for AI Content...\" }\n\n    <div class=\"btn-box\">\n      <a href=\"#\" class=\"btn-approve\">APPROVE POST</a>\n    </div>\n  </div>\n\n  <div class=\"footer\">\n    <p>Powered by <span>GreenLine365</span> | Local Business Intelligence</p>\n  </div>\n</div>\n\n</body>\n</html>\n`\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -3232,
+        544
+      ],
+      "id": "100a56aa-3e2f-40d0-8579-9e6e1ce6a9a2",
+      "name": "GL365 messenger1",
+      "webhookId": "a2004d51-ea5a-4785-a4bd-ab728c26d902"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.location_data.city }}",
+        "options": {
+          "systemMessage": "=YOUR TASK:\n1. Use the 'perplexity' tool to search: \"Top 3 interesting news stories or events in {{ $json.location_data.city }} today\".\n2. Ignore crime or bad news. Look for festivals, sports, business openings, or weather.\n3. Output the answer in this simple email format:\n\nSubject: 🏙️ City Pulse: Top stories for {{ $json.location_data.city }}\n\nHi Neighbor,\n\nHere is what is happening in {{ $json.location_data.city }} today:"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -3968,
+        416
+      ],
+      "id": "aa40c789-e146-4369-b0bd-95080e09db45",
+      "name": "Daily Trend Hunter1",
+      "notesInFlow": true,
+      "retryOnFail": true,
+      "waitBetweenTries": 2000,
+      "notes": "Daily trend agent for Greenline365. If this node fails repeatedly, check API keys, Perplexity tool, and JSON format in System Message.”"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "541823c5-6e43-4559-979c-a8cd70329498",
+              "name": "=={{ {\n  canonical: {\n    id: $json.id || $uuidv4(),\n    trace_id: $json.trace_id || $uuidv4(),\n    event_id: $json.event_id || $uuidv4(),\n    source: \"vibe\",\n    name: $json.name,\n    email: $json.email,\n    phone: $json.phone,\n    company: $json.company,\n    consent: {\n      marketing: true,\n      timestamp: new Date().toISOString()\n    },\n    stage: \"mini_dump\",\n    score: null,\n    intent: null,\n    created_at: new Date().toISOString(),\n    updated_at: new Date().toISOString()\n  }\n} }}",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3472,
+        544
+      ],
+      "id": "c5a99bc6-bea3-435b-8a7b-4509401e51d9",
+      "name": "GL365 Mini Dump1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -4144,
+        576
+      ],
+      "id": "9b109d89-35f1-45b2-a453-143350e01b57",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {
+          "maxTokens": 2500
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -3936,
+        944
+      ],
+      "id": "54acc4e1-1c54-4f0d-a780-11dadecf0967",
+      "name": "OpenAI Model2",
+      "notesInFlow": true,
+      "notes": "Daily trend agent for Greenline365. If this node fails repeatedly, check API keys, Perplexity tool configuration,"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "{{$node[\"Workflow Configuration\"].json.clientBusinessName}}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -3824,
+        944
+      ],
+      "id": "4f2d56a3-82b8-442a-bf38-79c6908e45ae",
+      "name": "Simple Memory12",
+      "notesInFlow": true,
+      "notes": "Simple Memory for content agent. Stores only the last 5–10 interactions for this client: name, city, tone, and explicit content preferences (e.g., caption length, emoji yes/no, A/B choice). No long‑term data or sensitive PII; Supabase is the source of truth. Do not change session key or context length without updating the SOP.\n\n{\n  \"memory_summary\": {\n    \"client_name\": \"<CLIENT_NAME>\",\n    \"client_city\": \"<CLIENT_CITY>\",\n    \"preferred_tone\": \"<PREFERRED_TONE>\",\n    \"content_mode\": \"<CONTENT_MODE>\",\n    \"recent_preferences\": [\n      \"Prefers short captions without emojis\",\n      \"Likes 2 options (A/B) per email\"\n    ],\n    \"last_generated_type\": \"photo_to_post\"\n  }\n}"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bc0832bc-6592-467d-ae1e-fb158d43c539",
+              "leftValue": "={{ $json.vibeCheck.approved }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -3584,
+        768
+      ],
+      "id": "3f8874bb-ea33-4545-8f6a-7d4110f75d69",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Search the web using Perplexity Sonar via OpenRouter for real-time, up-to-date information",
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openRouterApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: \"perplexity/sonar-online\", messages: [{ role: \"user\", content: \"Search for the top 3 local news events, weather, and community trends happening right now in \" + $json.city + \". Then write an HTML newsletter draft for \" + $json.name + \" with headings and short paragraphs. Return only HTML.\" }], max_tokens: 1024, temperature: 0.7 }) }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        -3712,
+        944
+      ],
+      "id": "f8e7d596-434e-44b9-80ba-de16bde6a181",
+      "name": "Message a model in Perplexity2",
+      "credentials": {
+        "openRouterApi": {
+          "id": "BgQfIS3XySiOhMjo",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "organizations",
+        "returnAll": true,
+        "filterType": "none"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -4304,
+        928
+      ],
+      "id": "216c4269-a5a8-40b5-a386-5cc76687e10a",
+      "name": "GL365 Brain2",
+      "credentials": {
+        "supabaseApi": {
+          "id": "m9mbFt3ANaSacO5C",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// IRON DOME VIBE CHECK PROTOCOL (v2.0)\n\n// 1. Get the text from the AI Agent\nconst generatedText =\n  $input.item.json.output ||\n  $input.item.json.text ||\n  \"\";\n\n// 2. Define the rules\nconst constraints = {\n  forbidden_words: [\n    \"synergy\",\n    \"blast\",\n    \"skyrocket\",\n    \"guaranteed\",\n    \"100%\",\n    \"crypto\",\n    \"investment\"\n  ],\n  copyright_risks: [\n    \"disney\",\n    \"marvel\",\n    \"star wars\",\n    \"mickey mouse\",\n    \"nike\",\n    \"nintendo\"\n  ]\n};\n\n// 3. Scan the text\nlet violations = [];\nconst textLower = generatedText.toLowerCase();\n\n// Scan for forbidden words\nfor (const word of constraints.forbidden_words) {\n  if (textLower.includes(word.toLowerCase())) {\n    violations.push(`Forbidden Word: \"${word}\"`);\n  }\n}\n\n// Scan for copyright risks\nfor (const brand of constraints.copyright_risks) {\n  if (textLower.includes(brand)) {\n    violations.push(`Copyright Risk: \"${brand}\"`);\n  }\n}\n\n// 4. Decision logic\nconst hasViolations = violations.length > 0;\n\n// 5. Build base payload (keep everything that came in)\nconst base = {\n  ...$json,\n  generatedText\n};\n\nif (hasViolations) {\n  // REJECT\n  return {\n    json: {\n      ...base,\n      status: \"REJECTED\",\n      reason: violations.join(\", \"),\n      original_text: generatedText,\n      vibeCheck: {\n        approved: false,\n        violations\n      }\n    }\n  };\n} else {\n  // APPROVE\n  return {\n    json: {\n      ...base,\n      status: \"APPROVED\",\n      final_text: generatedText,\n      timestamp: new Date().toISOString(),\n      vibeCheck: {\n        approved: true,\n        violations: []\n      }\n    }\n  };\n}"
+      },
+      "id": "9e75c357-0ea7-425d-b81b-40cf11332479",
+      "name": "Vibe rules2",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3712,
+        768
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "jared.tucker13@gmai.com",
+        "subject": "={{ \"Greenline Update: Action Required for \" + $json.name }}",
+        "message": "==`\n<!DOCTYPE html>\n<html>\n<head>\n<style>\n  body {\n    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;\n    background-color: #f4f7f6;\n    margin: 0;\n    padding: 0;\n    color: #333;\n  }\n  .container {\n    max-width: 640px;\n    margin: 30px auto;\n    background: #ffffff;\n    border-radius: 8px;\n    overflow: hidden;\n    box-shadow: 0 5px 20px rgba(0,0,0,0.15);\n  }\n  .header {\n    background: linear-gradient(135deg, #1a5c5c 0%, #2d7a7a 100%);\n    padding: 32px;\n    text-align: center;\n    border-top: 5px solid #b88a4d;\n  }\n  .header h1 {\n    color: #b88a4d;\n    margin: 0 0 4px 0;\n    font-size: 26px;\n    letter-spacing: 1px;\n    font-family: 'Georgia', serif;\n    text-transform: uppercase;\n    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);\n  }\n  .header p {\n    color: #c8e6e6;\n    margin: 0;\n    font-size: 12px;\n    letter-spacing: 2px;\n    text-transform: uppercase;\n  }\n\n  .content {\n    padding: 32px 36px 40px 36px;\n    font-size: 15px;\n    line-height: 1.9;\n    color: #444;\n  }\n\n  .meta {\n    font-size: 13px;\n    color: #666;\n    margin-bottom: 18px;\n  }\n\n  h2 {\n    color: #1a5c5c;\n    font-size: 20px;\n    margin: 0 0 10px 0;\n  }\n  h3 {\n    color: #1a5c5c;\n    font-size: 17px;\n    margin: 26px 0 8px 0;\n  }\n  ol {\n    padding-left: 18px;\n    margin: 14px 0 6px 0;\n  }\n  ol li {\n    margin-bottom: 14px;\n  }\n\n  .bonus {\n    margin-top: 26px;\n  }\n  .bonus-label {\n    font-size: 14px;\n    font-weight: 600;\n    color: #1a5c5c;\n    margin-bottom: 8px;\n  }\n  .caption-box {\n    background: #f0f3f4;\n    border-radius: 6px;\n    padding: 14px 16px;\n    font-size: 14px;\n    line-height: 1.7;\n  }\n\n  .btn-box {\n    text-align: center;\n    margin-top: 32px;\n  }\n  .btn-approve {\n    display: inline-block;\n    background: linear-gradient(135deg, #1a5c5c 0%, #2d7a7a 100%);\n    color: #1a5c5c;\n    padding: 14px 40px;\n    text-decoration: none;\n    border-radius: 4px;\n    font-weight: bold;\n    font-size: 15px;\n    letter-spacing: 1px;\n    border-bottom: 4px solid #b88a4d;\n    box-shadow: 0 4px 6px rgba(0,0,0,0.2);\n  }\n\n  .footer {\n    background: linear-gradient(135deg, #1a5c5c 0%, #2d7a7a 100%);\n    text-align: center;\n    padding: 20px 10px;\n    font-size: 12px;\n    color: #c8e6e6;\n    border-bottom: 5px solid #b88a4d;\n  }\n  .footer span {\n    color: #b88a4d;\n  }\n</style>\n</head>\n<body>\n\n<div class=\"container\">\n  <div class=\"header\">\n    <h1>GREENLINE 365</h1>\n    <p>GLOBAL SUSTAINABLE SOLUTIONS</p>\n  </div>\n\n  <div class=\"content\">\n    ${ $('AI Summary Agent').item.json.output || $('AI Summary Agent').item.json.text || \"⚠️ Waiting for AI Content...\" }\n\n    <div class=\"btn-box\">\n      <a href=\"#\" class=\"btn-approve\">APPROVE POST</a>\n    </div>\n  </div>\n\n  <div class=\"footer\">\n    <p>Powered by <span>GreenLine365</span> | Local Business Intelligence</p>\n  </div>\n</div>\n\n</body>\n</html>\n`\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -3232,
+        896
+      ],
+      "id": "275bd0d5-7de4-4b54-8f73-fca6e6f36d64",
+      "name": "GL365 messenger2",
+      "webhookId": "a2004d51-ea5a-4785-a4bd-ab728c26d902"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.location_data.city }}",
+        "options": {
+          "systemMessage": "=YOUR TASK:\n1. Use the 'perplexity' tool to search: \"Top 3 interesting news stories or events in {{ $json.location_data.city }} today\".\n2. Ignore crime or bad news. Look for festivals, sports, business openings, or weather.\n3. Output the answer in this simple email format:\n\nSubject: 🏙️ City Pulse: Top stories for {{ $json.location_data.city }}\n\nHi Neighbor,\n\nHere is what is happening in {{ $json.location_data.city }} today:"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -3968,
+        768
+      ],
+      "id": "c7efe5be-a3c0-43d5-9471-c99cbbcba25c",
+      "name": "Daily Trend Hunter2",
+      "notesInFlow": true,
+      "retryOnFail": true,
+      "waitBetweenTries": 2000,
+      "notes": "Daily trend agent for Greenline365. If this node fails repeatedly, check API keys, Perplexity tool, and JSON format in System Message.”"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "541823c5-6e43-4559-979c-a8cd70329498",
+              "name": "=={{ {\n  canonical: {\n    id: $json.id || $uuidv4(),\n    trace_id: $json.trace_id || $uuidv4(),\n    event_id: $json.event_id || $uuidv4(),\n    source: \"vibe\",\n    name: $json.name,\n    email: $json.email,\n    phone: $json.phone,\n    company: $json.company,\n    consent: {\n      marketing: true,\n      timestamp: new Date().toISOString()\n    },\n    stage: \"mini_dump\",\n    score: null,\n    intent: null,\n    created_at: new Date().toISOString(),\n    updated_at: new Date().toISOString()\n  }\n} }}",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3472,
+        896
+      ],
+      "id": "673bb5c2-780b-41d7-8404-0e3c2099280b",
+      "name": "GL365 Mini Dump2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -4144,
+        928
+      ],
+      "id": "3ad99b32-2b7e-491d-a31b-e947670efe67",
+      "name": "Loop Over Items2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d458255d-3ab8-43d2-a277-a498a368d567",
+              "name": "=canonical",
+              "value": "={{$json}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -4560,
+        2192
+      ],
+      "id": "b8dae349-00da-4a67-b077-77a5f8f67eb0",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "options": {
+          "temperature": 0.5
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -4272,
+        2336
+      ],
+      "id": "36735104-2948-4603-983f-4f6b9152802d",
+      "name": "OpenRouter Chat Model10",
+      "credentials": {
+        "openRouterApi": {
+          "id": "BgQfIS3XySiOhMjo",
+          "name": "OpenRouter account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Run every day at 7AM": {
+      "main": [
+        [
+          {
+            "node": "GL365 Brain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Daily Trend Hunter",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [],
+        [
+          {
+            "node": "GL365 Mini Dump",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model in Perplexity": {
+      "ai_tool": [
+        [
+          {
+            "node": "Daily Trend Hunter",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GL365 Brain": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vibe rules": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Trend Hunter": {
+      "main": [
+        [
+          {
+            "node": "Vibe rules",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "brainstorm agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory2": {
+      "ai_memory": [
+        [
+          {
+            "node": "image generation",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "brainstorm agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "image generation",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "brainstorm agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "image generation": {
+      "ai_tool": [
+        [
+          {
+            "node": "brainstorm agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory3": {
+      "ai_memory": [
+        [
+          {
+            "node": "brainstorm agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory4": {
+      "ai_memory": [
+        [
+          {
+            "node": "image generation1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "brainstorm agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "image generation1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "image generation1": {
+      "ai_tool": [
+        [
+          {
+            "node": "brainstorm agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory5": {
+      "ai_memory": [
+        [
+          {
+            "node": "brainstorm agent2",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory6": {
+      "ai_memory": [
+        [
+          {
+            "node": "image generation2",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "brainstorm agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model5": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "image generation2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "image generation2": {
+      "ai_tool": [
+        [
+          {
+            "node": "brainstorm agent2",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory7": {
+      "ai_memory": [
+        [
+          {
+            "node": "brainstorm agent3",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory8": {
+      "ai_memory": [
+        [
+          {
+            "node": "image generation3",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model6": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "brainstorm agent3",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model7": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "image generation3",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "image generation3": {
+      "ai_tool": [
+        [
+          {
+            "node": "brainstorm agent3",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory9": {
+      "ai_memory": [
+        [
+          {
+            "node": "brainstorm agent4",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory10": {
+      "ai_memory": [
+        [
+          {
+            "node": "image generation4",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model8": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "brainstorm agent4",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model9": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "image generation4",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "image generation4": {
+      "ai_tool": [
+        [
+          {
+            "node": "brainstorm agent4",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Daily Trend Hunter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Daily Trend Hunter1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory11": {
+      "ai_memory": [
+        [
+          {
+            "node": "Daily Trend Hunter1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "GL365 messenger1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "GL365 Mini Dump1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model in Perplexity1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Daily Trend Hunter1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GL365 Brain1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vibe rules1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GL365 messenger1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Trend Hunter1": {
+      "main": [
+        [
+          {
+            "node": "Vibe rules1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Daily Trend Hunter1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Daily Trend Hunter2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory12": {
+      "ai_memory": [
+        [
+          {
+            "node": "Daily Trend Hunter2",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "GL365 messenger2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "GL365 Mini Dump2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model in Perplexity2": {
+      "ai_tool": [
+        [
+          {
+            "node": "Daily Trend Hunter2",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GL365 Brain2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vibe rules2": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GL365 messenger2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Trend Hunter2": {
+      "main": [
+        [
+          {
+            "node": "Vibe rules2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items2": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Daily Trend Hunter2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GL365 Mini Dump": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model10": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Daily Trend Hunter",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "90255107-1f83-496e-9bed-8ce3126c90db",
+  "activeVersionId": null,
+  "versionCounter": 5,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-12-22T03:52:41.534Z",
+      "createdAt": "2025-12-22T03:52:41.534Z",
+      "role": "workflow:owner",
+      "workflowId": "6JynQddvtLWlPFbm",
+      "projectId": "CA2oX8JE8b4ELWzN",
+      "project": {
+        "updatedAt": "2025-11-26T23:39:45.565Z",
+        "createdAt": "2025-11-26T23:20:18.633Z",
+        "id": "CA2oX8JE8b4ELWzN",
+        "name": "jared tucker <jared.tucker13@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "projectRelations": [
+          {
+            "updatedAt": "2025-11-26T23:20:18.633Z",
+            "createdAt": "2025-11-26T23:20:18.633Z",
+            "userId": "08f0a56f-35d1-45de-ba8d-11e1f3f7c4cd",
+            "projectId": "CA2oX8JE8b4ELWzN",
+            "user": {
+              "updatedAt": "2026-02-20T18:18:04.769Z",
+              "createdAt": "2025-11-26T23:20:18.176Z",
+              "id": "08f0a56f-35d1-45de-ba8d-11e1f3f7c4cd",
+              "email": "jared.tucker13@gmail.com",
+              "firstName": "jared",
+              "lastName": "tucker",
+              "personalizationAnswers": {
+                "version": "v4",
+                "personalization_survey_submitted_at": "2025-11-26T23:41:07.799Z",
+                "personalization_survey_n8n_version": "1.121.3",
+                "companySize": "<20",
+                "companyType": "education",
+                "role": "business-owner",
+                "reportedSource": "youtube"
+              },
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "eANVAv2WVioSXMXW",
+                "userActivatedAt": 1766878669831,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1771611441895
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-02-20",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}
