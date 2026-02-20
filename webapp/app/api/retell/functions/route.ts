@@ -93,55 +93,121 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Check calendar availability
+// Check calendar availability — Cal.com API with per-tenant fallback
 async function checkAvailability(
-  supabase: any, 
-  args: { start_time: string; end_time?: string; service_type?: string },
+  supabase: any,
+  args: { start_time: string; end_time?: string; service_type?: string; resource?: string },
   businessId: string
 ): Promise<string> {
   try {
-    const { start_time, service_type } = args;
-    
+    const { start_time, service_type, resource } = args;
+
     // Parse the date
     const requestedDate = new Date(start_time);
     const dateStr = requestedDate.toISOString().split('T')[0];
-    
-    // Query existing bookings for that date
+
+    // Get per-tenant Cal.com credentials from Supabase
+    let calcomApiKey = process.env.CALCOM_API_KEY || '';
+    let calcomEventTypeId = process.env.CALCOM_EVENT_TYPE_ID || '';
+    let calcomTimezone = 'America/New_York';
+
+    if (businessId) {
+      const { data: tenant } = await supabase
+        .from('tenants')
+        .select('calcom_api_key, calcom_event_type_id, calcom_event_type_ids, calcom_timezone')
+        .eq('id', businessId)
+        .single();
+
+      if (tenant) {
+        if (tenant.calcom_api_key) calcomApiKey = tenant.calcom_api_key;
+        if (tenant.calcom_event_type_id) calcomEventTypeId = String(tenant.calcom_event_type_id);
+        if (tenant.calcom_timezone) calcomTimezone = tenant.calcom_timezone;
+
+        // If a specific service type is requested and tenant has per-service event types
+        if (service_type && tenant.calcom_event_type_ids) {
+          const serviceEventId = tenant.calcom_event_type_ids[service_type];
+          if (serviceEventId) calcomEventTypeId = String(serviceEventId);
+        }
+      }
+    }
+
+    // Try Cal.com API first
+    if (calcomApiKey && calcomEventTypeId) {
+      try {
+        const startTime = `${dateStr}T00:00:00Z`;
+        const endTime = `${dateStr}T23:59:59Z`;
+
+        const calcomRes = await fetch(
+          `https://api.cal.com/v1/slots?apiKey=${calcomApiKey}&eventTypeId=${calcomEventTypeId}&startTime=${startTime}&endTime=${endTime}&timeZone=${calcomTimezone}`,
+          { method: 'GET', headers: { 'Content-Type': 'application/json' } }
+        );
+
+        if (calcomRes.ok) {
+          const data = await calcomRes.json();
+          const slots: string[] = [];
+
+          if (data.slots && typeof data.slots === 'object') {
+            for (const [, dateSlots] of Object.entries(data.slots)) {
+              if (Array.isArray(dateSlots)) {
+                for (const slot of dateSlots) {
+                  const time = (slot as any).time || slot;
+                  if (typeof time === 'string') {
+                    const d = new Date(time);
+                    slots.push(`${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`);
+                  }
+                }
+              }
+            }
+          }
+
+          if (slots.length === 0) {
+            return `I'm sorry, we don't have any availability on ${formatDate(dateStr)}. Would you like to check another day?`;
+          }
+
+          const topSlots = slots.slice(0, 3);
+          const slotsText = topSlots.map(s => formatTime(s)).join(', ');
+          return `On ${formatDate(dateStr)}, I have ${slotsText} available. Which time works best for you?`;
+        } else {
+          console.error('[checkAvailability] Cal.com error:', await calcomRes.text());
+        }
+      } catch (calError) {
+        console.error('[checkAvailability] Cal.com request failed:', calError);
+      }
+    }
+
+    // Fallback: Query existing bookings from Supabase
     const { data: existingBookings } = await supabase
       .from('bookings')
       .select('time_slot, duration_minutes')
       .eq('business_id', businessId)
       .eq('date', dateStr)
       .in('status', ['confirmed', 'pending']);
-    
-    // Generate available slots (9 AM to 5 PM, 30-minute intervals)
+
     const allSlots = [];
     for (let hour = 9; hour < 17; hour++) {
       allSlots.push(`${hour}:00`);
       allSlots.push(`${hour}:30`);
     }
-    
-    // Filter out booked slots
+
     const bookedTimes = (existingBookings || []).map((b: any) => b.time_slot);
     const availableSlots = allSlots.filter(slot => !bookedTimes.includes(slot));
-    
+
     if (availableSlots.length === 0) {
-      return `I'm sorry, we don't have any availability on ${dateStr}. Would you like to check another day?`;
+      return `I'm sorry, we don't have any availability on ${formatDate(dateStr)}. Would you like to check another day?`;
     }
-    
-    // Return only first 3 options (Rule of Three)
+
     const topSlots = availableSlots.slice(0, 3);
     const slotsText = topSlots.map(s => formatTime(s)).join(', ');
-    
+
     return `On ${formatDate(dateStr)}, I have ${slotsText} available. Which time works best for you?`;
-    
+
   } catch (error) {
     console.error('[checkAvailability] Error:', error);
     return 'I had trouble checking the calendar. Let me try again or I can have someone call you back.';
   }
 }
 
-// Book a new appointment
+// Book a new appointment — Cal.com API with per-tenant credentials + Supabase record
 async function bookAppointment(
   supabase: any,
   args: {
@@ -155,52 +221,143 @@ async function bookAppointment(
   businessId: string
 ): Promise<string> {
   try {
-    const { time, guest_name, guest_email, guest_phone, notes } = args;
-    
+    const { time, guest_name, guest_phone, notes } = args;
+    const guest_email = args.guest_email || `booking-${Date.now()}@placeholder.gl365.com`;
+
     // Parse the time (expected in absolute format)
     const appointmentTime = new Date(time);
     const dateStr = appointmentTime.toISOString().split('T')[0];
     const timeSlot = `${appointmentTime.getHours()}:${String(appointmentTime.getMinutes()).padStart(2, '0')}`;
-    
-    // Check if slot is still available
-    const { data: existing } = await supabase
-      .from('bookings')
-      .select('id')
-      .eq('business_id', businessId)
-      .eq('date', dateStr)
-      .eq('time_slot', timeSlot)
-      .in('status', ['confirmed', 'pending'])
-      .single();
-    
-    if (existing) {
-      return `I'm sorry, that time slot was just taken. Let me check what else is available.`;
+
+    // Get per-tenant Cal.com credentials
+    let calcomApiKey = process.env.CALCOM_API_KEY || '';
+    let calcomEventTypeId = process.env.CALCOM_EVENT_TYPE_ID || '';
+    let calcomTimezone = 'America/New_York';
+
+    if (businessId) {
+      const { data: tenant } = await supabase
+        .from('tenants')
+        .select('calcom_api_key, calcom_event_type_id, calcom_timezone')
+        .eq('id', businessId)
+        .single();
+
+      if (tenant) {
+        if (tenant.calcom_api_key) calcomApiKey = tenant.calcom_api_key;
+        if (tenant.calcom_event_type_id) calcomEventTypeId = String(tenant.calcom_event_type_id);
+        if (tenant.calcom_timezone) calcomTimezone = tenant.calcom_timezone;
+      }
     }
-    
-    // Create the booking
-    const { data: booking, error } = await supabase
+
+    let calcomBookingUid: string | undefined;
+    let confirmationNumber: string;
+
+    // Try Cal.com booking API first
+    if (calcomApiKey && calcomEventTypeId) {
+      try {
+        const bookingData = {
+          eventTypeId: parseInt(calcomEventTypeId),
+          start: appointmentTime.toISOString(),
+          responses: {
+            name: guest_name,
+            email: guest_email,
+            phone: guest_phone || undefined,
+            notes: notes || 'Booked via AI Voice Agent',
+          },
+          timeZone: args.timezone || calcomTimezone,
+          language: 'en',
+          metadata: {
+            source: 'gl365_voice_ai',
+            business_id: businessId,
+            booked_at: new Date().toISOString(),
+          },
+        };
+
+        const calcomRes = await fetch(
+          `https://api.cal.com/v1/bookings?apiKey=${calcomApiKey}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(bookingData),
+          }
+        );
+
+        if (calcomRes.ok) {
+          const result = await calcomRes.json();
+          calcomBookingUid = result.uid || result.id?.toString();
+          confirmationNumber = calcomBookingUid?.slice(-8).toUpperCase() || generateConfirmation();
+        } else {
+          const errText = await calcomRes.text();
+          console.error('[bookAppointment] Cal.com booking error:', errText);
+          // Fall through to Supabase-only booking
+          confirmationNumber = generateConfirmation();
+        }
+      } catch (calError) {
+        console.error('[bookAppointment] Cal.com request failed:', calError);
+        confirmationNumber = generateConfirmation();
+      }
+    } else {
+      confirmationNumber = generateConfirmation();
+    }
+
+    // Always save to Supabase for GL365 records
+    const { error } = await supabase
       .from('bookings')
       .insert({
         business_id: businessId,
         date: dateStr,
         time_slot: timeSlot,
         customer_name: guest_name,
-        customer_email: guest_email || 'monitoring@amplifyvoice.ai',
+        customer_email: guest_email,
         customer_phone: guest_phone,
         notes: notes || '',
         status: 'confirmed',
-        source: 'retell_agent',
+        source: calcomBookingUid ? 'retell_agent_calcom' : 'retell_agent',
+        external_calendar_id: calcomBookingUid || null,
+        confirmation_number: confirmationNumber,
       })
       .select()
       .single();
-    
-    if (error) throw error;
-    
-    return `I've booked your appointment for ${formatDate(dateStr)} at ${formatTime(timeSlot)}. You'll receive a confirmation at ${guest_email || 'your email on file'}. Is there anything else I can help you with?`;
-    
+
+    if (error) {
+      console.error('[bookAppointment] Supabase insert error:', error);
+      // If Cal.com booking succeeded, the appointment still exists there
+      if (calcomBookingUid) {
+        return `I've booked your appointment for ${formatDate(dateStr)} at ${formatTime(timeSlot)}. Your confirmation number is ${confirmationNumber}. You'll receive a calendar invite at ${guest_email}. Is there anything else I can help with?`;
+      }
+      throw error;
+    }
+
+    // Journal the booking event
+    try {
+      await supabase.from('customer_journal').insert({
+        tenant_id: businessId,
+        contact_phone: guest_phone,
+        contact_email: guest_email,
+        contact_name: guest_name,
+        source: 'ai_call',
+        event_type: 'booking_created',
+        summary: `Booked ${notes || 'appointment'} for ${formatDate(dateStr)} at ${formatTime(timeSlot)}`,
+        raw_data: { confirmation_number: confirmationNumber, calcom_uid: calcomBookingUid },
+        sentiment: 'positive',
+      });
+    } catch {
+      // Journal is non-critical, don't fail the booking
+    }
+
+    const calcomConfirmation = calcomBookingUid
+      ? ` You'll receive a calendar invite at ${guest_email}.`
+      : '';
+
+    return `You're all set, ${guest_name}! Your appointment is booked for ${formatDate(dateStr)} at ${formatTime(timeSlot)}. Your confirmation number is ${confirmationNumber}.${calcomConfirmation} Is there anything else I can help with?`;
+
   } catch (error) {
     console.error('[bookAppointment] Error:', error);
     return 'I had trouble completing the booking. Let me transfer you to someone who can help.';
   }
+}
+
+function generateConfirmation(): string {
+  return 'GL' + Math.random().toString(36).substring(2, 8).toUpperCase();
 }
 
 // Reschedule an existing appointment
