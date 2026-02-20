@@ -1,0 +1,298 @@
+{
+  "updatedAt": "2025-12-26T03:18:49.305Z",
+  "createdAt": "2025-12-25T22:15:56.676Z",
+  "id": "qZpI0ck3KA87lEN1",
+  "name": "Leads-Intake",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "useCustomSchema": true,
+        "tableId": "=audit_events",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "=tenant_id",
+              "fieldValue": "={{$json.body?.tenant_id ?? $json.tenant_id ?? 'c730eaff-e1bb-420b-a797-72cb219fc54a'}}"
+            },
+            {
+              "fieldId": "=event_type",
+              "fieldValue": "lead.webhook.received"
+            },
+            {
+              "fieldId": "=trace_id",
+              "fieldValue": "={{$json.trace_id ?? $json.body?.trace_id ?? $json.event_id ?? $execution.id}}"
+            },
+            {
+              "fieldId": "=status",
+              "fieldValue": "==Ok"
+            },
+            {
+              "fieldId": "=metadata",
+              "fieldValue": "=={{$json}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        48,
+        0
+      ],
+      "id": "3b7dbdf9-0969-4275-a46d-6b995d4df758",
+      "name": "Supabase - Insert audit event",
+      "credentials": {
+        "supabaseApi": {
+          "id": "m9mbFt3ANaSacO5C",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "leads",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "tenant_id",
+              "fieldValue": "=={{$json.canonical.tenant_id}}"
+            },
+            {
+              "fieldId": "trace_id",
+              "fieldValue": "=={{$json.canonical.trace_id}}"
+            },
+            {
+              "fieldId": "event_id",
+              "fieldValue": "=={{$json.canonical.event_id}}"
+            },
+            {
+              "fieldId": "source",
+              "fieldValue": "=={{$json.canonical.source}}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{$json.canonical.email}}"
+            },
+            {
+              "fieldId": "phone",
+              "fieldValue": "=={{$json.canonical.phone}}"
+            },
+            {
+              "fieldId": "company",
+              "fieldValue": "=={{$json.canonical.company}}"
+            },
+            {
+              "fieldId": "stage",
+              "fieldValue": "=={{$json.canonical.stage}}"
+            },
+            {
+              "fieldId": "lead_score",
+              "fieldValue": "={{ parseInt($json.canonical?.lead_score ?? 0, 10) }}"
+            },
+            {
+              "fieldId": "intent",
+              "fieldValue": "=={{$json.canonical.intent}}"
+            },
+            {
+              "fieldId": "consent_marketing",
+              "fieldValue": "={{$json.canonical?.consent?.marketing === true}}"
+            },
+            {
+              "fieldId": "metadata",
+              "fieldValue": "=={{$json}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        0
+      ],
+      "id": "be8b6e85-b62e-421a-b269-41d715b1996d",
+      "name": "Supabase - Insert lead",
+      "credentials": {
+        "supabaseApi": {
+          "id": "m9mbFt3ANaSacO5C",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{(() => {\n  const body = $json.body ?? {};\n\n  const genId = () =>\n    ((+new Date()).toString(36) + Math.random().toString(36).slice(2, 10));\n\n  const genUuid = () => {\n    if (typeof $uuid === 'function') return $uuid();\n    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') return crypto.randomUUID();\n    return genId(); // last-resort fallback if helpers aren't available\n  };\n\n  return {\n    canonical: {\n      id: body.id ?? $json.id ?? genId(),\n      trace_id: body.trace_id ?? $json.trace_id ?? genId(),\n      event_id: genUuid(),\n\n      tenant_id: body.tenant_id ?? $json.tenant_id ?? 'gl365',\n      source: body.source ?? $json.source ?? 'nextjs',\n\n      name: body.name ?? $json.name ?? '',\n      email: body.email ?? $json.email ?? '',\n      phone: body.phone ?? $json.phone ?? '',\n      company: body.company ?? $json.company ?? '',\n\n      consent: {\n        marketing: (body?.consent?.marketing ?? $json?.consent?.marketing ?? false) === true,\n        timestamp: body?.consent?.timestamp ?? $json?.consent?.timestamp ?? new Date().toISOString(),\n      },\n\n      stage: body.stage ?? $json.stage ?? 'new',\n      score: body.score ?? $json.score ?? 0,\n      intent: body.intent ?? $json.intent ?? 'unknown',\n\n      created_at: body.created_at ?? $json.created_at ?? new Date().toISOString(),\n      updated_at: new Date().toISOString()\n    }\n  };\n})()}}      trace_id: body.trace_id ?? $json.trace_id ?? $uuid(),\n      event_id: canonicalEventId,\n      external_event_id: rawExternalEventId,\n\n      tenant_id: body.tenant_id ?? $json.tenant_id ?? 'gl365',\n      source: body.source ?? $json.source ?? 'nextjs',\n\n      name: body.name ?? $json.name ?? '',\n      email: body.email ?? $json.email ?? '',\n      phone: body.phone ?? $json.phone ?? '',\n      company: body.company ?? $json.company ?? '',\n\n      consent: {\n        marketing: marketingBool,\n        timestamp: body?.consent?.timestamp ?? $json?.consent?.timestamp ?? new Date().toISOString()\n      },\n\n      stage: body.stage ?? $json.stage ?? 'new',\n      lead_score: leadScoreInt,\n      intent: body.intent ?? $json.intent ?? 'unknown',\n\n      created_at: body.created_at ?? $json.created_at ?? new Date().toISOString(),\n      updated_at: new Date().toISOString()\n    }\n  };\n})()}}",
+        "includeOtherFields": "={{ false }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -352,
+        0
+      ],
+      "id": "563d9665-7668-478d-b7b0-6ff12fff6e8b",
+      "name": "Set - Canonical Lead"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "gl365/leads/intake/v1",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -608,
+        0
+      ],
+      "id": "44c63db8-fbab-407e-9dbd-2e57b8b48d8a",
+      "name": "Lead Intake",
+      "webhookId": "866decdc-e58b-4513-b37c-ad8a0c91e787",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "vPLfN8v1AqsIxyKI",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"queued\",\n  \"message\": \"Thanks — you're queued. Expect a call within the next 5 minutes.\",\n  \"trace_id\": \"={{$json.canonical.trace_id}}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        256,
+        0
+      ],
+      "id": "a9fe73ab-1215-4891-8c58-9387ab3f3a71",
+      "name": "Respond - 200 OK"
+    }
+  ],
+  "connections": {
+    "Supabase - Insert audit event": {
+      "main": [
+        [
+          {
+            "node": "Respond - 200 OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Insert lead": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Insert audit event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set - Canonical Lead": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Insert lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lead Intake": {
+      "main": [
+        [
+          {
+            "node": "Set - Canonical Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "b9bc32e8-7a43-429f-b289-29b63694a8eb",
+  "activeVersionId": null,
+  "versionCounter": 14,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-12-25T22:15:56.678Z",
+      "createdAt": "2025-12-25T22:15:56.678Z",
+      "role": "workflow:owner",
+      "workflowId": "qZpI0ck3KA87lEN1",
+      "projectId": "CA2oX8JE8b4ELWzN",
+      "project": {
+        "updatedAt": "2025-11-26T23:39:45.565Z",
+        "createdAt": "2025-11-26T23:20:18.633Z",
+        "id": "CA2oX8JE8b4ELWzN",
+        "name": "jared tucker <jared.tucker13@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "projectRelations": [
+          {
+            "updatedAt": "2025-11-26T23:20:18.633Z",
+            "createdAt": "2025-11-26T23:20:18.633Z",
+            "userId": "08f0a56f-35d1-45de-ba8d-11e1f3f7c4cd",
+            "projectId": "CA2oX8JE8b4ELWzN",
+            "user": {
+              "updatedAt": "2026-02-20T18:18:04.769Z",
+              "createdAt": "2025-11-26T23:20:18.176Z",
+              "id": "08f0a56f-35d1-45de-ba8d-11e1f3f7c4cd",
+              "email": "jared.tucker13@gmail.com",
+              "firstName": "jared",
+              "lastName": "tucker",
+              "personalizationAnswers": {
+                "version": "v4",
+                "personalization_survey_submitted_at": "2025-11-26T23:41:07.799Z",
+                "personalization_survey_n8n_version": "1.121.3",
+                "companySize": "<20",
+                "companyType": "education",
+                "role": "business-owner",
+                "reportedSource": "youtube"
+              },
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "eANVAv2WVioSXMXW",
+                "userActivatedAt": 1766878669831,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1771611441895
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-02-20",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}
