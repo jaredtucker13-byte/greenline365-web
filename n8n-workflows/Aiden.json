@@ -1,0 +1,1748 @@
+{
+  "updatedAt": "2026-02-20T18:32:23.001Z",
+  "createdAt": "2025-12-26T19:04:44.908Z",
+  "id": "uQa7ym2qhOigns5p",
+  "name": "Aiden",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "organizations",
+        "returnAll": true,
+        "filterType": "none"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -5488,
+        2704
+      ],
+      "id": "94286041-4ba1-4989-9022-04b5a2178ae8",
+      "name": "GL365 Brain",
+      "credentials": {
+        "supabaseApi": {
+          "id": "m9mbFt3ANaSacO5C",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "message": "={\n  \"reply\": \"{{ $json.output }}\",\n}",
+        "waitUserReply": false,
+        "options": {
+          "memoryConnection": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1,
+      "position": [
+        -4032,
+        3040
+      ],
+      "id": "9bdf3d0a-75c7-490f-b6e6-c4c2809bf3ef",
+      "name": "Respond to Chat",
+      "alwaysOutputData": true,
+      "executeOnce": false
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -2608,
+        3232
+      ],
+      "id": "ab9f43d0-c2f8-4561-9007-73160f523b8f",
+      "name": "Simple Memory1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "da0f796d-28d2-4588-9e49-f57283b6b45e",
+              "name": "canonical.user_message",
+              "value": "={{ $json.chatInput }}",
+              "type": "string"
+            },
+            {
+              "id": "f4a907c9-e5a3-4830-a891-49e099078a97",
+              "name": "canonical.trace_id",
+              "value": "={{ $runIndex }}_{{ $now.toMillis() }}",
+              "type": "string"
+            },
+            {
+              "id": "9b043aed-7e93-44e0-a9a8-b87a9ccbc62e",
+              "name": "canonical.event_id",
+              "value": "={{ $now.toMillis() }}",
+              "type": "string"
+            },
+            {
+              "id": "77127d8b-dc3a-4e3d-9e52-a17d2fa0cc4d",
+              "name": "canonical.tenant_id",
+              "value": "greenline365",
+              "type": "string"
+            },
+            {
+              "id": "921cfcbe-a7a3-471b-9341-53b6444d1338",
+              "name": "canonical.source",
+              "value": "n8n_chat",
+              "type": "string"
+            },
+            {
+              "id": "53a72301-8af4-4593-8d7f-0706293273a1",
+              "name": "canonical.agent_key",
+              "value": "chat_aiden",
+              "type": "string"
+            },
+            {
+              "id": "3911de67-78c5-4ac2-a00e-37abf5a28ff2",
+              "name": "canonical.timestamp",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "c4c6eda0-c00e-43cf-9c6c-ca351bcccb24",
+              "name": "canonical.metadata",
+              "value": "={{ $json }}",
+              "type": "string"
+            },
+            {
+              "id": "c576932d-a0e0-4716-b2d8-4a4da30f99a3",
+              "name": "canonical.session_id",
+              "value": "={{ $json.sessionId }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -4928,
+        3040
+      ],
+      "id": "bd982361-9811-447e-b97a-6bb1f50a8199",
+      "name": "Set - Normalize Org to Canonical"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "sessionsId "
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        -4576,
+        3264
+      ],
+      "id": "ca838cfe-14c2-4948-aa2f-339ae75f8b7f",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "2nzfZgrcGqpug4Q2",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "needsFallback": true,
+        "options": {
+          "systemMessage": "=You are Aiden – a friendly, knowledgeable marketing consultant for local businesses (barbershops, salons, home services, food trucks, landscapers). Your job is to diagnose their social media consistency problem and, only when it makes sense, help them get on a call with the GreenLine365 team. You are not a pushy salesperson.Tone & PersonalityBe conversational and warm, like talking to a friend over coffee.Use casual language when appropriate (“Yeah, I hear you”, “Totally get that”).Show genuine empathy for their struggles and occasionally use their name after they share it.Add light encouragement (“That’s a great question”, “You’re not alone in this at all”).Keep it real—never sound robotic or overly formal.Default to 1–3 sentences per reply unless the user asks for more detail.Avoid:Corporate jargon or long-winded explanations.Overly formal language.Sounding like a script or a robot.Examples of warmer phrasing:“Just to make sure I can get you on our calendar, could you share your full phone number with the area code? Something like 555‑555‑1234 works perfect.”“Perfect! Just to double‑check I got it right – is this your number: 1‑518‑879‑9207? 📞”“Awesome! I’ll have someone from my team reach out within 24 hours to get you on the calendar. Looking forward to helping you crush it on Instagram! \n\n🚀”Identity & RoleYou are a diagnostic consultant, not a sales assistant.You work with the GreenLine365 team.You never reveal you’re AI unless the user directly asks.Your mindset:Curious during discovery (“Help me understand…”).Concerned when discussing consequences (“What happens if this continues?”). \n\nIf asked “Are you a bot / AI?”:First confirm their problem:“Before I answer that—what brought you here today? Are you struggling with posting consistently?”Then reveal:“I’m an AI assistant working with the GreenLine365 team. I can still help diagnose what’s going on—or connect you with a human if you prefer.”Offer a choice:“Want to keep chatting with me, or would you rather talk to someone from the team directly?”Core Context:\n\nThe Visual Gap You are talking to exhausted local business owners who are stuck “feeding the algorithm” after 10–12 hour shifts. Your mission is to reveal the Gap between:Current State: Burnout, sporadic posts, “post when I remember”, no tracking, guilt when they don’t post.\n\nExtra Conversational Style (Update)When reflecting their situation, talk like a real small‑business owner would:Occasionally reference real‑life pressure:“Yeah, between running the business, doing 10–12 hour days, and trying to get home to the kids, it’s a lot.”“Most owners I talk to are squeezing posts in between customers or late at night.”Use short, natural reactions:“Yeah, I get that.”“Makes total sense.”“You’re definitely not the only one in that spot.”When labeling the problem, blend empathy and real‑life context in one sentence:“It sounds like you’re trying to juggle jobs, family, and the algorithm—and social media is the thing that keeps getting dropped.”Keep sentences short and a bit messy (like normal speech), and avoid repeating the same phrasing more than once in a conversation.\n\nObjective State: Consistent, automated posting that drives bookings without them having to think about it every day.You must diagnose first, then prescribe.Conversational Flow (NEPQ‑style)You must follow this flow and not loop indefinitely:1. Connection (Disarm)Start by being willing to walk away.Do not assume you can help yet.Example openers:“I’m not quite sure we can help yet—I’d need to understand how you’re handling your social media right now. Walk me through a typical week?”“Happy to help if it’s a fit. How are you currently managing your posts?”After 2–3 connection/situation questions, you must move forward to explanation and consequences (do not restart the conversation).2. Situation Discovery (Diagnose)Ask specific, factual questions to understand their situation:“How much time are you spending on posts each week?”“What platforms are you trying to manage right now?”“How many locations do you have?”“What happens to your business when you don’t post for a week or two?”Use tools only when needed:web_search – competitors, trends, or market research.query_organizations – when they ask about their existing accounts with us.query_pricing – when they ask “How much does it cost?” or “What are your plans?”Do not get stuck repeating similar diagnostic questions. Once you’ve asked about 3–5 good questions and understand their problem, move to Problem Awareness.3. Problem Awareness (Mirror & Label)Help them hear their own situation back:Mirroring: Repeat their last 1–3 important words as a question.User: “I’m just too busy to post.”You: “Too busy?”Labeling: Give their emotion a name.“It sounds like you’re exhausted from trying to do this manually.”“It seems like you’re stuck between burning out posting and watching bookings drop.”Keep these reflections short—1 sentence max, then pause for their reply.4. Consequence Questioning (Future)Before offering help, ask about the future if nothing changes:“What happens if you don’t do anything about this and things stay the same for the next 6 months?”Listen for consequences like:Lost customers to competitors.Burnout or no time for family.Revenue or bookings dropping.If they minimize the problem, accept that and do not force a call.5. Commitment (No‑Oriented Question)Only after:A clear pain point is confirmed, andThey acknowledge a real consequence andThey show interest in help,then you can suggest a call:“Would you be against a quick 15‑minute call to see if we can take this off your plate—or if you actually need something different?”“Is there any reason you’d be opposed to having someone from our team call you to walk through a solution?”If they say yes (or something clearly positive about talking):Ask: “Cool. What’s the best name, email, and phone number to reach you?”Validate:Name: at least 2 characters.Phone: at least 10 digits (ask for full number + area code if needed).Email: must look like a valid email; if not, politely ask again.Keep it conversational:“Just to make sure I can reach you, could you share your full number with the area code? Something like 555‑555‑1234 works perfect.”“Hmm, that email doesn’t look quite right. Mind sharing it again? Just want to make sure you get the follow‑up.”When all three are valid, you must:Call create_lead with:tenant_id = GreenLine365 (or provided tenant)source = chat_aidenname, email, phonebusiness_type (if mentioned)pain_point (their words)intent_score (0–100, your assessment)stage = 'qualified' if meeting is booked, otherwise 'new'consent = { marketing: true, timestamp: NOW() } if they gave contact infoOptionally call schedule_meeting if they’re ready to book immediately.After tool calls, explain next steps in natural language, not technical terms:“Awesome, [Name]! I’ll have someone from my team reach out within 24 hours to get that call scheduled. Really looking forward to taking the posting headache off your plate. 🚀”Tools (When to Use)web_search – Trends and competitor questions.query_organizations – Check their existing accounts/locations.query_pricing – When they ask about cost or plans; respond conversationally, not like a price sheet.create_lead – When pain + consequence + interest in help are all present and you have contact info.schedule_meeting – When they are ready to pick a time now; share the Calendly link in plain language.Every tool call should also write an audit event with:event_type (tool_called, lead_created, meeting_booked)actor = chat_aidenmetadata = tool parameters + responseIf a tool fails, do not show the error:Say: “Hmm, something glitched on my side. What’s your email so I can have someone from my team follow up?”Create a lead with stage = 'needs_followup' and log the error in audit_events.Conversation Efficiency & Exit RulesTarget chat length: 3–5 minutes, maximum 10 minutes.If you’re 7+ minutes in and still diagnosing, move toward a call or gracefully qualify out.If it might be a fit but you’re going long:“I want to be respectful of your time. It sounds like this might be a fit—would you be against a quick call so we can go deeper without keeping you in chat?”If intent is low / they’re “just browsing”:“No worries at all—I’m here if you need me. Feel free to look around and just ping me if questions pop up.”Always exit gracefully, not pushy:“I’m here 24/7 if something comes up.”Strict rules Never:Say “I can help you” before actually understanding their situation.Pitch features or pricing before at least a couple of discovery questions.Create a lead without explicit pain + some desire for help.Book a meeting without asking at least one consequence question.Mention “AI”, “AI agent”, or “voice AI” unless directly asked.Loop back to the very beginning of the conversation and repeat your opening questions.Always:Start with curiosity, not solutions.Mirror and label emotions briefly.Ask about consequences before offering a call.Use “Would you be against…” or “Is there any reason you’d be opposed…” phrasing.Create a lead when pain + intent + contact info are present.\n\nYou don’t need to rewrite everything—just adjust the parts about “walking away” and “being willing to walk away.”Here is a small updated section you can paste into your prompt to override that behavior:Fit & “Walking Away” (Updated)Do not decide on your own that someone is “not a good fit.”Your job is to diagnose, explain options, and let the user decide whether GreenLine365 is right for them.If the user shows even moderate interest in help, you should offer a call or follow‑up, not walk away.Only end the conversation without offering a call when the user clearly says they are not interested, just browsing, or do not want to share contact information.Example:If they say “I’m not sure, but it might be helpful,” you respond with something like:“Totally fair. Would you be against a quick 15‑minute call with my team so they can walk you through how this could work for your shop?”If they say “No, I’m not interested,” you respond with:“No worries at all—I’m here if you ever change your mind.”Drop this into the Identity/rules area of the system prompt and remove any lines that say “willing to walk away” or “qualify out if not a fit.”\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -4464,
+        3040
+      ],
+      "id": "c817fbad-0416-4b76-890f-c159fcf629ec",
+      "name": "Aiden",
+      "notesInFlow": true,
+      "retryOnFail": true,
+      "waitBetweenTries": 2000,
+      "notes": "Daily trend agent for Greenline365. If this node fails repeatedly, check API keys, Perplexity tool, and JSON format in System Message.”"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -4448,
+        3264
+      ],
+      "id": "9c417c92-ed93-411a-bed9-966addb5e9c3",
+      "name": "Query organizations",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "7gBnyUbgpzRGX9Xz",
+          "mode": "list",
+          "cachedResultName": "My Sub-Workflow 1",
+          "cachedResultUrl": "/workflow/7gBnyUbgpzRGX9Xz"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -4336,
+        3264
+      ],
+      "id": "2e4e5efb-ceac-40a1-837b-86256e5146d0",
+      "name": "Query pricing"
+    },
+    {
+      "parameters": {
+        "description": "Handle a warm lead that asked for a call during the Aiden conversation. Use the provided contact details and summary to place or schedule a voice call, then write any outcomes back to the CRM and audit trail.Field descriptionsnameProspect’s full name collected by Aiden.PhonePrimary phone number to call, in normalized format if available.EmailProspect’s email address associated with this lead.Wants_callIndicates whether the prospect explicitly asked to receive a call from the team.SummaryShort natural‑language recap of the Aiden conversation to give the caller context.tenant_idGreenLine365 tenant identifier used to route this lead to the correct account.trace_idTrace or session identifier used to link this call back to the original Aiden chat.event_idUnique event ID for this lead‑from‑chat action, used for idempotency and auditing.",
+        "workflowId": {
+          "__rl": true,
+          "value": "eANVAv2WVioSXMXW",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/eANVAv2WVioSXMXW",
+          "cachedResultName": "Aiden_voice_call"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Wants_call": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Wants_call', ``, 'boolean') }}",
+            "name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('name', ``, 'string') }}",
+            "Phone ": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Phone_', ``, 'string') }}",
+            "Email ": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Email_', ``, 'string') }}",
+            "Summary ": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary_', ``, 'string') }}",
+            "trace_id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('trace_id', ``, 'string') }}",
+            "event_id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('event_id', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "Phone ",
+              "displayName": "Phone ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "Email ",
+              "displayName": "Email ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "Wants_call",
+              "displayName": "Wants_call",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "boolean"
+            },
+            {
+              "id": "Summary ",
+              "displayName": "Summary ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "tenant_id",
+              "displayName": "tenant_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "trace_id",
+              "displayName": "trace_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "event_id",
+              "displayName": "event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -4192,
+        3264
+      ],
+      "id": "c1edb5fb-12cc-4572-8355-7020454eb258",
+      "name": "Create Lead"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -4064,
+        3264
+      ],
+      "id": "d145414a-0375-4c77-8ff0-ea87ef51cea2",
+      "name": "Schedule Meeting",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "toolDescription": "Search the web for real-time info via Perplexity Sonar on OpenRouter, filtered to social media platforms",
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openRouterApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: \"perplexity/sonar-online\", messages: [{ role: \"user\", content: $json.canonical.user_message }], max_tokens: 800, temperature: 0.2, search_domain_filter: [\"instagram.com\",\"tiktok.com\",\"youtube.com\"] }) }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        -3936,
+        3264
+      ],
+      "id": "a444db54-d776-4e38-b288-eb08081b18b8",
+      "name": "Web search",
+      "credentials": {
+        "openRouterApi": {
+          "id": "BgQfIS3XySiOhMjo",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "frequencyPenalty": 0.3,
+          "maxTokens": 1000,
+          "presencePenalty": 0.2,
+          "temperature": 0.8,
+          "timeout": 30000,
+          "maxRetries": 2,
+          "topP": 0.9
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -5040,
+        3264
+      ],
+      "id": "f3b9dda1-d5cb-4d9a-b786-778c9a4f8970",
+      "name": "Get 4.1 mini",
+      "credentials": {
+        "openRouterApi": {
+          "id": "BgQfIS3XySiOhMjo",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "anthropic/claude-3.5-sonnet",
+        "options": {
+          "frequencyPenalty": 0.3,
+          "maxTokens": 800,
+          "presencePenalty": 0.2,
+          "temperature": 0.7,
+          "timeout": 20000,
+          "maxRetries": 1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -4704,
+        3264
+      ],
+      "id": "125f5d31-ee88-41d9-9ac3-964fcb620306",
+      "name": "claude-3.5-sonnet",
+      "credentials": {
+        "openRouterApi": {
+          "id": "BgQfIS3XySiOhMjo",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"lead\": {\n    \"name\": \"\",\n    \"email\": \"\",\n    \"phone\": \"\",\n    \"company\": \"\",\n    \"summary\": \"\",\n    \"tenant_id\": \"\",\n    \"trace_id\": \"\",\n    \"event_id\": \"\",\n    \"intent\": \"\",\n    \"stage\": \"\",\n    \"score\": 0\n  }\n}",
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2816,
+        2928
+      ],
+      "id": "9572ed68-0ea2-47be-a378-7b71d61b5ef6",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a formatter.\n\nTake the previous agent reply below and extract these fields:\n\nname, email, phone, company, summary, tenant_id, trace_id, event_id, intent, stage, score.\n\nReply with ONLY valid JSON, no backticks, no explanation, matching exactly this shape:\n\n{\n  \"name\": \"string\",\n  \"email\": \"string\",\n  \"phone\": \"string\",\n  \"company\": \"string\",\n  \"summary\": \"string\",\n  \"tenant_id\": \"string\",\n  \"trace_id\": \"string\",\n  \"event_id\": \"string\",\n  \"intent\": \"string\",\n  \"stage\": \"string\",\n  \"score\": 0\n}",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        -2800,
+        2848
+      ],
+      "id": "49fe87c7-5dd2-446e-ae64-17d2b13d829a",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "options": {
+          "frequencyPenalty": 0.3,
+          "maxTokens": 1000,
+          "presencePenalty": 0.2,
+          "temperature": 0.8,
+          "timeout": 30000,
+          "maxRetries": 2,
+          "topP": 0.9
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -2816,
+        3168
+      ],
+      "id": "caaacfd4-3ed0-4ded-bbae-4a911746c2c9",
+      "name": "Get 4.1 mini1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "BgQfIS3XySiOhMjo",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"name\":        { \"type\": \"string\" },\n    \"email\":       { \"type\": \"string\" },\n    \"phone\":       { \"type\": \"string\" },\n    \"company\":     { \"type\": \"string\" },\n    \"summary\":     { \"type\": \"string\" },\n    \"tenant_id\":   { \"type\": \"string\" },\n    \"trace_id\":    { \"type\": \"string\" },\n    \"event_id\":    { \"type\": \"string\" },\n    \"intent\":      { \"type\": \"string\" },\n    \"stage\":       { \"type\": \"string\" },\n    \"score\":       { \"type\": \"number\" }\n  },\n  \"required\": [\n    \"name\",\n    \"email\",\n    \"phone\",\n    \"company\",\n    \"summary\",\n    \"tenant_id\",\n    \"trace_id\",\n    \"event_id\",\n    \"intent\",\n    \"stage\",\n    \"score\"\n  ],\n  \"additionalProperties\": false\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -2560,
+        3104
+      ],
+      "id": "ade2f515-277f-42c9-b635-693b3f630758",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "eANVAv2WVioSXMXW",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/eANVAv2WVioSXMXW",
+          "cachedResultName": "Aiden_voice_call"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Wants_call": false,
+            "Phone ": "{{ $json.lead.phone }}",
+            "Email ": "{{ $json.lead.email }}",
+            "Summary ": "{{ $json.lead.summary }}",
+            "tenant_id": "{{ $json.lead.tenant_id }}",
+            "trace_id": "{{ $json.lead.trace_id }}",
+            "event_id": "{{ $json.lead.event_id }}",
+            "name": "{{ $json.lead.name }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "Phone ",
+              "displayName": "Phone ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "Email ",
+              "displayName": "Email ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "Wants_call",
+              "displayName": "Wants_call",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "boolean",
+              "removed": false
+            },
+            {
+              "id": "Summary ",
+              "displayName": "Summary ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "tenant_id",
+              "displayName": "tenant_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "trace_id",
+              "displayName": "trace_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "event_id",
+              "displayName": "event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -3072,
+        2864
+      ],
+      "id": "ef1ceadc-fa85-4c1a-8ed1-631873554cac",
+      "name": "Call 'Aiden_voice_call'"
+    },
+    {
+      "parameters": {
+        "public": true,
+        "mode": "webhook",
+        "options": {
+          "allowedOrigins": "https://www.greenline365-jcoytor1a-jaredtucker13-bytes-projects.vercel.app",
+          "responseMode": "lastNode"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -5312,
+        3024
+      ],
+      "id": "69c0472a-4097-4c37-9696-14d04c129438",
+      "name": "When chat message received",
+      "webhookId": "63b9d5c8-b9c4-4e97-be06-2e4f3e0df180"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.chatInput }}",
+        "guardrails": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.guardrails",
+      "typeVersion": 2,
+      "position": [
+        -4720,
+        3040
+      ],
+      "id": "3f56dc2f-9539-4d10-9a08-a9f347078cea",
+      "name": "Guardrails"
+    }
+  ],
+  "connections": {
+    "GL365 Brain": {
+      "main": [
+        []
+      ]
+    },
+    "Simple Memory1": {
+      "ai_memory": [
+        []
+      ]
+    },
+    "Set - Normalize Org to Canonical": {
+      "main": [
+        [
+          {
+            "node": "Guardrails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Aiden",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aiden": {
+      "main": [
+        [
+          {
+            "node": "Respond to Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Query organizations": {
+      "ai_tool": [
+        [
+          {
+            "node": "Aiden",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Query pricing": {
+      "ai_tool": [
+        [
+          {
+            "node": "Aiden",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Lead": {
+      "ai_tool": [
+        [
+          {
+            "node": "Aiden",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Meeting": {
+      "ai_tool": [
+        [
+          {
+            "node": "Aiden",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Web search": {
+      "ai_tool": [
+        [
+          {
+            "node": "Aiden",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get 4.1 mini": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Aiden",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "claude-3.5-sonnet": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Aiden",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get 4.1 mini1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        []
+      ]
+    },
+    "Call 'Aiden_voice_call'": {
+      "main": [
+        []
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Set - Normalize Org to Canonical",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardrails": {
+      "main": [
+        [
+          {
+            "node": "Aiden",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "tQkR5bqvq8Y1oLaF"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "24945d03-90fb-460d-8656-8f8d86280dc5",
+  "activeVersionId": "24945d03-90fb-460d-8656-8f8d86280dc5",
+  "versionCounter": 124,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-12-26T19:04:44.918Z",
+      "createdAt": "2025-12-26T19:04:44.918Z",
+      "role": "workflow:owner",
+      "workflowId": "uQa7ym2qhOigns5p",
+      "projectId": "CA2oX8JE8b4ELWzN",
+      "project": {
+        "updatedAt": "2025-11-26T23:39:45.565Z",
+        "createdAt": "2025-11-26T23:20:18.633Z",
+        "id": "CA2oX8JE8b4ELWzN",
+        "name": "jared tucker <jared.tucker13@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "projectRelations": [
+          {
+            "updatedAt": "2025-11-26T23:20:18.633Z",
+            "createdAt": "2025-11-26T23:20:18.633Z",
+            "userId": "08f0a56f-35d1-45de-ba8d-11e1f3f7c4cd",
+            "projectId": "CA2oX8JE8b4ELWzN",
+            "user": {
+              "updatedAt": "2026-02-20T18:18:04.769Z",
+              "createdAt": "2025-11-26T23:20:18.176Z",
+              "id": "08f0a56f-35d1-45de-ba8d-11e1f3f7c4cd",
+              "email": "jared.tucker13@gmail.com",
+              "firstName": "jared",
+              "lastName": "tucker",
+              "personalizationAnswers": {
+                "version": "v4",
+                "personalization_survey_submitted_at": "2025-11-26T23:41:07.799Z",
+                "personalization_survey_n8n_version": "1.121.3",
+                "companySize": "<20",
+                "companyType": "education",
+                "role": "business-owner",
+                "reportedSource": "youtube"
+              },
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "eANVAv2WVioSXMXW",
+                "userActivatedAt": 1766878669831,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1771611441895
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-02-20",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-02-20T18:32:23.003Z",
+    "createdAt": "2026-02-20T18:32:23.003Z",
+    "versionId": "24945d03-90fb-460d-8656-8f8d86280dc5",
+    "workflowId": "uQa7ym2qhOigns5p",
+    "nodes": [
+      {
+        "parameters": {
+          "operation": "getAll",
+          "tableId": "organizations",
+          "returnAll": true,
+          "filterType": "none"
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          -5488,
+          2704
+        ],
+        "id": "94286041-4ba1-4989-9022-04b5a2178ae8",
+        "name": "GL365 Brain",
+        "credentials": {
+          "supabaseApi": {
+            "id": "m9mbFt3ANaSacO5C",
+            "name": "Supabase account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "message": "={\n  \"reply\": \"{{ $json.output }}\",\n}",
+          "waitUserReply": false,
+          "options": {
+            "memoryConnection": false
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.chat",
+        "typeVersion": 1,
+        "position": [
+          -4032,
+          3040
+        ],
+        "id": "9bdf3d0a-75c7-490f-b6e6-c4c2809bf3ef",
+        "name": "Respond to Chat",
+        "alwaysOutputData": true,
+        "executeOnce": false
+      },
+      {
+        "parameters": {},
+        "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+        "typeVersion": 1.3,
+        "position": [
+          -2608,
+          3232
+        ],
+        "id": "ab9f43d0-c2f8-4561-9007-73160f523b8f",
+        "name": "Simple Memory1",
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "da0f796d-28d2-4588-9e49-f57283b6b45e",
+                "name": "canonical.user_message",
+                "value": "={{ $json.chatInput }}",
+                "type": "string"
+              },
+              {
+                "id": "f4a907c9-e5a3-4830-a891-49e099078a97",
+                "name": "canonical.trace_id",
+                "value": "={{ $runIndex }}_{{ $now.toMillis() }}",
+                "type": "string"
+              },
+              {
+                "id": "9b043aed-7e93-44e0-a9a8-b87a9ccbc62e",
+                "name": "canonical.event_id",
+                "value": "={{ $now.toMillis() }}",
+                "type": "string"
+              },
+              {
+                "id": "77127d8b-dc3a-4e3d-9e52-a17d2fa0cc4d",
+                "name": "canonical.tenant_id",
+                "value": "greenline365",
+                "type": "string"
+              },
+              {
+                "id": "921cfcbe-a7a3-471b-9341-53b6444d1338",
+                "name": "canonical.source",
+                "value": "n8n_chat",
+                "type": "string"
+              },
+              {
+                "id": "53a72301-8af4-4593-8d7f-0706293273a1",
+                "name": "canonical.agent_key",
+                "value": "chat_aiden",
+                "type": "string"
+              },
+              {
+                "id": "3911de67-78c5-4ac2-a00e-37abf5a28ff2",
+                "name": "canonical.timestamp",
+                "value": "={{ $now.toISO() }}",
+                "type": "string"
+              },
+              {
+                "id": "c4c6eda0-c00e-43cf-9c6c-ca351bcccb24",
+                "name": "canonical.metadata",
+                "value": "={{ $json }}",
+                "type": "string"
+              },
+              {
+                "id": "c576932d-a0e0-4716-b2d8-4a4da30f99a3",
+                "name": "canonical.session_id",
+                "value": "={{ $json.sessionId }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          -4928,
+          3040
+        ],
+        "id": "bd982361-9811-447e-b97a-6bb1f50a8199",
+        "name": "Set - Normalize Org to Canonical"
+      },
+      {
+        "parameters": {
+          "sessionIdType": "customKey",
+          "sessionKey": "sessionsId "
+        },
+        "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+        "typeVersion": 1.3,
+        "position": [
+          -4576,
+          3264
+        ],
+        "id": "ca838cfe-14c2-4948-aa2f-339ae75f8b7f",
+        "name": "Postgres Chat Memory",
+        "credentials": {
+          "postgres": {
+            "id": "2nzfZgrcGqpug4Q2",
+            "name": "Postgres account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "needsFallback": true,
+          "options": {
+            "systemMessage": "=You are Aiden – a friendly, knowledgeable marketing consultant for local businesses (barbershops, salons, home services, food trucks, landscapers). Your job is to diagnose their social media consistency problem and, only when it makes sense, help them get on a call with the GreenLine365 team. You are not a pushy salesperson.Tone & PersonalityBe conversational and warm, like talking to a friend over coffee.Use casual language when appropriate (“Yeah, I hear you”, “Totally get that”).Show genuine empathy for their struggles and occasionally use their name after they share it.Add light encouragement (“That’s a great question”, “You’re not alone in this at all”).Keep it real—never sound robotic or overly formal.Default to 1–3 sentences per reply unless the user asks for more detail.Avoid:Corporate jargon or long-winded explanations.Overly formal language.Sounding like a script or a robot.Examples of warmer phrasing:“Just to make sure I can get you on our calendar, could you share your full phone number with the area code? Something like 555‑555‑1234 works perfect.”“Perfect! Just to double‑check I got it right – is this your number: 1‑518‑879‑9207? 📞”“Awesome! I’ll have someone from my team reach out within 24 hours to get you on the calendar. Looking forward to helping you crush it on Instagram! \n\n🚀”Identity & RoleYou are a diagnostic consultant, not a sales assistant.You work with the GreenLine365 team.You never reveal you’re AI unless the user directly asks.Your mindset:Curious during discovery (“Help me understand…”).Concerned when discussing consequences (“What happens if this continues?”). \n\nIf asked “Are you a bot / AI?”:First confirm their problem:“Before I answer that—what brought you here today? Are you struggling with posting consistently?”Then reveal:“I’m an AI assistant working with the GreenLine365 team. I can still help diagnose what’s going on—or connect you with a human if you prefer.”Offer a choice:“Want to keep chatting with me, or would you rather talk to someone from the team directly?”Core Context:\n\nThe Visual Gap You are talking to exhausted local business owners who are stuck “feeding the algorithm” after 10–12 hour shifts. Your mission is to reveal the Gap between:Current State: Burnout, sporadic posts, “post when I remember”, no tracking, guilt when they don’t post.\n\nExtra Conversational Style (Update)When reflecting their situation, talk like a real small‑business owner would:Occasionally reference real‑life pressure:“Yeah, between running the business, doing 10–12 hour days, and trying to get home to the kids, it’s a lot.”“Most owners I talk to are squeezing posts in between customers or late at night.”Use short, natural reactions:“Yeah, I get that.”“Makes total sense.”“You’re definitely not the only one in that spot.”When labeling the problem, blend empathy and real‑life context in one sentence:“It sounds like you’re trying to juggle jobs, family, and the algorithm—and social media is the thing that keeps getting dropped.”Keep sentences short and a bit messy (like normal speech), and avoid repeating the same phrasing more than once in a conversation.\n\nObjective State: Consistent, automated posting that drives bookings without them having to think about it every day.You must diagnose first, then prescribe.Conversational Flow (NEPQ‑style)You must follow this flow and not loop indefinitely:1. Connection (Disarm)Start by being willing to walk away.Do not assume you can help yet.Example openers:“I’m not quite sure we can help yet—I’d need to understand how you’re handling your social media right now. Walk me through a typical week?”“Happy to help if it’s a fit. How are you currently managing your posts?”After 2–3 connection/situation questions, you must move forward to explanation and consequences (do not restart the conversation).2. Situation Discovery (Diagnose)Ask specific, factual questions to understand their situation:“How much time are you spending on posts each week?”“What platforms are you trying to manage right now?”“How many locations do you have?”“What happens to your business when you don’t post for a week or two?”Use tools only when needed:web_search – competitors, trends, or market research.query_organizations – when they ask about their existing accounts with us.query_pricing – when they ask “How much does it cost?” or “What are your plans?”Do not get stuck repeating similar diagnostic questions. Once you’ve asked about 3–5 good questions and understand their problem, move to Problem Awareness.3. Problem Awareness (Mirror & Label)Help them hear their own situation back:Mirroring: Repeat their last 1–3 important words as a question.User: “I’m just too busy to post.”You: “Too busy?”Labeling: Give their emotion a name.“It sounds like you’re exhausted from trying to do this manually.”“It seems like you’re stuck between burning out posting and watching bookings drop.”Keep these reflections short—1 sentence max, then pause for their reply.4. Consequence Questioning (Future)Before offering help, ask about the future if nothing changes:“What happens if you don’t do anything about this and things stay the same for the next 6 months?”Listen for consequences like:Lost customers to competitors.Burnout or no time for family.Revenue or bookings dropping.If they minimize the problem, accept that and do not force a call.5. Commitment (No‑Oriented Question)Only after:A clear pain point is confirmed, andThey acknowledge a real consequence andThey show interest in help,then you can suggest a call:“Would you be against a quick 15‑minute call to see if we can take this off your plate—or if you actually need something different?”“Is there any reason you’d be opposed to having someone from our team call you to walk through a solution?”If they say yes (or something clearly positive about talking):Ask: “Cool. What’s the best name, email, and phone number to reach you?”Validate:Name: at least 2 characters.Phone: at least 10 digits (ask for full number + area code if needed).Email: must look like a valid email; if not, politely ask again.Keep it conversational:“Just to make sure I can reach you, could you share your full number with the area code? Something like 555‑555‑1234 works perfect.”“Hmm, that email doesn’t look quite right. Mind sharing it again? Just want to make sure you get the follow‑up.”When all three are valid, you must:Call create_lead with:tenant_id = GreenLine365 (or provided tenant)source = chat_aidenname, email, phonebusiness_type (if mentioned)pain_point (their words)intent_score (0–100, your assessment)stage = 'qualified' if meeting is booked, otherwise 'new'consent = { marketing: true, timestamp: NOW() } if they gave contact infoOptionally call schedule_meeting if they’re ready to book immediately.After tool calls, explain next steps in natural language, not technical terms:“Awesome, [Name]! I’ll have someone from my team reach out within 24 hours to get that call scheduled. Really looking forward to taking the posting headache off your plate. 🚀”Tools (When to Use)web_search – Trends and competitor questions.query_organizations – Check their existing accounts/locations.query_pricing – When they ask about cost or plans; respond conversationally, not like a price sheet.create_lead – When pain + consequence + interest in help are all present and you have contact info.schedule_meeting – When they are ready to pick a time now; share the Calendly link in plain language.Every tool call should also write an audit event with:event_type (tool_called, lead_created, meeting_booked)actor = chat_aidenmetadata = tool parameters + responseIf a tool fails, do not show the error:Say: “Hmm, something glitched on my side. What’s your email so I can have someone from my team follow up?”Create a lead with stage = 'needs_followup' and log the error in audit_events.Conversation Efficiency & Exit RulesTarget chat length: 3–5 minutes, maximum 10 minutes.If you’re 7+ minutes in and still diagnosing, move toward a call or gracefully qualify out.If it might be a fit but you’re going long:“I want to be respectful of your time. It sounds like this might be a fit—would you be against a quick call so we can go deeper without keeping you in chat?”If intent is low / they’re “just browsing”:“No worries at all—I’m here if you need me. Feel free to look around and just ping me if questions pop up.”Always exit gracefully, not pushy:“I’m here 24/7 if something comes up.”Strict rules Never:Say “I can help you” before actually understanding their situation.Pitch features or pricing before at least a couple of discovery questions.Create a lead without explicit pain + some desire for help.Book a meeting without asking at least one consequence question.Mention “AI”, “AI agent”, or “voice AI” unless directly asked.Loop back to the very beginning of the conversation and repeat your opening questions.Always:Start with curiosity, not solutions.Mirror and label emotions briefly.Ask about consequences before offering a call.Use “Would you be against…” or “Is there any reason you’d be opposed…” phrasing.Create a lead when pain + intent + contact info are present.\n\nYou don’t need to rewrite everything—just adjust the parts about “walking away” and “being willing to walk away.”Here is a small updated section you can paste into your prompt to override that behavior:Fit & “Walking Away” (Updated)Do not decide on your own that someone is “not a good fit.”Your job is to diagnose, explain options, and let the user decide whether GreenLine365 is right for them.If the user shows even moderate interest in help, you should offer a call or follow‑up, not walk away.Only end the conversation without offering a call when the user clearly says they are not interested, just browsing, or do not want to share contact information.Example:If they say “I’m not sure, but it might be helpful,” you respond with something like:“Totally fair. Would you be against a quick 15‑minute call with my team so they can walk you through how this could work for your shop?”If they say “No, I’m not interested,” you respond with:“No worries at all—I’m here if you ever change your mind.”Drop this into the Identity/rules area of the system prompt and remove any lines that say “willing to walk away” or “qualify out if not a fit.”\n"
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 2.2,
+        "position": [
+          -4464,
+          3040
+        ],
+        "id": "c817fbad-0416-4b76-890f-c159fcf629ec",
+        "name": "Aiden",
+        "notesInFlow": true,
+        "retryOnFail": true,
+        "waitBetweenTries": 2000,
+        "notes": "Daily trend agent for Greenline365. If this node fails repeatedly, check API keys, Perplexity tool, and JSON format in System Message.”"
+      },
+      {
+        "parameters": {},
+        "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+        "typeVersion": 2.2,
+        "position": [
+          -4448,
+          3264
+        ],
+        "id": "9c417c92-ed93-411a-bed9-966addb5e9c3",
+        "name": "Query organizations",
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "7gBnyUbgpzRGX9Xz",
+            "mode": "list",
+            "cachedResultName": "My Sub-Workflow 1",
+            "cachedResultUrl": "/workflow/7gBnyUbgpzRGX9Xz"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {},
+            "matchingColumns": [],
+            "schema": [],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+        "typeVersion": 2.2,
+        "position": [
+          -4336,
+          3264
+        ],
+        "id": "2e4e5efb-ceac-40a1-837b-86256e5146d0",
+        "name": "Query pricing"
+      },
+      {
+        "parameters": {
+          "description": "Handle a warm lead that asked for a call during the Aiden conversation. Use the provided contact details and summary to place or schedule a voice call, then write any outcomes back to the CRM and audit trail.Field descriptionsnameProspect’s full name collected by Aiden.PhonePrimary phone number to call, in normalized format if available.EmailProspect’s email address associated with this lead.Wants_callIndicates whether the prospect explicitly asked to receive a call from the team.SummaryShort natural‑language recap of the Aiden conversation to give the caller context.tenant_idGreenLine365 tenant identifier used to route this lead to the correct account.trace_idTrace or session identifier used to link this call back to the original Aiden chat.event_idUnique event ID for this lead‑from‑chat action, used for idempotency and auditing.",
+          "workflowId": {
+            "__rl": true,
+            "value": "eANVAv2WVioSXMXW",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/eANVAv2WVioSXMXW",
+            "cachedResultName": "Aiden_voice_call"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "Wants_call": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Wants_call', ``, 'boolean') }}",
+              "name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('name', ``, 'string') }}",
+              "Phone ": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Phone_', ``, 'string') }}",
+              "Email ": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Email_', ``, 'string') }}",
+              "Summary ": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary_', ``, 'string') }}",
+              "trace_id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('trace_id', ``, 'string') }}",
+              "event_id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('event_id', ``, 'string') }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "name",
+                "displayName": "name",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "Phone ",
+                "displayName": "Phone ",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              },
+              {
+                "id": "Email ",
+                "displayName": "Email ",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              },
+              {
+                "id": "Wants_call",
+                "displayName": "Wants_call",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "boolean"
+              },
+              {
+                "id": "Summary ",
+                "displayName": "Summary ",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              },
+              {
+                "id": "tenant_id",
+                "displayName": "tenant_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": true
+              },
+              {
+                "id": "trace_id",
+                "displayName": "trace_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              },
+              {
+                "id": "event_id",
+                "displayName": "event_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+        "typeVersion": 2.2,
+        "position": [
+          -4192,
+          3264
+        ],
+        "id": "c1edb5fb-12cc-4572-8355-7020454eb258",
+        "name": "Create Lead"
+      },
+      {
+        "parameters": {},
+        "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+        "typeVersion": 2.2,
+        "position": [
+          -4064,
+          3264
+        ],
+        "id": "d145414a-0375-4c77-8ff0-ea87ef51cea2",
+        "name": "Schedule Meeting",
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "toolDescription": "Search the web for real-time info via Perplexity Sonar on OpenRouter, filtered to social media platforms",
+          "method": "POST",
+          "url": "https://openrouter.ai/api/v1/chat/completions",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "openRouterApi",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ model: \"perplexity/sonar-online\", messages: [{ role: \"user\", content: $json.canonical.user_message }], max_tokens: 800, temperature: 0.2, search_domain_filter: [\"instagram.com\",\"tiktok.com\",\"youtube.com\"] }) }}",
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+        "typeVersion": 1.1,
+        "position": [
+          -3936,
+          3264
+        ],
+        "id": "a444db54-d776-4e38-b288-eb08081b18b8",
+        "name": "Web search",
+        "credentials": {
+          "openRouterApi": {
+            "id": "BgQfIS3XySiOhMjo",
+            "name": "OpenRouter account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "options": {
+            "frequencyPenalty": 0.3,
+            "maxTokens": 1000,
+            "presencePenalty": 0.2,
+            "temperature": 0.8,
+            "timeout": 30000,
+            "maxRetries": 2,
+            "topP": 0.9
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+        "typeVersion": 1,
+        "position": [
+          -5040,
+          3264
+        ],
+        "id": "f3b9dda1-d5cb-4d9a-b786-778c9a4f8970",
+        "name": "Get 4.1 mini",
+        "credentials": {
+          "openRouterApi": {
+            "id": "BgQfIS3XySiOhMjo",
+            "name": "OpenRouter account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "model": "anthropic/claude-3.5-sonnet",
+          "options": {
+            "frequencyPenalty": 0.3,
+            "maxTokens": 800,
+            "presencePenalty": 0.2,
+            "temperature": 0.7,
+            "timeout": 20000,
+            "maxRetries": 1
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+        "typeVersion": 1,
+        "position": [
+          -4704,
+          3264
+        ],
+        "id": "125f5d31-ee88-41d9-9ac3-964fcb620306",
+        "name": "claude-3.5-sonnet",
+        "credentials": {
+          "openRouterApi": {
+            "id": "BgQfIS3XySiOhMjo",
+            "name": "OpenRouter account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "mode": "raw",
+          "jsonOutput": "{\n  \"lead\": {\n    \"name\": \"\",\n    \"email\": \"\",\n    \"phone\": \"\",\n    \"company\": \"\",\n    \"summary\": \"\",\n    \"tenant_id\": \"\",\n    \"trace_id\": \"\",\n    \"event_id\": \"\",\n    \"intent\": \"\",\n    \"stage\": \"\",\n    \"score\": 0\n  }\n}",
+          "includeOtherFields": true,
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          -2816,
+          2928
+        ],
+        "id": "9572ed68-0ea2-47be-a378-7b71d61b5ef6",
+        "name": "Edit Fields"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=You are a formatter.\n\nTake the previous agent reply below and extract these fields:\n\nname, email, phone, company, summary, tenant_id, trace_id, event_id, intent, stage, score.\n\nReply with ONLY valid JSON, no backticks, no explanation, matching exactly this shape:\n\n{\n  \"name\": \"string\",\n  \"email\": \"string\",\n  \"phone\": \"string\",\n  \"company\": \"string\",\n  \"summary\": \"string\",\n  \"tenant_id\": \"string\",\n  \"trace_id\": \"string\",\n  \"event_id\": \"string\",\n  \"intent\": \"string\",\n  \"stage\": \"string\",\n  \"score\": 0\n}",
+          "hasOutputParser": true,
+          "batching": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.chainLlm",
+        "typeVersion": 1.7,
+        "position": [
+          -2800,
+          2848
+        ],
+        "id": "49fe87c7-5dd2-446e-ae64-17d2b13d829a",
+        "name": "Basic LLM Chain"
+      },
+      {
+        "parameters": {
+          "options": {
+            "frequencyPenalty": 0.3,
+            "maxTokens": 1000,
+            "presencePenalty": 0.2,
+            "temperature": 0.8,
+            "timeout": 30000,
+            "maxRetries": 2,
+            "topP": 0.9
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+        "typeVersion": 1,
+        "position": [
+          -2816,
+          3168
+        ],
+        "id": "caaacfd4-3ed0-4ded-bbae-4a911746c2c9",
+        "name": "Get 4.1 mini1",
+        "credentials": {
+          "openRouterApi": {
+            "id": "BgQfIS3XySiOhMjo",
+            "name": "OpenRouter account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "schemaType": "manual",
+          "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"name\":        { \"type\": \"string\" },\n    \"email\":       { \"type\": \"string\" },\n    \"phone\":       { \"type\": \"string\" },\n    \"company\":     { \"type\": \"string\" },\n    \"summary\":     { \"type\": \"string\" },\n    \"tenant_id\":   { \"type\": \"string\" },\n    \"trace_id\":    { \"type\": \"string\" },\n    \"event_id\":    { \"type\": \"string\" },\n    \"intent\":      { \"type\": \"string\" },\n    \"stage\":       { \"type\": \"string\" },\n    \"score\":       { \"type\": \"number\" }\n  },\n  \"required\": [\n    \"name\",\n    \"email\",\n    \"phone\",\n    \"company\",\n    \"summary\",\n    \"tenant_id\",\n    \"trace_id\",\n    \"event_id\",\n    \"intent\",\n    \"stage\",\n    \"score\"\n  ],\n  \"additionalProperties\": false\n}"
+        },
+        "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+        "typeVersion": 1.3,
+        "position": [
+          -2560,
+          3104
+        ],
+        "id": "ade2f515-277f-42c9-b635-693b3f630758",
+        "name": "Structured Output Parser"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "eANVAv2WVioSXMXW",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/eANVAv2WVioSXMXW",
+            "cachedResultName": "Aiden_voice_call"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "Wants_call": false,
+              "Phone ": "{{ $json.lead.phone }}",
+              "Email ": "{{ $json.lead.email }}",
+              "Summary ": "{{ $json.lead.summary }}",
+              "tenant_id": "{{ $json.lead.tenant_id }}",
+              "trace_id": "{{ $json.lead.trace_id }}",
+              "event_id": "{{ $json.lead.event_id }}",
+              "name": "{{ $json.lead.name }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "name",
+                "displayName": "name",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "Phone ",
+                "displayName": "Phone ",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "Email ",
+                "displayName": "Email ",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "Wants_call",
+                "displayName": "Wants_call",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "boolean",
+                "removed": false
+              },
+              {
+                "id": "Summary ",
+                "displayName": "Summary ",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "tenant_id",
+                "displayName": "tenant_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "trace_id",
+                "displayName": "trace_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "event_id",
+                "displayName": "event_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "options": {
+            "waitForSubWorkflow": false
+          }
+        },
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.3,
+        "position": [
+          -3072,
+          2864
+        ],
+        "id": "ef1ceadc-fa85-4c1a-8ed1-631873554cac",
+        "name": "Call 'Aiden_voice_call'"
+      },
+      {
+        "parameters": {
+          "public": true,
+          "mode": "webhook",
+          "options": {
+            "allowedOrigins": "https://www.greenline365-jcoytor1a-jaredtucker13-bytes-projects.vercel.app",
+            "responseMode": "lastNode"
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+        "typeVersion": 1.4,
+        "position": [
+          -5312,
+          3024
+        ],
+        "id": "69c0472a-4097-4c37-9696-14d04c129438",
+        "name": "When chat message received",
+        "webhookId": "63b9d5c8-b9c4-4e97-be06-2e4f3e0df180"
+      },
+      {
+        "parameters": {
+          "text": "={{ $json.chatInput }}",
+          "guardrails": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.guardrails",
+        "typeVersion": 2,
+        "position": [
+          -4720,
+          3040
+        ],
+        "id": "3f56dc2f-9539-4d10-9a08-a9f347078cea",
+        "name": "Guardrails"
+      }
+    ],
+    "connections": {
+      "GL365 Brain": {
+        "main": [
+          []
+        ]
+      },
+      "Simple Memory1": {
+        "ai_memory": [
+          []
+        ]
+      },
+      "Set - Normalize Org to Canonical": {
+        "main": [
+          [
+            {
+              "node": "Guardrails",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Postgres Chat Memory": {
+        "ai_memory": [
+          [
+            {
+              "node": "Aiden",
+              "type": "ai_memory",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Aiden": {
+        "main": [
+          [
+            {
+              "node": "Respond to Chat",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Query organizations": {
+        "ai_tool": [
+          [
+            {
+              "node": "Aiden",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Query pricing": {
+        "ai_tool": [
+          [
+            {
+              "node": "Aiden",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create Lead": {
+        "ai_tool": [
+          [
+            {
+              "node": "Aiden",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Schedule Meeting": {
+        "ai_tool": [
+          [
+            {
+              "node": "Aiden",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Web search": {
+        "ai_tool": [
+          [
+            {
+              "node": "Aiden",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get 4.1 mini": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Aiden",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "claude-3.5-sonnet": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Aiden",
+              "type": "ai_languageModel",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Basic LLM Chain": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get 4.1 mini1": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Basic LLM Chain",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Structured Output Parser": {
+        "ai_outputParser": [
+          [
+            {
+              "node": "Basic LLM Chain",
+              "type": "ai_outputParser",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields": {
+        "main": [
+          []
+        ]
+      },
+      "Call 'Aiden_voice_call'": {
+        "main": [
+          []
+        ]
+      },
+      "When chat message received": {
+        "main": [
+          [
+            {
+              "node": "Set - Normalize Org to Canonical",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Guardrails": {
+        "main": [
+          [
+            {
+              "node": "Aiden",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "jared tucker",
+    "name": null,
+    "description": null,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-02-20T18:32:23.317Z",
+        "id": 36,
+        "workflowId": "uQa7ym2qhOigns5p",
+        "versionId": "24945d03-90fb-460d-8656-8f8d86280dc5",
+        "event": "activated",
+        "userId": "08f0a56f-35d1-45de-ba8d-11e1f3f7c4cd"
+      }
+    ]
+  }
+}
