@@ -149,7 +149,7 @@ export default function Navbar() {
               transition={{ delay: 0.3 }}
             >
               <motion.div 
-                className="w-2 h-2 rounded-full bg-greenline shadow-intel-glow"
+                className="w-2 h-2 rounded-full bg-gold shadow-gold-glow"
                 animate={{ opacity: [1, 0.5, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
               />
@@ -292,7 +292,7 @@ export default function Navbar() {
             {/* Mobile Menu Button */}
             <motion.button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden w-10 h-10 flex items-center justify-center rounded-lg glass hover:glass-green transition-all"
+              className="md:hidden w-10 h-10 flex items-center justify-center rounded-lg glass hover:glass-gold transition-all"
               whileTap={{ scale: 0.95 }}
             >
               <svg 
@@ -348,7 +348,7 @@ export default function Navbar() {
                   >
                     {link.dropdown ? (
                       <div>
-                        <div className="block w-full p-4 text-center text-2xl font-display font-bold text-neon-green-500">
+                        <div className="block w-full p-4 text-center text-2xl font-display font-bold text-gold-400">
                           {link.label}
                         </div>
                         {link.dropdown.map((item) => (
@@ -356,7 +356,7 @@ export default function Navbar() {
                             key={item.href}
                             href={item.href}
                             onClick={() => setMobileMenuOpen(false)}
-                            className="block w-full p-3 text-center text-lg text-white/80 hover:text-neon-green-500 transition-all duration-300 rounded-xl hover:glass-green"
+                            className="block w-full p-3 text-center text-lg text-white/80 hover:text-gold-400 transition-all duration-300 rounded-xl hover:glass-gold"
                           >
                             {item.label}
                           </Link>
@@ -366,7 +366,7 @@ export default function Navbar() {
                       <Link
                         href={link.href}
                         onClick={() => setMobileMenuOpen(false)}
-                        className="block w-full p-4 text-center text-2xl font-display font-bold text-white hover:text-neon-green-500 transition-all duration-300 rounded-xl hover:glass-green"
+                        className="block w-full p-4 text-center text-2xl font-display font-bold text-white hover:text-gold-400 transition-all duration-300 rounded-xl hover:glass-gold"
                       >
                         {link.label}
                       </Link>
@@ -388,7 +388,7 @@ export default function Navbar() {
                           <Link
                             href="/god-mode"
                             onClick={() => setMobileMenuOpen(false)}
-                            className="block w-full p-4 text-center text-xl font-semibold text-red-400 rounded-xl glass-green"
+                            className="block w-full p-4 text-center text-xl font-semibold text-red-400 rounded-xl glass-gold"
                           >
                             God Mode
                           </Link>
@@ -397,7 +397,7 @@ export default function Navbar() {
                           <Link
                             href="/dashboard"
                             onClick={() => setMobileMenuOpen(false)}
-                            className="block w-full p-4 text-center text-xl font-semibold text-neon-green-500 rounded-xl glass-green"
+                            className="block w-full p-4 text-center text-xl font-semibold text-gold-400 rounded-xl glass-gold"
                           >
                             Dashboard
                           </Link>
@@ -414,7 +414,7 @@ export default function Navbar() {
                         <Link
                           href="/register-business"
                           onClick={() => setMobileMenuOpen(false)}
-                          className="block w-full p-4 text-center text-xl font-bold bg-neon-green-500 text-black rounded-xl"
+                          className="block w-full p-4 text-center text-xl font-bold bg-gold text-black rounded-xl"
                         >
                           Add Your Business
                         </Link>
@@ -432,8 +432,8 @@ export default function Navbar() {
               </div>
               
               {/* Decorative Elements */}
-              <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-radial-green opacity-20 blur-3xl" />
-              <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-radial-teal opacity-20 blur-3xl" />
+              <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-gold/10 opacity-20 blur-3xl rounded-full" />
+              <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-gold/10 opacity-20 blur-3xl rounded-full" />
             </motion.div>
           </motion.div>
         )}
