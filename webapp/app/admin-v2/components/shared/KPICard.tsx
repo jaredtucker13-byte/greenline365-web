@@ -53,11 +53,11 @@ export interface KPICardProps {
 
 const colorConfig = {
   emerald: {
-    gradient: 'from-emerald-500/10 to-emerald-600/5',
-    border: 'border-emerald-500/20',
-    text: 'text-emerald-400',
-    iconBg: 'bg-emerald-500/20',
-    sparkline: '#10B981',
+    gradient: 'from-gold-500/10 to-gold-600/5',
+    border: 'border-gold-500/20',
+    text: 'text-gold-400',
+    iconBg: 'bg-gold-500/20',
+    sparkline: '#C9A96E',
   },
   blue: {
     gradient: 'from-blue-500/10 to-blue-600/5',
@@ -155,7 +155,7 @@ export function KPICard({
       {trend && (
         <div className="flex items-center gap-1 text-xs">
           <span className={
-            trend.direction === 'up' ? 'text-emerald-400' :
+            trend.direction === 'up' ? 'text-gold-400' :
             trend.direction === 'down' ? 'text-red-400' : 'text-white/50'
           }>
             {trend.direction === 'up' ? '↑' : trend.direction === 'down' ? '↓' : '→'} {trend.value}
@@ -175,7 +175,7 @@ export function KPICard({
       {meta?.lastProcessedAt && (
         <div className="absolute bottom-2 right-2">
           <div 
-            className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" 
+            className="w-2 h-2 rounded-full bg-gold-500 animate-pulse" 
             title={`Last updated: ${new Date(meta.lastProcessedAt).toLocaleString()}`}
           />
         </div>

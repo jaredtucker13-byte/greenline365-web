@@ -57,8 +57,8 @@ export default async function TermsPage() {
       <div className="max-w-5xl mx-auto px-6">
         {/* Header */}
         <header className="mb-10 md:mb-14">
-          <div className="flex items-center gap-2 text-emerald-400 text-sm font-medium mb-4">
-            <Link href="/" className="hover:text-emerald-300 transition">Home</Link>
+          <div className="flex items-center gap-2 text-gold-400 text-sm font-medium mb-4">
+            <Link href="/" className="hover:text-gold-300 transition">Home</Link>
             <span className="text-white/30">/</span>
             <span>Legal</span>
             <span className="text-white/30">/</span>
@@ -95,7 +95,7 @@ export default async function TermsPage() {
                   <li key={section.id}>
                     <a 
                       href={`#${section.id}`}
-                      className="text-sm text-white/60 hover:text-emerald-400 transition block py-1"
+                      className="text-sm text-white/60 hover:text-gold-400 transition block py-1"
                     >
                       {section.title}
                     </a>
@@ -115,7 +115,7 @@ export default async function TermsPage() {
             ) : (
               <>
             {/* Introduction Card */}
-            <div className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-500/20 rounded-xl p-6">
+            <div className="bg-gradient-to-br from-gold-500/10 to-gold-500/5 border border-gold-500/20 rounded-xl p-6">
               <p className="text-white/80 leading-relaxed">
                 Welcome to GreenLine365. These Terms of Service govern your use of our AI-powered 
                 business automation platform. Please read them carefully before using our services.
@@ -125,7 +125,7 @@ export default async function TermsPage() {
             {/* Section 1 */}
             <section id="acceptance" className="scroll-mt-24">
               <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">1</span>
+                <span className="flex items-center justify-center w-8 h-8 bg-gold-500/20 text-gold-400 text-sm font-bold rounded-lg">1</span>
                 Acceptance of Terms
               </h2>
               <p className="text-white/70 leading-relaxed">
@@ -139,7 +139,7 @@ export default async function TermsPage() {
             {/* Section 2 */}
             <section id="description" className="scroll-mt-24">
               <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">2</span>
+                <span className="flex items-center justify-center w-8 h-8 bg-gold-500/20 text-gold-400 text-sm font-bold rounded-lg">2</span>
                 Description of Service
               </h2>
               <p className="text-white/70 leading-relaxed mb-5">
@@ -149,8 +149,8 @@ export default async function TermsPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="bg-white/5 border border-white/10 rounded-lg p-4">
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center">
-                      <svg className="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div className="w-10 h-10 bg-gold-500/20 rounded-lg flex items-center justify-center">
+                      <svg className="w-5 h-5 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                     </div>
@@ -160,8 +160,8 @@ export default async function TermsPage() {
                 </div>
                 <div className="bg-white/5 border border-white/10 rounded-lg p-4">
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center">
-                      <svg className="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div className="w-10 h-10 bg-gold-500/20 rounded-lg flex items-center justify-center">
+                      <svg className="w-5 h-5 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                       </svg>
                     </div>
@@ -171,8 +171,8 @@ export default async function TermsPage() {
                 </div>
                 <div className="bg-white/5 border border-white/10 rounded-lg p-4">
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center">
-                      <svg className="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div className="w-10 h-10 bg-gold-500/20 rounded-lg flex items-center justify-center">
+                      <svg className="w-5 h-5 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                       </svg>
                     </div>
@@ -182,8 +182,8 @@ export default async function TermsPage() {
                 </div>
                 <div className="bg-white/5 border border-white/10 rounded-lg p-4">
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center">
-                      <svg className="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div className="w-10 h-10 bg-gold-500/20 rounded-lg flex items-center justify-center">
+                      <svg className="w-5 h-5 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                     </div>
@@ -197,7 +197,7 @@ export default async function TermsPage() {
             {/* Section 3 - Directory Listing Terms */}
             <section id="directory-terms" className="scroll-mt-24">
               <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">3</span>
+                <span className="flex items-center justify-center w-8 h-8 bg-gold-500/20 text-gold-400 text-sm font-bold rounded-lg">3</span>
                 Directory Listing Terms
               </h2>
               <div className="space-y-4">
@@ -231,7 +231,7 @@ export default async function TermsPage() {
             {/* Section 4 - Reviews Policy */}
             <section id="reviews-policy" className="scroll-mt-24">
               <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">4</span>
+                <span className="flex items-center justify-center w-8 h-8 bg-gold-500/20 text-gold-400 text-sm font-bold rounded-lg">4</span>
                 Reviews Policy
               </h2>
               <div className="space-y-4">
@@ -259,7 +259,7 @@ export default async function TermsPage() {
             {/* Section 5 - Transaction & Interaction Fees */}
             <section id="transaction-fees" className="scroll-mt-24">
               <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">5</span>
+                <span className="flex items-center justify-center w-8 h-8 bg-gold-500/20 text-gold-400 text-sm font-bold rounded-lg">5</span>
                 Transaction & Interaction Fees
               </h2>
               <div className="space-y-4">
@@ -287,7 +287,7 @@ export default async function TermsPage() {
             {/* Section 6 - AI Disclaimer */}
             <section id="ai-disclaimer" className="scroll-mt-24">
               <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">6</span>
+                <span className="flex items-center justify-center w-8 h-8 bg-gold-500/20 text-gold-400 text-sm font-bold rounded-lg">6</span>
                 Artificial Intelligence & Automation Disclaimer
               </h2>
               <p className="text-white/70 leading-relaxed mb-5">
@@ -335,7 +335,7 @@ export default async function TermsPage() {
             {/* Section 4 */}
             <section id="accounts" className="scroll-mt-24">
               <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">4</span>
+                <span className="flex items-center justify-center w-8 h-8 bg-gold-500/20 text-gold-400 text-sm font-bold rounded-lg">4</span>
                 User Accounts & Security
               </h2>
               <p className="text-white/70 leading-relaxed mb-4">
@@ -343,25 +343,25 @@ export default async function TermsPage() {
               </p>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3 text-white/70">
-                  <svg className="w-5 h-5 text-emerald-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-5 h-5 text-gold-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                   <span>Provide accurate, current, and complete information during registration.</span>
                 </li>
                 <li className="flex items-start gap-3 text-white/70">
-                  <svg className="w-5 h-5 text-emerald-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-5 h-5 text-gold-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                   <span>Maintain the security of your password and API keys.</span>
                 </li>
                 <li className="flex items-start gap-3 text-white/70">
-                  <svg className="w-5 h-5 text-emerald-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-5 h-5 text-gold-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                   <span>Notify us immediately of any unauthorized use of your account.</span>
                 </li>
                 <li className="flex items-start gap-3 text-white/70">
-                  <svg className="w-5 h-5 text-emerald-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-5 h-5 text-gold-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                   <span>Accept responsibility for all activities that occur under your account, including actions taken by the AI agent as configured by you.</span>
@@ -372,7 +372,7 @@ export default async function TermsPage() {
             {/* Section 5 */}
             <section id="data-ownership" className="scroll-mt-24">
               <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">5</span>
+                <span className="flex items-center justify-center w-8 h-8 bg-gold-500/20 text-gold-400 text-sm font-bold rounded-lg">5</span>
                 Data Ownership & Intellectual Property
               </h2>
               <div className="space-y-4">
@@ -385,7 +385,7 @@ export default async function TermsPage() {
                 <div className="bg-white/5 border border-white/10 rounded-lg p-4">
                   <h3 className="font-semibold text-white mb-2">AI Training Rights</h3>
                   <p className="text-white/60 text-sm">
-                    As outlined in our <Link href="/trust" className="text-emerald-400 hover:text-emerald-300">Trust & Security Whitepaper</Link>, 
+                    As outlined in our <Link href="/trust" className="text-gold-400 hover:text-gold-300">Trust & Security Whitepaper</Link>, 
                     we may use pseudonymized (anonymized) usage patterns to improve our AI models. We do not use your proprietary 
                     trade secrets, raw client lists, or Personally Identifiable Information (PII) to train models for other tenants.
                   </p>
@@ -403,7 +403,7 @@ export default async function TermsPage() {
             {/* Section 6 */}
             <section id="billing" className="scroll-mt-24">
               <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">6</span>
+                <span className="flex items-center justify-center w-8 h-8 bg-gold-500/20 text-gold-400 text-sm font-bold rounded-lg">6</span>
                 Subscription, Billing, and Cancellation
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -437,7 +437,7 @@ export default async function TermsPage() {
             {/* Section 7 */}
             <section id="acceptable-use" className="scroll-mt-24">
               <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">7</span>
+                <span className="flex items-center justify-center w-8 h-8 bg-gold-500/20 text-gold-400 text-sm font-bold rounded-lg">7</span>
                 Acceptable Use Policy
               </h2>
               <p className="text-white/70 leading-relaxed mb-4">
@@ -474,7 +474,7 @@ export default async function TermsPage() {
             {/* Section 8 */}
             <section id="third-party" className="scroll-mt-24">
               <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">8</span>
+                <span className="flex items-center justify-center w-8 h-8 bg-gold-500/20 text-gold-400 text-sm font-bold rounded-lg">8</span>
                 Third-Party Services
               </h2>
               <p className="text-white/70 leading-relaxed">
@@ -488,7 +488,7 @@ export default async function TermsPage() {
             {/* Section 9 - Liability */}
             <section id="liability" className="scroll-mt-24">
               <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">9</span>
+                <span className="flex items-center justify-center w-8 h-8 bg-gold-500/20 text-gold-400 text-sm font-bold rounded-lg">9</span>
                 Limitation of Liability
               </h2>
               <div className="bg-gray-800/50 border border-white/10 rounded-xl p-5">
@@ -514,7 +514,7 @@ export default async function TermsPage() {
             {/* Section 10 */}
             <section id="indemnification" className="scroll-mt-24">
               <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">10</span>
+                <span className="flex items-center justify-center w-8 h-8 bg-gold-500/20 text-gold-400 text-sm font-bold rounded-lg">10</span>
                 Indemnification
               </h2>
               <p className="text-white/70 leading-relaxed">
@@ -528,7 +528,7 @@ export default async function TermsPage() {
             {/* Section 11 */}
             <section id="governing-law" className="scroll-mt-24">
               <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">11</span>
+                <span className="flex items-center justify-center w-8 h-8 bg-gold-500/20 text-gold-400 text-sm font-bold rounded-lg">11</span>
                 Governing Law
               </h2>
               <p className="text-white/70 leading-relaxed">
@@ -542,7 +542,7 @@ export default async function TermsPage() {
             {/* Section 12 */}
             <section id="changes" className="scroll-mt-24">
               <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">12</span>
+                <span className="flex items-center justify-center w-8 h-8 bg-gold-500/20 text-gold-400 text-sm font-bold rounded-lg">12</span>
                 Changes to Terms
               </h2>
               <p className="text-white/70 leading-relaxed">
@@ -555,16 +555,16 @@ export default async function TermsPage() {
             {/* Section 13 - Contact */}
             <section id="contact" className="scroll-mt-24">
               <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">13</span>
+                <span className="flex items-center justify-center w-8 h-8 bg-gold-500/20 text-gold-400 text-sm font-bold rounded-lg">13</span>
                 Contact Information
               </h2>
-              <div className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-500/20 rounded-xl p-6">
+              <div className="bg-gradient-to-br from-gold-500/10 to-gold-500/5 border border-gold-500/20 rounded-xl p-6">
                 <p className="text-white/70 leading-relaxed mb-4">
                   If you have any questions about these Terms, please contact us at:
                 </p>
                 <a 
                   href="mailto:greenline365help@gmail.com" 
-                  className="inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300 transition font-medium"
+                  className="inline-flex items-center gap-2 text-gold-400 hover:text-gold-300 transition font-medium"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -578,10 +578,10 @@ export default async function TermsPage() {
             <div className="pt-8 border-t border-white/10">
               <p className="text-white/40 text-sm mb-4">Related Documents:</p>
               <div className="flex flex-wrap gap-4">
-                <Link href="/privacy" className="text-emerald-400 hover:text-emerald-300 transition text-sm">
+                <Link href="/privacy" className="text-gold-400 hover:text-gold-300 transition text-sm">
                   Privacy Policy →
                 </Link>
-                <Link href="/trust" className="text-emerald-400 hover:text-emerald-300 transition text-sm">
+                <Link href="/trust" className="text-gold-400 hover:text-gold-300 transition text-sm">
                   Trust & Security →
                 </Link>
               </div>

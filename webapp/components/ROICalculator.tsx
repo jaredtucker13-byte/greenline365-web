@@ -288,24 +288,24 @@ export default function ROICalculator() {
           appearance: none;
           width: 24px;
           height: 24px;
-          background: #00FF00;
+          background: #C9A96E;
           border-radius: 50%;
           cursor: pointer;
-          box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+          box-shadow: 0 0 10px rgba(201, 169, 110, 0.5);
         }
         
         .slider-green::-moz-range-thumb {
           width: 24px;
           height: 24px;
-          background: #00FF00;
+          background: #C9A96E;
           border-radius: 50%;
           cursor: pointer;
           border: none;
-          box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+          box-shadow: 0 0 10px rgba(201, 169, 110, 0.5);
         }
         
         .slider-green::-webkit-slider-track {
-          background: linear-gradient(to right, #00FF00 0%, #00FF00 ${(blogsPerWeek / 20) * 100}%, rgba(255,255,255,0.1) ${(blogsPerWeek / 20) * 100}%);
+          background: linear-gradient(to right, #C9A96E 0%, #C9A96E ${(blogsPerWeek / 20) * 100}%, rgba(255,255,255,0.1) ${(blogsPerWeek / 20) * 100}%);
         }
       `}</style>
     </section>

@@ -142,7 +142,7 @@ export default function CopyrightGuidePage() {
           <h2 className="text-2xl font-bold text-white mb-8 text-center">⚡ Quick Overview</h2>
           
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="p-6 rounded-2xl bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20">
+            <div className="p-6 rounded-2xl bg-gradient-to-br from-green-500/10 to-gold-500/10 border border-green-500/20">
               <div className="text-3xl mb-4">✅</div>
               <h3 className="text-lg font-semibold text-white mb-2">What's Protected</h3>
               <ul className="text-sm text-white/60 space-y-2">

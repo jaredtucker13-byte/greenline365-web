@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
     .footer { padding: 20px; font-size: 12px; color: #666; text-align: center; }
     .severity-high { color: #ff4444; font-weight: bold; }
     .severity-medium { color: #ffaa00; font-weight: bold; }
-    .severity-low { color: #00aa00; font-weight: bold; }
+    .severity-low { color: #9A7A3E; font-weight: bold; }
   </style>
 </head>
 <body>

@@ -121,7 +121,7 @@ export default function SignUpPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-8 text-center"
+            className="bg-gold-500/10 border border-gold-500/30 rounded-2xl p-8 text-center"
           >
             <div className="text-5xl mb-4">✉️</div>
             <h2 className="text-2xl font-bold text-white mb-2">Check Your Email</h2>
@@ -129,7 +129,7 @@ export default function SignUpPage() {
               We've sent a confirmation link to <strong className="text-white">{formData.email}</strong>.
               Click the link to activate your account.
             </p>
-            <Link href="/login" className="inline-block mt-6 text-emerald-400 hover:text-emerald-300">
+            <Link href="/login" className="inline-block mt-6 text-gold-400 hover:text-gold-300">
               Go to Login →
             </Link>
           </motion.div>
@@ -145,16 +145,16 @@ export default function SignUpPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-8 text-center"
+            className="bg-gold-500/10 border border-gold-500/30 rounded-2xl p-8 text-center"
           >
-            <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="w-16 h-16 bg-gold-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
             </div>
             <h2 className="text-2xl font-bold text-white mb-2">Check Your Email!</h2>
             <p className="text-white/60 mb-4">
-              We sent a magic link to <span className="text-emerald-400 font-medium">{formData.email}</span>
+              We sent a magic link to <span className="text-gold-400 font-medium">{formData.email}</span>
             </p>
             <p className="text-white/40 text-sm mb-6">
               Click the link in the email to sign in instantly. If you're new, your account will be created automatically!
@@ -164,7 +164,7 @@ export default function SignUpPage() {
                 setMagicLinkSent(false);
                 setFormData({ fullName: '', email: '', password: '', confirmPassword: '' });
               }}
-              className="text-emerald-400 hover:text-emerald-300 text-sm"
+              className="text-gold-400 hover:text-gold-300 text-sm"
             >
               ← Use a different email
             </button>
@@ -223,7 +223,7 @@ export default function SignUpPage() {
               onClick={() => setAuthMethod('magic-link')}
               className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition ${
                 authMethod === 'magic-link'
-                  ? 'bg-emerald-500 text-black'
+                  ? 'bg-gold-500 text-black'
                   : 'text-white/60 hover:text-white'
               }`}
               data-testid="signup-magic-link-tab"
@@ -235,7 +235,7 @@ export default function SignUpPage() {
               onClick={() => setAuthMethod('password')}
               className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition ${
                 authMethod === 'password'
-                  ? 'bg-emerald-500 text-black'
+                  ? 'bg-gold-500 text-black'
                   : 'text-white/60 hover:text-white'
               }`}
               data-testid="signup-password-tab"
@@ -261,7 +261,7 @@ export default function SignUpPage() {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 outline-none transition"
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
                   placeholder="you@company.com"
                   data-testid="signup-email-input"
                 />
@@ -274,7 +274,7 @@ export default function SignUpPage() {
               <button
                 type="submit"
                 disabled={loading || !formData.email}
-                className="w-full py-4 bg-emerald-500 text-black font-bold rounded-xl hover:bg-emerald-400 transition disabled:opacity-50 flex items-center justify-center gap-3 min-h-[56px]"
+                className="w-full py-4 bg-gold-500 text-black font-bold rounded-xl hover:bg-gold-400 transition disabled:opacity-50 flex items-center justify-center gap-3 min-h-[56px]"
                 data-testid="signup-magic-link-btn"
               >
                 {loading ? (
@@ -303,7 +303,7 @@ export default function SignUpPage() {
                   value={formData.fullName}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 outline-none transition"
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
                   placeholder="John Smith"
                 />
               </div>
@@ -316,7 +316,7 @@ export default function SignUpPage() {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 outline-none transition"
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
                   placeholder="john@company.com"
                 />
               </div>
@@ -330,7 +330,7 @@ export default function SignUpPage() {
                     value={formData.password}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 pr-12 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 outline-none transition"
+                    className="w-full px-4 py-3 pr-12 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
                     placeholder="••••••••"
                   />
                   <EyeIcon show={showPassword} onClick={() => setShowPassword(!showPassword)} />
@@ -346,7 +346,7 @@ export default function SignUpPage() {
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 pr-12 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 outline-none transition"
+                    className="w-full px-4 py-3 pr-12 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
                     placeholder="••••••••"
                   />
                   <EyeIcon show={showConfirmPassword} onClick={() => setShowConfirmPassword(!showConfirmPassword)} />
@@ -356,7 +356,7 @@ export default function SignUpPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-4 bg-emerald-500 text-black font-bold rounded-xl hover:bg-emerald-400 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full py-4 bg-gold-500 text-black font-bold rounded-xl hover:bg-gold-400 transition disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <>
@@ -372,7 +372,7 @@ export default function SignUpPage() {
 
           <p className="text-center text-white/40 text-sm mt-6">
             Already have an account?{' '}
-            <Link href="/login" className="text-emerald-400 hover:text-emerald-300">
+            <Link href="/login" className="text-gold-400 hover:text-gold-300">
               Sign in
             </Link>
           </p>

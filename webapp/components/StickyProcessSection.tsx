@@ -22,7 +22,7 @@ const phases: StickyPhase[] = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
       </svg>
     ),
-    color: '#00FF00'
+    color: '#C9A96E'
   },
   {
     number: '02',
@@ -55,7 +55,7 @@ const phases: StickyPhase[] = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
       </svg>
     ),
-    color: '#00FFFF'
+    color: '#E6D8B5'
   }
 ];
 

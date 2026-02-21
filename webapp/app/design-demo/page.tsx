@@ -26,12 +26,12 @@ export default function DesignSystemDemo() {
             <div className="space-y-2">
               <div className="h-24 bg-neon-green-500 rounded-xl shadow-neon-green"></div>
               <p className="text-sm text-white/80 font-medium">Neon Green</p>
-              <p className="text-xs text-white/50">#00FF00</p>
+              <p className="text-xs text-white/50">#C9A96E</p>
             </div>
             <div className="space-y-2">
               <div className="h-24 bg-neon-teal-500 rounded-xl shadow-neon-teal"></div>
               <p className="text-sm text-white/80 font-medium">Neon Teal</p>
-              <p className="text-xs text-white/50">#00FFFF</p>
+              <p className="text-xs text-white/50">#E6D8B5</p>
             </div>
             <div className="space-y-2">
               <div className="h-24 bg-neon-amber-500 rounded-xl shadow-neon-amber"></div>

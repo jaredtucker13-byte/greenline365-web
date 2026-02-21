@@ -216,7 +216,7 @@ export default function VerifyPhonePage() {
                     value={formData.email}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 outline-none transition"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
                     placeholder="you@company.com"
                   />
                 </div>
@@ -231,7 +231,7 @@ export default function VerifyPhonePage() {
                     value={formData.phone}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 outline-none transition"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
                     placeholder="+1 (555) 123-4567"
                   />
                   <p className="text-white/40 text-xs mt-1">
@@ -242,7 +242,7 @@ export default function VerifyPhonePage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-4 bg-emerald-500 text-black font-bold rounded-xl hover:bg-emerald-400 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full py-4 bg-gold-500 text-black font-bold rounded-xl hover:bg-gold-400 transition disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {loading ? (
                     <>
@@ -286,7 +286,7 @@ export default function VerifyPhonePage() {
                         value={digit}
                         onChange={(e) => handleOtpChange(index, e.target.value)}
                         onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                        className="w-12 h-14 text-center text-2xl font-bold rounded-xl bg-white/5 border border-white/10 text-white focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 outline-none transition"
+                        className="w-12 h-14 text-center text-2xl font-bold rounded-xl bg-white/5 border border-white/10 text-white focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
                       />
                     ))}
                   </div>
@@ -295,7 +295,7 @@ export default function VerifyPhonePage() {
                 <button
                   type="submit"
                   disabled={loading || otp.join('').length !== 6}
-                  className="w-full py-4 bg-emerald-500 text-black font-bold rounded-xl hover:bg-emerald-400 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full py-4 bg-gold-500 text-black font-bold rounded-xl hover:bg-gold-400 transition disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {loading ? (
                     <>
@@ -312,7 +312,7 @@ export default function VerifyPhonePage() {
                     type="button"
                     onClick={resendOTP}
                     disabled={countdown > 0}
-                    className="text-sm text-white/60 hover:text-emerald-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="text-sm text-white/60 hover:text-gold-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {countdown > 0 
                       ? `Resend code in ${countdown}s` 
@@ -344,7 +344,7 @@ export default function VerifyPhonePage() {
                 <div className="space-y-3">
                   <Link
                     href="/signup"
-                    className="block w-full py-4 bg-emerald-500 text-black font-bold rounded-xl hover:bg-emerald-400 transition text-center"
+                    className="block w-full py-4 bg-gold-500 text-black font-bold rounded-xl hover:bg-gold-400 transition text-center"
                   >
                     Create Account
                   </Link>

@@ -103,7 +103,7 @@ export default function CommandCenter() {
   function getStatusBadge(status: string) {
     const styles: Record<string, string> = {
       pending: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
-      confirmed: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+      confirmed: 'bg-gold-500/20 text-gold-300 border-gold-500/30',
       cancelled: 'bg-red-500/20 text-red-300 border-red-500/30',
       completed: 'bg-gray-500/20 text-gray-300 border-gray-500/30',
     };
@@ -149,7 +149,7 @@ export default function CommandCenter() {
         </div>
         <div className="bg-gray-900/60 border border-gray-700 rounded-xl p-5">
           <div className="text-gray-400 text-sm mb-1">Confirmed</div>
-          <div className="text-3xl font-bold text-emerald-400">{stats.confirmed}</div>
+          <div className="text-3xl font-bold text-gold-400">{stats.confirmed}</div>
         </div>
         <div className="bg-gray-900/60 border border-gray-700 rounded-xl p-5">
           <div className="text-gray-400 text-sm mb-1">This Week</div>
@@ -183,7 +183,7 @@ export default function CommandCenter() {
           
           {loading ? (
             <div className="flex items-center justify-center h-64">
-              <div className="animate-spin w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full" />
+              <div className="animate-spin w-8 h-8 border-2 border-gold-500 border-t-transparent rounded-full" />
             </div>
           ) : bookings.length === 0 ? (
             <div className="text-center py-12 text-gray-400">
@@ -227,7 +227,7 @@ export default function CommandCenter() {
                       <td className="py-4">
                         <button
                           onClick={() => setSelectedBooking(booking)}
-                          className="text-emerald-400 hover:text-emerald-300 text-sm font-medium"
+                          className="text-gold-400 hover:text-gold-300 text-sm font-medium"
                         >
                           View
                         </button>
@@ -300,7 +300,7 @@ export default function CommandCenter() {
                   <span className="text-gray-400 block mb-2">Services Requested</span>
                   <div className="flex flex-wrap gap-2">
                     {selectedBooking.needs.map((need) => (
-                      <span key={need} className="px-2 py-1 bg-emerald-500/20 text-emerald-300 text-xs rounded-full">
+                      <span key={need} className="px-2 py-1 bg-gold-500/20 text-gold-300 text-xs rounded-full">
                         {need.replace('-', ' ')}
                       </span>
                     ))}
@@ -319,7 +319,7 @@ export default function CommandCenter() {
               <div className="flex gap-2">
                 <button
                   onClick={() => updateBookingStatus(selectedBooking.id, 'confirmed')}
-                  className="flex-1 py-2 px-4 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 transition text-sm font-medium"
+                  className="flex-1 py-2 px-4 rounded-lg bg-gold-500/20 text-gold-400 border border-gold-500/30 hover:bg-gold-500/30 transition text-sm font-medium"
                 >
                   Confirm
                 </button>

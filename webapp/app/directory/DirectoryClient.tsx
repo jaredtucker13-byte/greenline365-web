@@ -80,7 +80,7 @@ function Stars({ rating, size = 14 }: { rating: number; size?: number }) {
 function PropertyIntelBadge() {
   return (
     <span className="inline-flex items-center gap-1 font-semibold rounded-full px-2 py-0.5 text-[10px] badge-shimmer"
-      style={{ background: 'linear-gradient(135deg, #5B8A72, #7BAF95, #5B8A72)', backgroundSize: '200% auto', color: '#fff' }}
+      style={{ background: 'linear-gradient(135deg, #C9A96E, #E6D8B5, #C9A96E)', backgroundSize: '200% auto', color: '#fff' }}
       data-testid="property-intel-badge">
       <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
       Property Intelligence
@@ -430,7 +430,7 @@ export default function DirectoryPage() {
                     <span className={`text-white font-heading font-semibold block tracking-tight ${i === 0 ? 'text-2xl' : 'text-base'}`}>{cat.label}</span>
                     <span className="text-silver/70 text-xs font-body">{cat.sub}</span>
                   </div>
-                  {i === 0 && <span className="absolute top-3 right-3 text-[10px] px-2.5 py-1 rounded-full font-heading font-semibold uppercase tracking-wider" style={{ background: 'rgba(91,138,114,0.9)', color: '#fff' }}>Core</span>}
+                  {i === 0 && <span className="absolute top-3 right-3 text-[10px] px-2.5 py-1 rounded-full font-heading font-semibold uppercase tracking-wider" style={{ background: 'rgba(201,169,110,0.9)', color: '#fff' }}>Core</span>}
                 </motion.div>
               ))}
             </div>

@@ -21,7 +21,7 @@ const supabase = createClient(
 // Color map for event types
 const EVENT_COLORS: Record<string, string> = {
   booking: '#3B82F6',      // Blue
-  content: '#10B981',      // Green
+  content: '#C9A96E',      // Green
   campaign_email: '#F59E0B', // Amber
   newsletter: '#8B5CF6',   // Purple
   blog: '#EC4899',         // Pink
@@ -195,7 +195,7 @@ export async function POST(request: NextRequest) {
         event_type: safeEventType,
         scheduled_date,
         status: status || 'draft',
-        color: color || EVENT_COLORS[event_type || 'content'] || '#10B981',
+        color: color || EVENT_COLORS[event_type || 'content'] || '#C9A96E',
         metadata: { ...(metadata || {}), display_type: event_type || 'content' },
       })
       .select()

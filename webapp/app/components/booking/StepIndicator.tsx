@@ -21,7 +21,7 @@ export default function StepIndicator({ currentStep, totalSteps }: StepIndicator
       {/* Progress bar */}
       <div className="relative h-2 bg-white/10 rounded-full overflow-hidden mb-4">
         <div
-          className="absolute left-0 top-0 h-full bg-gradient-to-r from-emerald-500 to-emerald-400 transition-all duration-500"
+          className="absolute left-0 top-0 h-full bg-gradient-to-r from-gold-500 to-gold-400 transition-all duration-500"
           style={{ width: `${(currentStep / totalSteps) * 100}%` }}
         />
       </div>
@@ -38,9 +38,9 @@ export default function StepIndicator({ currentStep, totalSteps }: StepIndicator
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all ${
                   isCompleted
-                    ? 'bg-emerald-500 text-black'
+                    ? 'bg-gold-500 text-black'
                     : isActive
-                    ? 'bg-emerald-500/20 text-emerald-400 ring-2 ring-emerald-500'
+                    ? 'bg-gold-500/20 text-gold-400 ring-2 ring-gold-500'
                     : 'bg-white/10 text-white/40'
                 }`}
               >
@@ -54,7 +54,7 @@ export default function StepIndicator({ currentStep, totalSteps }: StepIndicator
               </div>
               <span
                 className={`mt-2 text-xs hidden sm:block ${
-                  isActive ? 'text-emerald-400' : isCompleted ? 'text-white/60' : 'text-white/30'
+                  isActive ? 'text-gold-400' : isCompleted ? 'text-white/60' : 'text-white/30'
                 }`}
               >
                 {label}

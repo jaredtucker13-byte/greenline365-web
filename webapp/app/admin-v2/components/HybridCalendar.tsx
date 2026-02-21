@@ -90,10 +90,10 @@ export default function HybridCalendar({
     switch (type) {
       case 'booking':
         return {
-          bg: 'bg-emerald-500/20',
-          border: 'border-l-emerald-400',
-          text: 'text-emerald-300',
-          dot: 'bg-emerald-400',
+          bg: 'bg-gold-500/20',
+          border: 'border-l-gold-400',
+          text: 'text-gold-300',
+          dot: 'bg-gold-400',
           icon: '📅',
         };
       case 'content':

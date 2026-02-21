@@ -137,7 +137,7 @@ export default function AnalyticsPage() {
                 onClick={() => setDateRange(range)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   dateRange === range
-                    ? 'bg-emerald-500 text-white'
+                    ? 'bg-gold-500 text-white'
                     : 'text-white/60 hover:text-white hover:bg-white/10'
                 }`}
               >
@@ -165,7 +165,7 @@ export default function AnalyticsPage() {
               generate images, send emails - we'll track it all and show you patterns.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
-              <a href="/admin-v2/blog-polish" className="px-6 py-3 rounded-xl bg-emerald-500 text-white font-medium hover:bg-emerald-600">
+              <a href="/admin-v2/blog-polish" className="px-6 py-3 rounded-xl bg-gold-500 text-white font-medium hover:bg-gold-600">
                 Create a Blog Post
               </a>
               <a href="/admin-v2/brand-voice" className="px-6 py-3 rounded-xl bg-white/10 text-white font-medium hover:bg-white/20">
@@ -228,7 +228,7 @@ export default function AnalyticsPage() {
                             </div>
                             <div className="h-2 bg-white/10 rounded-full overflow-hidden">
                               <div 
-                                className="h-full bg-gradient-to-r from-emerald-500 to-blue-500 rounded-full"
+                                className="h-full bg-gradient-to-r from-gold-500 to-blue-500 rounded-full"
                                 style={{ width: `${percentage}%` }}
                               />
                             </div>
@@ -272,7 +272,7 @@ export default function AnalyticsPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="backdrop-blur-xl bg-gradient-to-r from-emerald-500/10 to-blue-500/10 rounded-2xl border border-emerald-500/20 p-6"
+                className="backdrop-blur-xl bg-gradient-to-r from-gold-500/10 to-blue-500/10 rounded-2xl border border-gold-500/20 p-6"
               >
                 <h3 className="text-lg font-semibold text-white mb-4">💡 AI Insights</h3>
                 <div className="grid md:grid-cols-2 gap-4">
@@ -329,7 +329,7 @@ export default function AnalyticsPage() {
               <h3 className="text-lg font-semibold text-white mb-4">📊 Your Progress</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="text-center p-4">
-                  <div className="text-3xl font-bold text-emerald-400">
+                  <div className="text-3xl font-bold text-gold-400">
                     {overview?.summary.totalBlogs || 0}
                   </div>
                   <div className="text-xs text-white/50">Blog posts</div>

@@ -42,7 +42,7 @@ interface CalendarEvent {
 
 const EVENT_TYPE_CONFIG: Record<string, { label: string; color: string; dotColor: string }> = {
   booking: { label: 'Booking', color: '#3B82F6', dotColor: 'bg-blue-500' },
-  content: { label: 'Content', color: '#10B981', dotColor: 'bg-emerald-500' },
+  content: { label: 'Content', color: '#C9A96E', dotColor: 'bg-gold-500' },
   campaign_email: { label: 'Campaign', color: '#F59E0B', dotColor: 'bg-amber-500' },
   newsletter: { label: 'Newsletter', color: '#8B5CF6', dotColor: 'bg-purple-500' },
   blog: { label: 'Blog', color: '#EC4899', dotColor: 'bg-pink-500' },
@@ -382,7 +382,7 @@ export default function UnifiedCalendar() {
                             {' '}&middot;{' '}
                             {EVENT_TYPE_CONFIG[event.event_type]?.label || event.event_type}
                             {' '}&middot;{' '}
-                            <span className={event.status === 'draft' ? 'text-gray-400' : event.status === 'sent' ? 'text-emerald-400' : 'text-white/40'}>{event.status}</span>
+                            <span className={event.status === 'draft' ? 'text-gray-400' : event.status === 'sent' ? 'text-gold-400' : 'text-white/40'}>{event.status}</span>
                           </p>
                         </div>
                       </div>
@@ -446,7 +446,7 @@ function EventDetailDrawer({ event, onClose, onDelete, onRefresh }: {
               <div className="flex items-center gap-2 mb-2">
                 <span className="w-3 h-3 rounded-full" style={{ background: typeConfig.color }} />
                 <span className="text-xs font-medium px-2 py-0.5 rounded-full" style={{ background: `${typeConfig.color}20`, color: typeConfig.color }}>{typeConfig.label}</span>
-                <span className={`text-xs px-2 py-0.5 rounded-full ${event.status === 'draft' ? 'bg-gray-500/20 text-gray-400' : 'bg-emerald-500/20 text-emerald-400'}`}>{event.status}</span>
+                <span className={`text-xs px-2 py-0.5 rounded-full ${event.status === 'draft' ? 'bg-gray-500/20 text-gray-400' : 'bg-gold-500/20 text-gold-400'}`}>{event.status}</span>
               </div>
               <h2 className="text-xl font-bold text-white">{event.title}</h2>
             </div>
@@ -491,7 +491,7 @@ function EventDetailDrawer({ event, onClose, onDelete, onRefresh }: {
             </Link>
           )}
           {event.source === 'scheduled_content' && (
-            <Link href="/admin-v2/content-forge" className="block p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/20 text-emerald-400 text-sm hover:bg-emerald-500/10 transition text-center">
+            <Link href="/admin-v2/content-forge" className="block p-4 rounded-xl bg-gold-500/5 border border-gold-500/20 text-gold-400 text-sm hover:bg-gold-500/10 transition text-center">
               Open in Content Forge →
             </Link>
           )}

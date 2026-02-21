@@ -62,7 +62,7 @@ const PIPELINE_STAGES = [
   { id: 'new', label: 'New', color: '#3B82F6', bg: 'bg-blue-500/15', text: 'text-blue-400', border: 'border-blue-500/30' },
   { id: 'contacted', label: 'Contacted', color: '#8B5CF6', bg: 'bg-purple-500/15', text: 'text-purple-400', border: 'border-purple-500/30' },
   { id: 'replied', label: 'Replied', color: '#F59E0B', bg: 'bg-amber-500/15', text: 'text-amber-400', border: 'border-amber-500/30' },
-  { id: 'claimed', label: 'Claimed', color: '#10B981', bg: 'bg-emerald-500/15', text: 'text-emerald-400', border: 'border-emerald-500/30' },
+  { id: 'claimed', label: 'Claimed', color: '#C9A96E', bg: 'bg-gold-500/15', text: 'text-gold-400', border: 'border-gold-500/30' },
   { id: 'upgraded', label: 'Upgraded', color: '#06B6D4', bg: 'bg-cyan-500/15', text: 'text-cyan-400', border: 'border-cyan-500/30' },
   { id: 'gold', label: 'Gold', color: '#EAB308', bg: 'bg-yellow-500/15', text: 'text-yellow-400', border: 'border-yellow-500/30' },
 ];
@@ -656,12 +656,12 @@ function CampaignDrawer({ campaign, onClose, onUpdateStage, onRefresh, onShowImp
 
               {/* Send Result */}
               {sendResult && (
-                <div className={`p-4 rounded-xl border ${sendResult.success || sendResult.test ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-red-500/10 border-red-500/30'}`} data-testid="send-result">
+                <div className={`p-4 rounded-xl border ${sendResult.success || sendResult.test ? 'bg-gold-500/10 border-gold-500/30' : 'bg-red-500/10 border-red-500/30'}`} data-testid="send-result">
                   {sendResult.test ? (
-                    <p className="text-emerald-400 text-sm">Test email {sendResult.success ? 'sent' : 'failed'} to {sendResult.recipient}{sendResult.error ? `: ${sendResult.error}` : ''}</p>
+                    <p className="text-gold-400 text-sm">Test email {sendResult.success ? 'sent' : 'failed'} to {sendResult.recipient}{sendResult.error ? `: ${sendResult.error}` : ''}</p>
                   ) : sendResult.sent !== undefined ? (
                     <div>
-                      <p className="text-emerald-400 text-sm font-medium">{sendResult.sent} sent, {sendResult.failed} failed (Step {sendResult.step}: {sendResult.step_type?.replace(/_/g, ' ')})</p>
+                      <p className="text-gold-400 text-sm font-medium">{sendResult.sent} sent, {sendResult.failed} failed (Step {sendResult.step}: {sendResult.step_type?.replace(/_/g, ' ')})</p>
                       {sendResult.results?.filter((r: any) => !r.success).slice(0, 3).map((r: any, i: number) => (
                         <p key={i} className="text-red-400/70 text-xs mt-1">{r.email}: {r.error}</p>
                       ))}
@@ -981,7 +981,7 @@ function StatusBadge({ status }: { status: string }) {
     active: { bg: 'bg-[#39FF14]/15', text: 'text-[#39FF14]' },
     scheduled: { bg: 'bg-blue-500/20', text: 'text-blue-400' },
     sending: { bg: 'bg-amber-500/20', text: 'text-amber-400' },
-    sent: { bg: 'bg-emerald-500/20', text: 'text-emerald-400' },
+    sent: { bg: 'bg-gold-500/20', text: 'text-gold-400' },
     paused: { bg: 'bg-orange-500/20', text: 'text-orange-400' },
     completed: { bg: 'bg-cyan-500/20', text: 'text-cyan-400' },
   };

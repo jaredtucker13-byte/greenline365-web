@@ -40,7 +40,7 @@ export default function HowItWorksPage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-4xl md:text-5xl font-bold text-white mb-6"
           >
-            How <span className="text-emerald-400">GreenLine365</span> Works
+            How <span className="text-gold-400">GreenLine365</span> Works
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
@@ -66,14 +66,14 @@ export default function HowItWorksPage() {
                 <div className="bg-gradient-to-br from-gray-900/80 to-gray-900/40 border border-white/10 rounded-2xl p-8">
                   <div className="flex items-center gap-4 mb-4">
                     <span className="text-4xl">{step.icon}</span>
-                    <span className="text-emerald-400 font-mono text-sm">STEP {step.number}</span>
+                    <span className="text-gold-400 font-mono text-sm">STEP {step.number}</span>
                   </div>
                   <h3 className="text-2xl font-bold text-white mb-3">{step.title}</h3>
                   <p className="text-white/60">{step.description}</p>
                 </div>
               </div>
-              <div className="hidden md:flex w-20 h-20 rounded-full bg-emerald-500/10 border border-emerald-500/30 items-center justify-center">
-                <span className="text-emerald-400 font-bold text-2xl">{step.number}</span>
+              <div className="hidden md:flex w-20 h-20 rounded-full bg-gold-500/10 border border-gold-500/30 items-center justify-center">
+                <span className="text-gold-400 font-bold text-2xl">{step.number}</span>
               </div>
             </motion.div>
           ))}
@@ -88,7 +88,7 @@ export default function HowItWorksPage() {
         >
           <a
             href="/demo-calendar"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-emerald-500 text-black font-bold rounded-xl hover:bg-emerald-400 transition"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-gold-500 text-black font-bold rounded-xl hover:bg-gold-400 transition"
           >
             Get Started Today
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

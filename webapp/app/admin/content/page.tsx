@@ -120,7 +120,7 @@ export default function ContentManagerPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#121212] flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full" />
+        <div className="animate-spin w-8 h-8 border-2 border-gold-500 border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -164,14 +164,14 @@ export default function ContentManagerPage() {
                       onClick={() => handleSelectSection(section.key)}
                       className={`w-full text-left px-4 py-3 rounded-lg transition ${
                         selectedKey === section.key
-                          ? 'bg-emerald-500/20 border border-emerald-500/50 text-emerald-400'
+                          ? 'bg-gold-500/20 border border-gold-500/50 text-gold-400'
                           : 'bg-white/5 border border-white/10 text-white/70 hover:bg-white/10'
                       }`}
                     >
                       <div className="flex items-center justify-between">
                         <span className="font-medium">{section.label}</span>
                         {hasContent && (
-                          <span className="w-2 h-2 bg-emerald-500 rounded-full" />
+                          <span className="w-2 h-2 bg-gold-500 rounded-full" />
                         )}
                       </div>
                       <p className="text-xs text-white/40 mt-1">{section.description}</p>
@@ -202,7 +202,7 @@ export default function ContentManagerPage() {
                 {message && (
                   <div className={`mb-4 p-3 rounded-lg ${
                     message.type === 'success' 
-                      ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400'
+                      ? 'bg-gold-500/10 border border-gold-500/30 text-gold-400'
                       : 'bg-red-500/10 border border-red-500/30 text-red-400'
                   }`}>
                     {message.text}
@@ -218,7 +218,7 @@ export default function ContentManagerPage() {
                       type="text"
                       value={editDescription}
                       onChange={(e) => setEditDescription(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-emerald-500/50 outline-none"
+                      className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-gold-500/50 outline-none"
                       placeholder="Brief description of this content..."
                     />
                   </div>
@@ -231,7 +231,7 @@ export default function ContentManagerPage() {
                       value={editValue}
                       onChange={(e) => setEditValue(e.target.value)}
                       rows={20}
-                      className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-emerald-500/50 outline-none font-mono text-sm resize-y"
+                      className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-gold-500/50 outline-none font-mono text-sm resize-y"
                       placeholder="Enter your content here... You can use HTML or Markdown."
                     />
                     <p className="text-xs text-white/40 mt-2">
@@ -249,7 +249,7 @@ export default function ContentManagerPage() {
                     <button
                       onClick={handleSave}
                       disabled={saving}
-                      className="px-6 py-3 bg-emerald-500 text-black font-bold rounded-xl hover:bg-emerald-400 transition disabled:opacity-50 flex items-center gap-2"
+                      className="px-6 py-3 bg-gold-500 text-black font-bold rounded-xl hover:bg-gold-400 transition disabled:opacity-50 flex items-center gap-2"
                     >
                       {saving ? (
                         <>

@@ -4,9 +4,9 @@ export default function ComingSoonPage() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-8 pt-24">
       <div className="max-w-md text-center">
-        <div className="w-24 h-24 mx-auto mb-8 bg-emerald-500/20 rounded-full flex items-center justify-center">
+        <div className="w-24 h-24 mx-auto mb-8 bg-gold-500/20 rounded-full flex items-center justify-center">
           <svg
-            className="w-12 h-12 text-emerald-400"
+            className="w-12 h-12 text-gold-400"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -25,7 +25,7 @@ export default function ComingSoonPage() {
         </p>
         <Link
           href="/"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-500 text-black font-semibold rounded-xl hover:bg-emerald-400 transition"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-gold-500 text-black font-semibold rounded-xl hover:bg-gold-400 transition"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />

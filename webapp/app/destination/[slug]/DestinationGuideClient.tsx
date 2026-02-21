@@ -35,7 +35,7 @@ const DESTINATIONS: Record<string, {
   lng: number;
 }> = {
   'st-pete-beach':  { label: 'St. Pete Beach',  tagline: "Florida's Sunshine City",             heroGradient: 'from-sky-900/80 via-blue-900/60 to-midnight-900', lat: 27.7253, lng: -82.7412 },
-  'key-west':       { label: 'Key West',         tagline: 'Close to Perfect, Far from Normal',   heroGradient: 'from-teal-900/80 via-emerald-900/60 to-midnight-900', lat: 24.5551, lng: -81.7800 },
+  'key-west':       { label: 'Key West',         tagline: 'Close to Perfect, Far from Normal',   heroGradient: 'from-teal-900/80 via-gold-900/60 to-midnight-900', lat: 24.5551, lng: -81.7800 },
   'sarasota':       { label: 'Sarasota',         tagline: 'Where Arts Meet the Gulf',            heroGradient: 'from-indigo-900/80 via-purple-900/60 to-midnight-900', lat: 27.3364, lng: -82.5307 },
   'ybor-city':      { label: 'Ybor City',        tagline: "Tampa's Historic Latin Quarter",      heroGradient: 'from-red-900/80 via-orange-900/60 to-midnight-900', lat: 27.9617, lng: -82.4369 },
   'daytona':        { label: 'Daytona Beach',    tagline: "World's Most Famous Beach",           heroGradient: 'from-amber-900/80 via-yellow-900/60 to-midnight-900', lat: 29.2108, lng: -81.0228 },

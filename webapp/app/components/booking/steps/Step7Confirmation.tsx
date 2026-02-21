@@ -42,8 +42,8 @@ export default function Step7Confirmation({ onBack, onSubmit, data }: Step7Confi
   if (isSubmitted) {
     return (
       <div className="text-center py-8 space-y-6">
-        <div className="w-20 h-20 mx-auto bg-emerald-500/20 rounded-full flex items-center justify-center">
-          <svg className="w-10 h-10 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="w-20 h-20 mx-auto bg-gold-500/20 rounded-full flex items-center justify-center">
+          <svg className="w-10 h-10 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
@@ -121,7 +121,7 @@ export default function Step7Confirmation({ onBack, onSubmit, data }: Step7Confi
               <span className="text-white/50 block mb-2">Services Needed</span>
               <div className="flex flex-wrap gap-2">
                 {data.needs.map((need) => (
-                  <span key={need} className="px-2 py-1 bg-emerald-500/20 text-emerald-300 text-xs rounded-full">
+                  <span key={need} className="px-2 py-1 bg-gold-500/20 text-gold-300 text-xs rounded-full">
                     {need.replace('-', ' ')}
                   </span>
                 ))}
@@ -144,7 +144,7 @@ export default function Step7Confirmation({ onBack, onSubmit, data }: Step7Confi
           type="button"
           onClick={handleSubmit}
           disabled={isSubmitting}
-          className="flex-1 py-3 px-6 rounded-xl bg-emerald-500 text-black font-semibold hover:bg-emerald-400 transition disabled:opacity-50 flex items-center justify-center gap-2"
+          className="flex-1 py-3 px-6 rounded-xl bg-gold-500 text-black font-semibold hover:bg-gold-400 transition disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {isSubmitting ? (
             <>

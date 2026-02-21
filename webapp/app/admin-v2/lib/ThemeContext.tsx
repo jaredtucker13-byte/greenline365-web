@@ -78,7 +78,7 @@ const glassmorphismTheme: Theme = {
     textMuted: 'rgba(255,255,255,0.5)',
     textAccent: '#A7C957',
     
-    success: '#10B981',
+    success: '#C9A96E',
     warning: '#F59E0B',
     error: '#EF4444',
     info: '#3B82F6',
@@ -113,7 +113,7 @@ const midnightPurpleTheme: Theme = {
     textMuted: 'rgba(255,255,255,0.5)',
     textAccent: '#C4B5FD',
     
-    success: '#34D399',
+    success: '#D9C48F',
     warning: '#FBBF24',
     error: '#F87171',
     info: '#60A5FA',
@@ -148,7 +148,7 @@ const oceanBlueTheme: Theme = {
     textMuted: 'rgba(255,255,255,0.5)',
     textAccent: '#67E8F9',
     
-    success: '#34D399',
+    success: '#D9C48F',
     warning: '#FBBF24',
     error: '#F87171',
     info: '#38BDF8',
@@ -183,7 +183,7 @@ const sunsetOrangeTheme: Theme = {
     textMuted: 'rgba(255,255,255,0.5)',
     textAccent: '#FDBA74',
     
-    success: '#34D399',
+    success: '#D9C48F',
     warning: '#FCD34D',
     error: '#F87171',
     info: '#60A5FA',

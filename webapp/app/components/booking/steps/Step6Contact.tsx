@@ -29,7 +29,7 @@ export default function Step6Contact({ onBack, onNext, data, onUpdate }: Step6Co
             value={data.contactName || ''}
             onChange={(e) => onUpdate({ ...data, contactName: e.target.value })}
             placeholder="Jane Doe"
-            className="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition"
+            className="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-gold-500 focus:ring-1 focus:ring-gold-500 outline-none transition"
           />
         </div>
 
@@ -42,7 +42,7 @@ export default function Step6Contact({ onBack, onNext, data, onUpdate }: Step6Co
             value={data.email || ''}
             onChange={(e) => onUpdate({ ...data, email: e.target.value })}
             placeholder="jane@company.com"
-            className="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition"
+            className="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-gold-500 focus:ring-1 focus:ring-gold-500 outline-none transition"
           />
         </div>
 
@@ -55,7 +55,7 @@ export default function Step6Contact({ onBack, onNext, data, onUpdate }: Step6Co
             value={data.phone || ''}
             onChange={(e) => onUpdate({ ...data, phone: e.target.value })}
             placeholder="(555) 555-5555"
-            className="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition"
+            className="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-gold-500 focus:ring-1 focus:ring-gold-500 outline-none transition"
           />
         </div>
       </div>
@@ -72,7 +72,7 @@ export default function Step6Contact({ onBack, onNext, data, onUpdate }: Step6Co
           type="button"
           onClick={onNext}
           disabled={!data.contactName?.trim() || !data.email || !isValidEmail(data.email)}
-          className="flex-1 py-3 px-6 rounded-xl bg-emerald-500 text-black font-semibold hover:bg-emerald-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 py-3 px-6 rounded-xl bg-gold-500 text-black font-semibold hover:bg-gold-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Continue
         </button>

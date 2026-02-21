@@ -18,7 +18,7 @@ const INDUSTRIES = [
 ];
 
 const TIER_INFO: Record<string, { name: string; price: string; color: string }> = {
-  free: { name: 'Free', price: '$0', color: '#10B981' },
+  free: { name: 'Free', price: '$0', color: '#C9A96E' },
   pro: { name: 'Pro', price: '$45/mo', color: '#3B82F6' },
   premium: { name: 'Premium', price: '$89/mo', color: '#FF8C00' },
 };
@@ -160,7 +160,7 @@ function RegisterForm() {
   if (checkingAuth) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#0f0f0f]">
-        <div className="w-10 h-10 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+        <div className="w-10 h-10 border-4 border-gold-500/30 border-t-gold-500 rounded-full animate-spin" />
       </div>
     );
   }
@@ -187,12 +187,12 @@ function RegisterForm() {
       {/* Steps indicator */}
       <div className="max-w-md mx-auto px-6 mb-8">
         <div className="flex items-center gap-3">
-          <div className={`flex-1 h-1 rounded-full ${step === 'auth' || step === 'business' ? 'bg-emerald-500' : 'bg-white/10'}`} />
-          <div className={`flex-1 h-1 rounded-full ${step === 'business' ? 'bg-emerald-500' : 'bg-white/10'}`} />
+          <div className={`flex-1 h-1 rounded-full ${step === 'auth' || step === 'business' ? 'bg-gold-500' : 'bg-white/10'}`} />
+          <div className={`flex-1 h-1 rounded-full ${step === 'business' ? 'bg-gold-500' : 'bg-white/10'}`} />
         </div>
         <div className="flex justify-between mt-2 text-xs text-white/40">
-          <span className={step === 'auth' ? 'text-emerald-400' : 'text-white/60'}>1. Account</span>
-          <span className={step === 'business' ? 'text-emerald-400' : ''}>2. Business Info</span>
+          <span className={step === 'auth' ? 'text-gold-400' : 'text-white/60'}>1. Account</span>
+          <span className={step === 'business' ? 'text-gold-400' : ''}>2. Business Info</span>
         </div>
       </div>
 
@@ -240,7 +240,7 @@ function RegisterForm() {
                     value={authData.fullName}
                     onChange={(e) => setAuthData({ ...authData, fullName: e.target.value })}
                     required
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 outline-none transition"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
                     placeholder="John Smith"
                     data-testid="register-name-input"
                   />
@@ -252,7 +252,7 @@ function RegisterForm() {
                     value={authData.email}
                     onChange={(e) => setAuthData({ ...authData, email: e.target.value })}
                     required
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 outline-none transition"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
                     placeholder="you@company.com"
                     data-testid="register-email-input"
                   />
@@ -265,7 +265,7 @@ function RegisterForm() {
                     onChange={(e) => setAuthData({ ...authData, password: e.target.value })}
                     required
                     minLength={6}
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 outline-none transition"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
                     placeholder="Min 6 characters"
                     data-testid="register-password-input"
                   />
@@ -273,7 +273,7 @@ function RegisterForm() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3.5 bg-emerald-500 text-black font-bold rounded-xl hover:bg-emerald-400 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full py-3.5 bg-gold-500 text-black font-bold rounded-xl hover:bg-gold-400 transition disabled:opacity-50 flex items-center justify-center gap-2"
                   data-testid="register-auth-submit"
                 >
                   {loading ? <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" /> : 'Continue'}
@@ -282,7 +282,7 @@ function RegisterForm() {
 
               <p className="text-center text-white/40 text-sm mt-6">
                 Already have an account?{' '}
-                <Link href="/login" className="text-emerald-400 hover:text-emerald-300">Sign in</Link>
+                <Link href="/login" className="text-gold-400 hover:text-gold-300">Sign in</Link>
               </p>
             </>
           )}
@@ -290,7 +290,7 @@ function RegisterForm() {
           {step === 'business' && (
             <form onSubmit={handleBusinessSubmit} className="space-y-4">
               <div className="flex items-center gap-2 mb-2 text-sm text-white/50">
-                <svg className="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>
+                <svg className="w-4 h-4 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>
                 Logged in as <span className="text-white/70">{user?.email}</span>
               </div>
 
@@ -301,7 +301,7 @@ function RegisterForm() {
                   value={businessData.business_name}
                   onChange={(e) => setBusinessData({ ...businessData, business_name: e.target.value })}
                   required
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 outline-none transition"
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
                   placeholder="Acme Plumbing LLC"
                   data-testid="register-business-name"
                 />
@@ -313,7 +313,7 @@ function RegisterForm() {
                   value={businessData.industry}
                   onChange={(e) => setBusinessData({ ...businessData, industry: e.target.value })}
                   required
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 outline-none transition"
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
                   data-testid="register-industry-select"
                 >
                   <option value="" className="bg-gray-900">Select industry...</option>
@@ -328,7 +328,7 @@ function RegisterForm() {
                     type="tel"
                     value={businessData.phone}
                     onChange={(e) => setBusinessData({ ...businessData, phone: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-emerald-500/50 outline-none transition"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-gold-500/50 outline-none transition"
                     placeholder="(555) 123-4567"
                     data-testid="register-phone"
                   />
@@ -339,7 +339,7 @@ function RegisterForm() {
                     type="url"
                     value={businessData.website}
                     onChange={(e) => setBusinessData({ ...businessData, website: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-emerald-500/50 outline-none transition"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-gold-500/50 outline-none transition"
                     placeholder="https://..."
                     data-testid="register-website"
                   />
@@ -353,7 +353,7 @@ function RegisterForm() {
                     type="text"
                     value={businessData.city}
                     onChange={(e) => setBusinessData({ ...businessData, city: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-emerald-500/50 outline-none transition"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-gold-500/50 outline-none transition"
                     placeholder="Tampa"
                     data-testid="register-city"
                   />
@@ -364,7 +364,7 @@ function RegisterForm() {
                     type="text"
                     value={businessData.state}
                     onChange={(e) => setBusinessData({ ...businessData, state: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-emerald-500/50 outline-none transition"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-gold-500/50 outline-none transition"
                     placeholder="FL"
                     data-testid="register-state"
                   />
@@ -375,7 +375,7 @@ function RegisterForm() {
                     type="text"
                     value={businessData.zip_code}
                     onChange={(e) => setBusinessData({ ...businessData, zip_code: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-emerald-500/50 outline-none transition"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-gold-500/50 outline-none transition"
                     placeholder="33601"
                     data-testid="register-zip"
                   />
@@ -388,7 +388,7 @@ function RegisterForm() {
                   value={businessData.description}
                   onChange={(e) => setBusinessData({ ...businessData, description: e.target.value })}
                   rows={3}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-emerald-500/50 outline-none transition resize-none"
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-gold-500/50 outline-none transition resize-none"
                   placeholder="Tell customers what you do..."
                   data-testid="register-description"
                 />
@@ -398,7 +398,7 @@ function RegisterForm() {
                 type="submit"
                 disabled={loading}
                 className="w-full py-3.5 font-bold rounded-xl transition disabled:opacity-50 flex items-center justify-center gap-2 text-black"
-                style={{ background: selectedTier === 'free' ? '#10B981' : 'linear-gradient(135deg, #FF8C00, #FFB800)' }}
+                style={{ background: selectedTier === 'free' ? '#C9A96E' : 'linear-gradient(135deg, #FF8C00, #FFB800)' }}
                 data-testid="register-business-submit"
               >
                 {loading ? (
@@ -427,7 +427,7 @@ export default function RegisterBusinessPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-[#0f0f0f] flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+        <div className="w-10 h-10 border-4 border-gold-500/30 border-t-gold-500 rounded-full animate-spin" />
       </div>
     }>
       <RegisterForm />

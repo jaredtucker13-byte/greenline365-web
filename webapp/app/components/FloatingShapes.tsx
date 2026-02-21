@@ -20,7 +20,7 @@ export default function FloatingShapes() {
         style={{ y: y1 }}
         className="absolute -top-40 -right-40 w-[600px] h-[600px]"
       >
-        <div className="w-full h-full rounded-full bg-gradient-to-br from-neon-green-500/10 via-emerald-500/5 to-transparent blur-3xl" />
+        <div className="w-full h-full rounded-full bg-gradient-to-br from-gold-500/10 via-gold-300/5 to-transparent blur-3xl" />
       </motion.div>
 
       {/* 3D Cube Shape */}
@@ -29,8 +29,8 @@ export default function FloatingShapes() {
         className="absolute top-[20%] right-[15%]"
       >
         <div className="w-20 h-20 relative preserve-3d">
-          <div className="absolute inset-0 bg-gradient-to-br from-neon-green-500/20 to-emerald-500/10 rounded-xl border border-neon-green-500/30 backdrop-blur-sm transform rotate-12" />
-          <div className="absolute inset-2 bg-gradient-to-br from-neon-green-500/10 to-transparent rounded-lg border border-neon-green-500/20 transform -rotate-6" />
+          <div className="absolute inset-0 bg-gradient-to-br from-gold-500/20 to-gold-300/10 rounded-xl border border-gold-500/30 backdrop-blur-sm transform rotate-12" />
+          <div className="absolute inset-2 bg-gradient-to-br from-gold-500/10 to-transparent rounded-lg border border-gold-500/20 transform -rotate-6" />
         </div>
       </motion.div>
 
@@ -41,7 +41,7 @@ export default function FloatingShapes() {
         transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
         className="absolute top-[40%] left-[10%]"
       >
-        <div className="w-32 h-32 rounded-full border-4 border-dashed border-neon-green-500/20" />
+        <div className="w-32 h-32 rounded-full border-4 border-dashed border-gold-500/20" />
       </motion.div>
 
       {/* Hexagon */}
@@ -58,8 +58,8 @@ export default function FloatingShapes() {
           />
           <defs>
             <linearGradient id="hexGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#00ff00" />
-              <stop offset="100%" stopColor="#00aa00" />
+              <stop offset="0%" stopColor="#C9A96E" />
+              <stop offset="100%" stopColor="#9A7A3E" />
             </linearGradient>
           </defs>
         </svg>
@@ -75,7 +75,7 @@ export default function FloatingShapes() {
             key={i}
             animate={{ opacity: [0.3, 1, 0.3] }}
             transition={{ duration: 2, delay: i * 0.1, repeat: Infinity }}
-            className="w-1.5 h-1.5 bg-neon-green-500 rounded-full"
+            className="w-1.5 h-1.5 bg-gold rounded-full"
           />
         ))}
       </motion.div>
@@ -89,7 +89,7 @@ export default function FloatingShapes() {
           <polygon
             points="50,10 90,90 10,90"
             fill="none"
-            stroke="#00ff00"
+            stroke="#C9A96E"
             strokeWidth="2"
           />
         </svg>
@@ -98,7 +98,7 @@ export default function FloatingShapes() {
       {/* Gradient Line */}
       <motion.div
         style={{ y: y2 }}
-        className="absolute top-[50%] right-[5%] w-px h-40 bg-gradient-to-b from-transparent via-neon-green-500/50 to-transparent"
+        className="absolute top-[50%] right-[5%] w-px h-40 bg-gradient-to-b from-transparent via-gold-500/50 to-transparent"
       />
 
       {/* Circle Outline */}
@@ -108,7 +108,7 @@ export default function FloatingShapes() {
         transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
         className="absolute top-[80%] left-[15%]"
       >
-        <div className="w-24 h-24 rounded-full border-2 border-neon-green-500/20" />
+        <div className="w-24 h-24 rounded-full border-2 border-gold-500/20" />
       </motion.div>
 
       {/* Cross Shape */}
@@ -117,8 +117,8 @@ export default function FloatingShapes() {
         className="absolute top-[45%] right-[25%]"
       >
         <div className="relative w-10 h-10">
-          <div className="absolute top-1/2 left-0 w-full h-0.5 bg-neon-green-500/30 -translate-y-1/2" />
-          <div className="absolute left-1/2 top-0 w-0.5 h-full bg-neon-green-500/30 -translate-x-1/2" />
+          <div className="absolute top-1/2 left-0 w-full h-0.5 bg-gold-500/30 -translate-y-1/2" />
+          <div className="absolute left-1/2 top-0 w-0.5 h-full bg-gold-500/30 -translate-x-1/2" />
         </div>
       </motion.div>
 
@@ -135,7 +135,7 @@ export default function FloatingShapes() {
         style={{ y: y2 }}
         animate={{ x: [0, 10, 0] }}
         transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute top-[25%] left-[25%] text-4xl text-neon-green-500/20 font-mono"
+        className="absolute top-[25%] left-[25%] text-4xl text-gold/20 font-mono"
       >
         {'{ }'}
       </motion.div>
@@ -149,22 +149,22 @@ export default function FloatingShapes() {
         <motion.path
           d="M0,60 Q40,20 80,40 T160,20"
           fill="none"
-          stroke="#00ff00"
+          stroke="#C9A96E"
           strokeWidth="2"
           initial={{ pathLength: 0 }}
           animate={{ pathLength: 1 }}
           transition={{ duration: 2, repeat: Infinity, repeatType: 'reverse' }}
         />
-        <circle cx="0" cy="60" r="4" fill="#00ff00" />
-        <circle cx="80" cy="40" r="4" fill="#00ff00" />
-        <circle cx="160" cy="20" r="4" fill="#00ff00" />
+        <circle cx="0" cy="60" r="4" fill="#C9A96E" />
+        <circle cx="80" cy="40" r="4" fill="#C9A96E" />
+        <circle cx="160" cy="20" r="4" fill="#C9A96E" />
       </motion.svg>
 
       {/* Pulse Ring */}
       <motion.div
         animate={{ scale: [1, 1.5, 1], opacity: [0.5, 0, 0.5] }}
         transition={{ duration: 4, repeat: Infinity }}
-        className="absolute top-[35%] right-[35%] w-16 h-16 rounded-full border border-neon-green-500/50"
+        className="absolute top-[35%] right-[35%] w-16 h-16 rounded-full border border-gold-500/50"
       />
     </div>
   );

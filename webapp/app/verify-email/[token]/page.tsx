@@ -112,7 +112,7 @@ export default function VerifyEmailPage() {
         {status === 'loading' && (
           <div className="bg-gradient-to-br from-gray-900/80 to-gray-900/40 border border-white/10 rounded-2xl p-8 text-center">
             <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
-              <div className="w-8 h-8 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+              <div className="w-8 h-8 border-2 border-gold-500/30 border-t-gold-500 rounded-full animate-spin" />
             </div>
             <h1 className="text-2xl font-bold text-white mb-2">Verifying...</h1>
             <p className="text-gray-400">Please wait while we verify your email.</p>
@@ -121,23 +121,23 @@ export default function VerifyEmailPage() {
 
         {/* Success State */}
         {status === 'success' && (
-          <div className="bg-gradient-to-br from-gray-900/80 to-gray-900/40 border border-emerald-500/30 rounded-2xl p-8 text-center">
+          <div className="bg-gradient-to-br from-gray-900/80 to-gray-900/40 border border-gold-500/30 rounded-2xl p-8 text-center">
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', delay: 0.2 }}
-              className="w-20 h-20 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6"
+              className="w-20 h-20 bg-gold-500/20 rounded-full flex items-center justify-center mx-auto mb-6"
             >
               <span className="text-5xl">✅</span>
             </motion.div>
             <h1 className="text-2xl font-bold text-white mb-2">Email Verified!</h1>
             <p className="text-gray-400 mb-6">{message}</p>
-            <p className="text-emerald-400 text-sm mb-8">
+            <p className="text-gold-400 text-sm mb-8">
               You're now on the GreenLine365 waitlist. We'll notify you when we launch!
             </p>
             <Link
               href="/"
-              className="inline-block px-8 py-3 bg-emerald-500 text-black font-bold rounded-xl hover:bg-emerald-400 transition"
+              className="inline-block px-8 py-3 bg-gold-500 text-black font-bold rounded-xl hover:bg-gold-400 transition"
             >
               Return to Homepage →
             </Link>
@@ -171,7 +171,7 @@ export default function VerifyEmailPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="your@email.com"
                   required
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 outline-none transition"
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
                 />
               </div>
 
@@ -184,7 +184,7 @@ export default function VerifyEmailPage() {
                   placeholder="123456"
                   maxLength={6}
                   required
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-center text-2xl tracking-[0.5em] font-mono placeholder:text-white/30 placeholder:tracking-normal placeholder:text-base focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 outline-none transition"
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-center text-2xl tracking-[0.5em] font-mono placeholder:text-white/30 placeholder:tracking-normal placeholder:text-base focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
                 />
               </div>
 
@@ -195,7 +195,7 @@ export default function VerifyEmailPage() {
               <button
                 type="submit"
                 disabled={verifying || code.length !== 6 || !email}
-                className="w-full py-4 bg-emerald-500 text-black font-bold rounded-xl hover:bg-emerald-400 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full py-4 bg-gold-500 text-black font-bold rounded-xl hover:bg-gold-400 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {verifying ? (
                   <>
@@ -212,7 +212,7 @@ export default function VerifyEmailPage() {
               <p className="text-gray-500 text-sm">
                 Didn't receive the email? Check your spam folder.
               </p>
-              <Link href="/waitlist" className="text-emerald-400 text-sm hover:underline mt-2 inline-block">
+              <Link href="/waitlist" className="text-gold-400 text-sm hover:underline mt-2 inline-block">
                 ← Back to Waitlist
               </Link>
             </div>
