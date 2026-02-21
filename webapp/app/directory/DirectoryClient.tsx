@@ -329,7 +329,7 @@ export default function DirectoryPage() {
               <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
                 className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-gold/30 backdrop-blur-sm mb-8"
                 style={{ background: 'rgba(201, 169, 110, 0.12)' }}>
-                <span className="w-2 h-2 rounded-full bg-greenline animate-pulse" />
+                <span className="w-2 h-2 rounded-full bg-gold animate-pulse" />
                 <span className="text-xs font-semibold text-gold/90 tracking-widest font-heading uppercase">Live Directory</span>
               </motion.div>
 
@@ -768,7 +768,7 @@ function ListingCard({ listing: l, index: i }: { listing: Listing; index: number
   return (
     <Link href={`/listing/${l.slug}`}>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
-        className={`rounded-2xl overflow-hidden border transition-all duration-500 group cursor-pointer ${hasIntel ? 'border-greenline/20 shadow-intel-glow hover:border-greenline/40' : 'border-white/5 hover:border-gold/20 hover:shadow-gold-glow'}`}
+        className={`rounded-2xl overflow-hidden border transition-all duration-500 group cursor-pointer ${hasIntel ? 'border-gold/20 shadow-gold-glow hover:border-gold/40' : 'border-white/5 hover:border-gold/20 hover:shadow-gold-glow'}`}
         style={{ background: 'rgba(255,255,255,0.02)' }}
         data-testid={`listing-${l.slug}`}>
         <div className="relative h-40 overflow-hidden">

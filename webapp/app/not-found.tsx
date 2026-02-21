@@ -8,8 +8,8 @@ export default function NotFound() {
     <main className="min-h-screen bg-os-dark flex items-center justify-center px-4">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-os-dark via-os-dark-800 to-os-dark overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-neon-green-500/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-neon-green-500/5 rounded-full blur-3xl" />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gold-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gold-500/10 rounded-full blur-3xl" />
       </div>
 
       <div className="relative z-10 text-center max-w-lg">
@@ -22,7 +22,7 @@ export default function NotFound() {
         >
           <h1 className="text-[120px] md:text-[180px] font-display font-bold leading-none">
             <span className="text-white/10">4</span>
-            <span className="text-neon-green-500">0</span>
+            <span className="text-gold-400">0</span>
             <span className="text-white/10">4</span>
           </h1>
         </motion.div>
@@ -51,7 +51,7 @@ export default function NotFound() {
         >
           <Link
             href="/"
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-neon-green-500 text-black font-semibold rounded-xl hover:bg-neon-green-400 transition-all hover:scale-105"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gold text-black font-semibold rounded-xl hover:bg-gold-300 transition-all hover:scale-105"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
