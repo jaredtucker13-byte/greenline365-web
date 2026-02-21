@@ -9,6 +9,15 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { useGSAP, gsap } from '@/lib/gsap';
+import {
+  useScrollReveal,
+  useStaggerCards,
+  useCountUp,
+  useMagneticButton,
+  useParallax,
+  useSectionFade,
+} from '@/lib/gsap-animations';
 
 interface Listing {
   id: string;
@@ -88,6 +97,12 @@ function PropertyIntelBadge() {
   );
 }
 
+function CountUpStat({ value }: { value: number }) {
+  const ref = useCountUp(value, 2);
+  if (value <= 0) return <span>...</span>;
+  return <span ref={ref as React.RefObject<HTMLSpanElement>}>0</span>;
+}
+
 // ─── Main Component ────────────────────────────────────────────────
 export default function DirectoryPage() {
   const [listings, setListings] = useState<Listing[]>([]);
@@ -106,6 +121,51 @@ export default function DirectoryPage() {
   const [availableCities, setAvailableCities] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<'nearest' | 'highest' | 'lowest' | 'most-reviews'>('nearest');
   const [maxDistance, setMaxDistance] = useState<number>(0);
+
+  // ─── GSAP Hooks ──────────────────────────────────────────────────
+  const heroRef = useRef<HTMLDivElement>(null);
+  const searchBtnRef = useMagneticButton();
+  const heroImageRef = useParallax(0.15);
+  const categoriesRef = useStaggerCards();
+  const featuredSectionRef = useSectionFade();
+  const destinationsRef = useStaggerCards();
+  const valuePropRef = useScrollReveal({ stagger: 0.12, y: 40 });
+
+  // Hero entrance timeline (replaces Framer Motion delays)
+  useGSAP(() => {
+    if (!heroRef.current) return;
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+    tl.fromTo('[data-hero-badge]',
+      { opacity: 0, y: -20 },
+      { opacity: 1, y: 0, duration: 0.8 }
+    )
+    .fromTo('[data-hero-title]',
+      { opacity: 0, y: 40 },
+      { opacity: 1, y: 0, duration: 1 },
+      '-=0.4'
+    )
+    .fromTo('[data-hero-subtitle]',
+      { opacity: 0, y: 30 },
+      { opacity: 1, y: 0, duration: 0.8 },
+      '-=0.5'
+    )
+    .fromTo('[data-hero-search]',
+      { opacity: 0, y: 20 },
+      { opacity: 1, y: 0, duration: 0.6 },
+      '-=0.3'
+    )
+    .fromTo('[data-hero-pills] > *',
+      { opacity: 0, y: 10 },
+      { opacity: 1, y: 0, duration: 0.4, stagger: 0.06 },
+      '-=0.2'
+    )
+    .fromTo('[data-hero-stats]',
+      { opacity: 0, y: 20 },
+      { opacity: 1, y: 0, duration: 0.6 },
+      '-=0.2'
+    );
+  }, []);
 
   // Restore state from URL on mount (breadcrumb support)
   useEffect(() => {
@@ -318,38 +378,38 @@ export default function DirectoryPage() {
         <>
           {/* ─── HERO ─── */}
           <section className="relative overflow-hidden pt-16" style={{ minHeight: '85vh' }} data-testid="directory-hero">
-            <div className="absolute inset-0">
+            <div className="absolute inset-0" ref={heroImageRef as React.RefObject<HTMLDivElement>}>
               <img src="/images/hero-directory.png" alt="GreenLine365 business directory — discover local businesses across dining, services, nightlife and more" className="w-full h-full object-cover" />
             </div>
             {/* Darkened overlays for text legibility (WCAG fix) */}
             <div className="absolute inset-0 bg-gradient-to-b from-midnight-900/95 via-midnight-900/85 to-midnight-900" />
             <div className="absolute inset-0 bg-midnight-900/40" />
 
-            <div className="relative max-w-5xl mx-auto px-6 flex flex-col items-center justify-center" style={{ minHeight: '75vh' }}>
-              <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+            <div ref={heroRef} className="relative max-w-5xl mx-auto px-6 flex flex-col items-center justify-center" style={{ minHeight: '75vh' }}>
+              <div data-hero-badge
                 className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-gold/30 backdrop-blur-sm mb-8"
-                style={{ background: 'rgba(201, 169, 110, 0.12)' }}>
+                style={{ background: 'rgba(201, 169, 110, 0.12)', opacity: 0 }}>
                 <span className="w-2 h-2 rounded-full bg-greenline animate-pulse" />
                 <span className="text-xs font-semibold text-gold/90 tracking-widest font-heading uppercase">Live Directory</span>
-              </motion.div>
+              </div>
 
               {/* Benefit-focused headline */}
-              <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+              <h1 data-hero-title style={{ opacity: 0 }}
                 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-light text-white text-center leading-[1.15] mb-6 tracking-tight"
                 data-testid="directory-title">
                 Find <span className="font-semibold text-gradient-gold">Verified Local Pros</span>
                 <br className="hidden sm:block" />
                 <span className="text-white/90"> You Can Actually Trust</span>
-              </motion.h1>
+              </h1>
 
               {/* Value prop - now prominent */}
-              <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}
+              <p data-hero-subtitle style={{ opacity: 0 }}
                 className="text-base md:text-lg text-white/80 max-w-2xl mx-auto text-center mb-10 leading-relaxed font-body">
                 Every business in our directory is real, verified, and accountable. We reject listings that don't meet the standard — so you don't have to guess.
-              </motion.p>
+              </p>
 
               {/* Search Bar — clear primary CTA */}
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="w-full max-w-2xl">
+              <div data-hero-search style={{ opacity: 0 }} className="w-full max-w-2xl">
                 <div className="flex flex-col sm:flex-row gap-3 p-2 rounded-2xl backdrop-blur-xl border border-white/15" style={{ background: 'rgba(255,255,255,0.10)' }}>
                   <div className="flex-1 relative">
                     <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
@@ -358,32 +418,30 @@ export default function DirectoryPage() {
                       className="w-full pl-12 pr-4 py-4 rounded-xl text-sm bg-transparent text-white placeholder-white/50 focus:outline-none font-body"
                       data-testid="hero-search" />
                   </div>
-                  <button onClick={handleSearch}
+                  <button ref={searchBtnRef} onClick={handleSearch}
                     className="px-10 py-4 rounded-xl text-sm font-bold font-heading tracking-wide text-midnight-900 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
                     style={{ background: 'linear-gradient(135deg, #C9A96E 0%, #E6D8B5 50%, #C9A96E 100%)', boxShadow: '0 0 30px rgba(201,169,110,0.6), 0 4px 16px rgba(0,0,0,0.4)' }}
                     data-testid="hero-search-btn">
                     Search Directory
                   </button>
                 </div>
-                <div className="flex flex-wrap justify-center gap-2 mt-5">
-                  {CATEGORIES.slice(0, 6).map((cat, i) => (
-                    <motion.button key={cat.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 + i * 0.06 }}
+                <div data-hero-pills className="flex flex-wrap justify-center gap-2 mt-5">
+                  {CATEGORIES.slice(0, 6).map((cat) => (
+                    <button key={cat.id}
                       onClick={() => handleCategoryClick(cat.id)}
                       className="px-4 py-1.5 rounded-full text-xs font-medium text-white/70 border border-white/20 hover:border-gold/50 hover:text-gold hover:bg-gold/5 transition-all duration-300 backdrop-blur-sm font-body"
                       data-testid={`hero-chip-${cat.id}`}>
                       {cat.label}
-                    </motion.button>
+                    </button>
                   ))}
                 </div>
-              </motion.div>
+              </div>
 
-              {/* ─── TRUST COUNTER BAR (larger, higher contrast) ─── */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.0 }}
+              {/* ─── TRUST COUNTER BAR (GSAP count-up + entrance) ─── */}
+              <div
+                data-hero-stats
+                style={{ background: 'rgba(255,255,255,0.05)', opacity: 0 }}
                 className="mt-14 flex items-center gap-8 sm:gap-12 px-8 py-5 rounded-2xl border border-white/10 backdrop-blur-sm"
-                style={{ background: 'rgba(255,255,255,0.05)' }}
                 data-testid="trust-counter-bar"
               >
                 {[
@@ -398,18 +456,18 @@ export default function DirectoryPage() {
                       </svg>
                     </div>
                     <div>
-                      <span className="block text-2xl font-heading font-bold text-white">{stat.value > 0 ? `${stat.value}+` : '...'}</span>
+                      <span className="block text-2xl font-heading font-bold text-white"><CountUpStat value={stat.value} />+</span>
                       <span className="block text-xs text-white/60 uppercase tracking-wider font-heading">{stat.label}</span>
                     </div>
                     {i < 2 && <div className="hidden sm:block w-px h-10 bg-white/15 ml-4 sm:ml-6" />}
                   </div>
                 ))}
-              </motion.div>
+              </div>
             </div>
             <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-midnight-900 to-transparent" />
           </section>
 
-          {/* ─── BROWSE BY CATEGORY ─── */}
+          {/* ─── BROWSE BY CATEGORY (GSAP stagger on scroll) ─── */}
           <section id="categories" className="max-w-7xl mx-auto px-6 py-20" data-testid="categories-section">
             <p className="text-xs font-heading font-semibold uppercase tracking-[0.2em] text-center mb-3 text-gold">Browse By Category</p>
             <h2 className="text-3xl md:text-4xl font-heading font-light text-white text-center mb-3 tracking-tight">
@@ -417,10 +475,10 @@ export default function DirectoryPage() {
             </h2>
             <p className="text-white/50 text-center max-w-lg mx-auto mb-12 font-body">From home services to nightlife — find exactly what you need.</p>
 
-            {/* 9-Category Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {/* 9-Category Grid — GSAP stagger */}
+            <div ref={categoriesRef as React.RefObject<HTMLDivElement>} className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {CATEGORIES.map((cat, i) => (
-                <motion.div key={cat.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+                <div key={cat.id} data-card
                   className={`relative rounded-2xl overflow-hidden cursor-pointer group hover:shadow-gold-glow transition-all duration-500 ${i === 0 ? 'md:col-span-2 md:row-span-2' : ''}`}
                   style={{ minHeight: i === 0 ? 320 : 180 }}
                   onClick={() => handleCategoryClick(cat.id)} data-testid={`cat-${cat.id}`}>
@@ -431,13 +489,13 @@ export default function DirectoryPage() {
                     <span className="text-silver/70 text-xs font-body">{cat.sub}</span>
                   </div>
                   {i === 0 && <span className="absolute top-3 right-3 text-[10px] px-2.5 py-1 rounded-full font-heading font-semibold uppercase tracking-wider" style={{ background: 'rgba(91,138,114,0.9)', color: '#fff' }}>Core</span>}
-                </motion.div>
+                </div>
               ))}
             </div>
           </section>
 
-          {/* ─── FEATURED LISTINGS ─── */}
-          <section className="bg-charcoal-900 py-20" data-testid="featured-listings-section">
+          {/* ─── FEATURED LISTINGS (GSAP section fade) ─── */}
+          <section ref={featuredSectionRef as React.RefObject<HTMLElement>} className="bg-charcoal-900 py-20" data-testid="featured-listings-section">
             <div className="max-w-7xl mx-auto px-6">
               <p className="text-xs font-heading font-semibold uppercase tracking-[0.2em] text-center mb-3 text-gold">Showcase</p>
               <h2 className="text-3xl md:text-4xl font-heading font-light text-white text-center mb-3 tracking-tight">
@@ -500,8 +558,8 @@ export default function DirectoryPage() {
                 </p>
               </div>
 
-              {/* 8-Card Grid: 4 columns, 2 rows */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
+              {/* 8-Card Grid: 4 columns, 2 rows — GSAP stagger */}
+              <div ref={destinationsRef as React.RefObject<HTMLDivElement>} className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
                 {[
                   { slug: 'st-pete-beach',  label: 'St. Pete Beach',  tagline: "Florida's Sunshine City",            image: 'https://static.prod-images.emergentagent.com/jobs/2e119e5c-5e48-4af9-82e4-b66cfaef75d6/images/9f172c3ec8da33810bf5add7045d45d50c2a74434222d8de43496ad9db498e6a.png' },
                   { slug: 'key-west',       label: 'Key West',         tagline: 'Close to Perfect, Far from Normal', image: 'https://static.prod-images.emergentagent.com/jobs/2e119e5c-5e48-4af9-82e4-b66cfaef75d6/images/b6b16b8cb4d3ffcf8519f33cf4b55a5bab86a4fe22034d203f002c4c56c417ae.png' },
@@ -511,13 +569,8 @@ export default function DirectoryPage() {
                   { slug: 'orlando',        label: 'Orlando',          tagline: 'The City Beautiful',                image: 'https://static.prod-images.emergentagent.com/jobs/2e119e5c-5e48-4af9-82e4-b66cfaef75d6/images/5cc70d6507deeac4bf77f056c8f676e444f65bec8a857795608ebeaafd9af536.png' },
                   { slug: 'miami',          label: 'Miami',            tagline: 'Neon Nights & Coastal Luxury',      image: 'https://static.prod-images.emergentagent.com/jobs/2e119e5c-5e48-4af9-82e4-b66cfaef75d6/images/d771f9ed035f4fcd5df359e8bb0dd78ec2b6e5a9d6446dbd07377a903fa3945f.png' },
                   { slug: 'jacksonville',   label: 'Jacksonville',     tagline: 'Gridiron Grit & Riverfront Views',  image: 'https://static.prod-images.emergentagent.com/jobs/2e119e5c-5e48-4af9-82e4-b66cfaef75d6/images/3044a5e13c46207922e088bcb878b0ded80dcf0c9ca1d9c15c08586ac85cd2e3.png' },
-                ].map((d, i) => (
-                  <motion.div
-                    key={d.slug}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.15 + i * 0.07, duration: 0.5 }}
-                  >
+                ].map((d) => (
+                  <div key={d.slug} data-card>
                     <Link href={`/destination/${d.slug}`} className="block dest-card-frame group" data-testid={`dest-card-${d.slug}`}>
                       <div className="dest-card-inner">
                         {/* Image */}
@@ -536,7 +589,7 @@ export default function DirectoryPage() {
                         </div>
                       </div>
                     </Link>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             </div>
@@ -545,12 +598,12 @@ export default function DirectoryPage() {
             <div className="section-divider-gold max-w-5xl mx-auto mt-16" />
           </section>
 
-          {/* ─── VALUE PROPOSITION ─── */}
+          {/* ─── VALUE PROPOSITION (GSAP scroll reveal) ─── */}
           <section className="bg-midnight-900 py-20" data-testid="value-prop-section">
-            <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
+            <div ref={valuePropRef as React.RefObject<HTMLDivElement>} className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
               <div>
-                <h2 className="text-3xl font-heading font-light text-white mb-4 tracking-tight">A <span className="font-semibold text-gradient-gold">Trusted</span> Resource for Finding Local Pros</h2>
-                <p className="text-white/55 mb-10 leading-relaxed font-body">Whether you need emergency plumbing, a master electrician, or the best barber in town — our directory connects you with verified, accountable businesses.</p>
+                <h2 data-reveal className="text-3xl font-heading font-light text-white mb-4 tracking-tight">A <span className="font-semibold text-gradient-gold">Trusted</span> Resource for Finding Local Pros</h2>
+                <p data-reveal className="text-white/55 mb-10 leading-relaxed font-body">Whether you need emergency plumbing, a master electrician, or the best barber in town — our directory connects you with verified, accountable businesses.</p>
                 <div className="grid grid-cols-2 gap-6">
                   {[
                     { icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', label: 'Verified Pros' },
@@ -558,7 +611,7 @@ export default function DirectoryPage() {
                     { icon: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z', label: 'Easy Navigation' },
                     { icon: 'M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z', label: 'Direct Contact' },
                   ].map(f => (
-                    <div key={f.label} className="flex items-center gap-3 group/feat cursor-default">
+                    <div key={f.label} data-reveal className="flex items-center gap-3 group/feat cursor-default">
                       <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 group-hover/feat:scale-110 transition-transform duration-300 glass-gold">
                         <svg className="w-5 h-5 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d={f.icon} /></svg>
                       </div>
@@ -566,9 +619,9 @@ export default function DirectoryPage() {
                     </div>
                   ))}
                 </div>
-                <button onClick={handleBrowseAll} className="mt-10 btn-primary px-8 py-3 rounded-full text-sm" data-testid="find-business-btn">Find a Business</button>
+                <button data-reveal onClick={handleBrowseAll} className="mt-10 btn-primary px-8 py-3 rounded-full text-sm" data-testid="find-business-btn">Find a Business</button>
               </div>
-              <div className="relative">
+              <div data-reveal className="relative">
                 <img src="/images/hero-directory-alt.png" alt="GreenLine365 connects you with trusted, verified local businesses" className="w-full rounded-2xl object-cover" style={{ maxHeight: 400 }} />
               </div>
             </div>
