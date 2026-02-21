@@ -440,7 +440,7 @@ sudo supervisorctl restart frontend
 
 ## 📊 Progress Tracking
 
-**Overall Progress:** 28% Complete (2/7 phases done)
+**Overall Progress:** 28% Complete (2/7 UI phases done) + Trust Network Phase 1 Complete
 
 | Phase | Status | Progress | ETA |
 |-------|--------|----------|-----|
@@ -454,6 +454,29 @@ sudo supervisorctl restart frontend
 | 7. Polish | 🔵 Planned | 0% | ~3-4 hours |
 
 **Total Estimated Time Remaining:** ~19-25 hours of development
+
+---
+
+## 🛡️ Trust Network Phase 1 — Badge API & Embed Engine (COMPLETE — February 21, 2026)
+
+**Status:** Complete
+**Date:** February 21, 2026
+**Files Created:** 4 files, 415 lines
+
+### Accomplished:
+- ✅ Public Badge JSON API (`/api/badges/[partnerId]`) — CORS, 5min CDN cache, slug/uuid lookup
+- ✅ Embed Snippet Endpoint (`/api/badges/[partnerId]/embed`) — 3 styles (default, minimal, compact)
+- ✅ Badge.js Widget (`public/badge.js`) — zero-dep vanilla JS, IntersectionObserver, XHR cross-origin
+- ✅ Internal Badge API (`/api/badges`) — authenticated for portal snippet generator
+- ✅ Subscription-aware gating — inactive badges grayscale when tier = free
+- ✅ Deep codebase audit — discovered `directory_badges` and `payment_transactions` tables already existed
+- ✅ Migration 032 (`payment_events`) — created and run in Supabase production
+- ✅ `schema.sql` updated with `payment_events` block
+
+### Next Steps (Trust Network Phase 2):
+- Review widget: extend `/api/directory/reviews` with `?embed=true&limit=5&sort=recent`
+- Portal snippet generator UI component in `/portal`
+- `/trust` page enhancement with badge immutability content
 
 ---
 

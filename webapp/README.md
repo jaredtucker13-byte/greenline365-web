@@ -209,6 +209,16 @@ supabase functions deploy lead-alerts
 | `/api/bookings` | POST | Create new booking |
 | `/api/chat` | POST | AI chat completion |
 | `/api/verify-email` | POST | Email verification (mocked) |
+| `/api/badges/[partnerId]` | GET | Public badge JSON API (CORS, CDN cached) |
+| `/api/badges/[partnerId]/embed` | GET | HTML embed snippet (3 styles) |
+| `/api/badges` | GET | Authenticated badge API (portal UI) |
+| `/api/campaigns` | GET/POST | Campaign management |
+| `/api/calendar/unified` | GET/POST/PATCH/DELETE | Unified calendar events |
+| `/api/subscriptions` | GET/POST | Subscription management |
+| `/api/plans` | GET | Available plans |
+| `/api/billing/checkout` | POST | Stripe checkout session |
+| `/api/billing/portal` | POST | Stripe customer portal |
+| `/api/team` | GET/POST | Team member management |
 
 ---
 

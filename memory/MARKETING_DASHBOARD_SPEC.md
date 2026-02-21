@@ -13,7 +13,8 @@ Monitors the "Pulse" of the business across all platforms.
 |---|---|
 | Google Maps Integration | Live feed of recent Google reviews with AI "Draft Response" button powered by Brand Voice AI |
 | Greenline Directory Reviews | Direct feedback from local users, tracking Cleanliness and Vibe scores |
-| Active Badges | Visual display of "Earned" and "Integrated" badges (e.g., Intelligence Verified, Elite Service) |
+| Active Badges | Visual display of "Earned" and "Integrated" badges (e.g., Intelligence Verified, Elite Service). **IMPLEMENTED:** Badge data served via `GET /api/badges/[partnerId]` (public, CORS-enabled). External embed via `badge.js` widget. Inactive badges show grayscale when subscription = free. |
+| Badge Embed Widget | **NEW (Feb 21, 2026):** Partners can embed GL365 badges on their own sites via `<div data-gl365-badge data-partner-id="slug"></div>` + `badge.js`. 3 styles: default, minimal, compact. |
 
 ## 2. Conversion & Lead Engine
 Tracks the ROI of automated workflows.

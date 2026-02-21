@@ -95,7 +95,27 @@ CREATE POLICY "Admin full access to access_codes" ON access_codes
   );
 ```
 
-**That's it!** After this, you should be able to send invites. 🎯
+**That's it!** After this, you should be able to send invites.
+
+---
+
+## 📋 Additional Migrations (Sprint 1 + Trust Network)
+
+### 4. **028-031 — Hub-and-Spoke Subscription System** (Sprint 1)
+**Status:** ✅ Merged via PR #10 (Feb 20, 2026)
+- `028_subscription_tables.sql` — plans, subscriptions, feature_flags, roles, permissions, payment_events
+- `029_seed_subscription_data.sql` — 4 plans, 15 flags, 4 roles, 22 permissions
+- `030_listing_portal_tables.sql` — listing_photos, listing_menus, listing_stats
+- `031_extend_payment_events.sql` — stripe_event_id (unique), raw_payload (JSONB)
+
+### 5. **032_payment_events.sql** (Trust Network Phase 1)
+**Status:** ✅ Run in Supabase production (Feb 21, 2026)
+**What it does:** Creates `payment_events` table with full RLS policies
+**File:** `/database/migrations/032_payment_events.sql`
+
+### Codebase Audit Findings (Feb 21, 2026)
+- `directory_badges` table — **already existed** (no migration needed)
+- `payment_transactions` table — **already existed** (no migration needed)
 
 ---
 

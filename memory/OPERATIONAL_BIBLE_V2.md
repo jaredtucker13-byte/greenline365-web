@@ -28,9 +28,20 @@ $400 one-time audit — primary entry point converting cold prospects to high-ti
 
 Uses psychological pressure ("Negative Light") and time-weighted decay to ensure only elite businesses maintain status.
 
+### IMPLEMENTATION STATUS (February 21, 2026)
+**Trust Network Phase 1 — COMPLETE:**
+- ✅ `GET /api/badges/[partnerId]` — Public JSON API serving badge data (CORS, 5min cache)
+- ✅ `GET /api/badges/[partnerId]/embed` — HTML snippet for external partner sites (3 styles)
+- ✅ `public/badge.js` — Vanilla JS renderer embeddable on any external site
+- ✅ `GET /api/badges` — Authenticated API for portal snippet generator
+- ✅ Free tier = grayscale + 50% opacity + `badgeStatus: "inactive"` (the "Negative Light" in code)
+- ✅ `directory_badges` table confirmed existing in production
+- ✅ `payment_events` table created (migration 032)
+
 ### 1. The "Negative Light" Strategy (Free Tier)
 - **Locked State:** Full set of 7 badges displayed in Grayscale with padlock icon
 - **Paywall Trigger:** Click → "This business is not yet Intelligence Verified" → upgrade prompt
+- **Embed Widget:** External badge.js renders grayscale + pointer-events disabled when subscription inactive
 
 ### 2. Earned Badge Mechanics
 - **Poll Template Engine (Tier 2/3):** Specialized QR-code templates

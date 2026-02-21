@@ -110,6 +110,19 @@
 
 ---
 
+## 🛡️ TRUST NETWORK — BADGE API & EMBED ENGINE (NEW — February 21, 2026)
+
+| Feature | Description | Target Tier | Status |
+|---------|-------------|-------------|--------|
+| **Badge JSON API** | Public `GET /api/badges/[partnerId]` — CORS, CDN cache, slug/uuid | All (read-only) | ✅ Built |
+| **Embed Snippet** | `GET /api/badges/[partnerId]/embed?style=` — 3 styles (default, minimal, compact) | All | ✅ Built |
+| **Badge.js Widget** | `public/badge.js` — zero-dep vanilla JS, lazy load, cross-origin | External | ✅ Built |
+| **Internal Badge API** | `GET /api/badges?listing_id=&slug=` — authenticated for portal UI | Professional+ | ✅ Built |
+| **Subscription Gating** | Badges inactive + grayscale when tier = free | All | ✅ Built |
+| **Migration 032** | `payment_events` table — run in Supabase production | All | ✅ Run |
+
+---
+
 ## 🔮 FUTURE FEATURES (BACKLOG)
 
 | Feature | Description | Target Tier | Priority |

@@ -416,5 +416,37 @@ BUILT-IN 2 (Retell native):
 
                                                                 ---
 
-                                                                *Last Updated: February 19, 2026*
+                                                                *Last Updated: February 21, 2026*
                                                                 *Source: Analysis of memory/, webapp/docs/, webapp/app/api/, and Retell dashboard configuration*
+
+---
+
+## ADDENDUM — February 21, 2026 Session Update
+
+### Completed Since Last Analysis
+
+#### Database Audit Findings
+- **`directory_badges` table** — ALREADY EXISTS in production (was listed as potentially missing)
+- **`payment_transactions` table** — ALREADY EXISTS in production (was listed as potentially missing)
+- **`payment_events` table** — Created via migration 032, run in Supabase production
+
+#### Trust Network Phase 1 — Badge API & Embed Engine (COMPLETE)
+4 new API routes, 415 lines of code:
+- `GET /api/badges/[partnerId]` — Public badge JSON API (CORS, 5min CDN cache, slug/UUID lookup)
+- `GET /api/badges/[partnerId]/embed` — HTML embed snippet (3 styles: default, minimal, compact)
+- `GET /api/badges` — Authenticated internal API for portal snippet generator
+- `public/badge.js` — Zero-dep vanilla JS badge renderer (IntersectionObserver, XHR cross-origin)
+- Subscription-aware gating: badges marked inactive when business tier = free
+
+#### Gap Analysis Updates
+| Gap | Previous Status | Current Status |
+|-----|----------------|----------------|
+| Badge/Reputation System | Not built | Phase 1 COMPLETE — API + embed + widget |
+| `directory_badges` table | Unknown | Confirmed existing |
+| `payment_events` table | Missing | Created (migration 032) |
+| `payment_transactions` table | Unknown | Confirmed existing |
+
+#### Next Steps (Trust Network Phase 2)
+- Review widget: extend `/api/directory/reviews` with `?embed=true&limit=5&sort=recent`
+- Portal snippet generator UI component in `/portal`
+- `/trust` page enhancement with badge immutability content

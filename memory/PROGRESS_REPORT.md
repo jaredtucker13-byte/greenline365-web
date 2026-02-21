@@ -109,6 +109,27 @@
 
 ---
 
+## 🟢 NEW — Trust Network Phase 1 (Badge API + Embed Engine) — February 21, 2026
+
+### Badge System
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Public Badge JSON API | ✅ 100% | `GET /api/badges/[partnerId]` — CORS-enabled, 5min CDN cache, slug/uuid lookup |
+| Embed Snippet Endpoint | ✅ 100% | `GET /api/badges/[partnerId]/embed?style=` — returns ready-to-paste HTML |
+| Badge.js Renderer | ✅ 100% | `webapp/public/badge.js` — zero-dep vanilla JS, IntersectionObserver lazy load, XHR cross-origin |
+| Internal Badge API | ✅ 100% | `GET /api/badges?listing_id=&slug=` — authenticated, same response shape for portal UI |
+| Subscription-aware gating | ✅ 100% | Badges marked `badgeStatus: "inactive"` when business tier is free |
+| Inactive visual treatment | ✅ 100% | Grayscale + 50% opacity via CSS when subscription inactive |
+
+### Database Audit & Migrations (February 21, 2026)
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Deep codebase audit | ✅ Done | Discovered 2 of 3 "missing" tables already existed (`directory_badges`, `payment_transactions`) |
+| Migration 032 | ✅ Run in prod | `032_payment_events.sql` — created `payment_events` table |
+| schema.sql updated | ✅ Done | `payment_events` block added to master schema |
+
+---
+
 ## 🔴 NOT STARTED / BLOCKED
 
 ### Voice AI (Retell)
@@ -170,7 +191,9 @@
 | **Analytics** | 30% | Mock data only |
 | **Voice AI** | 10% | Paused |
 
-### **OVERALL: 75% Production Ready**
+| **Badge/Embed System** | 100% | Trust Network Phase 1 complete |
+
+### **OVERALL: 78% Production Ready**
 
 The core product (Blog Auto-Polish + Booking) is ready for users.
 Secondary features (Analytics, Voice AI, SMS) need more work.

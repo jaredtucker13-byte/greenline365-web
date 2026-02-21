@@ -96,6 +96,22 @@ Built the Campaign Manager and Unified Calendar:
 **Sidebar Updated:**
 - Added "Campaigns" entry with megaphone icon in CollapsibleSidebar.tsx
 
+### Trust Network Phase 1 — Badge API & Embed Engine (Feb 21, 2026)
+Built the GL365 Badge embed system for external partner sites:
+
+**Badge API (4 files, 415 lines):**
+- `GET /api/badges/[partnerId]` — Public JSON API, CORS-enabled, 5min CDN cache, slug/uuid lookup
+- `GET /api/badges/[partnerId]/embed?style=default|minimal|compact` — HTML snippet endpoint
+- `GET /api/badges?listing_id=&slug=` — Authenticated internal API for portal snippet generator
+- `webapp/public/badge.js` — Zero-dep vanilla JS widget, IntersectionObserver lazy load, XHR cross-origin
+
+**Database Audit & Migration:**
+- Deep codebase audit: discovered `directory_badges` and `payment_transactions` already existed
+- Created and ran migration `032_payment_events.sql` in Supabase production
+- Updated `schema.sql` with `payment_events` block
+
+---
+
 ## Backlog
 
 ### P0 — Immediate (Next Session)
@@ -108,8 +124,10 @@ Built the Campaign Manager and Unified Calendar:
 - Display coupons on listing pages + redemption flow
 - Display poll widgets on listings + results in dashboard
 
-### P2 — Property Intelligence Badge
-- Visual badge for high-tier CRM subscribers
+### P2 — Trust Network Phase 2
+- Review widget: extend `/api/directory/reviews` with `?embed=true&limit=5&sort=recent`
+- Portal snippet generator UI component in `/portal`
+- `/trust` page enhancement with badge immutability content
 
 ### P3 — Expansion
 - Expand discovery limits (25/category per destination)
@@ -122,6 +140,9 @@ Built the Campaign Manager and Unified Calendar:
 - `GET /api/calendar/unified` — Unified calendar events
 - `GET /api/directory/discover` — List 8 destinations & 10 categories
 - `POST /api/directory/discover` — Run discovery pipeline
+- `GET /api/badges/[partnerId]` — Public badge JSON API (CORS, CDN cached)
+- `GET /api/badges/[partnerId]/embed` — HTML embed snippet (3 styles)
+- `GET /api/badges` — Authenticated badge API (portal UI)
 
 ## Key Files
 - `/app/webapp/app/admin-v2/campaigns/page.tsx` — Campaign Manager UI

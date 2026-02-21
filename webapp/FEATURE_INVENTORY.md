@@ -298,6 +298,24 @@
 
 ---
 
+## 🛡️ Trust Network & Badge System (NEW — February 21, 2026)
+
+### Badge API & Embed Engine (Trust Network Phase 1)
+- ✅ **Public Badge JSON API** — `GET /api/badges/[partnerId]` — CORS-enabled, 5min CDN cache, slug/UUID lookup
+- ✅ **Embed Snippet Endpoint** — `GET /api/badges/[partnerId]/embed?style=default|minimal|compact` — ready-to-paste HTML
+- ✅ **Badge.js Widget** — `webapp/public/badge.js` — zero-dep vanilla JS, IntersectionObserver lazy load, XHR cross-origin
+- ✅ **Internal Badge API** — `GET /api/badges?listing_id=&slug=` — authenticated for portal snippet generator UI
+- ✅ **Subscription-Aware Gating** — badges `badgeStatus: "inactive"` when tier is free; grayscale + 50% opacity
+- ✅ **Widget Features** — star ratings, badge pills, hover tooltip (reviews + trust score), click-to-booking
+
+### Database Audit (February 21, 2026)
+- ✅ **`directory_badges` table** — already existed (discovered via codebase audit)
+- ✅ **`payment_transactions` table** — already existed (discovered via codebase audit)
+- ✅ **`payment_events` table** — migration 032 created and run in production
+- ✅ **`schema.sql` updated** — `payment_events` block added
+
+---
+
 ## 🚀 Coming Soon
 
 ### Planned Features
@@ -368,7 +386,9 @@
 **Platform Features:** 26  
 **Integration Features:** 20  
 
-**Total Active Features:** 108+
+**Badge & Embed Features:** 6
+
+**Total Active Features:** 114+
 
 ---
 

@@ -439,6 +439,15 @@ Super admins (`is_super_admin = true`) have:
 2. **002_add_performance_indexes.sql** - Added indexes for 1000+ users
 3. **003_enable_rls_missing_tables.sql** - Enabled RLS on 79 missing tables
 4. **004_cleanup_zero_row_tables.sql** - Zero-row table analysis and cleanup
+5. **028_subscription_tables.sql** - Core subscription tables (plans, subscriptions, feature_flags, roles, permissions)
+6. **029_seed_subscription_data.sql** - Seed data (4 plans, 15 feature flags, 4 roles, 22 permissions)
+7. **030_listing_portal_tables.sql** - listing_photos, listing_menus, listing_stats tables
+8. **031_extend_payment_events.sql** - Extended payment_events with stripe_event_id, raw_payload
+9. **032_payment_events.sql** - Created payment_events table (run in Supabase production Feb 21, 2026)
+
+### Tables Confirmed Existing (Codebase Audit Feb 21, 2026)
+- **directory_badges** - Badge data for directory listings (already existed)
+- **payment_transactions** - Payment transaction records (already existed)
 
 ---
 
