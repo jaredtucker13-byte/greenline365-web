@@ -8,12 +8,17 @@
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS payment_events (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  business_id UUID NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
-  stripe_event_id TEXT UNIQUE,
+  id                     UUID        PRIMARY KEY DEFAULT uuid_generate_v4(),
+  business_id            UUID        REFERENCES businesses(id) ON DELETE CASCADE,
   stripe_subscription_id TEXT,
-  stripe_invoice_id TEXT,
-  event_type TEXT NOT NULL CHECK (event_type IN (
+  stripe_invoice_id      TEXT,
+  stripe_event_id        TEXT        UNIQUE,
+  amount_cents           INTEGER     NOT NULL DEFAULT 0,
+  currency               TEXT        NOT NULL DEFAULT 'usd',
+  status                 TEXT        NOT NULL CHECK (status IN (
+    'succeeded', 'failed', 'refunded', 'processed', 'skipped'
+  )),
+  event_type             TEXT        NOT NULL CHECK (event_type IN (
     'charge', 'refund', 'proration_credit',
     'checkout.session.completed',
     'customer.subscription.updated',
@@ -23,11 +28,8 @@ CREATE TABLE IF NOT EXISTS payment_events (
     'invoice.payment_succeeded',
     'invoice.payment_failed'
   )),
-  amount_cents INTEGER NOT NULL DEFAULT 0,
-  currency TEXT NOT NULL DEFAULT 'usd',
-  status TEXT NOT NULL CHECK (status IN ('succeeded', 'failed', 'refunded', 'processed', 'skipped')),
-  raw_payload JSONB,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  raw_payload            JSONB,
+  created_at             TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- Indexes
@@ -35,32 +37,44 @@ CREATE INDEX IF NOT EXISTS idx_payment_events_business_id
   ON payment_events(business_id);
 CREATE INDEX IF NOT EXISTS idx_payment_events_stripe_event_id
   ON payment_events(stripe_event_id);
-CREATE INDEX IF NOT EXISTS idx_payment_events_stripe_subscription_id
-  ON payment_events(stripe_subscription_id);
-CREATE INDEX IF NOT EXISTS idx_payment_events_event_type
-  ON payment_events(event_type);
 CREATE INDEX IF NOT EXISTS idx_payment_events_created_at
   ON payment_events(created_at DESC);
 
 -- RLS
 ALTER TABLE payment_events ENABLE ROW LEVEL SECURITY;
 
--- Users can view payment events for their businesses
-CREATE POLICY "Users can view own payment events"
-  ON payment_events FOR SELECT
-  USING (
-    EXISTS (
-      SELECT 1 FROM user_businesses
-      WHERE user_businesses.business_id = payment_events.business_id
-        AND user_businesses.user_id = auth.uid()
-    )
-  );
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE tablename = 'payment_events'
+    AND policyname = 'payment_events_service_write'
+  ) THEN
+    CREATE POLICY payment_events_service_write
+    ON payment_events FOR ALL
+    TO service_role
+    USING (true) WITH CHECK (true);
+  END IF;
+END $$;
 
--- Service role full access (webhook writes)
-CREATE POLICY "Service role full access"
-  ON payment_events FOR ALL TO service_role
-  USING (true) WITH CHECK (true);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE tablename = 'payment_events'
+    AND policyname = 'payment_events_owner_read'
+  ) THEN
+    CREATE POLICY payment_events_owner_read
+    ON payment_events FOR SELECT
+    TO authenticated
+    USING (
+      EXISTS (
+        SELECT 1 FROM user_businesses ub
+        WHERE ub.business_id = payment_events.business_id
+        AND ub.user_id = auth.uid()
+      )
+    );
+  END IF;
+END $$;
 
 -- Grants
 GRANT SELECT ON payment_events TO authenticated;
-GRANT ALL ON payment_events TO service_role;
+GRANT ALL    ON payment_events TO service_role;
