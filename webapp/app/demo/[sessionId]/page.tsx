@@ -99,7 +99,7 @@ export default function DemoSessionPage() {
     return (
       <div className="min-h-screen bg-[#121212] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin w-10 h-10 border-3 border-emerald-500 border-t-transparent rounded-full mx-auto mb-4" />
+          <div className="animate-spin w-10 h-10 border-3 border-gold-500 border-t-transparent rounded-full mx-auto mb-4" />
           <p className="text-white/60">Loading your demo experience...</p>
         </div>
       </div>

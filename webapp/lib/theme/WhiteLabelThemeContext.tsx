@@ -95,7 +95,7 @@ const defaultTheme: BusinessTheme = {
   text_secondary: '#A0AEC0',
   text_muted: '#718096',
   border_color: '#2D3748',
-  success_color: '#10B981',
+  success_color: '#C9A96E',
   warning_color: '#FFC800',
   error_color: '#FF3B3B',
   font_heading: 'Inter',

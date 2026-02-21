@@ -932,7 +932,7 @@ Generate a high-quality mockup specifically for this ${section.label} section on
                     {/* Status & Meta */}
                     <div className="flex items-center justify-between">
                       <span className={`text-xs px-2 py-1 rounded-full ${
-                        proj.status === 'completed' ? 'bg-emerald-500/20 text-emerald-400' :
+                        proj.status === 'completed' ? 'bg-gold-500/20 text-gold-400' :
                         proj.status === 'in_progress' ? 'bg-yellow-500/20 text-yellow-400' :
                         proj.status === 'published' ? 'bg-cyan-500/20 text-cyan-400' :
                         'bg-white/10 text-white/50'
@@ -1066,8 +1066,8 @@ Generate a high-quality mockup specifically for this ${section.label} section on
                 </span>
               </h1>
               {hasSavedProject && (
-                <span className="text-xs text-emerald-400 flex items-center gap-1">
-                  <span className="w-2 h-2 bg-emerald-400 rounded-full" />
+                <span className="text-xs text-gold-400 flex items-center gap-1">
+                  <span className="w-2 h-2 bg-gold-400 rounded-full" />
                   Saved
                 </span>
               )}
@@ -1081,7 +1081,7 @@ Generate a high-quality mockup specifically for this ${section.label} section on
                 </div>
                 <div className="w-32 h-2 bg-white/10 rounded-full overflow-hidden">
                   <div 
-                    className="h-full bg-gradient-to-r from-emerald-500 to-cyan-500 transition-all"
+                    className="h-full bg-gradient-to-r from-gold-500 to-cyan-500 transition-all"
                     style={{ width: `${stats.progress}%` }}
                   />
                 </div>
@@ -1260,9 +1260,9 @@ Generate a high-quality mockup specifically for this ${section.label} section on
                       
                       {/* Extracted Website Data Display */}
                       {extractedWebsite && (
-                        <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 space-y-4">
+                        <div className="p-4 rounded-xl bg-gold-500/10 border border-gold-500/30 space-y-4">
                           <div className="flex items-center justify-between">
-                            <h4 className="font-semibold text-emerald-300 flex items-center gap-2">
+                            <h4 className="font-semibold text-gold-300 flex items-center gap-2">
                               ✅ Website Extracted Successfully
                             </h4>
                             <button
@@ -1396,7 +1396,7 @@ Generate a high-quality mockup specifically for this ${section.label} section on
                           onClick={() => setGenerationMode(gm.value as GenerationMode)}
                           className={`p-3 rounded-xl text-left transition ${
                             generationMode === gm.value
-                              ? 'bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/50'
+                              ? 'bg-gradient-to-r from-gold-500/20 to-teal-500/20 border border-gold-500/50'
                               : 'bg-white/5 border border-white/10 hover:bg-white/10'
                           }`}
                           data-testid={`generation-mode-${gm.value}`}
@@ -1578,7 +1578,7 @@ Generate a high-quality mockup specifically for this ${section.label} section on
                     value={section}
                     className={`p-4 rounded-xl border transition cursor-grab active:cursor-grabbing ${
                       section.status === 'approved'
-                        ? 'bg-emerald-500/10 border-emerald-500/30'
+                        ? 'bg-gold-500/10 border-gold-500/30'
                         : section.status === 'generated'
                         ? 'bg-blue-500/10 border-blue-500/30'
                         : section.status === 'generating'
@@ -1593,7 +1593,7 @@ Generate a high-quality mockup specifically for this ${section.label} section on
                         <div>
                           <div className="font-medium flex items-center gap-2">
                             {section.label}
-                            {section.status === 'approved' && <span className="text-emerald-400">✓</span>}
+                            {section.status === 'approved' && <span className="text-gold-400">✓</span>}
                             {section.status === 'generated' && <span className="text-blue-400">◉</span>}
                             {section.status === 'generating' && <span className="animate-spin">⏳</span>}
                           </div>
@@ -1663,7 +1663,7 @@ Generate a high-quality mockup specifically for this ${section.label} section on
               {stats.approved >= 3 && (
                 <button
                   onClick={() => setCurrentStep('assemble')}
-                  className="w-full py-4 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-semibold hover:opacity-90 transition flex items-center justify-center gap-3"
+                  className="w-full py-4 rounded-xl bg-gradient-to-r from-gold-500 to-cyan-500 text-white font-semibold hover:opacity-90 transition flex items-center justify-center gap-3"
                   data-testid="go-to-assemble-btn"
                 >
                   <span>🧩</span> Assemble & Preview ({stats.approved} sections ready)
@@ -1739,7 +1739,7 @@ Generate a high-quality mockup specifically for this ${section.label} section on
                   {/* Approve & Next */}
                   <button
                     onClick={approveAndNext}
-                    className="w-full py-4 rounded-xl bg-gradient-to-r from-emerald-500 to-green-500 text-white font-semibold hover:opacity-90 transition flex items-center justify-center gap-2"
+                    className="w-full py-4 rounded-xl bg-gradient-to-r from-gold-500 to-green-500 text-white font-semibold hover:opacity-90 transition flex items-center justify-center gap-2"
                     data-testid="approve-next-btn"
                   >
                     <span>✅</span> Approve & Build Next Section
@@ -1814,7 +1814,7 @@ Generate a high-quality mockup specifically for this ${section.label} section on
                   <Reorder.Item
                     key={section.id}
                     value={section}
-                    className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 cursor-grab active:cursor-grabbing"
+                    className="p-4 rounded-xl bg-gold-500/10 border border-gold-500/30 cursor-grab active:cursor-grabbing"
                     data-testid={`assembly-section-${index}`}
                   >
                     <div className="flex items-start gap-4">
@@ -1908,7 +1908,7 @@ Generate a high-quality mockup specifically for this ${section.label} section on
                 </button>
                 <button
                   onClick={openInCodeStudio}
-                  className="px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-medium hover:opacity-90 transition flex items-center gap-2"
+                  className="px-4 py-2 rounded-lg bg-gradient-to-r from-gold-500 to-cyan-500 text-white font-medium hover:opacity-90 transition flex items-center gap-2"
                   data-testid="open-code-studio-btn"
                 >
                   🎯 Open in Code Studio

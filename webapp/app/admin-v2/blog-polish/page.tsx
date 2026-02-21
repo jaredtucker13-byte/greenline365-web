@@ -1603,13 +1603,13 @@ export default function BlogPolishPage() {
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-emerald-400';
+    if (score >= 80) return 'text-gold-400';
     if (score >= 60) return 'text-amber-400';
     return 'text-red-400';
   };
 
   const getScoreGradient = (score: number) => {
-    if (score >= 80) return 'from-emerald-500 to-emerald-400';
+    if (score >= 80) return 'from-gold-500 to-gold-400';
     if (score >= 60) return 'from-amber-500 to-amber-400';
     return 'from-red-500 to-red-400';
   };
@@ -1685,7 +1685,7 @@ export default function BlogPolishPage() {
             exit={{ opacity: 0, y: -20 }}
             className={`relative z-30 mx-6 mt-4 p-4 rounded-xl backdrop-blur-xl flex items-center justify-between ${
               message.type === 'success'
-                ? 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-300'
+                ? 'bg-gold-500/20 border border-gold-500/30 text-gold-300'
                 : message.type === 'info'
                   ? 'bg-blue-500/20 border border-blue-500/30 text-blue-300'
                   : 'bg-red-500/20 border border-red-500/30 text-red-300'
@@ -3164,7 +3164,7 @@ export default function BlogPolishPage() {
                     {seoAnalysis.feedback.map((item, i) => (
                       <div key={i} className="flex items-start gap-2 text-sm">
                         <span className={
-                          item.type === 'success' ? 'text-emerald-400' :
+                          item.type === 'success' ? 'text-gold-400' :
                           item.type === 'warning' ? 'text-amber-400' :
                           item.type === 'info' ? 'text-sky-400' : 'text-red-400'
                         }>
@@ -3534,7 +3534,7 @@ export default function BlogPolishPage() {
                     applyImageToBlog(previewImage.url, selectedLayout);
                     setPreviewImage(null);
                   }}
-                  className="px-4 py-2 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-semibold hover:opacity-90 transition flex items-center gap-2"
+                  className="px-4 py-2 rounded-lg bg-gradient-to-r from-green-500 to-gold-500 text-white text-sm font-semibold hover:opacity-90 transition flex items-center gap-2"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

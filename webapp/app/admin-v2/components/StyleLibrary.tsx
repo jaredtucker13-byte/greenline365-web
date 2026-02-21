@@ -224,7 +224,7 @@ export default function StyleLibrary({ isOpen, onClose, onApplyStyle, currentSty
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 className={`mx-6 mt-4 px-4 py-3 rounded-xl text-sm ${
-                  message.type === 'success' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' :
+                  message.type === 'success' ? 'bg-gold-500/20 text-gold-300 border border-gold-500/30' :
                   message.type === 'info' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' :
                   'bg-red-500/20 text-red-300 border border-red-500/30'
                 }`}

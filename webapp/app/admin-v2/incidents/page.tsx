@@ -389,7 +389,7 @@ export default function IncidentsPage() {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-3">
-              <span className="text-emerald-400"><Icons.Shield /></span>
+              <span className="text-gold-400"><Icons.Shield /></span>
               Liability Documentation
             </h1>
             <p className="text-gray-400 mt-1">
@@ -398,7 +398,7 @@ export default function IncidentsPage() {
           </div>
           <button
             onClick={() => setShowNewForm(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 rounded-lg transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-gold-500 hover:bg-gold-600 rounded-lg transition-colors"
           >
             <Icons.Plus />
             New Incident
@@ -421,7 +421,7 @@ export default function IncidentsPage() {
                 <p className="text-gray-400">No incidents yet</p>
                 <button
                   onClick={() => setShowNewForm(true)}
-                  className="mt-4 text-emerald-400 hover:text-emerald-300"
+                  className="mt-4 text-gold-400 hover:text-gold-300"
                 >
                   Create your first incident report
                 </button>
@@ -433,7 +433,7 @@ export default function IncidentsPage() {
                   onClick={() => loadIncidentDetails(incident.id)}
                   className={`p-4 rounded-lg border cursor-pointer transition-all ${
                     selectedIncident?.id === incident.id
-                      ? 'bg-emerald-500/10 border-emerald-500/50'
+                      ? 'bg-gold-500/10 border-gold-500/50'
                       : 'bg-white/5 border-white/10 hover:bg-white/10'
                   }`}
                 >
@@ -483,7 +483,7 @@ export default function IncidentsPage() {
                       value={newIncident.title}
                       onChange={(e) => setNewIncident({ ...newIncident, title: e.target.value })}
                       placeholder="e.g., Water Damage Assessment - 123 Main St"
-                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:border-emerald-500"
+                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:border-gold-500"
                     />
                   </div>
                   
@@ -493,7 +493,7 @@ export default function IncidentsPage() {
                       type="text"
                       value={newIncident.customer_name}
                       onChange={(e) => setNewIncident({ ...newIncident, customer_name: e.target.value })}
-                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:border-emerald-500"
+                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:border-gold-500"
                     />
                   </div>
                   
@@ -503,7 +503,7 @@ export default function IncidentsPage() {
                       type="email"
                       value={newIncident.customer_email}
                       onChange={(e) => setNewIncident({ ...newIncident, customer_email: e.target.value })}
-                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:border-emerald-500"
+                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:border-gold-500"
                     />
                   </div>
                   
@@ -513,7 +513,7 @@ export default function IncidentsPage() {
                       type="tel"
                       value={newIncident.customer_phone}
                       onChange={(e) => setNewIncident({ ...newIncident, customer_phone: e.target.value })}
-                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:border-emerald-500"
+                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:border-gold-500"
                     />
                   </div>
                   
@@ -522,7 +522,7 @@ export default function IncidentsPage() {
                     <select
                       value={newIncident.severity}
                       onChange={(e) => setNewIncident({ ...newIncident, severity: e.target.value })}
-                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:border-emerald-500"
+                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:border-gold-500"
                     >
                       <option value="low">Low</option>
                       <option value="medium">Medium</option>
@@ -537,7 +537,7 @@ export default function IncidentsPage() {
                       type="text"
                       value={newIncident.property_address}
                       onChange={(e) => setNewIncident({ ...newIncident, property_address: e.target.value })}
-                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:border-emerald-500"
+                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:border-gold-500"
                     />
                   </div>
                   
@@ -547,7 +547,7 @@ export default function IncidentsPage() {
                       value={newIncident.description}
                       onChange={(e) => setNewIncident({ ...newIncident, description: e.target.value })}
                       rows={3}
-                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:border-emerald-500"
+                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:border-gold-500"
                     />
                   </div>
                 </div>
@@ -556,7 +556,7 @@ export default function IncidentsPage() {
                   <button
                     onClick={createIncident}
                     disabled={creating || !newIncident.title}
-                    className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 rounded-lg transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 bg-gold-500 hover:bg-gold-600 disabled:opacity-50 rounded-lg transition-colors"
                   >
                     {creating ? <Icons.Loader2 /> : <Icons.Plus />}
                     Create Incident
@@ -734,14 +734,14 @@ export default function IncidentsPage() {
                     
                     {selectedIncident.report_sections.executive_summary && (
                       <div className="mb-4">
-                        <h4 className="text-sm text-emerald-400 uppercase tracking-wider mb-2">Executive Summary</h4>
+                        <h4 className="text-sm text-gold-400 uppercase tracking-wider mb-2">Executive Summary</h4>
                         <p className="text-gray-300">{selectedIncident.report_sections.executive_summary}</p>
                       </div>
                     )}
                     
                     {(selectedIncident.report_sections.findings?.length ?? 0) > 0 && (
                       <div className="mb-4">
-                        <h4 className="text-sm text-emerald-400 uppercase tracking-wider mb-2">Key Findings</h4>
+                        <h4 className="text-sm text-gold-400 uppercase tracking-wider mb-2">Key Findings</h4>
                         <div className="space-y-2">
                           {selectedIncident.report_sections.findings.slice(0, 5).map((finding: any, i: number) => (
                             <div key={i} className="p-3 bg-white/5 rounded">
@@ -784,7 +784,7 @@ export default function IncidentsPage() {
                     <button
                       onClick={sendForSignature}
                       disabled={sending}
-                      className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 rounded-lg transition-colors"
+                      className="flex items-center gap-2 px-4 py-2 bg-gold-500 hover:bg-gold-600 disabled:opacity-50 rounded-lg transition-colors"
                     >
                       {sending ? <Icons.Loader2 /> : <Icons.Mail />}
                       Send for Signature
@@ -826,7 +826,7 @@ export default function IncidentsPage() {
                 <p className="text-gray-500 mb-4">Choose an incident from the list or create a new one</p>
                 <button
                   onClick={() => setShowNewForm(true)}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 rounded-lg transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-gold-500 hover:bg-gold-600 rounded-lg transition-colors"
                 >
                   <Icons.Plus />
                   Create New Incident

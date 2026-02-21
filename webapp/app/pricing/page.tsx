@@ -93,9 +93,9 @@ export default function PricingPage() {
           <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-sm font-semibold uppercase tracking-widest mb-3" style={{ color: '#FF8C00' }}>
             Simple, Transparent Pricing
           </motion.p>
-          <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.05 }} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 mb-4">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-xs font-bold text-emerald-400 tracking-wider uppercase">Early Access Beta</span>
+          <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.05 }} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-gold-500/30 bg-gold-500/10 mb-4">
+            <span className="w-2 h-2 rounded-full bg-gold-400 animate-pulse" />
+            <span className="text-xs font-bold text-gold-400 tracking-wider uppercase">Early Access Beta</span>
           </motion.div>
           <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-4xl md:text-5xl font-bold text-white mb-4" data-testid="pricing-title">
             Your Reputation Starts Here
@@ -174,7 +174,7 @@ export default function PricingPage() {
                   {tier.features.map((f, fi) => (
                     <div key={fi} className="flex items-start gap-2.5">
                       {f.included ? (
-                        <svg className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: '#10B981' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <svg className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: '#C9A96E' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
                       ) : (
@@ -204,7 +204,7 @@ export default function PricingPage() {
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           {[
-            { name: 'Intelligence Verified', color: '#10B981', active: true },
+            { name: 'Intelligence Verified', color: '#C9A96E', active: true },
             { name: 'Spotless Pro', color: '#3B82F6', active: true },
             { name: 'Local Vibe Elite', color: '#8B5CF6', active: false },
             { name: 'Master Technician', color: '#F59E0B', active: false },

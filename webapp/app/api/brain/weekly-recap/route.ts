@@ -139,7 +139,7 @@ ${marketingContext}`,
         <div style="color:#666;font-size:11px;">Thoughts</div>
       </div>
       <div style="flex:1;background:#111;border-radius:8px;padding:12px;">
-        <div style="color:#10B981;font-size:24px;font-weight:700;">${weekData.campaigns.emails_sent}</div>
+        <div style="color:#C9A96E;font-size:24px;font-weight:700;">${weekData.campaigns.emails_sent}</div>
         <div style="color:#666;font-size:11px;">Emails Sent</div>
       </div>
       <div style="flex:1;background:#111;border-radius:8px;padding:12px;">

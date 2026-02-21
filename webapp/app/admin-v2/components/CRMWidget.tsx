@@ -107,8 +107,8 @@ export default function CRMWidget() {
                 <div className="text-2xl font-bold text-white">{data.totalLeads}</div>
                 <div className="text-xs text-white/40">Total Leads</div>
               </div>
-              <div className="text-center p-3 rounded-xl bg-emerald-500/10">
-                <div className="text-2xl font-bold text-emerald-400">+{data.newLeads}</div>
+              <div className="text-center p-3 rounded-xl bg-gold-500/10">
+                <div className="text-2xl font-bold text-gold-400">+{data.newLeads}</div>
                 <div className="text-xs text-white/40">New (7d)</div>
               </div>
               <div className="text-center p-3 rounded-xl bg-purple-500/10">
@@ -128,7 +128,7 @@ export default function CRMWidget() {
                   initial={{ width: 0 }}
                   animate={{ width: `${Math.min(data.conversionRate, 100)}%` }}
                   transition={{ delay: 0.2, duration: 0.5 }}
-                  className="h-full bg-gradient-to-r from-[#39FF14] to-emerald-500 rounded-full"
+                  className="h-full bg-gradient-to-r from-[#39FF14] to-gold-500 rounded-full"
                 />
               </div>
             </div>

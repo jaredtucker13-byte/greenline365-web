@@ -103,7 +103,7 @@ export default function LoginPage() {
     return (
       <div className="min-h-screen flex items-center justify-center pt-24">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin mx-auto mb-4" />
+          <div className="w-12 h-12 border-4 border-gold-500/30 border-t-gold-500 rounded-full animate-spin mx-auto mb-4" />
           <p className="text-white/60">Checking session...</p>
         </div>
       </div>
@@ -170,7 +170,7 @@ export default function LoginPage() {
                 onChange={handleChange}
                 required
                 autoComplete="off"
-                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 outline-none transition"
+                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
                 placeholder="you@company.com"
                 data-testid="email-input"
               />
@@ -186,7 +186,7 @@ export default function LoginPage() {
                   onChange={handleChange}
                   required
                   autoComplete="new-password"
-                  className="w-full px-4 py-3 pr-12 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 outline-none transition"
+                  className="w-full px-4 py-3 pr-12 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
                   placeholder="••••••••"
                   data-testid="password-input"
                 />
@@ -212,7 +212,7 @@ export default function LoginPage() {
             <div className="flex justify-end">
               <Link 
                 href="/forgot-password" 
-                className="text-sm text-emerald-400 hover:text-emerald-300 transition"
+                className="text-sm text-gold-400 hover:text-gold-300 transition"
               >
                 Forgot password?
               </Link>
@@ -221,7 +221,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 bg-emerald-500 text-black font-bold rounded-xl hover:bg-emerald-400 transition disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full py-4 bg-gold-500 text-black font-bold rounded-xl hover:bg-gold-400 transition disabled:opacity-50 flex items-center justify-center gap-2"
               data-testid="signin-btn"
             >
               {loading ? (
@@ -238,7 +238,7 @@ export default function LoginPage() {
           <div className="mt-6 text-center">
             <p className="text-white/50 text-sm">
               Don't have an account?{' '}
-              <Link href="/signup" className="text-emerald-400 hover:text-emerald-300 transition font-medium">
+              <Link href="/signup" className="text-gold-400 hover:text-gold-300 transition font-medium">
                 Sign up
               </Link>
             </p>

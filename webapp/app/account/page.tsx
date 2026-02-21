@@ -53,7 +53,7 @@ export default function AccountPage() {
   if (loading) {
     return (
       <div className="py-20 flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-gold-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -78,7 +78,7 @@ export default function AccountPage() {
         >
           {/* Profile Section */}
           <div className="flex items-center gap-4 mb-8 pb-8 border-b border-white/10">
-            <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center text-2xl font-bold text-emerald-400">
+            <div className="w-16 h-16 rounded-full bg-gold-500/20 flex items-center justify-center text-2xl font-bold text-gold-400">
               {user?.email?.charAt(0).toUpperCase()}
             </div>
             <div>
@@ -87,7 +87,7 @@ export default function AccountPage() {
               </h2>
               <p className="text-white/60">{user?.email}</p>
               {isUserAdmin && (
-                <span className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 bg-emerald-500/20 text-emerald-400 text-xs rounded-full">
+                <span className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 bg-gold-500/20 text-gold-400 text-xs rounded-full">
                   <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                   </svg>
@@ -104,11 +104,11 @@ export default function AccountPage() {
             {isUserAdmin && (
               <Link
                 href="/admin-v2"
-                className="flex items-center justify-between w-full p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl hover:bg-emerald-500/20 transition group"
+                className="flex items-center justify-between w-full p-4 bg-gold-500/10 border border-gold-500/30 rounded-xl hover:bg-gold-500/20 transition group"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center">
-                    <svg className="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="w-10 h-10 rounded-lg bg-gold-500/20 flex items-center justify-center">
+                    <svg className="w-5 h-5 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
                     </svg>
                   </div>
@@ -117,7 +117,7 @@ export default function AccountPage() {
                     <p className="text-sm text-white/60">Access admin dashboard</p>
                   </div>
                 </div>
-                <svg className="w-5 h-5 text-white/40 group-hover:text-emerald-400 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-5 h-5 text-white/40 group-hover:text-gold-400 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </Link>

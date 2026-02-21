@@ -215,9 +215,9 @@ export default function BusinessDashboard() {
             <div>
               <div className="flex items-center gap-3">
                 <p className="text-xs font-heading font-semibold uppercase tracking-[0.2em] text-gold mb-1">Business Dashboard</p>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-[10px] font-bold text-emerald-400 tracking-wider uppercase">Beta</span>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-gold-500/30 bg-gold-500/10">
+                  <span className="w-1.5 h-1.5 rounded-full bg-gold-400 animate-pulse" />
+                  <span className="text-[10px] font-bold text-gold-400 tracking-wider uppercase">Beta</span>
                 </span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-heading font-light text-white" data-testid="dashboard-title">
@@ -620,7 +620,7 @@ export default function BusinessDashboard() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.35 }}
               className="rounded-2xl border border-greenline/20 p-6 relative overflow-hidden"
-              style={{ background: 'rgba(91,138,114,0.05)' }}
+              style={{ background: 'rgba(201,169,110,0.05)' }}
             >
               <div className="absolute top-0 right-0 w-24 h-24 bg-greenline/5 rounded-full -translate-y-8 translate-x-8" />
               <h3 className="text-sm font-heading font-semibold text-greenline uppercase tracking-wider mb-2">Property Intelligence</h3>

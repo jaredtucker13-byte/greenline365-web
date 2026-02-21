@@ -41,13 +41,13 @@ export default function Step4WhatYouNeed({ onBack, onNext, data, onUpdate }: Ste
             onClick={() => toggleNeed(option.value)}
             className={`w-full p-4 rounded-xl border text-left transition-all flex items-center gap-3 ${
               data.needs?.includes(option.value)
-                ? 'border-emerald-500 bg-emerald-500/10 text-white'
+                ? 'border-gold-500 bg-gold-500/10 text-white'
                 : 'border-white/10 bg-white/5 text-white/80 hover:border-white/30'
             }`}
           >
             <div className={`w-5 h-5 rounded border flex items-center justify-center ${
               data.needs?.includes(option.value)
-                ? 'border-emerald-500 bg-emerald-500'
+                ? 'border-gold-500 bg-gold-500'
                 : 'border-white/30'
             }`}>
               {data.needs?.includes(option.value) && (
@@ -70,7 +70,7 @@ export default function Step4WhatYouNeed({ onBack, onNext, data, onUpdate }: Ste
           onChange={(e) => onUpdate({ ...data, notes: e.target.value })}
           rows={3}
           placeholder="Tell us what you're trying to accomplish..."
-          className="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition resize-none"
+          className="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-gold-500 focus:ring-1 focus:ring-gold-500 outline-none transition resize-none"
         />
       </div>
 
@@ -86,7 +86,7 @@ export default function Step4WhatYouNeed({ onBack, onNext, data, onUpdate }: Ste
           type="button"
           onClick={onNext}
           disabled={!data.needs || data.needs.length === 0}
-          className="flex-1 py-3 px-6 rounded-xl bg-emerald-500 text-black font-semibold hover:bg-emerald-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 py-3 px-6 rounded-xl bg-gold-500 text-black font-semibold hover:bg-gold-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Continue
         </button>

@@ -211,12 +211,12 @@ export default function SignPage() {
       <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 flex items-center justify-center p-4">
         <div className={`rounded-lg p-8 max-w-md text-center ${
           result?.action === 'acknowledge' 
-            ? 'bg-emerald-500/10 border border-emerald-500/30' 
+            ? 'bg-gold-500/10 border border-gold-500/30' 
             : 'bg-orange-500/10 border border-orange-500/30'
         }`}>
           {result?.action === 'acknowledge' ? (
             <>
-              <div className="flex justify-center mb-4 text-emerald-400"><Icons.CheckCircle /></div>
+              <div className="flex justify-center mb-4 text-gold-400"><Icons.CheckCircle /></div>
               <h1 className="text-2xl font-bold text-white mb-2">Report Acknowledged</h1>
               <p className="text-gray-300 mb-4">
                 Thank you for reviewing and acknowledging this incident report.
@@ -251,7 +251,7 @@ export default function SignPage() {
       <header className="bg-slate-800/50 border-b border-white/10 py-4">
         <div className="max-w-4xl mx-auto px-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-emerald-400"><Icons.Shield /></span>
+            <span className="text-gold-400"><Icons.Shield /></span>
             <span className="font-bold text-lg">GreenLine365</span>
           </div>
           <div className="flex items-center gap-3">
@@ -339,14 +339,14 @@ export default function SignPage() {
             
             {incident.report_sections.executive_summary && (
               <div className="mb-6">
-                <h3 className="text-emerald-400 text-sm uppercase tracking-wider mb-2">Summary</h3>
+                <h3 className="text-gold-400 text-sm uppercase tracking-wider mb-2">Summary</h3>
                 <p className="text-gray-300">{incident.report_sections.executive_summary}</p>
               </div>
             )}
             
             {incident.report_sections.findings?.length > 0 && (
               <div className="mb-6">
-                <h3 className="text-emerald-400 text-sm uppercase tracking-wider mb-3">Key Findings</h3>
+                <h3 className="text-gold-400 text-sm uppercase tracking-wider mb-3">Key Findings</h3>
                 <div className="space-y-3">
                   {incident.report_sections.findings.map((finding: any, i: number) => (
                     <div key={i} className="bg-white/5 rounded-lg p-4">
@@ -358,7 +358,7 @@ export default function SignPage() {
                       </div>
                       <p className="text-sm text-gray-400">{finding.description}</p>
                       {finding.recommended_action && (
-                        <p className="text-sm text-emerald-400 mt-2">
+                        <p className="text-sm text-gold-400 mt-2">
                           <strong>Recommended:</strong> {finding.recommended_action}
                         </p>
                       )}
@@ -370,7 +370,7 @@ export default function SignPage() {
             
             {incident.report_sections.recommendations?.length > 0 && (
               <div className="mb-6">
-                <h3 className="text-emerald-400 text-sm uppercase tracking-wider mb-3">Recommendations</h3>
+                <h3 className="text-gold-400 text-sm uppercase tracking-wider mb-3">Recommendations</h3>
                 <ol className="list-decimal list-inside space-y-2">
                   {incident.report_sections.recommendations.map((rec: any, i: number) => (
                     <li key={i} className="text-gray-300">
@@ -409,7 +409,7 @@ export default function SignPage() {
               value={signerName}
               onChange={(e) => setSignerName(e.target.value)}
               placeholder="Enter your full legal name"
-              className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:border-emerald-500 text-white"
+              className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:border-gold-500 text-white"
             />
           </div>
 
@@ -447,7 +447,7 @@ export default function SignPage() {
               <button
                 onClick={() => handleSubmit('acknowledge')}
                 disabled={submitting || !signerName.trim()}
-                className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 rounded-lg font-semibold text-lg transition-colors"
+                className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-gold-500 hover:bg-gold-600 disabled:opacity-50 rounded-lg font-semibold text-lg transition-colors"
               >
                 {submitting ? <Icons.Loader2 /> : <Icons.CheckCircle />}
                 I Acknowledge This Report

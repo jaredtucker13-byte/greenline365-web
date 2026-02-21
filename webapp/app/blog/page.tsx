@@ -110,8 +110,8 @@ export default async function BlogListingPage() {
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         {/* Background decorations */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-emerald-900/20 via-transparent to-transparent" />
-        <div className="absolute top-20 left-1/4 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gold-900/20 via-transparent to-transparent" />
+        <div className="absolute top-20 left-1/4 w-72 h-72 bg-gold-500/10 rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-1/4 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl" />
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
@@ -119,7 +119,7 @@ export default async function BlogListingPage() {
             {/* Back to home */}
             <Link 
               href="/" 
-              className="inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300 transition mb-8 text-sm"
+              className="inline-flex items-center gap-2 text-gold-400 hover:text-gold-300 transition mb-8 text-sm"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -129,7 +129,7 @@ export default async function BlogListingPage() {
             
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6">
               The{' '}
-              <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-gold-400 to-cyan-400 bg-clip-text text-transparent">
                 GreenLine365
               </span>
               {' '}Blog
@@ -141,7 +141,7 @@ export default async function BlogListingPage() {
             {/* Category Pills */}
             {categories.length > 0 && (
               <div className="flex flex-wrap justify-center gap-3">
-                <span className="px-4 py-2 rounded-full bg-emerald-500/20 text-emerald-300 text-sm font-medium border border-emerald-500/30 cursor-pointer">
+                <span className="px-4 py-2 rounded-full bg-gold-500/20 text-gold-300 text-sm font-medium border border-gold-500/30 cursor-pointer">
                   All Posts
                 </span>
                 {categories.map((category) => (
@@ -212,7 +212,7 @@ export default async function BlogListingPage() {
                               backgroundColor: hasStyle 
                                 ? `${style.colors.primary}20` 
                                 : 'rgba(16, 185, 129, 0.15)',
-                              color: hasStyle ? style.colors.primary : '#10B981',
+                              color: hasStyle ? style.colors.primary : '#C9A96E',
                             }}
                           >
                             {post.category}
@@ -226,7 +226,7 @@ export default async function BlogListingPage() {
                       </div>
                       
                       {/* Title */}
-                      <h2 className="text-lg font-bold text-white mb-3 line-clamp-2 group-hover:text-emerald-400 transition-colors">
+                      <h2 className="text-lg font-bold text-white mb-3 line-clamp-2 group-hover:text-gold-400 transition-colors">
                         {post.title}
                       </h2>
                       
@@ -250,7 +250,7 @@ export default async function BlogListingPage() {
                         
                         <span 
                           className="text-xs font-medium flex items-center gap-1 opacity-0 group-hover:opacity-100 transition"
-                          style={{ color: hasStyle ? style.colors.primary : '#10B981' }}
+                          style={{ color: hasStyle ? style.colors.primary : '#C9A96E' }}
                         >
                           Read →
                         </span>
@@ -274,8 +274,8 @@ export default async function BlogListingPage() {
         )}
         
         {/* Newsletter CTA */}
-        <div className="mt-20 p-10 rounded-3xl bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 border border-emerald-500/20 text-center relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <div className="mt-20 p-10 rounded-3xl bg-gradient-to-r from-gold-500/10 to-cyan-500/10 border border-gold-500/20 text-center relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-gold-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
           <div className="relative">
             <h3 className="text-2xl sm:text-3xl font-bold text-white mb-4">
               Ready to Transform Your Marketing?
@@ -285,7 +285,7 @@ export default async function BlogListingPage() {
             </p>
             <Link
               href="/"
-              className="inline-flex items-center gap-3 px-8 py-4 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-semibold hover:opacity-90 transition shadow-lg shadow-emerald-500/25"
+              className="inline-flex items-center gap-3 px-8 py-4 rounded-xl bg-gradient-to-r from-gold-500 to-cyan-500 text-white font-semibold hover:opacity-90 transition shadow-lg shadow-gold-500/25"
             >
               Get Started Free
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -303,8 +303,8 @@ export default async function BlogListingPage() {
             © {new Date().getFullYear()} GreenLine365. All rights reserved.
           </span>
           <div className="flex gap-6">
-            <Link href="/" className="text-slate-500 hover:text-emerald-400 text-sm transition">Home</Link>
-            <Link href="/admin-v2" className="text-slate-500 hover:text-emerald-400 text-sm transition">Dashboard</Link>
+            <Link href="/" className="text-slate-500 hover:text-gold-400 text-sm transition">Home</Link>
+            <Link href="/admin-v2" className="text-slate-500 hover:text-gold-400 text-sm transition">Dashboard</Link>
           </div>
         </div>
       </footer>

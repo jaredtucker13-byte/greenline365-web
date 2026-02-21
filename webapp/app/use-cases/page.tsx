@@ -65,7 +65,7 @@ export default function UseCasesPage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-4xl md:text-5xl font-bold text-white mb-6"
           >
-            Use Cases by <span className="text-emerald-400">Industry</span>
+            Use Cases by <span className="text-gold-400">Industry</span>
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
@@ -114,7 +114,7 @@ export default function UseCasesPage() {
                 <ul className="space-y-1">
                   {useCase.solutions.map((solution) => (
                     <li key={solution} className="text-sm text-white/60 flex items-center gap-2">
-                      <span className="w-1 h-1 rounded-full bg-emerald-400" />
+                      <span className="w-1 h-1 rounded-full bg-gold-400" />
                       {solution}
                     </li>
                   ))}
@@ -144,7 +144,7 @@ export default function UseCasesPage() {
           <p className="text-white/60 mb-6">Don't see your industry? We customize for any business.</p>
           <Link
             href="/demo-calendar"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-emerald-500 text-black font-bold rounded-xl hover:bg-emerald-400 transition"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-gold-500 text-black font-bold rounded-xl hover:bg-gold-400 transition"
           >
             Book Your Custom Demo
           </Link>

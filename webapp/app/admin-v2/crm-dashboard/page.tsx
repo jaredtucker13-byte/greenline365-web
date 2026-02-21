@@ -70,7 +70,7 @@ interface AnalyticsMeta {
 const STATUS_CONFIG: Record<string, { label: string; color: string; bgColor: string; icon: string }> = {
   new: { label: 'New', color: 'text-blue-400', bgColor: 'bg-blue-500/20', icon: '🆕' },
   pending: { label: 'Pending', color: 'text-yellow-400', bgColor: 'bg-yellow-500/20', icon: '⏳' },
-  verified: { label: 'Verified', color: 'text-emerald-400', bgColor: 'bg-emerald-500/20', icon: '✓' },
+  verified: { label: 'Verified', color: 'text-gold-400', bgColor: 'bg-gold-500/20', icon: '✓' },
   contacted: { label: 'Contacted', color: 'text-purple-400', bgColor: 'bg-purple-500/20', icon: '📞' },
   qualified: { label: 'Qualified', color: 'text-cyan-400', bgColor: 'bg-cyan-500/20', icon: '⭐' },
   converted: { label: 'Converted', color: 'text-green-400', bgColor: 'bg-green-500/20', icon: '🎉' },
@@ -246,7 +246,7 @@ export default function CRMDashboard() {
       header: 'Contact',
       render: (lead) => (
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#39FF14]/20 to-emerald-500/20 flex items-center justify-center text-[#39FF14] font-medium text-sm">
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#39FF14]/20 to-gold-500/20 flex items-center justify-center text-[#39FF14] font-medium text-sm">
             {(lead.name || lead.email)[0].toUpperCase()}
           </div>
           <div>
@@ -286,7 +286,7 @@ export default function CRMDashboard() {
       header: 'Value',
       render: (lead) => (
         lead.value ? (
-          <span className="text-emerald-400 font-medium">${lead.value.toLocaleString()}</span>
+          <span className="text-gold-400 font-medium">${lead.value.toLocaleString()}</span>
         ) : (
           <span className="text-white/30">—</span>
         )
@@ -557,7 +557,7 @@ export default function CRMDashboard() {
                   <button
                     onClick={() => bulkUpdateStatus('verified')}
                     disabled={actionLoading}
-                    className="px-3 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 text-sm hover:bg-emerald-500/30 disabled:opacity-50"
+                    className="px-3 py-1.5 rounded-lg bg-gold-500/20 text-gold-400 text-sm hover:bg-gold-500/30 disabled:opacity-50"
                   >
                     ✓ Verify
                   </button>
@@ -731,7 +731,7 @@ function DetailRail({
         <div className="p-6 border-b border-white/10">
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#39FF14]/20 to-emerald-500/20 flex items-center justify-center text-[#39FF14] font-bold text-lg">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#39FF14]/20 to-gold-500/20 flex items-center justify-center text-[#39FF14] font-bold text-lg">
                 {(lead.name || lead.email)[0].toUpperCase()}
               </div>
               <div>
@@ -752,7 +752,7 @@ function DetailRail({
             {lead.phone && (
               <a
                 href={`tel:${lead.phone}`}
-                className="flex-1 py-2 rounded-lg bg-emerald-500/20 text-emerald-400 text-center text-sm font-medium hover:bg-emerald-500/30 transition"
+                className="flex-1 py-2 rounded-lg bg-gold-500/20 text-gold-400 text-center text-sm font-medium hover:bg-gold-500/30 transition"
               >
                 📞 Call
               </a>
@@ -840,7 +840,7 @@ function DetailRail({
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 rounded-lg bg-white/5">
                   <div className="text-white/40 text-xs mb-1">Value</div>
-                  <div className="text-xl font-bold text-emerald-400">
+                  <div className="text-xl font-bold text-gold-400">
                     {lead.value ? `$${lead.value.toLocaleString()}` : '—'}
                   </div>
                 </div>
@@ -885,9 +885,9 @@ function DetailRail({
                     </div>
                   )}
                   {lead.converted_at && (
-                    <div className="flex justify-between p-2 rounded bg-emerald-500/10">
-                      <span className="text-emerald-400">Converted</span>
-                      <span className="text-emerald-400">{new Date(lead.converted_at).toLocaleString()}</span>
+                    <div className="flex justify-between p-2 rounded bg-gold-500/10">
+                      <span className="text-gold-400">Converted</span>
+                      <span className="text-gold-400">{new Date(lead.converted_at).toLocaleString()}</span>
                     </div>
                   )}
                 </div>

@@ -17,12 +17,12 @@ interface Notification {
 const notifications: Notification[] = [
   { id: 1, type: 'trend', icon: '🔥', title: 'Trending Now', subtitle: 'Local BBQ Festival this weekend', time: 'Just now', color: 'from-orange-500 to-red-500' },
   { id: 2, type: 'content', icon: '✨', title: 'Content Ready', subtitle: '"5 Ways to Boost Reviews" generated', time: '2m ago', color: 'from-purple-500 to-pink-500' },
-  { id: 3, type: 'lead', icon: '🎯', title: 'New Lead Captured', subtitle: 'Sarah M. wants a consultation', time: '5m ago', color: 'from-green-500 to-emerald-500' },
+  { id: 3, type: 'lead', icon: '🎯', title: 'New Lead Captured', subtitle: 'Sarah M. wants a consultation', time: '5m ago', color: 'from-green-500 to-gold-500' },
   { id: 4, type: 'booking', icon: '📅', title: 'Booking Confirmed', subtitle: 'Mike B. - Strategy Session @ 2pm', time: '12m ago', color: 'from-blue-500 to-cyan-500' },
   { id: 5, type: 'insight', icon: '📈', title: 'Weekly Insight', subtitle: 'Engagement up 43% this week', time: '1h ago', color: 'from-yellow-500 to-orange-500' },
   { id: 6, type: 'trend', icon: '⚡', title: 'Pulse Alert', subtitle: 'High foot traffic detected nearby', time: 'Just now', color: 'from-cyan-500 to-blue-500' },
   { id: 7, type: 'content', icon: '🎬', title: 'Video Script Ready', subtitle: '"Customer Testimonial" generated', time: '3m ago', color: 'from-pink-500 to-rose-500' },
-  { id: 8, type: 'lead', icon: '📞', title: 'Voice AI Update', subtitle: 'Susan booked 3 appointments today', time: '15m ago', color: 'from-emerald-500 to-teal-500' },
+  { id: 8, type: 'lead', icon: '📞', title: 'Voice AI Update', subtitle: 'Susan booked 3 appointments today', time: '15m ago', color: 'from-gold-500 to-teal-500' },
 ];
 
 // Dashboard Stats
@@ -82,7 +82,7 @@ export default function PhoneMockup() {
                 <p className="text-[10px] text-white/50 uppercase tracking-wider">Command Center</p>
                 <h2 className="text-sm font-bold text-white">Good Morning 👋</h2>
               </div>
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-neon-green-500 to-emerald-600 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gold to-gold-600 flex items-center justify-center">
                 <span className="text-xs">JT</span>
               </div>
             </div>
@@ -101,7 +101,7 @@ export default function PhoneMockup() {
                   <div className="flex items-baseline gap-1">
                     <span className="text-lg font-bold text-white">{stat.value}</span>
                     {stat.change && (
-                      <span className={`text-[8px] ${stat.positive ? 'text-neon-green-400' : 'text-red-400'}`}>
+                      <span className={`text-[8px] ${stat.positive ? 'text-gold-400' : 'text-red-400'}`}>
                         {stat.change}
                       </span>
                     )}
@@ -115,8 +115,8 @@ export default function PhoneMockup() {
               <div className="flex items-center justify-between mb-2">
                 <p className="text-[10px] text-white/50 uppercase tracking-wider">Live Activity</p>
                 <div className="flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 bg-neon-green-500 rounded-full animate-pulse"></span>
-                  <span className="text-[8px] text-neon-green-400">LIVE</span>
+                  <span className="w-1.5 h-1.5 bg-gold rounded-full animate-pulse"></span>
+                  <span className="text-[8px] text-gold-400">LIVE</span>
                 </div>
               </div>
               
@@ -186,10 +186,10 @@ export default function PhoneMockup() {
             {/* Bottom Nav */}
             <div className="absolute bottom-3 left-3 right-3 h-12 bg-black/50 backdrop-blur-xl rounded-2xl flex items-center justify-around px-4 border border-white/10">
               <div className="flex flex-col items-center">
-                <svg className="w-5 h-5 text-neon-green-500" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-5 h-5 text-gold" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
                 </svg>
-                <span className="text-[6px] text-neon-green-400">Home</span>
+                <span className="text-[6px] text-gold-400">Home</span>
               </div>
               <div className="flex flex-col items-center opacity-50">
                 <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -218,7 +218,7 @@ export default function PhoneMockup() {
       <motion.div
         animate={{ y: [0, -10, 0], rotate: [0, 5, 0] }}
         transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute -top-8 -right-16 w-16 h-16 bg-gradient-to-br from-neon-green-500/30 to-emerald-500/30 rounded-2xl backdrop-blur-sm border border-neon-green-500/30 flex items-center justify-center"
+        className="absolute -top-8 -right-16 w-16 h-16 bg-gradient-to-br from-gold-500/30 to-gold-300/30 rounded-2xl backdrop-blur-sm border border-gold-500/30 flex items-center justify-center"
       >
         <span className="text-2xl">📈</span>
       </motion.div>

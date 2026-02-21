@@ -13,7 +13,7 @@
   --gold: #C9A96E;
   --gold-light: #E6D8B5;
   --silver: #A8A9AD;
-  --greenline: #5B8A72;
+  --greenline: #C9A96E;
 }
 
 * {
@@ -37,7 +37,7 @@ body {
     radial-gradient(ellipse at 90% 10%, rgba(201, 169, 110, 0.05) 0%, transparent 30%),
     radial-gradient(ellipse at 80% 85%, rgba(201, 169, 110, 0.06) 0%, transparent 35%),
     radial-gradient(ellipse at 20% 90%, rgba(201, 169, 110, 0.04) 0%, transparent 30%),
-    radial-gradient(ellipse at 50% 50%, rgba(91, 138, 114, 0.02) 0%, transparent 50%);
+    radial-gradient(ellipse at 50% 50%, rgba(201, 169, 110, 0.02) 0%, transparent 50%);
   color: var(--foreground);
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -68,7 +68,7 @@ body::after {
     radial-gradient(800px circle at 15% 25%, rgba(201, 169, 110, 0.04) 0%, transparent 70%),
     radial-gradient(600px circle at 85% 15%, rgba(201, 169, 110, 0.03) 0%, transparent 60%),
     radial-gradient(700px circle at 75% 80%, rgba(201, 169, 110, 0.035) 0%, transparent 65%),
-    radial-gradient(500px circle at 25% 85%, rgba(91, 138, 114, 0.025) 0%, transparent 60%);
+    radial-gradient(500px circle at 25% 85%, rgba(201, 169, 110, 0.025) 0%, transparent 60%);
   animation: ambientShift 20s ease-in-out infinite alternate;
 }
 
@@ -236,7 +236,7 @@ textarea:focus {
 
 .gsap-hover-lift:hover {
   transform: translateY(-5px);
-  box-shadow: 0 20px 40px rgba(0, 255, 0, 0.1);
+  box-shadow: 0 20px 40px rgba(201, 169, 110, 0.1);
 }
 
 @keyframes pulse-ring {
@@ -266,9 +266,9 @@ textarea:focus {
   animation: shimmer 2s infinite linear;
   background: linear-gradient(
     to right,
-    rgba(0, 255, 0, 0) 0%,
-    rgba(0, 255, 0, 0.1) 50%,
-    rgba(0, 255, 0, 0) 100%
+    rgba(201, 169, 110, 0) 0%,
+    rgba(201, 169, 110, 0.1) 50%,
+    rgba(201, 169, 110, 0) 100%
   );
   background-size: 1000px 100%;
 }
@@ -296,7 +296,7 @@ textarea:focus {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(0, 255, 0, 0.3),
+    rgba(201, 169, 110, 0.3),
     transparent
   );
   opacity: 0.5;
@@ -305,35 +305,35 @@ textarea:focus {
 /* Neon Border Effect */
 .neon-border {
   position: relative;
-  border: 1px solid rgba(0, 255, 0, 0.3);
-  box-shadow: 
-    0 0 10px rgba(0, 255, 0, 0.2),
-    inset 0 0 10px rgba(0, 255, 0, 0.05);
+  border: 1px solid rgba(201, 169, 110, 0.3);
+  box-shadow:
+    0 0 10px rgba(201, 169, 110, 0.2),
+    inset 0 0 10px rgba(201, 169, 110, 0.05);
 }
 
 .neon-border-teal {
   position: relative;
-  border: 1px solid rgba(0, 255, 255, 0.3);
-  box-shadow: 
-    0 0 10px rgba(0, 255, 255, 0.2),
-    inset 0 0 10px rgba(0, 255, 255, 0.05);
+  border: 1px solid rgba(201, 169, 110, 0.25);
+  box-shadow:
+    0 0 10px rgba(201, 169, 110, 0.15),
+    inset 0 0 10px rgba(201, 169, 110, 0.05);
 }
 
 /* Circuit Board Pattern */
 .circuit-bg {
-  background-image: 
-    linear-gradient(rgba(0, 255, 0, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 255, 0, 0.03) 1px, transparent 1px);
+  background-image:
+    linear-gradient(rgba(201, 169, 110, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201, 169, 110, 0.03) 1px, transparent 1px);
   background-size: 20px 20px;
 }
 
 /* Glow Text */
 .glow-text {
-  text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+  text-shadow: 0 0 10px rgba(201, 169, 110, 0.5);
 }
 
 .glow-text-teal {
-  text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+  text-shadow: 0 0 10px rgba(201, 169, 110, 0.4);
 }
 
 /* Card Hover Effect */
@@ -345,18 +345,18 @@ textarea:focus {
   transform: translateY(-4px);
   box-shadow: 
     0 12px 40px 0 rgba(0, 0, 0, 0.5),
-    0 0 20px rgba(0, 255, 0, 0.2);
+    0 0 20px rgba(201, 169, 110, 0.2);
 }
 
 /* Loading Spinner with Neon */
 .spinner-neon {
-  border: 3px solid rgba(0, 255, 0, 0.1);
-  border-top-color: #00FF00;
+  border: 3px solid rgba(201, 169, 110, 0.1);
+  border-top-color: #C9A96E;
   border-radius: 50%;
   width: 40px;
   height: 40px;
   animation: spin 1s linear infinite;
-  box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+  box-shadow: 0 0 15px rgba(201, 169, 110, 0.3);
 }
 
 @keyframes spin {
@@ -407,10 +407,10 @@ textarea:focus {
   background: linear-gradient(135deg, rgba(55,60,65,0.95) 0%, rgba(30,35,40,0.95) 100%);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(0,255,136,0.25);
+  border: 1px solid rgba(201,169,110,0.25);
   border-radius: 1rem;
   box-shadow: 
-    0 0 30px rgba(0,255,136,0.08),
+    0 0 30px rgba(201,169,110,0.08),
     0 8px 32px rgba(0,0,0,0.5),
     inset 0 1px 0 rgba(255,255,255,0.08);
   overflow: hidden;
@@ -436,7 +436,7 @@ textarea:focus {
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(0,255,136,0.4), transparent);
+  background: linear-gradient(90deg, transparent, rgba(201,169,110,0.4), transparent);
   z-index: 2;
 }
 
@@ -448,9 +448,9 @@ textarea:focus {
 
 /* OS Card hover state */
 .os-card:hover {
-  border-color: rgba(0,255,136,0.3);
+  border-color: rgba(201,169,110,0.3);
   box-shadow: 
-    0 0 30px rgba(0,255,136,0.1),
+    0 0 30px rgba(201,169,110,0.1),
     0 12px 40px rgba(0,0,0,0.5);
   transform: translateY(-4px);
 }
@@ -471,7 +471,7 @@ textarea:focus {
   left: 10%;
   width: 500px;
   height: 500px;
-  background: radial-gradient(ellipse, rgba(0,255,136,0.12) 0%, transparent 70%);
+  background: radial-gradient(ellipse, rgba(201,169,110,0.12) 0%, transparent 70%);
   border-radius: 50%;
   filter: blur(80px);
   animation: aurora-drift 15s ease-in-out infinite;
@@ -484,7 +484,7 @@ textarea:focus {
   right: 10%;
   width: 400px;
   height: 400px;
-  background: radial-gradient(ellipse, rgba(0,255,255,0.08) 0%, transparent 70%);
+  background: radial-gradient(ellipse, rgba(201,169,110,0.08) 0%, transparent 70%);
   border-radius: 50%;
   filter: blur(80px);
   animation: aurora-drift 12s ease-in-out infinite reverse;
@@ -513,8 +513,8 @@ textarea:focus {
 .icon-glass {
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, rgba(0,255,136,0.15) 0%, rgba(0,255,136,0.05) 100%);
-  border: 1px solid rgba(0,255,136,0.2);
+  background: linear-gradient(135deg, rgba(201,169,110,0.15) 0%, rgba(201,169,110,0.05) 100%);
+  border: 1px solid rgba(201,169,110,0.2);
   border-radius: 12px;
   display: flex;
   align-items: center;

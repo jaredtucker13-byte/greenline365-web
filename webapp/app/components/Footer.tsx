@@ -23,7 +23,7 @@ export default function Footer() {
           <div className="md:col-span-1">
             <Link href="/" className="text-2xl font-bold">
               <span className="text-white">Green</span>
-              <span className="text-emerald-400">Line365</span>
+              <span className="text-gold-400">Line365</span>
             </Link>
             <p className="mt-4 text-white/50 text-sm">
               Your AI-assisted planning and accountability partner.

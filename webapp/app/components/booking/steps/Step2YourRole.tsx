@@ -31,7 +31,7 @@ export default function Step2YourRole({ onBack, onNext, data, onUpdate }: Step2Y
             onClick={() => onUpdate({ role: role.value })}
             className={`w-full p-4 rounded-xl border text-left transition-all ${
               data.role === role.value
-                ? 'border-emerald-500 bg-emerald-500/10 text-white'
+                ? 'border-gold-500 bg-gold-500/10 text-white'
                 : 'border-white/10 bg-white/5 text-white/80 hover:border-white/30'
             }`}
           >
@@ -52,7 +52,7 @@ export default function Step2YourRole({ onBack, onNext, data, onUpdate }: Step2Y
           type="button"
           onClick={onNext}
           disabled={!data.role}
-          className="flex-1 py-3 px-6 rounded-xl bg-emerald-500 text-black font-semibold hover:bg-emerald-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 py-3 px-6 rounded-xl bg-gold-500 text-black font-semibold hover:bg-gold-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Continue
         </button>

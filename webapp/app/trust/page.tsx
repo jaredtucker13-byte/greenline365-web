@@ -81,8 +81,8 @@ export default async function TrustPage() {
       <div className="max-w-5xl mx-auto px-6">
         {/* Header */}
         <header className="mb-10 md:mb-14">
-          <div className="flex items-center gap-2 text-emerald-400 text-sm font-medium mb-4">
-            <Link href="/" className="hover:text-emerald-300 transition">Home</Link>
+          <div className="flex items-center gap-2 text-gold-400 text-sm font-medium mb-4">
+            <Link href="/" className="hover:text-gold-300 transition">Home</Link>
             <span className="text-white/30">/</span>
             <span>Legal</span>
             <span className="text-white/30">/</span>
@@ -92,8 +92,8 @@ export default async function TrustPage() {
             Trust & Security Whitepaper
           </h1>
           <div className="flex flex-wrap items-center gap-4 text-sm mb-6">
-            <span className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-full font-medium">
-              <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+            <span className="inline-flex items-center gap-2 px-3 py-1 bg-gold-500/20 text-gold-400 rounded-full font-medium">
+              <span className="w-2 h-2 bg-gold-400 rounded-full animate-pulse"></span>
               Status: Effective
             </span>
             <span className="text-white/60 flex items-center gap-2">
@@ -127,7 +127,7 @@ export default async function TrustPage() {
                   <li key={section.id}>
                     <a 
                       href={`#${section.id}`}
-                      className="text-sm text-white/60 hover:text-emerald-400 transition block py-1"
+                      className="text-sm text-white/60 hover:text-gold-400 transition block py-1"
                     >
                       {section.title}
                     </a>
@@ -139,10 +139,10 @@ export default async function TrustPage() {
               <div className="mt-6 pt-6 border-t border-white/10">
                 <p className="text-xs text-white/40 uppercase tracking-wider mb-3">Compliance</p>
                 <div className="flex flex-wrap gap-2">
-                  <span className="px-2 py-1 bg-emerald-500/10 text-emerald-400 text-xs rounded font-medium">SOC2</span>
-                  <span className="px-2 py-1 bg-emerald-500/10 text-emerald-400 text-xs rounded font-medium">GDPR</span>
-                  <span className="px-2 py-1 bg-emerald-500/10 text-emerald-400 text-xs rounded font-medium">HIPAA</span>
-                  <span className="px-2 py-1 bg-emerald-500/10 text-emerald-400 text-xs rounded font-medium">ISO 27001</span>
+                  <span className="px-2 py-1 bg-gold-500/10 text-gold-400 text-xs rounded font-medium">SOC2</span>
+                  <span className="px-2 py-1 bg-gold-500/10 text-gold-400 text-xs rounded font-medium">GDPR</span>
+                  <span className="px-2 py-1 bg-gold-500/10 text-gold-400 text-xs rounded font-medium">HIPAA</span>
+                  <span className="px-2 py-1 bg-gold-500/10 text-gold-400 text-xs rounded font-medium">ISO 27001</span>
                 </div>
               </div>
             </nav>
@@ -158,10 +158,10 @@ export default async function TrustPage() {
             ) : (
               <>
             {/* Hero Card */}
-            <div className="bg-gradient-to-br from-emerald-500/10 to-cyan-500/5 border border-emerald-500/20 rounded-2xl p-6 md:p-8">
+            <div className="bg-gradient-to-br from-gold-500/10 to-cyan-500/5 border border-gold-500/20 rounded-2xl p-6 md:p-8">
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <svg className="w-6 h-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="w-12 h-12 bg-gold-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <svg className="w-6 h-6 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                   </svg>
                 </div>
@@ -178,13 +178,13 @@ export default async function TrustPage() {
             {/* Section 1 - Executive Summary */}
             <section id="executive-summary" className="scroll-mt-24">
               <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">1</span>
+                <span className="flex items-center justify-center w-8 h-8 bg-gold-500/20 text-gold-400 text-sm font-bold rounded-lg">1</span>
                 Executive Summary
               </h2>
               <div className="space-y-4 text-white/70 leading-relaxed">
                 <p>
                   GreenLine365 treats data security as the <strong className="text-white">foundational layer</strong> of 
-                  our Living Economic Operating System. We utilize a <strong className="text-emerald-400">"Zero-Trust" Architecture</strong>, 
+                  our Living Economic Operating System. We utilize a <strong className="text-gold-400">"Zero-Trust" Architecture</strong>, 
                   meaning we do not rely on standard permissions alone; we rely on cryptographic and database-level 
                   isolation to ensure your business data remains sovereign, private, and secure.
                 </p>
@@ -198,7 +198,7 @@ export default async function TrustPage() {
             {/* Section 2 - Technical Architecture */}
             <section id="architecture" className="scroll-mt-24">
               <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">2</span>
+                <span className="flex items-center justify-center w-8 h-8 bg-gold-500/20 text-gold-400 text-sm font-bold rounded-lg">2</span>
                 Technical Architecture & Logical Isolation
               </h2>
               <p className="text-white/70 leading-relaxed mb-6">
@@ -266,15 +266,15 @@ export default async function TrustPage() {
                 </div>
 
                 {/* Encryption Card */}
-                <div className="bg-gradient-to-r from-emerald-500/10 to-emerald-500/5 border border-emerald-500/20 rounded-xl p-5">
+                <div className="bg-gradient-to-r from-gold-500/10 to-gold-500/5 border border-gold-500/20 rounded-xl p-5">
                   <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <svg className="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div className="w-10 h-10 bg-gold-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                       </svg>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-emerald-400 mb-2">Encryption</h3>
+                      <h3 className="font-semibold text-gold-400 mb-2">Encryption</h3>
                       <p className="text-white/60 text-sm">
                         Data is encrypted <strong className="text-white">in transit</strong> (via TLS 1.3) and 
                         <strong className="text-white"> at rest</strong> (via AES-256), ensuring that data remains 
@@ -289,12 +289,12 @@ export default async function TrustPage() {
             {/* Section 3 - AI Privacy */}
             <section id="ai-privacy" className="scroll-mt-24">
               <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">3</span>
+                <span className="flex items-center justify-center w-8 h-8 bg-gold-500/20 text-gold-400 text-sm font-bold rounded-lg">3</span>
                 AI Data Usage & Privacy Protocol
               </h2>
               <p className="text-white/70 leading-relaxed mb-6">
                 GreenLine365 uses advanced Artificial Intelligence to provide predictive analytics. 
-                We adhere to a strict <strong className="text-emerald-400">"Privacy Glass"</strong> policy to ensure 
+                We adhere to a strict <strong className="text-gold-400">"Privacy Glass"</strong> policy to ensure 
                 AI utility does not compromise data confidentiality.
               </p>
 
@@ -326,8 +326,8 @@ export default async function TrustPage() {
                 </div>
 
                 <div className="bg-white/5 border border-white/10 rounded-xl p-5">
-                  <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center mb-3">
-                    <svg className="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="w-10 h-10 bg-gold-500/20 rounded-lg flex items-center justify-center mb-3">
+                    <svg className="w-5 h-5 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                   </div>
@@ -356,7 +356,7 @@ export default async function TrustPage() {
             {/* Section 4 - Data Retention */}
             <section id="data-retention" className="scroll-mt-24">
               <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">4</span>
+                <span className="flex items-center justify-center w-8 h-8 bg-gold-500/20 text-gold-400 text-sm font-bold rounded-lg">4</span>
                 Data Retention & Minimization
               </h2>
               <p className="text-white/70 leading-relaxed mb-6">
@@ -373,7 +373,7 @@ export default async function TrustPage() {
                     <p className="text-white/60 text-sm">
                       We implement an automated <strong className="text-white">Time-To-Live (TTL)</strong> policy. 
                       Raw web-scraping data and temporary system logs are cryptographically erased after 
-                      <span className="text-emerald-400 font-semibold"> 90 days</span>.
+                      <span className="text-gold-400 font-semibold"> 90 days</span>.
                     </p>
                   </div>
                 </div>
@@ -386,7 +386,7 @@ export default async function TrustPage() {
                     <h3 className="font-semibold text-white mb-1">Audit Trails</h3>
                     <p className="text-white/60 text-sm">
                       We maintain a secure, <strong className="text-white">immutable log</strong> of all critical system 
-                      actions (logins, deletions, exports) for <span className="text-emerald-400 font-semibold">365 days</span> to 
+                      actions (logins, deletions, exports) for <span className="text-gold-400 font-semibold">365 days</span> to 
                       assist with internal compliance and security auditing.
                     </p>
                   </div>
@@ -401,7 +401,7 @@ export default async function TrustPage() {
                     <p className="text-white/60 text-sm">
                       Upon termination of service, all data associated with your <code className="bg-white/10 px-1.5 py-0.5 rounded text-xs">tenant_id</code> is 
                       scheduled for <strong className="text-white">permanent deletion</strong> within 
-                      <span className="text-emerald-400 font-semibold"> 30 days</span>.
+                      <span className="text-gold-400 font-semibold"> 30 days</span>.
                     </p>
                   </div>
                 </div>
@@ -411,7 +411,7 @@ export default async function TrustPage() {
             {/* Section 5 - Infrastructure */}
             <section id="infrastructure" className="scroll-mt-24">
               <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">5</span>
+                <span className="flex items-center justify-center w-8 h-8 bg-gold-500/20 text-gold-400 text-sm font-bold rounded-lg">5</span>
                 Infrastructure & Sub-processors
               </h2>
               <p className="text-white/70 leading-relaxed mb-6">
@@ -442,7 +442,7 @@ export default async function TrustPage() {
                           <td className="py-4 px-5">
                             <div className="flex flex-wrap gap-1">
                               {item.standard.split(', ').map((badge) => (
-                                <span key={badge} className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 text-xs rounded">
+                                <span key={badge} className="px-2 py-0.5 bg-gold-500/10 text-gold-400 text-xs rounded">
                                   {badge}
                                 </span>
                               ))}
@@ -459,14 +459,14 @@ export default async function TrustPage() {
             {/* Section 6 - Disaster Recovery */}
             <section id="disaster-recovery" className="scroll-mt-24">
               <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">6</span>
+                <span className="flex items-center justify-center w-8 h-8 bg-gold-500/20 text-gold-400 text-sm font-bold rounded-lg">6</span>
                 Disaster Recovery & Availability
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-500/20 rounded-xl p-5 text-center">
-                  <div className="w-12 h-12 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <svg className="w-6 h-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="bg-gradient-to-br from-gold-500/10 to-gold-500/5 border border-gold-500/20 rounded-xl p-5 text-center">
+                  <div className="w-12 h-12 bg-gold-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <svg className="w-6 h-6 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
                     </svg>
                   </div>
@@ -505,7 +505,7 @@ export default async function TrustPage() {
             {/* Section 7 - Contact */}
             <section id="contact" className="scroll-mt-24">
               <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">7</span>
+                <span className="flex items-center justify-center w-8 h-8 bg-gold-500/20 text-gold-400 text-sm font-bold rounded-lg">7</span>
                 Contact & Reporting
               </h2>
               <p className="text-white/70 leading-relaxed mb-6">
@@ -516,17 +516,17 @@ export default async function TrustPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <a 
                   href="mailto:greenline365help@gmail.com"
-                  className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-500/20 rounded-xl p-5 hover:border-emerald-500/40 transition group"
+                  className="bg-gradient-to-br from-gold-500/10 to-gold-500/5 border border-gold-500/20 rounded-xl p-5 hover:border-gold-500/40 transition group"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center group-hover:bg-emerald-500/30 transition">
-                      <svg className="w-6 h-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div className="w-12 h-12 bg-gold-500/20 rounded-xl flex items-center justify-center group-hover:bg-gold-500/30 transition">
+                      <svg className="w-6 h-6 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                       </svg>
                     </div>
                     <div>
                       <p className="text-white/40 text-sm">Security Contact</p>
-                      <p className="text-emerald-400 font-medium">greenline365help@gmail.com</p>
+                      <p className="text-gold-400 font-medium">greenline365help@gmail.com</p>
                     </div>
                   </div>
                 </a>
@@ -556,10 +556,10 @@ export default async function TrustPage() {
             <div className="pt-8 border-t border-white/10">
               <p className="text-white/40 text-sm mb-4">Related Documents:</p>
               <div className="flex flex-wrap gap-4">
-                <Link href="/terms" className="text-emerald-400 hover:text-emerald-300 transition text-sm">
+                <Link href="/terms" className="text-gold-400 hover:text-gold-300 transition text-sm">
                   Terms of Service →
                 </Link>
-                <Link href="/privacy" className="text-emerald-400 hover:text-emerald-300 transition text-sm">
+                <Link href="/privacy" className="text-gold-400 hover:text-gold-300 transition text-sm">
                   Privacy Policy →
                 </Link>
               </div>

@@ -16,10 +16,10 @@ export default function AdminPage() {
             <div className="flex items-center gap-6">
               <Link href="/" className="text-xl font-bold">
                 <span className="text-white">Green</span>
-                <span className="text-emerald-400">Line365</span>
+                <span className="text-gold-400">Line365</span>
               </Link>
               <span className="text-gray-600">|</span>
-              <span className="text-emerald-400 text-sm font-medium">Command Center</span>
+              <span className="text-gold-400 text-sm font-medium">Command Center</span>
             </div>
             <Link 
               href="/"

@@ -26,7 +26,7 @@ export interface FunnelChartProps {
 
 const colorClasses = {
   blue: 'bg-blue-500',
-  emerald: 'bg-emerald-500',
+  emerald: 'bg-gold-500',
   purple: 'bg-purple-500',
   amber: 'bg-amber-500',
   cyan: 'bg-cyan-500',
@@ -84,7 +84,7 @@ export function FunnelChart({
       
       {showConversionRate && stages.length >= 2 && (
         <div className="mt-4 text-center pt-3 border-t border-white/10">
-          <span className="text-2xl font-bold text-emerald-400">{conversionRate}%</span>
+          <span className="text-2xl font-bold text-gold-400">{conversionRate}%</span>
           <span className="text-white/50 text-sm ml-2">Conversion Rate</span>
         </div>
       )}

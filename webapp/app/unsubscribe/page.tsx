@@ -84,7 +84,7 @@ function UnsubscribeContent() {
         {status === 'loading' && (
           <div className="bg-gradient-to-br from-gray-900/80 to-gray-900/40 border border-white/10 rounded-2xl p-8 text-center">
             <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
-              <div className="w-8 h-8 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+              <div className="w-8 h-8 border-2 border-gold-500/30 border-t-gold-500 rounded-full animate-spin" />
             </div>
             <h1 className="text-2xl font-bold text-white mb-2">Processing...</h1>
             <p className="text-gray-400">Please wait while we update your preferences.</p>
@@ -145,12 +145,12 @@ function UnsubscribeContent() {
 
         {/* Success State */}
         {status === 'success' && (
-          <div className="bg-gradient-to-br from-gray-900/80 to-gray-900/40 border border-emerald-500/30 rounded-2xl p-8 text-center">
+          <div className="bg-gradient-to-br from-gray-900/80 to-gray-900/40 border border-gold-500/30 rounded-2xl p-8 text-center">
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', delay: 0.2 }}
-              className="w-20 h-20 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6"
+              className="w-20 h-20 bg-gold-500/20 rounded-full flex items-center justify-center mx-auto mb-6"
             >
               <span className="text-5xl">✅</span>
             </motion.div>
@@ -189,7 +189,7 @@ function UnsubscribeContent() {
         <div className="mt-6 text-center">
           <p className="text-gray-600 text-xs">
             Questions? Contact us at{' '}
-            <a href="mailto:greenline365help@gmail.com" className="text-emerald-400 hover:underline">
+            <a href="mailto:greenline365help@gmail.com" className="text-gold-400 hover:underline">
               greenline365help@gmail.com
             </a>
           </p>
@@ -203,7 +203,7 @@ export default function UnsubscribePage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-gold-500/30 border-t-gold-500 rounded-full animate-spin" />
       </div>
     }>
       <UnsubscribeContent />

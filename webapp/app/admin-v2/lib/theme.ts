@@ -17,7 +17,7 @@ export const tacticalTheme = {
   // Neon accent colors with glow effects
   accent: {
     neonGreen: '#39FF14',    // Primary neon green
-    emerald: '#10B981',      // Softer green for UI elements
+    emerald: '#C9A96E',      // Softer green for UI elements
     teal: '#0CE293',         // Content slots
     gold: '#FFC800',         // Review/Warning stage
     purple: '#8A2BE2',       // Launch stage
@@ -44,7 +44,7 @@ export const tacticalTheme = {
   status: {
     booking: {
       bg: 'rgba(16, 185, 129, 0.2)',
-      border: '#10B981',
+      border: '#C9A96E',
       glow: '0 0 20px rgba(16, 185, 129, 0.4)',
     },
     content: {

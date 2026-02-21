@@ -218,7 +218,7 @@ export default function BookingWidget({
                   }}
                   className={`p-3 rounded-lg border text-center transition-all ${
                     selectedDate === date
-                      ? 'border-emerald-500 bg-emerald-50'
+                      ? 'border-gold-500 bg-gold-50'
                       : 'border-gray-200 hover:border-gray-300'
                   }`}
                 >
@@ -271,7 +271,7 @@ export default function BookingWidget({
                     isBooked
                       ? 'border-gray-100 bg-gray-50 cursor-not-allowed opacity-50'
                       : selectedTime === time
-                        ? 'border-emerald-500 bg-emerald-50'
+                        ? 'border-gold-500 bg-gold-50'
                         : 'border-gray-200 hover:border-gray-300'
                   }`}
                 >
@@ -308,7 +308,7 @@ export default function BookingWidget({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Your name"
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-gold-500 outline-none"
             />
           </div>
           
@@ -319,7 +319,7 @@ export default function BookingWidget({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="your@email.com"
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-gold-500 outline-none"
             />
           </div>
           
@@ -330,7 +330,7 @@ export default function BookingWidget({
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="(555) 555-5555"
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-gold-500 outline-none"
             />
           </div>
 

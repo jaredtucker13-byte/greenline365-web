@@ -48,8 +48,8 @@ export default async function PrivacyPage() {
       <div className="max-w-5xl mx-auto px-6">
         {/* Header */}
         <header className="mb-10 md:mb-14">
-          <div className="flex items-center gap-2 text-emerald-400 text-sm font-medium mb-4">
-            <Link href="/" className="hover:text-emerald-300 transition">Home</Link>
+          <div className="flex items-center gap-2 text-gold-400 text-sm font-medium mb-4">
+            <Link href="/" className="hover:text-gold-300 transition">Home</Link>
             <span className="text-white/30">/</span>
             <span>Legal</span>
             <span className="text-white/30">/</span>
@@ -86,7 +86,7 @@ export default async function PrivacyPage() {
                   <li key={section.id}>
                     <a 
                       href={`#${section.id}`}
-                      className="text-sm text-white/60 hover:text-emerald-400 transition block py-1"
+                      className="text-sm text-white/60 hover:text-gold-400 transition block py-1"
                     >
                       {section.title}
                     </a>
@@ -108,10 +108,10 @@ export default async function PrivacyPage() {
                 {/* Section 1 - Overview */}
                 <section id="overview" className="scroll-mt-24">
                   <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                    <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">1</span>
+                    <span className="flex items-center justify-center w-8 h-8 bg-gold-500/20 text-gold-400 text-sm font-bold rounded-lg">1</span>
                     Overview
                   </h2>
-                  <div className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-500/20 rounded-xl p-6">
+                  <div className="bg-gradient-to-br from-gold-500/10 to-gold-500/5 border border-gold-500/20 rounded-xl p-6">
                     <p className="text-white/80 leading-relaxed">
                       This Privacy Policy explains how GreenLine365 (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;) collects, uses, and 
                       protects personal information when you visit our website or use our services, including SMS‑based verification.
@@ -126,7 +126,7 @@ export default async function PrivacyPage() {
                 {/* Section 2 - Data We Collect */}
                 <section id="data-collection" className="scroll-mt-24">
                   <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                    <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">2</span>
+                    <span className="flex items-center justify-center w-8 h-8 bg-gold-500/20 text-gold-400 text-sm font-bold rounded-lg">2</span>
                     Data We Collect
                   </h2>
                   <p className="text-white/70 leading-relaxed mb-5">
@@ -135,8 +135,8 @@ export default async function PrivacyPage() {
                   <div className="space-y-4">
                     <div className="bg-white/5 border border-white/10 rounded-lg p-5">
                       <div className="flex items-center gap-3 mb-3">
-                        <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center">
-                          <svg className="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <div className="w-10 h-10 bg-gold-500/20 rounded-lg flex items-center justify-center">
+                          <svg className="w-5 h-5 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                           </svg>
                         </div>
@@ -184,7 +184,7 @@ export default async function PrivacyPage() {
                 {/* Section 3 - Directory & Business Data */}
                 <section id="directory-data" className="scroll-mt-24">
                   <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                    <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">3</span>
+                    <span className="flex items-center justify-center w-8 h-8 bg-gold-500/20 text-gold-400 text-sm font-bold rounded-lg">3</span>
                     Directory & Business Data
                   </h2>
                   <p className="text-white/70 leading-relaxed mb-5">
@@ -206,7 +206,7 @@ export default async function PrivacyPage() {
                     <div className="bg-white/5 border border-white/10 rounded-lg p-5">
                       <h3 className="font-semibold text-white mb-2">Embedded Maps</h3>
                       <p className="text-white/60 text-sm">
-                        Listing pages include embedded Google Maps. When you view a map, Google may collect data according to their own <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:underline">Privacy Policy</a>. We do not control what data Google collects through embedded maps.
+                        Listing pages include embedded Google Maps. When you view a map, Google may collect data according to their own <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-gold-400 hover:underline">Privacy Policy</a>. We do not control what data Google collects through embedded maps.
                       </p>
                     </div>
                   </div>
@@ -215,7 +215,7 @@ export default async function PrivacyPage() {
                 {/* Section 4 - Reviews & AI Responses */}
                 <section id="reviews-ai" className="scroll-mt-24">
                   <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                    <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">4</span>
+                    <span className="flex items-center justify-center w-8 h-8 bg-gold-500/20 text-gold-400 text-sm font-bold rounded-lg">4</span>
                     Reviews & AI Responses
                   </h2>
                   <div className="space-y-4">
@@ -243,7 +243,7 @@ export default async function PrivacyPage() {
                 {/* Section 5 - Analytics & Interaction Tracking */}
                 <section id="analytics-tracking" className="scroll-mt-24">
                   <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                    <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">5</span>
+                    <span className="flex items-center justify-center w-8 h-8 bg-gold-500/20 text-gold-400 text-sm font-bold rounded-lg">5</span>
                     Analytics & Interaction Tracking
                   </h2>
                   <div className="space-y-4">
@@ -265,7 +265,7 @@ export default async function PrivacyPage() {
                 {/* Section 6 - How We Use Your Data */}
                 <section id="data-usage" className="scroll-mt-24">
                   <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                    <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">6</span>
+                    <span className="flex items-center justify-center w-8 h-8 bg-gold-500/20 text-gold-400 text-sm font-bold rounded-lg">6</span>
                     How We Use Your Data
                   </h2>
                   <p className="text-white/70 leading-relaxed mb-4">
@@ -273,7 +273,7 @@ export default async function PrivacyPage() {
                   </p>
                   <ul className="space-y-4">
                     <li className="flex items-start gap-4 text-white/70 bg-white/5 border border-white/10 rounded-lg p-4">
-                      <svg className="w-6 h-6 text-emerald-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="w-6 h-6 text-gold-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                       <span>
@@ -282,7 +282,7 @@ export default async function PrivacyPage() {
                       </span>
                     </li>
                     <li className="flex items-start gap-4 text-white/70 bg-white/5 border border-white/10 rounded-lg p-4">
-                      <svg className="w-6 h-6 text-emerald-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="w-6 h-6 text-gold-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                       <span>
@@ -292,7 +292,7 @@ export default async function PrivacyPage() {
                       </span>
                     </li>
                     <li className="flex items-start gap-4 text-white/70 bg-white/5 border border-white/10 rounded-lg p-4">
-                      <svg className="w-6 h-6 text-emerald-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="w-6 h-6 text-gold-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                       <span>
@@ -307,7 +307,7 @@ export default async function PrivacyPage() {
                 {/* Section 4 - Sharing, Storage & Retention */}
                 <section id="sharing-storage" className="scroll-mt-24">
                   <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                    <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">7</span>
+                    <span className="flex items-center justify-center w-8 h-8 bg-gold-500/20 text-gold-400 text-sm font-bold rounded-lg">7</span>
                     Sharing, Storage & Retention
                   </h2>
                   <div className="space-y-4">
@@ -327,8 +327,8 @@ export default async function PrivacyPage() {
                       </p>
                     </div>
 
-                    <div className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-500/20 rounded-lg p-5">
-                      <h3 className="font-semibold text-emerald-400 mb-3 flex items-center gap-2">
+                    <div className="bg-gradient-to-br from-gold-500/10 to-gold-500/5 border border-gold-500/20 rounded-lg p-5">
+                      <h3 className="font-semibold text-gold-400 mb-3 flex items-center gap-2">
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                         </svg>
@@ -359,7 +359,7 @@ export default async function PrivacyPage() {
                 {/* Section 5 - Your Choices & Contact */}
                 <section id="your-choices" className="scroll-mt-24">
                   <h2 className="text-xl md:text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                    <span className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 text-emerald-400 text-sm font-bold rounded-lg">8</span>
+                    <span className="flex items-center justify-center w-8 h-8 bg-gold-500/20 text-gold-400 text-sm font-bold rounded-lg">8</span>
                     Your Choices & Contact
                   </h2>
                   <div className="space-y-4">
@@ -407,7 +407,7 @@ export default async function PrivacyPage() {
                   </div>
 
                   {/* Contact Card */}
-                  <div className="mt-8 bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-500/20 rounded-xl p-6">
+                  <div className="mt-8 bg-gradient-to-br from-gold-500/10 to-gold-500/5 border border-gold-500/20 rounded-xl p-6">
                     <h3 className="font-semibold text-white mb-4">Contact Us About Privacy</h3>
                     <p className="text-white/70 leading-relaxed mb-4">
                       If you have questions or concerns about this Privacy Policy, please contact us:
@@ -415,7 +415,7 @@ export default async function PrivacyPage() {
                     <div className="space-y-2">
                       <a 
                         href="mailto:greenline365help@gmail.com" 
-                        className="inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300 transition font-medium"
+                        className="inline-flex items-center gap-2 text-gold-400 hover:text-gold-300 transition font-medium"
                       >
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -435,10 +435,10 @@ export default async function PrivacyPage() {
                 <div className="pt-8 border-t border-white/10">
                   <p className="text-white/40 text-sm mb-4">Related Documents:</p>
                   <div className="flex flex-wrap gap-4">
-                    <Link href="/terms" className="text-emerald-400 hover:text-emerald-300 transition text-sm">
+                    <Link href="/terms" className="text-gold-400 hover:text-gold-300 transition text-sm">
                       Terms of Service →
                     </Link>
-                    <Link href="/trust" className="text-emerald-400 hover:text-emerald-300 transition text-sm">
+                    <Link href="/trust" className="text-gold-400 hover:text-gold-300 transition text-sm">
                       Trust & Security →
                     </Link>
                   </div>

@@ -24,7 +24,7 @@ export default function Step5Time({ onBack, onNext, data, onUpdate }: Step5TimeP
             type="datetime-local"
             value={data.preferredDateTime || ''}
             onChange={(e) => onUpdate({ ...data, preferredDateTime: e.target.value })}
-            className="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition"
+            className="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-white focus:border-gold-500 focus:ring-1 focus:ring-gold-500 outline-none transition"
           />
         </div>
 
@@ -36,7 +36,7 @@ export default function Step5Time({ onBack, onNext, data, onUpdate }: Step5TimeP
             type="datetime-local"
             value={data.alternateDateTime || ''}
             onChange={(e) => onUpdate({ ...data, alternateDateTime: e.target.value })}
-            className="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition"
+            className="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-white focus:border-gold-500 focus:ring-1 focus:ring-gold-500 outline-none transition"
           />
         </div>
       </div>
@@ -53,7 +53,7 @@ export default function Step5Time({ onBack, onNext, data, onUpdate }: Step5TimeP
           type="button"
           onClick={onNext}
           disabled={!data.preferredDateTime}
-          className="flex-1 py-3 px-6 rounded-xl bg-emerald-500 text-black font-semibold hover:bg-emerald-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 py-3 px-6 rounded-xl bg-gold-500 text-black font-semibold hover:bg-gold-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Continue
         </button>

@@ -135,7 +135,7 @@ export default function DemoCalendarPage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-3xl md:text-4xl font-bold text-white mb-4"
           >
-            Book Your <span className="text-emerald-400">Demo</span>
+            Book Your <span className="text-gold-400">Demo</span>
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
@@ -152,7 +152,7 @@ export default function DemoCalendarPage() {
           {[1, 2].map((s) => (
             <div key={s} className="flex items-center gap-2">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition ${
-                step >= s ? 'bg-emerald-500 text-black' : 'bg-white/10 text-white/40'
+                step >= s ? 'bg-gold-500 text-black' : 'bg-white/10 text-white/40'
               }`}>
                 {s}
               </div>
@@ -182,7 +182,7 @@ export default function DemoCalendarPage() {
                     value={formData.name}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 outline-none transition"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
                     placeholder="John Smith"
                   />
                 </div>
@@ -195,7 +195,7 @@ export default function DemoCalendarPage() {
                     value={formData.email}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 outline-none transition"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
                     placeholder="john@company.com"
                   />
                 </div>
@@ -208,7 +208,7 @@ export default function DemoCalendarPage() {
                     value={formData.company}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 outline-none transition"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
                     placeholder="Acme Inc"
                   />
                 </div>
@@ -220,7 +220,7 @@ export default function DemoCalendarPage() {
                     name="website"
                     value={formData.website}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 outline-none transition"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
                     placeholder="https://company.com"
                   />
                   <p className="text-xs text-white/40 mt-1">We'll use this to personalize your demo experience</p>
@@ -234,7 +234,7 @@ export default function DemoCalendarPage() {
                     }
                   }}
                   disabled={!formData.name || !formData.email || !formData.company}
-                  className="w-full py-4 bg-emerald-500 text-black font-bold rounded-xl hover:bg-emerald-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full py-4 bg-gold-500 text-black font-bold rounded-xl hover:bg-gold-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Continue
                 </button>
@@ -253,7 +253,7 @@ export default function DemoCalendarPage() {
                         onClick={() => handleIndustrySelect(industry.id)}
                         className={`p-4 rounded-xl border text-left transition ${
                           formData.industry === industry.id
-                            ? 'bg-emerald-500/20 border-emerald-500/50 text-white'
+                            ? 'bg-gold-500/20 border-gold-500/50 text-white'
                             : 'bg-white/5 border-white/10 text-white/70 hover:border-white/20'
                         }`}
                       >
@@ -271,7 +271,7 @@ export default function DemoCalendarPage() {
                     name="phone"
                     value={formData.phone}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 outline-none transition"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
                     placeholder="(555) 123-4567"
                   />
                 </div>
@@ -287,7 +287,7 @@ export default function DemoCalendarPage() {
                   <button
                     type="submit"
                     disabled={!formData.industry || loading}
-                    className="flex-1 py-4 bg-emerald-500 text-black font-bold rounded-xl hover:bg-emerald-400 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="flex-1 py-4 bg-gold-500 text-black font-bold rounded-xl hover:bg-gold-400 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {loading ? (
                       <>

@@ -514,7 +514,7 @@ export default function BrandVoicePage() {
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {profile.biography?.expertise?.map((exp, i) => (
-                    <span key={i} className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-sm flex items-center gap-2">
+                    <span key={i} className="px-3 py-1 rounded-full bg-gold-500/20 text-gold-300 text-sm flex items-center gap-2">
                       {exp}
                       <button onClick={() => removeFromList('expertise', i)} className="hover:text-white">×</button>
                     </span>
@@ -583,14 +583,14 @@ export default function BrandVoicePage() {
                   />
                   <button
                     onClick={() => addToList('preferredPhrases', preferredInput, setPreferredInput)}
-                    className="px-4 py-2 rounded-xl bg-emerald-500 text-white font-medium hover:bg-emerald-600 transition-colors"
+                    className="px-4 py-2 rounded-xl bg-gold-500 text-white font-medium hover:bg-gold-600 transition-colors"
                   >
                     Add
                   </button>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {profile.preferredPhrases?.map((phrase, i) => (
-                    <span key={i} className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-sm flex items-center gap-2">
+                    <span key={i} className="px-3 py-1 rounded-full bg-gold-500/20 text-gold-300 text-sm flex items-center gap-2">
                       {phrase}
                       <button onClick={() => removeFromList('preferredPhrases', i)} className="hover:text-white">×</button>
                     </span>
@@ -644,7 +644,7 @@ export default function BrandVoicePage() {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
-                  className="flex items-center gap-2 text-emerald-400"
+                  className="flex items-center gap-2 text-gold-400"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />

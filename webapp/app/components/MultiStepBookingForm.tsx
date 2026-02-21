@@ -231,8 +231,8 @@ export default function MultiStepBookingForm({ compact = false }: MultiStepBooki
   if (isComplete) {
     return (
       <div className={`text-center ${compact ? 'py-6' : 'py-12'}`}>
-        <div className={`${compact ? 'w-14 h-14 mb-4' : 'w-20 h-20 mb-6'} mx-auto bg-emerald-500/20 rounded-full flex items-center justify-center`}>
-          <svg className={`${compact ? 'w-7 h-7' : 'w-10 h-10'} text-emerald-400`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className={`${compact ? 'w-14 h-14 mb-4' : 'w-20 h-20 mb-6'} mx-auto bg-gold-500/20 rounded-full flex items-center justify-center`}>
+          <svg className={`${compact ? 'w-7 h-7' : 'w-10 h-10'} text-gold-400`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
@@ -253,9 +253,9 @@ export default function MultiStepBookingForm({ compact = false }: MultiStepBooki
               <div
                 className={`${compact ? 'w-6 h-6 text-xs' : 'w-8 h-8 text-sm'} rounded-full flex items-center justify-center font-medium transition-all ${
                   i + 1 < step
-                    ? 'bg-emerald-500 text-black'
+                    ? 'bg-gold-500 text-black'
                     : i + 1 === step
-                    ? 'bg-emerald-500/20 text-emerald-400 ring-2 ring-emerald-500'
+                    ? 'bg-gold-500/20 text-gold-400 ring-2 ring-gold-500'
                     : 'bg-gray-800 text-gray-500'
                 }`}
               >
@@ -268,7 +268,7 @@ export default function MultiStepBookingForm({ compact = false }: MultiStepBooki
                 )}
               </div>
               {!compact && (
-                <span className={`mt-2 text-xs hidden sm:block ${i + 1 <= step ? 'text-emerald-400' : 'text-gray-500'}`}>
+                <span className={`mt-2 text-xs hidden sm:block ${i + 1 <= step ? 'text-gold-400' : 'text-gray-500'}`}>
                   {label}
                 </span>
               )}
@@ -277,7 +277,7 @@ export default function MultiStepBookingForm({ compact = false }: MultiStepBooki
         </div>
         <div className="h-1 bg-gray-800 rounded-full overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 transition-all duration-500"
+            className="h-full bg-gradient-to-r from-gold-500 to-gold-400 transition-all duration-500"
             style={{ width: `${((step - 1) / (totalSteps - 1)) * 100}%` }}
           />
         </div>
@@ -298,8 +298,8 @@ export default function MultiStepBookingForm({ compact = false }: MultiStepBooki
               value={formData.fullName}
               onChange={(e) => updateField('fullName', e.target.value)}
               placeholder="John Smith"
-              className={`w-full ${compact ? 'p-2.5 text-sm rounded-lg' : 'p-4 rounded-xl'} bg-gray-800/50 border text-white placeholder:text-gray-500 focus:ring-2 focus:ring-emerald-500 outline-none transition ${
-                errors.fullName ? 'border-red-500' : 'border-gray-700 focus:border-emerald-500'
+              className={`w-full ${compact ? 'p-2.5 text-sm rounded-lg' : 'p-4 rounded-xl'} bg-gray-800/50 border text-white placeholder:text-gray-500 focus:ring-2 focus:ring-gold-500 outline-none transition ${
+                errors.fullName ? 'border-red-500' : 'border-gray-700 focus:border-gold-500'
               }`}
             />
             {errors.fullName && <p className="mt-1 text-xs text-red-400">{errors.fullName}</p>}
@@ -318,8 +318,8 @@ export default function MultiStepBookingForm({ compact = false }: MultiStepBooki
                 }}
                 placeholder="john@company.com"
                 disabled={emailVerified}
-                className={`flex-1 ${compact ? 'p-2.5 text-sm rounded-lg' : 'p-4 rounded-xl'} bg-gray-800/50 border text-white placeholder:text-gray-500 focus:ring-2 focus:ring-emerald-500 outline-none transition disabled:opacity-60 ${
-                  errors.email ? 'border-red-500' : emailVerified ? 'border-emerald-500' : 'border-gray-700 focus:border-emerald-500'
+                className={`flex-1 ${compact ? 'p-2.5 text-sm rounded-lg' : 'p-4 rounded-xl'} bg-gray-800/50 border text-white placeholder:text-gray-500 focus:ring-2 focus:ring-gold-500 outline-none transition disabled:opacity-60 ${
+                  errors.email ? 'border-red-500' : emailVerified ? 'border-gold-500' : 'border-gray-700 focus:border-gold-500'
                 }`}
               />
               {!emailVerified && (
@@ -327,13 +327,13 @@ export default function MultiStepBookingForm({ compact = false }: MultiStepBooki
                   type="button"
                   onClick={sendVerificationCode}
                   disabled={sendingCode || !formData.email}
-                  className={`${compact ? 'px-3 py-1.5 text-xs rounded-lg' : 'px-4 py-2 text-sm rounded-xl'} bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 transition disabled:opacity-50 font-medium whitespace-nowrap`}
+                  className={`${compact ? 'px-3 py-1.5 text-xs rounded-lg' : 'px-4 py-2 text-sm rounded-xl'} bg-gold-500/20 text-gold-400 hover:bg-gold-500/30 transition disabled:opacity-50 font-medium whitespace-nowrap`}
                 >
                   {sendingCode ? 'Sending...' : codeSent ? 'Resend' : 'Verify'}
                 </button>
               )}
               {emailVerified && (
-                <div className={`flex items-center ${compact ? 'px-2' : 'px-4'} text-emerald-400`}>
+                <div className={`flex items-center ${compact ? 'px-2' : 'px-4'} text-gold-400`}>
                   <svg className={compact ? 'w-4 h-4' : 'w-5 h-5'} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
@@ -352,13 +352,13 @@ export default function MultiStepBookingForm({ compact = false }: MultiStepBooki
                     onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                     placeholder="000000"
                     maxLength={6}
-                    className="flex-1 p-3 rounded-lg bg-gray-900 border border-gray-600 text-white text-center text-lg tracking-widest font-mono focus:ring-2 focus:ring-emerald-500 outline-none"
+                    className="flex-1 p-3 rounded-lg bg-gray-900 border border-gray-600 text-white text-center text-lg tracking-widest font-mono focus:ring-2 focus:ring-gold-500 outline-none"
                   />
                   <button
                     type="button"
                     onClick={verifyCode}
                     disabled={verifying || verificationCode.length !== 6}
-                    className="px-6 py-2 bg-emerald-500 text-black font-semibold rounded-lg hover:bg-emerald-400 transition disabled:opacity-50"
+                    className="px-6 py-2 bg-gold-500 text-black font-semibold rounded-lg hover:bg-gold-400 transition disabled:opacity-50"
                   >
                     {verifying ? 'Verifying...' : 'Confirm'}
                   </button>
@@ -375,8 +375,8 @@ export default function MultiStepBookingForm({ compact = false }: MultiStepBooki
               value={formData.phone}
               onChange={(e) => updateField('phone', formatPhone(e.target.value))}
               placeholder="(555) 555-5555"
-              className={`w-full p-4 rounded-xl bg-gray-800/50 border text-white placeholder:text-gray-500 focus:ring-2 focus:ring-emerald-500 outline-none transition ${
-                errors.phone ? 'border-red-500' : 'border-gray-700 focus:border-emerald-500'
+              className={`w-full p-4 rounded-xl bg-gray-800/50 border text-white placeholder:text-gray-500 focus:ring-2 focus:ring-gold-500 outline-none transition ${
+                errors.phone ? 'border-red-500' : 'border-gray-700 focus:border-gold-500'
               }`}
             />
             {errors.phone && <p className="mt-1 text-sm text-red-400">{errors.phone}</p>}
@@ -385,7 +385,7 @@ export default function MultiStepBookingForm({ compact = false }: MultiStepBooki
           <button
             type="button"
             onClick={nextStep}
-            className="w-full py-4 rounded-xl bg-emerald-500 text-black font-semibold hover:bg-emerald-400 transition disabled:opacity-50"
+            className="w-full py-4 rounded-xl bg-gold-500 text-black font-semibold hover:bg-gold-400 transition disabled:opacity-50"
           >
             Continue
           </button>
@@ -407,8 +407,8 @@ export default function MultiStepBookingForm({ compact = false }: MultiStepBooki
               value={formData.businessName}
               onChange={(e) => updateField('businessName', e.target.value)}
               placeholder="Acme Corporation"
-              className={`w-full p-4 rounded-xl bg-gray-800/50 border text-white placeholder:text-gray-500 focus:ring-2 focus:ring-emerald-500 outline-none transition ${
-                errors.businessName ? 'border-red-500' : 'border-gray-700 focus:border-emerald-500'
+              className={`w-full p-4 rounded-xl bg-gray-800/50 border text-white placeholder:text-gray-500 focus:ring-2 focus:ring-gold-500 outline-none transition ${
+                errors.businessName ? 'border-red-500' : 'border-gray-700 focus:border-gold-500'
               }`}
             />
             {errors.businessName && <p className="mt-1 text-sm text-red-400">{errors.businessName}</p>}
@@ -421,7 +421,7 @@ export default function MultiStepBookingForm({ compact = false }: MultiStepBooki
               value={formData.industry}
               onChange={(e) => updateField('industry', e.target.value)}
               placeholder="e.g., Home Services, Healthcare, Retail"
-              className="w-full p-4 rounded-xl bg-gray-800/50 border border-gray-700 text-white placeholder:text-gray-500 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500 outline-none transition"
+              className="w-full p-4 rounded-xl bg-gray-800/50 border border-gray-700 text-white placeholder:text-gray-500 focus:border-gold-500 focus:ring-2 focus:ring-gold-500 outline-none transition"
             />
           </div>
 
@@ -436,7 +436,7 @@ export default function MultiStepBookingForm({ compact = false }: MultiStepBooki
             <button
               type="button"
               onClick={nextStep}
-              className="flex-1 py-4 rounded-xl bg-emerald-500 text-black font-semibold hover:bg-emerald-400 transition"
+              className="flex-1 py-4 rounded-xl bg-gold-500 text-black font-semibold hover:bg-gold-400 transition"
             >
               Continue
             </button>
@@ -462,12 +462,12 @@ export default function MultiStepBookingForm({ compact = false }: MultiStepBooki
                   onClick={() => toggleNeed(option.value)}
                   className={`p-3 rounded-xl border text-left text-sm transition-all flex items-center gap-2 ${
                     formData.needs.includes(option.value)
-                      ? 'border-emerald-500 bg-emerald-500/10 text-white'
+                      ? 'border-gold-500 bg-gold-500/10 text-white'
                       : 'border-gray-700 bg-gray-800/30 text-gray-300 hover:border-gray-600'
                   }`}
                 >
                   <div className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 ${
-                    formData.needs.includes(option.value) ? 'border-emerald-500 bg-emerald-500' : 'border-gray-600'
+                    formData.needs.includes(option.value) ? 'border-gold-500 bg-gold-500' : 'border-gray-600'
                   }`}>
                     {formData.needs.includes(option.value) && (
                       <svg className="w-3 h-3 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -489,8 +489,8 @@ export default function MultiStepBookingForm({ compact = false }: MultiStepBooki
               value={formData.preferredDateTime}
               onChange={(e) => updateField('preferredDateTime', e.target.value)}
               min={new Date().toISOString().slice(0, 16)}
-              className={`w-full p-4 rounded-xl bg-gray-800/50 border text-white focus:ring-2 focus:ring-emerald-500 outline-none transition ${
-                errors.preferredDateTime ? 'border-red-500' : 'border-gray-700 focus:border-emerald-500'
+              className={`w-full p-4 rounded-xl bg-gray-800/50 border text-white focus:ring-2 focus:ring-gold-500 outline-none transition ${
+                errors.preferredDateTime ? 'border-red-500' : 'border-gray-700 focus:border-gold-500'
               }`}
             />
             {errors.preferredDateTime && <p className="mt-1 text-sm text-red-400">{errors.preferredDateTime}</p>}
@@ -503,7 +503,7 @@ export default function MultiStepBookingForm({ compact = false }: MultiStepBooki
               onChange={(e) => updateField('notes', e.target.value)}
               rows={3}
               placeholder="Any specific requirements or questions..."
-              className="w-full p-4 rounded-xl bg-gray-800/50 border border-gray-700 text-white placeholder:text-gray-500 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500 outline-none transition resize-none"
+              className="w-full p-4 rounded-xl bg-gray-800/50 border border-gray-700 text-white placeholder:text-gray-500 focus:border-gold-500 focus:ring-2 focus:ring-gold-500 outline-none transition resize-none"
             />
           </div>
 
@@ -511,7 +511,7 @@ export default function MultiStepBookingForm({ compact = false }: MultiStepBooki
             <button type="button" onClick={prevStep} className="flex-1 py-4 rounded-xl border border-gray-600 text-gray-300 hover:bg-gray-800 transition">
               Back
             </button>
-            <button type="button" onClick={nextStep} className="flex-1 py-4 rounded-xl bg-emerald-500 text-black font-semibold hover:bg-emerald-400 transition">
+            <button type="button" onClick={nextStep} className="flex-1 py-4 rounded-xl bg-gold-500 text-black font-semibold hover:bg-gold-400 transition">
               Review
             </button>
           </div>
@@ -536,7 +536,7 @@ export default function MultiStepBookingForm({ compact = false }: MultiStepBooki
                 <span className="text-gray-400">Email</span>
                 <span className="text-white font-medium flex items-center gap-2">
                   {formData.email}
-                  <svg className="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-4 h-4 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </span>
@@ -567,7 +567,7 @@ export default function MultiStepBookingForm({ compact = false }: MultiStepBooki
                 <span className="text-gray-400 block mb-2">Services</span>
                 <div className="flex flex-wrap gap-2">
                   {formData.needs.map((need) => (
-                    <span key={need} className="px-3 py-1 bg-emerald-500/20 text-emerald-300 text-xs rounded-full">
+                    <span key={need} className="px-3 py-1 bg-gold-500/20 text-gold-300 text-xs rounded-full">
                       {needsOptions.find((o) => o.value === need)?.label}
                     </span>
                   ))}
@@ -584,7 +584,7 @@ export default function MultiStepBookingForm({ compact = false }: MultiStepBooki
               type="button"
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="flex-1 py-4 rounded-xl bg-emerald-500 text-black font-semibold hover:bg-emerald-400 transition disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex-1 py-4 rounded-xl bg-gold-500 text-black font-semibold hover:bg-gold-400 transition disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {isSubmitting ? (
                 <>

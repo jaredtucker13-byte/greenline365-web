@@ -44,7 +44,7 @@ const ScoreRing = ({ score, label, size = 60 }: { score: number; label: string; 
   const strokeDashoffset = circumference - (score / 100) * circumference;
   
   const getColor = (s: number) => {
-    if (s >= 80) return '#00ff00';
+    if (s >= 80) return '#C9A96E';
     if (s >= 60) return '#ffff00';
     return '#ff4444';
   };
@@ -429,7 +429,7 @@ export default function ContentForge2() {
                 <button
                   onClick={handleGenerate}
                   disabled={!selectedBlueprint || !topic || isGenerating}
-                  className="w-full mt-4 py-3 bg-gradient-to-r from-neon-green-500 to-emerald-600 text-black font-bold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full mt-4 py-3 bg-gradient-to-r from-neon-green-500 to-gold-600 text-black font-bold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {isGenerating ? (
                     <>
@@ -689,7 +689,7 @@ export default function ContentForge2() {
                 <button
                   onClick={handleGenerateCalendar}
                   disabled={isGeneratingCalendar}
-                  className="px-4 py-2 bg-gradient-to-r from-neon-green-500 to-emerald-600 text-black font-bold rounded-lg disabled:opacity-50 flex items-center gap-2"
+                  className="px-4 py-2 bg-gradient-to-r from-neon-green-500 to-gold-600 text-black font-bold rounded-lg disabled:opacity-50 flex items-center gap-2"
                 >
                   {isGeneratingCalendar ? (
                     <>

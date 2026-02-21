@@ -903,7 +903,7 @@ ${files.html.replace(/<!DOCTYPE html>|<html[^>]*>|<\/html>|<head>[\s\S]*<\/head>
           {/* Left: Logo & Project Name */}
           <div className="flex items-center gap-4">
             <Link href="/admin-v2" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 to-cyan-400 flex items-center justify-center text-black font-bold text-sm">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-gold-400 to-cyan-400 flex items-center justify-center text-black font-bold text-sm">
                 CS
               </div>
               <span className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
@@ -930,7 +930,7 @@ ${files.html.replace(/<!DOCTYPE html>|<html[^>]*>|<\/html>|<head>[\s\S]*<\/head>
                 onClick={() => setDeviceSize(key as DeviceSize)}
                 className={`px-3 py-1.5 rounded-md text-xs font-medium transition ${
                   deviceSize === key
-                    ? 'bg-gradient-to-r from-emerald-500 to-cyan-500 text-black'
+                    ? 'bg-gradient-to-r from-gold-500 to-cyan-500 text-black'
                     : theme === 'dark' ? 'text-white/60 hover:text-white hover:bg-white/10' : 'text-gray-600 hover:bg-gray-200'
                 }`}
               >
@@ -951,7 +951,7 @@ ${files.html.replace(/<!DOCTYPE html>|<html[^>]*>|<\/html>|<head>[\s\S]*<\/head>
               onClick={() => setAutoRefresh(!autoRefresh)}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
                 autoRefresh 
-                  ? 'bg-emerald-500/20 text-emerald-400' 
+                  ? 'bg-gold-500/20 text-gold-400' 
                   : theme === 'dark' ? 'bg-white/5 text-white/70' : 'bg-gray-100 text-gray-700'
               }`}
               title={autoRefresh ? 'Auto-refresh ON' : 'Auto-refresh OFF'}
@@ -988,7 +988,7 @@ ${files.html.replace(/<!DOCTYPE html>|<html[^>]*>|<\/html>|<head>[\s\S]*<\/head>
             </button>
             <button
               onClick={exportAsZip}
-              className="px-4 py-1.5 rounded-lg text-sm font-medium bg-gradient-to-r from-emerald-500 to-cyan-500 text-black hover:shadow-lg hover:shadow-emerald-500/30 transition"
+              className="px-4 py-1.5 rounded-lg text-sm font-medium bg-gradient-to-r from-gold-500 to-cyan-500 text-black hover:shadow-lg hover:shadow-gold-500/30 transition"
             >
               ⬇️ Export
             </button>
@@ -1022,8 +1022,8 @@ ${files.html.replace(/<!DOCTYPE html>|<html[^>]*>|<\/html>|<head>[\s\S]*<\/head>
                   className={`px-4 py-3 text-sm font-medium transition flex items-center gap-2 ${
                     activeFile === type
                       ? theme === 'dark' 
-                        ? 'bg-[#1e1e1e] text-white border-b-2 border-emerald-500' 
-                        : 'bg-white text-gray-900 border-b-2 border-emerald-500'
+                        ? 'bg-[#1e1e1e] text-white border-b-2 border-gold-500' 
+                        : 'bg-white text-gray-900 border-b-2 border-gold-500'
                       : theme === 'dark'
                         ? 'text-white/50 hover:text-white/80 hover:bg-white/5'
                         : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
@@ -1171,12 +1171,12 @@ ${files.html.replace(/<!DOCTYPE html>|<html[^>]*>|<\/html>|<head>[\s\S]*<\/head>
                   <button
                     key={key}
                     onClick={() => loadTemplate(key)}
-                    className="p-6 rounded-xl bg-white/5 border border-white/10 text-left hover:bg-white/10 hover:border-emerald-500/50 transition group"
+                    className="p-6 rounded-xl bg-white/5 border border-white/10 text-left hover:bg-white/10 hover:border-gold-500/50 transition group"
                   >
                     <div className="text-3xl mb-3">
                       {key === 'blank' ? '📝' : key === 'landingPage' ? '🚀' : key === 'animation' ? '✨' : '🎨'}
                     </div>
-                    <h3 className="text-lg font-semibold text-white group-hover:text-emerald-400 transition">
+                    <h3 className="text-lg font-semibold text-white group-hover:text-gold-400 transition">
                       {template.name}
                     </h3>
                     <p className="text-sm text-white/50 mt-1">{template.description}</p>

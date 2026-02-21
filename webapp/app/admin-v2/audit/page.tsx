@@ -74,7 +74,7 @@ export default function AuditPage() {
   const getCategoryColor = (category: string) => {
     const colors: Record<string, string> = {
       auth: 'bg-blue-500/20 text-blue-400',
-      data: 'bg-emerald-500/20 text-emerald-400',
+      data: 'bg-gold-500/20 text-gold-400',
       admin: 'bg-purple-500/20 text-purple-400',
       system: 'bg-gray-500/20 text-gray-400',
       security: 'bg-red-500/20 text-red-400',
@@ -84,7 +84,7 @@ export default function AuditPage() {
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      success: 'text-emerald-400',
+      success: 'text-gold-400',
       failure: 'text-red-400',
       denied: 'text-amber-400',
     };
@@ -185,7 +185,7 @@ export default function AuditPage() {
                   transition={{ delay: 0.1 }}
                   className="backdrop-blur-xl bg-white/5 rounded-2xl border border-white/10 p-6"
                 >
-                  <div className="text-3xl font-bold text-emerald-400">{summary.byStatus?.success || 0}</div>
+                  <div className="text-3xl font-bold text-gold-400">{summary.byStatus?.success || 0}</div>
                   <div className="text-sm text-white/50">Successful</div>
                 </motion.div>
                 

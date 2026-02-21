@@ -231,7 +231,7 @@ export default function OnboardingPage() {
         particleCount: 100,
         spread: 70,
         origin: { y: 0.6 },
-        colors: ['#10B981', '#3B82F6', '#8B5CF6'],
+        colors: ['#C9A96E', '#3B82F6', '#8B5CF6'],
       });
 
       // Move to completion step or redirect after brief success display
@@ -305,13 +305,13 @@ export default function OnboardingPage() {
               onClick={() => setMode('wizard')}
               whileHover={{ scale: 1.02, y: -4 }}
               whileTap={{ scale: 0.98 }}
-              className="p-8 rounded-3xl bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 border border-emerald-500/30 text-left hover:border-emerald-500/50 transition-colors group"
+              className="p-8 rounded-3xl bg-gradient-to-br from-gold-500/20 to-gold-600/10 border border-gold-500/30 text-left hover:border-gold-500/50 transition-colors group"
               data-testid="choose-wizard"
             >
               <div className="text-4xl mb-4">🧙‍♂️</div>
               <h2 className="text-2xl font-bold text-white mb-2">Guided Wizard</h2>
               <p className="text-white/60 mb-4">Step-by-step setup with helpful prompts. Takes about 5 minutes.</p>
-              <div className="flex items-center text-emerald-400 font-medium">
+              <div className="flex items-center text-gold-400 font-medium">
                 <span>Recommended for first-timers</span>
                 <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
@@ -357,7 +357,7 @@ export default function OnboardingPage() {
         {/* Progress bar */}
         <div className="fixed top-0 left-0 right-0 h-1 bg-white/10 z-50">
           <motion.div
-            className="h-full bg-gradient-to-r from-emerald-500 to-blue-500"
+            className="h-full bg-gradient-to-r from-gold-500 to-blue-500"
             initial={{ width: 0 }}
             animate={{ width: `${((currentStep + 1) / WIZARD_STEPS.length) * 100}%` }}
             transition={{ duration: 0.3 }}
@@ -371,7 +371,7 @@ export default function OnboardingPage() {
               <div
                 key={s.id}
                 className={`w-2 h-2 rounded-full transition-colors ${
-                  i <= currentStep ? 'bg-emerald-500' : 'bg-white/20'
+                  i <= currentStep ? 'bg-gold-500' : 'bg-white/20'
                 }`}
               />
             ))}
@@ -417,7 +417,7 @@ export default function OnboardingPage() {
                     <div className="pt-4">
                       <button
                         onClick={() => setCurrentStep(1)}
-                        className="px-8 py-4 rounded-xl bg-gradient-to-r from-emerald-500 to-blue-500 text-white font-bold text-lg hover:from-emerald-600 hover:to-blue-600 transition-all"
+                        className="px-8 py-4 rounded-xl bg-gradient-to-r from-gold-500 to-blue-500 text-white font-bold text-lg hover:from-gold-600 hover:to-blue-600 transition-all"
                       >
                         Let's Get Started
                       </button>
@@ -434,7 +434,7 @@ export default function OnboardingPage() {
                           type="text"
                           value={formData.displayName}
                           onChange={(e) => updateForm('displayName', e.target.value)}
-                          className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 focus:border-emerald-500 focus:outline-none"
+                          className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 focus:border-gold-500 focus:outline-none"
                           placeholder="Jared Tucker"
                         />
                       </div>
@@ -444,7 +444,7 @@ export default function OnboardingPage() {
                           type="text"
                           value={formData.businessName}
                           onChange={(e) => updateForm('businessName', e.target.value)}
-                          className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 focus:border-emerald-500 focus:outline-none"
+                          className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 focus:border-gold-500 focus:outline-none"
                           placeholder="GreenLine365"
                         />
                       </div>
@@ -456,7 +456,7 @@ export default function OnboardingPage() {
                           type="text"
                           value={formData.location}
                           onChange={(e) => updateForm('location', e.target.value)}
-                          className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 focus:border-emerald-500 focus:outline-none"
+                          className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 focus:border-gold-500 focus:outline-none"
                           placeholder="Tampa, FL"
                         />
                       </div>
@@ -466,7 +466,7 @@ export default function OnboardingPage() {
                           type="text"
                           value={formData.industry}
                           onChange={(e) => updateForm('industry', e.target.value)}
-                          className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 focus:border-emerald-500 focus:outline-none"
+                          className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 focus:border-gold-500 focus:outline-none"
                           placeholder="Marketing, HVAC, Restaurant..."
                         />
                       </div>
@@ -484,7 +484,7 @@ export default function OnboardingPage() {
                           onClick={() => selectPreset(preset)}
                           className={`p-4 rounded-xl border text-left transition-all ${
                             formData.personalityPreset === preset.id
-                              ? 'bg-emerald-500/20 border-emerald-500'
+                              ? 'bg-gold-500/20 border-gold-500'
                               : 'bg-white/5 border-white/10 hover:border-white/20'
                           }`}
                         >
@@ -505,11 +505,11 @@ export default function OnboardingPage() {
                           className="flex-1 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none text-sm"
                           placeholder="e.g., Uses sports metaphors"
                         />
-                        <button onClick={addQuirk} className="px-4 py-2 rounded-xl bg-emerald-500 text-white">Add</button>
+                        <button onClick={addQuirk} className="px-4 py-2 rounded-xl bg-gold-500 text-white">Add</button>
                       </div>
                       <div className="flex flex-wrap gap-2">
                         {formData.quirks.map((q, i) => (
-                          <span key={i} className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-sm">
+                          <span key={i} className="px-3 py-1 rounded-full bg-gold-500/20 text-gold-300 text-sm">
                             {q}
                             <button onClick={() => setFormData(p => ({ ...p, quirks: p.quirks.filter((_, j) => j !== i) }))} className="ml-2">×</button>
                           </span>
@@ -526,7 +526,7 @@ export default function OnboardingPage() {
                       <textarea
                         value={formData.mainService}
                         onChange={(e) => updateForm('mainService', e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 focus:border-emerald-500 focus:outline-none resize-none"
+                        className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 focus:border-gold-500 focus:outline-none resize-none"
                         rows={2}
                         placeholder="Describe your core offering..."
                       />
@@ -536,7 +536,7 @@ export default function OnboardingPage() {
                       <textarea
                         value={formData.uniqueValue}
                         onChange={(e) => updateForm('uniqueValue', e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 focus:border-emerald-500 focus:outline-none resize-none"
+                        className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 focus:border-gold-500 focus:outline-none resize-none"
                         rows={2}
                         placeholder="What should every customer know about your quality?"
                       />
@@ -546,7 +546,7 @@ export default function OnboardingPage() {
                       <textarea
                         value={formData.typicalProcess}
                         onChange={(e) => updateForm('typicalProcess', e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 focus:border-emerald-500 focus:outline-none resize-none"
+                        className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 focus:border-gold-500 focus:outline-none resize-none"
                         rows={3}
                         placeholder="Step 1: Customer calls... Step 2: We diagnose... Step 3: ..."
                       />
@@ -598,8 +598,8 @@ export default function OnboardingPage() {
                       Your AI assistant is now configured with your brand voice and knowledge base.
                     </p>
                     <div className="grid grid-cols-3 gap-4 py-4">
-                      <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-                        <div className="text-2xl font-bold text-emerald-400">{formData.quirks.length}</div>
+                      <div className="p-4 rounded-xl bg-gold-500/10 border border-gold-500/20">
+                        <div className="text-2xl font-bold text-gold-400">{formData.quirks.length}</div>
                         <div className="text-xs text-white/50">Style Quirks</div>
                       </div>
                       <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
@@ -613,7 +613,7 @@ export default function OnboardingPage() {
                     </div>
                     <button
                       onClick={() => router.push('/admin-v2')}
-                      className="px-8 py-4 rounded-xl bg-gradient-to-r from-emerald-500 to-blue-500 text-white font-bold text-lg hover:from-emerald-600 hover:to-blue-600 transition-all"
+                      className="px-8 py-4 rounded-xl bg-gradient-to-r from-gold-500 to-blue-500 text-white font-bold text-lg hover:from-gold-600 hover:to-blue-600 transition-all"
                     >
                       Go to Dashboard
                     </button>
@@ -636,10 +636,10 @@ export default function OnboardingPage() {
                       onClick={handleSave}
                       disabled={saving}
                       className={`px-8 py-3 rounded-xl font-bold transition-all disabled:cursor-wait ${
-                        saveStatus === 'success' ? 'bg-emerald-500 text-white' :
+                        saveStatus === 'success' ? 'bg-gold-500 text-white' :
                         saveStatus === 'error' ? 'bg-red-500 text-white' :
-                        saving ? 'bg-gradient-to-r from-emerald-500 to-blue-500 text-white animate-pulse' :
-                        'bg-gradient-to-r from-emerald-500 to-blue-500 text-white hover:from-emerald-600 hover:to-blue-600'
+                        saving ? 'bg-gradient-to-r from-gold-500 to-blue-500 text-white animate-pulse' :
+                        'bg-gradient-to-r from-gold-500 to-blue-500 text-white hover:from-gold-600 hover:to-blue-600'
                       }`}
                     >
                       {saveStatus === 'success' ? 'Saved!' :
@@ -662,7 +662,7 @@ export default function OnboardingPage() {
                   ) : (
                     <button
                       onClick={() => setCurrentStep(prev => prev + 1)}
-                      className="px-8 py-3 rounded-xl bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition-colors"
+                      className="px-8 py-3 rounded-xl bg-gold-500 text-white font-bold hover:bg-gold-600 transition-colors"
                     >
                       Continue
                     </button>
@@ -719,10 +719,10 @@ export default function OnboardingPage() {
               onClick={handleSave}
               disabled={saving}
               className={`px-8 py-4 rounded-xl font-bold text-lg transition-all disabled:cursor-wait ${
-                saveStatus === 'success' ? 'bg-emerald-500 text-white' :
+                saveStatus === 'success' ? 'bg-gold-500 text-white' :
                 saveStatus === 'error' ? 'bg-red-500 text-white' :
-                saving ? 'bg-gradient-to-r from-emerald-500 to-blue-500 text-white animate-pulse' :
-                'bg-gradient-to-r from-emerald-500 to-blue-500 text-white hover:from-emerald-600 hover:to-blue-600'
+                saving ? 'bg-gradient-to-r from-gold-500 to-blue-500 text-white animate-pulse' :
+                'bg-gradient-to-r from-gold-500 to-blue-500 text-white hover:from-gold-600 hover:to-blue-600'
               }`}
             >
               {saveStatus === 'success' ? 'Saved!' :
