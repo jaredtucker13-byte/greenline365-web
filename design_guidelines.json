@@ -1,128 +1,316 @@
 {
-  "design_system": {
-    "typography": {
-      "font_family": {
-        "heading": "Playfair Display, Poppins, sans-serif",
-        "body": "Manrope, Inter, sans-serif",
-        "mono": "JetBrains Mono, monospace"
-      },
-      "scale": {
-        "h1": "text-5xl md:text-6xl font-light tracking-tight",
-        "h2": "text-4xl md:text-5xl font-light tracking-tight",
-        "h3": "text-3xl font-medium tracking-normal",
-        "h4": "text-2xl font-medium tracking-normal",
-        "body_lg": "text-lg leading-relaxed",
-        "body_base": "text-base leading-relaxed text-white/80",
-        "caption": "text-sm tracking-wide uppercase text-white/60"
-      }
+    "_meta": {
+          "version": "2.0.0",
+          "last_updated": "2026-02-23",
+          "directive": "Premium Evolution — Main Branch Merge",
+          "source_of_truth": true,
+          "note": "Governs ALL pages. Directory and Home Ledger built first. Rest follows."
     },
-    "colors": {
-      "palette": {
-        "primary": {
-          "DEFAULT": "#84A98C",
-          "foreground": "#ffffff",
-          "50": "#f2f7f4",
-          "100": "#e1ede5",
-          "200": "#c3dbc9",
-          "300": "#9ebfa6",
-          "400": "#84a98c",
-          "500": "#628b6b",
-          "600": "#4a6e52",
-          "700": "#3d5843",
-          "800": "#334638",
-          "900": "#2b3a30"
-        },
-        "glass": {
-          "surface": "rgba(255, 255, 255, 0.08)",
-          "surface_hover": "rgba(255, 255, 255, 0.12)",
-          "border": "rgba(255, 255, 255, 0.15)",
-          "border_highlight": "rgba(255, 255, 255, 0.3)",
-          "text_primary": "#ffffff",
-          "text_secondary": "rgba(255, 255, 255, 0.7)",
-          "text_muted": "rgba(255, 255, 255, 0.5)"
-        },
-        "status": {
-          "success": "#A7C957",
-          "warning": "#E9C46A",
-          "error": "#E76F51",
-          "info": "#8ECAE6"
-        }
-      },
-      "background": {
-        "image_url": "https://images.unsplash.com/photo-1709137924046-26190dd12d06?q=85&w=2532&auto=format&fit=crop",
-        "overlay": "bg-black/40"
-      }
+    "design_system": {
+          "aesthetic": "Premium Glassmorphism. UI floats as translucent layer over cinematic backgrounds.",
+          "typography": {
+                  "font_family": {
+                            "heading": "Playfair Display, Poppins, sans-serif",
+                            "body": "Manrope, Inter, sans-serif",
+                            "mono": "JetBrains Mono, monospace"
+                  },
+                  "scale": {
+                            "h1": "text-5xl md:text-7xl font-light tracking-tight",
+                            "h2": "text-4xl md:text-5xl font-light tracking-tight",
+                            "h3": "text-3xl font-medium tracking-normal",
+                            "h4": "text-2xl font-medium tracking-normal",
+                            "body_lg": "text-lg leading-relaxed",
+                            "body_base": "text-base leading-relaxed text-white/80",
+                            "caption": "text-sm tracking-wide uppercase text-white/60"
+                  }
+          },
+          "colors": {
+                  "palette": {
+                            "primary": {
+                                        "DEFAULT": "#84A98C",
+                                        "foreground": "#ffffff",
+                              "50": "#f2f7f4",
+                                        "100": "#e1ede5",
+                                        "200": "#c3dbc9",
+                                        "300": "#9ebfa6",
+                                        "400": "#84a98c",
+                                        "500": "#628b6b",
+                                        "600": "#4a6e52",
+                                        "700": "#3d5843",
+                                        "800": "#334638",
+                                        "900": "#2b3a30"
+                            },
+                            "gold": {
+                                        "DEFAULT": "#C9A84C",
+                              "light": "#E8C97A",
+                                        "dark": "#8A6A1C",
+                                        "champagne": "#F0DFA0"
+                            },
+                            "obsidian": {
+                                        "DEFAULT": "#0A0A0A",
+                                        "surface": "#111111",
+                                        "elevated": "#1A1A1A",
+                                        "border": "#2A2A2A"
+                            },
+                            "glass": {
+                                        "surface": "rgba(255, 255, 255, 0.07)",
+                                        "surface_hover": "rgba(255, 255, 255, 0.12)",
+                                        "surface_active": "rgba(255, 255, 255, 0.16)",
+                                        "border": "rgba(255, 255, 255, 0.12)",
+                                        "border_highlight": "rgba(255, 255, 255, 0.28)",
+                                        "border_gold": "rgba(201, 168, 76, 0.4)",
+                                        "text_primary": "#ffffff",
+                                        "text_secondary": "rgba(255, 255, 255, 0.7)",
+                                        "text_muted": "rgba(255, 255, 255, 0.45)"
+                            },
+                            "status": {
+                                        "success": "#A7C957",
+                                        "warning": "#E9C46A",
+                                        "error": "#E76F51",
+                                        "info": "#8ECAE6"
+                            }
+                  }
+          },
+          "visual_enhancers": {
+                  "glassmorphism": {
+                            "base": "backdrop-blur-xl bg-white/5 border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.45)]",
+                            "card": "backdrop-blur-2xl bg-white/[0.07] border border-white/[0.12] shadow-[0_8px_32px_rgba(0,0,0,0.5)] hover:bg-white/[0.12] hover:border-white/20 transition-all duration-300",
+                            "card_gold": "backdrop-blur-2xl bg-white/[0.06] border border-[rgba(201,168,76,0.35)] shadow-[0_8px_40px_rgba(0,0,0,0.6)] hover:border-[rgba(201,168,76,0.6)] transition-all duration-300",
+                            "modal": "backdrop-blur-3xl bg-black/50 border border-white/10 shadow-2xl",
+                            "nav": "backdrop-blur-2xl bg-black/30 border-b border-white/[0.08]",
+                            "search_pill": "backdrop-blur-xl bg-white/[0.08] border border-white/20 rounded-full focus-within:border-white/40 transition-all duration-300",
+                            "category_card": "backdrop-blur-md bg-black/40 border border-white/[0.12] rounded-2xl overflow-hidden hover:scale-[1.02] transition-all duration-300"
+                  },
+                  "borders": {
+                            "subtle": "border border-white/[0.08]",
+                            "standard": "border border-white/[0.12]",
+                            "highlight": "border-t border-t-white/25 border-b border-b-black/30 border-x-transparent",
+                            "gold": "border border-[rgba(201,168,76,0.4)]",
+                            "gold_glow": "border border-[rgba(201,168,76,0.6)] shadow-[0_0_12px_rgba(201,168,76,0.15)]"
+                  },
+                  "shadows": {
+                            "soft": "0 10px 40px -10px rgba(0,0,0,0.6)",
+                            "deep": "0 24px 64px -12px rgba(0,0,0,0.8)",
+                            "glow_green": "0 0 24px rgba(132, 169, 140, 0.25)",
+                            "glow_gold": "0 0 24px rgba(201, 168, 76, 0.2)",
+                            "inner_highlight": "inset 0 1px 0 rgba(255,255,255,0.1)"
+                  }
+          },
+          "layout": {
+                  "spacing": {
+                            "container_padding": "p-8 md:p-12 lg:p-16",
+                            "section_gap": "gap-12 md:gap-16",
+                            "item_gap": "gap-6",
+                            "hero_padding": "pt-24 pb-20 md:pt-32 md:pb-28"
+                  },
+                  "grid": {
+                            "pricing": "grid grid-cols-1 md:grid-cols-3 gap-8",
+                            "categories": "flex gap-4 overflow-x-auto pb-4",
+                            "dashboard": "grid grid-cols-1 md:grid-cols-12 gap-6",
+                            "calendar": "grid grid-cols-7 gap-px bg-white/[0.06] rounded-xl overflow-hidden border border-white/[0.08]"
+                  },
+                  "max_width": "max-w-7xl mx-auto px-6"
+          },
+          "motion": {
+                  "animation_library": "GSAP 3.14.2 + ScrollTrigger",
+                  "transitions": "transition-all duration-300 ease-out",
+                  "hover": "hover:-translate-y-1 hover:shadow-lg",
+                  "entrance": {
+                            "initial": { "opacity": 0, "y": 24 },
+                            "animate": { "opacity": 1, "y": 0 },
+                            "exit": { "opacity": 0, "y": -20 }
+                  },
+                  "stagger": "0.08s between children",
+                  "page_transition": "fade + translateY(16px), 0.4s"
+          }
     },
-    "visual_enhancers": {
-      "glassmorphism": {
-        "base": "backdrop-blur-xl bg-white/5 border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.36)]",
-        "card": "backdrop-blur-2xl bg-white/10 border border-white/20 shadow-lg hover:bg-white/15 transition-all duration-300",
-        "modal": "backdrop-blur-3xl bg-black/40 border border-white/10 shadow-2xl"
-      },
-      "borders": {
-        "subtle": "border border-white/10",
-        "highlight": "border-t border-t-white/30 border-b border-b-black/20 border-x-transparent"
-      },
-      "shadows": {
-        "soft": "0 10px 40px -10px rgba(0,0,0,0.5)",
-        "glow": "0 0 20px rgba(132, 169, 140, 0.3)"
-      }
+    "pages": {
+          "directory": {
+                  "name": "Directory Homepage",
+                  "route": "/",
+                  "status": "BUILD NEXT",
+                  "aesthetic_ref": "Images 1000007779 and 1000007782",
+                  "goal": "The front door. Unrivaled Standard for home services.",
+                  "background": {
+                            "style": "Cinematic, deep dark base with dramatic photography. UI floats above it.",
+                            "base_color": "#0A0A0A",
+                            "overlay": "linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.7) 100%)"
+                  },
+                  "hero": {
+                            "headline": "THE UNRIVALED STANDARD IN HOME SERVICES.",
+                            "subheadline": "Curated. Verified. Your Home's Legacy.",
+                            "sub2": "Discover Elite Professionals in Every Field.",
+                            "search_placeholder": "Search for Excellence...",
+                            "search_cta": "FIND A PRO"
+                  },
+                  "navigation": {
+                            "logo": "GreenLine365",
+              "links": ["Home", "Member", "Products", "Categories", "Secure", "Contact"],
+                            "cta_buttons": ["Member Access", "Premium Verification"]
+                  },
+                  "category_section": {
+                            "display": "Horizontal scrolling with cinematic photography",
+                            "categories": ["Fine Dining", "Luxury Wellness", "Private Clubs", "Home Services", "Automotive", "Legal & Financial"],
+                            "card_style": "Frosted glass over full-bleed photography. Title at bottom-left."
+                  },
+                  "private_vault_cta": {
+                            "label": "Private Vault",
+                            "headline": "YOUR HOME'S HERITAGE. DOCUMENTED.",
+                            "links_to": "/home-ledger"
+                  },
+                  "css_notes": [
+                            "Hero text: Playfair Display, large, font-light, tracking-tight",
+                            "Cards: backdrop-filter blur(24px), rgba white backgrounds",
+                            "Gold (#C9A84C) for Premium badges and Founding Member callouts",
+                            "Category cards: cinematic img fill + dark gradient overlay",
+                            "Search bar: pill shape, glassmorphism bg, gold CTA button",
+                            "Floating elements: drop shadow + inner highlight on top border edge"
+                  ]
+          },
+          "pricing": {
+                  "name": "Pricing Page",
+                  "route": "/pricing",
+                  "status": "PLANNED",
+                  "CRITICAL_RULE": "ONLY three tiers. NO $299/$599/$899. Those prices are DELETED.",
+                  "tiers": [
+                            {
+                                        "name": "Free",
+                                        "price": "$0/mo",
+                                        "description": "Basic presence in the directory.",
+                                        "features": ["Basic listing (name, address, phone, hours)", "Search visibility", "Standard placement"],
+                                        "cta": "Claim Your Listing"
+                            },
+                            {
+                                        "name": "Pro",
+                                        "price": "$45/mo",
+                                        "description": "Verification and trust signals.",
+                                        "features": ["Everything in Free", "Verified badge", "2 custom images", "Book Now CTA", "Business description", "Trust signal display"],
+                                        "cta": "Go Pro",
+                                        "badge": "Most Popular"
+                            },
+                            {
+                                        "name": "Premium",
+                                        "price": "$89/mo",
+                                        "description": "Lead generation, analytics, and AI response tools.",
+                                        "features": ["Everything in Pro", "Lead generation tools", "Google photo sync", "Featured placement", "AI Review Response", "Analytics", "Priority support"],
+                                        "cta": "Go Premium",
+                                        "badge": "Best Value"
+                            }
+                  ],
+                  "founding_member_banner": {
+                            "headline": "Be the Business Everyone Else References",
+                            "cta": "Apply for Founding Member"
+                  }
+          },
+          "home_ledger": {
+                  "name": "GL365 Home Ledger",
+                  "route": "/home-ledger",
+                  "status": "BUILD NEXT — currently 404",
+                  "aesthetic_ref": "Images 1000007780 and 1000007781",
+                  "goal": "Private Luxury Vault. Secure. Exclusive. Premium.",
+                  "background": {
+                            "style": "Deep obsidian. The darkness IS the aesthetic. Gold accents emerge from black.",
+                            "base_color": "#0A0A0A",
+                            "accent_color": "#C9A84C"
+                  },
+                  "hero": {
+                            "headline": "YOUR HOME'S HERITAGE. DOCUMENTED.",
+                            "subheadline": "The private vault for every detail, document, and decision your home has ever seen.",
+                            "cta_primary": "Access Your Vault",
+                            "icon": "Key or shield — gold/metallic"
+                  },
+                  "modules": [
+                            { "name": "Filing Cabinet", "description": "AES-256 encrypted document storage" },
+                            { "name": "Incident Reports", "description": "Damage documentation + signature collection" },
+                            { "name": "Referral Network", "description": "Your trusted contractor directory" }
+                  ],
+                  "css_notes": [
+                            "Background: pure obsidian #0A0A0A, no photography",
+                            "Cards: bg-white/[0.04] with gold border rgba(201,168,76,0.35)",
+                            "Gold (#C9A84C) is the ONLY accent — no sage green on this page",
+                            "Metallic shimmer on hover: gold gradient edge reveals",
+                            "Inner-highlight borders: border-t rgba(201,168,76,0.2) on cards",
+                            "AES-256 security badge: prominent trust signal",
+                            "Hero icon: large, centered, gold metallic key/shield"
+                  ]
+          },
+          "command_center": {
+                  "name": "Admin v2 Command Center",
+                  "route": "/admin-v2",
+                  "status": "LIVE — protected, not publicly linked",
+                  "note": "Back-end product. Email outreach only. Same Glassmorphism system."
+          }
     },
-    "layout": {
-      "spacing": {
-        "container_padding": "p-6 md:p-10",
-        "section_gap": "gap-8",
-        "item_gap": "gap-4"
-      },
-      "grid": {
-        "calendar": "grid grid-cols-7 gap-px bg-white/10 rounded-lg overflow-hidden border border-white/10",
-        "dashboard": "grid grid-cols-1 md:grid-cols-12 gap-6"
-      }
+    "components": {
+          "GlassCard": {
+                  "path": "/webapp/components/ui/os/GlassCard.tsx",
+                  "status": "Ready",
+                  "base_class": "backdrop-blur-2xl bg-white/[0.07] border border-white/[0.12] rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] transition-all duration-300",
+                  "hover_class": "hover:bg-white/[0.12] hover:border-white/20 hover:-translate-y-1",
+                  "gold_variant": "border-[rgba(201,168,76,0.35)] hover:border-[rgba(201,168,76,0.6)]"
+          },
+          "Button": {
+                  "path": "/webapp/components/ui/os/Button.tsx",
+                  "status": "Ready",
+                  "variants": {
+                            "primary": "bg-primary-500 hover:bg-primary-400 text-white px-6 py-3 rounded-full font-medium transition-all duration-200",
+                            "gold": "bg-gradient-to-r from-[#C9A84C] to-[#E8C97A] text-black px-6 py-3 rounded-full font-semibold transition-all duration-200",
+                    "ghost": "bg-white/[0.08] border border-white/20 text-white px-6 py-3 rounded-full hover:bg-white/[0.15] transition-all duration-200",
+                            "find_a_pro": "bg-gradient-to-r from-[#C9A84C] to-[#8A6A1C] text-white px-8 py-3 rounded-full font-bold uppercase text-sm tracking-wide transition-all duration-200"
+                  }
+          },
+          "NeonText": { "path": "/webapp/components/ui/os/NeonText.tsx", "status": "Ready" },
+          "PricingCard": {
+                  "path": "/webapp/components/ui/os/PricingCard.tsx",
+                  "status": "Build needed",
+                  "note": "ONLY render Free/$0, Pro/$45, Premium/$89. No other prices.",
+                  "base_class": "backdrop-blur-2xl bg-white/[0.07] border border-white/[0.12] rounded-3xl p-8 transition-all duration-300",
+                  "featured_class": "border-[rgba(132,169,140,0.5)] shadow-[0_0_40px_rgba(132,169,140,0.1)]",
+                  "premium_class": "border-[rgba(201,168,76,0.45)] shadow-[0_0_40px_rgba(201,168,76,0.12)]"
+          },
+          "SearchPill": {
+                  "class": "flex items-center gap-3 backdrop-blur-xl bg-white/[0.08] border border-white/20 rounded-full px-6 py-4 w-full max-w-2xl",
+                  "cta_class": "bg-gradient-to-r from-[#C9A84C] to-[#8A6A1C] text-white px-6 py-2 rounded-full font-bold text-sm uppercase tracking-widest"
+          },
+          "CategoryCard": {
+                  "class": "relative w-48 h-64 flex-shrink-0 rounded-2xl overflow-hidden cursor-pointer group",
+                  "image_class": "absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500",
+                  "overlay_class": "absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent",
+                  "title_class": "absolute bottom-4 left-4 text-white font-semibold text-lg"
+          },
+          "Sidebar": { "style": "fixed left-0 top-0 h-full w-64 bg-black/25 backdrop-blur-xl border-r border-white/[0.08] z-50" },
+          "EventCard": { "style": "bg-white/[0.08] hover:bg-white/[0.15] border-l-2 border-l-primary-400 backdrop-blur-md p-3 rounded-lg text-xs text-white cursor-pointer transition-colors duration-200" }
     },
-    "motion": {
-      "transitions": "transition-all duration-300 ease-out",
-      "hover": "hover:-translate-y-1 hover:shadow-lg",
-      "entrance": {
-        "initial": { "opacity": 0, "y": 20 },
-        "animate": { "opacity": 1, "y": 0 },
-        "exit": { "opacity": 0, "y": -20 }
-      }
+    "universal_guidelines": [
+          "NEVER use generic SaaS layouts. Every screen must feel like a premium, private platform.",
+          "Use 2-3x more spacing than usual. Luxury breathes.",
+          "Every interactive element needs a micro-animation (hover lift, glow pulse, scale).",
+          "Use sonner for toasts — styled to match the glass theme.",
+          "Glassmorphism is the ONLY visual style. No flat colors, no solid fills on cards.",
+          "Directory accent: sage green (#84A98C). Home Ledger accent: gold (#C9A84C) ONLY.",
+          "All text must pass WCAG AA contrast against dark backgrounds.",
+          "GSAP ScrollTrigger for all scroll-based entrance animations.",
+          "Playfair Display for all hero headlines. Poppins for UI labels."
+    ],
+    "implementation_checklist": {
+          "global_css": [
+                  "Set body background to #0A0A0A",
+                  "Remove circuit-bg classes and neon gradient remnants",
+                  "Add Playfair Display + Manrope from Google Fonts",
+                  "Set default text color to rgba(255,255,255,0.85)"
+          ],
+          "tailwind_config": [
+                  "Add primary (Sage Green #84A98C) palette",
+                  "Add gold (#C9A84C) palette",
+                  "Add obsidian (#0A0A0A) palette",
+                  "Add custom shadow utilities for glow effects",
+                  "Keep os-dark as fallback"
+          ],
+          "shadcn_overrides": [
+                  "Override Shadcn backgrounds to transparent",
+                  "Override Shadcn borders to rgba(255,255,255,0.12)",
+                  "Override Shadcn text colors to white/80",
+                  "Use className prop to layer glass styles on top"
+          ]
     }
-  },
-  "components": {
-    "Calendar": {
-      "path": "/app/webapp/app/admin/content/page.tsx",
-      "description": "Main content matrix calendar. Needs to be a glass grid over the nature background.",
-      "features": [
-        "Month/Week/Day view toggle (Segmented Control style)",
-        "Glass cards for events",
-        "Drag and drop support (visual only for now)",
-        "Filter sidebar (collapsible glass panel)"
-      ]
-    },
-    "EventCard": {
-      "style": "bg-white/10 hover:bg-white/20 border-l-2 border-l-primary-400 backdrop-blur-md p-2 rounded text-xs text-white cursor-pointer transition-colors"
-    },
-    "Sidebar": {
-      "style": "fixed left-0 top-0 h-full w-64 bg-black/20 backdrop-blur-xl border-r border-white/10 z-50"
-    }
-  },
-  "image_urls": {
-    "background": "https://images.unsplash.com/photo-1709137924046-26190dd12d06?q=85&w=2532&auto=format&fit=crop",
-    "user_avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=64&h=64"
-  },
-  "instructions_to_main_agent": [
-    "1. UPDATE GLOBAL CSS: Add the nature background image to the body with a dark overlay. Remove the 'circuit-bg' and neon gradients.",
-    "2. UPDATE TAILWIND CONFIG: Add the 'primary' (Sage Green) palette. Keep 'os-dark' as a fallback but prioritize the new glass colors.",
-    "3. REFACTOR /admin/content/page.tsx: Rewrite the entire page to use the new Glassmorphism design.",
-    "4. USE SHADCN: Use existing Shadcn components but override their styles with `className` to match the glass theme (transparent bg, white borders).",
-    "5. DO NOT DELETE existing logic if possible, but wrap it in the new UI.",
-    "6. ENSURE CONTRAST: All text must be readable against the nature background. Use `text-shadow-sm` if needed."
-  ],
-  "universal_guidelines": [
-    "Avoid generic 'AI slop' designs. Make it feel like a premium app.",
-    "Use 2-3x more spacing than usual.",
-    "Every interaction needs a micro-animation.",
-    "Use 'sonner' for toasts."
-  ]
 }
