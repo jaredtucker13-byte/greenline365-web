@@ -275,7 +275,7 @@ export default function PricingPage() {
           </div>
 
           <p className="text-center text-xs text-zinc-600 mt-8">
-            Marketplace add-ons require an active Pro or Premium subscription. Transaction fees ($0.60/interaction) apply to directory-only listings.
+            Marketplace add-ons require an active Pro or Premium subscription. QR Shield transaction fees are capped at $0.60 per scan — no percentages, no surprises. Applies to directory-only listings.
           </p>
         </div>
       </section>
