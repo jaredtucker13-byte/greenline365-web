@@ -4,8 +4,7 @@ import { rateLimit, rateLimitResponse } from '@/lib/rate-limit';
 import crypto from 'crypto';
 import { captureException } from '@/lib/error-tracking';
 
-// N8N Webhook URL — set via environment variable
-const N8N_WEBHOOK_URL = process.env.N8N_OTP_WEBHOOK_URL || '';
+// OTP delivery — sends directly via Gmail (replaces n8n webhook)
 
 // Generate a random 6-digit OTP
 function generateOTP(): string {
@@ -83,30 +82,43 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Send OTP to N8N webhook
+    // Send OTP via email (native — replaces n8n webhook)
     try {
-      const webhookResponse = await fetch(N8N_WEBHOOK_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          phone,
-          code,
-          email,
-          timestamp: new Date().toISOString(),
-        }),
-      });
+      const nodemailer = await import('nodemailer');
+      const gmailUser = process.env.GMAIL_USER;
+      const gmailPass = process.env.GMAIL_APP_PASSWORD;
 
-      if (!webhookResponse.ok) {
-        console.error('N8N webhook error:', await webhookResponse.text());
-        // Don't fail the request - OTP is stored, just log the webhook issue
+      if (gmailUser && gmailPass) {
+        const transporter = nodemailer.default.createTransport({
+          service: 'gmail',
+          auth: { user: gmailUser, pass: gmailPass },
+        });
+
+        await transporter.sendMail({
+          from: `"GreenLine365" <${gmailUser}>`,
+          to: email,
+          subject: `Your GreenLine365 verification code: ${code}`,
+          html: `
+            <div style="font-family: -apple-system, sans-serif; max-width: 400px; margin: 0 auto; text-align: center;">
+              <h2 style="color: #065f46;">GreenLine365</h2>
+              <p>Your verification code is:</p>
+              <div style="font-size: 32px; font-weight: bold; letter-spacing: 8px; padding: 20px; background: #f0fdf4; border-radius: 8px; color: #065f46;">
+                ${code}
+              </div>
+              <p style="color: #6b7280; font-size: 13px; margin-top: 16px;">
+                This code expires in 10 minutes.<br>
+                If you didn't request this, ignore this email.
+              </p>
+            </div>
+          `,
+        });
+        console.log('OTP sent via email successfully');
       } else {
-        console.log('OTP sent to N8N webhook successfully');
+        console.warn('[OTP] Gmail not configured — OTP stored but not delivered');
       }
-    } catch (webhookError) {
-      console.error('Failed to call N8N webhook:', webhookError);
-      // Don't fail - the OTP is stored, webhook delivery can be retried
+    } catch (emailError) {
+      console.error('Failed to send OTP email:', emailError);
+      // Don't fail — the OTP is stored, user can request resend
     }
 
     return NextResponse.json(

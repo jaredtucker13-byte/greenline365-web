@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       const trendsToInsert = trends.map((trend: any) => ({
         city_name: city || 'Tampa, FL',
         zip_code: zipCode || null,
-        source: `n8n_${trendType}`,
+        source: `cron_${trendType}`,
         expires_at: expiresAt,
         trend_data: {
           title: trend.title || 'Trending Opportunity',
@@ -65,8 +65,8 @@ export async function POST(request: NextRequest) {
         user_id: null, // System-generated
         zip_code: zipCode || 'system',
         trend_type: trendType,
-        n8n_request: {},
-        n8n_response: body,
+        source_request: {},
+        source_response: body,
         trends_count: trendsToInsert.length,
         expires_at: expiresAt,
         status: 'success'
@@ -110,13 +110,13 @@ export async function GET(request: NextRequest) {
     if (type === 'live_pulse') {
       // Get trends that haven't expired (have expires_at in the future)
       query = query
-        .eq('source', 'n8n_live_pulse')
+        .eq('source', 'cron_live_pulse')
         .gt('expires_at', new Date().toISOString());
     } else {
       // Get weekly batch trends (last 7 days, no expiry)
       const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
       query = query
-        .eq('source', 'n8n_weekly_batch')
+        .eq('source', 'cron_weekly_batch')
         .gte('created_at', weekAgo);
     }
 

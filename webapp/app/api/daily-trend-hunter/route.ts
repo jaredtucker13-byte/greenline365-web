@@ -7,8 +7,7 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKey); }
 
-// N8N Webhook URL — set via environment variable (falls back to AI if unavailable)
-const N8N_WEBHOOK_URL = process.env.N8N_TREND_WEBHOOK_URL || '';
+// Native trend generation — n8n dependency removed
 
 // ZIP code to city mapping for common areas
 const ZIP_TO_CITY: Record<string, string> = {
@@ -149,32 +148,7 @@ export async function POST(request: NextRequest) {
     let trends = [];
     let source = 'ai';
 
-    // Try N8N webhook first (with short timeout)
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-
-      const n8nResponse = await fetch(N8N_WEBHOOK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ zipCode, trendType }),
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (n8nResponse.ok) {
-        const n8nData = await n8nResponse.json();
-        if (Array.isArray(n8nData.trends) && n8nData.trends.length > 0) {
-          trends = n8nData.trends;
-          source = 'n8n';
-        }
-      }
-    } catch (n8nError) {
-      console.log('N8N webhook unavailable, using AI fallback');
-    }
-
-    // Fallback to AI-generated trends
+    // Generate trends natively via AI (n8n removed)
     if (trends.length === 0) {
       trends = await generateTrendsWithAI(zipCode, city);
     }
