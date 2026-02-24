@@ -61,6 +61,9 @@ const navItems = [
   { id: 'platform-costs', label: 'API Costs', icon: 'dollar', href: '/admin-v2/platform-costs', feature: null, platformOwnerOnly: true },
   { id: 'audit', label: 'Audit Logs', icon: 'shield', href: '/admin-v2/audit', feature: null, adminOnly: true },
   { id: 'settings', label: 'Settings', icon: 'cog', href: '/admin-v2/settings', feature: null },
+  // --- Platform HQ ---
+  { id: 'divider-platform', label: 'PLATFORM', icon: '', href: '', feature: null, isDivider: true, platformOwnerOnly: true },
+  { id: 'hq', label: 'Greenline HQ', icon: 'shield', href: '/admin-v2/hq', feature: null, platformOwnerOnly: true },
 ];
 
 const icons: Record<string, React.ReactElement> = {
@@ -215,8 +218,11 @@ export default function CollapsibleSidebar({
   // Filter nav items based on features
   const visibleNavItems = useMemo(() => {
     return navItems.filter(item => {
-      // Always show dividers
-      if ((item as any).isDivider) return true;
+      // Show dividers (but respect platformOwnerOnly on dividers too)
+      if ((item as any).isDivider) {
+        if ((item as any).platformOwnerOnly && !isPlatformOwner) return false;
+        return true;
+      }
       
       // Platform owner only items (API Costs, etc.)
       if ((item as any).platformOwnerOnly && !isPlatformOwner) {
