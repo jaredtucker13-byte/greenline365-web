@@ -15,6 +15,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import ReactMarkdown from 'react-markdown';
 
 // ============================================
 // TYPES
@@ -325,7 +326,7 @@ export default function ChatWidget({
   const recognitionRef = useRef<any>(null);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   // Get page context and set mode
   useEffect(() => {
@@ -466,8 +467,12 @@ export default function ChatWidget({
   const sendMessage = useCallback(async (messageText?: string) => {
     const text = messageText || inputValue.trim();
     if (!text || isLoading) return;
-    
+
     setInputValue('');
+    // Reset textarea height
+    if (inputRef.current) {
+      inputRef.current.style.height = 'auto';
+    }
     setIsLoading(true);
     
     // Check for name
@@ -772,7 +777,7 @@ interface ChatContentProps {
   styles: ReturnType<typeof getModeStyles>;
   quickActions: Array<{ text: string; icon: string }>;
   messagesEndRef: React.RefObject<HTMLDivElement | null>;
-  inputRef: React.RefObject<HTMLInputElement | null>;
+  inputRef: React.RefObject<HTMLTextAreaElement | null>;
   onClose?: () => void;
   isExpanded?: boolean;
   setIsExpanded?: (expanded: boolean) => void;
@@ -974,7 +979,15 @@ function ChatContent({
                 }`}
                 style={msg.role === 'user' ? { backgroundColor: styles.accent } : undefined}
               >
-                <p className="leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                {msg.role === 'user' ? (
+                  <p className="leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                ) : (
+                  <div className="leading-relaxed chat-markdown prose prose-invert prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-headings:my-2 prose-headings:text-white prose-strong:text-white prose-a:text-[var(--chat-accent)] prose-code:text-[var(--chat-accent)] prose-code:bg-black/30 prose-code:rounded prose-code:px-1 prose-code:py-0.5 prose-pre:bg-black/40 prose-pre:rounded-lg"
+                    style={{ '--chat-accent': styles.accent } as React.CSSProperties}
+                  >
+                    <ReactMarkdown>{msg.content}</ReactMarkdown>
+                  </div>
+                )}
               </div>
               
               {/* Content Suggestions (for assistant messages) */}
@@ -1042,80 +1055,104 @@ function ChatContent({
       </div>
 
       {/* Input */}
-      <div 
-        className="flex-shrink-0 p-4 border-t bg-black/50"
+      <div
+        className="flex-shrink-0 p-3 border-t bg-black/50"
         style={{ borderColor: `${styles.accent}20` }}
       >
         {/* Clear conversation button */}
         {messages.length > 0 && (
           <button
             onClick={clearConversation}
-            className="mb-3 text-xs text-gray-500 hover:text-gray-400 transition-colors"
+            className="mb-2 text-xs text-gray-500 hover:text-gray-400 transition-colors"
           >
             Clear conversation
           </button>
         )}
-        
-        <div className="flex items-center gap-2">
+
+        <div
+          className="flex items-end gap-2 rounded-xl border bg-gray-800/50 px-3 py-2 transition-all"
+          style={{
+            borderColor: isListening
+              ? 'rgba(239, 68, 68, 0.5)'
+              : inputValue
+                ? `${styles.accent}50`
+                : 'rgba(75,75,75,0.5)',
+          }}
+        >
           {/* Voice Input Button */}
           <button
             onClick={toggleVoiceInput}
-            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
-              isListening 
-                ? 'bg-red-500/20 text-red-400 animate-pulse border border-red-500/50' 
-                : 'bg-gray-800/50 text-gray-400 hover:text-white hover:bg-gray-700/50 border border-gray-700/50'
+            className={`flex-shrink-0 w-8 h-8 mb-0.5 rounded-lg flex items-center justify-center transition-all ${
+              isListening
+                ? 'bg-red-500/20 text-red-400 animate-pulse'
+                : 'text-gray-400 hover:text-white'
             }`}
             title={isListening ? 'Stop listening' : 'Voice input'}
           >
             {isListening ? (
               <span className="w-3 h-3 rounded-full bg-red-500"></span>
             ) : (
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
               </svg>
             )}
           </button>
-          
-          <input
+
+          <textarea
             ref={inputRef}
-            type="text"
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
+            onChange={(e) => {
+              setInputValue(e.target.value);
+              // Auto-resize textarea
+              e.target.style.height = 'auto';
+              e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
+            }}
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 sendMessage();
+                // Reset textarea height after send
+                if (inputRef.current) {
+                  inputRef.current.style.height = 'auto';
+                }
               }
             }}
-            placeholder={isListening 
-              ? "Listening..." 
-              : currentMode === 'creative' 
-                ? "Tell me what you're working on..." 
+            placeholder={isListening
+              ? "Listening..."
+              : currentMode === 'creative'
+                ? "Tell me what you're working on..."
                 : "Type your message..."}
-            className="flex-1 rounded-xl px-4 py-3 text-sm outline-none bg-gray-800/50 border text-white placeholder:text-gray-500 transition-all"
-            style={{ 
-              borderColor: isListening 
-                ? 'rgba(239, 68, 68, 0.5)' 
-                : inputValue 
-                  ? `${styles.accent}50` 
-                  : 'rgba(75,75,75,0.5)',
+            className="flex-1 text-sm outline-none bg-transparent text-white placeholder:text-gray-500 resize-none leading-relaxed py-1"
+            style={{
+              minHeight: '24px',
+              maxHeight: '120px',
             }}
+            rows={1}
             disabled={isLoading}
           />
 
           <button
-            onClick={() => sendMessage()}
+            onClick={() => {
+              sendMessage();
+              if (inputRef.current) {
+                inputRef.current.style.height = 'auto';
+              }
+            }}
             disabled={isLoading || !inputValue.trim()}
-            className="w-11 h-11 rounded-xl flex items-center justify-center font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-            style={{ 
-              backgroundColor: styles.accent,
-              color: 'black',
+            className="flex-shrink-0 w-8 h-8 mb-0.5 rounded-lg flex items-center justify-center font-bold transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+            style={{
+              backgroundColor: inputValue.trim() ? styles.accent : 'transparent',
+              color: inputValue.trim() ? 'black' : styles.accent,
             }}
           >
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12h13M13 5l7 7-7 7" />
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
             </svg>
           </button>
+        </div>
+
+        <div className="mt-1.5 text-center">
+          <span className="text-[10px] text-gray-600">Press Enter to send, Shift+Enter for new line</span>
         </div>
       </div>
     </div>

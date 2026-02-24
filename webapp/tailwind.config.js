@@ -135,6 +135,7 @@ module.exports = {
     },
   },
   plugins: [
+    require('@tailwindcss/typography'),
     plugin(function({ addUtilities, addComponents }) {
       addUtilities({
         '.glass': {
