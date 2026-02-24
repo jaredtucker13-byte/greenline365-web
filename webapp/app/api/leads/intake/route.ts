@@ -41,6 +41,7 @@ interface LeadIntakeBody {
 
   // Consent
   consent_marketing?: boolean;
+  sms_opt_in?: boolean;
 
   // Agent context
   agent_session_id?: string;
@@ -118,6 +119,8 @@ export async function POST(request: NextRequest) {
       lead_score: body.intent_score || 0,
       intent: body.pain_point || body.message || 'unknown',
       consent_marketing: body.consent_marketing || false,
+      sms_opt_in: body.sms_opt_in || false,
+      sms_consent_at: body.sms_opt_in ? now : null,
       metadata: {
         name: body.name,
         company: body.company,

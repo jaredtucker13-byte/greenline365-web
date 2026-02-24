@@ -54,6 +54,20 @@ export async function signInWithMagicLink(email: string, redirectTo?: string) {
   return { data, error };
 }
 
+export async function resetPassword(email: string) {
+  const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${typeof window !== 'undefined' ? window.location.origin : ''}/reset-password`,
+  });
+  return { data, error };
+}
+
+export async function updatePassword(newPassword: string) {
+  const { data, error } = await supabase.auth.updateUser({
+    password: newPassword,
+  });
+  return { data, error };
+}
+
 export async function signOut() {
   const { error } = await supabase.auth.signOut();
   return { error };

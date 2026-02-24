@@ -74,15 +74,40 @@ jobs:
         run: npx eslint . --max-warnings=0 || npx eslint . || echo "Lint completed with warnings"
 
   # -------------------------------------------------------
+  # Agent: TESTER - Unit & Integration Tests
+  # WHAT: Runs Vitest test suite (43+ tests)
+  # WHEN: After typecheck and lint pass
+  # TRIGGERS: Broken logic, regressions, failing assertions
+  # -------------------------------------------------------
+  test:
+    name: "Agent: TESTER - Unit Tests"
+    runs-on: ubuntu-latest
+    needs: [typecheck, lint]
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install dependencies
+        run: npm install
+      - name: Run tests
+        run: npm test
+
+  # -------------------------------------------------------
   # Agent: SAYA - Next.js Build Verification
   # WHAT: Full production build to verify all pages compile
-  # WHEN: After typecheck and lint pass
+  # WHEN: After typecheck, lint, and tests pass
   # TRIGGERS: Build failures, missing env vars, SSR errors
   # -------------------------------------------------------
   build:
     name: "Agent: SAYA - Build Verification"
     runs-on: ubuntu-latest
-    needs: [typecheck, lint]
+    needs: [typecheck, lint, test]
     defaults:
       run:
         working-directory: ${{ env.WORKING_DIR }}
@@ -211,7 +236,7 @@ jobs:
   audit-report:
     name: "Supervisor - Trifecta Audit Report"
     runs-on: ubuntu-latest
-    needs: [typecheck, lint, build, env-audit, supabase-check]
+    needs: [typecheck, lint, test, build, env-audit, supabase-check]
     if: always()
     steps:
       - name: Generate Testing Trifecta Report
@@ -222,6 +247,7 @@ jobs:
           echo "SECTION 1 BASELINE:"
           echo "  TypeCheck = ${{ needs.typecheck.result }}"
           echo "  Lint      = ${{ needs.lint.result }}"
+          echo "  Tests     = ${{ needs.test.result }}"
           echo "SECTION 2 IMPROVEMENT:"
           echo "  Build     = ${{ needs.build.result }}"
           echo "  Migrations= ${{ needs.supabase-check.result }}"
@@ -231,12 +257,8 @@ jobs:
           echo "Commit: ${{ github.sha }}"
           echo "Branch: ${{ github.ref_name }}"
           echo "======================================================="
-          if [ "${{ needs.typecheck.result }}" = "success" ] && [ "${{ needs.lint.result }}" = "success" ] && [ "${{ needs.build.result }}" = "success" ]; then
+          if [ "${{ needs.typecheck.result }}" = "success" ] && [ "${{ needs.lint.result }}" = "success" ] && [ "${{ needs.test.result }}" = "success" ] && [ "${{ needs.build.result }}" = "success" ]; then
             echo "TRIFECTA STATUS: ALL CORE CHECKS PASSED"
-                      else
-                                  echo "TRIFECTA STATUS: ISSUES DETECTED"
-                                              exit 1
-                                                        fi
           else
             echo "TRIFECTA STATUS: ISSUES DETECTED"
             exit 1

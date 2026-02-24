@@ -44,6 +44,7 @@ function RegisterForm() {
     state: '',
     zip_code: '',
     description: '',
+    sms_consent: false,
   });
 
   useEffect(() => {
@@ -381,6 +382,21 @@ function RegisterForm() {
                   />
                 </div>
               </div>
+
+              {businessData.phone && (
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={businessData.sms_consent}
+                    onChange={(e) => setBusinessData({ ...businessData, sms_consent: e.target.checked })}
+                    className="mt-1 w-4 h-4 rounded border-white/20 bg-white/5 text-gold-500 focus:ring-gold-500/50"
+                    data-testid="register-sms-consent"
+                  />
+                  <span className="text-white/50 text-xs leading-relaxed">
+                    I consent to receive SMS/text messages from GreenLine365 about my listing, leads, and account updates. Message &amp; data rates may apply. Reply STOP to opt out.
+                  </span>
+                </label>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-white/70 mb-1.5">Description</label>

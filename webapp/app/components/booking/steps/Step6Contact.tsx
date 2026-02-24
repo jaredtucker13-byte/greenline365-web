@@ -3,8 +3,8 @@
 type Step6ContactProps = {
   onBack: () => void;
   onNext: () => void;
-  data: { contactName?: string; email?: string; phone?: string };
-  onUpdate: (data: { contactName?: string; email?: string; phone?: string }) => void;
+  data: { contactName?: string; email?: string; phone?: string; smsConsent?: boolean };
+  onUpdate: (data: { contactName?: string; email?: string; phone?: string; smsConsent?: boolean }) => void;
 };
 
 export default function Step6Contact({ onBack, onNext, data, onUpdate }: Step6ContactProps) {
@@ -58,6 +58,19 @@ export default function Step6Contact({ onBack, onNext, data, onUpdate }: Step6Co
             className="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-gold-500 focus:ring-1 focus:ring-gold-500 outline-none transition"
           />
         </div>
+        {data.phone && (
+          <label className="flex items-start gap-3 cursor-pointer group">
+            <input
+              type="checkbox"
+              checked={data.smsConsent || false}
+              onChange={(e) => onUpdate({ ...data, smsConsent: e.target.checked })}
+              className="mt-1 w-4 h-4 rounded border-white/20 bg-white/5 text-gold-500 focus:ring-gold-500/50"
+            />
+            <span className="text-white/50 text-xs leading-relaxed">
+              I consent to receive SMS/text messages from GreenLine365 regarding my booking and account. Message &amp; data rates may apply. Reply STOP to opt out.
+            </span>
+          </label>
+        )}
       </div>
 
       <div className="flex gap-3 pt-4">

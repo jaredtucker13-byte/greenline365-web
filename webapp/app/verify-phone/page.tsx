@@ -15,6 +15,7 @@ export default function VerifyPhonePage() {
   const [formData, setFormData] = useState({
     email: '',
     phone: '',
+    smsConsent: false,
   });
   
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -239,9 +240,21 @@ export default function VerifyPhonePage() {
                   </p>
                 </div>
 
+                <label className="flex items-start gap-3 cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    checked={formData.smsConsent}
+                    onChange={(e) => setFormData({ ...formData, smsConsent: e.target.checked })}
+                    className="mt-1 w-4 h-4 rounded border-white/20 bg-white/5 text-gold-500 focus:ring-gold-500/50"
+                  />
+                  <span className="text-white/50 text-xs leading-relaxed">
+                    By checking this box, I consent to receive SMS/text messages from GreenLine365, including verification codes, account alerts, and promotional messages. Message &amp; data rates may apply. Reply STOP to opt out at any time.
+                  </span>
+                </label>
+
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={loading || !formData.smsConsent}
                   className="w-full py-4 bg-gold-500 text-black font-bold rounded-xl hover:bg-gold-400 transition disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {loading ? (
