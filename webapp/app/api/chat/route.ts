@@ -5,7 +5,114 @@ import { getSkillContextForIntent, getCoreMarketingContext } from '@/lib/marketi
 import { CHAT_FORMAT_DIRECTIVE } from '@/lib/format-standards';
 import { rateLimit, rateLimitResponse } from '@/lib/rate-limit';
 
-type Msg = { role: 'user' | 'assistant' | 'system'; content: string };
+type Msg = { role: 'user' | 'assistant' | 'system'; content: string | unknown };
+
+// ========================================
+// MESSAGE SANITIZATION
+// ========================================
+
+/**
+ * Sanitize messages to prevent "tool_use ids must be unique" errors.
+ *
+ * When conversation history includes raw Claude responses (content arrays
+ * with tool_use blocks), duplicate IDs can slip through. This function:
+ * 1. Ensures every tool_use block has a globally unique ID
+ * 2. Updates corresponding tool_result blocks to reference the new IDs
+ * 3. Flattens plain-text content arrays into strings where possible
+ */
+function sanitizeMessages(messages: Msg[]): Msg[] {
+  const seenIds = new Set<string>();
+  const idRemapping = new Map<string, string>();
+
+  function generateUniqueId(): string {
+    return `toolu_${crypto.randomUUID().replace(/-/g, '').slice(0, 24)}`;
+  }
+
+  // First pass: find and remap duplicate tool_use IDs
+  for (const msg of messages) {
+    const content = msg.content;
+    if (!Array.isArray(content)) continue;
+
+    for (const block of content) {
+      if (
+        block &&
+        typeof block === 'object' &&
+        'type' in block &&
+        block.type === 'tool_use' &&
+        'id' in block &&
+        typeof block.id === 'string'
+      ) {
+        if (seenIds.has(block.id)) {
+          const newId = generateUniqueId();
+          idRemapping.set(block.id, newId);
+        }
+        seenIds.add(block.id);
+      }
+    }
+  }
+
+  if (idRemapping.size === 0) {
+    // No duplicates — still normalise content to strings where safe
+    return messages.map(normalizeMessageContent);
+  }
+
+  // Second pass: apply remapping
+  return messages.map((msg) => {
+    const content = msg.content;
+    if (!Array.isArray(content)) return normalizeMessageContent(msg);
+
+    const newContent = content.map((block: any) => {
+      if (!block || typeof block !== 'object') return block;
+
+      // Remap tool_use IDs
+      if (block.type === 'tool_use' && idRemapping.has(block.id)) {
+        return { ...block, id: idRemapping.get(block.id) };
+      }
+
+      // Remap tool_result references
+      if (block.type === 'tool_result' && idRemapping.has(block.tool_use_id)) {
+        return { ...block, tool_use_id: idRemapping.get(block.tool_use_id) };
+      }
+
+      return block;
+    });
+
+    return { ...msg, content: newContent } as Msg;
+  });
+}
+
+/** Extract plain text from a message content field (handles strings and content-block arrays). */
+function extractText(content: unknown): string {
+  if (typeof content === 'string') return content;
+  if (Array.isArray(content)) {
+    return content
+      .filter((b: any) => typeof b === 'string' || b?.type === 'text')
+      .map((b: any) => (typeof b === 'string' ? b : b.text))
+      .join('');
+  }
+  return '';
+}
+
+/** Convert content arrays that contain only text blocks into plain strings. */
+function normalizeMessageContent(msg: Msg): Msg {
+  const content = msg.content;
+  if (!Array.isArray(content)) return msg;
+
+  const hasOnlyText = content.every(
+    (b: any) =>
+      typeof b === 'string' ||
+      (b && typeof b === 'object' && b.type === 'text' && typeof b.text === 'string')
+  );
+
+  if (hasOnlyText) {
+    const text = content
+      .map((b: any) => (typeof b === 'string' ? b : b.text))
+      .join('');
+    return { ...msg, content: text };
+  }
+
+  return msg;
+}
 
 // ========================================
 // BOOKING INTENT DETECTION
@@ -22,7 +129,7 @@ interface BookingIntent {
 
 function detectBookingIntent(message: string, history: Msg[]): BookingIntent | null {
   const lower = message.toLowerCase();
-  const fullConvo = history.map(m => m.content.toLowerCase()).join(' ');
+  const fullConvo = history.map(m => extractText(m.content).toLowerCase()).join(' ');
   
   // Check if this is a booking-related conversation
   const bookingKeywords = ['book', 'schedule', 'demo', 'appointment', 'meeting', 'call', 'consultation'];
@@ -103,7 +210,7 @@ async function handleBookingIntent(intent: BookingIntent, message: string, histo
     if (intent.type === 'confirm' && intent.date && intent.time) {
       // Extract name from conversation
       const namePattern = /(?:my name is|i'm|i am|this is)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i;
-      const convoText = history.map(m => m.content).join(' ');
+      const convoText = history.map(m => extractText(m.content)).join(' ');
       const nameMatch = convoText.match(namePattern);
       const customerName = nameMatch ? nameMatch[1] : 'Guest';
       
@@ -421,9 +528,19 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({} as Record<string, unknown>));
 
-    const message: string | undefined =
+    const rawContent =
       body?.message ??
       body?.messages?.[body.messages.length - 1]?.content;
+
+    // Extract plain text from content (handles both string and content-block arrays)
+    const message: string | undefined = typeof rawContent === 'string'
+      ? rawContent
+      : Array.isArray(rawContent)
+        ? rawContent
+            .filter((b: any) => typeof b === 'string' || (b?.type === 'text'))
+            .map((b: any) => (typeof b === 'string' ? b : b.text))
+            .join('')
+        : undefined;
 
     if (!message || typeof message !== 'string') {
       return Response.json({ error: 'Missing message' }, { status: 400 });
@@ -517,6 +634,9 @@ export async function POST(req: NextRequest) {
       ...messages.filter(m => m.role !== 'system'),
     ];
 
+    // Sanitize messages to prevent duplicate tool_use ID errors
+    const sanitizedMessages = sanitizeMessages(messagesWithSystem);
+
     console.log(`[Chat] Session: ${sessionId || 'anonymous'}, Mode: ${mode || 'default'}, Model: ${model}, HasMemory: ${!!aiContext}`);
 
     const upstream = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -529,7 +649,7 @@ export async function POST(req: NextRequest) {
       },
       body: JSON.stringify({
         model,
-        messages: messagesWithSystem,
+        messages: sanitizedMessages,
         stream: false,
         temperature: mode === 'creative' ? 0.8 : 0.7,
         max_tokens: mode === 'creative' ? 1000 : (directoryContext ? 800 : 500),
@@ -542,12 +662,54 @@ export async function POST(req: NextRequest) {
 
     // Handle rate limits or errors gracefully
     if (!upstream.ok) {
+      const errorMsg = json?.error?.message || json?.error || '';
+      const isToolIdError = typeof errorMsg === 'string' && errorMsg.includes('tool_use ids must be unique');
+
+      if (isToolIdError) {
+        // Strip all tool_use / tool_result blocks and retry once
+        console.warn('[Chat] Duplicate tool_use IDs detected — stripping tool blocks and retrying');
+
+        const strippedMessages = sanitizedMessages.map((m) => {
+          if (!Array.isArray(m.content)) return m;
+          const textOnly = (m.content as any[])
+            .filter((b: any) => typeof b === 'string' || b?.type === 'text')
+            .map((b: any) => (typeof b === 'string' ? b : b.text))
+            .join('');
+          return { ...m, content: textOnly || '[tool interaction]' } as Msg;
+        });
+
+        const retry = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+            'Content-Type': 'application/json',
+            'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com',
+            'X-Title': 'GreenLine365 Assistant',
+          },
+          body: JSON.stringify({
+            model,
+            messages: strippedMessages,
+            stream: false,
+            temperature: mode === 'creative' ? 0.8 : 0.7,
+            max_tokens: mode === 'creative' ? 1000 : (directoryContext ? 800 : 500),
+          }),
+        });
+
+        const retryJson = await retry.json().catch(async () => ({
+          error: await retry.text(),
+        }));
+
+        if (retry.ok) {
+          return Response.json(retryJson, { status: 200 });
+        }
+      }
+
       console.error('[Chat] API Error:', json);
       return Response.json(
-        { 
+        {
           error: 'Service temporarily unavailable',
           reply: "I'm experiencing a brief delay. Please try again in a moment."
-        }, 
+        },
         { status: upstream.status }
       );
     }
