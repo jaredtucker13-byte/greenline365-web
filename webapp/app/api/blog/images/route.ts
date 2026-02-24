@@ -6,12 +6,12 @@ import { callOpenRouter, callOpenRouterJSON } from '@/lib/openrouter';
  * 
  * Actions:
  * - analyze: Analyze content and suggest image placements with enriched artistic prompts
- * - generate: Generate images using Nano Banana Pro (cinematic) or GPT-5.2 (charts)
+ * - generate: Generate images using Nano Banana Pro (cinematic) or GPT-4o (charts)
  * - generate-custom: Generate custom image from user prompt
  * 
  * Features:
  * - Enriched artistic prompts with cinematic details (user sees clean version, API gets full details)
- * - Chart/infographic detection → routes to GPT-5.2
+ * - Chart/infographic detection → routes to GPT-4o
  * - Retry logic: if one image fails, discard all and retry (up to 3 attempts)
  * - Multiple aspect ratios: landscape (16:9), portrait (9:16), square (1:1), cinematic (21:9)
  * - 4K resolution output
@@ -25,7 +25,7 @@ interface ImageSuggestion {
   enrichedPrompt?: string; // Full artistic prompt for API (hidden from user)
   position: number;
   sectionTitle?: string;
-  isChart?: boolean; // If true, route to GPT-5.2
+  isChart?: boolean; // If true, route to GPT-4o
   suggestedRatio?: '16:9' | '9:16' | '1:1' | '21:9';
 }
 
@@ -166,20 +166,7 @@ async function analyzeContent(body: AnalyzeRequest) {
 
   // Use OpenRouter to analyze content with enhanced artistic direction
   // This is the "Garnishing Agent" - like the chef who plates food beautifully
-  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-      'Content-Type': 'application/json',
-      'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com',
-      'X-Title': 'GreenLine365 Visual Director',
-    },
-    body: JSON.stringify({
-      model: 'openai/gpt-4o',
-      messages: [
-        {
-          role: 'system',
-          content: `You are the VISUAL DIRECTOR - the garnishing expert who takes content and transforms it into a stunning visual presentation. Think of yourself as the person at a Michelin-star restaurant who takes every dish and plates it to perfection, adding the final artistic touches that elevate good to extraordinary.
+  const systemPrompt = `You are the VISUAL DIRECTOR - the garnishing expert who takes content and transforms it into a stunning visual presentation. Think of yourself as the person at a Michelin-star restaurant who takes every dish and plates it to perfection, adding the final artistic touches that elevate good to extraordinary.
 
 You have a COMPLETE toolkit at your disposal:
 
@@ -284,7 +271,7 @@ For enrichedPrompt, be EXTREMELY SPECIFIC:
 - Style Reference: "Like a Christopher Nolan establishing shot meets Apple product photography"
 
 DETECT SPECIAL CONTENT:
-- Statistics/data/percentages → isChart: true (routes to GPT-5.2)
+- Statistics/data/percentages → isChart: true (routes to chart generator)
 - Multiple related items → suggest gallery-grid template
 - Journey/process content → suggest s-flow template
 - Single key concept → suggest circular-focus template
@@ -308,8 +295,13 @@ Return JSON array (max 5 suggestions):
     "suggestedTemplate": "s-flow|gallery-grid|drop-cap|hero-feature|circular-focus|hexagonal-grid|none",
     "frameStyle": "wood|metal|museum|shadow-box|minimal (only if framed mode)"
   }
-]`
-        },
+]`;
+
+  try {
+    const { content: aiResponse } = await callOpenRouter({
+      model: 'openai/gpt-4o',
+      messages: [
+        { role: 'system', content: systemPrompt },
         {
           role: 'user',
           content: `As the Visual Director, analyze this blog post and design the perfect visual presentation. Consider the content's tone, flow, and purpose. Suggest up to 5 optimal image placements with full artistic direction:
@@ -322,30 +314,21 @@ ${content}`
       ],
       temperature: 0.7,
       max_tokens: 2500,
-    }),
-  });
+      caller: 'blog-images-analyze',
+    });
 
-  if (!response.ok) {
-    const error = await response.text();
-    console.error('[Blog Images] OpenRouter error:', error);
-    return NextResponse.json({ error: 'Analysis failed' }, { status: 500 });
-  }
-
-  const data = await response.json();
-  const aiResponse = data.choices?.[0]?.message?.content || '[]';
-
-  // Parse JSON response
-  try {
+    // Parse JSON response
     const jsonMatch = aiResponse.match(/\[[\s\S]*\]/);
     if (jsonMatch) {
       const suggestions = JSON.parse(jsonMatch[0]);
       return NextResponse.json({ suggestions });
     }
-  } catch (e) {
-    console.error('[Blog Images] JSON parse error:', e);
-  }
 
-  return NextResponse.json({ suggestions: [], raw: aiResponse });
+    return NextResponse.json({ suggestions: [], raw: aiResponse });
+  } catch (e) {
+    console.error('[Blog Images] OpenRouter error:', e);
+    return NextResponse.json({ error: 'Analysis failed' }, { status: 500 });
+  }
 }
 
 async function generateImages(body: GenerateRequest) {
@@ -362,7 +345,7 @@ async function generateImages(body: GenerateRequest) {
     return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
   }
 
-  // Route charts to GPT-5.2 via OpenRouter
+  // Route charts to GPT-4o via OpenRouter
   if (isChart) {
     return generateChartWithGPT(prompt, aspectRatio);
   }
@@ -532,23 +515,16 @@ async function generateImageBatch(
 }
 
 async function generateChartWithGPT(prompt: string, aspectRatio: string) {
-  console.log('[Blog Images] Generating chart/infographic with GPT-5.2...');
-  
-  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-      'Content-Type': 'application/json',
-      'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com',
-      'X-Title': 'GreenLine365 Chart Generation',
-    },
-    body: JSON.stringify({
-      model: 'openai/gpt-5.2',
+  console.log('[Blog Images] Generating chart/infographic with GPT-4o...');
+
+  try {
+    const { content: chartContent } = await callOpenRouter({
+      model: 'openai/gpt-4o',
       messages: [
         {
           role: 'system',
           content: `You are an expert data visualization designer. Create beautiful, clear charts and infographics.
-          
+
 When asked to create a chart or infographic:
 1. Design a clean, professional visualization
 2. Use a modern color palette suitable for business
@@ -561,43 +537,38 @@ Output the visualization as an SVG or describe it in detail for rendering.`
         {
           role: 'user',
           content: `Create a professional chart/infographic for: ${prompt}
-          
+
 Aspect ratio: ${aspectRatio}
 Style: Clean, modern, professional for a business blog`
         }
       ],
       temperature: 0.5,
       max_tokens: 2000,
-    }),
-  });
+      caller: 'blog-images-chart',
+    });
 
-  if (!response.ok) {
-    const error = await response.text();
-    console.error('[Blog Images] GPT-5.2 chart error:', error);
-    return NextResponse.json({ 
-      success: false, 
+    // For now, return the chart description/SVG
+    // In production, this would be rendered to an actual image
+    return NextResponse.json({
+      success: true,
+      isChart: true,
+      chartContent,
+      message: 'Chart generated with GPT-4o',
+      images: [{
+        id: `chart-${Date.now()}`,
+        type: 'chart',
+        content: chartContent,
+        aspectRatio,
+      }],
+    });
+  } catch (error) {
+    console.error('[Blog Images] GPT-4o chart error:', error);
+    return NextResponse.json({
+      success: false,
       error: 'Chart generation failed',
       message: 'Could not generate chart. Try a different description.',
     }, { status: 500 });
   }
-
-  const data = await response.json();
-  const chartContent = data.choices?.[0]?.message?.content || '';
-
-  // For now, return the chart description/SVG
-  // In production, this would be rendered to an actual image
-  return NextResponse.json({
-    success: true,
-    isChart: true,
-    chartContent,
-    message: 'Chart generated with GPT-5.2',
-    images: [{
-      id: `chart-${Date.now()}`,
-      type: 'chart',
-      content: chartContent,
-      aspectRatio,
-    }],
-  });
 }
 
 async function generateCustomImage(body: GenerateCustomRequest) {
@@ -727,15 +698,8 @@ async function analyzePageStyle(body: StyleAnalyzeRequest) {
   }
 
   // Use AI to analyze content and suggest page styling
-  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-      'Content-Type': 'application/json',
-      'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com',
-      'X-Title': 'GreenLine365 Style Analysis',
-    },
-    body: JSON.stringify({
+  try {
+    const { parsed: styleGuide } = await callOpenRouterJSON({
       model: 'openai/gpt-4o-mini',
       messages: [
         {
@@ -775,28 +739,12 @@ ${content.slice(0, 1500)}`
       ],
       temperature: 0.6,
       max_tokens: 800,
-    }),
-  });
+      caller: 'blog-images-style',
+    });
 
-  if (!response.ok) {
+    return NextResponse.json({ styleGuide });
+  } catch (e) {
+    console.error('[Blog Images] Style analysis error:', e);
     return NextResponse.json({ error: 'Style analysis failed' }, { status: 500 });
   }
-
-  const data = await response.json();
-  const aiResponse = data.choices?.[0]?.message?.content || '{}';
-
-  try {
-    const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      const styleGuide = JSON.parse(jsonMatch[0]);
-      return NextResponse.json({ styleGuide });
-    }
-  } catch (e) {
-    console.error('[Blog Images] Style JSON parse error:', e);
-  }
-
-  return NextResponse.json({
-    error: 'Could not parse style suggestions',
-    raw: aiResponse,
-  });
 }

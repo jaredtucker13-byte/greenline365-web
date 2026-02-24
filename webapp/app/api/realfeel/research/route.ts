@@ -1,17 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { callOpenRouterJSON } from '@/lib/openrouter';
 
 /**
  * Perplexity Research API
- * 
+ *
  * Uses OpenRouter's Perplexity Sonar model for real-time business research
  * Used during warm transfers to generate sales briefs
- * 
+ *
  * POST /api/realfeel/research
  */
-
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
 interface ResearchRequest {
   business_id: string;
@@ -76,53 +74,32 @@ The whisper_script should be ~10 seconds when read aloud and include:
 - One key insight about their business
 - One potential upsell/hook based on current conditions`;
 
-  const response = await fetch(OPENROUTER_URL, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-      'Content-Type': 'application/json',
-      'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com',
-      'X-Title': 'GreenLine365 Sales Research'
-    },
-    body: JSON.stringify({
-      model: 'perplexity/sonar-pro', // Using Perplexity Sonar via OpenRouter
+  try {
+    const { parsed } = await callOpenRouterJSON<SalesBrief>({
+      model: 'perplexity/sonar-pro',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt }
       ],
       temperature: 0.3,
-      max_tokens: 1000
-    })
-  });
+      max_tokens: 1000,
+      caller: 'realfeel-generateResearch',
+    });
 
-  if (!response.ok) {
-    const error = await response.text();
-    console.error('[Perplexity] API error:', error);
-    throw new Error(`Research API error: ${response.status}`);
-  }
+    return parsed;
+  } catch (error) {
+    console.error('[Perplexity] Research error:', error);
 
-  const data = await response.json();
-  const content = data.choices?.[0]?.message?.content || '';
-  
-  // Parse JSON from response
-  try {
-    const jsonMatch = content.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      return JSON.parse(jsonMatch[0]);
-    }
-  } catch (parseError) {
-    console.error('[Perplexity] Parse error:', parseError);
+    // Fallback structure
+    return {
+      company_name: companyName || 'Unknown Company',
+      industry: 'Unknown',
+      key_services: [],
+      potential_pain_points: [],
+      talking_points: ['Ask about their current challenges', 'Discuss their growth plans'],
+      whisper_script: `Transferring call from ${companyName || 'a prospect'}. Be prepared to discuss their business needs.`
+    };
   }
-  
-  // Fallback structure
-  return {
-    company_name: companyName || 'Unknown Company',
-    industry: 'Unknown',
-    key_services: [],
-    potential_pain_points: [],
-    talking_points: ['Ask about their current challenges', 'Discuss their growth plans'],
-    whisper_script: `Transferring call from ${companyName || 'a prospect'}. Be prepared to discuss their business needs.`
-  };
 }
 
 export async function POST(request: NextRequest) {
@@ -164,22 +141,6 @@ export async function POST(request: NextRequest) {
     
     if (!userBusiness) {
       return NextResponse.json({ error: 'Access denied' }, { status: 403 });
-    }
-    
-    if (!OPENROUTER_API_KEY) {
-      // Return mock data if API not configured
-      return NextResponse.json({
-        success: true,
-        mock: true,
-        research: {
-          company_name: prospect_company || 'Demo Company',
-          industry: 'Technology',
-          key_services: ['Service A', 'Service B'],
-          potential_pain_points: ['Scaling challenges', 'Customer acquisition'],
-          talking_points: ['Ask about growth plans', 'Discuss automation needs'],
-          whisper_script: `Transferring ${prospect_name || 'caller'} from ${prospect_company || 'a prospect'}. They may be interested in automation solutions.`
-        }
-      });
     }
     
     // Generate research

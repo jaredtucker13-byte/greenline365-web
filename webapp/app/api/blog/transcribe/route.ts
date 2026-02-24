@@ -18,54 +18,34 @@ export async function POST(request: NextRequest) {
     console.log('[Transcribe] Starting transcription with GPT-4o Audio...');
 
     // Use GPT-4o Audio Preview via OpenRouter for transcription
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com',
-        'X-Title': 'GreenLine365 Voice Transcription',
-      },
-      body: JSON.stringify({
-        model: 'openai/gpt-4o-audio-preview',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a transcription assistant. Transcribe the audio accurately. Return ONLY the transcribed text, nothing else. Do not add any commentary or formatting.',
-          },
-          {
-            role: 'user',
-            content: [
-              {
-                type: 'text',
-                text: 'Please transcribe this audio recording accurately:',
+    const { content: transcribedText } = await callOpenRouter({
+      model: 'openai/gpt-4o-audio-preview',
+      messages: [
+        {
+          role: 'system',
+          content: 'You are a transcription assistant. Transcribe the audio accurately. Return ONLY the transcribed text, nothing else. Do not add any commentary or formatting.',
+        },
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'text',
+              text: 'Please transcribe this audio recording accurately:',
+            },
+            {
+              type: 'input_audio',
+              input_audio: {
+                data: audio,
+                format: 'webm',
               },
-              {
-                type: 'input_audio',
-                input_audio: {
-                  data: audio,
-                  format: 'webm',
-                },
-              },
-            ],
-          },
-        ],
-        temperature: 0.2,
-        max_tokens: 2000,
-      }),
+            },
+          ],
+        },
+      ],
+      temperature: 0.2,
+      max_tokens: 2000,
+      caller: 'blog-transcribe',
     });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('[Transcribe] OpenRouter error:', errorText);
-      return NextResponse.json(
-        { error: 'Transcription service error' },
-        { status: 500 }
-      );
-    }
-
-    const data = await response.json();
-    const transcribedText = data.choices?.[0]?.message?.content || '';
 
     if (!transcribedText) {
       return NextResponse.json(

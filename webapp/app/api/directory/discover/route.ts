@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { callOpenRouter } from '@/lib/openrouter';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const openrouterKey = process.env.OPENROUTER_API_KEY!;
 const googlePlacesKey = process.env.GOOGLE_PLACES_API_KEY!;
 
 function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKey); }
@@ -71,32 +71,21 @@ Return ONLY a valid JSON array. No markdown, no explanation. Example format:
 
 Focus on popular, well-reviewed, real businesses that tourists would visit. Include a mix of well-known and local favorites.`;
 
-  const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${openrouterKey}`,
-      'HTTP-Referer': 'https://greenline365.com',
-      'X-Title': 'GL365 Directory Discovery',
-    },
-    body: JSON.stringify({
+  try {
+    const { content } = await callOpenRouter({
       model: 'perplexity/sonar-pro',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.1,
       max_tokens: 4000,
-    }),
-  });
+      caller: 'directory-discover',
+    });
 
-  const data = await res.json();
-  const content = data.choices?.[0]?.message?.content || '[]';
-
-  try {
     // Extract JSON from response (may have markdown wrapping)
     const jsonMatch = content.match(/\[[\s\S]*\]/);
     if (!jsonMatch) return [];
     return JSON.parse(jsonMatch[0]);
-  } catch {
-    console.error('[Discover] Failed to parse Perplexity response:', content.slice(0, 200));
+  } catch (error) {
+    console.error('[Discover] Failed to get/parse Perplexity response:', error);
     return [];
   }
 }

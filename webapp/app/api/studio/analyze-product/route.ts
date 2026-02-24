@@ -1,20 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { callOpenRouterJSON } from '@/lib/openrouter';
 
 /**
  * Product Analysis API
- * 
+ *
  * Uses Gemini 3 Pro via OpenRouter to analyze product photos and generate:
  * - Product description
- * - Price suggestions  
+ * - Price suggestions
  * - Material details
  * - Marketing angles
- * 
+ *
  * POST /api/studio/analyze-product
  */
-
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const GEMINI_MODEL = 'google/gemini-2.5-pro-preview';
 
 interface AnalyzeProductRequest {
   imageUrls: string[];  // Direct URLs or base64
@@ -39,15 +37,6 @@ export async function POST(request: NextRequest) {
         { error: 'At least one image required' },
         { status: 400 }
       );
-    }
-
-    // Check if OpenRouter API key is configured
-    if (!OPENROUTER_API_KEY) {
-      console.warn('[Product Analysis] OpenRouter API key not configured, using mock response');
-      return NextResponse.json({
-        success: true,
-        analysis: getMockAnalysis(productType),
-      });
     }
 
     // Build vision prompt
@@ -75,7 +64,7 @@ Analyze and return ONLY valid JSON (no markdown):
 
     // Build content array with images
     const content: any[] = [{ type: 'text', text: systemPrompt }];
-    
+
     for (const url of imageUrls.slice(0, 5)) {
       content.push({
         type: 'image_url',
@@ -84,55 +73,18 @@ Analyze and return ONLY valid JSON (no markdown):
     }
 
     // Call Gemini via OpenRouter
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com',
-        'X-Title': 'ArtfulPhusion Creative Studio',
-      },
-      body: JSON.stringify({
-        model: GEMINI_MODEL,
+    let analysis;
+    try {
+      const { parsed } = await callOpenRouterJSON({
+        model: 'google/gemini-2.5-pro-preview',
         messages: [{ role: 'user', content }],
         temperature: 0.3,
         max_tokens: 2000,
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('[Product Analysis] OpenRouter error:', errorText);
-      
-      // Fallback to mock if API fails
-      return NextResponse.json({
-        success: true,
-        analysis: getMockAnalysis(productType),
-        warning: 'AI analysis unavailable, using template',
+        caller: 'studio-analyzeProduct',
       });
-    }
-
-    const result = await response.json();
-    const text = result.choices?.[0]?.message?.content || '';
-    
-    // Parse JSON from response
-    let analysis;
-    try {
-      // Remove markdown code blocks if present
-      let jsonText = text;
-      if (text.includes('```')) {
-        const match = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-        jsonText = match ? match[1] : text;
-      }
-      
-      const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        analysis = JSON.parse(jsonMatch[0]);
-      } else {
-        throw new Error('No JSON found');
-      }
-    } catch (parseError) {
-      console.error('[Product Analysis] Parse error:', parseError);
+      analysis = parsed;
+    } catch (aiError) {
+      console.error('[Product Analysis] AI error, falling back to mock:', aiError);
       analysis = getMockAnalysis(productType);
     }
 

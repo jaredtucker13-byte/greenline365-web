@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { callOpenRouterJSON } from '@/lib/openrouter';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -23,28 +24,13 @@ const ZIP_TO_CITY: Record<string, string> = {
 
 // Generate trends using AI
 async function generateTrendsWithAI(zipCode: string, city: string) {
-  const openRouterKey = process.env.OPENROUTER_API_KEY;
-  
-  if (!openRouterKey) {
-    // Return mock trends if no API key
-    return generateMockTrends(zipCode, city);
-  }
-
   try {
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${openRouterKey}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com',
-        'X-Title': 'GreenLine365 Trend Hunter',
-      },
-      body: JSON.stringify({
-        model: 'openai/gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: `You are a local business trend analyst. Generate 3-4 realistic, actionable local trends for small businesses in the specified area. Focus on events, seasonal opportunities, local happenings, and weather-based opportunities.
+    const { parsed } = await callOpenRouterJSON<{ trends: any[] }>({
+      model: 'openai/gpt-4o-mini',
+      messages: [
+        {
+          role: 'system',
+          content: `You are a local business trend analyst. Generate 3-4 realistic, actionable local trends for small businesses in the specified area. Focus on events, seasonal opportunities, local happenings, and weather-based opportunities.
 
 Return ONLY valid JSON in this exact format (no markdown, no extra text):
 {
@@ -60,33 +46,18 @@ Return ONLY valid JSON in this exact format (no markdown, no extra text):
     }
   ]
 }`
-          },
-          {
-            role: 'user',
-            content: `Generate local business trends and opportunities for ZIP code ${zipCode} (${city}). Include current seasonal events, upcoming local happenings, and actionable marketing opportunities. Today is ${new Date().toLocaleDateString()}.`
-          }
-        ],
-        temperature: 0.7,
-        max_tokens: 800,
-      }),
+        },
+        {
+          role: 'user',
+          content: `Generate local business trends and opportunities for ZIP code ${zipCode} (${city}). Include current seasonal events, upcoming local happenings, and actionable marketing opportunities. Today is ${new Date().toLocaleDateString()}.`
+        }
+      ],
+      temperature: 0.7,
+      max_tokens: 800,
+      caller: 'daily-trend-hunter',
     });
 
-    if (!response.ok) {
-      console.error('OpenRouter API error:', response.status);
-      return generateMockTrends(zipCode, city);
-    }
-
-    const data = await response.json();
-    const content = data.choices?.[0]?.message?.content || '';
-    
-    // Parse the JSON response
-    const jsonMatch = content.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      const parsed = JSON.parse(jsonMatch[0]);
-      return parsed.trends || [];
-    }
-    
-    return generateMockTrends(zipCode, city);
+    return parsed.trends || [];
   } catch (error) {
     console.error('AI trend generation error:', error);
     return generateMockTrends(zipCode, city);

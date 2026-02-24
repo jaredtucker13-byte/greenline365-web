@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-// Use Perplexity models via OpenRouter for trending topic research
-const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
+import { callOpenRouter } from '@/lib/openrouter';
 
 interface TrendingRequest {
   industry?: string; // Now optional
@@ -19,14 +17,6 @@ export async function POST(request: NextRequest) {
     const industryContext = industry 
       ? `in the ${industry}${niche ? ` (specifically ${niche})` : ''} industry`
       : 'across all industries';
-
-    const apiKey = process.env.OPENROUTER_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json(
-        { error: 'OpenRouter API key not configured' },
-        { status: 500 }
-      );
-    }
 
     // Build the search prompt based on type
     const prompts: Record<string, string> = {
@@ -69,36 +59,16 @@ Return ONLY a valid JSON array with this exact format, no other text:
 
     const systemPrompt = `You are a content research expert with access to current internet information. Your job is to identify trending topics, content opportunities, and market insights. IMPORTANT: Return ONLY valid JSON arrays as specified - no markdown, no code blocks, no explanations. Just the raw JSON array.`;
 
-    const response = await fetch(OPENROUTER_API_URL, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com',
-        'X-Title': 'GreenLine365 Trending Research',
-      },
-      body: JSON.stringify({
-        model: 'perplexity/sonar', // Perplexity Sonar with online search via OpenRouter
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: prompts[type] || prompts.trending },
-        ],
-        temperature: 0.3,
-        max_tokens: 2000,
-      }),
+    const { content } = await callOpenRouter({
+      model: 'perplexity/sonar', // Perplexity Sonar with online search via OpenRouter
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: prompts[type] || prompts.trending },
+      ],
+      temperature: 0.3,
+      max_tokens: 2000,
+      caller: 'blog-trending',
     });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('[Trending API] OpenRouter Error:', errorText);
-      return NextResponse.json(
-        { error: 'Failed to fetch trending topics', details: errorText },
-        { status: response.status }
-      );
-    }
-
-    const data = await response.json();
-    const content = data.choices?.[0]?.message?.content || '';
 
     // Parse JSON from response
     let results = [];

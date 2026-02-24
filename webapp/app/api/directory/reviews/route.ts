@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { createClient as createServerClient } from '@/lib/supabase/server';
 
+import { callOpenRouter } from '@/lib/openrouter';
+
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKey); }
 
 /**
@@ -27,8 +28,6 @@ interface Review {
 
 // Generate AI response draft
 async function generateAIResponse(businessName: string, industry: string, reviewText: string, rating: number, reviewerName: string, ownerPreferences?: string): Promise<string> {
-  if (!OPENROUTER_API_KEY) return '';
-
   const prompt = `You are responding to a customer review on behalf of "${businessName}" (a ${industry.replace(/-/g, ' ')} business).
 
 Review by ${reviewerName} (${rating}/5 stars):
@@ -39,25 +38,15 @@ ${ownerPreferences ? `Business owner tone preferences: ${ownerPreferences}` : ''
 Write a professional, warm, and authentic response (2-4 sentences). Be specific to what they mentioned. If positive, thank them genuinely. If negative, acknowledge the concern, apologize where appropriate, and offer to make it right. Never be defensive. Sign off with just the business name.`;
 
   try {
-    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://greenline365.com',
-        'X-Title': 'GL365 Review Response AI',
-      },
-      body: JSON.stringify({
-        model: 'openai/gpt-4o-mini',
-        messages: [{ role: 'user', content: prompt }],
-        max_tokens: 300,
-        temperature: 0.7,
-      }),
+    const { content } = await callOpenRouter({
+      model: 'openai/gpt-4o-mini',
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: 300,
+      temperature: 0.7,
+      caller: 'directory-reviews',
     });
 
-    if (!res.ok) return '';
-    const data = await res.json();
-    return data.choices?.[0]?.message?.content || '';
+    return content;
   } catch {
     return '';
   }

@@ -1,20 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { callOpenRouterJSON } from '@/lib/openrouter';
 
 /**
  * AI-Powered Onboarding Extraction API
- * 
+ *
  * The "Zero-Friction" engine using Gemini 3 Pro via OpenRouter
  * Extracts business data from:
- * - Photos/PDFs (menus, flyers, documents) 
+ * - Photos/PDFs (menus, flyers, documents)
  * - Website URLs (scraping)
  * - Brand voice text
- * 
+ *
  * POST /api/onboarding/extract - Extract data from inputs
  */
-
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const GEMINI_3_PRO = 'google/gemini-2.5-pro-preview'; // Gemini 3 Pro on OpenRouter
 
 interface ExtractionRequest {
   businessId: string;
@@ -152,11 +150,6 @@ async function extractFromImages(
   industry?: string,
   location?: string
 ): Promise<{ services: any[]; businessInfo: any }> {
-  if (!OPENROUTER_API_KEY) {
-    console.error('[Image Extraction] OpenRouter API key not configured');
-    return { services: [], businessInfo: {} };
-  }
-
   try {
     // Build content array with images
     const content: any[] = [{
@@ -191,48 +184,14 @@ Return ONLY valid JSON in this EXACT format (no markdown, no code blocks):
       });
     });
 
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com',
-        'X-Title': 'GreenLine365 Onboarding Engine',
-      },
-      body: JSON.stringify({
-        model: GEMINI_3_PRO,
-        messages: [{
-          role: 'user',
-          content,
-        }],
-        temperature: 0.2,
-        max_tokens: 8000,
-      }),
+    const { parsed } = await callOpenRouterJSON<{ services: any[]; businessInfo: any }>({
+      model: 'google/gemini-2.5-pro-preview',
+      messages: [{ role: 'user', content }],
+      temperature: 0.2,
+      max_tokens: 8000,
+      caller: 'onboarding-extractFromImages',
     });
 
-    if (!response.ok) {
-      const error = await response.text();
-      console.error('[Image Extraction] OpenRouter error:', error);
-      return { services: [], businessInfo: {} };
-    }
-
-    const result = await response.json();
-    const text = result.choices?.[0]?.message?.content || '';
-    
-    // Extract JSON from response (handle code blocks)
-    let jsonText = text;
-    if (text.includes('```')) {
-      const match = text.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
-      jsonText = match ? match[1] : text;
-    }
-    
-    const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      console.error('[Image Extraction] No JSON in response');
-      return { services: [], businessInfo: {} };
-    }
-
-    const parsed = JSON.parse(jsonMatch[0]);
     return {
       services: parsed.services || [],
       businessInfo: parsed.businessInfo || {},
@@ -268,19 +227,16 @@ async function extractFromWebsite(url: string): Promise<{
     }
 
     // Analyze with Gemini 3 Pro (2M context window)
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com',
-        'X-Title': 'GreenLine365 Onboarding Engine',
-      },
-      body: JSON.stringify({
-        model: GEMINI_3_PRO,
-        messages: [{
-          role: 'user',
-          content: `Analyze this complete website content and extract ALL business intelligence:
+    const { parsed } = await callOpenRouterJSON<{
+      services: any[];
+      brandVoice: any;
+      businessInfo: any;
+      faq: any[];
+    }>({
+      model: 'google/gemini-2.5-pro-preview',
+      messages: [{
+        role: 'user',
+        content: `Analyze this complete website content and extract ALL business intelligence:
 
 ${rawContent}
 
@@ -297,33 +253,13 @@ Return ONLY valid JSON (no markdown, no code blocks):
   "businessInfo": {"name": "...", "tagline": "...", "description": "...", "hours": "...", "contact": {}},
   "faq": [{"question": "...", "answer": "..."}]
 }`
-        }],
-        temperature: 0.2,
-        max_tokens: 8000,
-      }),
+      }],
+      temperature: 0.2,
+      max_tokens: 8000,
+      caller: 'onboarding-extractFromWebsite',
     });
 
-    if (!response.ok) {
-      console.error('[Website Extraction] OpenRouter error');
-      return { services: [], brandVoice: {}, businessInfo: {}, faq: [] };
-    }
-
-    const result = await response.json();
-    const text = result.choices?.[0]?.message?.content || '';
-    
-    // Handle markdown code blocks
-    let jsonText = text;
-    if (text.includes('```')) {
-      const match = text.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
-      jsonText = match ? match[1] : text;
-    }
-    
-    const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      return { services: [], brandVoice: {}, businessInfo: {}, faq: [] };
-    }
-
-    return JSON.parse(jsonMatch[0]);
+    return parsed;
 
   } catch (error) {
     console.error('[Website Extraction] Error:', error);
@@ -334,22 +270,14 @@ Return ONLY valid JSON (no markdown, no code blocks):
 // Analyze brand voice using Gemini 3 Pro thinking mode
 async function analyzeBrandVoice(text: string): Promise<any> {
   try {
-    const voiceResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com',
-        'X-Title': 'GreenLine365 Brand Voice Analyzer',
-      },
-      body: JSON.stringify({
-        model: GEMINI_3_PRO,
-        messages: [{
-          role: 'system',
-          content: 'You are a brand strategy expert who distills brand identity and voice from text. You analyze tone, vocabulary, and values to create permanent identity profiles.'
-        }, {
-          role: 'user',
-          content: `Analyze this brand voice text and extract the core identity elements:
+    const { parsed } = await callOpenRouterJSON({
+      model: 'google/gemini-2.5-pro-preview',
+      messages: [{
+        role: 'system',
+        content: 'You are a brand strategy expert who distills brand identity and voice from text. You analyze tone, vocabulary, and values to create permanent identity profiles.'
+      }, {
+        role: 'user',
+        content: `Analyze this brand voice text and extract the core identity elements:
 
 ${text.substring(0, 20000)}
 
@@ -361,32 +289,13 @@ Return ONLY valid JSON (no markdown, no code blocks):
   "target_audience": "specific description of who they serve",
   "unique_selling_points": ["unique point 1", "unique point 2", "unique point 3"]
 }`
-        }],
-        temperature: 0.3,
-        max_tokens: 2048,
-      }),
+      }],
+      temperature: 0.3,
+      max_tokens: 2048,
+      caller: 'onboarding-analyzeBrandVoice',
     });
 
-    if (!voiceResponse.ok) {
-      return {};
-    }
-
-    const result = await voiceResponse.json();
-    const responseText = result.choices?.[0]?.message?.content || '';
-    
-    // Handle markdown code blocks
-    let jsonText = responseText;
-    if (responseText.includes('```')) {
-      const match = responseText.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
-      jsonText = match ? match[1] : responseText;
-    }
-    
-    const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      return {};
-    }
-
-    return JSON.parse(jsonMatch[0]);
+    return parsed;
 
   } catch (error) {
     console.error('[Brand Voice] Error:', error);
