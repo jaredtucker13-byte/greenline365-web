@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { HTML_FORMAT_DIRECTIVE } from '@/lib/format-standards';
-
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+import { callOpenRouterJSON } from '@/lib/openrouter';
 
 // Generate report sections from AI analysis
 export async function POST(request: NextRequest) {
@@ -93,41 +92,21 @@ Generate a professional incident report with these EXACT sections in JSON format
   "liability_statement": "Professional liability statement noting that this report documents conditions as observed and does not constitute admission of liability by any party. Customer acknowledgment indicates review of findings only."
 }`;
 
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://greenline365.com',
-        'X-Title': 'GreenLine365 Report Generation'
-      },
-      body: JSON.stringify({
-        model: 'anthropic/claude-opus-4.6',
+    let reportSections;
+    try {
+      const { parsed } = await callOpenRouterJSON({
+        model: 'anthropic/claude-sonnet-4.6',
         messages: [
           { role: 'system', content: 'You are a professional incident documentation specialist. Always respond with valid JSON only.' },
           { role: 'user', content: reportPrompt }
         ],
         max_tokens: 3000,
-        temperature: 0.3
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`OpenRouter API error: ${response.status}`);
-    }
-
-    const result = await response.json();
-    const reportText = result.choices?.[0]?.message?.content || '';
-
-    // Parse JSON
-    let reportSections;
-    try {
-      const jsonMatch = reportText.match(/```json\n?([\s\S]*?)\n?```/) || 
-                        reportText.match(/\{[\s\S]*\}/);
-      const jsonStr = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : reportText;
-      reportSections = JSON.parse(jsonStr);
+        temperature: 0.3,
+        caller: 'GL365 Report Generator',
+      });
+      reportSections = parsed;
     } catch (e) {
-      console.error('Failed to parse report JSON:', reportText);
+      console.error('Failed to parse report JSON:', e);
       reportSections = {
         executive_summary: 'Report generation completed. Please review findings.',
         findings: imageAnalyses.map((img: any) => img.analysis?.findings || []).flat(),

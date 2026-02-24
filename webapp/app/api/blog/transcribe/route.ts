@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { callOpenRouter } from '@/lib/openrouter';
 
 /**
  * Blog Voice Transcription API

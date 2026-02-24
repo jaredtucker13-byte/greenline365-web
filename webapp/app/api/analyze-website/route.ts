@@ -1,17 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSkillContext, getCoreMarketingContext } from '@/lib/marketing-skills-loader';
 import { HTML_FORMAT_DIRECTIVE } from '@/lib/format-standards';
+import { callOpenRouter } from '@/lib/openrouter';
 
 // Website Analyzer API - Premium Feature
-// Uses Gemini 3 Pro for vision analysis and Claude Opus 4.6 for suggestions
+// Uses Gemini for vision analysis and Claude Opus 4.6 for suggestions
 
 interface AnalysisRequest {
   url?: string;
   imageBase64?: string;
   analysisType?: 'full' | 'hero' | 'conversion' | 'visual';
 }
-
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,17 +24,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!OPENROUTER_API_KEY) {
-      return NextResponse.json(
-        { error: 'OpenRouter API key not configured' },
-        { status: 500 }
-      );
-    }
-
-    // Prepare the image for analysis
     let imageData = imageBase64;
-    
-    // If URL provided, we'd need to screenshot it (handled client-side for now)
     if (url && !imageBase64) {
       return NextResponse.json(
         { error: 'Please provide a screenshot. URL-based capture coming soon.' },
@@ -43,7 +32,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Analysis prompts for different types
     const analysisPrompts: Record<string, string> = {
       full: `Analyze this website landing page screenshot and provide a comprehensive redesign assessment.
 
@@ -99,64 +87,38 @@ Be brutally honest - this is for internal optimization only.`,
 5. Specific design improvements`,
     };
 
-    // Call Gemini 3 Pro via OpenRouter (best vision model)
-    const visionResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com',
-        'X-Title': 'GreenLine365 Website Analyzer',
-      },
-      body: JSON.stringify({
-        model: 'google/gemini-2.5-pro-preview', // Gemini 3 Pro - best vision
-        messages: [
-          {
-            role: 'system',
-            content: 'You are an expert UI/UX designer and CRO specialist. Analyze websites with brutal honesty for internal optimization. Be specific and actionable.'
-          },
-          {
-            role: 'user',
-            content: [
-              { type: 'text', text: analysisPrompts[analysisType] || analysisPrompts.full },
-              { 
-                type: 'image_url', 
-                image_url: { 
-                  url: `data:image/jpeg;base64,${imageData}`,
-                  detail: 'high'
-                } 
+    // Step 1: Vision analysis with Gemini
+    const { content: geminiAnalysis } = await callOpenRouter({
+      model: 'google/gemini-2.5-pro-preview',
+      messages: [
+        {
+          role: 'system',
+          content: 'You are an expert UI/UX designer and CRO specialist. Analyze websites with brutal honesty for internal optimization. Be specific and actionable.'
+        },
+        {
+          role: 'user',
+          content: [
+            { type: 'text', text: analysisPrompts[analysisType] || analysisPrompts.full },
+            {
+              type: 'image_url',
+              image_url: {
+                url: `data:image/jpeg;base64,${imageData}`,
+                detail: 'high'
               }
-            ]
-          }
-        ],
-        max_tokens: 4096,
-        temperature: 0.3,
-      }),
+            }
+          ]
+        }
+      ],
+      max_tokens: 4096,
+      temperature: 0.3,
+      caller: 'GL365 Website Analyzer (Vision)',
     });
 
-    if (!visionResponse.ok) {
-      const error = await visionResponse.text();
-      console.error('[Website Analyzer] Vision API error:', error);
-      return NextResponse.json(
-        { error: 'Vision analysis failed', details: error },
-        { status: visionResponse.status }
-      );
-    }
-
-    const visionData = await visionResponse.json();
-    const geminiAnalysis = visionData.choices?.[0]?.message?.content || '';
-
-    // Get additional creative suggestions from Claude 4.5 Sonnet
-    const claudeResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com',
-        'X-Title': 'GreenLine365 Website Analyzer',
-      },
-      body: JSON.stringify({
-        model: 'anthropic/claude-opus-4.6', // Claude Opus 4.6 - best for complex website analysis
+    // Step 2: Creative suggestions with Claude Opus 4.6
+    let claudeSuggestions = '';
+    try {
+      const { content } = await callOpenRouter({
+        model: 'anthropic/claude-opus-4.6',
         messages: [
           {
             role: 'system',
@@ -180,13 +142,11 @@ Be creative and specific!`
         ],
         max_tokens: 2048,
         temperature: 0.7,
-      }),
-    });
-
-    let claudeSuggestions = '';
-    if (claudeResponse.ok) {
-      const claudeData = await claudeResponse.json();
-      claudeSuggestions = claudeData.choices?.[0]?.message?.content || '';
+        caller: 'GL365 Website Analyzer (Creative)',
+      });
+      claudeSuggestions = content;
+    } catch (e) {
+      console.warn('[Website Analyzer] Creative suggestions failed:', e);
     }
 
     return NextResponse.json({

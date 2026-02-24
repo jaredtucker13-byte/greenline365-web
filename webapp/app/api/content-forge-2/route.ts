@@ -2,12 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { getSkillContextForIntent, getSkillContext, getCoreMarketingContext } from '@/lib/marketing-skills-loader';
 import { CHAT_FORMAT_DIRECTIVE } from '@/lib/format-standards';
+import { callOpenRouter, callOpenRouterJSON } from '@/lib/openrouter';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabase = createClient(supabaseUrl, supabaseKey);
-
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 
 // =====================================================
 // TEMPORAL CONTENT GENERATION ENGINE
@@ -41,36 +40,22 @@ interface ContentBlueprint {
   outputs_to: string[];
 }
 
-// AI Generation using OpenRouter
+// AI Generation using shared OpenRouter utility
 async function generateWithAI(prompt: string, maxTokens: number = 1000): Promise<string> {
-  if (!OPENROUTER_API_KEY) {
-    throw new Error('OpenRouter API key not configured');
-  }
-
-  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-      'Content-Type': 'application/json',
-      'HTTP-Referer': 'https://greenline365.com',
-      'X-Title': 'GreenLine365 Content Forge'
-    },
-    body: JSON.stringify({
-      model: 'anthropic/claude-opus-4.6',
-      messages: [
-        {
-          role: 'system',
-          content: `You are a world-class content strategist from 15 years in the future. You write content that converts readers into customers. Your writing is clear, punchy, and valuable. You avoid fluff, jargon, and generic advice. Every sentence earns its place.${CHAT_FORMAT_DIRECTIVE}${getSkillContextForIntent(prompt)}${getCoreMarketingContext()}`
-        },
-        { role: 'user', content: prompt }
-      ],
-      max_tokens: maxTokens,
-      temperature: 0.7
-    })
+  const { content } = await callOpenRouter({
+    model: 'anthropic/claude-opus-4.6',
+    messages: [
+      {
+        role: 'system',
+        content: `You are a world-class content strategist from 15 years in the future. You write content that converts readers into customers. Your writing is clear, punchy, and valuable. You avoid fluff, jargon, and generic advice. Every sentence earns its place.${CHAT_FORMAT_DIRECTIVE}${getSkillContextForIntent(prompt)}${getCoreMarketingContext()}`
+      },
+      { role: 'user', content: prompt }
+    ],
+    max_tokens: maxTokens,
+    temperature: 0.7,
+    caller: 'GL365 Content Forge 2',
   });
-
-  const data = await response.json();
-  return data.choices?.[0]?.message?.content || '';
+  return content;
 }
 
 // Score content quality
@@ -207,11 +192,21 @@ Make each headline use a different approach:
 
 Return as JSON array: [{"headline": "...", "ctr_score": 8, "approach": "...", "why": "..."}]`;
 
-  const result = await generateWithAI(prompt, 800);
   try {
-    // Extract JSON from response
-    const jsonMatch = result.match(/\[[\s\S]*\]/);
-    return jsonMatch ? JSON.parse(jsonMatch[0]) : [];
+    const { parsed } = await callOpenRouterJSON({
+      model: 'anthropic/claude-opus-4.6',
+      messages: [
+        {
+          role: 'system',
+          content: `You are a world-class content strategist. Return valid JSON only.${getCoreMarketingContext()}`
+        },
+        { role: 'user', content: prompt }
+      ],
+      max_tokens: 800,
+      temperature: 0.7,
+      caller: 'GL365 Content Forge 2 (Headlines)',
+    });
+    return Array.isArray(parsed) ? parsed : [];
   } catch {
     return [];
   }

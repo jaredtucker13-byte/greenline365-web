@@ -14,13 +14,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { sendEmail } from '@/lib/email/gmail-sender';
 import { getCoreMarketingContext } from '@/lib/marketing-skills-loader';
+import { callOpenRouter } from '@/lib/openrouter';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const OWNER_EMAIL = process.env.OWNER_EMAIL || 'jared.tucker13@gmail.com';
 const BIZ_ID = process.env.BUSINESS_ID || '4c8278a9-46a5-4621-bf3a-88fd03d71478';
 
@@ -80,20 +80,14 @@ export async function POST(request: NextRequest) {
       },
     };
 
-    // === GENERATE AI RECAP WITH OPUS 4.6 ===
+    // === GENERATE AI RECAP WITH SONNET 4.6 ===
     const marketingContext = getCoreMarketingContext();
-    
-    const aiResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'anthropic/claude-opus-4.6',
-        messages: [{
-          role: 'system',
-          content: `You are a strategic business advisor writing a weekly recap email for a business owner. Be concise, specific, and actionable. Use the marketing frameworks provided to inform your recommendations.
+
+    const aiResult = await callOpenRouter({
+      model: 'anthropic/claude-sonnet-4.6',
+      messages: [{
+        role: 'system',
+        content: `You are a strategic business advisor writing a weekly recap email for a business owner. Be concise, specific, and actionable. Use the marketing frameworks provided to inform your recommendations.
 
 CRITICAL FORMATTING RULES:
 - Output clean HTML only. No markdown. No asterisks. No hashtags.
@@ -106,17 +100,16 @@ CRITICAL FORMATTING RULES:
 - Use plenty of spacing between sections
 - Write like you're texting a friend who runs a business — casual, direct, no corporate speak
 ${marketingContext}`,
-        }, {
-          role: 'user',
-          content: `Generate a weekly recap for GreenLine365 (Florida business directory). Here's this week's data:\n\n${JSON.stringify(weekData, null, 2)}\n\nSections (use <h3> tags):\n1. Wins This Week\n2. The Numbers\n3. Needs Attention\n4. This Week's Game Plan (5 specific tasks, numbered)\n5. Big Picture Thought\n\nKeep it under 400 words. Output clean HTML only.`,
-        }],
-        max_tokens: 1000,
-        temperature: 0.6,
-      }),
+      }, {
+        role: 'user',
+        content: `Generate a weekly recap for GreenLine365 (Florida business directory). Here's this week's data:\n\n${JSON.stringify(weekData, null, 2)}\n\nSections (use <h3> tags):\n1. Wins This Week\n2. The Numbers\n3. Needs Attention\n4. This Week's Game Plan (5 specific tasks, numbered)\n5. Big Picture Thought\n\nKeep it under 400 words. Output clean HTML only.`,
+      }],
+      max_tokens: 1000,
+      temperature: 0.6,
+      caller: 'GL365 Weekly Recap',
     });
 
-    const aiData = await aiResponse.json();
-    const recapText = aiData.choices?.[0]?.message?.content || 'Recap generation failed.';
+    const recapText = aiResult.content || 'Recap generation failed.';
 
     // === BUILD EMAIL ===
     const today = new Date();

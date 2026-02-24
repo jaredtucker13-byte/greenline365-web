@@ -1,21 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { callOpenRouterJSON } from '@/lib/openrouter';
 
 /**
  * Brain Capture API
- * 
+ *
  * Captures thoughts from Slack (or other sources) and routes to appropriate buckets
- * Uses Gemini 3 Pro for intelligent classification
- * 
+ * Uses Claude Opus 4.6 for intelligent classification
+ *
  * POST /api/brain/capture - Capture and route a thought
  * GET /api/brain/inbox - Get unprocessed thoughts
- * POST /api/brain/process - Process a specific thought
  */
-
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-
-// Use Opus 4.6 for better classification
-const CLASSIFIER_MODEL = 'anthropic/claude-opus-4.6';
 
 interface CaptureThoughtRequest {
   businessId: string;
@@ -28,22 +23,18 @@ interface CaptureThoughtRequest {
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
-    
-    // Parse body ONCE at the start
+
     const body: CaptureThoughtRequest = await request.json();
     const { text, businessId, source = 'web', slackMessageId, slackThreadTs } = body;
-    
-    // Check if this is from Slack webhook (might not have auth)
+
     const slackToken = request.headers.get('x-slack-token');
-    
+
     if (!slackToken) {
-      // Normal authenticated request
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
-      
-      // Verify access
+
       const { data: access } = await supabase
         .from('user_businesses')
         .select('role')
@@ -114,30 +105,24 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Classify thought using Gemini 3 Pro
 async function classifyThought(text: string): Promise<{
   bucket: string;
   confidence: number;
   reasoning: string;
+  title?: string;
 }> {
   try {
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: CLASSIFIER_MODEL,
-        messages: [{
-          role: 'system',
-          content: `You are an intelligent thought router for a business owner's "Second Brain." Classify incoming thoughts into the correct bucket.
+    const { parsed } = await callOpenRouterJSON({
+      model: 'anthropic/claude-opus-4.6',
+      messages: [{
+        role: 'system',
+        content: `You are an intelligent thought router for a business owner's "Second Brain." Classify incoming thoughts into the correct bucket.
 
 BUCKETS:
-- people: Mentions a specific person by name, relationship context, follow-up reminders, networking notes. Examples: "Follow up with Mike about the proposal", "Sarah's birthday is next week"
-- projects: Active work items, business goals, tasks with deliverables, things being built. Examples: "Finish the campaign manager", "Launch the email sequence by Friday"
-- ideas: Insights, concepts, future possibilities, brainstorms, strategies. Examples: "What if we offered a referral program?", "The pricing should include analytics"
-- admin: Errands, todos, deadlines, bills, scheduling, operational tasks. Examples: "Pay the hosting bill", "Renew domain before March", "Schedule dentist appointment"
+- people: Mentions a specific person by name, relationship context, follow-up reminders, networking notes.
+- projects: Active work items, business goals, tasks with deliverables, things being built.
+- ideas: Insights, concepts, future possibilities, brainstorms, strategies.
+- admin: Errands, todos, deadlines, bills, scheduling, operational tasks.
 
 RULES:
 - If it mentions a person's name → people
@@ -146,33 +131,23 @@ RULES:
 - If it's a routine task or errand → admin
 - When unsure, choose the most actionable bucket
 
-Return ONLY valid JSON: {"bucket": "people|projects|ideas|admin", "confidence": 0.0-1.0, "title": "short 5-8 word title", "reasoning": "brief explanation"}`
-        }, {
-          role: 'user',
-          content: `Classify this thought:\n\n"${text}"`
-        }],
-        temperature: 0.2,
-        max_tokens: 200,
-      }),
+Return JSON: {"bucket": "people|projects|ideas|admin", "confidence": 0.0-1.0, "title": "short 5-8 word title", "reasoning": "brief explanation"}`
+      }, {
+        role: 'user',
+        content: `Classify this thought:\n\n"${text}"`
+      }],
+      temperature: 0.2,
+      max_tokens: 200,
+      caller: 'GL365 Brain Capture',
     });
 
-    const result = await response.json();
-    const responseText = result.choices?.[0]?.message?.content || '';
-    
-    const jsonMatch = responseText.match(/\{[\s\S]*?\}/);
-    if (!jsonMatch) {
-      return { bucket: 'ideas', confidence: 0.5, reasoning: 'Default classification' };
-    }
-
-    return JSON.parse(jsonMatch[0]);
-
+    return parsed;
   } catch (error) {
     console.error('[Classify Thought] Error:', error);
     return { bucket: 'ideas', confidence: 0.5, reasoning: 'Classification failed' };
   }
 }
 
-// Route thought to appropriate bucket
 async function routeThought(
   supabase: any,
   thoughtId: string,
@@ -182,7 +157,7 @@ async function routeThought(
 ): Promise<boolean> {
   try {
     const title = classification.title || text.substring(0, 100);
-    
+
     switch (classification.bucket) {
       case 'people':
         await supabase.from('brain_people').insert({
@@ -192,7 +167,7 @@ async function routeThought(
           context: 'Captured from Second Brain',
         });
         break;
-        
+
       case 'projects':
         await supabase.from('brain_projects').insert({
           business_id: businessId,
@@ -201,7 +176,7 @@ async function routeThought(
           status: 'active',
         });
         break;
-        
+
       case 'ideas':
         await supabase.from('brain_ideas').insert({
           business_id: businessId,
@@ -209,7 +184,7 @@ async function routeThought(
           description: text,
         });
         break;
-        
+
       case 'admin':
         await supabase.from('brain_admin').insert({
           business_id: businessId,
@@ -225,12 +200,11 @@ async function routeThought(
   }
 }
 
-// Get unprocessed thoughts
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
-    
+
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

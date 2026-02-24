@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { callOpenRouter, callOpenRouterJSON } from '@/lib/openrouter';
 
 /**
  * Blog Image Suggestion & Generation API

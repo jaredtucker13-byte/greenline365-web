@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { HTML_FORMAT_DIRECTIVE } from '@/lib/format-standards';
-
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+import { callOpenRouterJSON } from '@/lib/openrouter';
 
 // HVAC-specific analysis prompt
 const HVAC_ANALYSIS_PROMPT = `You are an expert HVAC inspector and liability documentation specialist. Analyze this image for an incident report.
@@ -83,21 +82,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing image_url or image_base64' }, { status: 400 });
     }
 
-    // Prepare image content for GPT-4o
-    const imageContent = image_base64 
+    // Prepare image content
+    const imageContent = image_base64
       ? { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${image_base64}` } }
       : { type: 'image_url', image_url: { url: image_url } };
 
-    // Call GPT-4o via OpenRouter
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://greenline365.com',
-        'X-Title': 'GreenLine365 Incident Analysis'
-      },
-      body: JSON.stringify({
+    let analysis;
+    let rawResponse = '';
+    try {
+      const { parsed, content } = await callOpenRouterJSON({
         model: 'anthropic/claude-opus-4.6',
         messages: [
           {
@@ -113,33 +106,17 @@ export async function POST(request: NextRequest) {
           }
         ],
         max_tokens: 2000,
-        temperature: 0.3
-      })
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('OpenRouter error:', errorText);
-      throw new Error(`OpenRouter API error: ${response.status}`);
-    }
-
-    const result = await response.json();
-    const analysisText = result.choices?.[0]?.message?.content || '';
-
-    // Parse JSON from response
-    let analysis;
-    try {
-      // Extract JSON from potential markdown code blocks
-      const jsonMatch = analysisText.match(/```json\n?([\s\S]*?)\n?```/) || 
-                        analysisText.match(/\{[\s\S]*\}/);
-      const jsonStr = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : analysisText;
-      analysis = JSON.parse(jsonStr);
+        temperature: 0.3,
+        caller: 'GL365 Incident Analyzer',
+      });
+      analysis = parsed;
+      rawResponse = content;
     } catch (e) {
-      console.error('Failed to parse analysis JSON:', analysisText);
+      console.error('Failed to parse analysis JSON:', e);
       analysis = {
         detected_issues: [],
         severity: 'medium',
-        description: analysisText,
+        description: 'Analysis parsing failed',
         findings: [],
         suggested_caption: 'Image analysis completed',
         confidence: 0.5
@@ -149,7 +126,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       analysis,
-      raw_response: analysisText
+      raw_response: rawResponse
     });
 
   } catch (error: any) {

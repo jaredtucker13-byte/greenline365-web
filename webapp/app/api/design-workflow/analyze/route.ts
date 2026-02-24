@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSkillContext, getCoreMarketingContext } from '@/lib/marketing-skills-loader';
 import { HTML_FORMAT_DIRECTIVE } from '@/lib/format-standards';
+import { callOpenRouter } from '@/lib/openrouter';
 
 interface AnalyzeRequest {
   mode: 'analyze' | 'scratch';
@@ -12,8 +13,6 @@ interface AnalyzeRequest {
   stylePreference?: string;
   targetAudience?: string;
 }
-
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 
 // Analysis prompts for different types
 const ANALYSIS_PROMPTS: Record<string, string> = {
@@ -34,94 +33,56 @@ const MODEL_MAP: Record<string, string> = {
   'gpt-4o': 'openai/gpt-4o', // GPT-4o with vision
 };
 
-async function analyzeWithOpenRouter(
-  imageBase64: string, 
-  prompt: string, 
+async function analyzeWithVision(
+  imageBase64: string,
+  prompt: string,
   modelId: string
 ): Promise<string> {
-  if (!OPENROUTER_API_KEY) {
-    throw new Error('OpenRouter API key not configured');
-  }
-
-  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-      'Content-Type': 'application/json',
-      'HTTP-Referer': 'https://greenline365.com',
-      'X-Title': 'GreenLine365 Website Builder',
-    },
-    body: JSON.stringify({
-      model: modelId,
-      messages: [
-        {
-          role: 'system',
-          content: 'You are an expert UI/UX designer and web development consultant. Analyze websites thoroughly and provide actionable insights.',
-        },
-        {
-          role: 'user',
-          content: [
-            { type: 'text', text: prompt },
-            {
-              type: 'image_url',
-              image_url: {
-                url: `data:image/png;base64,${imageBase64}`,
-              },
+  const result = await callOpenRouter({
+    model: modelId,
+    messages: [
+      {
+        role: 'system',
+        content: 'You are an expert UI/UX designer and web development consultant. Analyze websites thoroughly and provide actionable insights.',
+      },
+      {
+        role: 'user',
+        content: [
+          { type: 'text', text: prompt },
+          {
+            type: 'image_url',
+            image_url: {
+              url: `data:image/png;base64,${imageBase64}`,
             },
-          ],
-        },
-      ],
-      max_tokens: 4096,
-    }),
+          },
+        ],
+      },
+    ],
+    max_tokens: 4096,
+    caller: 'GL365 Design Analyzer',
   });
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    console.error('OpenRouter error:', errorData);
-    throw new Error(errorData.error?.message || `OpenRouter API error: ${response.status}`);
-  }
-
-  const data = await response.json();
-  return data.choices?.[0]?.message?.content || 'No analysis generated';
+  return result.content || 'No analysis generated';
 }
 
-async function generateDesignWithOpenRouter(prompt: string): Promise<string> {
-  if (!OPENROUTER_API_KEY) {
-    throw new Error('OpenRouter API key not configured');
-  }
-
-  // Using Claude 4.5 Sonnet for text-only design generation
-  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-      'Content-Type': 'application/json',
-      'HTTP-Referer': 'https://greenline365.com',
-      'X-Title': 'GreenLine365 Website Builder',
-    },
-    body: JSON.stringify({
-      model: 'anthropic/claude-opus-4.6', // Claude Opus 4.6 - best for complex analysis
-      messages: [
-        {
-          role: 'system',
-          content: `You are a world-class web designer who creates stunning, conversion-optimized websites.${HTML_FORMAT_DIRECTIVE}${getSkillContext('page-cro')}${getCoreMarketingContext()}`,
-        },
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ],
-      max_tokens: 4096,
-    }),
+async function generateDesign(prompt: string): Promise<string> {
+  const result = await callOpenRouter({
+    model: 'anthropic/claude-sonnet-4.6',
+    messages: [
+      {
+        role: 'system',
+        content: `You are a world-class web designer who creates stunning, conversion-optimized websites.${HTML_FORMAT_DIRECTIVE}${getSkillContext('page-cro')}${getCoreMarketingContext()}`,
+      },
+      {
+        role: 'user',
+        content: prompt,
+      },
+    ],
+    max_tokens: 4096,
+    caller: 'GL365 Design Generator',
   });
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error?.message || `OpenRouter API error: ${response.status}`);
-  }
-
-  const data = await response.json();
-  return data.choices?.[0]?.message?.content || 'No design generated';
+  return result.content || 'No design generated';
 }
 
 export async function POST(request: NextRequest) {
@@ -143,7 +104,7 @@ export async function POST(request: NextRequest) {
       const modelId = MODEL_MAP[visionModel] || MODEL_MAP['gemini-3-pro'];
       const prompt = ANALYSIS_PROMPTS[analysisType] || ANALYSIS_PROMPTS.full;
 
-      const analysisText = await analyzeWithOpenRouter(imageBase64, prompt, modelId);
+      const analysisText = await analyzeWithVision(imageBase64, prompt, modelId);
 
       return NextResponse.json({
         success: true,
@@ -152,7 +113,7 @@ export async function POST(request: NextRequest) {
       });
 
     } else {
-      // Scratch mode - text only design generation with Claude 4.5 Sonnet
+      // Scratch mode - text only design generation
       const { description, brandColors, stylePreference, targetAudience } = body;
 
       if (!description) {
@@ -174,7 +135,7 @@ Please provide:
 5. KEY SECTIONS - what to include and why
 6. CONVERSION ELEMENTS - CTAs, forms, trust indicators`;
 
-      const analysisText = await generateDesignWithOpenRouter(designPrompt);
+      const analysisText = await generateDesign(designPrompt);
 
       return NextResponse.json({
         success: true,

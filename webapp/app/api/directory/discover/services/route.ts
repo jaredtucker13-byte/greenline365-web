@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { callOpenRouter } from '@/lib/openrouter';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const openrouterKey = process.env.OPENROUTER_API_KEY;
 const googlePlacesKey = process.env.GOOGLE_PLACES_API_KEY!;
 function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKey); }
 
@@ -28,10 +28,6 @@ const SERVICE_TYPES: Record<string, string> = {
 export async function POST(request: NextRequest) {
   const body = await request.json();
   const { service_type, city = 'Tampa', limit = 25 } = body;
-
-  if (!openrouterKey) {
-    return NextResponse.json({ error: 'OpenRouter API key not configured' }, { status: 500 });
-  }
 
   if (!service_type || !SERVICE_TYPES[service_type]) {
     return NextResponse.json({ error: 'Invalid service_type', valid: Object.keys(SERVICE_TYPES) }, { status: 400 });
@@ -59,24 +55,15 @@ Return ONLY a valid JSON array. No markdown. Example:
 
 Focus on local, independently owned businesses (NOT national chains). Include a mix of established and newer companies.`;
 
-  const discoverRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${openrouterKey}`,
-      'HTTP-Referer': 'https://greenline365.com',
-      'X-Title': 'GL365 Service Discovery',
-    },
-    body: JSON.stringify({
-      model: 'perplexity/sonar-pro',
-      messages: [{ role: 'user', content: discoverPrompt }],
-      temperature: 0.1,
-      max_tokens: 8000,
-    }),
+  const discoverResult = await callOpenRouter({
+    model: 'perplexity/sonar-pro',
+    messages: [{ role: 'user', content: discoverPrompt }],
+    temperature: 0.1,
+    max_tokens: 8000,
+    caller: 'GL365 Service Discovery',
   });
 
-  const discoverData = await discoverRes.json();
-  const content = discoverData.choices?.[0]?.message?.content || '[]';
+  const content = discoverResult.content || '[]';
 
   let businesses: any[] = [];
   try {
@@ -159,24 +146,15 @@ ${biz.specialties ? `- Specialties: ${biz.specialties.join(', ')}` : ''}
 
 Write it as a concise internal brief, not a customer-facing description. Be specific and actionable.`;
 
-      const briefRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${openrouterKey}`,
-          'HTTP-Referer': 'https://greenline365.com',
-          'X-Title': 'GL365 Brief Generator',
-        },
-        body: JSON.stringify({
-          model: 'anthropic/claude-opus-4.6',
-          messages: [{ role: 'user', content: briefPrompt }],
-          temperature: 0.5,
-          max_tokens: 300,
-        }),
+      const briefResult = await callOpenRouter({
+        model: 'anthropic/claude-sonnet-4.6',
+        messages: [{ role: 'user', content: briefPrompt }],
+        temperature: 0.5,
+        max_tokens: 300,
+        caller: 'GL365 Brief Generator',
       });
 
-      const briefData = await briefRes.json();
-      const brief = briefData.choices?.[0]?.message?.content || '';
+      const brief = briefResult.content || '';
 
       // Create slug
       const slug = biz.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);

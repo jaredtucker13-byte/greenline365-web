@@ -1,16 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSkillContext, getCoreMarketingContext } from '@/lib/marketing-skills-loader';
 import { CHAT_FORMAT_DIRECTIVE } from '@/lib/format-standards';
+import { callOpenRouter, callOpenRouterJSON } from '@/lib/openrouter';
 
 /**
  * Blog AI Enhancement API
- * Uses OpenRouter with model selection for different tasks:
- * - Claude for creative content enhancement
- * - GPT-4o for outlines and structure
- * - Fast models for quick suggestions
+ * Uses Claude Sonnet 4.6 via OpenRouter for all blog tasks
  */
 
-type AIAction = 
+type AIAction =
   | 'generate_outline'
   | 'enhance_content'
   | 'enhance_content_with_title'
@@ -29,34 +27,13 @@ interface AIRequest {
   customPrompt?: string;
 }
 
-// Model selection based on task
-const getModel = (action: AIAction): string => {
-  switch (action) {
-    case 'enhance_content':
-    case 'enhance_content_with_title':
-    case 'custom_generate':
-      // Claude excels at creative writing enhancement
-      return 'anthropic/claude-sonnet-4.6';
-    case 'generate_outline':
-    case 'suggest_headlines':
-      // Sonnet 4.6 for structured outputs
-      return 'anthropic/claude-sonnet-4.6';
-    case 'generate_meta':
-    case 'suggest_tags':
-    case 'improve_seo':
-      // Sonnet 4.6 for quick tasks
-      return 'anthropic/claude-sonnet-4.6';
-    default:
-      return 'anthropic/claude-sonnet-4.6';
-  }
-};
+const MODEL = 'anthropic/claude-sonnet-4.6';
 
 // System prompts for each action
 const getSystemPrompt = (action: AIAction): string => {
   const contentSkill = getSkillContext('content-strategy');
   const copySkill = getSkillContext('copywriting');
-  const seoSkill = getSkillContext('seo-audit');
-  
+
   switch (action) {
     case 'generate_outline':
       return `You are a professional content strategist. Generate a detailed blog post outline with:
@@ -78,13 +55,6 @@ Return the enhanced content in markdown format.${copySkill}`;
       return `You are an expert editor and content enhancer. Your task is to:
 1. Improve the blog content to be more engaging, readable, and polished
 2. Generate a compelling NEW title that matches the enhanced content
-
-Enhancement guidelines:
-- Make content more engaging and readable
-- Add vivid examples and analogies where appropriate
-- Improve flow and transitions
-- Keep the original voice and message
-- Optimize for web readability (short paragraphs, subheadings)
 
 You MUST return a JSON object with this exact structure:
 {
@@ -134,23 +104,18 @@ export async function POST(request: NextRequest) {
     const { action, title, content, category, keywords, customPrompt } = body;
 
     if (!action) {
-      return NextResponse.json(
-        { error: 'Action is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Action is required' }, { status: 400 });
     }
 
-    const model = getModel(action);
     let systemPrompt = getSystemPrompt(action);
-
-    // Build user message based on action
     let userMessage = '';
+
     switch (action) {
       case 'custom_generate':
         if (!customPrompt) {
           return NextResponse.json({ error: 'Custom prompt is required' }, { status: 400 });
         }
-        systemPrompt = `You are a professional blog content writer. Create engaging, well-structured content based on the user's prompt. 
+        systemPrompt = `You are a professional blog content writer. Create engaging, well-structured content based on the user's prompt.
 Write in a professional yet approachable tone. Use markdown formatting with proper headings, bullet points, and paragraphs.
 Focus on providing valuable, actionable information that readers can use.
 ${category ? `The content is for the ${category} category.` : ''}
@@ -162,51 +127,37 @@ ${title ? `The blog title context is: "${title}"` : ''}`;
         break;
 
       case 'generate_outline':
-        if (!title) {
-          return NextResponse.json({ error: 'Title is required for outline generation' }, { status: 400 });
-        }
+        if (!title) return NextResponse.json({ error: 'Title is required for outline generation' }, { status: 400 });
         userMessage = `Create a detailed blog outline for: "${title}"${category ? `\nCategory: ${category}` : ''}${keywords?.length ? `\nTarget keywords: ${keywords.join(', ')}` : ''}`;
         break;
 
       case 'enhance_content':
-        if (!content) {
-          return NextResponse.json({ error: 'Content is required for enhancement' }, { status: 400 });
-        }
+        if (!content) return NextResponse.json({ error: 'Content is required for enhancement' }, { status: 400 });
         userMessage = `Enhance this blog post:\n\nTitle: ${title || 'Untitled'}\n\nContent:\n${content}`;
         break;
 
       case 'enhance_content_with_title':
-        if (!content) {
-          return NextResponse.json({ error: 'Content is required for enhancement' }, { status: 400 });
-        }
+        if (!content) return NextResponse.json({ error: 'Content is required for enhancement' }, { status: 400 });
         userMessage = `Enhance this blog post and suggest a matching title:\n\nCurrent Title: ${title || 'Untitled'}\n${category ? `Category: ${category}\n` : ''}\nContent:\n${content}\n\nRemember to return a JSON object with "title" and "content" keys.`;
         break;
 
       case 'generate_meta':
-        if (!title || !content) {
-          return NextResponse.json({ error: 'Title and content are required for meta generation' }, { status: 400 });
-        }
+        if (!title || !content) return NextResponse.json({ error: 'Title and content are required for meta generation' }, { status: 400 });
         userMessage = `Generate SEO meta for:\n\nTitle: ${title}\n\nContent excerpt: ${content.substring(0, 500)}...`;
         break;
 
       case 'suggest_headlines':
-        if (!title) {
-          return NextResponse.json({ error: 'Title is required for headline suggestions' }, { status: 400 });
-        }
+        if (!title) return NextResponse.json({ error: 'Title is required for headline suggestions' }, { status: 400 });
         userMessage = `Suggest alternative headlines for: "${title}"${content ? `\n\nContent preview: ${content.substring(0, 300)}...` : ''}`;
         break;
 
       case 'suggest_tags':
-        if (!title && !content) {
-          return NextResponse.json({ error: 'Title or content is required for tag suggestions' }, { status: 400 });
-        }
+        if (!title && !content) return NextResponse.json({ error: 'Title or content is required for tag suggestions' }, { status: 400 });
         userMessage = `Suggest tags for:\n\nTitle: ${title || 'Untitled'}\n\nContent: ${content?.substring(0, 500) || 'No content yet'}`;
         break;
 
       case 'improve_seo':
-        if (!title || !content) {
-          return NextResponse.json({ error: 'Title and content are required for SEO analysis' }, { status: 400 });
-        }
+        if (!title || !content) return NextResponse.json({ error: 'Title and content are required for SEO analysis' }, { status: 400 });
         userMessage = `Analyze and suggest SEO improvements for:\n\nTitle: ${title}\n\nContent:\n${content}`;
         break;
 
@@ -214,61 +165,60 @@ ${title ? `The blog title context is: "${title}"` : ''}`;
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
     }
 
-    console.log(`[Blog AI] Action: ${action}, Model: ${model}`);
+    const isJsonAction = ['generate_meta', 'suggest_headlines', 'suggest_tags', 'improve_seo', 'enhance_content_with_title'].includes(action);
 
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com',
-        'X-Title': 'GreenLine365 Blog AI',
-      },
-      body: JSON.stringify({
-        model,
+    let result: any;
+    let raw: string;
+
+    if (isJsonAction) {
+      try {
+        const { parsed, content: rawContent } = await callOpenRouterJSON({
+          model: MODEL,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userMessage },
+          ],
+          temperature: 0.5,
+          max_tokens: action === 'enhance_content_with_title' ? 2500 : 1000,
+          caller: `GL365 Blog AI (${action})`,
+        });
+        result = parsed;
+        raw = rawContent;
+      } catch {
+        // Fallback to non-JSON mode if JSON parsing fails
+        const { content: rawContent } = await callOpenRouter({
+          model: MODEL,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userMessage },
+          ],
+          temperature: 0.5,
+          max_tokens: action === 'enhance_content_with_title' ? 2500 : 1000,
+          caller: `GL365 Blog AI (${action})`,
+        });
+        result = rawContent;
+        raw = rawContent;
+      }
+    } else {
+      const { content: rawContent } = await callOpenRouter({
+        model: MODEL,
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userMessage },
         ],
-        stream: false,
-        temperature: action === 'enhance_content' || action === 'enhance_content_with_title' ? 0.7 : 0.5,
-        max_tokens: action === 'enhance_content' || action === 'enhance_content_with_title' ? 2500 : 1000,
-      }),
-    });
-
-    if (!response.ok) {
-      const error = await response.text();
-      console.error('[Blog AI] OpenRouter error:', error);
-      return NextResponse.json(
-        { error: 'AI service error' },
-        { status: 500 }
-      );
-    }
-
-    const data = await response.json();
-    const aiResponse = data.choices?.[0]?.message?.content || '';
-
-    // Parse JSON responses for certain actions
-    let result: any = { raw: aiResponse };
-
-    if (['generate_meta', 'suggest_headlines', 'suggest_tags', 'improve_seo', 'enhance_content_with_title'].includes(action)) {
-      try {
-        // Extract JSON from response (may be wrapped in markdown code blocks)
-        const jsonMatch = aiResponse.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
-        if (jsonMatch) {
-          result.parsed = JSON.parse(jsonMatch[0]);
-        }
-      } catch (e) {
-        // Keep raw response if JSON parsing fails
-        console.log('[Blog AI] Could not parse JSON response');
-      }
+        temperature: action === 'enhance_content' ? 0.7 : 0.5,
+        max_tokens: action === 'enhance_content' ? 2500 : 1000,
+        caller: `GL365 Blog AI (${action})`,
+      });
+      result = rawContent;
+      raw = rawContent;
     }
 
     return NextResponse.json({
       action,
-      model,
-      result: result.parsed || aiResponse,
-      raw: aiResponse,
+      model: MODEL,
+      result,
+      raw,
     });
 
   } catch (error: any) {

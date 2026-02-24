@@ -4,6 +4,7 @@ import { MemoryBucketService, AIContext } from '@/lib/memory-bucket-service';
 import { getSkillContextForIntent, getCoreMarketingContext } from '@/lib/marketing-skills-loader';
 import { CHAT_FORMAT_DIRECTIVE } from '@/lib/format-standards';
 import { rateLimit, rateLimitResponse } from '@/lib/rate-limit';
+import { callOpenRouter } from '@/lib/openrouter';
 
 type Msg = { role: 'user' | 'assistant' | 'system'; content: string };
 
@@ -437,10 +438,6 @@ export async function POST(req: NextRequest) {
     const sessionId = body?.sessionId as string | undefined;
     const model = getModel(mode);
 
-    if (!process.env.OPENROUTER_API_KEY) {
-      return Response.json({ error: 'OpenRouter API key not configured' }, { status: 500 });
-    }
-
     // ========================================
     // BOOKING INTENT DETECTION & HANDLING
     // ========================================
@@ -523,50 +520,42 @@ export async function POST(req: NextRequest) {
 
     console.log(`[Chat] Session: ${sessionId || 'anonymous'}, Mode: ${mode || 'default'}, Model: ${model}, HasMemory: ${!!aiContext}`);
 
-    const upstream = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com',
-        'X-Title': 'GreenLine365 Assistant',
-      },
-      body: JSON.stringify({
+    let assistantContent: string;
+    try {
+      const result = await callOpenRouter({
         model,
         messages: messagesWithSystem,
-        stream: false,
         temperature: mode === 'creative' ? 0.8 : 0.7,
         max_tokens: mode === 'creative' ? 1000 : (directoryContext ? 800 : 500),
-      }),
-    });
-
-    const json = await upstream.json().catch(async () => ({
-      error: await upstream.text(),
-    }));
-
-    // Handle rate limits or errors gracefully
-    if (!upstream.ok) {
-      console.error('[Chat] API Error:', json);
+        caller: 'GL365 Chat',
+      });
+      assistantContent = result.content;
+    } catch (error: any) {
+      console.error('[Chat] API Error:', error.message);
       return Response.json(
-        { 
+        {
           error: 'Service temporarily unavailable',
           reply: "I'm experiencing a brief delay. Please try again in a moment."
-        }, 
-        { status: upstream.status }
+        },
+        { status: 503 }
       );
     }
 
+    const json = {
+      choices: [{ message: { role: 'assistant', content: assistantContent } }]
+    };
+
     // Store assistant response in Buffer (Layer 4)
-    if (userId && sessionId && json?.choices?.[0]?.message?.content) {
+    if (userId && sessionId && assistantContent) {
       try {
         const supabase = await createClient();
         const memoryService = new MemoryBucketService(supabase, userId);
         await memoryService.addToBuffer(sessionId, {
           contextType: 'message',
-          content: { 
-            role: 'assistant', 
-            content: json.choices[0].message.content, 
-            timestamp: new Date().toISOString() 
+          content: {
+            role: 'assistant',
+            content: assistantContent,
+            timestamp: new Date().toISOString()
           },
           importance: 5,
         });

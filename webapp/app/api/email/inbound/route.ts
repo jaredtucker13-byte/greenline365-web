@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { callOpenRouterJSON } from '@/lib/openrouter';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const openrouterKey = process.env.OPENROUTER_API_KEY!;
 const sendgridKey = process.env.SENDGRID_API_KEY!;
 
 function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKey); }
@@ -45,20 +45,13 @@ Return JSON only:
 }`;
 
   try {
-    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${openrouterKey}` },
-      body: JSON.stringify({
-        model: 'google/gemini-2.0-flash-001',
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0.1,
-        response_format: { type: 'json_object' },
-      }),
+    const { parsed } = await callOpenRouterJSON<{ confirmed: boolean; corrections: Record<string, string> }>({
+      model: 'google/gemini-2.0-flash-001',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.1,
+      caller: 'email-inbound-parseCorrections',
     });
-    const data = await res.json();
-    const content = data.choices?.[0]?.message?.content || '{}';
-    const cleaned = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-    return JSON.parse(cleaned);
+    return parsed;
   } catch {
     return { confirmed: replyText.toLowerCase().includes('good') || replyText.toLowerCase().includes('correct'), corrections: {} };
   }

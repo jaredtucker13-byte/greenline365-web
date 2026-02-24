@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { callOpenRouterJSON } from '@/lib/openrouter';
 
 /**
  * Image Analysis API - "Autopilot Mode"
- * 
+ *
  * Analyzes an uploaded image and generates:
  * - Title/Name
  * - Caption (social media ready)
  * - Product Description
  * - Keywords/Tags
  * - Hashtags
- * 
- * Uses GPT-4o vision capabilities via OpenRouter
  */
 
 export async function POST(request: NextRequest) {
@@ -18,7 +17,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { imageData, imageUrl, contentType = 'photo', businessType = 'local business', location = 'Tampa, FL' } = body;
 
-    // Require either base64 image data or URL
     if (!imageData && !imageUrl) {
       return NextResponse.json(
         { error: 'Image data or URL is required' },
@@ -26,32 +24,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const openRouterKey = process.env.OPENROUTER_API_KEY;
-    if (!openRouterKey) {
-      return NextResponse.json(
-        { error: 'OpenRouter API key not configured' },
-        { status: 500 }
-      );
-    }
+    const imageContent = imageData
+      ? { type: 'image_url', image_url: { url: imageData } }
+      : { type: 'image_url', image_url: { url: imageUrl } };
 
-    // Build the image content for the API
-    const imageContent = imageData 
-      ? { type: 'image_url', image_url: { url: imageData } } // Base64 data URL
-      : { type: 'image_url', image_url: { url: imageUrl } }; // External URL
-
-    // Create the analysis prompt based on content type
     const analysisPrompt = getAnalysisPrompt(contentType, businessType, location);
 
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${openRouterKey}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com',
-        'X-Title': 'GreenLine365 Image Analyzer',
-      },
-      body: JSON.stringify({
-        model: 'anthropic/claude-opus-4.6', // Claude Opus 4.6 - best vision analysis
+    let analysis;
+    try {
+      const { parsed } = await callOpenRouterJSON({
+        model: 'anthropic/claude-opus-4.6',
         messages: [
           {
             role: 'system',
@@ -76,38 +58,14 @@ IMPORTANT: Return ONLY valid JSON. No markdown, no extra text, just the JSON obj
         ],
         temperature: 0.8,
         max_tokens: 1500,
-      }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error('OpenRouter API error:', response.status, errorData);
-      return NextResponse.json(
-        { error: 'Failed to analyze image', details: errorData },
-        { status: response.status }
-      );
-    }
-
-    const data = await response.json();
-    const content = data.choices?.[0]?.message?.content || '';
-
-    // Parse the JSON response
-    let analysis;
-    try {
-      // Try to extract JSON from the response
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        analysis = JSON.parse(jsonMatch[0]);
-      } else {
-        throw new Error('No JSON found in response');
-      }
+        caller: 'GL365 Image Analyzer',
+      });
+      analysis = parsed;
     } catch (parseError) {
-      console.error('JSON parse error:', parseError, 'Content:', content);
-      // Return a fallback response
+      console.error('Image analysis parse error:', parseError);
       analysis = generateFallbackAnalysis(contentType);
     }
 
-    // Ensure all required fields exist
     const result = {
       success: true,
       analysis: {
@@ -143,13 +101,12 @@ IMPORTANT: Return ONLY valid JSON. No markdown, no extra text, just the JSON obj
   }
 }
 
-// Generate analysis prompt based on content type
 function getAnalysisPrompt(contentType: string, businessType: string, location: string): string {
   const basePrompt = `Analyze this image for a ${businessType} in ${location}. `;
-  
+
   const typeSpecificPrompt = {
     photo: `This is a general photo post for social media.
-    
+
 Generate content that:
 - Captures the essence and story of this image
 - Creates engagement and connection
@@ -191,7 +148,6 @@ Return a JSON object with this EXACT structure:
 }`;
 }
 
-// Fallback analysis if AI fails
 function generateFallbackAnalysis(contentType: string) {
   return {
     title: contentType === 'product' ? 'New Product Spotlight' : 'Check This Out',

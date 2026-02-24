@@ -1,18 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { callOpenRouter } from '@/lib/openrouter';
 
-// OpenRouter API configuration
-const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-
-// Model mapping based on user's requirements
+// Model mapping — all through OpenRouter
 const MODELS = {
-  // Claude Sonnet 4.6 for smart thinking and content generation
   'smart-thinking': 'anthropic/claude-sonnet-4.6',
-  // Claude Sonnet 4.6 for blog content and hashtags
   'blog-content': 'anthropic/claude-sonnet-4.6',
-  // Perplexity for live web search
   'web-search': 'perplexity/llama-3.1-sonar-large-128k-online',
-  // Default fallback
   'default': 'anthropic/claude-sonnet-4.6'
 };
 
@@ -27,138 +20,100 @@ interface ContentForgeRequest {
   additionalContext?: string;
 }
 
-async function callOpenRouter(
-  model: string,
-  systemPrompt: string,
-  userPrompt: string
-): Promise<string> {
-  if (!OPENROUTER_API_KEY) {
-    throw new Error('OpenRouter API key not configured');
-  }
-
-  const response = await fetch(OPENROUTER_API_URL, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-      'Content-Type': 'application/json',
-      'HTTP-Referer': 'https://greenline365.com',
-      'X-Title': 'GreenLine365 ContentForge'
-    },
-    body: JSON.stringify({
-      model: model,
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt }
-      ],
-      max_tokens: 1000,
-      temperature: 0.7
-    })
+async function aiCall(model: string, systemPrompt: string, userPrompt: string): Promise<string> {
+  const { content } = await callOpenRouter({
+    model,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt }
+    ],
+    max_tokens: 1000,
+    temperature: 0.7,
+    caller: 'GL365 ContentForge',
   });
-
-  if (!response.ok) {
-    const error = await response.text();
-    console.error('OpenRouter API error:', error);
-    throw new Error(`OpenRouter API error: ${response.status}`);
-  }
-
-  const data = await response.json();
-  return data.choices[0]?.message?.content || '';
+  return content;
 }
 
-// Generate AI caption for content
 async function generateCaption(params: ContentForgeRequest): Promise<string> {
-  const systemPrompt = `You are a social media expert specializing in engaging captions for local businesses. 
+  return aiCall(MODELS['smart-thinking'],
+    `You are a social media expert specializing in engaging captions for local businesses.
 Write captions that are:
 - Authentic and conversational
 - Include a call-to-action
 - Optimized for engagement
-- 2-3 sentences max`;
-
-  const userPrompt = `Generate an engaging social media caption for a ${params.businessType || 'local business'} ${params.location ? `in ${params.location}` : ''}.
+- 2-3 sentences max`,
+    `Generate an engaging social media caption for a ${params.businessType || 'local business'} ${params.location ? `in ${params.location}` : ''}.
 ${params.contentType ? `Content type: ${params.contentType}` : ''}
 ${params.imageDescription ? `Image shows: ${params.imageDescription}` : ''}
 ${params.additionalContext ? `Additional context: ${params.additionalContext}` : ''}
 
-Write only the caption, nothing else.`;
-
-  return callOpenRouter(MODELS['smart-thinking'], systemPrompt, userPrompt);
+Write only the caption, nothing else.`);
 }
 
-// Generate relevant keywords
 async function generateKeywords(params: ContentForgeRequest): Promise<string[]> {
-  const systemPrompt = `You are an SEO and social media keyword expert. Generate relevant, high-traffic keywords for local business content.`;
-
-  const userPrompt = `Generate 8-10 relevant keywords for:
+  const response = await aiCall(MODELS['smart-thinking'],
+    'You are an SEO and social media keyword expert. Generate relevant, high-traffic keywords for local business content.',
+    `Generate 8-10 relevant keywords for:
 Business type: ${params.businessType || 'local business'}
 ${params.location ? `Location: ${params.location}` : ''}
 ${params.contentType ? `Content type: ${params.contentType}` : ''}
 ${params.productName ? `Product/Service: ${params.productName}` : ''}
 
-Return only the keywords as a comma-separated list, nothing else.`;
-
-  const response = await callOpenRouter(MODELS['smart-thinking'], systemPrompt, userPrompt);
+Return only the keywords as a comma-separated list, nothing else.`);
   return response.split(',').map(k => k.trim()).filter(k => k.length > 0);
 }
 
-// Generate product description
 async function generateDescription(params: ContentForgeRequest): Promise<string> {
-  const systemPrompt = `You are a professional copywriter specializing in product descriptions for small businesses.
+  return aiCall(MODELS['smart-thinking'],
+    `You are a professional copywriter specializing in product descriptions for small businesses.
 Write descriptions that are:
 - Compelling and benefit-focused
 - Include key features
 - Have a clear value proposition
-- 3-4 sentences max`;
-
-  const userPrompt = `Write a product/service description for:
+- 3-4 sentences max`,
+    `Write a product/service description for:
 ${params.productName ? `Product/Service: ${params.productName}` : 'a local business offering'}
 Business type: ${params.businessType || 'local business'}
 ${params.imageDescription ? `Details: ${params.imageDescription}` : ''}
 ${params.additionalContext ? `Additional info: ${params.additionalContext}` : ''}
 
-Write only the description, nothing else.`;
-
-  return callOpenRouter(MODELS['smart-thinking'], systemPrompt, userPrompt);
+Write only the description, nothing else.`);
 }
 
-// Generate blog content using Claude
 async function generateBlog(params: ContentForgeRequest): Promise<{ title: string; content: string }> {
-  const systemPrompt = `You are a content marketing expert writing blog posts for small businesses. 
+  const response = await aiCall(MODELS['blog-content'],
+    `You are a content marketing expert writing blog posts for small businesses.
 Create engaging, SEO-friendly blog content that:
 - Provides real value to readers
 - Is authentic and relatable
 - Includes practical tips
-- Is optimized for local search`;
-
-  const userPrompt = `Write a short blog post (300-400 words) for:
+- Is optimized for local search`,
+    `Write a short blog post (300-400 words) for:
 Business type: ${params.businessType || 'local business'}
 ${params.location ? `Location: ${params.location}` : ''}
 ${params.additionalContext ? `Topic/Context: ${params.additionalContext}` : 'general business tips'}
 
 Format your response as:
 TITLE: [Your title here]
-CONTENT: [Your blog content here]`;
+CONTENT: [Your blog content here]`);
 
-  const response = await callOpenRouter(MODELS['blog-content'], systemPrompt, userPrompt);
-  
-  // Parse the response (using [\s\S] instead of /s flag for ES compatibility)
   const titleMatch = response.match(/TITLE:\s*([\s\S]+?)(?:\n|CONTENT:)/);
   const contentMatch = response.match(/CONTENT:\s*([\s\S]+)/);
-  
+
   return {
     title: titleMatch?.[1]?.trim() || 'Untitled Blog Post',
     content: contentMatch?.[1]?.trim() || response
   };
 }
 
-// Generate smart hashtags using Claude
 async function generateHashtags(params: ContentForgeRequest): Promise<{ standard: string[]; optional: string[] }> {
-  const systemPrompt = `You are a social media hashtag strategist. Generate hashtags that:
+  const response = await aiCall(MODELS['blog-content'],
+    `You are a social media hashtag strategist. Generate hashtags that:
 - Balance reach and discoverability
 - Include local hashtags when relevant
 - Mix popular and niche tags
-- Are currently trending when applicable`;
-
-  const userPrompt = `Generate hashtags for:
+- Are currently trending when applicable`,
+    `Generate hashtags for:
 Business type: ${params.businessType || 'local business'}
 ${params.location ? `Location: ${params.location}` : ''}
 ${params.brandHashtag ? `Brand hashtag: ${params.brandHashtag}` : ''}
@@ -168,14 +123,11 @@ Format your response as:
 STANDARD: [2-3 essential hashtags that should always be used]
 OPTIONAL: [3-5 additional hashtags to rotate]
 
-Include # symbol with each hashtag.`;
+Include # symbol with each hashtag.`);
 
-  const response = await callOpenRouter(MODELS['blog-content'], systemPrompt, userPrompt);
-  
-  // Parse the response (using [\s\S] instead of /s flag for ES compatibility)
   const standardMatch = response.match(/STANDARD:\s*([\s\S]+?)(?:\n|OPTIONAL:)/);
   const optionalMatch = response.match(/OPTIONAL:\s*([\s\S]+)/);
-  
+
   const parseHashtags = (text: string | undefined): string[] => {
     if (!text) return [];
     return text.match(/#\w+/g) || [];
@@ -187,24 +139,20 @@ Include # symbol with each hashtag.`;
   };
 }
 
-// Get live trends using Perplexity
 async function getTrends(params: ContentForgeRequest): Promise<{ trends: string[]; suggestions: string[] }> {
-  const systemPrompt = `You are a local marketing trend analyst. Find current, actionable trends and events that small businesses can use for content.`;
-
-  const userPrompt = `Find current trends and events for:
+  const response = await aiCall(MODELS['web-search'],
+    'You are a local marketing trend analyst. Find current, actionable trends and events that small businesses can use for content.',
+    `Find current trends and events for:
 Business type: ${params.businessType || 'local business'}
 ${params.location ? `Location: ${params.location}` : 'general local trends'}
 
 Format your response as:
 TRENDS: [List 3-5 current trends or events, one per line]
-SUGGESTIONS: [List 2-3 content ideas based on these trends, one per line]`;
+SUGGESTIONS: [List 2-3 content ideas based on these trends, one per line]`);
 
-  const response = await callOpenRouter(MODELS['web-search'], systemPrompt, userPrompt);
-  
-  // Parse the response (using [\s\S] instead of /s flag for ES compatibility)
   const trendsMatch = response.match(/TRENDS:\s*([\s\S]+?)(?:\n\n|SUGGESTIONS:)/);
   const suggestionsMatch = response.match(/SUGGESTIONS:\s*([\s\S]+)/);
-  
+
   const parseList = (text: string | undefined): string[] => {
     if (!text) return [];
     return text.split('\n').map(line => line.replace(/^[-•*\d.]\s*/, '').trim()).filter(line => line.length > 0);
@@ -219,7 +167,7 @@ SUGGESTIONS: [List 2-3 content ideas based on these trends, one per line]`;
 export async function POST(request: NextRequest) {
   try {
     const body: ContentForgeRequest = await request.json();
-    
+
     if (!body.action) {
       return NextResponse.json({ error: 'Action is required' }, { status: 400 });
     }
@@ -264,9 +212,9 @@ export async function GET() {
     message: 'ContentForge API',
     actions: ['caption', 'keywords', 'description', 'blog', 'hashtags', 'trends'],
     models: {
-      'smart-thinking': 'GPT-4o (for captions, keywords, descriptions)',
-      'blog-content': 'Claude Sonnet (for blogs, hashtags)',
-      'web-search': 'Perplexity (for live trends)'
+      'smart-thinking': 'Claude Sonnet 4.6 (captions, keywords, descriptions)',
+      'blog-content': 'Claude Sonnet 4.6 (blogs, hashtags)',
+      'web-search': 'Perplexity (live trends)'
     }
   });
 }

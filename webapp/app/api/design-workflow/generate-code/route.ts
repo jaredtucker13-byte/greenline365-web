@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { callOpenRouter } from '@/lib/openrouter';
 
 interface CodeGenRequest {
   designSpec: any;
   analysisText: string;
 }
-
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,10 +13,6 @@ export async function POST(request: NextRequest) {
 
     if (!analysisText) {
       return NextResponse.json({ error: 'Design specification required' }, { status: 400 });
-    }
-
-    if (!OPENROUTER_API_KEY) {
-      return NextResponse.json({ error: 'OpenRouter API key not configured' }, { status: 500 });
     }
 
     const codePrompt = `Based on the following design analysis, generate a complete, production-ready React component using Tailwind CSS.
@@ -37,43 +32,24 @@ Requirements:
 
 Output ONLY the code, no explanations. Start with the import statements.`;
 
-    // Using Claude 4.5 Sonnet for code generation via OpenRouter
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://greenline365.com',
-        'X-Title': 'GreenLine365 Code Generator',
-      },
-      body: JSON.stringify({
-        model: 'anthropic/claude-opus-4.6', // Claude Opus 4.6 - best for code generation
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a senior React developer specializing in modern web development. Output ONLY clean, production-ready code without any explanations or markdown code blocks.',
-          },
-          {
-            role: 'user',
-            content: codePrompt,
-          },
-        ],
-        max_tokens: 8192,
-        temperature: 0.2, // Lower temperature for more consistent code
-      }),
+    const result = await callOpenRouter({
+      model: 'anthropic/claude-opus-4.6',
+      messages: [
+        {
+          role: 'system',
+          content: 'You are a senior React developer specializing in modern web development. Output ONLY clean, production-ready code without any explanations or markdown code blocks.',
+        },
+        {
+          role: 'user',
+          content: codePrompt,
+        },
+      ],
+      max_tokens: 8192,
+      temperature: 0.2,
+      caller: 'GL365 Code Generator',
     });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error('[Generate Code] OpenRouter error:', errorData);
-      return NextResponse.json(
-        { success: false, error: errorData.error?.message || 'Code generation failed' },
-        { status: 500 }
-      );
-    }
-
-    const data = await response.json();
-    let code = data.choices?.[0]?.message?.content || '';
+    let code = result.content || '';
 
     // Clean up code if wrapped in markdown code blocks
     code = code.trim();

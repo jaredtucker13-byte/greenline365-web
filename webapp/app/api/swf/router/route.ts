@@ -1,13 +1,12 @@
 // SWF Smart Router
 import { createClient } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
+import { callOpenRouter } from "@/lib/openrouter";
 
 export const runtime = "edge";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const OPENROUTER_BASE = "https://openrouter.ai/api/v1";
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
 const MODEL_MAP: Record<string, string> = { "opus_4.6": "anthropic/claude-opus-4.6", gpt_4o: "anthropic/claude-sonnet-4.6", haiku: "anthropic/claude-sonnet-4.6", perplexity: "perplexity/sonar-pro" };
@@ -15,7 +14,6 @@ const DEPT_KW: Record<string, string[]> = { executive:["strategy","plan","vision
 
 export async function POST(req: NextRequest) {
   try {
-    if (!OPENROUTER_API_KEY) return NextResponse.json({error:"OpenRouter API key not configured"},{status:500});
     const p = await req.json();
     if (p.table === "task_queue" && p.type === "INSERT") return handleNewTask(p.record);
     if (p.table === "task_queue" && p.type === "UPDATE" && p.record.status === "completed") return handleDone(p.record);
@@ -97,10 +95,14 @@ async function handleDone(rec: any) {
 
 async function callModel(tier: string, prompt: string, caller: string) {
   const model = MODEL_MAP[tier]||MODEL_MAP["gpt_4o"];
-  const res = await fetch(OPENROUTER_BASE+"/chat/completions",{method:"POST",headers:{Authorization:"Bearer "+OPENROUTER_API_KEY,"Content-Type":"application/json","HTTP-Referer":"https://www.greenline365.com","X-Title":"SWF"},body:JSON.stringify({model,messages:[{role:"user",content:prompt}],temperature:tier==="opus_4.6"?0.3:0.7,max_tokens:tier==="opus_4.6"?8192:4096})});
-  if (!res.ok) throw new Error("OpenRouter "+res.status+": "+(await res.text()));
-  const d = await res.json();
-  return {output:d.choices?.[0]?.message?.content||"",tokens:{input:d.usage?.prompt_tokens||0,output:d.usage?.completion_tokens||0}};
+  const result = await callOpenRouter({
+    model,
+    messages:[{role:"user",content:prompt}],
+    temperature:tier==="opus_4.6"?0.3:0.7,
+    max_tokens:tier==="opus_4.6"?8192:4096,
+    caller:`SWF ${caller}`,
+  });
+  return {output:result.content,tokens:result.tokens};
 }
 
 async function log(type: string, taskId: string, payload: any) { await supabase.from("event_log").insert({event_type:type,task_id:taskId,payload}); }
