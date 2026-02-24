@@ -22,7 +22,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient, createServerClient } from '@/lib/supabase/server';
-import { callOpenRouter, callOpenRouterJSON, type ChatMessage } from '@/lib/openrouter';
+import { callOpenRouter, callOpenRouterJSON, type ChatMessage, type ToolCallMessage, type ToolDefinition } from '@/lib/openrouter';
 import { getAgentPrompt, getAgentTools, resolveTransferAgent, type AgentId, type AgentMode } from '@/lib/agent-personalities';
 import { getBrainSkillReference } from '@/lib/brain/skill-definitions';
 import { runBrainWorkers, type WorkerContext } from '@/lib/brain/workers';
@@ -164,8 +164,13 @@ export async function POST(request: NextRequest) {
     ];
 
     // ── Step 5: Agentic tool execution loop ────────────────────
+    //
+    // Uses OpenRouter's structured tool calling (OpenAI-compatible).
+    // The model returns tool_calls[] when it wants to invoke tools.
+    // We execute each tool, feed results back as role:"tool" messages,
+    // and loop until the model produces a final text response.
 
-    const tools = getAgentTools(agentId);
+    const tools = getAgentTools(agentId) as ToolDefinition[];
     const allToolCalls: ToolCallResult[] = [];
     let finalContent = '';
     let iterations = 0;
@@ -179,98 +184,85 @@ export async function POST(request: NextRequest) {
         temperature: 0.7,
         max_tokens: 1000,
         caller: `GL365 Agent:${agentId}/${mode}`,
-        // Pass tools for function calling
-        ...(tools.length > 0 ? { tools } : {}),
-      } as any);
+        tools: tools.length > 0 ? tools : undefined,
+      });
 
-      // Check if the response includes tool calls
-      // OpenRouter returns tool_calls in the raw response
-      const rawContent = result.content;
-
-      // Parse for tool call patterns in the response
-      const toolCallMatch = rawContent.match(/\{"tool_calls":\s*\[/);
-
-      // For OpenRouter with function calling, we check the raw response
-      // If no tool calls, this is the final response
-      if (!toolCallMatch && !rawContent.includes('"function_call"')) {
-        finalContent = rawContent;
+      // If no tool calls, this is the final text response
+      if (!result.tool_calls || result.tool_calls.length === 0) {
+        finalContent = result.content;
         break;
       }
 
-      // If we detect the model wants to call a tool, extract and execute it
-      // Note: In production with proper OpenRouter function calling support,
-      // tool_calls come as structured data. Here we handle both patterns.
-      try {
-        const toolCalls = extractToolCalls(rawContent);
-        if (toolCalls.length === 0) {
-          finalContent = rawContent;
-          break;
+      // Model wants to call tools — build the assistant message with tool_calls
+      const assistantMessage: ChatMessage = {
+        role: 'assistant',
+        content: result.content || null,
+        tool_calls: result.tool_calls,
+      };
+      messages.push(assistantMessage);
+
+      // Execute each tool call and add results as role:"tool" messages
+      for (const tc of result.tool_calls) {
+        let parsedArgs: Record<string, any> = {};
+        try {
+          parsedArgs = JSON.parse(tc.function.arguments);
+        } catch {
+          parsedArgs = {};
         }
 
-        for (const call of toolCalls) {
-          const toolResult = await executeToolCall(call.name, call.arguments, supabase, session);
-          allToolCalls.push({ name: call.name, arguments: call.arguments, result: toolResult });
+        const toolResult = await executeToolCall(tc.function.name, parsedArgs, supabase, session);
+        allToolCalls.push({ name: tc.function.name, arguments: parsedArgs, result: toolResult });
 
-          // Add tool result to message history for next iteration
-          messages.push({
-            role: 'assistant',
-            content: `I called ${call.name}(${JSON.stringify(call.arguments)})`,
-          });
-          messages.push({
-            role: 'user',
-            content: `[Tool Result for ${call.name}]: ${JSON.stringify(toolResult)}`,
-          });
+        // Add tool result in the proper OpenAI-compatible format
+        messages.push({
+          role: 'tool',
+          tool_call_id: tc.id,
+          content: JSON.stringify(toolResult),
+        });
 
-          // Handle special tool results
-          if (call.name === 'transfer_department') {
-            // Update session with transfer
-            const targetAgent = resolveTransferAgent(call.arguments.department);
-            const transferEntry = {
-              from: agentId,
-              to: call.arguments.department,
-              reason: call.arguments.context_summary,
-              at: new Date().toISOString(),
-            };
+        // Handle special tool results (side effects)
+        if (tc.function.name === 'transfer_department') {
+          const targetAgent = resolveTransferAgent(parsedArgs.department);
+          const transferEntry = {
+            from: agentId,
+            to: parsedArgs.department,
+            reason: parsedArgs.context_summary,
+            at: new Date().toISOString(),
+          };
 
-            const currentChain = session.transfer_chain || [];
-            currentChain.push(transferEntry);
+          const currentChain = session.transfer_chain || [];
+          currentChain.push(transferEntry);
 
-            await supabase
-              .from('agent_chat_sessions')
-              .update({
-                transfer_chain: currentChain,
-                agent_id: targetAgent || agentId,
-                status: call.arguments.department === 'human' ? 'escalated' : 'transferred',
-                updated_at: new Date().toISOString(),
-              })
-              .eq('id', sessionId);
-          }
-
-          if (call.name === 'create_lead') {
-            // Update session with lead info
-            await supabase
-              .from('agent_chat_sessions')
-              .update({
-                lead_created: true,
-                contact_name: call.arguments.name || session.contact_name,
-                contact_email: call.arguments.email || session.contact_email,
-                contact_phone: call.arguments.phone || session.contact_phone,
-                contact_business_type: call.arguments.business_type,
-                intent_score: call.arguments.intent_score || 80,
-                pain_points: call.arguments.pain_point ? [call.arguments.pain_point] : [],
-                updated_at: new Date().toISOString(),
-              })
-              .eq('id', sessionId);
-          }
+          await supabase
+            .from('agent_chat_sessions')
+            .update({
+              transfer_chain: currentChain,
+              agent_id: targetAgent || agentId,
+              status: parsedArgs.department === 'human' ? 'escalated' : 'transferred',
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', sessionId);
         }
-      } catch {
-        // If tool parsing fails, treat the response as the final answer
-        finalContent = rawContent;
-        break;
+
+        if (tc.function.name === 'create_lead') {
+          await supabase
+            .from('agent_chat_sessions')
+            .update({
+              lead_created: true,
+              contact_name: parsedArgs.name || session.contact_name,
+              contact_email: parsedArgs.email || session.contact_email,
+              contact_phone: parsedArgs.phone || session.contact_phone,
+              contact_business_type: parsedArgs.business_type,
+              intent_score: parsedArgs.intent_score || 80,
+              pain_points: parsedArgs.pain_point ? [parsedArgs.pain_point] : [],
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', sessionId);
+        }
       }
     }
 
-    // If we exhausted iterations, use the last response
+    // If we exhausted iterations without a final text response, do one last call without tools
     if (!finalContent) {
       const lastResult = await callOpenRouter({
         model: AGENT_MODEL,
@@ -636,44 +628,6 @@ function buildEnhancedSystemPrompt(agentId: AgentId, mode: AgentMode, brain: Bra
 }
 
 // ── Tool Execution ─────────────────────────────────────────────────
-
-function extractToolCalls(content: string): Array<{ name: string; arguments: Record<string, any> }> {
-  // Try to find function call patterns in the response
-  const calls: Array<{ name: string; arguments: Record<string, any> }> = [];
-
-  // Pattern 1: JSON tool_calls array
-  const jsonMatch = content.match(/\{"tool_calls":\s*(\[[\s\S]*?\])\}/);
-  if (jsonMatch) {
-    try {
-      const parsed = JSON.parse(jsonMatch[1]);
-      for (const call of parsed) {
-        calls.push({
-          name: call.function?.name || call.name,
-          arguments: call.function?.arguments
-            ? (typeof call.function.arguments === 'string'
-                ? JSON.parse(call.function.arguments)
-                : call.function.arguments)
-            : call.arguments || {},
-        });
-      }
-      return calls;
-    } catch { /* fall through */ }
-  }
-
-  // Pattern 2: Single function_call
-  const funcMatch = content.match(/\{"function_call":\s*\{[\s\S]*?"name":\s*"([^"]+)"[\s\S]*?"arguments":\s*(\{[\s\S]*?\})\s*\}\}/);
-  if (funcMatch) {
-    try {
-      calls.push({
-        name: funcMatch[1],
-        arguments: JSON.parse(funcMatch[2]),
-      });
-      return calls;
-    } catch { /* fall through */ }
-  }
-
-  return calls;
-}
 
 async function executeToolCall(
   name: string,

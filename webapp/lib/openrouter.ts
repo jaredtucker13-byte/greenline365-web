@@ -8,10 +8,27 @@ const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
 // ── Types ──────────────────────────────────────────────────────────
 
+export interface ToolCallMessage {
+  id: string;
+  type: 'function';
+  function: { name: string; arguments: string };
+}
+
 export type ChatMessage = {
-  role: 'system' | 'user' | 'assistant';
-  content: string | Array<{ type: string; [key: string]: any }>;
+  role: 'system' | 'user' | 'assistant' | 'tool';
+  content: string | null | Array<{ type: string; [key: string]: any }>;
+  tool_calls?: ToolCallMessage[];
+  tool_call_id?: string;
 };
+
+export interface ToolDefinition {
+  type: 'function';
+  function: {
+    name: string;
+    description: string;
+    parameters: Record<string, any>;
+  };
+}
 
 export interface OpenRouterConfig {
   model: string;
@@ -20,10 +37,13 @@ export interface OpenRouterConfig {
   max_tokens?: number;
   json_mode?: boolean;
   caller?: string;
+  tools?: ToolDefinition[];
 }
 
 export interface OpenRouterResult {
   content: string;
+  tool_calls?: ToolCallMessage[];
+  finish_reason?: string;
   tokens: { input: number; output: number };
 }
 
@@ -63,6 +83,10 @@ export async function callOpenRouter(config: OpenRouterConfig): Promise<OpenRout
     max_tokens: config.max_tokens ?? 1000,
   };
 
+  if (config.tools && config.tools.length > 0) {
+    body.tools = config.tools;
+  }
+
   if (config.json_mode) {
     body.response_format = { type: 'json_object' };
   }
@@ -99,18 +123,22 @@ export async function callOpenRouter(config: OpenRouterConfig): Promise<OpenRout
       }
 
       const data = await response.json();
-      const content = data.choices?.[0]?.message?.content || '';
+      const message = data.choices?.[0]?.message;
+      const content = message?.content || '';
+      const toolCalls: ToolCallMessage[] | undefined = message?.tool_calls;
+      const finishReason = data.choices?.[0]?.finish_reason;
       const tokens = {
         input: data.usage?.prompt_tokens || 0,
         output: data.usage?.completion_tokens || 0,
       };
 
       const cost = estimateCost(config.model, tokens.input, tokens.output);
+      const toolInfo = toolCalls?.length ? ` | tools:${toolCalls.map(t => t.function.name).join(',')}` : '';
       console.log(
-        `[OpenRouter] ${config.caller || '?'} | ${config.model.split('/')[1]} | ${tokens.input}in+${tokens.output}out | ~$${cost.toFixed(4)}`
+        `[OpenRouter] ${config.caller || '?'} | ${config.model.split('/')[1]} | ${tokens.input}in+${tokens.output}out | ~$${cost.toFixed(4)}${toolInfo}`
       );
 
-      return { content, tokens };
+      return { content, tool_calls: toolCalls, finish_reason: finishReason, tokens };
     } catch (error: any) {
       lastError = error;
       if (attempt < maxRetries) {
