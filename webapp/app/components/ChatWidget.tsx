@@ -318,7 +318,7 @@ export default function ChatWidget({
   const [showTryMe, setShowTryMe] = useState(true);
   const [hasInteracted, setHasInteracted] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
-  const [sessionId] = useState(() => generateId());
+  const [sessionId, setSessionId] = useState(() => generateId());
   const [currentMode, setCurrentMode] = useState<AssistantMode>('concierge');
   
   // Voice input state
@@ -584,6 +584,18 @@ export default function ChatWidget({
     localStorage.removeItem('gl365_chat_messages');
   };
 
+  const startNewConversation = () => {
+    setMessages([]);
+    setInputValue('');
+    setSessionId(generateId());
+    setIsLoading(false);
+    localStorage.removeItem('gl365_chat_messages');
+    // Reset textarea height
+    if (inputRef.current) {
+      inputRef.current.style.height = 'auto';
+    }
+  };
+
   const styles = getModeStyles(currentMode);
   const quickActions = QUICK_ACTIONS[currentMode];
 
@@ -600,6 +612,7 @@ export default function ChatWidget({
           handleQuickAction={handleQuickAction}
           handleApplySuggestion={handleApplySuggestion}
           clearConversation={clearConversation}
+          startNewConversation={startNewConversation}
           userName={userName}
           currentMode={currentMode}
           setCurrentMode={setCurrentMode}
@@ -737,6 +750,7 @@ export default function ChatWidget({
               handleQuickAction={handleQuickAction}
               handleApplySuggestion={handleApplySuggestion}
               clearConversation={clearConversation}
+              startNewConversation={startNewConversation}
               userName={userName}
               currentMode={currentMode}
               setCurrentMode={setCurrentMode}
@@ -771,6 +785,7 @@ interface ChatContentProps {
   handleQuickAction: (text: string) => void;
   handleApplySuggestion: (suggestion: ContentSuggestion) => void;
   clearConversation: () => void;
+  startNewConversation: () => void;
   userName: string | null;
   currentMode: AssistantMode;
   setCurrentMode: (mode: AssistantMode) => void;
@@ -795,6 +810,7 @@ function ChatContent({
   handleQuickAction,
   handleApplySuggestion,
   clearConversation,
+  startNewConversation,
   userName,
   currentMode,
   setCurrentMode,
@@ -836,14 +852,34 @@ function ChatContent({
           
           <div className="flex items-center gap-2">
             {/* Mode indicator */}
-            <span 
+            <span
               className="w-2 h-2 rounded-full animate-pulse"
               style={{ backgroundColor: styles.accent }}
             />
             <span className="text-xs" style={{ color: `${styles.accent}99` }}>
               {currentMode === 'creative' ? 'Creative Mode' : 'Online'}
             </span>
-            
+
+            {/* New Conversation button */}
+            {messages.length > 0 && (
+              <button
+                onClick={startNewConversation}
+                className="w-8 h-8 rounded-full border bg-black/40 hover:bg-black/60 transition-colors flex items-center justify-center"
+                style={{ borderColor: `${styles.accent}30` }}
+                title="New conversation"
+              >
+                <svg
+                  className="w-4 h-4"
+                  style={{ color: styles.accent }}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+              </button>
+            )}
+
             {/* Expand button (desktop only) */}
             {setIsExpanded && (
               <button
@@ -1059,13 +1095,16 @@ function ChatContent({
         className="flex-shrink-0 p-3 border-t bg-black/50"
         style={{ borderColor: `${styles.accent}20` }}
       >
-        {/* Clear conversation button */}
+        {/* New conversation button */}
         {messages.length > 0 && (
           <button
-            onClick={clearConversation}
-            className="mb-2 text-xs text-gray-500 hover:text-gray-400 transition-colors"
+            onClick={startNewConversation}
+            className="mb-2 text-xs text-gray-500 hover:text-gray-400 transition-colors flex items-center gap-1"
           >
-            Clear conversation
+            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            New conversation
           </button>
         )}
 
