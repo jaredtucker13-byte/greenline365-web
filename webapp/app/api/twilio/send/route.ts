@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { requireAuth } from '@/lib/auth/middleware';
 import twilio from 'twilio';
 
 /**
  * Send SMS API
- * 
- * POST /api/twilio/send - Send an SMS message
- * 
+ *
+ * POST /api/twilio/send - Send an SMS message (requires authentication)
+ *
  * Used for:
  * - Booking confirmations
  * - Appointment reminders
@@ -15,9 +16,12 @@ import twilio from 'twilio';
 
 const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID || '';
 const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN || '';
-const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER || '+18135409691';
+const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER!;
 
 export async function POST(request: NextRequest) {
+  const auth = await requireAuth(request);
+  if (auth instanceof Response) return auth;
+
   try {
     const body = await request.json();
     const { 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
+import { requireAuth } from '@/lib/auth/middleware';
 import sharp from 'sharp';
 
 const BUCKET_NAME = 'blog-images';
@@ -37,9 +38,12 @@ async function optimizeImage(buffer: Buffer, mimeType: string): Promise<{ data: 
 }
 
 /**
- * POST - Upload image with automatic optimization
+ * POST - Upload image with automatic optimization (requires authentication)
  */
 export async function POST(req: NextRequest) {
+  const auth = await requireAuth(req);
+  if (auth instanceof Response) return auth;
+
   try {
     const formData = await req.formData();
     const file = formData.get('file') as File | null;
@@ -126,9 +130,12 @@ export async function POST(req: NextRequest) {
 }
 
 /**
- * DELETE - Delete image from Supabase Storage
+ * DELETE - Delete image from Supabase Storage (requires authentication)
  */
 export async function DELETE(req: NextRequest) {
+  const auth = await requireAuth(req);
+  if (auth instanceof Response) return auth;
+
   try {
     const { searchParams } = new URL(req.url);
     const path = searchParams.get('path');

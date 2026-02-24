@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/auth/middleware';
 
 /**
- * Website Reverse Engineering API
- * 
+ * Website Reverse Engineering API (requires authentication)
+ *
  * Extracts everything from a website:
  * - Content (headlines, text, CTAs)
  * - Color palette
@@ -119,6 +120,9 @@ function categorizeColors(colors: string[]): ExtractedContent['colors'] {
 }
 
 export async function POST(request: NextRequest) {
+  const auth = await requireAuth(request);
+  if (auth instanceof Response) return auth;
+
   try {
     const { url } = await request.json();
 

@@ -5,8 +5,8 @@ import { callOpenRouterJSON } from '@/lib/openrouter';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-// N8N Webhook URL (Production) - will fallback to AI if unavailable
-const N8N_WEBHOOK_URL = 'https://n8n.srv1f56042.hstgr.cloud/webhook-test/d25b2519-f339-49a2-be95-c7faafa9242a';
+// N8N Webhook URL — set via environment variable (falls back to AI if unavailable)
+const N8N_WEBHOOK_URL = process.env.N8N_TREND_WEBHOOK_URL || '';
 
 // ZIP code to city mapping for common areas
 const ZIP_TO_CITY: Record<string, string> = {

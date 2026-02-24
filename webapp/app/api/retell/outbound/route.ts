@@ -1,18 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Retell from 'retell-sdk';
 import { createClient } from '@/lib/supabase/server';
+import { requireAuth } from '@/lib/auth/middleware';
 
 /**
- * Outbound Call API - Trigger Retell to call a prospect
- * 
+ * Outbound Call API - Trigger Retell to call a prospect (requires authentication)
+ *
  * POST /api/retell/outbound
- * 
+ *
  * Used by the Concierge widget to initiate demo calls
  */
 
 const RETELL_API_KEY = process.env.RETELL_API_KEY || '';
 
 export async function POST(request: NextRequest) {
+  const auth = await requireAuth(request);
+  if (auth instanceof Response) return auth;
+
   try {
     const body = await request.json();
     const { 
@@ -107,9 +111,8 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
     
-    return NextResponse.json({ 
+    return NextResponse.json({
       error: 'Failed to initiate call. Please try again.',
-      details: error.message 
     }, { status: 500 });
   }
 }
@@ -192,6 +195,6 @@ export async function GET(request: NextRequest) {
     
   } catch (error: any) {
     console.error('[Outbound Status] Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to retrieve call status' }, { status: 500 });
   }
 }

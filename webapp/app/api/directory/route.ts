@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { getTierLimits } from '@/lib/feature-gates';
 import { getPlaceholderImage, isClaimable } from '@/lib/directory-config';
+import { requireAuth } from '@/lib/auth/middleware';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -172,8 +173,11 @@ export async function GET(request: NextRequest) {
   return NextResponse.json(applyWeightedRanking(listings));
 }
 
-// POST /api/directory - Create listing (AI scraper or manual)
+// POST /api/directory - Create listing (requires authentication)
 export async function POST(request: NextRequest) {
+  const auth = await requireAuth(request);
+  if (auth instanceof Response) return auth;
+
   const supabase = getServiceClient();
   const body = await request.json();
   const { business_name, industry, website, phone, email, address_line1, city, state, zip_code, description, tenant_id, logo_url } = body;
@@ -201,21 +205,35 @@ export async function POST(request: NextRequest) {
   return NextResponse.json(data, { status: 201 });
 }
 
-// PATCH /api/directory - Update listing
+// PATCH /api/directory - Update listing (requires authentication)
 export async function PATCH(request: NextRequest) {
+  const auth = await requireAuth(request);
+  if (auth instanceof Response) return auth;
+
   const supabase = getServiceClient();
   const body = await request.json();
   const { id, ...updates } = body;
 
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 });
 
+  // Only allow specific safe fields to be updated
+  const allowedFields = [
+    'business_name', 'industry', 'description', 'phone', 'email', 'website',
+    'address_line1', 'city', 'state', 'zip_code', 'logo_url', 'cover_image_url',
+    'business_hours', 'subcategories', 'metadata', 'is_published',
+  ];
+  const safeUpdates: Record<string, unknown> = {};
+  for (const key of allowedFields) {
+    if (key in updates) safeUpdates[key] = updates[key];
+  }
+
   const { data, error } = await supabase
     .from('directory_listings')
-    .update({ ...updates, updated_at: new Date().toISOString() })
+    .update({ ...safeUpdates, updated_at: new Date().toISOString() })
     .eq('id', id)
     .select()
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: 'Failed to update listing' }, { status: 500 });
   return NextResponse.json(data);
 }

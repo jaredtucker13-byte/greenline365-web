@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { callOpenRouter, callOpenRouterJSON } from '@/lib/openrouter';
+import { requireAuth } from '@/lib/auth/middleware';
 
 /**
- * Blog Image Suggestion & Generation API
+ * Blog Image Suggestion & Generation API (requires authentication)
  * 
  * Actions:
  * - analyze: Analyze content and suggest image placements with enriched artistic prompts
@@ -130,6 +131,9 @@ function getAspectRatioSize(ratio: string): string {
 }
 
 export async function POST(request: NextRequest) {
+  const auth = await requireAuth(request);
+  if (auth instanceof Response) return auth;
+
   try {
     const body = await request.json();
     const { action } = body;

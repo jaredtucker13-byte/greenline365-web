@@ -1,12 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { callOpenRouter } from '@/lib/openrouter';
+import { requireAuth } from '@/lib/auth/middleware';
 
 /**
- * Blog Voice Transcription API
+ * Blog Voice Transcription API (requires authentication)
  * Uses OpenRouter GPT-4o Audio for speech-to-text
  */
 
 export async function POST(request: NextRequest) {
+  const auth = await requireAuth(request);
+  if (auth instanceof Response) return auth;
+
   try {
     const body = await request.json();
     const { audio } = body;

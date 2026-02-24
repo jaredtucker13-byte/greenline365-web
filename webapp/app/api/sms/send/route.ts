@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/auth/middleware';
 import twilio from 'twilio';
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
@@ -25,8 +26,11 @@ function replaceVariables(content: string, variables: Record<string, string>): s
   return result;
 }
 
-// POST /api/sms/send - Send SMS message(s)
+// POST /api/sms/send - Send SMS message(s) (requires authentication)
 export async function POST(request: NextRequest) {
+  const auth = await requireAuth(request);
+  if (auth instanceof Response) return auth;
+
   try {
     if (!client) {
       return NextResponse.json(

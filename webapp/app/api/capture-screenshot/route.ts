@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/auth/middleware';
 
 /**
- * URL Screenshot Capture API
+ * URL Screenshot Capture API (requires authentication)
  * Uses multiple fallback services for reliability
  */
 
@@ -13,6 +14,9 @@ interface CaptureRequest {
 }
 
 export async function POST(request: NextRequest) {
+  const auth = await requireAuth(request);
+  if (auth instanceof Response) return auth;
+
   try {
     const body: CaptureRequest = await request.json();
     const { url, fullPage = false, width = 1920, height = 1080 } = body;

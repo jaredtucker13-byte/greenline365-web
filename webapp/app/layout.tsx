@@ -1,4 +1,5 @@
 import './globals.css';
+import { Inter, Montserrat } from 'next/font/google';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ChatWidget from './components/ChatWidget';
@@ -6,6 +7,20 @@ import ScrollToTop from './components/ScrollToTop';
 import { ServiceWorkerProvider } from '@/lib/use-service-worker';
 import { AdminEditModeProvider } from '@/components/editor';
 import type { Metadata } from 'next';
+
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600'],
+  display: 'swap',
+  variable: '--font-inter',
+});
+
+const montserrat = Montserrat({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700', '800'],
+  display: 'swap',
+  variable: '--font-montserrat',
+});
 
 // ===========================================
 // SEO CONFIGURATION - GreenLine365
@@ -113,7 +128,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${inter.variable} ${montserrat.variable}`}>
       <head>
         {/* JSON-LD Structured Data for Organization */}
         <script

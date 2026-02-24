@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { requireAuth } from '@/lib/auth/middleware';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -137,6 +138,9 @@ async function scrapeContactPage(websiteUrl: string): Promise<ScrapedContact[]> 
  * Body: { batch_size?: number, scrape_websites?: boolean }
  */
 export async function POST(request: NextRequest) {
+  const auth = await requireAuth(request);
+  if (auth instanceof Response) return auth;
+
   const supabase = getServiceClient();
   const body = await request.json();
   const { batch_size = 50, scrape_websites = true } = body;

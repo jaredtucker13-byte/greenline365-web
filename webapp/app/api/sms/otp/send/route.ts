@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { rateLimit, rateLimitResponse } from '@/lib/rate-limit';
 import twilio from 'twilio';
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
@@ -8,8 +9,12 @@ const verifyServiceSid = process.env.TWILIO_VERIFY_SERVICE_SID;
 // Initialize Twilio client
 const client = accountSid && authToken ? twilio(accountSid, authToken) : null;
 
-// POST /api/sms/otp/send - Send OTP code
+// POST /api/sms/otp/send - Send OTP code (rate limited)
 export async function POST(request: NextRequest) {
+  // Rate limit: 5 OTP requests per minute per IP
+  const rl = rateLimit(request, { max: 5, windowMs: 60_000 });
+  if (!rl.allowed) return rateLimitResponse(rl.retryAfter);
+
   try {
     if (!client) {
       return NextResponse.json(
@@ -58,12 +63,9 @@ export async function POST(request: NextRequest) {
       });
 
       // In production, store this OTP in database with expiry
-      // For now, return it (only for testing - remove in production!)
       return NextResponse.json({
         success: true,
         message: 'OTP sent successfully',
-        // Remove this in production - only for testing
-        _debug_otp: otp,
       });
     }
   } catch (error: any) {
