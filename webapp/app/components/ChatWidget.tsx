@@ -301,13 +301,21 @@ const getModeStyles = (mode: AssistantMode) => {
 interface ChatWidgetProps {
   onContentSuggestion?: (suggestion: ContentSuggestion) => void;
   forceMode?: AssistantMode;
+  forceAgent?: 'aiden' | 'ada' | 'susan' | 'concierge' | 'scout';
   embedded?: boolean;
+  /** Tenant/business ID for contractor-scoped chat isolation */
+  tenantId?: string;
+  /** Use the agentic endpoint with brain context, tools, and memory */
+  agentic?: boolean;
 }
 
-export default function ChatWidget({ 
-  onContentSuggestion, 
+export default function ChatWidget({
+  onContentSuggestion,
   forceMode,
-  embedded = false 
+  forceAgent,
+  embedded = false,
+  tenantId,
+  agentic = false,
 }: ChatWidgetProps) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(embedded);
@@ -319,7 +327,10 @@ export default function ChatWidget({
   const [hasInteracted, setHasInteracted] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState(() => generateId());
+  const [agentSessionId, setAgentSessionId] = useState<string | null>(null);
   const [currentMode, setCurrentMode] = useState<AssistantMode>('concierge');
+  const [currentAgent, setCurrentAgent] = useState<string>(forceAgent || 'concierge');
+  const visitorIdRef = useRef<string | null>(null);
   
   // Voice input state
   const [isListening, setIsListening] = useState(false);
@@ -337,7 +348,22 @@ export default function ChatWidget({
   // Load persisted data
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    
+
+    // Initialize visitor ID for agentic sessions
+    if (agentic && !visitorIdRef.current) {
+      const existing = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('gl365_visitor='))
+        ?.split('=')[1];
+      if (existing) {
+        visitorIdRef.current = existing;
+      } else {
+        const newId = `visitor_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        document.cookie = `gl365_visitor=${newId}; max-age=31536000; path=/; SameSite=Lax`;
+        visitorIdRef.current = newId;
+      }
+    }
+
     const hasClicked = localStorage.getItem('gl365_chat_interacted');
     if (hasClicked === 'true') {
       setShowTryMe(false);
@@ -474,14 +500,14 @@ export default function ChatWidget({
       inputRef.current.style.height = 'auto';
     }
     setIsLoading(true);
-    
+
     // Check for name
     const detectedName = extractName(text);
     if (detectedName && !userName) {
       setUserName(detectedName);
       localStorage.setItem('gl365_user_name', detectedName);
     }
-    
+
     const userMessage: Message = {
       id: generateId(),
       role: 'user',
@@ -489,41 +515,73 @@ export default function ChatWidget({
       timestamp: new Date(),
       mode: currentMode,
     };
-    
+
     setMessages(prev => [...prev, userMessage]);
-    
+
     try {
-      // Build context-aware system prompt
-      const systemPrompt = SYSTEM_PROMPTS[currentMode];
-      const contextInfo = userName ? `\n\nUser's name: ${userName}` : '';
-      
-      const apiMessages = [
-        { role: 'system', content: systemPrompt + contextInfo },
-        ...messages.slice(-10).map(m => ({ role: m.role, content: m.content })),
-        { role: 'user', content: text },
-      ];
-      
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: text,
-          messages: apiMessages,
-          mode: currentMode,
-          sessionId,
-        }),
-      });
-      
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
+      let assistantReply: string;
+
+      if (agentic) {
+        // ── Agentic endpoint: brain-connected, tools, memory, tenant-scoped ──
+        const response = await fetch('/api/chat/agent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: text,
+            sessionId: agentSessionId || undefined,
+            agentId: currentAgent,
+            mode: currentMode === 'creative' ? 'sales' : 'concierge',
+            visitorId: visitorIdRef.current,
+            businessId: tenantId || undefined,
+            contactName: userName || undefined,
+          }),
+        });
+
+        if (!response.ok) throw new Error(`API error: ${response.status}`);
+        const data = await response.json();
+
+        // Persist the agent session ID for conversation continuity
+        if (data.sessionId && !agentSessionId) {
+          setAgentSessionId(data.sessionId);
+        }
+
+        // Track if agent was transferred
+        if (data.transferred) {
+          setCurrentAgent(data.agentId);
+        }
+
+        assistantReply = data?.reply ?? "I'm here to help! Could you rephrase that?";
+      } else {
+        // ── Simple endpoint: lightweight, localStorage-based ──
+        const systemPrompt = SYSTEM_PROMPTS[currentMode];
+        const contextInfo = userName ? `\n\nUser's name: ${userName}` : '';
+
+        const apiMessages = [
+          { role: 'system', content: systemPrompt + contextInfo },
+          ...messages.slice(-10).map(m => ({ role: m.role, content: m.content })),
+          { role: 'user', content: text },
+        ];
+
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: text,
+            messages: apiMessages,
+            mode: currentMode,
+            sessionId,
+          }),
+        });
+
+        if (!response.ok) throw new Error(`API error: ${response.status}`);
+        const data = await response.json();
+
+        assistantReply =
+          data?.choices?.[0]?.message?.content ??
+          data?.reply ??
+          data?.message ??
+          "I'm here to help! Could you rephrase that?";
       }
-      
-      const data = await response.json();
-      const assistantReply = 
-        data?.choices?.[0]?.message?.content ??
-        data?.reply ??
-        data?.message ??
-        "I'm here to help! Could you rephrase that?";
       
       // Parse any content suggestions from the response
       const suggestions = parseContentSuggestions(assistantReply);
@@ -557,7 +615,7 @@ export default function ChatWidget({
     } finally {
       setIsLoading(false);
     }
-  }, [inputValue, isLoading, messages, currentMode, userName, sessionId, onContentSuggestion]);
+  }, [inputValue, isLoading, messages, currentMode, userName, sessionId, agentSessionId, currentAgent, agentic, tenantId, onContentSuggestion]);
 
   const handleToggle = () => {
     setIsOpen(prev => !prev);
@@ -588,6 +646,8 @@ export default function ChatWidget({
     setMessages([]);
     setInputValue('');
     setSessionId(generateId());
+    setAgentSessionId(null);
+    setCurrentAgent(forceAgent || 'concierge');
     setIsLoading(false);
     localStorage.removeItem('gl365_chat_messages');
     // Reset textarea height
