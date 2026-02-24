@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAuth } from '@/lib/auth/middleware';
 import twilio from 'twilio';
+import { captureException } from '@/lib/error-tracking';
 
 /**
  * Send SMS API
@@ -103,10 +104,11 @@ export async function POST(request: NextRequest) {
       to: formattedTo
     });
     
-  } catch (error: any) {
+  } catch (error: unknown) {
+    captureException(error, { source: 'api/twilio/send', extra: { method: 'POST' } });
     console.error('[Send SMS] Error:', error);
-    return NextResponse.json({ 
-      error: error.message || 'Failed to send SMS' 
+    return NextResponse.json({
+      error: error instanceof Error ? error.message : 'Failed to send SMS'
     }, { status: 500 });
   }
 }

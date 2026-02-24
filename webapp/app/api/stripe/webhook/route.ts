@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { bustFeatureCache } from '@/lib/services/feature-resolution';
+import { captureException } from '@/lib/error-tracking';
 
 let _stripe: Stripe | null = null;
 function getStripe(): Stripe {
@@ -50,7 +51,8 @@ async function logWebhookEvent(
       amount_cents: 0,
       raw_payload: rawPayload,
     });
-  } catch (err) {
+  } catch (err: unknown) {
+    captureException(err, { source: 'api/stripe/webhook', extra: { method: 'POST', context: 'logWebhookEvent' } });
     console.error('[STRIPE WEBHOOK] Failed to log event:', err);
   }
 }
@@ -72,8 +74,9 @@ export async function POST(request: NextRequest) {
   try {
     const sig = request.headers.get('stripe-signature')!;
     event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
-  } catch (err: any) {
-    console.error('[STRIPE WEBHOOK] Signature verification failed:', err.message);
+  } catch (err: unknown) {
+    captureException(err, { source: 'api/stripe/webhook', extra: { method: 'POST', context: 'signature_verification' } });
+    console.error('[STRIPE WEBHOOK] Signature verification failed:', err instanceof Error ? err.message : err);
     return NextResponse.json({ error: 'Webhook signature verification failed' }, { status: 400 });
   }
 
@@ -344,8 +347,9 @@ export async function POST(request: NextRequest) {
         console.log(`[STRIPE] Unhandled event type: ${event.type}`);
         processingStatus = 'skipped';
     }
-  } catch (err: any) {
-    console.error(`[STRIPE WEBHOOK] Error processing ${event.type}:`, err.message);
+  } catch (err: unknown) {
+    captureException(err, { source: 'api/stripe/webhook', extra: { method: 'POST', eventType: event.type, eventId: event.id } });
+    console.error(`[STRIPE WEBHOOK] Error processing ${event.type}:`, err instanceof Error ? err.message : err);
     processingStatus = 'failed';
     // Log the failed event before returning error
     await logWebhookEvent(supabase, event.id, event.type, 'failed', event);

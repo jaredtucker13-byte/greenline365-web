@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import crypto from 'crypto';
+import { captureException } from '@/lib/error-tracking';
 
 // GET - List incidents or get single incident
 export async function GET(request: NextRequest) {
@@ -47,9 +48,10 @@ export async function GET(request: NextRequest) {
     if (error) throw error;
 
     return NextResponse.json(incidents);
-  } catch (error: any) {
+  } catch (error: unknown) {
+    captureException(error, { source: 'api/incidents', extra: { method: 'GET' } });
     console.error('GET /api/incidents error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -92,9 +94,10 @@ export async function POST(request: NextRequest) {
     if (error) throw error;
 
     return NextResponse.json(incident);
-  } catch (error: any) {
+  } catch (error: unknown) {
+    captureException(error, { source: 'api/incidents', extra: { method: 'POST' } });
     console.error('POST /api/incidents error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -129,9 +132,10 @@ export async function PUT(request: NextRequest) {
     if (error) throw error;
 
     return NextResponse.json(incident);
-  } catch (error: any) {
+  } catch (error: unknown) {
+    captureException(error, { source: 'api/incidents', extra: { method: 'PUT' } });
     console.error('PUT /api/incidents error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -161,8 +165,9 @@ export async function DELETE(request: NextRequest) {
     if (error) throw error;
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    captureException(error, { source: 'api/incidents', extra: { method: 'DELETE' } });
     console.error('DELETE /api/incidents error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Internal server error' }, { status: 500 });
   }
 }

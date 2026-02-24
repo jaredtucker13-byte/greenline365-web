@@ -5,6 +5,7 @@ import { getSkillContextForIntent, getCoreMarketingContext } from '@/lib/marketi
 import { CHAT_FORMAT_DIRECTIVE } from '@/lib/format-standards';
 import { rateLimit, rateLimitResponse } from '@/lib/rate-limit';
 import { callOpenRouter } from '@/lib/openrouter';
+import { captureException } from '@/lib/error-tracking';
 
 type Msg = { role: 'user' | 'assistant' | 'system'; content: string };
 
@@ -567,6 +568,7 @@ export async function POST(req: NextRequest) {
 
     return Response.json(json, { status: 200 });
   } catch (e: unknown) {
+    captureException(e, { source: 'api/chat', extra: { method: 'POST' } });
     const errorMessage = e instanceof Error ? e.message : 'Server error';
     console.error('[Chat] Server Error:', errorMessage);
     return Response.json({ error: errorMessage }, { status: 500 });

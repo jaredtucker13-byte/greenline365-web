@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
 import { rateLimit, rateLimitResponse } from '@/lib/rate-limit';
 import crypto from 'crypto';
+import { captureException } from '@/lib/error-tracking';
 
 // N8N Webhook URL — set via environment variable
 const N8N_WEBHOOK_URL = process.env.N8N_OTP_WEBHOOK_URL || '';
@@ -116,7 +117,8 @@ export async function POST(request: NextRequest) {
       },
       { status: 200 }
     );
-  } catch (error) {
+  } catch (error: unknown) {
+    captureException(error, { source: 'api/send-otp', extra: { method: 'POST' } });
     console.error('Error in send-otp:', error);
     return NextResponse.json(
       { error: 'Internal server error' },

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { rateLimit, rateLimitResponse } from '@/lib/rate-limit';
 
 /**
  * Generate Mockup API - Context-Aware
@@ -239,6 +240,9 @@ Requirements:
 }
 
 export async function POST(request: NextRequest) {
+  const rl = rateLimit(request, { max: 5, windowMs: 60_000 });
+  if (!rl.allowed) return rateLimitResponse(rl.retryAfter);
+
   try {
     const body: MockupRequest = await request.json();
     const { 

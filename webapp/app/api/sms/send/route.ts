@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth/middleware';
 import twilio from 'twilio';
+import { captureException } from '@/lib/error-tracking';
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
@@ -93,10 +94,11 @@ export async function POST(request: NextRequest) {
       failed: results.filter(r => !r.success).length,
     }, { status: allSuccess ? 200 : someSuccess ? 207 : 500 });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    captureException(error, { source: 'api/sms/send', extra: { method: 'POST' } });
     console.error('Error sending SMS:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to send SMS' },
+      { error: error instanceof Error ? error.message : 'Failed to send SMS' },
       { status: 500 }
     );
   }

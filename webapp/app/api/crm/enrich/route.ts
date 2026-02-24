@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { requireAuth } from '@/lib/auth/middleware';
+import { captureException } from '@/lib/error-tracking';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -535,6 +536,7 @@ export async function POST(request: NextRequest) {
 
       result.status = 'success';
     } catch (err: unknown) {
+      captureException(err, { source: 'api/crm/enrich', extra: { method: 'POST', leadId: lead.id } });
       const errorMsg = err instanceof Error ? err.message : 'Unknown error';
       result.status = 'error';
       result.error = errorMsg;

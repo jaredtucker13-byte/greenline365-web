@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSkillContext, getCoreMarketingContext } from '@/lib/marketing-skills-loader';
 import { HTML_FORMAT_DIRECTIVE } from '@/lib/format-standards';
 import { callOpenRouter } from '@/lib/openrouter';
+import { rateLimit, rateLimitResponse } from '@/lib/rate-limit';
 
 // Website Analyzer API - Premium Feature
 // Uses Gemini for vision analysis and Claude Opus 4.6 for suggestions
@@ -13,6 +14,9 @@ interface AnalysisRequest {
 }
 
 export async function POST(request: NextRequest) {
+  const rl = rateLimit(request, { max: 3, windowMs: 60_000 });
+  if (!rl.allowed) return rateLimitResponse(rl.retryAfter);
+
   try {
     const body: AnalysisRequest = await request.json();
     const { url, imageBase64, analysisType = 'full' } = body;

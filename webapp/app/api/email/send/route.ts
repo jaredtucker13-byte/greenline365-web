@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { requireAuth } from '@/lib/auth/middleware';
+import { captureException } from '@/lib/error-tracking';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -152,10 +153,11 @@ export async function POST(request: NextRequest) {
       failed: results.filter(r => !r.success).length,
     }, { status: allSuccess ? 200 : someSuccess ? 207 : 500 });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    captureException(error, { source: 'api/email/send', extra: { method: 'POST' } });
     console.error('Error sending email:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to send email' },
+      { error: error instanceof Error ? error.message : 'Failed to send email' },
       { status: 500 }
     );
   }

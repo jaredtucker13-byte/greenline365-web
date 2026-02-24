@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { rateLimit, rateLimitResponse } from '@/lib/rate-limit';
 
 // POST /api/directory/scrape/bulk - Process multiple URLs
 // Body: { urls: ["https://example.com", ...], tier: "free" }
 // Returns results for each URL (success or error)
 export async function POST(request: NextRequest) {
+  const rl = rateLimit(request, { max: 2, windowMs: 60_000 });
+  if (!rl.allowed) return rateLimitResponse(rl.retryAfter);
+
   const body = await request.json();
   const { urls, tier } = body;
 

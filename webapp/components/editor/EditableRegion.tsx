@@ -282,7 +282,7 @@ function EditModal({
           {type === 'image' ? (
             <div className="space-y-4">
               {value && (
-                <div className="aspect-video rounded-xl overflow-hidden bg-white/5 border border-white/10">
+                <div className="relative aspect-video rounded-xl overflow-hidden bg-white/5 border border-white/10">
                   <Image src={value} alt="Preview" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
                 </div>
               )}

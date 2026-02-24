@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { callOpenRouterJSON } from '@/lib/openrouter';
+import { rateLimit, rateLimitResponse } from '@/lib/rate-limit';
 
 /**
  * Image Analysis API - "Autopilot Mode"
@@ -13,6 +14,9 @@ import { callOpenRouterJSON } from '@/lib/openrouter';
  */
 
 export async function POST(request: NextRequest) {
+  const rl = rateLimit(request, { max: 5, windowMs: 60_000 });
+  if (!rl.allowed) return rateLimitResponse(rl.retryAfter);
+
   try {
     const body = await request.json();
     const { imageData, imageUrl, contentType = 'photo', businessType = 'local business', location = 'Tampa, FL' } = body;

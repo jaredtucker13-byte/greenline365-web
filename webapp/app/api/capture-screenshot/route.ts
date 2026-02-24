@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth/middleware';
+import { rateLimit, rateLimitResponse } from '@/lib/rate-limit';
+import { captureException } from '@/lib/error-tracking';
 
 /**
  * URL Screenshot Capture API (requires authentication)
@@ -16,6 +18,9 @@ interface CaptureRequest {
 export async function POST(request: NextRequest) {
   const auth = await requireAuth(request);
   if (auth instanceof Response) return auth;
+
+  const rl = rateLimit(request, { max: 5, windowMs: 60_000 });
+  if (!rl.allowed) return rateLimitResponse(rl.retryAfter);
 
   try {
     const body: CaptureRequest = await request.json();
@@ -134,12 +139,13 @@ export async function POST(request: NextRequest) {
       url: normalizedUrl,
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    captureException(error, { source: 'api/capture-screenshot', extra: { method: 'POST' } });
     console.error('[Screenshot] Error:', error);
-    
+
     return NextResponse.json({
       success: false,
-      error: error.message || 'Screenshot capture failed',
+      error: error instanceof Error ? error.message : 'Screenshot capture failed',
       suggestion: 'Please take a screenshot manually and upload it instead.',
     }, { status: 500 });
   }

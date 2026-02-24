@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Retell from 'retell-sdk';
 import { createClient } from '@/lib/supabase/server';
 import { requireAuth } from '@/lib/auth/middleware';
+import { captureException } from '@/lib/error-tracking';
 
 /**
  * Outbound Call API - Trigger Retell to call a prospect (requires authentication)
@@ -101,11 +102,12 @@ export async function POST(request: NextRequest) {
       estimated_wait: '10-15 seconds'
     });
     
-  } catch (error: any) {
+  } catch (error: unknown) {
+    captureException(error, { source: 'api/retell/outbound', extra: { method: 'POST' } });
     console.error('[Outbound Call] Error:', error);
-    
+
     // Handle specific Retell errors
-    if (error.message?.includes('invalid phone')) {
+    if (error instanceof Error && error.message?.includes('invalid phone')) {
       return NextResponse.json({ 
         error: 'Invalid phone number. Please check and try again.' 
       }, { status: 400 });
@@ -193,7 +195,8 @@ export async function GET(request: NextRequest) {
       recording_url: call.recording_url
     });
     
-  } catch (error: any) {
+  } catch (error: unknown) {
+    captureException(error, { source: 'api/retell/outbound', extra: { method: 'GET' } });
     console.error('[Outbound Status] Error:', error);
     return NextResponse.json({ error: 'Failed to retrieve call status' }, { status: 500 });
   }

@@ -86,7 +86,7 @@ function getOutreachHtml(contact: any, step: any, siteUrl: string): string {
       We'd love to share the full report. Just reply to this email and we'll send it over — completely free, no strings attached.
     </p>
     <div style="text-align:center;margin:24px 0;">
-      <a href="mailto:${process.env.GMAIL_USER || 'greenline365help@gmail.com'}?subject=Send me the audit for ${encodeURIComponent(businessName)}" style="display:inline-block;background:linear-gradient(135deg,#C9A96E,#E6D8B5);color:#000;font-weight:700;font-size:15px;padding:14px 36px;border-radius:10px;text-decoration:none;">
+      <a href="mailto:${process.env.SENDER_EMAIL || 'noreply@greenline365.com'}?subject=Send me the audit for ${encodeURIComponent(businessName)}" style="display:inline-block;background:linear-gradient(135deg,#C9A96E,#E6D8B5);color:#000;font-weight:700;font-size:15px;padding:14px 36px;border-radius:10px;text-decoration:none;">
         Get My Free Audit
       </a>
     </div>

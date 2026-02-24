@@ -15,6 +15,7 @@ import { createClient } from '@supabase/supabase-js';
 import { sendEmail } from '@/lib/email/gmail-sender';
 import { getCoreMarketingContext } from '@/lib/marketing-skills-loader';
 import { callOpenRouter } from '@/lib/openrouter';
+import { captureException } from '@/lib/error-tracking';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -175,8 +176,9 @@ ${marketingContext}`,
       sent_to: OWNER_EMAIL,
       error: sendResult.error,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    captureException(error, { source: 'api/brain/weekly-recap', extra: { method: 'POST' } });
     console.error('[Weekly Recap] Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Internal server error' }, { status: 500 });
   }
 }

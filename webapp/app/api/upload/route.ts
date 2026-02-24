@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
 import { requireAuth } from '@/lib/auth/middleware';
 import sharp from 'sharp';
+import { rateLimit, rateLimitResponse } from '@/lib/rate-limit';
+import { captureException } from '@/lib/error-tracking';
 
 const BUCKET_NAME = 'blog-images';
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -43,6 +45,9 @@ async function optimizeImage(buffer: Buffer, mimeType: string): Promise<{ data: 
 export async function POST(req: NextRequest) {
   const auth = await requireAuth(req);
   if (auth instanceof Response) return auth;
+
+  const rl = rateLimit(req, { max: 10, windowMs: 60_000 });
+  if (!rl.allowed) return rateLimitResponse(rl.retryAfter);
 
   try {
     const formData = await req.formData();
@@ -123,7 +128,8 @@ export async function POST(req: NextRequest) {
       format: extension,
       type: contentType,
     });
-  } catch (error) {
+  } catch (error: unknown) {
+    captureException(error, { source: 'api/upload', extra: { method: 'POST' } });
     console.error('Upload error:', error);
     return NextResponse.json({ error: error instanceof Error ? error.message : 'Upload failed' }, { status: 500 });
   }
@@ -146,7 +152,8 @@ export async function DELETE(req: NextRequest) {
     if (error) return NextResponse.json({ error: 'Failed to delete image' }, { status: 500 });
 
     return NextResponse.json({ success: true, message: 'Image deleted' });
-  } catch (error) {
+  } catch (error: unknown) {
+    captureException(error, { source: 'api/upload', extra: { method: 'DELETE' } });
     console.error('Delete error:', error);
     return NextResponse.json({ error: 'Delete failed' }, { status: 500 });
   }
@@ -156,6 +163,9 @@ export async function DELETE(req: NextRequest) {
  * GET - List images in a folder
  */
 export async function GET(req: NextRequest) {
+  const auth = await requireAuth(req);
+  if (auth instanceof Response) return auth;
+
   try {
     const { searchParams } = new URL(req.url);
     const folder = searchParams.get('folder') || 'uploads';
@@ -175,7 +185,8 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json({ success: true, images, count: images.length });
-  } catch (error) {
+  } catch (error: unknown) {
+    captureException(error, { source: 'api/upload', extra: { method: 'GET' } });
     console.error('List error:', error);
     return NextResponse.json({ error: 'Failed to list images' }, { status: 500 });
   }

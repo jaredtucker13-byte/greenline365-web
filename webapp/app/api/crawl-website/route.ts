@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth/middleware';
+import { rateLimit, rateLimitResponse } from '@/lib/rate-limit';
+import { captureException } from '@/lib/error-tracking';
 
 /**
  * Website Reverse Engineering API (requires authentication)
@@ -122,6 +124,9 @@ function categorizeColors(colors: string[]): ExtractedContent['colors'] {
 export async function POST(request: NextRequest) {
   const auth = await requireAuth(request);
   if (auth instanceof Response) return auth;
+
+  const rl = rateLimit(request, { max: 5, windowMs: 60_000 });
+  if (!rl.allowed) return rateLimitResponse(rl.retryAfter);
 
   try {
     const { url } = await request.json();
@@ -368,10 +373,11 @@ export async function POST(request: NextRequest) {
       data: extracted,
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    captureException(error, { source: 'api/crawl-website', extra: { method: 'POST' } });
     console.error('[Crawl Website] Error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to crawl website' },
+      { error: error instanceof Error ? error.message : 'Failed to crawl website' },
       { status: 500 }
     );
   }

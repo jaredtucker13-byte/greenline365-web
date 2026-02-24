@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSkillContext, getCoreMarketingContext } from '@/lib/marketing-skills-loader';
 import { CHAT_FORMAT_DIRECTIVE } from '@/lib/format-standards';
 import { callOpenRouter, callOpenRouterJSON } from '@/lib/openrouter';
+import { rateLimit, rateLimitResponse } from '@/lib/rate-limit';
+import { captureException } from '@/lib/error-tracking';
 
 /**
  * Blog AI Enhancement API
@@ -99,6 +101,9 @@ Return as JSON: {"suggestions": [...], "priority": "high/medium/low", "estimated
 };
 
 export async function POST(request: NextRequest) {
+  const rl = rateLimit(request, { max: 10, windowMs: 60_000 });
+  if (!rl.allowed) return rateLimitResponse(rl.retryAfter);
+
   try {
     const body: AIRequest = await request.json();
     const { action, title, content, category, keywords, customPrompt } = body;
@@ -221,10 +226,11 @@ ${title ? `The blog title context is: "${title}"` : ''}`;
       raw,
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    captureException(error, { source: 'api/blog/ai', extra: { method: 'POST' } });
     console.error('[Blog AI] Error:', error);
     return NextResponse.json(
-      { error: error.message || 'Internal server error' },
+      { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }
     );
   }

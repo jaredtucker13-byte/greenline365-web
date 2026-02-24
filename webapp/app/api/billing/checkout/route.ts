@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { requireAuth } from '@/lib/auth/middleware';
 import { createServerClient } from '@/lib/supabase/server';
+import { captureException } from '@/lib/error-tracking';
 
 function getStripe() {
     const key = process.env.STRIPE_SECRET_KEY;
@@ -115,6 +116,7 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({ url: session.url, session_id: session.id });
   } catch (err: unknown) {
+        captureException(err, { source: 'api/billing/checkout', extra: { method: 'POST' } });
         const message = err instanceof Error ? err.message : 'Checkout failed';
         console.error('[BILLING] Checkout error:', message);
         return NextResponse.json({ error: message }, { status: 500 });
