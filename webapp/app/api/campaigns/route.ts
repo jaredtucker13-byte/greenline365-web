@@ -6,10 +6,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKey); }
 
 export async function GET(request: NextRequest) {
   try {
@@ -17,6 +16,7 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status');
     const limit = parseInt(searchParams.get('limit') || '50');
 
+    const supabase = getServiceClient();
     let query = supabase
       .from('email_campaigns')
       .select('*')
@@ -99,6 +99,7 @@ export async function POST(request: NextRequest) {
       emails_unsubscribed: 0,
     };
 
+    const supabase = getServiceClient();
     const { data, error } = await supabase
       .from('email_campaigns')
       .insert(campaignData)

@@ -20,10 +20,9 @@ import {
   getVerificationEmailHtml 
 } from '@/lib/email/sendgrid-sender';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKey); }
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com';
 
@@ -60,6 +59,7 @@ export async function POST(request: NextRequest) {
       errors: 0,
       skipped: 0,
     };
+    const supabase = getServiceClient();
 
     console.log('[Resend] Starting verification resend job at', now.toISOString());
 
@@ -198,6 +198,7 @@ export async function POST(request: NextRequest) {
 // GET endpoint for manual status check
 export async function GET() {
   try {
+    const supabase = getServiceClient();
     const { data: stats, error } = await supabase
       .from('crm_leads')
       .select('status, verification_attempts')

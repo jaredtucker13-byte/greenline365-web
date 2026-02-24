@@ -43,18 +43,22 @@ export async function GET(request: NextRequest) {
     if (error) {
       // Table might not exist yet
       if (error.code === 'PGRST205' || error.message.includes('style_presets')) {
-        return NextResponse.json({ 
+        return NextResponse.json({
           presets: [],
           tableExists: false,
           message: 'Style presets table not found. Please run the migration.'
+        }, {
+          headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200' },
         });
       }
       throw error;
     }
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       presets: data || [],
       tableExists: true
+    }, {
+      headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200' },
     });
   } catch (error: any) {
     console.error('[Styles API] GET error:', error);

@@ -12,10 +12,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { sendEmail, generateVerificationToken, getVerificationEmailHtml } from '@/lib/email/gmail-sender';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKey); }
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com';
 
@@ -40,6 +39,7 @@ export async function POST(req: NextRequest) {
     }
 
     const normalizedEmail = email.toLowerCase().trim();
+    const supabase = getServiceClient();
 
     // NEW: Link-based double opt-in verification
     if (source && ['waitlist', 'newsletter', 'crm', 'demo'].includes(source)) {

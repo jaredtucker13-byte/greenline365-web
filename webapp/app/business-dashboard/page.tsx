@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase/client';
 import type { User } from '@supabase/supabase-js';
@@ -297,7 +298,7 @@ export default function BusinessDashboard() {
               {/* Cover Image */}
               <div className="relative h-48 bg-gradient-to-br from-midnight-800 to-charcoal-800">
                 {activeListing?.cover_image_url ? (
-                  <img src={activeListing.cover_image_url} alt={activeListing.business_name} className="w-full h-full object-cover" />
+                  <Image src={activeListing.cover_image_url} alt={activeListing.business_name} fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
                     <span className="text-6xl font-heading font-light text-white/10">{activeListing?.business_name[0]}</span>
@@ -497,7 +498,7 @@ export default function BusinessDashboard() {
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
                   {activeListing.gallery_images.map((img, i) => (
                     <div key={i} className="relative aspect-square rounded-xl overflow-hidden border border-white/5">
-                      <img src={img} alt={`Photo ${i + 1}`} className="w-full h-full object-cover" />
+                      <Image src={img} alt={`Photo ${i + 1}`} fill className="object-cover" sizes="(max-width: 640px) 33vw, 25vw" />
                       {((tier === 'free' && i >= 1) || (tier === 'pro' && i >= 2)) && (
                         <div className="absolute inset-0 bg-midnight-900/80 flex items-center justify-center backdrop-blur-sm">
                           <svg className="w-5 h-5 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>

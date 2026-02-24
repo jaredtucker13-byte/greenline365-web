@@ -111,7 +111,9 @@ export async function GET(request: NextRequest) {
     if (data.directory_badges) {
       data.directory_badges = data.directory_badges.filter((b: any) => b.is_active);
     }
-    return NextResponse.json(applyPhotoGating(data));
+    return NextResponse.json(applyPhotoGating(data), {
+      headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=3600' },
+    });
   }
 
   // Search/list
@@ -167,10 +169,14 @@ export async function GET(request: NextRequest) {
       if (b.distance !== null) return 1;
       return 0;
     });
-    return NextResponse.json(listings);
+    return NextResponse.json(listings, {
+      headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=3600' },
+    });
   }
 
-  return NextResponse.json(applyWeightedRanking(listings));
+  return NextResponse.json(applyWeightedRanking(listings), {
+    headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=3600' },
+  });
 }
 
 // POST /api/directory - Create listing (requires authentication)

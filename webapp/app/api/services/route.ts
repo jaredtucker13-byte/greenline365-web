@@ -33,33 +33,41 @@ export async function GET(request: NextRequest) {
     if (error) {
       // Table might not exist yet - return default services
       console.log('[Services] Table may not exist:', error.message);
-      return NextResponse.json({ 
+      return NextResponse.json({
         services: [
           { id: 'default-1', name: 'Quick Demo', duration_minutes: 10, price: 0, price_type: 'free', color: '#39FF14' },
           { id: 'default-2', name: 'Strategy Call', duration_minutes: 30, price: 0, price_type: 'free', color: '#0CE293' },
         ]
+      }, {
+        headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600' },
       });
     }
 
     // If no services found, return defaults
     if (!services || services.length === 0) {
-      return NextResponse.json({ 
+      return NextResponse.json({
         services: [
           { id: 'default-1', name: 'Quick Demo', duration_minutes: 10, price: 0, price_type: 'free', color: '#39FF14' },
           { id: 'default-2', name: 'Strategy Call', duration_minutes: 30, price: 0, price_type: 'free', color: '#0CE293' },
         ]
+      }, {
+        headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600' },
       });
     }
 
-    return NextResponse.json({ services });
+    return NextResponse.json({ services }, {
+      headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600' },
+    });
   } catch (error: any) {
     console.error('[Services] Error:', error);
     // Return defaults on error
-    return NextResponse.json({ 
+    return NextResponse.json({
       services: [
         { id: 'default-1', name: 'Quick Demo', duration_minutes: 10, price: 0, price_type: 'free', color: '#39FF14' },
         { id: 'default-2', name: 'Strategy Call', duration_minutes: 30, price: 0, price_type: 'free', color: '#0CE293' },
       ]
+    }, {
+      headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600' },
     });
   }
 }

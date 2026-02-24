@@ -13,10 +13,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKey); }
 
 // Color map for event types
 const EVENT_COLORS: Record<string, string> = {
@@ -43,6 +42,7 @@ export async function GET(request: NextRequest) {
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
     const eventType = searchParams.get('type');
+    const supabase = getServiceClient();
 
     const events: any[] = [];
 
@@ -163,6 +163,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { title, description, event_type, scheduled_date, content_type, metadata, color, status } = body;
+    const supabase = getServiceClient();
 
     if (!title || !scheduled_date) {
       return NextResponse.json({ error: 'Title and scheduled_date required' }, { status: 400 });
@@ -214,6 +215,7 @@ export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
     const { id, source, ...updates } = body;
+    const supabase = getServiceClient();
 
     if (!id) {
       return NextResponse.json({ error: 'Event ID required' }, { status: 400 });
@@ -249,6 +251,7 @@ export async function DELETE(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
     const source = searchParams.get('source');
+    const supabase = getServiceClient();
 
     if (!id) {
       return NextResponse.json({ error: 'Event ID required' }, { status: 400 });

@@ -1,24 +1,26 @@
-"use client";
+'use client';
 
-import NextError from "next/error";
+import NextError from 'next/error';
+import { useEffect } from 'react';
 
 export default function GlobalError({
   error,
 }: {
   error: Error & { digest?: string };
 }) {
-  // Log error to console in development
-  if (process.env.NODE_ENV === "development") {
-    console.error("Global error:", error);
-  }
+  useEffect(() => {
+    // Report to error tracking (loads lib lazily to avoid bundling on every page)
+    import('@/lib/error-tracking').then(({ captureException }) => {
+      captureException(error, {
+        source: 'global-error',
+        extra: { digest: error.digest },
+      });
+    });
+  }, [error]);
 
   return (
     <html lang="en">
       <body>
-        {/* `NextError` is the default Next.js error page component. Its type
-        definition requires a `statusCode` prop. However, since the App Router
-        does not expose status codes for errors, we simply pass 0 to render a
-        generic error message. */}
         <NextError statusCode={0} />
       </body>
     </html>

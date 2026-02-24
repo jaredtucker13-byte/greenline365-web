@@ -7,10 +7,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKey); }
 
 export async function GET(
   request: NextRequest,
@@ -20,6 +19,7 @@ export async function GET(
     const { id } = await params;
     const { searchParams } = new URL(request.url);
     const stage = searchParams.get('stage');
+    const supabase = getServiceClient();
 
     const { data, error } = await supabase
       .from('email_campaigns')
@@ -47,6 +47,7 @@ export async function POST(
   try {
     const { id } = await params;
     const body = await request.json();
+    const supabase = getServiceClient();
 
     if (body.action === 'import_from_directory') {
       // Import contacts from directory_listings based on filters
@@ -180,6 +181,7 @@ export async function PATCH(
     const { id } = await params;
     const body = await request.json();
     const { email, pipeline_stage, current_step } = body;
+    const supabase = getServiceClient();
 
     if (!email) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
@@ -229,6 +231,7 @@ export async function PATCH(
 }
 
 async function createCrmLead(contact: any) {
+  const supabase = getServiceClient();
   // Check if lead already exists
   const { data: existing } = await supabase
     .from('crm_leads')

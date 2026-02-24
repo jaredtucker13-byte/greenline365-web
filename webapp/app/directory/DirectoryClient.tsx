@@ -9,6 +9,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface Listing {
   id: string;
@@ -319,7 +320,7 @@ export default function DirectoryPage() {
           {/* ─── HERO ─── */}
           <section className="relative overflow-hidden pt-16" style={{ minHeight: '85vh' }} data-testid="directory-hero">
             <div className="absolute inset-0">
-              <img src="/images/hero-directory.png" alt="GreenLine365 business directory — discover local businesses across dining, services, nightlife and more" className="w-full h-full object-cover" />
+              <Image src="/images/hero-directory.png" alt="GreenLine365 business directory — discover local businesses across dining, services, nightlife and more" fill className="object-cover" priority sizes="100vw" />
             </div>
             {/* Darkened overlays for text legibility (WCAG fix) */}
             <div className="absolute inset-0 bg-gradient-to-b from-midnight-900/95 via-midnight-900/85 to-midnight-900" />
@@ -424,7 +425,7 @@ export default function DirectoryPage() {
                   className={`relative rounded-2xl overflow-hidden cursor-pointer group hover:shadow-gold-glow transition-all duration-500 ${i === 0 ? 'md:col-span-2 md:row-span-2' : ''}`}
                   style={{ minHeight: i === 0 ? 320 : 180 }}
                   onClick={() => handleCategoryClick(cat.id)} data-testid={`cat-${cat.id}`}>
-                  <img src={cat.img} alt={`${cat.label} — ${cat.sub}`} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <Image src={cat.img} alt={`${cat.label} — ${cat.sub}`} fill className="object-cover group-hover:scale-105 transition-transform duration-700" sizes="(max-width: 768px) 50vw, 33vw" />
                   <div className="absolute inset-0 bg-gradient-to-t from-midnight-900/90 via-midnight-900/40 to-transparent group-hover:from-midnight-900/95 transition-all duration-500" />
                   <div className="absolute bottom-4 left-4">
                     <span className={`text-white font-heading font-semibold block tracking-tight ${i === 0 ? 'text-2xl' : 'text-base'}`}>{cat.label}</span>
@@ -569,7 +570,7 @@ export default function DirectoryPage() {
                 <button onClick={handleBrowseAll} className="mt-10 btn-primary px-8 py-3 rounded-full text-sm" data-testid="find-business-btn">Find a Business</button>
               </div>
               <div className="relative">
-                <img src="/images/hero-directory-alt.png" alt="GreenLine365 connects you with trusted, verified local businesses" className="w-full rounded-2xl object-cover" style={{ maxHeight: 400 }} />
+                <Image src="/images/hero-directory-alt.png" alt="GreenLine365 connects you with trusted, verified local businesses" width={800} height={400} className="w-full rounded-2xl object-cover" style={{ maxHeight: 400 }} />
               </div>
             </div>
           </section>
@@ -608,7 +609,7 @@ export default function DirectoryPage() {
           <section className="relative bg-midnight-950 pt-20 pb-8 overflow-hidden">
             {currentCat && (
               <div className="absolute inset-0 opacity-20">
-                <img src={currentCat.img} alt={`${currentCat.label} category background`} className="w-full h-full object-cover" />
+                <Image src={currentCat.img} alt={`${currentCat.label} category background`} fill className="object-cover" sizes="100vw" />
               </div>
             )}
             <div className="absolute inset-0 bg-gradient-to-b from-midnight-950/60 via-midnight-950/80 to-midnight-950" />
@@ -773,7 +774,7 @@ function ListingCard({ listing: l, index: i }: { listing: Listing; index: number
         data-testid={`listing-${l.slug}`}>
         <div className="relative h-40 overflow-hidden">
           {l.cover_image_url || l.logo_url ? (
-            <img src={l.cover_image_url || l.logo_url!} alt={`${l.business_name} — ${l.industry.replace(/-/g, ' ')} in ${l.city || 'Florida'}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            <Image src={l.cover_image_url || l.logo_url!} alt={`${l.business_name} — ${l.industry.replace(/-/g, ' ')} in ${l.city || 'Florida'}`} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-midnight-800 to-charcoal-800">
               <span className="text-4xl font-heading font-light text-white/10">{l.business_name[0]}</span>
@@ -930,7 +931,7 @@ function SubcategoryCarouselRow({ label, subtitle, industry, searchTerm, sortBy,
               >
                 <div className="relative h-32 sm:h-36 overflow-hidden">
                   {l.cover_image_url ? (
-                    <img src={l.cover_image_url} alt={l.business_name} className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500" loading="lazy" />
+                    <Image src={l.cover_image_url} alt={l.business_name} fill className="object-cover group-hover/card:scale-105 transition-transform duration-500" sizes="(max-width: 640px) 80vw, (max-width: 1024px) 40vw, 25vw" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-midnight-800 to-charcoal-800">
                       <span className="text-3xl font-heading text-white/10">{l.business_name[0]}</span>
@@ -996,7 +997,7 @@ function GroupedBrowseView({ activeCategory, sortBy, setSortBy, cityFilter, setC
       <section className="relative bg-midnight-950 pt-20 pb-6 overflow-hidden">
         {currentCat && (
           <div className="absolute inset-0 opacity-15">
-            <img src={currentCat.img} alt="" className="w-full h-full object-cover" />
+            <Image src={currentCat.img} alt="" fill className="object-cover" sizes="100vw" />
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-b from-midnight-900/60 to-midnight-950" />

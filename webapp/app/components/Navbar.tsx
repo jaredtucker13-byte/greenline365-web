@@ -33,53 +33,30 @@ export default function Navbar() {
     }
   }, []);
 
+  // Fetch admin status in a single parallel call instead of 3 sequential queries
+  const fetchAdminStatus = async (userId: string) => {
+    const [superAdminResult, profileResult] = await Promise.all([
+      supabase.from('super_admins').select('user_id').eq('user_id', userId).single(),
+      supabase.from('profiles').select('is_admin').eq('id', userId).single(),
+    ]);
+    setIsSuperAdmin(!!superAdminResult.data);
+    setIsAdmin(profileResult.data?.is_admin || false);
+  };
+
   useEffect(() => {
     const getSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setUser(session?.user || null);
-      
-      if (session?.user) {
-        // Check if user is in super_admins table
-        const { data: superAdminData } = await supabase
-          .from('super_admins')
-          .select('user_id')
-          .eq('user_id', session.user.id)
-          .single();
-        
-        setIsSuperAdmin(!!superAdminData);
-        
-        // Check regular admin status
-        const { data } = await supabase
-          .from('profiles')
-          .select('is_admin')
-          .eq('id', session.user.id)
-          .single();
-        setIsAdmin(data?.is_admin || false);
-      }
+      if (session?.user) await fetchAdminStatus(session.user.id);
       setLoading(false);
     };
 
     getSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user || null);
       if (session?.user) {
-        // Check super admin
-        const { data: superAdminData } = await supabase
-          .from('super_admins')
-          .select('user_id')
-          .eq('user_id', session.user.id)
-          .single();
-        
-        setIsSuperAdmin(!!superAdminData);
-        
-        // Check regular admin
-        const { data } = await supabase
-          .from('profiles')
-          .select('is_admin')
-          .eq('id', session.user.id)
-          .single();
-        setIsAdmin(data?.is_admin || false);
+        await fetchAdminStatus(session.user.id);
       } else {
         setIsAdmin(false);
         setIsSuperAdmin(false);

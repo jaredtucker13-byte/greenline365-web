@@ -11,10 +11,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { sendEmail } from '@/lib/email/gmail-sender';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKey); }
 
 // Default outreach email template
 function getOutreachHtml(contact: any, step: any, siteUrl: string): string {
@@ -176,6 +175,7 @@ export async function POST(
     const { id } = await params;
     const body = await request.json();
     const { step_number, test_email, limit } = body;
+    const supabase = getServiceClient();
 
     // Fetch campaign
     const { data: campaign, error: fetchError } = await supabase

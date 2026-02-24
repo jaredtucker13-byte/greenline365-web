@@ -30,7 +30,9 @@ export async function GET(
         .eq('post_id', data.id);
     }
     
-    return NextResponse.json({ post: data });
+    return NextResponse.json({ post: data }, {
+      headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600' },
+    });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 404 });
   }

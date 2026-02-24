@@ -2,10 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { requireAuth } from '@/lib/auth/middleware';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKey); }
 
 // SendGrid API
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
@@ -70,6 +69,7 @@ export async function POST(request: NextRequest) {
   try {
     const body: SendEmailRequest = await request.json();
     const { to, subject, html_content, plain_content, template_id, variables = {}, campaign_id } = body;
+    const supabase = getServiceClient();
 
     if (!to || (!html_content && !template_id)) {
       return NextResponse.json(

@@ -87,6 +87,8 @@ export async function GET(request: NextRequest) {
     reviews,
     total: reviews.length,
     average_rating: Math.round(avgRating * 10) / 10,
+  }, {
+    headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600' },
   });
 }
 

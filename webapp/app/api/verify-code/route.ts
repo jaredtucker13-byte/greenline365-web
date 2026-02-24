@@ -11,15 +11,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKey); }
 
 // Sync verified lead to CRM - matches actual crm_leads schema
 async function syncToCRM(entry: any): Promise<{ success: boolean; error?: string }> {
   console.log('[CRM Sync] Starting sync for:', entry.email);
-  
+  const supabase = getServiceClient();
+
   try {
     // Check if lead already exists in CRM
     const { data: existingLead, error: findError } = await supabase
@@ -103,6 +103,7 @@ export async function POST(request: NextRequest) {
     }
 
     const normalizedEmail = email.toLowerCase().trim();
+    const supabase = getServiceClient();
 
     // Find the waitlist entry
     const { data: entry, error: findError } = await supabase
