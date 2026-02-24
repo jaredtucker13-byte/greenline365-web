@@ -36,18 +36,18 @@ const getModel = (action: AIAction): string => {
     case 'enhance_content_with_title':
     case 'custom_generate':
       // Claude excels at creative writing enhancement
-      return 'anthropic/claude-sonnet-4';
+      return 'anthropic/claude-sonnet-4.6';
     case 'generate_outline':
     case 'suggest_headlines':
-      // GPT-4o for structured outputs
-      return 'openai/gpt-4o';
+      // Sonnet 4.6 for structured outputs
+      return 'anthropic/claude-sonnet-4.6';
     case 'generate_meta':
     case 'suggest_tags':
     case 'improve_seo':
-      // Fast model for quick tasks
-      return 'openai/gpt-4o-mini';
+      // Sonnet 4.6 for quick tasks
+      return 'anthropic/claude-sonnet-4.6';
     default:
-      return 'openai/gpt-4o-mini';
+      return 'anthropic/claude-sonnet-4.6';
   }
 };
 

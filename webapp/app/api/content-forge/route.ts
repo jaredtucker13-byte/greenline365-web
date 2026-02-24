@@ -6,14 +6,14 @@ const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 
 // Model mapping based on user's requirements
 const MODELS = {
-  // GPT-5.2 for smart thinking and content generation
-  'smart-thinking': 'openai/gpt-4o', // Using gpt-4o as fallback since gpt-5.2 may not be available
-  // Claude Sonnet 4 for blog content and hashtags
-  'blog-content': 'anthropic/claude-sonnet-4',
+  // Claude Sonnet 4.6 for smart thinking and content generation
+  'smart-thinking': 'anthropic/claude-sonnet-4.6',
+  // Claude Sonnet 4.6 for blog content and hashtags
+  'blog-content': 'anthropic/claude-sonnet-4.6',
   // Perplexity for live web search
   'web-search': 'perplexity/llama-3.1-sonar-large-128k-online',
   // Default fallback
-  'default': 'openai/gpt-4o'
+  'default': 'anthropic/claude-sonnet-4.6'
 };
 
 interface ContentForgeRequest {

@@ -10,7 +10,7 @@ const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const OPENROUTER_BASE = "https://openrouter.ai/api/v1";
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
-const MODEL_MAP: Record<string, string> = { "opus_4.6": "anthropic/claude-opus-4.6", gpt_4o: "openai/gpt-4o", haiku: "anthropic/claude-3.5-haiku", perplexity: "perplexity/sonar-pro" };
+const MODEL_MAP: Record<string, string> = { "opus_4.6": "anthropic/claude-opus-4.6", gpt_4o: "anthropic/claude-sonnet-4.6", haiku: "anthropic/claude-sonnet-4.6", perplexity: "perplexity/sonar-pro" };
 const DEPT_KW: Record<string, string[]> = { executive:["strategy","plan","vision","priority","decision"], growth_sales:["lead","prospect","sales","outreach","pipeline","deal","revenue","funnel"], operations:["book","schedule","calendar","dispatch","logistics","meeting"], success:["support","ticket","customer","resolve","onboard","complaint","help"], dev_it:["code","deploy","test","fix","build","api","database","server","debug"], creative:["content","blog","social","seo","design","brand","copy","image","video","campaign","marketing"] };
 
 export async function POST(req: NextRequest) {
