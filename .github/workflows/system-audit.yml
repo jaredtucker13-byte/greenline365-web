@@ -237,7 +237,3 @@ jobs:
                                   echo "TRIFECTA STATUS: ISSUES DETECTED"
                                               exit 1
                                                         fi
-          else
-            echo "TRIFECTA STATUS: ISSUES DETECTED"
-            exit 1
-          fi
