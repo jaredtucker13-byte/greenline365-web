@@ -92,25 +92,14 @@ async function dbQuery(args: { sql: string }): Promise<MCPToolResult> {
 
 // ---------- Image Generation ----------
 async function imageGenerate(args: { prompt: string; size?: string }): Promise<MCPToolResult> {
-  if (IS_PRODUCTION) {
-    // Production: Nana Banana Pro 3
-    const res = await fetch("/api/generate-nano-banana", {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt: args.prompt, size: args.size || "1024x1024" }),
-    });
-    const data = await res.json();
-    return { success: true, data };
-  } else {
-    // Dev/Test: DALL-E 3
-    const OPENAI_KEY = process.env.OPENAI_API_KEY;
-    if (!OPENAI_KEY) return { success: false, data: null, error: "OPENAI_API_KEY not configured for dev image gen" };
-    const res = await fetch("https://api.openai.com/v1/images/generations", {
-      method: "POST", headers: { Authorization: "Bearer " + OPENAI_KEY, "Content-Type": "application/json" },
-      body: JSON.stringify({ model: "dall-e-3", prompt: args.prompt, n: 1, size: args.size || "1024x1024" }),
-    });
-    const data = await res.json();
-    return { success: true, data: data.data?.[0]?.url || data };
-  }
+  // All image gen routes through the internal API (uses Kie.ai / Nano Banana).
+  // No direct OpenAI or other API keys — everything through OpenRouter or internal services.
+  const res = await fetch("/api/generate-nano-banana", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ prompt: args.prompt, size: args.size || "1024x1024" }),
+  });
+  const data = await res.json();
+  return { success: true, data };
 }
 
 // ---------- Export tool list for agent prompts ----------
