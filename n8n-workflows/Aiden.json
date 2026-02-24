@@ -134,7 +134,8 @@
     {
       "parameters": {
         "sessionIdType": "customKey",
-        "sessionKey": "sessionsId "
+        "sessionKey": "sessionsId ",
+        "contextWindowLength": 20
       },
       "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
       "typeVersion": 1.3,
@@ -1036,7 +1037,8 @@
       {
         "parameters": {
           "sessionIdType": "customKey",
-          "sessionKey": "sessionsId "
+          "sessionKey": "sessionsId ",
+          "contextWindowLength": 20
         },
         "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
         "typeVersion": 1.3,
