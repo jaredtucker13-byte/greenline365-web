@@ -55,5 +55,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  return [...staticPages, ...featurePages, ...destPages, ...listingPages];
+  // Exclude all /greenline-hq paths (super-admin only, not public)
+  const allPages = [...staticPages, ...featurePages, ...destPages, ...listingPages];
+  return allPages.filter(page => !page.url.includes('/greenline-hq'));
 }
