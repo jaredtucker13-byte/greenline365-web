@@ -74,27 +74,14 @@ Return ONLY valid JSON with these fields (use null if not found):
   "subcategories": ["array of subcategories or services offered"]
 }`;
 
-  const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${openrouterKey}`,
-    },
-    body: JSON.stringify({
+  try {
+    const { parsed } = await callOpenRouterJSON({
       model: 'google/gemini-2.0-flash-001',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.1,
-      response_format: { type: 'json_object' },
-    }),
-  });
-
-  const data = await res.json();
-  const content = data.choices?.[0]?.message?.content || '{}';
-
-  // Parse JSON from response
-  try {
-    const cleaned = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-    return JSON.parse(cleaned);
+      caller: 'GL365 Directory Scrape',
+    });
+    return parsed;
   } catch {
     return { business_name: null, industry: 'general', description: null };
   }
