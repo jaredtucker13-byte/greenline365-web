@@ -3,11 +3,11 @@ import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const openrouterKey = process.env.OPENROUTER_API_KEY!;
+const openrouterKey = process.env.OPENROUTER_API_KEY;
 const googlePlacesKey = process.env.GOOGLE_PLACES_API_KEY!;
 function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKey); }
 
-const ADMIN_USER_ID = '677b536d-6521-4ac8-a0a5-98278b35f4cc';
+const ADMIN_USER_ID = process.env.ADMIN_USER_ID || '677b536d-6521-4ac8-a0a5-98278b35f4cc';
 
 const SERVICE_TYPES: Record<string, string> = {
   'roofers': 'roofing companies roof repair roof replacement',
@@ -28,6 +28,10 @@ const SERVICE_TYPES: Record<string, string> = {
 export async function POST(request: NextRequest) {
   const body = await request.json();
   const { service_type, city = 'Tampa', limit = 25 } = body;
+
+  if (!openrouterKey) {
+    return NextResponse.json({ error: 'OpenRouter API key not configured' }, { status: 500 });
+  }
 
   if (!service_type || !SERVICE_TYPES[service_type]) {
     return NextResponse.json({ error: 'Invalid service_type', valid: Object.keys(SERVICE_TYPES) }, { status: 400 });

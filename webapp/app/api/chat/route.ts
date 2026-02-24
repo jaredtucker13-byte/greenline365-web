@@ -437,6 +437,10 @@ export async function POST(req: NextRequest) {
     const sessionId = body?.sessionId as string | undefined;
     const model = getModel(mode);
 
+    if (!process.env.OPENROUTER_API_KEY) {
+      return Response.json({ error: 'OpenRouter API key not configured' }, { status: 500 });
+    }
+
     // ========================================
     // BOOKING INTENT DETECTION & HANDLING
     // ========================================

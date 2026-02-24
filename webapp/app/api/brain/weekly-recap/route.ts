@@ -21,8 +21,8 @@ const supabase = createClient(
 );
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const OWNER_EMAIL = 'jared.tucker13@gmail.com';
-const BIZ_ID = '4c8278a9-46a5-4621-bf3a-88fd03d71478';
+const OWNER_EMAIL = process.env.OWNER_EMAIL || 'jared.tucker13@gmail.com';
+const BIZ_ID = process.env.BUSINESS_ID || '4c8278a9-46a5-4621-bf3a-88fd03d71478';
 
 export async function POST(request: NextRequest) {
   try {

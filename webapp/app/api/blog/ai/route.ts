@@ -36,7 +36,7 @@ const getModel = (action: AIAction): string => {
     case 'enhance_content_with_title':
     case 'custom_generate':
       // Claude excels at creative writing enhancement
-      return 'anthropic/claude-3.5-sonnet';
+      return 'anthropic/claude-sonnet-4';
     case 'generate_outline':
     case 'suggest_headlines':
       // GPT-4o for structured outputs
