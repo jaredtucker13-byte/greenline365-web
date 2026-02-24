@@ -1,0 +1,55 @@
+# GreenLine365
+
+> The Unrivaled Standard in Home Services. Curated. Verified. Your Home's Legacy.
+
+GreenLine365 is a two-sided marketplace and accountability platform for home services. We connect verified homeowners with elite home service contractors through data-driven qualification, AI-powered tools, and a proprietary accountability system.
+
+## For Homeowners
+
+GreenLine365 helps homeowners understand what their home is really costing them and connects them with vetted, verified contractors.
+
+- **Home Savings Calculator**: Free tool that calculates energy waste based on your ZIP code, equipment age, and utility data. Get personalized savings estimates in 60 seconds.
+- **GL365 Verified Contractors**: Every contractor in our Verified Supplier Network has been scored on years in business, insurance, licensing, customer satisfaction, and financial stability. Minimum score: 80/100.
+- **Home Ledger**: A permanent, verified record of your home's service history — equipment installed, inspections completed, and work performed. Builds your home's documented value over time.
+- **Scout (AI Home Advisor)**: Talk to Scout for a personalized energy and equipment analysis. Zero pressure, data-driven advice based on real utility data for your area.
+
+## For Contractors
+
+GreenLine365 provides home service contractors with an AI-powered operations platform, reputation management, and access to pre-qualified homeowner leads.
+
+- **Command Center**: AI-powered dashboard with social media automation, content creation, scheduling, analytics, and CRM.
+- **Badge System**: Multi-factor reputation scoring with visual badges — industry credentials, insurance verification, customer satisfaction, and platform engagement.
+- **Verified Supplier Network**: Earn the highest badge tier to receive pre-qualified homeowner leads. Homeowners have already seen their numbers and agreed to an assessment. Close rates: 60-80%.
+- **Digital Infrastructure Audit**: Professional analysis of a contractor's online presence with AI-generated recommendations.
+
+## Services & Trades Covered
+
+- HVAC (heating, ventilation, air conditioning)
+- Roofing
+- Plumbing
+- Electrical
+- Water heater installation and repair
+- General home services
+
+## Coverage Area
+
+Currently serving the Tampa Bay, Florida metropolitan area with plans for national expansion.
+
+## Contact
+
+- Website: https://greenline365.com
+- Home Savings Calculator: https://greenline365.com/home-savings-calculator
+- Business Directory: https://greenline365.com/directory
+- Register Your Business: https://greenline365.com/register-business
+
+## Key Pages
+
+- /home-savings-calculator — Free energy waste analysis for homeowners
+- /directory — Searchable directory of verified home service businesses
+- /listing/[business-slug] — Individual business profile pages
+- /pricing — Subscription tiers for contractors
+- /features/ai-content-creation — AI content creation for contractors
+- /features/automated-scheduling — Social media scheduling
+- /features/local-trend-tracking — Local market trend intelligence
+- /about — Company story and mission
+- /blog — Home services industry insights and guides

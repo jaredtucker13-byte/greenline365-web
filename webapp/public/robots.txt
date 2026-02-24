@@ -1,0 +1,17 @@
+# GreenLine365 - Robots.txt
+# https://greenline365.com
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin-v2/
+Disallow: /dashboard/
+Disallow: /login
+Disallow: /register
+Disallow: /auth/
+
+# Sitemap
+Sitemap: https://greenline365.com/sitemap.xml
+
+# LLMs.txt - AI crawler guidance
+# See: https://greenline365.com/llms.txt

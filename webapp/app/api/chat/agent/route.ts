@@ -24,6 +24,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient, createServerClient } from '@/lib/supabase/server';
 import { callOpenRouter, callOpenRouterJSON, type ChatMessage } from '@/lib/openrouter';
 import { getAgentPrompt, getAgentTools, resolveTransferAgent, type AgentId, type AgentMode } from '@/lib/agent-personalities';
+import { getBrainSkillReference } from '@/lib/brain/skill-definitions';
+import { runBrainWorkers, type WorkerContext } from '@/lib/brain/workers';
 
 // ── Types ──────────────────────────────────────────────────────────
 
@@ -333,6 +335,26 @@ export async function POST(request: NextRequest) {
 
     await updateContactInfo(supabase, sessionId, message, finalContent, session);
 
+    // ── Step 10: Fire Brain Workers (background, non-blocking) ──
+
+    const workerCtx: WorkerContext = {
+      supabase,
+      sessionId,
+      agentId,
+      mode,
+      userMessage: message,
+      assistantResponse: finalContent,
+      toolCalls: allToolCalls,
+      session,
+      contactEmail: session.contact_email || body.contactEmail,
+      contactName: session.contact_name || body.contactName,
+      contactPhone: session.contact_phone || body.contactPhone,
+      businessId: session.business_id || businessId,
+    };
+
+    // Fire-and-forget — workers process in background after response
+    runBrainWorkers(workerCtx).catch(() => {});
+
     // ── Return response ────────────────────────────────────────
 
     return NextResponse.json({
@@ -501,7 +523,8 @@ async function loadBrainContext(supabase: any, params: BrainContextParams): Prom
 // ── Enhanced System Prompt with Brain Context ──────────────────────
 
 function buildEnhancedSystemPrompt(agentId: AgentId, mode: AgentMode, brain: BrainContext, session?: any): string {
-  let prompt = getAgentPrompt(agentId, mode);
+  // Brain skill reference is the foundational layer — injected before agent personality
+  let prompt = getBrainSkillReference() + '\n\n' + getAgentPrompt(agentId, mode);
 
   // Inject sentiment-aware behavior adjustment
   if (session?.sentiment_score !== undefined && session.sentiment_score !== null) {
