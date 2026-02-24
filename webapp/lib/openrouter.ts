@@ -35,8 +35,11 @@ const PRICING: Record<string, { input: number; output: number }> = {
   'anthropic/claude-sonnet-4':    { input: 3,    output: 15 },
   'openai/gpt-4o':                { input: 2.5,  output: 10 },
   'openai/gpt-4o-mini':           { input: 0.15, output: 0.6 },
+  'openai/gpt-4o-audio-preview':  { input: 2.5,  output: 10 },
   'google/gemini-2.5-pro-preview':{ input: 1.25, output: 10 },
+  'google/gemini-2.0-flash-001':  { input: 0.1,  output: 0.4 },
   'perplexity/sonar-pro':         { input: 3,    output: 15 },
+  'perplexity/sonar':             { input: 1,    output: 1 },
   'perplexity/llama-3.1-sonar-large-128k-online': { input: 1, output: 1 },
 };
 

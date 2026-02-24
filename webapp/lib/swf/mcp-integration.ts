@@ -5,10 +5,12 @@ import { createClient } from "@supabase/supabase-js";
 const MCP_PLAYWRIGHT_URL = process.env.MCP_PLAYWRIGHT_URL || "http://localhost:3001";
 const IS_PRODUCTION = process.env.NODE_ENV === "production";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+function getServiceClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
 
 // ---------- Types ----------
 interface MCPToolCall { tool: string; args: Record<string, any>; }
@@ -63,7 +65,12 @@ async function browserExtract(args: { selector?: string }): Promise<MCPToolResul
 }
 
 // ---------- Database Tools ----------
+const TABLE_NAME_RE = /^[a-zA-Z_][a-zA-Z0-9_]{0,62}$/;
+const BLOCKED_SQL_RE = /\b(DROP|TRUNCATE|ALTER|CREATE|GRANT|REVOKE|DELETE\s+FROM)\b/i;
+
 async function dbRead(args: { table: string; filters?: Record<string, any>; limit?: number }): Promise<MCPToolResult> {
+  if (!TABLE_NAME_RE.test(args.table)) return { success: false, data: null, error: "Invalid table name" };
+  const supabase = getServiceClient();
   let query = supabase.from(args.table).select("*");
   if (args.filters) for (const [key, val] of Object.entries(args.filters)) query = query.eq(key, val);
   if (args.limit) query = query.limit(args.limit);
@@ -71,10 +78,14 @@ async function dbRead(args: { table: string; filters?: Record<string, any>; limi
   return error ? { success: false, data: null, error: error.message } : { success: true, data };
 }
 async function dbWrite(args: { table: string; record: Record<string, any> }): Promise<MCPToolResult> {
+  if (!TABLE_NAME_RE.test(args.table)) return { success: false, data: null, error: "Invalid table name" };
+  const supabase = getServiceClient();
   const { data, error } = await supabase.from(args.table).upsert(args.record).select();
   return error ? { success: false, data: null, error: error.message } : { success: true, data };
 }
 async function dbQuery(args: { sql: string }): Promise<MCPToolResult> {
+  if (BLOCKED_SQL_RE.test(args.sql)) return { success: false, data: null, error: "Destructive SQL statements are not allowed" };
+  const supabase = getServiceClient();
   const { data, error } = await supabase.rpc("execute_sql", { query: args.sql });
   return error ? { success: false, data: null, error: error.message } : { success: true, data };
 }
