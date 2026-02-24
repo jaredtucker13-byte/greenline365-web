@@ -162,10 +162,12 @@ export default function ListingDetailPage() {
       {/* Hero / Cover Image */}
       <section className="relative h-64 sm:h-80 lg:h-96 overflow-hidden">
         {listing.cover_image_url ? (
-          <img
+          <Image
             src={listing.cover_image_url}
             alt={`${listing.business_name} — ${listing.industry.replace(/-/g, ' ')} in ${listing.city}, ${listing.state}`}
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
+            sizes="100vw"
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-midnight-800 to-charcoal-800 flex items-center justify-center">
@@ -311,10 +313,12 @@ export default function ListingDetailPage() {
               >
                 {/* Main Photo */}
                 <div className="relative aspect-video">
-                  <img
+                  <Image
                     src={photos[activePhoto]}
                     alt={`${listing.business_name} photo ${activePhoto + 1}`}
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
                   />
                   {photos.length > 1 && (
                     <div className="absolute bottom-3 right-3 px-2.5 py-1 rounded-full text-xs font-heading font-semibold text-white/80 backdrop-blur-sm" style={{ background: 'rgba(0,0,0,0.6)' }}>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
+import Image from 'next/image';
 
 // Inline SVG Icons
 const Icons = {
@@ -310,11 +311,15 @@ export default function SignPage() {
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {incident.incident_images.map((image, index) => (
                 <div key={image.id} className="relative">
-                  <img
-                    src={image.url}
-                    alt={`Evidence ${index + 1}`}
-                    className="w-full h-48 object-cover rounded-lg"
-                  />
+                  <div className="relative h-48">
+                    <Image
+                      src={image.url}
+                      alt={`Evidence ${index + 1}`}
+                      fill
+                      className="object-cover rounded-lg"
+                      sizes="(max-width: 768px) 50vw, 33vw"
+                    />
+                  </div>
                   {image.caption && (
                     <p className="text-xs text-gray-400 mt-1">{image.caption}</p>
                   )}

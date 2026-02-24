@@ -1190,11 +1190,14 @@ Generate a high-quality mockup specifically for this ${section.label} section on
                       
                       {imagePreview ? (
                         <div className="relative group">
-                          <img
+                          <Image
                             src={imagePreview}
                             alt="Uploaded screenshot"
+                            width={800}
+                            height={450}
                             className="w-full rounded-xl border border-white/20"
                             data-testid="image-preview"
+                            sizes="(max-width: 768px) 100vw, 50vw"
                           />
                           {/* X button to remove image */}
                           <button
@@ -1645,9 +1648,11 @@ Generate a high-quality mockup specifically for this ${section.label} section on
                     {/* Thumbnail preview if generated */}
                     {section.mockupImageUrl && (
                       <div className="mt-3 pt-3 border-t border-white/10">
-                        <img
+                        <Image
                           src={section.mockupImageUrl}
                           alt={section.label}
+                          width={80}
+                          height={80}
                           className="h-20 w-auto rounded-lg object-cover"
                           onError={(e) => {
                             // Fallback for broken images
@@ -1703,9 +1708,11 @@ Generate a high-quality mockup specifically for this ${section.label} section on
               
               {sections[currentSectionIndex].mockupImageUrl ? (
                 <div className="relative">
-                  <img
+                  <Image
                     src={sections[currentSectionIndex].mockupImageUrl}
                     alt="Section Mockup"
+                    width={800}
+                    height={450}
                     className="w-full rounded-xl shadow-2xl border border-white/20"
                     data-testid="mockup-preview-image"
                     onError={(e) => {
@@ -1822,9 +1829,11 @@ Generate a high-quality mockup specifically for this ${section.label} section on
                       <span className="text-white/30 cursor-grab mt-2">⋮⋮</span>
                       
                       {section.mockupImageUrl && (
-                        <img
+                        <Image
                           src={section.mockupImageUrl}
                           alt={section.label}
+                          width={128}
+                          height={80}
                           className="w-32 h-20 rounded-lg object-cover flex-shrink-0"
                           onError={(e) => {
                             (e.target as HTMLImageElement).style.display = 'none';
@@ -1877,10 +1886,12 @@ Generate a high-quality mockup specifically for this ${section.label} section on
                 <div className="space-y-2 max-h-96 overflow-y-auto">
                   {sections.filter(s => s.status === 'approved').map((section) => (
                     section.mockupImageUrl && (
-                      <img
+                      <Image
                         key={section.id}
                         src={section.mockupImageUrl}
                         alt={section.label}
+                        width={800}
+                        height={450}
                         className="w-full rounded-lg"
                         onError={(e) => {
                           (e.target as HTMLImageElement).style.display = 'none';
@@ -1992,16 +2003,22 @@ Generate a high-quality mockup specifically for this ${section.label} section on
               </button>
               
               {selectedPreviewSection?.mockupImageUrl ? (
-                <img
+                <Image
                   src={selectedPreviewSection.mockupImageUrl}
                   alt="Full Preview"
+                  width={1200}
+                  height={800}
                   className="max-w-full max-h-full rounded-xl shadow-2xl"
+                  sizes="100vw"
                 />
               ) : sections[currentSectionIndex]?.mockupImageUrl ? (
-                <img
+                <Image
                   src={sections[currentSectionIndex].mockupImageUrl}
                   alt="Full Preview"
+                  width={1200}
+                  height={800}
                   className="max-w-full max-h-full rounded-xl shadow-2xl"
+                  sizes="100vw"
                 />
               ) : (
                 <div className="text-white/50">No image to preview</div>

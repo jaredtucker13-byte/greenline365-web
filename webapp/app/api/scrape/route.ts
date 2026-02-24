@@ -20,8 +20,8 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
-// Use service role for backend operations
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+// Use service role for backend operations — created per-request, not at module level
+function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKey); }
 
 interface ScrapeRequest {
   url: string;
@@ -38,6 +38,7 @@ interface ScrapedData {
 
 export async function POST(request: Request) {
   try {
+    const supabase = getServiceClient();
     const body: ScrapeRequest = await request.json();
     const { url, demo_request_id } = body;
 
@@ -55,7 +56,7 @@ export async function POST(request: Request) {
 
     // Update demo_request status to processing
     if (demo_request_id) {
-      await supabaseAdmin
+      await supabase
         .from('demo_requests')
         .update({ scrape_status: 'processing', updated_at: new Date().toISOString() })
         .eq('id', demo_request_id);
@@ -72,7 +73,7 @@ export async function POST(request: Request) {
     // Store scraped data in database
     if (demo_request_id) {
       // Update demo_request with scraped data
-      await supabaseAdmin
+      await supabase
         .from('demo_requests')
         .update({ 
           scrape_status: 'completed',
@@ -82,7 +83,7 @@ export async function POST(request: Request) {
         .eq('id', demo_request_id);
 
       // Also store in ingested_website_data for the Companion
-      await supabaseAdmin
+      await supabase
         .from('ingested_website_data')
         .insert({
           demo_request_id,
@@ -242,6 +243,7 @@ function generateSimulatedData(url: string): ScrapedData {
 
 // GET endpoint to check scrape status
 export async function GET(request: Request) {
+  const supabase = getServiceClient();
   const { searchParams } = new URL(request.url);
   const demo_request_id = searchParams.get('demo_request_id');
 
@@ -249,7 +251,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'demo_request_id is required' }, { status: 400 });
   }
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabase
     .from('demo_requests')
     .select('id, scrape_status, scraped_data, website_url')
     .eq('id', demo_request_id)

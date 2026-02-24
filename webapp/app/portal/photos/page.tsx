@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { usePortalContext } from '@/lib/hooks/usePortalContext';
+import Image from 'next/image';
 import UpgradeCTA from '@/components/portal/UpgradeCTA';
 
 interface Photo {
@@ -182,11 +183,12 @@ export default function PhotosPage() {
                   : 'border-white/10'
               } ${draggedId === photo.id ? 'opacity-50' : ''}`}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={photo.url}
                 alt={photo.alt_text || 'Listing photo'}
-                className="h-full w-full object-cover"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 50vw, 33vw"
               />
               {photo.is_cover && (
                 <span className="absolute left-2 top-2 rounded bg-neon-green-500 px-2 py-0.5 text-[10px] font-bold text-black">

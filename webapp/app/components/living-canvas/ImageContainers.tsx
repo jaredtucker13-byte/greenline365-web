@@ -134,14 +134,15 @@ export function OrganicImageContainer({
           clipPath: shapeDefinition.clipPath,
         }}
       >
-        <img
+        <Image
           src={src}
           alt={alt}
-          className={`w-full h-full object-cover transition-opacity duration-700 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+          fill
+          className={`object-cover transition-opacity duration-700 ${loaded ? 'opacity-100' : 'opacity-0'}`}
           onLoad={() => setLoaded(true)}
-          loading="lazy"
+          sizes="(max-width: 768px) 100vw, 50vw"
         />
-        
+
         {/* Soft edge fade for organic feel */}
         <div 
           className="absolute inset-0 pointer-events-none"
@@ -256,12 +257,13 @@ export function FramedImageContainer({
             left: frameAsset?.innerBounds?.left || 16,
           }}
         >
-          <img
+          <Image
             src={src}
             alt={alt}
-            className={`w-full h-full object-cover transition-opacity duration-700 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+            fill
+            className={`object-cover transition-opacity duration-700 ${loaded ? 'opacity-100' : 'opacity-0'}`}
             onLoad={() => setLoaded(true)}
-            loading="lazy"
+            sizes="(max-width: 768px) 100vw, 50vw"
           />
           
           {/* Glass reflection effect */}
@@ -361,7 +363,7 @@ export function DropCapImage({
 
   return (
     <div
-      className={`living-canvas-drop-cap ${className}`}
+      className={`living-canvas-drop-cap relative ${className}`}
       style={{
         width: sizeMap[size],
         height: sizeMap[size],
@@ -372,13 +374,15 @@ export function DropCapImage({
         marginBottom: '0.25rem',
       }}
     >
-      <img
+      <Image
         src={src}
         alt={alt}
-        className="w-full h-full object-cover"
+        fill
+        className="object-cover"
         style={{
           clipPath: shapeDefinition.clipPath,
         }}
+        sizes="96px"
       />
     </div>
   );

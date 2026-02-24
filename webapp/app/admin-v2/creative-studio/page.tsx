@@ -20,8 +20,8 @@ import { useBusiness } from '@/lib/business';
 import { useCostTracking } from '@/lib/cost-tracking';
 import CollapsibleSidebar from '../components/CollapsibleSidebar';
 import TacticalHeader from '../components/TacticalHeader';
-import { 
-  Upload, Sparkles, Users, Image, Download, Share2, Folder,
+import {
+  Upload, Sparkles, Users, Image as ImageIcon, Download, Share2, Folder,
   Plus, Camera, Wand2, Eye, ChevronRight, X, Check, Loader2,
   RefreshCw, Trash2, Star, Grid, List, ArrowRight, Link, ExternalLink
 } from 'lucide-react';
@@ -671,10 +671,12 @@ export default function CreativeStudioPage() {
                         {/* Show file previews */}
                         {uploadedFiles.map((file, i) => (
                           <div key={`file-${i}`} className="relative w-20 h-20 rounded-lg overflow-hidden group">
-                            <img
+                            <Image
                               src={URL.createObjectURL(file)}
                               alt={file.name}
-                              className="w-full h-full object-cover"
+                              fill
+                              className="object-cover"
+                              sizes="80px"
                             />
                             <button
                               onClick={() => removeFile(i)}
@@ -687,10 +689,12 @@ export default function CreativeStudioPage() {
                         {/* Show URL previews */}
                         {uploadedUrls.map((url, i) => (
                           <div key={`url-${i}`} className="relative w-20 h-20 rounded-lg overflow-hidden group">
-                            <img
+                            <Image
                               src={url}
                               alt={`Image ${i + 1}`}
-                              className="w-full h-full object-cover"
+                              fill
+                              className="object-cover"
+                              sizes="80px"
                               onError={(e) => {
                                 (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill="%23333" width="80" height="80"/><text fill="%23666" x="40" y="45" text-anchor="middle" font-size="10">Error</text></svg>';
                               }}
@@ -1270,7 +1274,7 @@ export default function CreativeStudioPage() {
                       </div>
                     ) : (
                       <div className="aspect-video rounded-lg bg-white/5 border border-dashed border-white/20 flex flex-col items-center justify-center">
-                        <Image className="w-8 h-8 text-white/20 mb-2" />
+                        <ImageIcon className="w-8 h-8 text-white/20 mb-2" />
                         <p className="text-white/40 text-sm">No mockups generated yet</p>
                         <button
                           onClick={() => rerunMockups(selectedProduct)}

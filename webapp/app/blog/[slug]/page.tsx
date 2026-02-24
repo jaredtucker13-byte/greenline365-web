@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 
 interface StyleGuide {
@@ -266,10 +267,13 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 borderRadius: style?.layout?.headerStyle === 'minimal' ? '0.5rem' : '1rem',
               }}
             >
-              <img
+              <Image
                 src={post.featured_image}
                 alt={post.title}
+                width={1200}
+                height={630}
                 className="w-full h-auto object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
               />
             </div>
           )}

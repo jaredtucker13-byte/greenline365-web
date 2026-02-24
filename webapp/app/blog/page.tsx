@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Metadata } from 'next';
 
 // Don't try to statically generate this page — fetch blog data on each request
@@ -193,11 +194,13 @@ export default async function BlogListingPage() {
                     
                     {/* Featured Image */}
                     {post.featured_image && (
-                      <div className="aspect-video overflow-hidden">
-                        <img
+                      <div className="aspect-video overflow-hidden relative">
+                        <Image
                           src={post.featured_image}
                           alt={post.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                          sizes="(max-width: 768px) 100vw, 33vw"
                         />
                       </div>
                     )}

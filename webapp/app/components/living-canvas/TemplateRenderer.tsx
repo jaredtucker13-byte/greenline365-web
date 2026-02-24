@@ -11,6 +11,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LivingCanvasImage, DropCapImage, ShapedText, FrameConfig } from './ImageContainers';
 import { SHAPE_PRESETS, getShapeDefinition } from './css-shapes';
+import Image from 'next/image';
 import { ExtractedPalette, extractColorsFromImage, DEFAULT_PALETTE, applyPaletteToElement, generateGradient } from './color-extraction';
 
 // ============================================
@@ -329,10 +330,12 @@ function HeroFeatureTemplate({
       {/* Hero section */}
       <div className="relative h-[60vh] min-h-[400px] overflow-hidden">
         {heroImage?.url && (
-          <img
+          <Image
             src={heroImage.url}
             alt={heroImage.alt || ''}
-            className="absolute inset-0 w-full h-full object-cover"
+            fill
+            className="object-cover"
+            sizes="100vw"
           />
         )}
         

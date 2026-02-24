@@ -17,6 +17,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Pencil, X, Check, Image as ImageIcon, Type, Loader2, Upload } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
+import Image from 'next/image';
 import { useAdminEditMode } from './AdminEditModeContext';
 
 interface EditableRegionProps {
@@ -141,10 +142,13 @@ export function EditableRegion({
   const renderContent = () => {
     if (type === 'image' && content?.image_url) {
       return (
-        <img 
-          src={content.image_url} 
-          alt={content.image_alt || ''} 
+        <Image
+          src={content.image_url}
+          alt={content.image_alt || ''}
+          width={800}
+          height={450}
           className={imageClassName}
+          sizes="(max-width: 768px) 100vw, 50vw"
         />
       );
     }
@@ -279,7 +283,7 @@ function EditModal({
             <div className="space-y-4">
               {value && (
                 <div className="aspect-video rounded-xl overflow-hidden bg-white/5 border border-white/10">
-                  <img src={value} alt="Preview" className="w-full h-full object-cover" />
+                  <Image src={value} alt="Preview" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
                 </div>
               )}
               <div className="relative">

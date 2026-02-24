@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKey); }
 
 // Trend data structure stored in JSONB
 interface TrendData {
@@ -16,7 +17,7 @@ interface TrendData {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const supabase = getServiceClient();
     
     // Parse N8N payload
     const body = await request.json();
@@ -96,7 +97,7 @@ export async function POST(request: NextRequest) {
 // GET endpoint to retrieve current trends
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const supabase = getServiceClient();
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type') || 'weekly_batch';
 

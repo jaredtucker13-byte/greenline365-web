@@ -3489,10 +3489,13 @@ export default function BlogPolishPage() {
               </button>
               
               {/* Image */}
-              <img
+              <Image
                 src={previewImage.url}
                 alt="Preview"
+                width={1200}
+                height={800}
                 className="w-full h-auto max-h-[80vh] object-contain rounded-lg shadow-2xl"
+                sizes="(max-width: 768px) 100vw, 50vw"
               />
               
               {/* Action buttons */}

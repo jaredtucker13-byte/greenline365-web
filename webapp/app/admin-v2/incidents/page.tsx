@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase/client';
+import Image from 'next/image';
 
 // Inline SVG Icons
 const Icons = {
@@ -655,11 +656,15 @@ export default function IncidentsPage() {
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                       {selectedIncident.incident_images.map(image => (
                         <div key={image.id} className="relative group">
-                          <img
-                            src={image.url}
-                            alt={image.filename}
-                            className="w-full h-40 object-cover rounded-lg"
-                          />
+                          <div className="relative h-40">
+                            <Image
+                              src={image.url}
+                              alt={image.filename}
+                              fill
+                              className="object-cover rounded-lg"
+                              sizes="(max-width: 768px) 50vw, 33vw"
+                            />
+                          </div>
                           <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg p-2 flex flex-col justify-between">
                             <div className="text-xs">
                               {image.ai_analysis?.severity && (

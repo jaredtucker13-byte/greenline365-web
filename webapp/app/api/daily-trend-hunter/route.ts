@@ -3,7 +3,9 @@ import { createClient } from '@supabase/supabase-js';
 import { callOpenRouterJSON } from '@/lib/openrouter';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKey); }
 
 // N8N Webhook URL — set via environment variable (falls back to AI if unavailable)
 const N8N_WEBHOOK_URL = process.env.N8N_TREND_WEBHOOK_URL || '';
@@ -190,22 +192,20 @@ export async function POST(request: NextRequest) {
     }));
 
     // Try to log to Supabase (non-blocking)
-    if (supabaseKey) {
-      try {
-        const supabase = createClient(supabaseUrl, supabaseKey);
-        await supabase.from('trend_history').insert({
-          user_id: userId || null,
-          zip_code: zipCode,
-          trend_type: trendType,
-          n8n_request: { zipCode, trendType },
-          n8n_response: { trends: formattedTrends, source },
-          trends_count: formattedTrends.length,
-          status: 'success'
-        });
-      } catch (e) {
-        // Ignore Supabase errors - don't fail the request
-        console.log('Supabase logging skipped');
-      }
+    try {
+      const supabase = getServiceClient();
+      await supabase.from('trend_history').insert({
+        user_id: userId || null,
+        zip_code: zipCode,
+        trend_type: trendType,
+        n8n_request: { zipCode, trendType },
+        n8n_response: { trends: formattedTrends, source },
+        trends_count: formattedTrends.length,
+        status: 'success'
+      });
+    } catch (e) {
+      // Ignore Supabase errors - don't fail the request
+      console.log('Supabase logging skipped');
     }
 
     // Return response
