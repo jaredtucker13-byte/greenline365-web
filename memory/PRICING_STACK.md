@@ -1,4 +1,8 @@
-# Greenline365 Pricing & Value Stack
+> **DEPRECATED — This file is superseded by `docs/specs/pricing.md` as of 2026-02-24.**
+> The tier names (Tier 1/2/3) and pricing below are outdated. The current model uses Operator/Commander/Sovereign tiers.
+> See `docs/specs/pricing.md` for the canonical pricing reference.
+
+# Greenline365 Pricing & Value Stack (LEGACY)
 ## The Tiered Revenue Model
 
 ---

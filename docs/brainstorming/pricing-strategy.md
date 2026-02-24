@@ -1,7 +1,10 @@
-# GreenLine365 — Pricing Strategy
+> **DEPRECATED — This file is superseded by `docs/specs/pricing.md` as of 2026-02-24.**
+> Most "TBD" items below have been resolved. See `docs/specs/pricing.md` for the canonical pricing reference.
+
+# GreenLine365 — Pricing Strategy (LEGACY)
 
 Brainstorming Document
-Status: Draft — Pricing NOT FINAL. Many items TBD.
+Status: ~~Draft — Pricing NOT FINAL. Many items TBD.~~ DEPRECATED — see docs/specs/pricing.md
 Created: 2026-02-21
 Author: Jared Tucker (Creator, GL365)
 File: docs/brainstorming/pricing-strategy.md

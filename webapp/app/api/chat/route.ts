@@ -8,6 +8,56 @@ import { rateLimit, rateLimitResponse } from '@/lib/rate-limit';
 type Msg = { role: 'user' | 'assistant' | 'system'; content: string };
 
 // ========================================
+// MESSAGE SANITIZATION
+// ========================================
+
+/**
+ * Sanitize messages to prevent Anthropic API errors like
+ * "tool_use ids must be unique". This strips tool_use/tool_result
+ * content blocks and ensures all content is plain text strings.
+ */
+function sanitizeMessages(msgs: any[]): Msg[] {
+  return msgs
+    .filter((m) => m && m.role && m.content != null)
+    .map((m) => {
+      // If content is already a string, return as-is
+      if (typeof m.content === 'string') {
+        return { role: m.role, content: m.content } as Msg;
+      }
+
+      // If content is an array (Anthropic multi-block format), flatten to text
+      if (Array.isArray(m.content)) {
+        const textParts: string[] = [];
+
+        for (const block of m.content) {
+          if (!block || typeof block !== 'object') continue;
+
+          // Skip tool_use and tool_result blocks entirely
+          if (block.type === 'tool_use' || block.type === 'tool_result') {
+            continue;
+          }
+
+          // Extract text from text blocks
+          if (block.type === 'text' && typeof block.text === 'string') {
+            textParts.push(block.text);
+          } else if (typeof block === 'string') {
+            textParts.push(block);
+          }
+        }
+
+        const combined = textParts.join('\n').trim();
+        if (!combined) return null;
+
+        return { role: m.role, content: combined } as Msg;
+      }
+
+      // Fallback: stringify non-standard content
+      return { role: m.role, content: String(m.content) } as Msg;
+    })
+    .filter((m): m is Msg => m !== null && m.content.length > 0);
+}
+
+// ========================================
 // BOOKING INTENT DETECTION
 // ========================================
 
@@ -421,16 +471,28 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({} as Record<string, unknown>));
 
-    const message: string | undefined =
-      body?.message ??
-      body?.messages?.[body.messages.length - 1]?.content;
+    // Extract the latest user message (handle both string and array content)
+    let message: string | undefined = body?.message;
+    if (!message && body?.messages?.length) {
+      const lastMsg = body.messages[body.messages.length - 1];
+      if (typeof lastMsg?.content === 'string') {
+        message = lastMsg.content;
+      } else if (Array.isArray(lastMsg?.content)) {
+        // Extract text from array content blocks
+        message = lastMsg.content
+          .filter((b: any) => b?.type === 'text' && typeof b.text === 'string')
+          .map((b: any) => b.text)
+          .join('\n')
+          .trim() || undefined;
+      }
+    }
 
     if (!message || typeof message !== 'string') {
       return Response.json({ error: 'Missing message' }, { status: 400 });
     }
 
     const messages: Msg[] = body?.messages?.length
-      ? body.messages
+      ? sanitizeMessages(body.messages)
       : [{ role: 'user', content: message }];
 
     const mode = body?.mode as string | undefined;
