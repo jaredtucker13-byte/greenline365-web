@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Prepare the image for analysis
-    let imageData = imageBase64;
+    const imageData = imageBase64;
     
     // If URL provided, we'd need to screenshot it (handled client-side for now)
     if (url && !imageBase64) {

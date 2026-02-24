@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get business-specific content first, then fall back to global
-    let query = supabase
+    const query = supabase
       .from('site_content')
       .select('*')
       .eq('page_slug', pageSlug);

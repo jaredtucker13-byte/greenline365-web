@@ -800,7 +800,7 @@ export default function BlogPolishPage() {
   };
 
   // Copy suggestion to custom prompt input
-  const useSuggestion = (text: string) => {
+  const applySuggestion = (text: string) => {
     setCustomPromptInput(text);
     setMessage({ type: 'info', text: 'Suggestion copied to prompt input. Edit and generate!' });
   };
@@ -2152,7 +2152,7 @@ export default function BlogPolishPage() {
                               {headline}
                             </button>
                             <button
-                              onClick={() => useSuggestion(`Write a blog post with the headline: "${headline}"`)}
+                              onClick={() => applySuggestion(`Write a blog post with the headline: "${headline}"`)}
                               className="px-2 py-1 rounded bg-purple-500/30 text-purple-200 text-[10px] hover:bg-purple-500/40 transition whitespace-nowrap"
                               title="Use this suggestion to generate content"
                             >
@@ -2189,7 +2189,7 @@ export default function BlogPolishPage() {
                       <div className="flex items-center justify-between mb-2">
                         <p className="text-xs text-white/50">🔎 SEO Meta</p>
                         <button
-                          onClick={() => useSuggestion(`Write content optimized for: ${aiSuggestions.meta?.description}. Keywords: ${aiSuggestions.meta?.keywords?.join(', ')}`)}
+                          onClick={() => applySuggestion(`Write content optimized for: ${aiSuggestions.meta?.description}. Keywords: ${aiSuggestions.meta?.keywords?.join(', ')}`)}
                           className="px-2 py-1 rounded bg-purple-500/30 text-purple-200 text-[10px] hover:bg-purple-500/40 transition"
                         >
                           Use This
@@ -2212,7 +2212,7 @@ export default function BlogPolishPage() {
                         <p className="text-xs text-white/50">📋 Generated Outline</p>
                         <div className="flex gap-2">
                           <button
-                            onClick={() => useSuggestion(`Expand on this outline:\n${aiSuggestions.outline}`)}
+                            onClick={() => applySuggestion(`Expand on this outline:\n${aiSuggestions.outline}`)}
                             className="px-2 py-1 rounded bg-purple-500/30 text-purple-200 text-[10px] hover:bg-purple-500/40 transition"
                           >
                             Use This
