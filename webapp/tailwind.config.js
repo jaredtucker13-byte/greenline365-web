@@ -136,6 +136,8 @@ module.exports = {
   },
   plugins: [
     require('@tailwindcss/typography'),
+    require('@tailwindcss/forms')({ strategy: 'class' }),
+    require('@tailwindcss/container-queries'),
     plugin(function({ addUtilities, addComponents }) {
       addUtilities({
         '.glass': {
