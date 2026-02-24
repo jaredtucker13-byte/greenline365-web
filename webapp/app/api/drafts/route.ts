@@ -3,9 +3,8 @@ import { createClient } from '@supabase/supabase-js';
 
 // Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKey); }
 
 // ============================================
 // GET - Fetch all drafts for a user
@@ -15,7 +14,8 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get('userId');
     const status = searchParams.get('status') || 'draft'; // 'draft', 'scheduled', 'published'
-    
+    const supabase = getServiceClient();
+
     // Build query - don't require userId since we're demoing
     let query = supabase
       .from('scheduled_content')
@@ -54,7 +54,8 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    
+    const supabase = getServiceClient();
+
     const {
       userId,
       title,
@@ -121,7 +122,8 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     const body = await req.json();
-    
+    const supabase = getServiceClient();
+
     const {
       id,
       userId,
@@ -198,6 +200,7 @@ export async function DELETE(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
     const userId = searchParams.get('userId');
+    const supabase = getServiceClient();
 
     if (!id) {
       return NextResponse.json({ error: 'id is required' }, { status: 400 });

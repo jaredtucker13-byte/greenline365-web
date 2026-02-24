@@ -19,6 +19,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence, Reorder } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 
 // Types
 type AnalysisMode = 'analyze' | 'scratch';
@@ -915,9 +916,9 @@ Generate a high-quality mockup specifically for this ${section.label} section on
                     data-testid={`project-card-${proj.id}`}
                   >
                     {/* Preview Image or Placeholder */}
-                    <div className="aspect-video bg-black/40 rounded-xl mb-4 overflow-hidden flex items-center justify-center">
+                    <div className="relative aspect-video bg-black/40 rounded-xl mb-4 overflow-hidden flex items-center justify-center">
                       {proj.preview_image ? (
-                        <img src={proj.preview_image} alt={proj.name} className="w-full h-full object-cover" />
+                        <Image src={proj.preview_image} alt={proj.name} fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
                       ) : (
                         <span className="text-4xl opacity-30">🌐</span>
                       )}
@@ -1684,7 +1685,7 @@ Generate a high-quality mockup specifically for this ${section.label} section on
               {imagePreview && (
                 <div className="p-4 rounded-xl bg-white/5 border border-white/10">
                   <h3 className="text-sm font-medium text-white/70 mb-2">Source Image</h3>
-                  <img src={imagePreview} alt="Source" className="w-full rounded-lg" />
+                  <Image src={imagePreview} alt="Source" width={800} height={600} className="w-full rounded-lg" />
                 </div>
               )}
             </div>

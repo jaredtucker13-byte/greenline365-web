@@ -13,6 +13,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Draft {
@@ -336,12 +337,14 @@ export default function DraftsPanel({ userId = 'demo-user', onEditDraft, onPubli
                 >
                   <div className="flex items-start gap-3">
                     {/* Thumbnail or icon */}
-                    <div className="w-12 h-12 rounded-lg bg-[#2D3748] flex items-center justify-center flex-shrink-0 overflow-hidden">
+                    <div className="relative w-12 h-12 rounded-lg bg-[#2D3748] flex items-center justify-center flex-shrink-0 overflow-hidden">
                       {item.image_url ? (
-                        <img 
-                          src={item.image_url} 
-                          alt="" 
-                          className="w-full h-full object-cover"
+                        <Image
+                          src={item.image_url}
+                          alt=""
+                          fill
+                          className="object-cover"
+                          sizes="48px"
                         />
                       ) : (
                         <span className="text-2xl">{getContentTypeIcon(item.content_type)}</span>

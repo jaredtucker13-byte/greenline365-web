@@ -14,6 +14,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import { useBusiness } from '@/lib/business';
@@ -456,8 +457,8 @@ export default function ThemeSettingsPage() {
                       <label className="block text-sm font-medium text-white/70 mb-2">Logo</label>
                       <div className="flex items-center gap-4">
                         {theme.logo_url ? (
-                          <div className="w-32 h-16 rounded-lg bg-white/10 flex items-center justify-center overflow-hidden">
-                            <img src={theme.logo_url} alt="Logo" className="max-w-full max-h-full object-contain" />
+                          <div className="relative w-32 h-16 rounded-lg bg-white/10 flex items-center justify-center overflow-hidden">
+                            <Image src={theme.logo_url} alt="Logo" fill className="object-contain" sizes="128px" />
                           </div>
                         ) : (
                           <div className="w-32 h-16 rounded-lg bg-white/5 border-2 border-dashed border-white/20 flex items-center justify-center">
@@ -718,7 +719,7 @@ export default function ThemeSettingsPage() {
                     style={{ background: theme?.surface_color || '#1A1A1A' }}
                   >
                     {theme?.logo_url ? (
-                      <img src={theme.logo_url} alt="Logo" className="h-8 w-auto" />
+                      <Image src={theme.logo_url} alt="Logo" width={120} height={32} className="h-8 w-auto" />
                     ) : (
                       <div 
                         className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold"

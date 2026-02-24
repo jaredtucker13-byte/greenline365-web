@@ -6,16 +6,16 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "edge";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKey); }
 
 export async function POST(req: NextRequest) {
   const { command, priority, initiated_by } = await req.json();
   if (!command || typeof command !== "string") {
     return NextResponse.json({ error: "Missing 'command' field" }, { status: 400 });
   }
+  const supabase = getServiceClient();
   const taskId = crypto.randomUUID();
   const { error } = await supabase.from("task_queue").insert({
     id: taskId,
@@ -31,6 +31,7 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   const taskId = url.searchParams.get("task_id");
+  const supabase = getServiceClient();
   if (taskId) {
     const { data, error } = await supabase.from("task_queue").select("*").eq("id", taskId).single();
     if (error) return NextResponse.json({ error: error.message }, { status: 404 });

@@ -1,10 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKey); }
 
 // GET /api/blog/[slug] - Get single blog post
 export async function GET(
@@ -13,7 +12,8 @@ export async function GET(
 ) {
   try {
     const { slug } = await params;
-    
+    const supabase = getServiceClient();
+
     const { data, error } = await supabase
       .from('blog_posts')
       .select('*, blog_analytics(*)')
@@ -46,7 +46,8 @@ export async function PATCH(
   try {
     const { slug } = await params;
     const body = await request.json();
-    
+    const supabase = getServiceClient();
+
     const { data, error } = await supabase
       .from('blog_posts')
       .update({
@@ -72,7 +73,8 @@ export async function DELETE(
 ) {
   try {
     const { slug } = await params;
-    
+    const supabase = getServiceClient();
+
     const { error } = await supabase
       .from('blog_posts')
       .delete()

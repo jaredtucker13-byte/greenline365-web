@@ -9,6 +9,7 @@
  */
 
 import React, { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import { ShapeDefinition, getShapeDefinition, SHAPE_PRESETS } from './css-shapes';
 import { ExtractedPalette, extractColorsFromImage, DEFAULT_PALETTE, generateAtmosphericGlow } from './color-extraction';
 
@@ -216,10 +217,13 @@ export function FramedImageContainer({
         {frameAsset?.url ? (
           // Custom frame asset
           <div className="absolute inset-0">
-            <img 
-              src={frameAsset.url} 
-              alt="Frame" 
-              className="w-full h-full object-fill"
+            <Image
+              src={frameAsset.url}
+              alt="Frame"
+              fill
+              className="object-fill"
+              sizes="100%"
+              unoptimized
             />
           </div>
         ) : (

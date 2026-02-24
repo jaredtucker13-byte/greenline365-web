@@ -3,8 +3,8 @@ import { createClient } from '@supabase/supabase-js';
 
 // Initialize Supabase
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKey); }
 
 // Retell API
 const RETELL_API_KEY = process.env.RETELL_API_KEY;
@@ -53,6 +53,7 @@ async function makeOutboundCall(
 
 // Get tenant by ID or default
 async function getTenant(tenantId?: string) {
+  const supabase = getServiceClient();
   if (tenantId) {
     const { data } = await supabase
       .from('tenants')
@@ -95,7 +96,8 @@ export async function POST(request: NextRequest) {
     
     // Get tenant
     const tenant = await getTenant(tenant_id);
-    
+    const supabase = getServiceClient();
+
     // Save to scheduled_calls table
     const { data: scheduledCall, error: dbError } = await supabase
       .from('scheduled_calls')
@@ -197,7 +199,8 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status') || 'pending';
     const limit = parseInt(searchParams.get('limit') || '50');
-    
+    const supabase = getServiceClient();
+
     const { data: calls, error } = await supabase
       .from('scheduled_calls')
       .select(`

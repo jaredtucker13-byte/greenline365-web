@@ -3,8 +3,8 @@ import { createClient } from '@supabase/supabase-js';
 
 // Initialize Supabase
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKey); }
 
 // Cal.com Configuration
 const CALCOM_API_KEY = process.env.CALCOM_API_KEY || '';
@@ -462,6 +462,7 @@ function formatTimeForSpeech(timeStr: string): string {
 }
 
 async function getTenant(phoneNumber?: string) {
+  const supabase = getServiceClient();
   // Try to find tenant by phone number
   if (phoneNumber) {
     const { data } = await supabase
@@ -482,6 +483,7 @@ async function getTenant(phoneNumber?: string) {
 }
 
 async function getAgent(agentCode: string) {
+  const supabase = getServiceClient();
   const { data } = await supabase
     .from('agents')
     .select('*')
@@ -508,6 +510,7 @@ function generateConfirmationNumber(): string {
 // =====================================================
 
 async function executeTool(toolName: string, args: Record<string, any>, tenant: any, agentType?: string) {
+  const supabase = getServiceClient();
   switch (toolName) {
     
     // ===== MEMORY TOOLS =====
@@ -1614,6 +1617,7 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET() {
+  const supabase = getServiceClient();
   const tenant = await getTenant();
   const { data: agents } = await supabase.from('agents').select('agent_name, agent_role, agent_code');
   

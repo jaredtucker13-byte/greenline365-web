@@ -14,6 +14,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { supabase } from '@/lib/supabase/client';
 import { useBusiness } from '@/lib/business';
 import { useCostTracking } from '@/lib/cost-tracking';
@@ -754,15 +755,15 @@ export default function CreativeStudioPage() {
                   <div className="grid md:grid-cols-2 gap-6">
                     {/* Preview */}
                     <div className="space-y-4">
-                      <div className="aspect-square rounded-xl overflow-hidden bg-white/10">
+                      <div className="relative aspect-square rounded-xl overflow-hidden bg-white/10">
                         {uploadedUrls[0] && (
-                          <img src={uploadedUrls[0]} alt="Product" className="w-full h-full object-cover" />
+                          <Image src={uploadedUrls[0]} alt="Product" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
                         )}
                       </div>
                       <div className="flex gap-2">
                         {uploadedUrls.slice(1).map((url, i) => (
-                          <div key={i} className="w-16 h-16 rounded-lg overflow-hidden bg-white/10">
-                            <img src={url} alt={`View ${i + 2}`} className="w-full h-full object-cover" />
+                          <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden bg-white/10">
+                            <Image src={url} alt={`View ${i + 2}`} fill className="object-cover" sizes="64px" />
                           </div>
                         ))}
                       </div>
@@ -846,10 +847,12 @@ export default function CreativeStudioPage() {
                         >
                           {/* Preview Image */}
                           <div className="aspect-video relative">
-                            <img 
-                              src={scene.preview} 
+                            <Image
+                              src={scene.preview}
                               alt={scene.name}
-                              className="w-full h-full object-cover"
+                              fill
+                              className="object-cover"
+                              sizes="(max-width: 768px) 50vw, 33vw"
                             />
                             {selectedScenes.includes(scene.slug) && (
                               <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-purple-500 flex items-center justify-center">
@@ -895,9 +898,9 @@ export default function CreativeStudioPage() {
                               selectedModel === model.id ? 'bg-purple-500/20 border-2 border-purple-500' : 'bg-white/5 border border-white/10'
                             }`}
                           >
-                            <div className="w-12 h-12 rounded-full bg-white/10 overflow-hidden mb-1">
+                            <div className="relative w-12 h-12 rounded-full bg-white/10 overflow-hidden mb-1">
                               {model.preview_url ? (
-                                <img src={model.preview_url} alt={model.name} className="w-full h-full object-cover" />
+                                <Image src={model.preview_url} alt={model.name} fill className="object-cover" sizes="48px" />
                               ) : (
                                 <Users className="w-5 h-5 text-white/50 m-auto mt-3" />
                               )}
@@ -958,9 +961,11 @@ export default function CreativeStudioPage() {
                     {generatedMockups.length > 0 ? (
                       generatedMockups.map((mockup, i) => (
                         <div key={i} className="relative group rounded-xl overflow-hidden bg-white/10">
-                          <img 
-                            src={mockup.url} 
-                            alt={`Mockup ${i + 1}`} 
+                          <Image
+                            src={mockup.url}
+                            alt={`Mockup ${i + 1}`}
+                            width={400}
+                            height={400}
                             className="w-full aspect-square object-cover"
                             onError={(e) => {
                               // Show placeholder on error
@@ -1081,9 +1086,9 @@ export default function CreativeStudioPage() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
                   {signatureModels.map(model => (
                     <div key={model.id} className="p-4 rounded-xl bg-white/5 border border-white/10">
-                      <div className="w-full aspect-square rounded-lg bg-white/10 mb-3 overflow-hidden">
+                      <div className="relative w-full aspect-square rounded-lg bg-white/10 mb-3 overflow-hidden">
                         {model.preview_url ? (
-                          <img src={model.preview_url} alt={model.name} className="w-full h-full object-cover" />
+                          <Image src={model.preview_url} alt={model.name} fill className="object-cover" sizes="(max-width: 768px) 50vw, 25vw" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
                             <Users className="w-8 h-8 text-white/20" />
@@ -1137,9 +1142,9 @@ export default function CreativeStudioPage() {
                       onClick={() => { setSelectedProduct(product); setShowProductDetail(true); }}
                       className="rounded-xl bg-white/5 border border-white/10 overflow-hidden cursor-pointer hover:border-purple-500/50 hover:bg-white/[0.07] transition group"
                     >
-                      <div className="aspect-square bg-white/10 relative">
+                      <div className="relative aspect-square bg-white/10">
                         {product.original_images?.[0] && (
-                          <img src={product.original_images[0]} alt={product.name} className="w-full h-full object-cover" />
+                          <Image src={product.original_images[0]} alt={product.name} fill className="object-cover" sizes="(max-width: 768px) 50vw, 25vw" />
                         )}
                         {/* Mockup count badge */}
                         {product.mockups && product.mockups.length > 0 && (
@@ -1207,8 +1212,8 @@ export default function CreativeStudioPage() {
                     <h3 className="text-sm font-medium text-white/70 mb-3">Original Images</h3>
                     <div className="grid grid-cols-2 gap-2">
                       {selectedProduct.original_images?.map((url, i) => (
-                        <div key={i} className="aspect-square rounded-lg overflow-hidden bg-white/10">
-                          <img src={url} alt={`${selectedProduct.name} ${i + 1}`} className="w-full h-full object-cover" />
+                        <div key={i} className="relative aspect-square rounded-lg overflow-hidden bg-white/10">
+                          <Image src={url} alt={`${selectedProduct.name} ${i + 1}`} fill className="object-cover" sizes="(max-width: 768px) 50vw, 25vw" />
                         </div>
                       ))}
                     </div>
@@ -1245,8 +1250,8 @@ export default function CreativeStudioPage() {
                     {selectedProduct.mockups && selectedProduct.mockups.length > 0 ? (
                       <div className="grid grid-cols-2 gap-2">
                         {selectedProduct.mockups.map((mockup, i) => (
-                          <div key={mockup.id || i} className="aspect-square rounded-lg overflow-hidden bg-white/10 relative group">
-                            <img src={mockup.image_url} alt={`Mockup ${i + 1}`} className="w-full h-full object-cover" />
+                          <div key={mockup.id || i} className="relative aspect-square rounded-lg overflow-hidden bg-white/10 group">
+                            <Image src={mockup.image_url} alt={`Mockup ${i + 1}`} fill className="object-cover" sizes="(max-width: 768px) 50vw, 25vw" />
                             <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
                               <a 
                                 href={mockup.image_url} 

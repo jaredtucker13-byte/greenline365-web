@@ -16,10 +16,9 @@ import { sendEmail } from '@/lib/email/gmail-sender';
 import { getCoreMarketingContext } from '@/lib/marketing-skills-loader';
 import { callOpenRouter } from '@/lib/openrouter';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKey); }
 
 const OWNER_EMAIL = process.env.OWNER_EMAIL!;
 const BIZ_ID = process.env.BUSINESS_ID!;
@@ -29,6 +28,7 @@ export async function POST(request: NextRequest) {
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
     const weekStart = oneWeekAgo.toISOString();
+    const supabase = getServiceClient();
 
     // === GATHER ALL DATA ===
 

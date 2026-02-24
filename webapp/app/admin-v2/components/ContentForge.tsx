@@ -13,6 +13,7 @@
  */
 
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
@@ -853,7 +854,7 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                           </div>
                           {imagePreview ? (
                             <div className="relative rounded-lg overflow-hidden aspect-video" style={{ border: '1px solid var(--theme-glass-border)' }}>
-                              <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                              <Image src={imagePreview} alt="Preview" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
                               
                               {/* Analysis overlay */}
                               {isAnalyzingImage && (
@@ -1463,9 +1464,9 @@ End with a call to action."
                   </div>
 
                   {/* Image Preview */}
-                  <div className="aspect-square rounded-lg mb-2 overflow-hidden flex items-center justify-center" style={{ background: 'var(--theme-bg-primary)' }}>
+                  <div className="relative aspect-square rounded-lg mb-2 overflow-hidden flex items-center justify-center" style={{ background: 'var(--theme-bg-primary)' }}>
                     {imagePreview ? (
-                      <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                      <Image src={imagePreview} alt="Preview" fill className="object-cover" sizes="300px" />
                     ) : (
                       <div className="text-center" style={{ color: 'var(--theme-text-muted)' }}>
                         <span className="text-3xl">🖼️</span>

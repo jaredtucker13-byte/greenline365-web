@@ -7,7 +7,7 @@ export const runtime = "edge";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+function getServiceClient() { return createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY); }
 
 const MODEL_MAP: Record<string, string> = { "opus_4.6": "anthropic/claude-opus-4.6", gpt_4o: "anthropic/claude-sonnet-4.6", haiku: "anthropic/claude-sonnet-4.6", perplexity: "perplexity/sonar-pro" };
 const DEPT_KW: Record<string, string[]> = { executive:["strategy","plan","vision","priority","decision"], growth_sales:["lead","prospect","sales","outreach","pipeline","deal","revenue","funnel"], operations:["book","schedule","calendar","dispatch","logistics","meeting"], success:["support","ticket","customer","resolve","onboard","complaint","help"], dev_it:["code","deploy","test","fix","build","api","database","server","debug"], creative:["content","blog","social","seo","design","brand","copy","image","video","campaign","marketing"] };
@@ -24,6 +24,7 @@ export async function POST(req: NextRequest) {
 }
 
 async function handleNewTask(task: any) {
+  const supabase = getServiceClient();
   await supabase.from("task_queue").update({status:"in_progress"}).eq("id",task.id);
   await log("vibe_command",task.id,{command:task.vibe_command});
   const {data:roles} = await supabase.from("workforce_roles").select("*");
@@ -52,6 +53,7 @@ function kwTriage(cmd: string) {
 }
 
 async function spawnWorker(taskId: string, st: any, roles: any[]) {
+  const supabase = getServiceClient();
   const role = roles.find((r:any)=>r.role_slug===st.role_slug);
   const tier = st.model_override||role?.model_tier||"gpt_4o";
   const tid = crypto.randomUUID();
@@ -70,6 +72,7 @@ async function spawnWorker(taskId: string, st: any, roles: any[]) {
 }
 
 async function audit(taskId: string, cmd: string, intent: any, results: any[]) {
+  const supabase = getServiceClient();
   const summary = results.map(r=>`--- ${r.role_slug} (${r.confidence}) ---\n${r.output}`).join("\n");
   const p = `SUPREME AUDITOR: Verify and synthesize.\nCOMMAND: "${cmd}"\nWORKERS:\n${summary}\nRespond JSON: {"final_synthesis":"","vetoed_items":[],"confidence":0.95,"audit_notes":"","recommended_actions":[]}`;
   const a = await callModel("opus_4.6", p, "supreme_auditor");
@@ -82,12 +85,14 @@ async function audit(taskId: string, cmd: string, intent: any, results: any[]) {
 }
 
 async function handleEscalation(ev: any) {
+  const supabase = getServiceClient();
   const r = await callModel("opus_4.6","ESCALATION from "+ev.source_role+": "+JSON.stringify(ev.payload),"ceo");
   await supabase.from("reasoning_traces").insert({task_id:ev.task_id,role_slug:"ceo",department:"executive",model_used:"opus_4.6",input_prompt:"Escalation",raw_output:r.output,status:"completed",signed_off_by:"SIGNED_OFF_BY_OPUS_4.6",completed_at:new Date().toISOString()});
   return NextResponse.json({status:"resolved",output:r.output});
 }
 
 async function handleDone(rec: any) {
+  const supabase = getServiceClient();
   const {data} = await supabase.from("reasoning_traces").select("status").eq("task_id",rec.id).neq("role_slug","supreme_auditor");
   if (data?.every((t:any)=>t.status==="completed"||t.status==="failed")) await log("audit_pass",rec.id,{message:"All workers complete"});
   return NextResponse.json({status:"noted"});
@@ -105,4 +110,4 @@ async function callModel(tier: string, prompt: string, caller: string) {
   return {output:result.content,tokens:result.tokens};
 }
 
-async function log(type: string, taskId: string, payload: any) { await supabase.from("event_log").insert({event_type:type,task_id:taskId,payload}); }
+async function log(type: string, taskId: string, payload: any) { const supabase = getServiceClient(); await supabase.from("event_log").insert({event_type:type,task_id:taskId,payload}); }

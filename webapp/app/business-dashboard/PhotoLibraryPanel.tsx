@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 interface PhotoLibraryProps {
   listingId: string;
@@ -164,7 +165,7 @@ export default function PhotoLibraryPanel({ listingId }: PhotoLibraryProps) {
                     onClick={() => togglePhoto(url)}
                     data-testid={`photo-${i}`}
                   >
-                    <img src={url} alt={`Photo ${i + 1}`} className="w-full h-full object-cover" />
+                    <Image src={url} alt={`Photo ${i + 1}`} fill className="object-cover" sizes="(max-width: 640px) 33vw, 25vw" />
 
                     {/* Selection indicator */}
                     {isSelected && (
@@ -233,7 +234,7 @@ export default function PhotoLibraryPanel({ listingId }: PhotoLibraryProps) {
             <div className="grid grid-cols-2 gap-4">
               {menuImages.map((url, i) => (
                 <div key={i} className="relative rounded-xl overflow-hidden border border-white/10">
-                  <img src={url} alt={`Menu page ${i + 1}`} className="w-full object-contain" style={{ maxHeight: 400 }} />
+                  <Image src={url} alt={`Menu page ${i + 1}`} width={600} height={400} className="w-full object-contain" style={{ maxHeight: 400 }} />
                   <button
                     onClick={async () => {
                       await fetch('/api/directory/photos', {

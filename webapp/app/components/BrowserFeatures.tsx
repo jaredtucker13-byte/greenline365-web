@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import {
   copyToClipboard,
   shareContent,
@@ -282,12 +283,13 @@ export function QRCode({
 
   return (
     <div className={`inline-block ${className}`}>
-      <img 
-        src={qrUrl} 
-        alt="QR Code" 
-        width={size} 
+      <Image
+        src={qrUrl}
+        alt="QR Code"
+        width={size}
         height={size}
         className="rounded-lg"
+        unoptimized
       />
     </div>
   );
@@ -488,11 +490,16 @@ export function LinkPreview({
       className={`block bg-white/10 rounded-xl overflow-hidden hover:bg-white/15 transition ${className}`}
     >
       {preview.image && (
-        <img 
-          src={preview.image} 
-          alt={preview.title || ''} 
-          className="w-full h-32 object-cover"
-        />
+        <div className="relative w-full h-32">
+          <Image
+            src={preview.image}
+            alt={preview.title || ''}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 50vw"
+            unoptimized
+          />
+        </div>
       )}
       <div className="p-3">
         {preview.title && (

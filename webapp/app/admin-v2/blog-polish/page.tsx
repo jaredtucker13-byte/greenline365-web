@@ -17,6 +17,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import StyleLibrary from '../components/StyleLibrary';
 import CopyrightTools from '../components/CopyrightTools';
 import AIContentDisclaimer from '../components/AIContentDisclaimer';
@@ -2433,10 +2434,12 @@ export default function BlogPolishPage() {
                                           : 'border-transparent hover:border-white/30'
                                       }`}
                                     >
-                                      <img 
+                                      <Image
                                         src={imgSrc}
                                         alt="Generated"
-                                        className="w-full h-full object-cover"
+                                        fill
+                                        className="object-cover"
+                                        sizes="(max-width: 768px) 50vw, 33vw"
                                         onError={(e) => {
                                           (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="60" viewBox="0 0 100 60"><rect fill="%23333" width="100" height="60"/><text fill="%23666" x="50" y="35" text-anchor="middle" font-size="10">Image</text></svg>';
                                         }}
@@ -2573,9 +2576,9 @@ export default function BlogPolishPage() {
                                 <div key={img.id} className="relative group">
                                   <button
                                     onClick={() => setPreviewImage({ url: img.url, id: img.id })}
-                                    className="aspect-video w-full rounded-lg overflow-hidden border border-white/10 hover:border-purple-500/50 transition"
+                                    className="relative aspect-video w-full rounded-lg overflow-hidden border border-white/10 hover:border-purple-500/50 transition"
                                   >
-                                    <img src={img.url} alt="Custom generated" className="w-full h-full object-cover" />
+                                    <Image src={img.url} alt="Custom generated" fill className="object-cover" sizes="33vw" />
                                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
                                       <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
@@ -3318,7 +3321,7 @@ export default function BlogPolishPage() {
                 <div className="grid grid-cols-3 gap-2 mt-3">
                   {imagePreviews.map((img, idx) => (
                     <div key={idx} className="relative group aspect-square rounded-lg overflow-hidden bg-white/5">
-                      <img src={img} alt={`Upload ${idx + 1}`} className="w-full h-full object-cover" />
+                      <Image src={img} alt={`Upload ${idx + 1}`} fill className="object-cover" sizes="33vw" />
                       <button
                         onClick={() => removeImage(idx)}
                         className="absolute top-1 right-1 w-5 h-5 bg-red-500/80 rounded-full text-white text-xs opacity-0 group-hover:opacity-100 transition flex items-center justify-center"

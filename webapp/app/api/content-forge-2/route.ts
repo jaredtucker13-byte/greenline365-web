@@ -5,8 +5,8 @@ import { CHAT_FORMAT_DIRECTIVE } from '@/lib/format-standards';
 import { callOpenRouter, callOpenRouterJSON } from '@/lib/openrouter';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKey); }
 
 // =====================================================
 // TEMPORAL CONTENT GENERATION ENGINE
@@ -219,6 +219,7 @@ Return as JSON array: [{"headline": "...", "ctr_score": 8, "approach": "...", "w
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const action = searchParams.get('action');
+  const supabase = getServiceClient();
 
   switch (action) {
     case 'blueprints': {
@@ -288,12 +289,13 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { action } = body;
+    const supabase = getServiceClient();
 
     switch (action) {
       // Generate content from blueprint
       case 'generate': {
         const { blueprint_code, topic, target_audience, pillar_context, tone } = body;
-        
+
         // Get blueprint
         const { data: blueprint } = await supabase
           .from('content_blueprints')

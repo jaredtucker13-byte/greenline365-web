@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 interface Listing {
   id: string;
@@ -331,9 +332,9 @@ export default function ListingDetailPage() {
                       <button
                         key={i}
                         onClick={() => setActivePhoto(i)}
-                        className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${i === activePhoto ? 'border-gold' : 'border-transparent opacity-60 hover:opacity-100'}`}
+                        className={`relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${i === activePhoto ? 'border-gold' : 'border-transparent opacity-60 hover:opacity-100'}`}
                       >
-                        <img src={photo} alt="" className="w-full h-full object-cover" />
+                        <Image src={photo} alt="" fill className="object-cover" sizes="64px" />
                       </button>
                     ))}
                   </div>
@@ -598,7 +599,7 @@ export default function ListingDetailPage() {
                     >
                       <div className="relative h-24">
                         {r.cover_image_url ? (
-                          <img src={r.cover_image_url} alt={r.business_name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                          <Image src={r.cover_image_url} alt={r.business_name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 50vw, 25vw" />
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-midnight-800 to-charcoal-800 flex items-center justify-center">
                             <span className="text-2xl font-heading font-light text-white/10">{r.business_name[0]}</span>

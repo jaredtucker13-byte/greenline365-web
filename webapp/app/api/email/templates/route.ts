@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKey); }
 
 // GET /api/email/templates - List all templates
 // POST /api/email/templates - Create new template
@@ -12,7 +11,8 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
-    
+    const supabase = getServiceClient();
+
     let query = supabase
       .from('email_templates')
       .select('*')
@@ -41,7 +41,8 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { name, description, category, subject, preview_text, html_content, plain_content, variables } = body;
-    
+    const supabase = getServiceClient();
+
     if (!name || !category || !subject || !html_content) {
       return NextResponse.json(
         { error: 'Missing required fields: name, category, subject, html_content' },

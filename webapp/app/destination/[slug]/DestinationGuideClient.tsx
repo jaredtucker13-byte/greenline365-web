@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface Listing {
   id: string;
@@ -296,8 +297,8 @@ function GuideListingCard({ listing: l, index: i }: { listing: Listing; index: n
       {/* Image */}
       <div className="relative h-44 overflow-hidden">
         {l.cover_image_url ? (
-          <img src={l.cover_image_url} alt={l.business_name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+          <Image src={l.cover_image_url} alt={l.business_name}
+            fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-midnight-800 to-charcoal-800">
             <span className="text-4xl font-heading font-light text-white/10">{l.business_name[0]}</span>

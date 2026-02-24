@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKey); }
 
 // Style preset interface
 interface StylePreset {
@@ -27,6 +26,7 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const tenantId = searchParams.get('tenant_id');
     const includeDefaults = searchParams.get('include_defaults') === 'true';
+    const supabase = getServiceClient();
 
     let query = supabase
       .from('style_presets')
@@ -73,6 +73,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body: StylePreset = await request.json();
+    const supabase = getServiceClient();
 
     if (!body.name || !body.style_guide) {
       return NextResponse.json(
@@ -125,6 +126,7 @@ export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
     const { id, ...updates } = body;
+    const supabase = getServiceClient();
 
     if (!id) {
       return NextResponse.json(
@@ -164,6 +166,7 @@ export async function DELETE(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const id = searchParams.get('id');
+    const supabase = getServiceClient();
 
     if (!id) {
       return NextResponse.json(

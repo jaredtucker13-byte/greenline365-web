@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKey); }
 
 // GET /api/sms/templates - List SMS templates
 export async function GET() {
   try {
+    const supabase = getServiceClient();
     const { data, error } = await supabase
       .from('sms_templates')
       .select('*')
@@ -72,7 +72,8 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { name, message, category, variables } = body;
-    
+    const supabase = getServiceClient();
+
     if (!name || !message) {
       return NextResponse.json(
         { error: 'Name and message are required' },

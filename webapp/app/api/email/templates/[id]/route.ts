@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKey); }
 
 // GET /api/email/templates/[id] - Get single template
 export async function GET(
@@ -13,13 +12,14 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    
+    const supabase = getServiceClient();
+
     const { data, error } = await supabase
       .from('email_templates')
       .select('*')
       .eq('id', id)
       .single();
-    
+
     if (error) throw error;
     if (!data) {
       return NextResponse.json({ error: 'Template not found' }, { status: 404 });
@@ -44,7 +44,8 @@ export async function PUT(
     const { id } = await params;
     const body = await request.json();
     const { name, description, category, subject, preview_text, html_content, plain_content, variables, is_active } = body;
-    
+    const supabase = getServiceClient();
+
     const updateData: any = { updated_at: new Date().toISOString() };
     
     if (name !== undefined) {
@@ -86,7 +87,8 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    
+    const supabase = getServiceClient();
+
     const { error } = await supabase
       .from('email_templates')
       .delete()

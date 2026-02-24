@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+function getServiceClient() { return createClient(supabaseUrl, supabaseServiceKey); }
 
 // GET /api/email/campaigns - List all campaigns
 // POST /api/email/campaigns - Create new campaign
@@ -12,7 +11,8 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
-    
+    const supabase = getServiceClient();
+
     let query = supabase
       .from('email_campaigns')
       .select(`
@@ -42,17 +42,18 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { 
-      name, 
-      description, 
-      template_id, 
-      recipient_list, 
+    const {
+      name,
+      description,
+      template_id,
+      recipient_list,
       custom_recipients,
       subject,
       html_content,
-      scheduled_for 
+      scheduled_for
     } = body;
-    
+    const supabase = getServiceClient();
+
     if (!name) {
       return NextResponse.json(
         { error: 'Missing required field: name' },
