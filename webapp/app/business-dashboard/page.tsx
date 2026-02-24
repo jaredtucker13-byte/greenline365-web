@@ -11,6 +11,7 @@ import { TIER_PRICES, TIER_NAMES } from '@/lib/feature-gates';
 import type { DirectoryTier } from '@/lib/feature-gates';
 import ReviewsPanel from './ReviewsPanel';
 import PhotoLibraryPanel from './PhotoLibraryPanel';
+import NotificationBell from '@/app/components/NotificationBell';
 
 interface Listing {
   id: string;
@@ -227,6 +228,7 @@ export default function BusinessDashboard() {
               <p className="text-white/40 text-sm font-body mt-1">Manage your directory listing</p>
             </div>
             <div className="flex items-center gap-3">
+              <NotificationBell variant="gold" />
               <span
                 className="px-3 py-1.5 rounded-full text-xs font-heading font-bold uppercase tracking-wider"
                 style={{
