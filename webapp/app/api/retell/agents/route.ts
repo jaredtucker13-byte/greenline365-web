@@ -14,8 +14,54 @@ import { createClient } from '@/lib/supabase/server';
 // Agent Types
 type AgentType = 'receptionist' | 'sales' | 'customer_service';
 
+// Warm-up protocol for voice agents (same philosophy as chat agents)
+const VOICE_WARM_UP = `
+## Warm-Up Protocol — The Customer Never Repeats Themselves
+CRITICAL: Before diving into business, check if customer context was loaded.
+
+### If Customer Context is Available:
+- Greet them BY NAME: "Hey [Name], great to hear from you again!"
+- Reference their history: "Last time we chatted about [topic] — how did that go?"
+- NEVER re-ask questions they already answered in previous calls or chats
+- Reference specific pain points: "I remember you mentioned [pain point]."
+- If they had a previous appointment: "I see you were in on [date]. Hope everything went well!"
+
+### If This is a Transfer:
+- Immediately acknowledge: "Hey! I've got all the context from your earlier conversation."
+- Reference the specific details — mention their pain points bullet by bullet
+- Jump straight into helping: "So you're looking for [specific thing] — let me help with that."
+- NEVER say "Can you tell me what you're calling about?" if you already have context
+
+### Every Call:
+- At the START of every call, call the lookup_customer_context function with any available phone/email/name
+- Use whatever context comes back to personalize the entire conversation
+- If no context found, that's fine — proceed normally as a new caller
+`;
+
 // Function definitions for Retell agents
 const FUNCTION_DEFINITIONS = {
+  lookup_customer_context: {
+    name: 'lookup_customer_context',
+    description: 'Look up a caller\'s history from past calls, chats, and brain memory. Call this at the START of every conversation with the caller\'s phone number, email, or name. Returns past conversations, pain points, preferences, and any previous agent interactions so you can personalize the call.',
+    parameters: {
+      type: 'object',
+      properties: {
+        customer_phone: {
+          type: 'string',
+          description: 'Caller phone number (from caller ID or stated by caller).'
+        },
+        customer_email: {
+          type: 'string',
+          description: 'Customer email if known.'
+        },
+        customer_name: {
+          type: 'string',
+          description: 'Customer name if stated.'
+        }
+      }
+    }
+  },
+
   check_availability_cal: {
     name: 'check_availability_cal',
     description: 'Check calendar availability for a specific date. The start_time and end_time MUST be full absolute dates (e.g., "Thursday, May 15, 2025 10:00 AM"). Always convert relative dates like "next Tuesday" to absolute dates before calling.',
@@ -232,7 +278,9 @@ User: "I need to cancel my appointment tomorrow"
 Agent: "I can certainly help with that. Before I process the cancellation, would you prefer to move this to next week instead? That way you won't lose your spot and we can find a time that works better for your schedule."
 
 User: "No, I really need to cancel"
-Agent: "I understand. Let me look up your appointment." ~calls check_current_appointment~ "I found your appointment. I'll process the cancellation now. Is there anything else I can help you with?"`,
+Agent: "I understand. Let me look up your appointment." ~calls check_current_appointment~ "I found your appointment. I'll process the cancellation now. Is there anything else I can help you with?"
+
+${VOICE_WARM_UP}`,
 
   sales: `You are a professional sales representative for {{business_name}}. You receive warm transfers from the receptionist with context about each prospect.
 
@@ -265,7 +313,9 @@ Before each transfer, you'll receive a whisper briefing containing:
 - Confident but not pushy
 - Helpful and consultative
 - Professional and knowledgeable
-- Enthusiastic about helping them succeed`,
+- Enthusiastic about helping them succeed
+
+${VOICE_WARM_UP}`,
 
   customer_service: `You are a professional customer service representative for {{business_name}}. Your mission is to resolve issues quickly while maintaining positive relationships.
 
@@ -302,7 +352,9 @@ Before each transfer, you'll receive a whisper briefing containing:
 
 ## Example Handling Upset Customer
 User: "This is ridiculous! You guys messed up my appointment!"
-Agent: "I sincerely apologize for the mix-up with your appointment. I understand how frustrating that is, and I want to make this right for you. Let me look into what happened and find the best solution. Can you tell me a bit more about the issue?"`,
+Agent: "I sincerely apologize for the mix-up with your appointment. I understand how frustrating that is, and I want to make this right for you. Let me look into what happened and find the best solution. Can you tell me a bit more about the issue?"
+
+${VOICE_WARM_UP}`,
 };
 
 export async function GET(request: NextRequest) {
@@ -341,6 +393,7 @@ export async function GET(request: NextRequest) {
       // Determine which functions this agent needs
       const functionsByType: Record<AgentType, string[]> = {
         receptionist: [
+          'lookup_customer_context',
           'check_availability_cal',
           'book_appointment_cal',
           'check_current_appointment',
@@ -350,10 +403,12 @@ export async function GET(request: NextRequest) {
           'get_weather_context'
         ],
         sales: [
+          'lookup_customer_context',
           'check_availability_cal',
           'book_appointment_cal',
         ],
         customer_service: [
+          'lookup_customer_context',
           'check_current_appointment',
           'reschedule_appointment',
           'cancel_appointment',

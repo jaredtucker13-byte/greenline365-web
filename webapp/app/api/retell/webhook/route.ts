@@ -95,12 +95,12 @@ async function handleCallEnded(supabase: any, callData: any, businessId: string)
   const duration = callData.end_timestamp && callData.start_timestamp
     ? Math.round((callData.end_timestamp - callData.start_timestamp) / 1000)
     : null;
-  
+
   const { error } = await supabase
     .from('call_logs')
     .update({
-      ended_at: callData.end_timestamp 
-        ? new Date(callData.end_timestamp).toISOString() 
+      ended_at: callData.end_timestamp
+        ? new Date(callData.end_timestamp).toISOString()
         : new Date().toISOString(),
       duration_seconds: duration,
       conversation_summary: callData.transcript,
@@ -111,10 +111,38 @@ async function handleCallEnded(supabase: any, callData: any, businessId: string)
       },
     })
     .eq('call_id', callData.call_id);
-  
+
   if (error) {
     console.error('[Retell] Error updating call_ended:', error);
   }
+
+  // Brain journal — log voice call so chat agents can recall it
+  const callerName = callData.retell_llm_dynamic_variables?.customer_name || callData.from_number;
+  const callerPhone = callData.from_number;
+  const callerEmail = callData.retell_llm_dynamic_variables?.customer_email;
+
+  await supabase.from('memory_event_journal').insert({
+    event_type: 'voice_call',
+    event_category: 'call',
+    title: `Voice call${callerName ? ` with ${callerName}` : ''} (${duration ? Math.round(duration / 60) + ' min' : 'unknown duration'})`,
+    description: callData.transcript ? callData.transcript.substring(0, 500) : 'No transcript available',
+    metadata: {
+      call_id: callData.call_id,
+      caller_phone: callerPhone,
+      caller_email: callerEmail,
+      caller_name: callerName,
+      duration_seconds: duration,
+      agent_id: callData.agent_id,
+      disconnection_reason: callData.disconnection_reason,
+    },
+    tags: [
+      'voice_call',
+      `agent:${callData.agent_id || 'retell'}`,
+      ...(callerPhone ? [`phone:${callerPhone}`] : []),
+    ],
+    search_text: [callerName, callerPhone, callerEmail, callData.transcript?.substring(0, 200)].filter(Boolean).join(' '),
+    ai_generated: false,
+  }).then(() => {}).catch(() => {}); // Fire and forget
 }
 
 async function handleCallAnalyzed(supabase: any, callData: any, businessId: string) {
@@ -173,6 +201,48 @@ async function handleCallAnalyzed(supabase: any, callData: any, businessId: stri
     console.error('[Retell] Error updating call_analyzed:', error);
   }
   
+  // Brain: upsert contact to brain_people so chat agents recognize them
+  const callerName = callData.retell_llm_dynamic_variables?.customer_name;
+  const callerPhone = callData.from_number;
+  const callerEmail = callData.retell_llm_dynamic_variables?.customer_email;
+
+  if (callerName && businessId) {
+    await supabase.from('brain_people').upsert({
+      business_id: businessId,
+      name: callerName,
+      relationship: intentDetected === 'booking' ? 'customer' : 'prospect',
+      contact_info: {
+        phone: callerPhone,
+        email: callerEmail,
+      },
+      notes: analysis.call_summary?.substring(0, 500),
+      context: `Voice call on ${new Date().toLocaleDateString()}. Intent: ${intentDetected}. Action: ${actionTaken}. Sentiment: ${analysis.user_sentiment || 'unknown'}`,
+      last_contact: new Date().toISOString(),
+    }, {
+      onConflict: 'business_id,name',
+      ignoreDuplicates: false,
+    }).then(() => {}).catch(() => {});
+
+    // Brain edge: contact → call
+    if (callerPhone) {
+      await supabase.from('brain_edges').insert({
+        business_id: businessId,
+        source_type: 'contact',
+        source_id: callerPhone,
+        target_type: 'voice_call',
+        target_id: callData.call_id,
+        relationship: 'had_call',
+        strength: 1.0,
+        metadata: {
+          intent: intentDetected,
+          action: actionTaken,
+          sentiment: analysis.user_sentiment,
+        },
+        created_by: 'retell_webhook',
+      }).then(() => {}).catch(() => {});
+    }
+  }
+
   // Create audit log for cancellation attempts
   if (cancellationAttempted) {
     await supabase.from('call_audits').insert({

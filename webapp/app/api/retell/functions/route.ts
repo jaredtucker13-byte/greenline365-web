@@ -51,6 +51,10 @@ export async function POST(request: NextRequest) {
     let result: string;
     
     switch (functionName) {
+      case 'lookup_customer_context':
+        result = await lookupCustomerContext(supabase, args, businessId);
+        break;
+
       case 'check_availability_cal':
         result = await checkAvailability(supabase, args, businessId);
         break;
@@ -90,6 +94,124 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ 
       result: 'I encountered an error. Please try again or I can connect you with a team member.'
     });
+  }
+}
+
+// Look up customer context from brain memory, past chats, and past calls
+async function lookupCustomerContext(
+  supabase: any,
+  args: { customer_phone?: string; customer_email?: string; customer_name?: string },
+  businessId: string
+): Promise<string> {
+  try {
+    const { customer_phone, customer_email, customer_name } = args;
+    const contextParts: string[] = [];
+
+    // 1. Look up past chat sessions
+    if (customer_phone || customer_email) {
+      let query = supabase
+        .from('agent_chat_sessions')
+        .select('agent_id, agent_mode, contact_name, contact_business_type, pain_points, intent_score, lead_created, created_at, sentiment_score')
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      if (customer_phone) query = query.eq('contact_phone', customer_phone);
+      else if (customer_email) query = query.eq('contact_email', customer_email);
+
+      const { data: chatSessions } = await query;
+
+      if (chatSessions?.length > 0) {
+        contextParts.push('PAST CHAT SESSIONS:');
+        for (const s of chatSessions) {
+          const date = new Date(s.created_at).toLocaleDateString();
+          let line = `- ${date}: Chatted with ${s.agent_id} (${s.agent_mode})`;
+          if (s.contact_name) line += `. Name: ${s.contact_name}`;
+          if (s.contact_business_type) line += `. Business: ${s.contact_business_type}`;
+          if (s.pain_points?.length) line += `. Pain points: ${s.pain_points.join(', ')}`;
+          if (s.intent_score) line += `. Intent: ${s.intent_score}/100`;
+          if (s.lead_created) line += '. Lead was created.';
+          if (s.sentiment_score !== null && s.sentiment_score !== undefined) line += `. Sentiment: ${s.sentiment_score > 0 ? 'positive' : s.sentiment_score < 0 ? 'negative' : 'neutral'}`;
+          contextParts.push(line);
+        }
+      }
+    }
+
+    // 2. Look up past voice calls
+    if (customer_phone) {
+      const { data: pastCalls } = await supabase
+        .from('call_logs')
+        .select('started_at, duration_seconds, intent_detected, action_taken, conversation_summary, caller_name')
+        .eq('caller_phone', customer_phone)
+        .order('started_at', { ascending: false })
+        .limit(3);
+
+      if (pastCalls?.length > 0) {
+        contextParts.push('PAST VOICE CALLS:');
+        for (const c of pastCalls) {
+          const date = new Date(c.started_at).toLocaleDateString();
+          let line = `- ${date}: ${c.duration_seconds ? Math.round(c.duration_seconds / 60) + ' min call' : 'Call'}`;
+          if (c.caller_name) line += `. Name: ${c.caller_name}`;
+          if (c.intent_detected) line += `. Intent: ${c.intent_detected}`;
+          if (c.action_taken && c.action_taken !== 'none') line += `. Action: ${c.action_taken}`;
+          if (c.conversation_summary) line += `. Summary: ${c.conversation_summary.substring(0, 150)}`;
+          contextParts.push(line);
+        }
+      }
+    }
+
+    // 3. Look up brain_people record
+    if (customer_name || customer_email) {
+      let peopleQuery = supabase
+        .from('brain_people')
+        .select('name, relationship, notes, context, last_contact')
+        .limit(1);
+
+      if (customer_email && businessId) {
+        peopleQuery = peopleQuery.eq('business_id', businessId).contains('contact_info', { email: customer_email });
+      } else if (customer_name && businessId) {
+        peopleQuery = peopleQuery.eq('business_id', businessId).ilike('name', `%${customer_name}%`);
+      }
+
+      const { data: person } = await peopleQuery.single();
+
+      if (person) {
+        contextParts.push('BRAIN MEMORY:');
+        contextParts.push(`- Name: ${person.name}, Relationship: ${person.relationship}`);
+        if (person.notes) contextParts.push(`- Notes: ${person.notes}`);
+        if (person.context) contextParts.push(`- Context: ${person.context}`);
+        if (person.last_contact) contextParts.push(`- Last contact: ${new Date(person.last_contact).toLocaleDateString()}`);
+      }
+    }
+
+    // 4. Look up upcoming bookings
+    if (customer_phone || customer_email) {
+      let bookingQuery = supabase
+        .from('bookings')
+        .select('date, time_slot, customer_name, status')
+        .in('status', ['confirmed', 'pending'])
+        .gte('date', new Date().toISOString().split('T')[0])
+        .order('date', { ascending: true })
+        .limit(1);
+
+      if (customer_phone) bookingQuery = bookingQuery.eq('customer_phone', customer_phone);
+      else if (customer_email) bookingQuery = bookingQuery.eq('customer_email', customer_email);
+
+      const { data: upcoming } = await bookingQuery.single();
+
+      if (upcoming) {
+        contextParts.push(`UPCOMING APPOINTMENT: ${formatDate(upcoming.date)} at ${formatTime(upcoming.time_slot)} (${upcoming.status})`);
+      }
+    }
+
+    if (contextParts.length === 0) {
+      return 'No previous history found for this caller. This appears to be a new customer.';
+    }
+
+    return `CUSTOMER CONTEXT FOUND:\n${contextParts.join('\n')}\n\nIMPORTANT: Use this context to personalize the conversation. Greet them by name. Reference their past interactions. Never ask them to repeat information you already have.`;
+
+  } catch (error) {
+    console.error('[lookupCustomerContext] Error:', error);
+    return 'Could not look up customer context. Proceed as a new caller.';
   }
 }
 

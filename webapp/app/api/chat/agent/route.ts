@@ -149,7 +149,7 @@ export async function POST(request: NextRequest) {
       .order('created_at', { ascending: true })
       .limit(30);
 
-    const systemPrompt = buildEnhancedSystemPrompt(agentId, mode, brainContext);
+    const systemPrompt = buildEnhancedSystemPrompt(agentId, mode, brainContext, session);
 
     const messages: ChatMessage[] = [
       { role: 'system', content: systemPrompt },
@@ -280,7 +280,29 @@ export async function POST(request: NextRequest) {
       finalContent = lastResult.content;
     }
 
-    // ── Step 6: Store assistant response ───────────────────────
+    // ── Step 6: Sentiment scoring ─────────────────────────────
+
+    const sentimentScore = scoreSentiment(message);
+
+    // Update user message with sentiment
+    await supabase.from('agent_chat_messages')
+      .update({ sentiment_score: sentimentScore })
+      .eq('session_id', sessionId)
+      .eq('role', 'user')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .then(() => {}).catch(() => {});
+
+    // Update session rolling sentiment
+    await supabase.from('agent_chat_sessions')
+      .update({
+        sentiment_score: sentimentScore,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', sessionId)
+      .then(() => {}).catch(() => {});
+
+    // ── Step 7: Store assistant response ───────────────────────
 
     await supabase.from('agent_chat_messages').insert({
       session_id: sessionId,
@@ -293,7 +315,7 @@ export async function POST(request: NextRequest) {
       model_used: AGENT_MODEL,
     });
 
-    // ── Step 7: Auto-journal to brain ──────────────────────────
+    // ── Step 8: Auto-journal to brain ──────────────────────────
 
     await autoJournal(supabase, {
       sessionId,
@@ -307,7 +329,7 @@ export async function POST(request: NextRequest) {
       businessId: session.business_id || businessId,
     });
 
-    // ── Step 8: Extract and update contact info ────────────────
+    // ── Step 9: Extract and update contact info ────────────────
 
     await updateContactInfo(supabase, sessionId, message, finalContent, session);
 
@@ -346,6 +368,7 @@ interface BrainContext {
   knowledgeChunks: any[];
   graphConnections: any[];
   recentEvents: any[];
+  transferContext: any | null;
   contextUsed: Record<string, any>;
 }
 
@@ -355,6 +378,7 @@ async function loadBrainContext(supabase: any, params: BrainContextParams): Prom
     knowledgeChunks: [],
     graphConnections: [],
     recentEvents: [],
+    transferContext: null,
     contextUsed: {},
   };
 
@@ -435,6 +459,37 @@ async function loadBrainContext(supabase: any, params: BrainContextParams): Prom
       );
     }
 
+    // 5. Transfer context — if this session was transferred, load the previous conversation
+    queries.push(
+      supabase
+        .from('agent_chat_sessions')
+        .select('transfer_chain')
+        .eq('id', params.sessionId)
+        .single()
+        .then(async (res: any) => {
+          const chain = res.data?.transfer_chain;
+          if (chain && chain.length > 0) {
+            const lastTransfer = chain[chain.length - 1];
+            // Load the last few messages from before the transfer for full context
+            const { data: transferMessages } = await supabase
+              .from('agent_chat_messages')
+              .select('role, content, agent_id')
+              .eq('session_id', params.sessionId)
+              .order('created_at', { ascending: false })
+              .limit(10);
+
+            context.transferContext = {
+              from_agent: lastTransfer.from,
+              to_department: lastTransfer.to,
+              reason: lastTransfer.reason,
+              transferred_at: lastTransfer.at,
+              recent_messages: (transferMessages || []).reverse(),
+            };
+            context.contextUsed.transfer = true;
+          }
+        })
+    );
+
     await Promise.allSettled(queries);
   } catch (error) {
     console.warn('[Agent Chat] Brain context loading error (non-fatal):', error);
@@ -445,33 +500,87 @@ async function loadBrainContext(supabase: any, params: BrainContextParams): Prom
 
 // ── Enhanced System Prompt with Brain Context ──────────────────────
 
-function buildEnhancedSystemPrompt(agentId: AgentId, mode: AgentMode, brain: BrainContext): string {
+function buildEnhancedSystemPrompt(agentId: AgentId, mode: AgentMode, brain: BrainContext, session?: any): string {
   let prompt = getAgentPrompt(agentId, mode);
+
+  // Inject sentiment-aware behavior adjustment
+  if (session?.sentiment_score !== undefined && session.sentiment_score !== null) {
+    const s = session.sentiment_score;
+    if (s <= -0.5) {
+      prompt += `\n\n═══ SENTIMENT ALERT: FRUSTRATED CUSTOMER (${s}) ═══\n`;
+      prompt += `This customer is showing frustration. IMMEDIATELY:\n`;
+      prompt += `- Drop ALL sales frameworks and diagnostic questions\n`;
+      prompt += `- Lead with pure empathy: "I can tell this has been frustrating..."\n`;
+      prompt += `- Listen more, talk less — short, caring responses\n`;
+      prompt += `- Offer to connect them with a human if they want\n`;
+      prompt += `- Do NOT pitch anything until their sentiment improves\n`;
+    } else if (s <= -0.2) {
+      prompt += `\n\n═══ SENTIMENT: MILDLY NEGATIVE (${s}) ═══\n`;
+      prompt += `This customer seems a bit down or overwhelmed. Be extra warm and empathetic.\n`;
+      prompt += `Mirror their feelings before moving to solutions. Go slower.\n`;
+    } else if (s >= 0.5) {
+      prompt += `\n\n═══ SENTIMENT: VERY POSITIVE (${s}) ═══\n`;
+      prompt += `This customer is engaged and positive! Match their energy.\n`;
+      prompt += `Good time to explore deeper or suggest next steps if appropriate.\n`;
+    }
+  }
 
   // Inject past conversation memory
   if (brain.pastConversations.length > 0) {
     prompt += `\n\n═══ MEMORY: PAST CONVERSATIONS WITH THIS PERSON ═══\n`;
-    prompt += `You have spoken with this person before. Here's what you know:\n`;
+    prompt += `⚡ RETURNING CUSTOMER — You have spoken with this person before!\n`;
+    prompt += `Your FIRST message MUST reference something specific from their history.\n\n`;
     for (const conv of brain.pastConversations) {
       const date = new Date(conv.created_at).toLocaleDateString();
-      prompt += `- ${date}: ${conv.agent_id} (${conv.agent_mode}) — `;
+      prompt += `• ${date}: ${conv.agent_id} (${conv.agent_mode}) — `;
       if (conv.conversation_summary) {
         prompt += conv.conversation_summary;
       } else {
         prompt += `${conv.message_count} messages exchanged`;
       }
       if (conv.pain_points?.length) {
-        prompt += ` | Pain points: ${conv.pain_points.join(', ')}`;
+        prompt += `\n  Pain points: ${conv.pain_points.map((p: string) => `"${p}"`).join(', ')}`;
+      }
+      if (conv.contact_business_type) {
+        prompt += `\n  Business type: ${conv.contact_business_type}`;
       }
       if (conv.lead_created) {
-        prompt += ` | Lead was created`;
+        prompt += `\n  ✓ Lead was created — they showed real interest`;
       }
       if (conv.contact_name) {
-        prompt += ` | Name: ${conv.contact_name}`;
+        prompt += `\n  Name: ${conv.contact_name}`;
+      }
+      if (conv.intent_score) {
+        prompt += `\n  Intent score: ${conv.intent_score}/100`;
       }
       prompt += `\n`;
     }
-    prompt += `IMPORTANT: Reference this history naturally. Don't repeat questions you've already asked. Pick up where you left off.\n`;
+    prompt += `\nRULES FOR RETURNING CUSTOMERS:\n`;
+    prompt += `- Greet them warmly BY NAME if known\n`;
+    prompt += `- Reference their specific pain points from the bullet points above\n`;
+    prompt += `- Do NOT re-ask questions they already answered\n`;
+    prompt += `- Pick up the conversation naturally from where it left off\n`;
+    prompt += `- If they showed high intent before, be warmer and more direct\n`;
+  }
+
+  // Inject transfer context — bullet points so the agent never asks the customer to repeat
+  if (brain.transferContext) {
+    const tc = brain.transferContext;
+    prompt += `\n\n═══ TRANSFER CONTEXT — READ EVERY BULLET POINT ═══\n`;
+    prompt += `⚡ This customer was just transferred from ${tc.from_agent} (${tc.to_department}).\n`;
+    prompt += `Transfer reason: ${tc.reason}\n\n`;
+    if (tc.recent_messages?.length > 0) {
+      prompt += `Here is their recent conversation (read ALL of these before responding):\n`;
+      for (const msg of tc.recent_messages) {
+        const role = msg.role === 'user' ? '👤 Customer' : `🤖 ${msg.agent_id || tc.from_agent}`;
+        prompt += `${role}: ${msg.content.substring(0, 300)}\n`;
+      }
+    }
+    prompt += `\nRULES FOR POST-TRANSFER:\n`;
+    prompt += `- Your FIRST message must show you have full context: "Hey! [Agent] filled me in — I know you're dealing with [specific issue]."\n`;
+    prompt += `- Reference the bullet points above so they NEVER have to repeat themselves\n`;
+    prompt += `- Jump straight to helping with what they need\n`;
+    prompt += `- If pain points were discussed, acknowledge them specifically\n`;
   }
 
   // Inject relevant knowledge
@@ -563,6 +672,9 @@ async function executeToolCall(
       case 'transfer_department':
         return toolTransferDepartment(args, session);
 
+      case 'competitive_intel':
+        return await toolCompetitiveIntel(args);
+
       case 'check_availability':
         return { available: true, message: 'Calendar availability check — feature coming soon. Please ask the prospect for their preferred time and we will confirm.' };
 
@@ -646,6 +758,45 @@ async function toolWebSearch(query: string): Promise<any> {
     return { results: result.content };
   } catch (error: any) {
     return { error: 'Search unavailable', fallback: 'I can share general industry knowledge instead.' };
+  }
+}
+
+async function toolCompetitiveIntel(args: Record<string, any>): Promise<any> {
+  try {
+    const { business_name, city, business_type } = args;
+    const query = `"${business_name}" ${city} ${business_type || ''} reviews social media presence Google reviews Instagram Facebook Yelp rating`;
+
+    const result = await callOpenRouter({
+      model: 'perplexity/sonar-pro',
+      messages: [{
+        role: 'user',
+        content: `Research the online presence of "${business_name}" in ${city}${business_type ? ` (${business_type})` : ''}. Find and report:
+
+1. Google Reviews: star rating, approximate number of reviews, any notable recent reviews
+2. Instagram: handle if found, approximate follower count, posting frequency
+3. Facebook: page name, follower count, recent activity
+4. Yelp: rating and review count if listed
+5. Website: whether they have one and its quality
+6. Any other notable online presence (TikTok, YouTube, etc.)
+
+Be specific with numbers. If you can't find something, say "not found" for that item. Return facts only, no opinions.`,
+      }],
+      temperature: 0.2,
+      max_tokens: 800,
+      caller: 'GL365 CompetitiveIntel',
+    });
+
+    return {
+      business_name,
+      city,
+      intel: result.content,
+      source: 'perplexity/sonar-pro',
+    };
+  } catch (error: any) {
+    return {
+      error: 'Competitive intel search unavailable',
+      fallback: 'I can still help based on what you tell me about your business.',
+    };
   }
 }
 
@@ -796,6 +947,41 @@ async function autoJournal(supabase: any, params: JournalParams): Promise<void> 
     // Auto-journaling is non-critical — never let it break the response
     console.warn('[Agent Chat] Auto-journal error (non-fatal):', error);
   }
+}
+
+// ── Sentiment Scoring (lightweight, no API call) ──────────────────
+
+const POSITIVE_SIGNALS = [
+  /\b(love|great|awesome|amazing|perfect|excited|interested|sounds good|yes|yeah|absolutely|definitely|fantastic|wonderful|cool|nice|thanks|thank you|appreciate)\b/i,
+  /!\s*$/,  // Exclamation marks
+  /😊|😃|👍|🙌|❤️|🔥|💪|✅/,
+];
+
+const NEGATIVE_SIGNALS = [
+  /\b(frustrated|annoyed|angry|upset|disappointed|hate|terrible|awful|worst|waste|scam|ridiculous|unacceptable|cancel|stop|leave me alone|not interested|go away)\b/i,
+  /\b(can't|won't|don't want|no way|forget it|never mind|nah|nope)\b/i,
+  /😡|😤|👎|💀|🙄/,
+];
+
+const OVERWHELMED_SIGNALS = [
+  /\b(overwhelmed|exhausted|burnt? out|stressed|drowning|too much|can't keep up|no time|swamped|buried)\b/i,
+];
+
+function scoreSentiment(message: string): number {
+  let score = 0; // -1.0 to 1.0 scale
+
+  for (const pattern of POSITIVE_SIGNALS) {
+    if (pattern.test(message)) score += 0.3;
+  }
+  for (const pattern of NEGATIVE_SIGNALS) {
+    if (pattern.test(message)) score -= 0.4;
+  }
+  for (const pattern of OVERWHELMED_SIGNALS) {
+    if (pattern.test(message)) score -= 0.2; // Mildly negative — they need empathy, not pushback
+  }
+
+  // Clamp to -1.0 to 1.0
+  return Math.max(-1.0, Math.min(1.0, Math.round(score * 100) / 100));
 }
 
 // ── Contact Info Extraction ────────────────────────────────────────
