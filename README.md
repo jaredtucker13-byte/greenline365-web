@@ -33,19 +33,28 @@ greenline365.com (Public)
 
 ---
 
-## 1. Pricing — Source of Truth
+## 1. Pricing
 
-**The public `/pricing` page shows ONLY the three Directory tiers below.**
-All references to $299 / $599 / $899 bundles are DELETED. Those prices are old and incorrect.
+> **Canonical pricing reference:** [`docs/specs/pricing.md`](docs/specs/pricing.md) — the ONE file for all pricing decisions.
 
-| Tier | Price | Key Features |
-|------|-------|--------------|
-| **Free** | $0/mo | Basic listing — name, address, phone, hours, search visibility |
-| **Pro** | $45/mo | + Verification badge, 2 custom images, Book Now CTA, description, trust signals |
-| **Premium** | $89/mo | + Lead generation, Google photo sync, featured placement, AI Review Response, analytics |
-| **Founding Member** | Locked-in forever | Featured homepage placement, priority support, badge, rate never increases |
+**Public /pricing page** shows ONLY the three Directory tiers:
 
-**Back-end product pricing** (Command Center, Booking System, Home Ledger) is TBD and delivered via direct email outreach — never shown on the public pricing page.
+| Tier | Price | Tagline |
+|------|-------|---------|
+| **Free** | $0/mo | Get discovered |
+| **Pro** | $45/mo | Get chosen |
+| **Premium** | $89/mo | Get booked |
+| **Founding Member** | Locked-in forever | First 50 verified businesses |
+
+**System B (Tactical Command Center)** — sold via email outreach only, NEVER on public site:
+
+| Tier | Monthly Base | Setup Fee |
+|------|-------------|-----------|
+| **Operator** | $1,500/mo | $2,500 |
+| **Commander** | $2,500/mo | $3,500 |
+| **Sovereign** | $3,500/mo | $5,500 |
+
+Modules are individually priced add-ons ($129–$599/mo). See `docs/specs/pricing.md` for full module pricing, bundles, marketplace add-ons, and transaction fee model.
 
 ---
 
@@ -89,12 +98,15 @@ We are 100% committed to a **Glassmorphism aesthetic** that creates an elite, pr
 | Product | Status | Access Model | Pricing |
 |---------|--------|--------------|---------|
 | Directory Listing | ✅ Live | Public | Free / $45 / $89/mo |
-| Command Center | ✅ Live (admin) | Email outreach only | TBD (~$297–$497/mo) |
-| Live Local Pulse | ✅ Creator only | Waitlist | TBD add-on |
-| GL365 Home Ledger | ✅ Module live | /home-ledger page needed | TBD |
+| Command Center | ✅ Live (admin) | Email outreach only | $1,500–$3,500/mo base |
+| Live Local Pulse | ✅ Creator only | Module add-on | $149/mo |
+| GL365 Home Ledger | ✅ Module live | Module add-on | $249/mo |
+| Booking System | ✅ Module live | Module add-on | $299/mo |
+| The Brain (Main Brain) | ✅ Module live | Module add-on | $599/mo |
+| Second Brain (Slack) | ✅ Module live | Module add-on | $499/mo |
+| Campaigns Module | ✅ Live (admin) | Module add-on | $199/mo |
 | AI Booking Widget | 🔵 Roadmap | White-label ready | TBD |
 | AI Chat Widget | 🔵 Roadmap | White-label ready | TBD |
-| Campaigns Module | ✅ Live (admin) | Bundled w/ Command Center | TBD |
 
 ---
 
@@ -259,13 +271,14 @@ greenline365-web/                  ← THIS IS THE MAIN / SOURCE OF TRUTH REPO
 
 These must be resolved before certain build steps and outreach can be finalized:
 
-- Command Center base price — needed before Email 3 can be sent (target: $297–$497/mo)
-- Home Ledger pricing — standalone tier vs. bundle-only
-- Live Local Pulse pricing — add-on or tier-included
-- Campaigns Module — separate add-on or bundled
+- ~~Command Center base price~~ — **RESOLVED:** Operator $1,500 / Commander $2,500 / Sovereign $3,500 (see `docs/specs/pricing.md`)
+- ~~Home Ledger pricing~~ — **RESOLVED:** $249/mo module add-on
+- ~~Live Local Pulse pricing~~ — **RESOLVED:** $149/mo module add-on
+- ~~Campaigns Module~~ — **RESOLVED:** $199/mo module add-on
 - White-label priority — before or after first 30 founding members?
 - Annual billing discount — 2 months free?
 - `/home-ledger` page — must be built before property manager outreach begins
+- Database seed migration (029) — prices need updating to match `docs/specs/pricing.md`
 
 ---
 
