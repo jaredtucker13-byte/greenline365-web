@@ -34,7 +34,7 @@ export interface CrawlResult {
   opportunities: string[];
 }
 
-function calculateSeoScore(result: Omit<CrawlResult, 'seoScore'>): number {
+function calculateSeoScore(result: Omit<CrawlResult, 'seoScore' | 'opportunities'>): number {
   let score = 0;
   const max = 100;
 
