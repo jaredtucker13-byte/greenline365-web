@@ -5,7 +5,7 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Define protected routes that need auth
-  const isProtectedRoute = pathname.startsWith('/admin-v2') || pathname.startsWith('/admin') || pathname === '/business-dashboard' || pathname === '/onboarding';
+  const isProtectedRoute = pathname.startsWith('/admin-v2') || pathname.startsWith('/admin') || pathname.startsWith('/greenline-hq') || pathname === '/business-dashboard' || pathname === '/onboarding';
   const isLoginPage = pathname === '/login';
 
   // Public pages: skip Supabase entirely — never block public access
