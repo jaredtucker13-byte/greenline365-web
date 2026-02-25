@@ -1,15 +1,22 @@
 -- ============================================
 -- BLAST DEALS & LOCAL PULSE SYSTEM
--- Migration 026: Flash promotions, QR claims, consumer profiles
+-- Migration 026: Flash promotions, QR redemptions, consumer profiles
 -- B2C retail focus (coffee shops, food, beauty, fitness, entertainment)
--- Single thank-you email with optional next-visit discount + review CTA
 -- Home services follow-up is a SEPARATE system — not included here
+--
+-- TWO EMAILS (not a sequence — two independent triggers):
+--   Email 1: Deal distribution — owner approves a deal, it goes out to clientele
+--   Email 2: Post-purchase thank you — triggered by QR scan at register (~5 min delay)
+--
+-- THE QR CODE IS THE COUPON:
+--   Customer scans QR at register → discount applied → consumer captured → thank-you fires
 -- ============================================
 
 -- ============================================
 -- CONSUMER PROFILES TABLE
--- People who scan QR codes / claim deals
+-- People who scan QR codes at the register
 -- This is how businesses build their clientele list through GL365
+-- Captured at the moment of QR scan (register checkout)
 -- ============================================
 CREATE TABLE IF NOT EXISTS consumer_profiles (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -20,7 +27,7 @@ CREATE TABLE IF NOT EXISTS consumer_profiles (
   preferences JSONB DEFAULT '{}',
   -- Track which businesses they've interacted with
   first_business_id UUID,
-  total_claims INTEGER DEFAULT 0,
+  total_redemptions INTEGER DEFAULT 0,
   total_visits INTEGER DEFAULT 0,
   opted_in_marketing BOOLEAN DEFAULT true,
   created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -39,8 +46,10 @@ CREATE POLICY "Service can manage consumer profiles" ON consumer_profiles
 
 -- ============================================
 -- BLAST DEALS TABLE
--- Time-limited, claim-based flash promotions
--- Created from Local Pulse trend suggestions
+-- The coupon itself. Lives inside a QR code.
+-- Created when owner approves a Local Pulse suggestion.
+-- Distributed via Email 1 (deal email) to the business's clientele.
+-- Redeemed when customer scans QR at the register.
 -- ============================================
 CREATE TABLE IF NOT EXISTS blast_deals (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -49,7 +58,7 @@ CREATE TABLE IF NOT EXISTS blast_deals (
   listing_id UUID,
   created_by UUID,
 
-  -- Deal content
+  -- Deal / coupon content
   title TEXT NOT NULL,
   description TEXT,
   deal_type TEXT NOT NULL CHECK (deal_type IN ('bogo', 'percent_off', 'dollar_off', 'free_item', 'bundle', 'custom')),
@@ -61,47 +70,51 @@ CREATE TABLE IF NOT EXISTS blast_deals (
   expires_at TIMESTAMPTZ NOT NULL,
   time_window TEXT, -- Human-readable: "2-5pm today", "This weekend only"
 
-  -- Claim settings
-  claim_required BOOLEAN DEFAULT false, -- false = open coupon, true = must claim a spot
-  max_claims INTEGER, -- NULL = unlimited (open deals). Set for limited-spot deals.
-  current_claims INTEGER DEFAULT 0,
-  arrival_window_minutes INTEGER, -- How long they have to arrive after claiming (10, 15, 30, 60 min)
+  -- Redemption limits
+  max_redemptions INTEGER, -- NULL = unlimited. Set for limited-quantity deals.
+  current_redemptions INTEGER DEFAULT 0,
 
-  -- QR Code
+  -- QR Code (THE coupon — this is what the customer scans at the register)
   qr_code_url TEXT, -- Generated QR code image URL or data URI
-  claim_code TEXT NOT NULL, -- Short code: "BLAST-COFFEE-2X4K"
-  claim_url TEXT, -- Full URL: greenline365.com/claim/BLAST-COFFEE-2X4K
+  qr_code_data TEXT, -- Raw data encoded in the QR (deal ID + validation hash)
+  deal_code TEXT NOT NULL, -- Short human-readable code: "BLAST-COFFEE-2X4K"
 
-  -- Source (what trend inspired this)
-  source_trend_id TEXT, -- References the trend that sparked this deal
+  -- Source (what Local Pulse trend inspired this deal)
+  source_trend_id TEXT,
   source_trend_title TEXT,
 
   -- Status
   status TEXT DEFAULT 'draft' CHECK (status IN ('draft', 'active', 'paused', 'expired', 'sold_out')),
 
-  -- Distribution channels
-  channels JSONB DEFAULT '["directory"]', -- ["directory", "email", "sms", "social"]
+  -- ===== EMAIL 1: DEAL DISTRIBUTION =====
+  -- When owner approves, this deal gets emailed to their clientele
+  distribution_channels JSONB DEFAULT '["email"]', -- ["email", "directory", "sms", "social"]
+  distribution_email_sent_at TIMESTAMPTZ, -- When the deal email went out
+  distribution_email_count INTEGER DEFAULT 0, -- How many consumers received it
 
-  -- Engagement metrics
-  views INTEGER DEFAULT 0,
-  scans INTEGER DEFAULT 0,
-  shares INTEGER DEFAULT 0,
+  -- ===== EMAIL 2: THANK-YOU CONFIG (owner controls these) =====
+  -- Fires ~5 min after QR scan at register. Co-branded: business + GL365.
+  thankyou_email_enabled BOOLEAN DEFAULT true,
+  thankyou_delay_minutes INTEGER DEFAULT 5, -- Delay after QR scan before sending
 
-  -- Thank-you email config (single email sent on behalf of the business)
-  email_enabled BOOLEAN DEFAULT true,
-  email_template TEXT DEFAULT 'deal_claim_thankyou',
-
-  -- Next-visit discount (owner-controlled, included in the thank-you email)
+  -- Next-visit discount (included in thank-you email, owner's discretion)
   followup_discount_enabled BOOLEAN DEFAULT false,
   followup_discount_type TEXT CHECK (followup_discount_type IN ('percent_off', 'dollar_off', 'free_item', 'custom')),
   followup_discount_value TEXT, -- e.g. "10%", "$5 off", "Free coffee"
   followup_discount_terms TEXT, -- e.g. "Valid within 30 days of your visit"
-  followup_discount_expires_days INTEGER DEFAULT 30, -- Days from claim until discount expires
+  followup_discount_expires_days INTEGER DEFAULT 30,
 
-  -- Review request (included in the thank-you email)
+  -- Review request (included in thank-you email, owner's discretion)
   review_link_enabled BOOLEAN DEFAULT true,
   review_link_url TEXT, -- Owner's Google/Yelp/custom review page URL
   review_link_text TEXT DEFAULT 'Your feedback means the world to us! Leave us a review.',
+
+  -- Engagement metrics
+  email_opens INTEGER DEFAULT 0, -- Deal email opens
+  email_clicks INTEGER DEFAULT 0, -- Deal email click-throughs
+  qr_scans INTEGER DEFAULT 0, -- Total QR scans at register (= redemptions)
+  thankyou_opens INTEGER DEFAULT 0, -- Thank-you email opens
+  review_clicks INTEGER DEFAULT 0, -- Review link clicks from thank-you
 
   -- Metadata
   category TEXT, -- "food", "beauty", "fitness", etc.
@@ -116,7 +129,7 @@ CREATE INDEX IF NOT EXISTS idx_blast_deals_business ON blast_deals(business_id);
 CREATE INDEX IF NOT EXISTS idx_blast_deals_listing ON blast_deals(listing_id);
 CREATE INDEX IF NOT EXISTS idx_blast_deals_status ON blast_deals(status);
 CREATE INDEX IF NOT EXISTS idx_blast_deals_expires ON blast_deals(expires_at);
-CREATE INDEX IF NOT EXISTS idx_blast_deals_claim_code ON blast_deals(claim_code);
+CREATE INDEX IF NOT EXISTS idx_blast_deals_deal_code ON blast_deals(deal_code);
 CREATE INDEX IF NOT EXISTS idx_blast_deals_active ON blast_deals(status, expires_at)
   WHERE status = 'active';
 
@@ -132,74 +145,79 @@ CREATE POLICY "Service can manage all deals" ON blast_deals
   FOR ALL USING (auth.role() = 'service_role');
 
 -- ============================================
--- DEAL CLAIMS TABLE
--- Every time a consumer claims/scans a blast deal
--- Triggers a single thank-you email on behalf of the business
--- (B2C retail/food/beauty — NOT home services, that's a separate system)
+-- DEAL REDEMPTIONS TABLE
+-- Every QR scan at the register = one redemption row.
+-- This is the PURCHASE EVENT. The customer scanned the QR to apply
+-- their coupon at checkout. This one scan:
+--   1. Applies the discount to their purchase
+--   2. Captures their info (email, name) into consumer_profiles
+--   3. Links them to this business in consumer_business_links
+--   4. Schedules the thank-you email (~5 min later)
 -- ============================================
-CREATE TABLE IF NOT EXISTS deal_claims (
+CREATE TABLE IF NOT EXISTS deal_redemptions (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   deal_id UUID NOT NULL REFERENCES blast_deals(id) ON DELETE CASCADE,
   consumer_id UUID REFERENCES consumer_profiles(id),
 
-  -- Consumer info (captured at claim time)
+  -- Consumer info (captured at QR scan)
   consumer_email TEXT NOT NULL,
   consumer_name TEXT,
   consumer_phone TEXT,
 
-  -- Claim details
-  claim_code TEXT NOT NULL,
-  claimed_at TIMESTAMPTZ DEFAULT NOW(),
-  redeemed_at TIMESTAMPTZ, -- When they actually used the deal in-store
+  -- Redemption details
+  deal_code TEXT NOT NULL, -- The code from the QR
+  scanned_at TIMESTAMPTZ DEFAULT NOW(), -- The moment they scanned at the register
+  discount_applied TEXT, -- What discount was actually applied: "50% off", "$5 off", etc.
 
-  -- Thank-you email status (single email, not a drip sequence)
-  email_status TEXT DEFAULT 'pending' CHECK (email_status IN (
-    'pending',   -- Claim just happened, email not sent yet
-    'sent',      -- Thank-you email sent (with discount + review link)
-    'failed',    -- Email failed to send
-    'opted_out'  -- Consumer unsubscribed
+  -- ===== THANK-YOU EMAIL (Email 2) tracking =====
+  thankyou_status TEXT DEFAULT 'scheduled' CHECK (thankyou_status IN (
+    'scheduled',  -- QR scanned, thank-you email queued (~5 min delay)
+    'sent',       -- Thank-you email delivered (co-branded: business + GL365)
+    'failed',     -- Email failed to send
+    'opted_out'   -- Consumer had previously unsubscribed
   )),
-  email_sent_at TIMESTAMPTZ,
+  thankyou_scheduled_for TIMESTAMPTZ, -- scanned_at + delay (e.g. 5 min)
+  thankyou_sent_at TIMESTAMPTZ,
 
-  -- Followup discount tracking (if the owner included one in the thank-you email)
+  -- Followup discount tracking (if owner included one in thank-you email)
   followup_discount_code TEXT, -- Generated code for their next-visit discount
-  followup_discount_redeemed_at TIMESTAMPTZ, -- Did they actually come back?
-  followup_discount_expires_at TIMESTAMPTZ, -- When the next-visit discount expires
+  followup_discount_redeemed_at TIMESTAMPTZ, -- Did they come back and use it?
+  followup_discount_expires_at TIMESTAMPTZ,
 
   -- Review tracking
-  review_link_clicked BOOLEAN DEFAULT false,
+  review_link_clicked_at TIMESTAMPTZ,
 
-  -- Attribution
-  source TEXT DEFAULT 'qr_scan' CHECK (source IN ('qr_scan', 'link', 'directory', 'email', 'sms')),
+  -- Attribution (how did they originally get the deal?)
+  attribution TEXT DEFAULT 'email' CHECK (attribution IN ('email', 'directory', 'sms', 'social', 'walk_in')),
 
   -- Metadata
   device_info JSONB DEFAULT '{}',
-  location_data JSONB DEFAULT '{}',
+  scan_location JSONB DEFAULT '{}',
 
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS idx_deal_claims_deal ON deal_claims(deal_id);
-CREATE INDEX IF NOT EXISTS idx_deal_claims_consumer ON deal_claims(consumer_id);
-CREATE INDEX IF NOT EXISTS idx_deal_claims_email ON deal_claims(consumer_email);
-CREATE INDEX IF NOT EXISTS idx_deal_claims_pending_email ON deal_claims(email_status)
-  WHERE email_status = 'pending';
-CREATE INDEX IF NOT EXISTS idx_deal_claims_claimed ON deal_claims(claimed_at DESC);
+CREATE INDEX IF NOT EXISTS idx_deal_redemptions_deal ON deal_redemptions(deal_id);
+CREATE INDEX IF NOT EXISTS idx_deal_redemptions_consumer ON deal_redemptions(consumer_id);
+CREATE INDEX IF NOT EXISTS idx_deal_redemptions_email ON deal_redemptions(consumer_email);
+CREATE INDEX IF NOT EXISTS idx_deal_redemptions_scheduled ON deal_redemptions(thankyou_status, thankyou_scheduled_for)
+  WHERE thankyou_status = 'scheduled';
+CREATE INDEX IF NOT EXISTS idx_deal_redemptions_scanned ON deal_redemptions(scanned_at DESC);
 
-ALTER TABLE deal_claims ENABLE ROW LEVEL SECURITY;
+ALTER TABLE deal_redemptions ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Business owners can view claims on own deals" ON deal_claims
+CREATE POLICY "Business owners can view redemptions on own deals" ON deal_redemptions
   FOR SELECT USING (
     deal_id IN (SELECT id FROM blast_deals WHERE created_by = auth.uid())
   );
 
-CREATE POLICY "Service can manage all claims" ON deal_claims
+CREATE POLICY "Service can manage all redemptions" ON deal_redemptions
   FOR ALL USING (auth.role() = 'service_role');
 
 -- ============================================
 -- CONSUMER-BUSINESS RELATIONSHIPS TABLE
--- Tracks which consumers belong to which businesses
--- This is the business's clientele list built through GL365
+-- Built automatically when a consumer scans a QR at a business.
+-- This IS the business's clientele list, grown through GL365.
 -- ============================================
 CREATE TABLE IF NOT EXISTS consumer_business_links (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -210,7 +228,7 @@ CREATE TABLE IF NOT EXISTS consumer_business_links (
   -- Relationship
   first_interaction_at TIMESTAMPTZ DEFAULT NOW(),
   last_interaction_at TIMESTAMPTZ DEFAULT NOW(),
-  total_claims INTEGER DEFAULT 1,
+  total_redemptions INTEGER DEFAULT 1,
   total_visits INTEGER DEFAULT 0,
   total_spent NUMERIC DEFAULT 0,
 
@@ -246,23 +264,26 @@ CREATE POLICY "Service can manage all links" ON consumer_business_links
 
 -- ============================================
 -- DEAL EMAIL TEMPLATES TABLE
--- Single thank-you email sent ON BEHALF of the business (not GL365)
--- B2C retail focus: thank you + optional next-visit discount + review CTA
--- Home services will have their own separate follow-up system
+-- Two separate templates for two separate emails:
+--   1. deal_distribution — the deal/coupon announcement (sent to clientele list)
+--   2. post_purchase_thankyou — co-branded thank-you (sent ~5 min after QR scan)
+-- These are NOT a sequence. Different triggers, different purposes.
+-- Home services will have their own separate templates.
 -- ============================================
 CREATE TABLE IF NOT EXISTS deal_email_templates (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   template_name TEXT NOT NULL UNIQUE,
+  template_type TEXT NOT NULL CHECK (template_type IN ('deal_distribution', 'post_purchase_thankyou')),
 
   -- Email content (with merge fields)
   subject_template TEXT NOT NULL,
   body_template TEXT NOT NULL,
-  -- Merge fields: {{business_name}}, {{consumer_name}}, {{deal_title}},
-  --   {{deal_description}}, {{deal_expires}}, {{claim_code}}, {{claim_date}},
-  --   {{followup_discount_section}}, {{review_section}}
 
-  -- Sender config (appears FROM the business)
+  -- Sender / branding config
   sender_name_template TEXT DEFAULT '{{business_name}}',
+  -- For deal_distribution: appears from the business only
+  -- For post_purchase_thankyou: co-branded business + GL365
+  co_branded BOOLEAN DEFAULT false,
 
   -- Which business types use this template
   business_type TEXT DEFAULT 'retail' CHECK (business_type IN ('retail', 'food', 'beauty', 'fitness', 'entertainment', 'other')),
@@ -271,22 +292,51 @@ CREATE TABLE IF NOT EXISTS deal_email_templates (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Seed default: single thank-you email with discount offer + review CTA
-INSERT INTO deal_email_templates (template_name, subject_template, body_template, business_type) VALUES
+-- ===== EMAIL 1: Deal Distribution =====
+-- Sent when the owner approves a deal. Goes to their clientele list.
+-- The coupon/QR code is embedded in this email.
+INSERT INTO deal_email_templates (template_name, template_type, subject_template, body_template, co_branded, business_type) VALUES
 (
-  'deal_claim_thankyou',
-  'Thank you for your business at {{business_name}}!',
+  'deal_distribution',
+  'deal_distribution',
+  '{{business_name}} has a deal for you: {{deal_title}}!',
+  'Hi {{consumer_name}},
+
+Great news from {{business_name}}!
+
+{{deal_title}}
+{{deal_description}}
+
+{{deal_value}} — valid until {{deal_expires}}.
+{{deal_terms}}
+
+Scan this QR code at the register to redeem:
+{{qr_code_image}}
+
+Or use code: {{deal_code}}
+
+See you soon!
+
+— The {{business_name}} Team',
+  false, -- Appears from the business only
+  'retail'
+);
+
+-- ===== EMAIL 2: Post-Purchase Thank You =====
+-- Sent ~5 min after QR scan at the register.
+-- CO-BRANDED: business name + GreenLine 365.
+-- GL365 gets brand visibility with every transaction.
+INSERT INTO deal_email_templates (template_name, template_type, subject_template, body_template, co_branded, business_type) VALUES
+(
+  'post_purchase_thankyou',
+  'post_purchase_thankyou',
+  'Thank you for your purchase at {{business_name}}!',
   'Hi {{consumer_name}},
 
 Thank you for choosing {{business_name}}! We truly appreciate your business.
 
-Here''s your deal details:
-{{deal_description}}
-
-Valid until: {{deal_expires}}
-Your claim code: {{claim_code}}
-
-Just show this email or your QR code when you visit.
+Today''s deal: {{deal_title}}
+Discount applied: {{discount_applied}}
 
 {{followup_discount_section}}
 
@@ -295,16 +345,19 @@ Just show this email or your QR code when you visit.
 We look forward to seeing you again!
 
 Warm regards,
-The {{business_name}} Team',
+The {{business_name}} Team
+Powered by GreenLine 365',
+  true, -- Co-branded: business + GL365
   'retail'
 );
 
--- Followup discount section template (injected when owner has enabled it):
--- "As a thank you, here''s a little something for your next visit:
---  {{followup_discount_value}} — use code {{followup_discount_code}}
+-- Followup discount section (injected when owner has it enabled):
+-- "As a thank you, here''s something for your next visit:
+--  {{followup_discount_value}}
+--  Use code: {{followup_discount_code}}
 --  {{followup_discount_terms}}"
 --
--- Review section template (injected when owner has enabled it):
+-- Review section (injected when owner has it enabled):
 -- "Your feedback is very important to us!
 --  {{review_link_text}}
 --  [Leave a Review]({{review_link_url}})"
@@ -316,9 +369,8 @@ CREATE POLICY "Service can manage email templates" ON deal_email_templates
 
 -- ============================================
 -- AI FEEDBACK LOOP TABLE
--- Tracks which trend suggestions business owners accepted/rejected
+-- Tracks which Local Pulse suggestions owners accepted/rejected
 -- The AI reads this to get smarter about what to suggest
--- Also tracks: which suggestions came from the knowledge base
 -- ============================================
 CREATE TABLE IF NOT EXISTS pulse_feedback (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -335,9 +387,9 @@ CREATE TABLE IF NOT EXISTS pulse_feedback (
 
   -- What the owner did
   action TEXT NOT NULL CHECK (action IN (
-    'accepted',          -- Owner created a deal from this suggestion
+    'accepted',          -- Owner approved the deal suggestion
     'rejected',          -- Owner saw it but did not act
-    'modified',          -- Owner liked the idea but changed the deal
+    'modified',          -- Owner liked it but tweaked the deal
     'dismissed'          -- Owner explicitly dismissed it
   )),
 
@@ -346,9 +398,10 @@ CREATE TABLE IF NOT EXISTS pulse_feedback (
   modifications_made JSONB DEFAULT '{}',
 
   -- Performance of the resulting deal (updated after the deal runs)
-  deal_claims INTEGER DEFAULT 0,
   deal_redemptions INTEGER DEFAULT 0,
   deal_revenue NUMERIC DEFAULT 0,
+  followup_discount_redemptions INTEGER DEFAULT 0, -- How many came back with the next-visit discount
+  review_clicks INTEGER DEFAULT 0,
 
   -- Context (for the AI to learn patterns)
   business_category TEXT,
@@ -386,17 +439,21 @@ ALTER TABLE local_trends ADD COLUMN IF NOT EXISTS suggested_deal JSONB DEFAULT '
 -- ============================================
 DO $$
 BEGIN
-  RAISE NOTICE '✅ Blast Deals & Local Pulse system created!';
-  RAISE NOTICE '📊 Tables created:';
-  RAISE NOTICE '   - consumer_profiles (GL365 consumer accounts)';
-  RAISE NOTICE '   - blast_deals (flash promotions + QR codes + owner-controlled discount & review settings)';
-  RAISE NOTICE '   - deal_claims (claim tracking + single thank-you email + followup discount tracking)';
-  RAISE NOTICE '   - consumer_business_links (business clientele tracking)';
-  RAISE NOTICE '   - deal_email_templates (single thank-you email template)';
-  RAISE NOTICE '   - pulse_feedback (AI learning feedback loop)';
-  RAISE NOTICE '🔐 RLS policies enabled on all tables';
-  RAISE NOTICE '📧 Single thank-you email: thank you + next-visit discount + review CTA';
-  RAISE NOTICE '🏪 B2C retail focus (coffee shops, food, beauty, etc.)';
-  RAISE NOTICE '🏠 Home services follow-up is a SEPARATE system (not included here)';
-  RAISE NOTICE '🤖 AI feedback loop ready for learning';
+  RAISE NOTICE '=== Blast Deals & Local Pulse system created ===';
+  RAISE NOTICE 'Tables:';
+  RAISE NOTICE '  consumer_profiles — GL365 consumer accounts (built from QR scans)';
+  RAISE NOTICE '  blast_deals — coupons that live in QR codes (owner-approved from Local Pulse)';
+  RAISE NOTICE '  deal_redemptions — QR scan at register = purchase event + thank-you trigger';
+  RAISE NOTICE '  consumer_business_links — business clientele (grown through GL365)';
+  RAISE NOTICE '  deal_email_templates — 2 templates: deal distribution + post-purchase thank-you';
+  RAISE NOTICE '  pulse_feedback — AI feedback loop for smarter suggestions';
+  RAISE NOTICE '';
+  RAISE NOTICE 'Email 1: Deal distribution (owner approves deal -> sent to clientele)';
+  RAISE NOTICE 'Email 2: Post-purchase thank-you (QR scan at register -> 5 min delay)';
+  RAISE NOTICE '  - Co-branded: business name + GreenLine 365';
+  RAISE NOTICE '  - Optional next-visit discount (owner discretion)';
+  RAISE NOTICE '  - Review CTA (owner provides their review link)';
+  RAISE NOTICE '';
+  RAISE NOTICE 'B2C retail focus. Home services is a separate system.';
+  RAISE NOTICE 'RLS enabled on all tables.';
 END $$;
