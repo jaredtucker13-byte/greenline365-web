@@ -243,7 +243,7 @@ export default function HealthcarePage() {
               {[
                 {
                   title: 'HIPAA Compliant',
-                  desc: 'SOC 2 Type II + HIPAA certified. All patient data encrypted, BAA included, regular security audits.',
+                  desc: 'Built to HIPAA standards with BAA included. All patient data encrypted at rest and in transit. Pursuing SOC 2 Type II certification.',
                   icon: '🔒'
                 },
                 {
@@ -324,7 +324,7 @@ export default function HealthcarePage() {
               {[
                 {
                   q: 'Is this really HIPAA compliant?',
-                  a: 'Yes. We are SOC 2 Type II certified and fully HIPAA compliant. We sign BAAs with all healthcare providers and undergo regular third-party security audits.'
+                  a: 'Yes. Our infrastructure is built to HIPAA standards and we sign BAAs with all healthcare providers. We are actively pursuing SOC 2 Type II certification and undergo regular third-party security audits.'
                 },
                 {
                   q: 'Can patients book specific appointment types?',

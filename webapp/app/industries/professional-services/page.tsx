@@ -243,7 +243,7 @@ export default function ProfessionalServicesPage() {
               {[
                 {
                   title: 'Secure Document Management',
-                  desc: 'Client portal for secure document sharing. HIPAA/SOC2 compliant with encrypted storage.',
+                  desc: 'Client portal for secure document sharing. Encrypted storage with security controls aligned to SOC 2 standards.',
                   icon: '🔒'
                 },
                 {
@@ -324,7 +324,7 @@ export default function ProfessionalServicesPage() {
               {[
                 {
                   q: 'Is this secure enough for sensitive client information?',
-                  a: 'Yes. We are SOC2 Type II certified and HIPAA compliant. All data is encrypted at rest and in transit. Client portals use bank-level security.'
+                  a: 'Yes. We are actively pursuing SOC 2 Type II certification and our infrastructure follows HIPAA best practices. All data is encrypted at rest and in transit. Client portals use bank-level security.'
                 },
                 {
                   q: 'Can it integrate with my practice management software?',

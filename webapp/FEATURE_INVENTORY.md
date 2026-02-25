@@ -118,7 +118,7 @@
 - ✅ **Geo-Targeted Ads** - Target shoppers within 5 miles
 
 ### For Professional Services (`/industries/professional-services`)
-- ✅ **Secure Document Management** - HIPAA/SOC2 compliant file sharing
+- ✅ **Secure Document Management** - Encrypted file sharing (working toward SOC 2 Type II certification)
 - ✅ **Conflict Checking** - Automatic conflict-of-interest screening (law firms)
 - ✅ **Billing Integration** - QuickBooks, FreshBooks, practice management sync
 - ✅ **Referral Tracking** - Monitor and acknowledge referral sources
@@ -126,7 +126,7 @@
 - ✅ **Client Milestones** - Automated celebration emails for wins/anniversaries
 
 ### For Healthcare (`/industries/healthcare`)
-- ✅ **HIPAA Compliance** - SOC 2 Type II + HIPAA certified
+- ✅ **HIPAA Compliance** - HIPAA-ready infrastructure (pursuing SOC 2 Type II certification)
 - ✅ **EHR Integration** - Epic, Cerner, Athenahealth, DrChrono (40+ systems)
 - ✅ **Insurance Verification** - Real-time eligibility checks via Availity
 - ✅ **Telemedicine Support** - Book in-person and virtual visits
@@ -265,7 +265,7 @@
 
 ### Data Security
 - ✅ **Encryption** - Data encrypted at rest and in transit
-- ✅ **SOC 2 Type II** - Certified security controls
+- ✅ **SOC 2 Type II** - Pursuing certification (security controls aligned with SOC 2 standards)
 - ✅ **HIPAA Compliance** - Healthcare data protection
 - ✅ **Regular Audits** - Third-party security reviews
 
