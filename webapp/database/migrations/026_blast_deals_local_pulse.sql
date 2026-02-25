@@ -1,6 +1,9 @@
 -- ============================================
 -- BLAST DEALS & LOCAL PULSE SYSTEM
--- Migration 026: Flash promotions, QR claims, consumer profiles, and auto-sequences
+-- Migration 026: Flash promotions, QR claims, consumer profiles
+-- B2C retail focus (coffee shops, food, beauty, fitness, entertainment)
+-- Single thank-you email with optional next-visit discount + review CTA
+-- Home services follow-up is a SEPARATE system — not included here
 -- ============================================
 
 -- ============================================
@@ -84,12 +87,25 @@ CREATE TABLE IF NOT EXISTS blast_deals (
   scans INTEGER DEFAULT 0,
   shares INTEGER DEFAULT 0,
 
-  -- Email sequence config (sent on behalf of the business)
-  sequence_enabled BOOLEAN DEFAULT true,
-  sequence_template TEXT DEFAULT 'deal_claim_nurture',
+  -- Thank-you email config (single email sent on behalf of the business)
+  email_enabled BOOLEAN DEFAULT true,
+  email_template TEXT DEFAULT 'deal_claim_thankyou',
+
+  -- Next-visit discount (owner-controlled, included in the thank-you email)
+  followup_discount_enabled BOOLEAN DEFAULT false,
+  followup_discount_type TEXT CHECK (followup_discount_type IN ('percent_off', 'dollar_off', 'free_item', 'custom')),
+  followup_discount_value TEXT, -- e.g. "10%", "$5 off", "Free coffee"
+  followup_discount_terms TEXT, -- e.g. "Valid within 30 days of your visit"
+  followup_discount_expires_days INTEGER DEFAULT 30, -- Days from claim until discount expires
+
+  -- Review request (included in the thank-you email)
+  review_link_enabled BOOLEAN DEFAULT true,
+  review_link_url TEXT, -- Owner's Google/Yelp/custom review page URL
+  review_link_text TEXT DEFAULT 'Your feedback means the world to us! Leave us a review.',
 
   -- Metadata
   category TEXT, -- "food", "beauty", "fitness", etc.
+  business_type TEXT DEFAULT 'retail' CHECK (business_type IN ('retail', 'food', 'beauty', 'fitness', 'entertainment', 'other')),
   tags JSONB DEFAULT '[]',
 
   created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -118,7 +134,8 @@ CREATE POLICY "Service can manage all deals" ON blast_deals
 -- ============================================
 -- DEAL CLAIMS TABLE
 -- Every time a consumer claims/scans a blast deal
--- This triggers the email sequence on behalf of the business
+-- Triggers a single thank-you email on behalf of the business
+-- (B2C retail/food/beauty — NOT home services, that's a separate system)
 -- ============================================
 CREATE TABLE IF NOT EXISTS deal_claims (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -135,17 +152,22 @@ CREATE TABLE IF NOT EXISTS deal_claims (
   claimed_at TIMESTAMPTZ DEFAULT NOW(),
   redeemed_at TIMESTAMPTZ, -- When they actually used the deal in-store
 
-  -- Email sequence tracking
-  sequence_status TEXT DEFAULT 'pending' CHECK (sequence_status IN (
-    'pending',      -- Claim just happened, sequence not started
-    'email_1_sent', -- Thank you email sent (on behalf of business)
-    'email_2_sent', -- Follow-up / feedback request
-    'email_3_sent', -- "Come back" offer
-    'completed',    -- Full sequence done
-    'opted_out'     -- Consumer unsubscribed
+  -- Thank-you email status (single email, not a drip sequence)
+  email_status TEXT DEFAULT 'pending' CHECK (email_status IN (
+    'pending',   -- Claim just happened, email not sent yet
+    'sent',      -- Thank-you email sent (with discount + review link)
+    'failed',    -- Email failed to send
+    'opted_out'  -- Consumer unsubscribed
   )),
-  sequence_started_at TIMESTAMPTZ,
-  last_email_sent_at TIMESTAMPTZ,
+  email_sent_at TIMESTAMPTZ,
+
+  -- Followup discount tracking (if the owner included one in the thank-you email)
+  followup_discount_code TEXT, -- Generated code for their next-visit discount
+  followup_discount_redeemed_at TIMESTAMPTZ, -- Did they actually come back?
+  followup_discount_expires_at TIMESTAMPTZ, -- When the next-visit discount expires
+
+  -- Review tracking
+  review_link_clicked BOOLEAN DEFAULT false,
 
   -- Attribution
   source TEXT DEFAULT 'qr_scan' CHECK (source IN ('qr_scan', 'link', 'directory', 'email', 'sms')),
@@ -160,8 +182,8 @@ CREATE TABLE IF NOT EXISTS deal_claims (
 CREATE INDEX IF NOT EXISTS idx_deal_claims_deal ON deal_claims(deal_id);
 CREATE INDEX IF NOT EXISTS idx_deal_claims_consumer ON deal_claims(consumer_id);
 CREATE INDEX IF NOT EXISTS idx_deal_claims_email ON deal_claims(consumer_email);
-CREATE INDEX IF NOT EXISTS idx_deal_claims_sequence ON deal_claims(sequence_status)
-  WHERE sequence_status NOT IN ('completed', 'opted_out');
+CREATE INDEX IF NOT EXISTS idx_deal_claims_pending_email ON deal_claims(email_status)
+  WHERE email_status = 'pending';
 CREATE INDEX IF NOT EXISTS idx_deal_claims_claimed ON deal_claims(claimed_at DESC);
 
 ALTER TABLE deal_claims ENABLE ROW LEVEL SECURITY;
@@ -223,40 +245,40 @@ CREATE POLICY "Service can manage all links" ON consumer_business_links
   FOR ALL USING (auth.role() = 'service_role');
 
 -- ============================================
--- DEAL CLAIM SEQUENCES TABLE
--- Email templates sent ON BEHALF of the business (not GL365)
+-- DEAL EMAIL TEMPLATES TABLE
+-- Single thank-you email sent ON BEHALF of the business (not GL365)
+-- B2C retail focus: thank you + optional next-visit discount + review CTA
+-- Home services will have their own separate follow-up system
 -- ============================================
-CREATE TABLE IF NOT EXISTS deal_claim_sequences (
+CREATE TABLE IF NOT EXISTS deal_email_templates (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  sequence_name TEXT NOT NULL DEFAULT 'deal_claim_nurture',
-  step_number INTEGER NOT NULL,
+  template_name TEXT NOT NULL UNIQUE,
 
   -- Email content (with merge fields)
   subject_template TEXT NOT NULL,
   body_template TEXT NOT NULL,
-  -- Merge fields: {{business_name}}, {{consumer_name}}, {{deal_title}}, {{claim_date}}
-
-  -- Timing
-  delay_hours INTEGER NOT NULL DEFAULT 0, -- Hours after claim to send
+  -- Merge fields: {{business_name}}, {{consumer_name}}, {{deal_title}},
+  --   {{deal_description}}, {{deal_expires}}, {{claim_code}}, {{claim_date}},
+  --   {{followup_discount_section}}, {{review_section}}
 
   -- Sender config (appears FROM the business)
   sender_name_template TEXT DEFAULT '{{business_name}}',
 
-  -- Conditions
-  send_condition TEXT DEFAULT 'always' CHECK (send_condition IN ('always', 'if_not_redeemed', 'if_redeemed')),
+  -- Which business types use this template
+  business_type TEXT DEFAULT 'retail' CHECK (business_type IN ('retail', 'food', 'beauty', 'fitness', 'entertainment', 'other')),
 
   is_active BOOLEAN DEFAULT true,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Seed default sequence: 3 emails on behalf of the business
-INSERT INTO deal_claim_sequences (sequence_name, step_number, subject_template, body_template, delay_hours, send_condition) VALUES
+-- Seed default: single thank-you email with discount offer + review CTA
+INSERT INTO deal_email_templates (template_name, subject_template, body_template, business_type) VALUES
 (
-  'deal_claim_nurture', 1,
-  'Thanks for claiming your deal at {{business_name}}! 🎉',
+  'deal_claim_thankyou',
+  'Thank you for your business at {{business_name}}!',
   'Hi {{consumer_name}},
 
-Thanks for grabbing "{{deal_title}}" at {{business_name}}! We appreciate you stopping by.
+Thank you for choosing {{business_name}}! We truly appreciate your business.
 
 Here''s your deal details:
 {{deal_description}}
@@ -264,49 +286,32 @@ Here''s your deal details:
 Valid until: {{deal_expires}}
 Your claim code: {{claim_code}}
 
-Just show this email or your QR code when you visit. We can''t wait to see you!
+Just show this email or your QR code when you visit.
+
+{{followup_discount_section}}
+
+{{review_section}}
+
+We look forward to seeing you again!
 
 Warm regards,
 The {{business_name}} Team',
-  0, -- Immediate
-  'always'
-),
-(
-  'deal_claim_nurture', 2,
-  'How was your visit to {{business_name}}? ⭐',
-  'Hi {{consumer_name}},
-
-We hope you enjoyed your experience at {{business_name}}!
-
-If you haven''t had a chance to use your "{{deal_title}}" deal yet, don''t forget — it''s still valid until {{deal_expires}}.
-
-Already stopped by? We''d love to hear how it went. Your feedback helps us serve you better.
-
-Thanks for being awesome,
-The {{business_name}} Team',
-  48, -- 2 days later
-  'always'
-),
-(
-  'deal_claim_nurture', 3,
-  'A little something extra from {{business_name}} 💛',
-  'Hi {{consumer_name}},
-
-We loved having you as part of the {{business_name}} community! As a thank you, we wanted to let you know about what''s coming up:
-
-Keep an eye out for more exclusive deals and offers — we''ve got some great things planned.
-
-See you soon!
-
-Cheers,
-The {{business_name}} Team',
-  120, -- 5 days later
-  'always'
+  'retail'
 );
 
-ALTER TABLE deal_claim_sequences ENABLE ROW LEVEL SECURITY;
+-- Followup discount section template (injected when owner has enabled it):
+-- "As a thank you, here''s a little something for your next visit:
+--  {{followup_discount_value}} — use code {{followup_discount_code}}
+--  {{followup_discount_terms}}"
+--
+-- Review section template (injected when owner has enabled it):
+-- "Your feedback is very important to us!
+--  {{review_link_text}}
+--  [Leave a Review]({{review_link_url}})"
 
-CREATE POLICY "Service can manage sequences" ON deal_claim_sequences
+ALTER TABLE deal_email_templates ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Service can manage email templates" ON deal_email_templates
   FOR ALL USING (auth.role() = 'service_role');
 
 -- ============================================
@@ -384,12 +389,14 @@ BEGIN
   RAISE NOTICE '✅ Blast Deals & Local Pulse system created!';
   RAISE NOTICE '📊 Tables created:';
   RAISE NOTICE '   - consumer_profiles (GL365 consumer accounts)';
-  RAISE NOTICE '   - blast_deals (flash promotions + QR codes)';
-  RAISE NOTICE '   - deal_claims (claim tracking + email sequences)';
+  RAISE NOTICE '   - blast_deals (flash promotions + QR codes + owner-controlled discount & review settings)';
+  RAISE NOTICE '   - deal_claims (claim tracking + single thank-you email + followup discount tracking)';
   RAISE NOTICE '   - consumer_business_links (business clientele tracking)';
-  RAISE NOTICE '   - deal_claim_sequences (email templates)';
+  RAISE NOTICE '   - deal_email_templates (single thank-you email template)';
   RAISE NOTICE '   - pulse_feedback (AI learning feedback loop)';
   RAISE NOTICE '🔐 RLS policies enabled on all tables';
-  RAISE NOTICE '📧 Default 3-email nurture sequence seeded';
+  RAISE NOTICE '📧 Single thank-you email: thank you + next-visit discount + review CTA';
+  RAISE NOTICE '🏪 B2C retail focus (coffee shops, food, beauty, etc.)';
+  RAISE NOTICE '🏠 Home services follow-up is a SEPARATE system (not included here)';
   RAISE NOTICE '🤖 AI feedback loop ready for learning';
 END $$;
