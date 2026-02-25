@@ -255,7 +255,7 @@ ALTER TABLE consumer_business_links ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Business owners can view own clientele" ON consumer_business_links
   FOR ALL USING (
     business_id IN (
-      SELECT id FROM directory_listings WHERE user_id = auth.uid()
+      SELECT business_id FROM user_businesses WHERE user_id = auth.uid()
     )
   );
 
