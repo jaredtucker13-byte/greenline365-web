@@ -18,13 +18,13 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     
-    // Parse N8N payload
+    // Parse payload (supports both legacy n8n format and new pipeline format)
     const body = await request.json();
     const { trends, type, zipCode, city } = body;
 
-    // Determine if this is weekly batch or 3-hour pulse
+    // Determine trend type and expiry
     const trendType = type || 'weekly_batch';
-    const expiresAt = trendType === 'live_pulse' 
+    const expiresAt = (trendType === 'live_pulse' || trendType === 'cron_3h')
       ? new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString() // 3 hours
       : null;
 
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
       const trendsToInsert = trends.map((trend: any) => ({
         city_name: city || 'Tampa, FL',
         zip_code: zipCode || null,
-        source: `n8n_${trendType}`,
+        source: `pulse_${trendType}`,
         expires_at: expiresAt,
         trend_data: {
           title: trend.title || 'Trending Opportunity',
@@ -106,17 +106,18 @@ export async function GET(request: NextRequest) {
       .select('*')
       .order('created_at', { ascending: false });
 
+    const zipCode = searchParams.get('zipCode');
+
     if (type === 'live_pulse') {
-      // Get trends that haven't expired (have expires_at in the future)
+      // Get non-expired trends from any source (n8n legacy or new pipeline)
       query = query
-        .eq('source', 'n8n_live_pulse')
         .gt('expires_at', new Date().toISOString());
+      if (zipCode) query = query.eq('zip_code', zipCode);
     } else {
-      // Get weekly batch trends (last 7 days, no expiry)
+      // Get recent trends (last 7 days)
       const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-      query = query
-        .eq('source', 'n8n_weekly_batch')
-        .gte('created_at', weekAgo);
+      query = query.gte('created_at', weekAgo);
+      if (zipCode) query = query.eq('zip_code', zipCode);
     }
 
     const { data, error } = await query.limit(10);
@@ -137,6 +138,8 @@ export async function GET(request: NextRequest) {
       suggested_action: item.trend_data?.suggested_action || '',
       expected_traffic: item.trend_data?.expected_traffic || 'medium',
       event_date: item.trend_data?.event_date,
+      vibe_score: item.vibe_score || 80,
+      suggested_deal: item.suggested_deal || null,
       expires_at: item.expires_at,
       created_at: item.created_at,
       city_name: item.city_name,
