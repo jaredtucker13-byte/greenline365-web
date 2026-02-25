@@ -17,10 +17,11 @@ export default function Navbar() {
   const [loading, setLoading] = useState(true);
   const [scrolled, setScrolled] = useState(false);
 
-  // Hide navbar on dashboard routes
-  const isDashboardRoute = pathname?.startsWith('/admin-v2') || 
-                           pathname?.startsWith('/dashboard') || 
-                           pathname?.startsWith('/god-mode');
+  // Hide navbar on dashboard/admin routes
+  const isDashboardRoute = pathname?.startsWith('/admin-v2') ||
+                           pathname?.startsWith('/dashboard') ||
+                           pathname?.startsWith('/god-mode') ||
+                           pathname?.startsWith('/greenline-hq');
 
   // Scroll detection for nav blur effect
   useEffect(() => {

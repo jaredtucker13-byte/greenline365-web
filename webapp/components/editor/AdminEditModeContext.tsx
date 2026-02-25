@@ -8,6 +8,7 @@
  */
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 
 interface AdminEditModeContextType {
@@ -116,6 +117,16 @@ export function AdminEditModeProvider({ children }: { children: ReactNode }) {
 
 // Floating toggle button component
 function AdminEditModeToggle({ isEditMode, onToggle }: { isEditMode: boolean; onToggle: () => void }) {
+  const pathname = usePathname();
+
+  // Hide on admin/HQ routes that have their own navigation
+  const isAdminRoute = pathname?.startsWith('/admin-v2') ||
+                       pathname?.startsWith('/dashboard') ||
+                       pathname?.startsWith('/god-mode') ||
+                       pathname?.startsWith('/greenline-hq');
+
+  if (isAdminRoute) return null;
+
   return (
     <button
       onClick={onToggle}

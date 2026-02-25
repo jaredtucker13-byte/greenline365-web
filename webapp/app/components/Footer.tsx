@@ -6,10 +6,11 @@ import { usePathname } from 'next/navigation';
 export default function Footer() {
   const pathname = usePathname();
   
-  // Hide footer on dashboard routes
-  const isDashboardRoute = pathname?.startsWith('/admin-v2') || 
-                           pathname?.startsWith('/dashboard') || 
-                           pathname?.startsWith('/god-mode');
+  // Hide footer on dashboard/admin routes
+  const isDashboardRoute = pathname?.startsWith('/admin-v2') ||
+                           pathname?.startsWith('/dashboard') ||
+                           pathname?.startsWith('/god-mode') ||
+                           pathname?.startsWith('/greenline-hq');
 
   if (isDashboardRoute) {
     return null;
