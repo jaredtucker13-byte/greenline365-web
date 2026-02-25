@@ -157,9 +157,9 @@ export async function crawlSite(url: string): Promise<CrawlResult> {
   const h1: string[] = [];
   const h2: string[] = [];
   const h3: string[] = [];
-  $('h1').each((_, el) => h1.push($(el).text().trim()));
-  $('h2').each((_, el) => h2.push($(el).text().trim()));
-  $('h3').each((_, el) => h3.push($(el).text().trim()));
+  $('h1').each((_, el) => { h1.push($(el).text().trim()); });
+  $('h2').each((_, el) => { h2.push($(el).text().trim()); });
+  $('h3').each((_, el) => { h3.push($(el).text().trim()); });
 
   // Word count (visible body text)
   const bodyText = $('body').text().replace(/\s+/g, ' ').trim();
