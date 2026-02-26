@@ -130,7 +130,7 @@ export default function ListingDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-midnight-900 flex items-center justify-center pt-20">
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center pt-20">
         <div className="flex items-center gap-3">
           <div className="w-5 h-5 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
           <span className="text-white/50 font-body text-sm">Loading listing...</span>
@@ -141,7 +141,7 @@ export default function ListingDetailPage() {
 
   if (!listing) {
     return (
-      <div className="min-h-screen bg-midnight-900 flex items-center justify-center pt-20">
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center pt-20">
         <div className="text-center">
           <h1 className="text-2xl font-heading font-light text-white mb-3">Listing Not Found</h1>
           <p className="text-white/50 font-body mb-6">This business doesn&apos;t exist in our directory.</p>
@@ -155,9 +155,11 @@ export default function ListingDetailPage() {
   const googleRating = listing.metadata?.google_rating;
   const googleReviews = listing.metadata?.google_review_count;
   const googleMapsUrl = listing.metadata?.google_maps_url;
+  const businessHours = listing.business_hours as Record<string, { open: string; close: string; closed: boolean }> | null;
+  const menuSections = listing.menu as { id: string; name: string; items: { id: string; name: string; description: string; price: string }[] }[] | null;
 
   return (
-    <div className="min-h-screen bg-midnight-900 pt-20 pb-16" data-testid="listing-detail-page">
+    <div className="min-h-screen bg-[#0A0A0A] pt-20 pb-16" data-testid="listing-detail-page">
       {/* Hero / Cover Image */}
       <section className="relative h-64 sm:h-80 lg:h-96 overflow-hidden">
         {listing.cover_image_url ? (
@@ -167,7 +169,7 @@ export default function ListingDetailPage() {
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-midnight-800 to-charcoal-800 flex items-center justify-center">
+          <div className="w-full h-full bg-gradient-to-br from-[#111111] to-charcoal-800 flex items-center justify-center">
             <span className="text-8xl font-heading font-light text-white/10">{listing.business_name[0]}</span>
           </div>
         )}
@@ -185,7 +187,7 @@ export default function ListingDetailPage() {
               }
             }}
             className="inline-flex items-center gap-2 px-3 py-2 rounded-lg backdrop-blur-sm text-sm text-white/70 hover:text-white border border-white/10 hover:border-white/20 transition-all font-body"
-            style={{ background: 'rgba(13,27,42,0.7)' }}
+            style={{ background: 'rgba(10,10,10,0.7)' }}
             data-testid="back-button"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
@@ -194,7 +196,7 @@ export default function ListingDetailPage() {
           <Link
             href="/"
             className="inline-flex items-center gap-1 px-3 py-2 rounded-lg backdrop-blur-sm text-sm text-white/40 hover:text-white border border-white/5 hover:border-white/15 transition-all font-body"
-            style={{ background: 'rgba(13,27,42,0.5)' }}
+            style={{ background: 'rgba(10,10,10,0.5)' }}
             data-testid="back-to-directory"
           >
             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
@@ -208,7 +210,7 @@ export default function ListingDetailPage() {
             <span
               className="px-3 py-1.5 rounded-full text-xs font-heading font-bold uppercase tracking-wider"
               style={{
-                background: listing.tier === 'premium' ? 'linear-gradient(135deg, #C9A96E, #E6D8B5)' : 'linear-gradient(135deg, #3B82F6, #60A5FA)',
+                background: listing.tier === 'premium' ? 'linear-gradient(135deg, #C9A84C, #E8C97A)' : 'linear-gradient(135deg, #3B82F6, #60A5FA)',
                 color: '#0D1B2A',
               }}
             >
@@ -227,7 +229,7 @@ export default function ListingDetailPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="rounded-2xl border border-white/10 p-6 backdrop-blur-xl"
-              style={{ background: 'rgba(13,27,42,0.9)' }}
+              style={{ background: 'rgba(10,10,10,0.9)' }}
               data-testid="listing-header"
             >
               <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -288,7 +290,7 @@ export default function ListingDetailPage() {
                 <div className="mt-4">
                   <span
                     className="inline-flex items-center gap-1.5 font-semibold rounded-full px-3 py-1.5 text-xs"
-                    style={{ background: 'linear-gradient(135deg, #C9A96E, #E6D8B5)', color: '#fff' }}
+                    style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C97A)', color: '#fff' }}
                     data-testid="pi-badge"
                   >
                     <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
@@ -341,6 +343,83 @@ export default function ListingDetailPage() {
               </motion.div>
             )}
 
+            {/* ─── BUSINESS HOURS ─── */}
+            {businessHours && Object.keys(businessHours).length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15 }}
+                className="rounded-2xl border border-white/10 p-6"
+                style={{ background: 'rgba(255,255,255,0.03)' }}
+                data-testid="business-hours"
+              >
+                <h3 className="text-sm font-heading font-semibold text-white uppercase tracking-wider mb-4">Business Hours</h3>
+                <div className="space-y-2">
+                  {['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map(day => {
+                    const hours = businessHours[day];
+                    const dayNames: Record<string, string> = { mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday', sun: 'Sunday' };
+                    const today = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase().slice(0, 3);
+                    const isToday = day === today;
+                    return (
+                      <div key={day} className={`flex items-center justify-between py-2 px-3 rounded-lg ${isToday ? 'bg-[rgba(201,168,76,0.08)] border border-[rgba(201,168,76,0.15)]' : ''}`}>
+                        <span className={`text-sm font-body ${isToday ? 'text-[#C9A84C] font-semibold' : 'text-white/60'}`}>
+                          {dayNames[day]}
+                          {isToday && <span className="ml-2 text-[10px] text-[#C9A84C]/60 uppercase">Today</span>}
+                        </span>
+                        {hours?.closed ? (
+                          <span className="text-sm text-white/30 font-body">Closed</span>
+                        ) : hours?.open && hours?.close ? (
+                          <span className={`text-sm font-body ${isToday ? 'text-white font-medium' : 'text-white/60'}`}>
+                            {hours.open} — {hours.close}
+                          </span>
+                        ) : (
+                          <span className="text-sm text-white/20 font-body">—</span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
+
+            {/* ─── MENU / PRICING ─── */}
+            {menuSections && menuSections.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.18 }}
+                className="rounded-2xl border border-white/10 p-6"
+                style={{ background: 'rgba(255,255,255,0.03)' }}
+                data-testid="menu-section"
+              >
+                <h3 className="text-sm font-heading font-semibold text-white uppercase tracking-wider mb-6">Menu & Pricing</h3>
+                <div className="space-y-8">
+                  {menuSections.map(section => (
+                    <div key={section.id}>
+                      <h4 className="text-base font-heading font-semibold text-[#C9A84C] mb-4 pb-2 border-b border-[rgba(201,168,76,0.15)]">{section.name}</h4>
+                      <div className="space-y-3">
+                        {section.items?.map(item => (
+                          <div key={item.id} className="flex items-start justify-between gap-4">
+                            <div className="flex-1 min-w-0">
+                              <span className="text-sm font-body text-white font-medium">{item.name}</span>
+                              {item.description && (
+                                <p className="text-xs text-white/40 font-body mt-0.5">{item.description}</p>
+                              )}
+                            </div>
+                            {item.price && (
+                              <span className="text-sm font-heading font-semibold text-[#C9A84C] flex-shrink-0">
+                                ${item.price}
+                              </span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
             {/* Is This Your Business? */}
             {!listing.is_claimed && (listing as any).is_claimable !== false && (
               <motion.div
@@ -348,7 +427,7 @@ export default function ListingDetailPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
                 className="rounded-2xl border border-gold/15 p-6"
-                style={{ background: 'rgba(201,169,110,0.04)' }}
+                style={{ background: 'rgba(201,168,76,0.04)' }}
                 data-testid="claim-section"
               >
                 <div className="flex items-start gap-4">
@@ -363,7 +442,7 @@ export default function ListingDetailPage() {
                       Claim this listing to update your information, add photos, and unlock premium features. Contact our team to verify ownership and get your claim code.
                     </p>
                     {showClaimInfo ? (
-                      <div className="p-4 rounded-xl border border-gold/10 bg-midnight-900/50 space-y-2">
+                      <div className="p-4 rounded-xl border border-gold/10 bg-[#0A0A0A]/50 space-y-2">
                         <p className="text-xs text-white/60 font-body">Email us to claim this listing:</p>
                         <a
                           href={`mailto:greenline365help@gmail.com?subject=Claim%20Listing%3A%20${encodeURIComponent(listing.business_name)}&body=I%20would%20like%20to%20claim%20the%20listing%20for%20${encodeURIComponent(listing.business_name)}%20(${listing.city}%2C%20${listing.state}).%0A%0AMy%20name%3A%20%0AMy%20role%20at%20the%20business%3A%20`}
@@ -426,7 +505,7 @@ export default function ListingDetailPage() {
                       <span className="text-4xl font-heading font-bold text-white block">{reviewStats.average_rating}</span>
                       <div className="flex gap-0.5 justify-center mt-1">
                         {[1,2,3,4,5].map(s => (
-                          <svg key={s} className="w-3.5 h-3.5" fill={s <= Math.round(reviewStats.average_rating) ? '#C9A96E' : 'none'} stroke={s <= Math.round(reviewStats.average_rating) ? '#C9A96E' : '#555'} strokeWidth={1.5} viewBox="0 0 24 24">
+                          <svg key={s} className="w-3.5 h-3.5" fill={s <= Math.round(reviewStats.average_rating) ? '#C9A84C' : 'none'} stroke={s <= Math.round(reviewStats.average_rating) ? '#C9A84C' : '#555'} strokeWidth={1.5} viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                           </svg>
                         ))}
@@ -438,7 +517,7 @@ export default function ListingDetailPage() {
                       {ratingCounts.map(({ star, count }) => (
                         <div key={star} className="flex items-center gap-2" data-testid={`rating-bar-${star}`}>
                           <span className="text-[11px] text-white/40 font-body w-3 text-right">{star}</span>
-                          <svg className="w-3 h-3 flex-shrink-0" fill="#C9A96E" viewBox="0 0 24 24">
+                          <svg className="w-3 h-3 flex-shrink-0" fill="#C9A84C" viewBox="0 0 24 24">
                             <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                           </svg>
                           <div className="flex-1 h-2 rounded-full bg-white/5 overflow-hidden">
@@ -464,7 +543,7 @@ export default function ListingDetailPage() {
 
               {/* Review Form */}
               {showReviewForm && (
-                <div className="mb-6 p-4 rounded-xl border border-gold/10 bg-midnight-900/50 space-y-3" data-testid="review-form">
+                <div className="mb-6 p-4 rounded-xl border border-gold/10 bg-[#0A0A0A]/50 space-y-3" data-testid="review-form">
                   <input
                     value={reviewForm.reviewer_name}
                     onChange={e => setReviewForm({ ...reviewForm, reviewer_name: e.target.value })}
@@ -477,7 +556,7 @@ export default function ListingDetailPage() {
                     <div className="flex gap-1">
                       {[1,2,3,4,5].map(s => (
                         <button key={s} onClick={() => setReviewForm({ ...reviewForm, rating: s })} className="p-1" data-testid={`star-${s}`}>
-                          <svg className="w-7 h-7 transition-colors" fill={s <= reviewForm.rating ? '#C9A96E' : 'none'} stroke={s <= reviewForm.rating ? '#C9A96E' : '#555'} strokeWidth={1.5} viewBox="0 0 24 24">
+                          <svg className="w-7 h-7 transition-colors" fill={s <= reviewForm.rating ? '#C9A84C' : 'none'} stroke={s <= reviewForm.rating ? '#C9A84C' : '#555'} strokeWidth={1.5} viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                           </svg>
                         </button>
@@ -497,7 +576,7 @@ export default function ListingDetailPage() {
                       onClick={submitReview}
                       disabled={submittingReview}
                       className="px-5 py-2.5 rounded-xl text-xs font-bold font-heading text-midnight-900 transition-all active:scale-95 hover:scale-[1.03] hover:shadow-lg disabled:opacity-50"
-                      style={{ background: 'linear-gradient(135deg, #C9A96E, #E6D8B5)', boxShadow: '0 0 16px rgba(201,169,110,0.3)' }}
+                      style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C97A)', boxShadow: '0 0 16px rgba(201,168,76,0.3)' }}
                       data-testid="submit-review-btn"
                     >
                       {submittingReview ? 'Submitting...' : 'Submit Review'}
@@ -552,7 +631,7 @@ export default function ListingDetailPage() {
                             <div className="flex items-center gap-2">
                               <div className="flex gap-0.5">
                                 {[1,2,3,4,5].map((s: number) => (
-                                  <svg key={s} className="w-3 h-3" fill={s <= review.rating ? '#C9A96E' : 'none'} stroke={s <= review.rating ? '#C9A96E' : '#555'} strokeWidth={1.5} viewBox="0 0 24 24">
+                                  <svg key={s} className="w-3 h-3" fill={s <= review.rating ? '#C9A84C' : 'none'} stroke={s <= review.rating ? '#C9A84C' : '#555'} strokeWidth={1.5} viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                                   </svg>
                                 ))}
@@ -600,7 +679,7 @@ export default function ListingDetailPage() {
                         {r.cover_image_url ? (
                           <img src={r.cover_image_url} alt={r.business_name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                         ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-midnight-800 to-charcoal-800 flex items-center justify-center">
+                          <div className="w-full h-full bg-gradient-to-br from-[#111111] to-charcoal-800 flex items-center justify-center">
                             <span className="text-2xl font-heading font-light text-white/10">{r.business_name[0]}</span>
                           </div>
                         )}
@@ -631,7 +710,7 @@ export default function ListingDetailPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
               className="rounded-2xl border border-white/10 p-6 sticky top-24"
-              style={{ background: 'rgba(13,27,42,0.9)', backdropFilter: 'blur(16px)' }}
+              style={{ background: 'rgba(10,10,10,0.9)', backdropFilter: 'blur(16px)' }}
               data-testid="contact-card"
             >
               <h3 className="text-sm font-heading font-semibold text-white uppercase tracking-wider mb-5">Contact</h3>
@@ -643,7 +722,7 @@ export default function ListingDetailPage() {
                     <a
                       href={`tel:${listing.phone}`}
                       className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-bold font-heading text-midnight-900 transition-all hover:scale-[1.02]"
-                      style={{ background: 'linear-gradient(135deg, #C9A96E, #E6D8B5)', boxShadow: '0 0 16px rgba(201,169,110,0.3)' }}
+                      style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C97A)', boxShadow: '0 0 16px rgba(201,168,76,0.3)' }}
                       data-testid="cta-call-now"
                     >
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

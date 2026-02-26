@@ -251,7 +251,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body className="min-h-screen bg-midnight-900">
+      <body className="min-h-screen bg-obsidian">
         <ServiceWorkerProvider>
           <AdminEditModeProvider>
             <ScrollToTop />
