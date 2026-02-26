@@ -203,7 +203,7 @@ export default function ReviewsPanel({ listingId }: { listingId: string }) {
                     <div className="flex items-center gap-2">
                       <div className="flex gap-0.5">
                         {[1,2,3,4,5].map(s => (
-                          <svg key={s} className="w-3 h-3" fill={s <= review.rating ? '#C9A96E' : 'none'} stroke={s <= review.rating ? '#C9A96E' : '#555'} strokeWidth={1.5} viewBox="0 0 24 24">
+                          <svg key={s} className="w-3 h-3" fill={s <= review.rating ? '#C9A84C' : 'none'} stroke={s <= review.rating ? '#C9A84C' : '#555'} strokeWidth={1.5} viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                           </svg>
                         ))}
@@ -258,8 +258,8 @@ export default function ReviewsPanel({ listingId }: { listingId: string }) {
                     <button
                       onClick={() => reviewAction('approve_draft', review.id)}
                       disabled={actionLoading === review.id}
-                      className="px-3 py-1.5 rounded-lg text-xs font-bold font-heading text-midnight-900 transition-all hover:scale-[1.02]"
-                      style={{ background: 'linear-gradient(135deg, #C9A96E, #E6D8B5)' }}
+                      className="px-3 py-1.5 rounded-lg text-xs font-bold font-heading text-[#0A0A0A] transition-all hover:scale-[1.02]"
+                      style={{ background: 'linear-gradient(135deg, #C9A84C, #E6D8B5)' }}
                       data-testid={`approve-draft-${review.id}`}
                     >
                       Approve &amp; Publish
@@ -302,8 +302,8 @@ export default function ReviewsPanel({ listingId }: { listingId: string }) {
                     <button
                       onClick={() => reviewAction('respond', review.id, { response_text: editText })}
                       disabled={!editText.trim() || actionLoading === review.id}
-                      className="px-4 py-2 rounded-lg text-xs font-bold font-heading text-midnight-900 transition-all hover:scale-[1.02] disabled:opacity-50"
-                      style={{ background: 'linear-gradient(135deg, #C9A96E, #E6D8B5)' }}
+                      className="px-4 py-2 rounded-lg text-xs font-bold font-heading text-[#0A0A0A] transition-all hover:scale-[1.02] disabled:opacity-50"
+                      style={{ background: 'linear-gradient(135deg, #C9A84C, #E6D8B5)' }}
                       data-testid={`publish-response-${review.id}`}
                     >
                       Publish Response

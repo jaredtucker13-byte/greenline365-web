@@ -212,7 +212,7 @@ export default async function BlogListingPage() {
                               backgroundColor: hasStyle 
                                 ? `${style.colors.primary}20` 
                                 : 'rgba(16, 185, 129, 0.15)',
-                              color: hasStyle ? style.colors.primary : '#C9A96E',
+                              color: hasStyle ? style.colors.primary : '#C9A84C',
                             }}
                           >
                             {post.category}
@@ -250,7 +250,7 @@ export default async function BlogListingPage() {
                         
                         <span 
                           className="text-xs font-medium flex items-center gap-1 opacity-0 group-hover:opacity-100 transition"
-                          style={{ color: hasStyle ? style.colors.primary : '#C9A96E' }}
+                          style={{ color: hasStyle ? style.colors.primary : '#C9A84C' }}
                         >
                           Read →
                         </span>

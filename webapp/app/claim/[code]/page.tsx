@@ -101,7 +101,7 @@ export default function ClaimPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-        <div className="animate-pulse text-[#C9A96E] text-lg">Loading deal...</div>
+        <div className="animate-pulse text-[#C9A84C] text-lg">Loading deal...</div>
       </div>
     );
   }
@@ -113,7 +113,7 @@ export default function ClaimPage() {
           <div className="text-6xl mb-4">😔</div>
           <h1 className="text-2xl font-bold text-white mb-2">Deal Not Available</h1>
           <p className="text-gray-400 mb-6">{error}</p>
-          <a href="/directory" className="text-[#C9A96E] hover:underline">
+          <a href="/directory" className="text-[#C9A84C] hover:underline">
             Browse the directory →
           </a>
         </div>
@@ -132,13 +132,13 @@ export default function ClaimPage() {
           <h1 className="text-3xl font-bold text-white mb-2">Deal Claimed!</h1>
           <p className="text-green-400 text-lg mb-6">{claimResult.message}</p>
 
-          <div className="bg-gradient-to-r from-[#C9A96E]/10 to-[#E8D5A3]/10 border-2 border-[#C9A96E]/40 rounded-2xl p-6 mb-6">
+          <div className="bg-gradient-to-r from-[#C9A84C]/10 to-[#E8D5A3]/10 border-2 border-[#C9A84C]/40 rounded-2xl p-6 mb-6">
             <h2 className="text-xl font-bold text-white mb-2">{deal.title}</h2>
-            <div className="text-4xl font-bold text-[#C9A96E] mb-4">{deal.deal_value}</div>
+            <div className="text-4xl font-bold text-[#C9A84C] mb-4">{deal.deal_value}</div>
 
             <div className="bg-black/40 rounded-xl p-4 mb-4">
               <p className="text-xs text-gray-400 mb-1">Show this code when you visit</p>
-              <p className="text-2xl font-mono font-bold text-[#C9A96E] tracking-wider">
+              <p className="text-2xl font-mono font-bold text-[#C9A84C] tracking-wider">
                 {deal.claim_code}
               </p>
             </div>
@@ -162,7 +162,7 @@ export default function ClaimPage() {
             </p>
           )}
 
-          <a href="/directory" className="text-[#C9A96E] hover:underline text-sm">
+          <a href="/directory" className="text-[#C9A84C] hover:underline text-sm">
             Discover more local businesses →
           </a>
         </div>
@@ -176,26 +176,26 @@ export default function ClaimPage() {
       <div className="max-w-md w-full">
         {/* GL365 Branding */}
         <div className="text-center mb-6">
-          <p className="text-[#C9A96E] font-bold text-sm tracking-wider">GREENLINE365</p>
+          <p className="text-[#C9A84C] font-bold text-sm tracking-wider">GREENLINE365</p>
           <p className="text-gray-500 text-xs">Local Deals</p>
         </div>
 
         {/* Deal Card */}
-        <div className="bg-gradient-to-b from-[#1a1a2e] to-[#0a0a0a] border border-[#C9A96E]/30 rounded-2xl overflow-hidden">
+        <div className="bg-gradient-to-b from-[#1a1a2e] to-[#0a0a0a] border border-[#C9A84C]/30 rounded-2xl overflow-hidden">
           {/* Deal Header */}
-          <div className="bg-gradient-to-r from-[#C9A96E]/20 to-[#E8D5A3]/20 p-6 text-center">
-            <div className="inline-block bg-[#C9A96E] text-black text-xs font-bold px-4 py-1 rounded-full mb-4 tracking-wider">
+          <div className="bg-gradient-to-r from-[#C9A84C]/20 to-[#E8D5A3]/20 p-6 text-center">
+            <div className="inline-block bg-[#C9A84C] text-black text-xs font-bold px-4 py-1 rounded-full mb-4 tracking-wider">
               ⚡ FLASH DEAL
             </div>
             <h1 className="text-2xl font-bold text-white mb-2">{deal.title}</h1>
             {deal.business_name && (
-              <p className="text-[#C9A96E]">at {deal.business_name}</p>
+              <p className="text-[#C9A84C]">at {deal.business_name}</p>
             )}
           </div>
 
           {/* Deal Value */}
           <div className="p-6 text-center">
-            <div className="text-5xl font-bold text-[#C9A96E] mb-4">{deal.deal_value}</div>
+            <div className="text-5xl font-bold text-[#C9A84C] mb-4">{deal.deal_value}</div>
             {deal.description && (
               <p className="text-gray-300 mb-4">{deal.description}</p>
             )}
@@ -203,7 +203,7 @@ export default function ClaimPage() {
             {/* Urgency Indicators */}
             <div className="flex flex-wrap gap-2 justify-center mb-6">
               {deal.time_window && (
-                <span className="bg-[#C9A96E]/10 text-[#C9A96E] text-xs px-3 py-1 rounded-full border border-[#C9A96E]/30">
+                <span className="bg-[#C9A84C]/10 text-[#C9A84C] text-xs px-3 py-1 rounded-full border border-[#C9A84C]/30">
                   ⏰ {deal.time_window}
                 </span>
               )}
@@ -236,7 +236,7 @@ export default function ClaimPage() {
             {!deal.claim_required && !isExpired && (
               <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-6 mb-4">
                 <p className="text-sm text-gray-400 mb-2">Just mention this deal when you visit!</p>
-                <p className="text-3xl font-mono font-bold text-[#C9A96E] tracking-wider mb-2">
+                <p className="text-3xl font-mono font-bold text-[#C9A84C] tracking-wider mb-2">
                   {deal.claim_code}
                 </p>
                 <p className="text-green-400 text-sm">No claim needed — show up and enjoy</p>
@@ -251,7 +251,7 @@ export default function ClaimPage() {
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   placeholder="Your email"
-                  className="w-full bg-black/40 border border-gray-700 rounded-xl px-4 py-3 text-white focus:border-[#C9A96E] focus:outline-none"
+                  className="w-full bg-black/40 border border-gray-700 rounded-xl px-4 py-3 text-white focus:border-[#C9A84C] focus:outline-none"
                   required
                 />
                 <input
@@ -259,7 +259,7 @@ export default function ClaimPage() {
                   value={name}
                   onChange={e => setName(e.target.value)}
                   placeholder="Your name (optional)"
-                  className="w-full bg-black/40 border border-gray-700 rounded-xl px-4 py-3 text-white focus:border-[#C9A96E] focus:outline-none"
+                  className="w-full bg-black/40 border border-gray-700 rounded-xl px-4 py-3 text-white focus:border-[#C9A84C] focus:outline-none"
                 />
 
                 {error && <p className="text-red-400 text-sm">{error}</p>}
@@ -267,7 +267,7 @@ export default function ClaimPage() {
                 <button
                   onClick={handleClaim}
                   disabled={!email || claiming}
-                  className="w-full py-4 bg-gradient-to-r from-[#C9A96E] to-[#E8D5A3] hover:from-[#E8D5A3] hover:to-[#C9A96E] text-black font-bold text-lg rounded-xl transition-all transform hover:scale-[1.02] disabled:opacity-50"
+                  className="w-full py-4 bg-gradient-to-r from-[#C9A84C] to-[#E8D5A3] hover:from-[#E8D5A3] hover:to-[#C9A84C] text-black font-bold text-lg rounded-xl transition-all transform hover:scale-[1.02] disabled:opacity-50"
                 >
                   {claiming ? 'Claiming...' : `Claim My Spot (${spotsLeft} left)`}
                 </button>
@@ -282,7 +282,7 @@ export default function ClaimPage() {
 
         {/* Footer */}
         <div className="text-center mt-6">
-          <a href="/directory" className="text-[#C9A96E] hover:underline text-sm">
+          <a href="/directory" className="text-[#C9A84C] hover:underline text-sm">
             Discover more local businesses on GreenLine365 →
           </a>
         </div>

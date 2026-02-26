@@ -174,7 +174,7 @@ export default function PricingPage() {
                   {tier.features.map((f, fi) => (
                     <div key={fi} className="flex items-start gap-2.5">
                       {f.included ? (
-                        <svg className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: '#C9A96E' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <svg className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: '#C9A84C' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
                       ) : (
@@ -204,7 +204,7 @@ export default function PricingPage() {
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           {[
-            { name: 'Intelligence Verified', color: '#C9A96E', active: true },
+            { name: 'Intelligence Verified', color: '#C9A84C', active: true },
             { name: 'Spotless Pro', color: '#3B82F6', active: true },
             { name: 'Local Vibe Elite', color: '#8B5CF6', active: false },
             { name: 'Master Technician', color: '#F59E0B', active: false },

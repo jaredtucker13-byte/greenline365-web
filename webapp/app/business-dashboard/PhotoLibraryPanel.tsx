@@ -136,8 +136,8 @@ export default function PhotoLibraryPanel({ listingId }: PhotoLibraryProps) {
               <button
                 onClick={saveSelection}
                 disabled={saving}
-                className="px-4 py-2 rounded-lg text-xs font-bold font-heading text-midnight-900 transition-all hover:scale-[1.02] disabled:opacity-50"
-                style={{ background: 'linear-gradient(135deg, #C9A96E, #E6D8B5)' }}
+                className="px-4 py-2 rounded-lg text-xs font-bold font-heading text-[#0A0A0A] transition-all hover:scale-[1.02] disabled:opacity-50"
+                style={{ background: 'linear-gradient(135deg, #C9A84C, #E6D8B5)' }}
                 data-testid="save-photo-selection"
               >
                 {saving ? 'Saving...' : 'Save Selection'}
@@ -169,7 +169,7 @@ export default function PhotoLibraryPanel({ listingId }: PhotoLibraryProps) {
                     {/* Selection indicator */}
                     {isSelected && (
                       <div className="absolute top-2 left-2 w-6 h-6 rounded-full bg-gold flex items-center justify-center">
-                        <svg className="w-3.5 h-3.5 text-midnight-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <svg className="w-3.5 h-3.5 text-[#0A0A0A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
                       </div>
@@ -177,7 +177,7 @@ export default function PhotoLibraryPanel({ listingId }: PhotoLibraryProps) {
 
                     {/* Cover badge */}
                     {isCover && (
-                      <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded text-[8px] font-bold bg-gold text-midnight-900 uppercase">Cover</div>
+                      <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded text-[8px] font-bold bg-gold text-[#0A0A0A] uppercase">Cover</div>
                     )}
 
                     {/* Set as cover (on hover) */}
@@ -192,7 +192,7 @@ export default function PhotoLibraryPanel({ listingId }: PhotoLibraryProps) {
 
                     {/* Lock overlay for free tier */}
                     {tier === 'free' && (
-                      <div className="absolute inset-0 bg-midnight-900/60 flex items-center justify-center backdrop-blur-[2px]">
+                      <div className="absolute inset-0 bg-[#0A0A0A]/60 flex items-center justify-center backdrop-blur-[2px]">
                         <svg className="w-6 h-6 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
                         </svg>
@@ -217,7 +217,7 @@ export default function PhotoLibraryPanel({ listingId }: PhotoLibraryProps) {
               <p className="text-xs text-white/40 font-body mb-3">
                 Upgrade to Pro ($45/mo) to choose any 2 photos, or Premium ($89/mo) for up to 10.
               </p>
-              <button className="px-4 py-2 rounded-lg text-xs font-bold font-heading text-midnight-900" style={{ background: 'linear-gradient(135deg, #C9A96E, #E6D8B5)' }}>
+              <button className="px-4 py-2 rounded-lg text-xs font-bold font-heading text-[#0A0A0A]" style={{ background: 'linear-gradient(135deg, #C9A84C, #E6D8B5)' }}>
                 Upgrade Now
               </button>
             </div>

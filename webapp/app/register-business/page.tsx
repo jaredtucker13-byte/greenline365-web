@@ -18,7 +18,7 @@ const INDUSTRIES = [
 ];
 
 const TIER_INFO: Record<string, { name: string; price: string; color: string }> = {
-  free: { name: 'Free', price: '$0', color: '#C9A96E' },
+  free: { name: 'Free', price: '$0', color: '#C9A84C' },
   pro: { name: 'Pro', price: '$45/mo', color: '#3B82F6' },
   premium: { name: 'Premium', price: '$89/mo', color: '#FF8C00' },
 };
@@ -398,7 +398,7 @@ function RegisterForm() {
                 type="submit"
                 disabled={loading}
                 className="w-full py-3.5 font-bold rounded-xl transition disabled:opacity-50 flex items-center justify-center gap-2 text-black"
-                style={{ background: selectedTier === 'free' ? '#C9A96E' : 'linear-gradient(135deg, #FF8C00, #FFB800)' }}
+                style={{ background: selectedTier === 'free' ? '#C9A84C' : 'linear-gradient(135deg, #FF8C00, #FFB800)' }}
                 data-testid="register-business-submit"
               >
                 {loading ? (

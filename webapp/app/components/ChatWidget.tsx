@@ -269,7 +269,7 @@ const getModeStyles = (mode: AssistantMode) => {
       subtitle: 'Your brainstorming partner',
     },
     concierge: {
-      accent: '#C9A96E', // Emerald
+      accent: '#C9A84C', // Emerald
       accentLight: 'rgba(16, 185, 129, 0.1)',
       gradient: 'from-gold-500 to-teal-500',
       title: 'GreenLine Concierge',

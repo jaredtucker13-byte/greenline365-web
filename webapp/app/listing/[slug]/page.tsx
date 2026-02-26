@@ -173,7 +173,7 @@ export default function ListingDetailPage() {
             <span className="text-8xl font-heading font-light text-white/10">{listing.business_name[0]}</span>
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-midnight-900 via-midnight-900/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/40 to-transparent" />
 
         {/* Back button + Directory home */}
         <div className="absolute top-4 left-4 flex items-center gap-2">
@@ -575,7 +575,7 @@ export default function ListingDetailPage() {
                     <button
                       onClick={submitReview}
                       disabled={submittingReview}
-                      className="px-5 py-2.5 rounded-xl text-xs font-bold font-heading text-midnight-900 transition-all active:scale-95 hover:scale-[1.03] hover:shadow-lg disabled:opacity-50"
+                      className="px-5 py-2.5 rounded-xl text-xs font-bold font-heading text-[#0A0A0A] transition-all active:scale-95 hover:scale-[1.03] hover:shadow-lg disabled:opacity-50"
                       style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C97A)', boxShadow: '0 0 16px rgba(201,168,76,0.3)' }}
                       data-testid="submit-review-btn"
                     >
@@ -721,7 +721,7 @@ export default function ListingDetailPage() {
                   {listing.phone && (
                     <a
                       href={`tel:${listing.phone}`}
-                      className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-bold font-heading text-midnight-900 transition-all hover:scale-[1.02]"
+                      className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-bold font-heading text-[#0A0A0A] transition-all hover:scale-[1.02]"
                       style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C97A)', boxShadow: '0 0 16px rgba(201,168,76,0.3)' }}
                       data-testid="cta-call-now"
                     >

@@ -26,22 +26,25 @@ interface Listing {
   directory_badges: { id: string; badge_type: string; badge_label: string; badge_color: string }[];
 }
 
-// ─── Destination Config ───
+// ─── Destination Config — Region/State Architecture ───
+// Organized by state > region for clean multi-state expansion
 const DESTINATIONS: Record<string, {
   label: string;
   tagline: string;
-  heroGradient: string;
+  state: string;
+  stateAbbr: string;
+  region: string;
   lat: number;
   lng: number;
 }> = {
-  'st-pete-beach':  { label: 'St. Pete Beach',  tagline: "Florida's Sunshine City",             heroGradient: 'from-sky-900/80 via-blue-900/60 to-midnight-900', lat: 27.7253, lng: -82.7412 },
-  'key-west':       { label: 'Key West',         tagline: 'Close to Perfect, Far from Normal',   heroGradient: 'from-teal-900/80 via-gold-900/60 to-midnight-900', lat: 24.5551, lng: -81.7800 },
-  'sarasota':       { label: 'Sarasota',         tagline: 'Where Arts Meet the Gulf',            heroGradient: 'from-indigo-900/80 via-purple-900/60 to-midnight-900', lat: 27.3364, lng: -82.5307 },
-  'ybor-city':      { label: 'Ybor City',        tagline: "Tampa's Historic Latin Quarter",      heroGradient: 'from-red-900/80 via-orange-900/60 to-midnight-900', lat: 27.9617, lng: -82.4369 },
-  'daytona':        { label: 'Daytona Beach',    tagline: "World's Most Famous Beach",           heroGradient: 'from-amber-900/80 via-yellow-900/60 to-midnight-900', lat: 29.2108, lng: -81.0228 },
-  'orlando':        { label: 'Orlando',          tagline: 'The City Beautiful',                  heroGradient: 'from-violet-900/80 via-fuchsia-900/60 to-midnight-900', lat: 28.5383, lng: -81.3792 },
-  'miami':          { label: 'Miami',            tagline: 'Neon Nights & Coastal Luxury',        heroGradient: 'from-cyan-900/80 via-blue-900/60 to-midnight-900', lat: 25.7617, lng: -80.1918 },
-  'jacksonville':   { label: 'Jacksonville',     tagline: 'Gridiron Grit & Riverfront Views',    heroGradient: 'from-slate-900/80 via-stone-900/60 to-midnight-900', lat: 30.3322, lng: -81.6557 },
+  'st-pete-beach':  { label: 'St. Pete Beach',  tagline: "Florida's Sunshine City",             state: 'Florida', stateAbbr: 'FL', region: 'Tampa Bay',    lat: 27.7253, lng: -82.7412 },
+  'key-west':       { label: 'Key West',         tagline: 'Close to Perfect, Far from Normal',   state: 'Florida', stateAbbr: 'FL', region: 'Florida Keys', lat: 24.5551, lng: -81.7800 },
+  'sarasota':       { label: 'Sarasota',         tagline: 'Where Arts Meet the Gulf',            state: 'Florida', stateAbbr: 'FL', region: 'Gulf Coast',   lat: 27.3364, lng: -82.5307 },
+  'ybor-city':      { label: 'Ybor City',        tagline: "Tampa's Historic Latin Quarter",      state: 'Florida', stateAbbr: 'FL', region: 'Tampa Bay',    lat: 27.9617, lng: -82.4369 },
+  'daytona':        { label: 'Daytona Beach',    tagline: "World's Most Famous Beach",           state: 'Florida', stateAbbr: 'FL', region: 'East Coast',   lat: 29.2108, lng: -81.0228 },
+  'orlando':        { label: 'Orlando',          tagline: 'The City Beautiful',                  state: 'Florida', stateAbbr: 'FL', region: 'Central FL',   lat: 28.5383, lng: -81.3792 },
+  'miami':          { label: 'Miami',            tagline: 'Neon Nights & Coastal Luxury',        state: 'Florida', stateAbbr: 'FL', region: 'South FL',     lat: 25.7617, lng: -80.1918 },
+  'jacksonville':   { label: 'Jacksonville',     tagline: 'Gridiron Grit & Riverfront Views',    state: 'Florida', stateAbbr: 'FL', region: 'North FL',     lat: 30.3322, lng: -81.6557 },
 };
 
 // ─── Tourism Sections ───
@@ -58,11 +61,36 @@ const SECTIONS = [
   { id: 'getting-around',     label: 'Getting Around',       icon: 'M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7' },
 ];
 
+// ─── Industry Categories (same as main directory) ───
+const INDUSTRY_LABELS: Record<string, string> = {
+  'services': 'Services',
+  'dining': 'Dining',
+  'health-wellness': 'Health & Wellness',
+  'style-shopping': 'Style & Shopping',
+  'nightlife': 'Nightlife',
+  'family-entertainment': 'Family Entertainment',
+  'destinations': 'Destinations',
+  'hotels-lodging': 'Hotels & Lodging',
+  'professional-services': 'Professional Services',
+};
+
+const INDUSTRY_ICONS: Record<string, string> = {
+  'services': 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z',
+  'dining': 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2-1.343-2-3-2zM12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2z',
+  'health-wellness': 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z',
+  'style-shopping': 'M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z',
+  'nightlife': 'M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z',
+  'family-entertainment': 'M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+  'destinations': 'M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064',
+  'hotels-lodging': 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6',
+  'professional-services': 'M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
+};
+
 function Stars({ rating, size = 12 }: { rating: number; size?: number }) {
   return (
     <div className="flex gap-0.5">
       {[1,2,3,4,5].map(s => (
-        <svg key={s} width={size} height={size} viewBox="0 0 24 24" fill={s <= Math.round(rating) ? '#C9A96E' : 'none'} stroke={s <= Math.round(rating) ? '#C9A96E' : '#555'} strokeWidth={1.5}>
+        <svg key={s} width={size} height={size} viewBox="0 0 24 24" fill={s <= Math.round(rating) ? '#C9A84C' : 'none'} stroke={s <= Math.round(rating) ? '#C9A84C' : '#555'} strokeWidth={1.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
         </svg>
       ))}
@@ -72,9 +100,15 @@ function Stars({ rating, size = 12 }: { rating: number; size?: number }) {
 
 export default function DestinationGuideClient({ slug }: { slug: string }) {
   const [listings, setListings] = useState<Record<string, Listing[]>>({});
+  const [featured, setFeatured] = useState<Listing[]>([]);
+  const [topRated, setTopRated] = useState<Listing[]>([]);
+  const [industryCounts, setIndustryCounts] = useState<Record<string, number>>({});
+  const [cities, setCities] = useState<string[]>([]);
   const [activeSection, setActiveSection] = useState('stay');
+  const [activeView, setActiveView] = useState<'explore' | 'browse'>('explore');
   const [loading, setLoading] = useState(true);
   const [allCount, setAllCount] = useState(0);
+  const [claimedCount, setClaimedCount] = useState(0);
 
   const dest = DESTINATIONS[slug];
 
@@ -92,8 +126,12 @@ export default function DestinationGuideClient({ slug }: { slug: string }) {
       if (data.sections) {
         setListings(data.sections);
         setAllCount(data.totalCount || 0);
+        setFeatured(data.featured || []);
+        setTopRated(data.topRated || []);
+        setIndustryCounts(data.industryCounts || {});
+        setCities(data.cities || []);
+        setClaimedCount(data.claimedCount || 0);
 
-        // Auto-select first section with data
         const firstWithData = SECTIONS.find(s => (data.sections[s.id] || []).length > 0);
         if (firstWithData) setActiveSection(firstWithData.id);
       }
@@ -104,12 +142,20 @@ export default function DestinationGuideClient({ slug }: { slug: string }) {
     setLoading(false);
   }
 
+  // Group destinations by region for the footer nav
+  const destinationsByRegion = Object.entries(DESTINATIONS).reduce<Record<string, { slug: string; label: string }[]>>((acc, [key, d]) => {
+    if (key === slug) return acc;
+    if (!acc[d.region]) acc[d.region] = [];
+    acc[d.region].push({ slug: key, label: d.label });
+    return acc;
+  }, {});
+
   if (!dest) {
     return (
-      <div className="min-h-screen bg-midnight-900 flex items-center justify-center" data-testid="destination-not-found">
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center" data-testid="destination-not-found">
         <div className="text-center">
           <h1 className="text-3xl font-heading font-light text-white mb-4">Destination Not Found</h1>
-          <p className="text-silver mb-8 font-body">This destination guide doesn&apos;t exist yet.</p>
+          <p className="text-white/40 mb-8 font-body">This destination guide doesn&apos;t exist yet.</p>
           <Link href="/" className="btn-primary px-6 py-3 rounded-xl text-sm" data-testid="back-home-btn">Back to Directory</Link>
         </div>
       </div>
@@ -118,35 +164,45 @@ export default function DestinationGuideClient({ slug }: { slug: string }) {
 
   const currentListings = listings[activeSection] || [];
   const currentSection = SECTIONS.find(s => s.id === activeSection);
+  const totalIndustryCount = Object.values(industryCounts).reduce((sum, c) => sum + c, 0);
+  const activeIndustries = Object.entries(industryCounts).filter(([, count]) => count > 0);
 
   return (
-    <div className="min-h-screen bg-midnight-900 pt-20" data-testid="destination-guide">
-      {/* ─── Hero ─── */}
-      <section className="relative overflow-hidden" style={{ minHeight: '50vh' }} data-testid="destination-hero">
-        <div className={`absolute inset-0 bg-gradient-to-b ${dest.heroGradient}`} />
-        <div className="absolute inset-0 bg-gradient-to-r from-midnight-900/60 via-transparent to-midnight-900/60" />
+    <div className="min-h-screen bg-[#0A0A0A] pt-20" data-testid="destination-guide">
+      {/* ─── Cinematic Hero ─── */}
+      <section className="relative overflow-hidden" style={{ minHeight: '60vh' }} data-testid="destination-hero">
+        {/* Depth gradient layers */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0A] via-[#111111] to-[#0A0A0A]" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0A0A0A]/80 via-transparent to-[#0A0A0A]/80" />
 
-        {/* Decorative elements */}
-        <div className="absolute top-20 left-10 w-64 h-64 rounded-full opacity-5" style={{ background: 'radial-gradient(circle, #C9A96E 0%, transparent 70%)' }} />
-        <div className="absolute bottom-10 right-10 w-48 h-48 rounded-full opacity-5" style={{ background: 'radial-gradient(circle, #C9A96E 0%, transparent 70%)' }} />
+        {/* Gold light trails */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/3 left-0 w-full h-[1px] opacity-10" style={{ background: 'linear-gradient(90deg, transparent, #C9A84C, transparent)' }} />
+          <div className="absolute top-2/3 left-0 w-full h-[1px] opacity-5" style={{ background: 'linear-gradient(90deg, transparent, #C9A84C 30%, transparent 70%)' }} />
+        </div>
 
-        <div className="relative max-w-6xl mx-auto px-6 flex flex-col justify-center" style={{ minHeight: '50vh' }}>
+        {/* Gold ambient glow */}
+        <div className="absolute top-20 left-1/4 w-96 h-96 rounded-full opacity-[0.04]" style={{ background: 'radial-gradient(circle, #C9A84C 0%, transparent 70%)' }} />
+        <div className="absolute bottom-10 right-1/4 w-64 h-64 rounded-full opacity-[0.03]" style={{ background: 'radial-gradient(circle, #C9A84C 0%, transparent 70%)' }} />
+
+        <div className="relative max-w-6xl mx-auto px-6 flex flex-col justify-center" style={{ minHeight: '60vh' }}>
           {/* Breadcrumb */}
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
-            <Link href="/" className="inline-flex items-center gap-2 text-sm text-silver/50 hover:text-gold transition font-body mb-8" data-testid="breadcrumb-home">
+            <Link href="/" className="inline-flex items-center gap-2 text-sm text-white/30 hover:text-gold transition font-body mb-8" data-testid="breadcrumb-home">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
               Directory
             </Link>
           </motion.div>
 
-          {/* Badge */}
+          {/* Region Badge */}
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-gold/20 backdrop-blur-sm mb-6 w-fit"
-            style={{ background: 'rgba(201, 169, 110, 0.08)' }}>
-            <span className="w-2 h-2 rounded-full bg-greenline animate-pulse" />
-            <span className="text-xs font-medium text-white/80 tracking-widest font-heading uppercase">Destination Guide</span>
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#C9A84C]/20 backdrop-blur-sm mb-6 w-fit"
+            style={{ background: 'rgba(201, 168, 76, 0.06)' }}>
+            <span className="w-2 h-2 rounded-full bg-[#C9A84C] animate-pulse" />
+            <span className="text-xs font-medium text-white/80 tracking-widest font-heading uppercase">{dest.region} &middot; {dest.stateAbbr}</span>
           </motion.div>
 
+          {/* Title */}
           <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
             className="text-4xl sm:text-5xl lg:text-6xl font-heading font-light text-white leading-[1.05] mb-4 tracking-tight"
             data-testid="destination-title">
@@ -154,123 +210,403 @@ export default function DestinationGuideClient({ slug }: { slug: string }) {
           </motion.h1>
 
           <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
-            className="text-lg text-white/50 max-w-xl mb-6 font-body" data-testid="destination-tagline">
+            className="text-lg text-white/40 max-w-xl mb-8 font-body" data-testid="destination-tagline">
             {dest.tagline}
           </motion.p>
 
+          {/* Stats Row */}
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
-            className="flex items-center gap-4">
-            <span className="text-sm text-gold font-heading font-semibold" data-testid="destination-count">
-              {loading ? '...' : `${allCount} businesses`}
-            </span>
-            <span className="w-1 h-1 rounded-full bg-silver/30" />
-            <span className="text-sm text-silver/50 font-body">Florida</span>
+            className="flex flex-wrap items-center gap-6">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl font-heading font-semibold text-[#C9A84C]" data-testid="destination-count">
+                {loading ? '—' : allCount}
+              </span>
+              <span className="text-sm text-white/30 font-body">businesses</span>
+            </div>
+            <span className="w-1 h-1 rounded-full bg-white/10" />
+            <div className="flex items-center gap-2">
+              <span className="text-2xl font-heading font-semibold text-white/70">
+                {loading ? '—' : activeIndustries.length}
+              </span>
+              <span className="text-sm text-white/30 font-body">categories</span>
+            </div>
+            <span className="w-1 h-1 rounded-full bg-white/10" />
+            <div className="flex items-center gap-2">
+              <span className="text-2xl font-heading font-semibold text-white/70">
+                {loading ? '—' : claimedCount}
+              </span>
+              <span className="text-sm text-white/30 font-body">verified</span>
+            </div>
+            {cities.length > 1 && (
+              <>
+                <span className="w-1 h-1 rounded-full bg-white/10" />
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl font-heading font-semibold text-white/70">
+                    {cities.length}
+                  </span>
+                  <span className="text-sm text-white/30 font-body">neighborhoods</span>
+                </div>
+              </>
+            )}
           </motion.div>
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-midnight-900 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0A0A0A] to-transparent" />
       </section>
 
-      {/* ─── Section Nav (Horizontal Tabs) ─── */}
-      <section className="sticky top-0 z-30 bg-midnight-900/95 backdrop-blur-xl border-b border-white/5" data-testid="section-nav">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="flex overflow-x-auto gap-1 py-3 scrollbar-hide">
-            {SECTIONS.map(section => {
-              const count = (listings[section.id] || []).length;
-              return (
-                <button
-                  key={section.id}
-                  onClick={() => setActiveSection(section.id)}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-medium whitespace-nowrap transition-all duration-300 font-body ${
-                    activeSection === section.id
-                      ? 'bg-gold/15 text-gold border border-gold/30'
-                      : count > 0
-                        ? 'text-white/50 border border-white/10 hover:text-white/70 hover:border-white/20'
-                        : 'text-white/20 border border-white/5 opacity-60'
-                  }`}
-                  data-testid={`section-tab-${section.id}`}
-                >
-                  <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d={section.icon} />
-                  </svg>
-                  {section.label}
-                  {count > 0 && (
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
-                      activeSection === section.id ? 'bg-gold/20 text-gold' : 'bg-white/5 text-white/30'
-                    }`}>{count}</span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
+      {/* ─── View Toggle ─── */}
+      <section className="max-w-6xl mx-auto px-6 pt-4 pb-2">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setActiveView('explore')}
+            className={`px-5 py-2.5 rounded-xl text-sm font-medium font-body transition-all duration-300 ${
+              activeView === 'explore'
+                ? 'bg-[#C9A84C]/15 text-[#C9A84C] border border-[#C9A84C]/30'
+                : 'text-white/40 border border-white/5 hover:text-white/60 hover:border-white/10'
+            }`}
+          >
+            Explore
+          </button>
+          <button
+            onClick={() => setActiveView('browse')}
+            className={`px-5 py-2.5 rounded-xl text-sm font-medium font-body transition-all duration-300 ${
+              activeView === 'browse'
+                ? 'bg-[#C9A84C]/15 text-[#C9A84C] border border-[#C9A84C]/30'
+                : 'text-white/40 border border-white/5 hover:text-white/60 hover:border-white/10'
+            }`}
+          >
+            Browse by Category
+          </button>
         </div>
       </section>
 
-      {/* ─── Section Content ─── */}
-      <section className="max-w-6xl mx-auto px-6 py-10" data-testid="section-content">
-        <AnimatePresence mode="wait">
-          <motion.div key={activeSection} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
-            {/* Section Header */}
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center glass-gold">
-                <svg className="w-5 h-5 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d={currentSection?.icon || ''} />
-                </svg>
-              </div>
-              <div>
-                <h2 className="text-xl font-heading font-semibold text-white" data-testid="section-title">{currentSection?.label}</h2>
-                <p className="text-xs text-silver/50 font-body">{currentListings.length} options in {dest.label}</p>
-              </div>
-            </div>
-
-            {/* Listings Grid */}
-            {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {[1,2,3,4,5,6].map(i => (
-                  <div key={i} className="h-72 rounded-2xl animate-pulse bg-charcoal-800/30" />
-                ))}
-              </div>
-            ) : currentListings.length === 0 ? (
-              <div className="text-center py-16" data-testid="section-empty">
-                <div className="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center glass-gold">
-                  <svg className="w-10 h-10 text-gold/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d={currentSection?.icon || ''} />
+      {activeView === 'explore' ? (
+        <>
+          {/* ─── Featured Businesses ─── */}
+          {!loading && featured.length > 0 && (
+            <section className="max-w-6xl mx-auto px-6 py-10" data-testid="featured-section">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(201, 168, 76, 0.1)', border: '1px solid rgba(201, 168, 76, 0.2)' }}>
+                  <svg className="w-5 h-5 text-[#C9A84C]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-heading font-light text-white mb-2">Coming Soon</h3>
-                <p className="text-sm text-silver/50 font-body max-w-md mx-auto mb-6">
-                  We&apos;re curating the best {currentSection?.label?.toLowerCase()} options in {dest.label}. Check back soon!
-                </p>
-                <Link href="/register-business" className="btn-primary px-6 py-3 rounded-xl text-sm" data-testid="register-from-empty">
-                  Add Your Business
-                </Link>
+                <div>
+                  <h2 className="text-xl font-heading font-semibold text-white">Featured in {dest.label}</h2>
+                  <p className="text-xs text-white/30 font-body">Verified businesses with the highest trust scores</p>
+                </div>
               </div>
-            ) : (
+
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {currentListings.map((l, i) => (
+                {featured.map((l, i) => (
+                  <GuideListingCard key={l.id} listing={l} index={i} isFeatured />
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* ─── Top Rated ─── */}
+          {!loading && topRated.length > 0 && (
+            <section className="max-w-6xl mx-auto px-6 py-10 border-t border-white/5" data-testid="top-rated-section">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(201, 168, 76, 0.1)', border: '1px solid rgba(201, 168, 76, 0.2)' }}>
+                  <svg className="w-5 h-5 text-[#C9A84C]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                  </svg>
+                </div>
+                <div>
+                  <h2 className="text-xl font-heading font-semibold text-white">Top Rated in {dest.label}</h2>
+                  <p className="text-xs text-white/30 font-body">Highest-rated businesses based on reviews</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {topRated.map((l, i) => (
                   <GuideListingCard key={l.id} listing={l} index={i} />
                 ))}
               </div>
-            )}
-          </motion.div>
-        </AnimatePresence>
+            </section>
+          )}
+
+          {/* ─── Voted Best — Coming Soon ─── */}
+          <section className="max-w-6xl mx-auto px-6 py-12 border-t border-white/5" data-testid="voted-best-section">
+            <div className="relative rounded-2xl overflow-hidden border border-[#C9A84C]/10" style={{ background: 'rgba(201, 168, 76, 0.03)' }}>
+              <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-1/2 left-0 w-full h-[1px] opacity-5" style={{ background: 'linear-gradient(90deg, transparent, #C9A84C, transparent)' }} />
+              </div>
+
+              <div className="relative p-8 sm:p-12 text-center">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#C9A84C]/20 mb-6" style={{ background: 'rgba(201, 168, 76, 0.08)' }}>
+                    <span className="text-xs font-heading font-semibold text-[#C9A84C] tracking-widest uppercase">Coming Soon</span>
+                  </div>
+
+                  <h3 className="text-2xl sm:text-3xl font-heading font-light text-white mb-4">
+                    Voted Best in <span className="text-[#C9A84C]">{dest.label}</span>
+                  </h3>
+                  <p className="text-white/40 font-body max-w-lg mx-auto mb-6 text-sm leading-relaxed">
+                    Real rankings from real people. GL365 polls will let you vote for the best businesses
+                    in {dest.label} — Best Plumber, Best Restaurant, Best Salon, and more.
+                    No fake reviews. No pay-to-win. Just your vote.
+                  </p>
+
+                  <div className="flex flex-wrap justify-center gap-3">
+                    {['Best Restaurant', 'Best Plumber', 'Best Salon', 'Best HVAC'].map(badge => (
+                      <span key={badge} className="px-4 py-2 rounded-full text-xs font-heading font-semibold border border-[#C9A84C]/15 text-[#C9A84C]/60" style={{ background: 'rgba(201, 168, 76, 0.05)' }}>
+                        {badge}
+                      </span>
+                    ))}
+                  </div>
+                </motion.div>
+              </div>
+            </div>
+          </section>
+
+          {/* ─── Category Overview Grid ─── */}
+          {!loading && activeIndustries.length > 0 && (
+            <section className="max-w-6xl mx-auto px-6 py-10 border-t border-white/5" data-testid="category-overview">
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h2 className="text-xl font-heading font-semibold text-white">Browse by Category</h2>
+                  <p className="text-xs text-white/30 font-body mt-1">{totalIndustryCount} businesses across {activeIndustries.length} categories in {dest.label}</p>
+                </div>
+                <button
+                  onClick={() => setActiveView('browse')}
+                  className="text-sm text-[#C9A84C] font-body hover:text-[#E8C97A] transition"
+                >
+                  View All &rarr;
+                </button>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                {activeIndustries.map(([id, count], i) => (
+                  <motion.button
+                    key={id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                    onClick={() => setActiveView('browse')}
+                    className="rounded-xl p-5 text-left border border-white/5 hover:border-[#C9A84C]/20 transition-all duration-300 group"
+                    style={{ background: 'rgba(255,255,255,0.02)' }}
+                  >
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center mb-3" style={{ background: 'rgba(201, 168, 76, 0.08)' }}>
+                      <svg className="w-4 h-4 text-[#C9A84C]/70 group-hover:text-[#C9A84C] transition" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d={INDUSTRY_ICONS[id] || INDUSTRY_ICONS['services']} />
+                      </svg>
+                    </div>
+                    <span className="block text-sm font-heading font-semibold text-white/80 group-hover:text-white transition mb-1">
+                      {INDUSTRY_LABELS[id] || id}
+                    </span>
+                    <span className="block text-xs text-white/30 font-body">{count} {count === 1 ? 'business' : 'businesses'}</span>
+                  </motion.button>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* ─── Tourism Section Tabs ─── */}
+          <section className="border-t border-white/5">
+            <div className="sticky top-0 z-30 bg-[#0A0A0A]/95 backdrop-blur-xl border-b border-white/5" data-testid="section-nav">
+              <div className="max-w-6xl mx-auto px-6">
+                <div className="flex overflow-x-auto gap-1 py-3 scrollbar-hide">
+                  {SECTIONS.map(section => {
+                    const count = (listings[section.id] || []).length;
+                    return (
+                      <button
+                        key={section.id}
+                        onClick={() => setActiveSection(section.id)}
+                        className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-medium whitespace-nowrap transition-all duration-300 font-body ${
+                          activeSection === section.id
+                            ? 'bg-[#C9A84C]/15 text-[#C9A84C] border border-[#C9A84C]/30'
+                            : count > 0
+                              ? 'text-white/50 border border-white/10 hover:text-white/70 hover:border-white/20'
+                              : 'text-white/20 border border-white/5 opacity-60'
+                        }`}
+                        data-testid={`section-tab-${section.id}`}
+                      >
+                        <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d={section.icon} />
+                        </svg>
+                        {section.label}
+                        {count > 0 && (
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                            activeSection === section.id ? 'bg-[#C9A84C]/20 text-[#C9A84C]' : 'bg-white/5 text-white/30'
+                          }`}>{count}</span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Section Content */}
+            <div className="max-w-6xl mx-auto px-6 py-10" data-testid="section-content">
+              <AnimatePresence mode="wait">
+                <motion.div key={activeSection} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
+                  <div className="flex items-center gap-3 mb-8">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(201, 168, 76, 0.1)', border: '1px solid rgba(201, 168, 76, 0.2)' }}>
+                      <svg className="w-5 h-5 text-[#C9A84C]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d={currentSection?.icon || ''} />
+                      </svg>
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-heading font-semibold text-white" data-testid="section-title">{currentSection?.label}</h2>
+                      <p className="text-xs text-white/30 font-body">{currentListings.length} options in {dest.label}</p>
+                    </div>
+                  </div>
+
+                  {loading ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                      {[1,2,3,4,5,6].map(i => (
+                        <div key={i} className="h-72 rounded-2xl animate-pulse" style={{ background: 'rgba(255,255,255,0.03)' }} />
+                      ))}
+                    </div>
+                  ) : currentListings.length === 0 ? (
+                    <div className="text-center py-16" data-testid="section-empty">
+                      <div className="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center" style={{ background: 'rgba(201, 168, 76, 0.08)', border: '1px solid rgba(201, 168, 76, 0.15)' }}>
+                        <svg className="w-10 h-10 text-[#C9A84C]/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d={currentSection?.icon || ''} />
+                        </svg>
+                      </div>
+                      <h3 className="text-xl font-heading font-light text-white mb-2">Coming Soon</h3>
+                      <p className="text-sm text-white/30 font-body max-w-md mx-auto mb-6">
+                        We&apos;re curating the best {currentSection?.label?.toLowerCase()} options in {dest.label}. Check back soon!
+                      </p>
+                      <Link href="/register-business" className="btn-primary px-6 py-3 rounded-xl text-sm" data-testid="register-from-empty">
+                        Add Your Business
+                      </Link>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                      {currentListings.map((l, i) => (
+                        <GuideListingCard key={l.id} listing={l} index={i} />
+                      ))}
+                    </div>
+                  )}
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </section>
+        </>
+      ) : (
+        /* ─── Browse by Industry Category View ─── */
+        <section className="max-w-6xl mx-auto px-6 py-10" data-testid="browse-view">
+          <div className="mb-8">
+            <h2 className="text-2xl font-heading font-light text-white mb-2">All Categories in {dest.label}</h2>
+            <p className="text-sm text-white/30 font-body">{totalIndustryCount} businesses across {activeIndustries.length} categories</p>
+          </div>
+
+          {activeIndustries.length === 0 && !loading ? (
+            <div className="text-center py-16">
+              <h3 className="text-xl font-heading font-light text-white mb-2">No businesses yet</h3>
+              <p className="text-sm text-white/30 font-body max-w-md mx-auto mb-6">
+                Be the first to list your business in {dest.label}.
+              </p>
+              <Link href="/register-business" className="btn-primary px-6 py-3 rounded-xl text-sm">
+                Add Your Business
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-12">
+              {activeIndustries.map(([industryId, count]) => {
+                // Get all listings in this destination for this industry
+                const industryListings = Object.values(listings)
+                  .flat()
+                  .filter(l => l.industry === industryId)
+                  .sort((a, b) => (b.trust_score || 0) - (a.trust_score || 0));
+
+                // Deduplicate by ID
+                const seen = new Set<string>();
+                const unique = industryListings.filter(l => {
+                  if (seen.has(l.id)) return false;
+                  seen.add(l.id);
+                  return true;
+                });
+
+                if (unique.length === 0) return null;
+
+                return (
+                  <div key={industryId}>
+                    <div className="flex items-center gap-3 mb-5">
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'rgba(201, 168, 76, 0.08)' }}>
+                        <svg className="w-4 h-4 text-[#C9A84C]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d={INDUSTRY_ICONS[industryId] || INDUSTRY_ICONS['services']} />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-heading font-semibold text-white">{INDUSTRY_LABELS[industryId] || industryId}</h3>
+                        <p className="text-xs text-white/30 font-body">{unique.length} in {dest.label}</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                      {unique.slice(0, 6).map((l, i) => (
+                        <GuideListingCard key={l.id} listing={l} index={i} />
+                      ))}
+                    </div>
+                    {unique.length > 6 && (
+                      <p className="text-sm text-[#C9A84C]/60 font-body mt-4">
+                        + {unique.length - 6} more {INDUSTRY_LABELS[industryId]?.toLowerCase() || industryId} businesses
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* ─── Add Your Business CTA ─── */}
+      <section className="border-t border-white/5 py-16" data-testid="add-business-cta">
+        <div className="max-w-6xl mx-auto px-6 text-center">
+          <h3 className="text-2xl font-heading font-light text-white mb-4">
+            Own a business in <span className="text-[#C9A84C]">{dest.label}</span>?
+          </h3>
+          <p className="text-white/40 font-body max-w-md mx-auto mb-8 text-sm">
+            Get discovered by locals and visitors. Join the GL365 verified directory — free to start, no contracts.
+          </p>
+          <Link href="/register-business" className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl text-sm font-heading font-semibold text-black transition-all duration-300 hover:shadow-lg"
+            style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C97A)' }}>
+            Add Your Business — Free
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </Link>
+        </div>
       </section>
 
-      {/* ─── All Destinations CTA ─── */}
+      {/* ─── Explore More Destinations ─── */}
       <section className="border-t border-white/5 py-16" data-testid="other-destinations">
         <div className="max-w-6xl mx-auto px-6">
-          <h3 className="text-lg font-heading font-semibold text-white mb-6 text-center">Explore More Destinations</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            {Object.entries(DESTINATIONS).filter(([key]) => key !== slug).map(([key, d]) => (
-              <Link key={key} href={`/destination/${key}`}
-                className="rounded-xl p-4 border border-white/5 hover:border-gold/20 transition-all duration-300 text-center group"
-                style={{ background: 'rgba(255,255,255,0.02)' }}
-                data-testid={`dest-link-${key}`}>
-                <span className="text-sm font-heading font-semibold text-white/70 group-hover:text-gold transition-colors">{d.label}</span>
-                <span className="block text-[10px] text-silver/40 mt-1 font-body">FL</span>
-              </Link>
-            ))}
-          </div>
+          <h3 className="text-lg font-heading font-semibold text-white mb-8 text-center">Explore More Destinations</h3>
+
+          {Object.keys(destinationsByRegion).length > 0 ? (
+            <div className="space-y-6">
+              {Object.entries(destinationsByRegion).map(([region, dests]) => (
+                <div key={region}>
+                  <h4 className="text-xs font-heading font-semibold text-[#C9A84C]/60 tracking-widest uppercase mb-3">{region}</h4>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                    {dests.map(d => (
+                      <Link key={d.slug} href={`/destination/${d.slug}`}
+                        className="rounded-xl p-4 border border-white/5 hover:border-[#C9A84C]/20 transition-all duration-300 text-center group"
+                        style={{ background: 'rgba(255,255,255,0.02)' }}
+                        data-testid={`dest-link-${d.slug}`}>
+                        <span className="text-sm font-heading font-semibold text-white/70 group-hover:text-[#C9A84C] transition-colors">{d.label}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-white/30 text-sm font-body">More destinations coming soon.</p>
+          )}
         </div>
       </section>
     </div>
@@ -278,7 +614,7 @@ export default function DestinationGuideClient({ slug }: { slug: string }) {
 }
 
 // ─── Guide Listing Card ───
-function GuideListingCard({ listing: l, index: i }: { listing: Listing; index: number }) {
+function GuideListingCard({ listing: l, index: i, isFeatured }: { listing: Listing; index: number; isFeatured?: boolean }) {
   const googleRating = l.metadata?.google_rating;
   const googleReviewCount = l.metadata?.google_review_count;
   const googleMapsUrl = l.metadata?.google_maps_url;
@@ -289,8 +625,12 @@ function GuideListingCard({ listing: l, index: i }: { listing: Listing; index: n
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: i * 0.04 }}
-        className="rounded-2xl overflow-hidden border border-white/5 hover:border-gold/20 hover:shadow-gold-glow transition-all duration-500 group cursor-pointer"
-        style={{ background: 'rgba(255,255,255,0.02)' }}
+        className={`rounded-2xl overflow-hidden border hover:shadow-lg transition-all duration-500 group cursor-pointer ${
+          isFeatured
+            ? 'border-[#C9A84C]/20 hover:border-[#C9A84C]/40'
+            : 'border-white/5 hover:border-[#C9A84C]/20'
+        }`}
+        style={{ background: isFeatured ? 'rgba(201, 168, 76, 0.03)' : 'rgba(255,255,255,0.02)' }}
         data-testid={`guide-listing-${l.slug}`}
       >
       {/* Image */}
@@ -299,35 +639,45 @@ function GuideListingCard({ listing: l, index: i }: { listing: Listing; index: n
           <img src={l.cover_image_url} alt={l.business_name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-midnight-800 to-charcoal-800">
+          <div className="w-full h-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #111111, #1A1A1A)' }}>
             <span className="text-4xl font-heading font-light text-white/10">{l.business_name[0]}</span>
           </div>
         )}
+
         {/* Google Rating Badge */}
         {googleRating && (
           <div className="absolute top-3 right-3 flex items-center gap-1 px-2 py-1 rounded-lg backdrop-blur-md text-xs font-semibold"
-            style={{ background: 'rgba(13,27,42,0.8)', color: '#C9A96E' }}>
+            style={{ background: 'rgba(10,10,10,0.8)', color: '#C9A84C' }}>
             <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
               <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
             </svg>
             {googleRating.toFixed(1)}
           </div>
         )}
+
         {/* Tier badge */}
         {l.tier !== 'free' && (
-          <span className="absolute top-3 left-3 text-[10px] px-2 py-0.5 rounded-full font-heading font-semibold uppercase tracking-wider text-midnight-900"
-            style={{ background: l.tier === 'premium' ? 'linear-gradient(135deg, #C9A96E, #E6D8B5)' : 'linear-gradient(135deg, #A8A9AD, #C0C0C0)' }}>
+          <span className="absolute top-3 left-3 text-[10px] px-2 py-0.5 rounded-full font-heading font-semibold uppercase tracking-wider text-[#0A0A0A]"
+            style={{ background: l.tier === 'premium' ? 'linear-gradient(135deg, #C9A84C, #E8C97A)' : 'linear-gradient(135deg, #A8A9AD, #C0C0C0)' }}>
             {l.tier === 'premium' ? 'Premier' : 'Pro'}
           </span>
+        )}
+
+        {/* Featured indicator */}
+        {isFeatured && (
+          <div className="absolute bottom-3 left-3 flex items-center gap-1 px-2 py-1 rounded-lg backdrop-blur-md text-[10px] font-heading font-semibold tracking-wider uppercase"
+            style={{ background: 'rgba(201, 168, 76, 0.2)', color: '#C9A84C', border: '1px solid rgba(201, 168, 76, 0.3)' }}>
+            Featured
+          </div>
         )}
       </div>
 
       {/* Content */}
       <div className="p-4">
-        <h3 className="font-heading font-semibold text-sm text-gold truncate mb-1" data-testid={`guide-name-${l.slug}`}>{l.business_name}</h3>
+        <h3 className="font-heading font-semibold text-sm text-[#C9A84C] truncate mb-1" data-testid={`guide-name-${l.slug}`}>{l.business_name}</h3>
 
         {l.city && (
-          <p className="text-[11px] text-silver/50 flex items-center gap-1 mb-1.5 font-body">
+          <p className="text-[11px] text-white/30 flex items-center gap-1 mb-1.5 font-body">
             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -336,9 +686,9 @@ function GuideListingCard({ listing: l, index: i }: { listing: Listing; index: n
           </p>
         )}
 
-        {l.description && <p className="text-xs text-white/35 line-clamp-2 mb-3 font-body">{l.description}</p>}
+        {l.description && <p className="text-xs text-white/25 line-clamp-2 mb-3 font-body">{l.description}</p>}
 
-        {/* Actions — use onClick+stopPropagation to avoid nested <a> */}
+        {/* Actions */}
         <div className="flex items-center gap-2 mt-auto">
           {l.phone && (
             <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.location.href = `tel:${l.phone}`; }} className="btn-ghost text-xs px-3 py-1.5 rounded-full flex items-center gap-1" data-testid={`guide-call-${l.slug}`}>
@@ -357,7 +707,7 @@ function GuideListingCard({ listing: l, index: i }: { listing: Listing; index: n
             </button>
           )}
           {googleMapsUrl && (
-            <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.open(googleMapsUrl, '_blank'); }} className="ml-auto text-[10px] text-silver/40 hover:text-gold transition font-body" data-testid={`guide-maps-${l.slug}`}>
+            <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.open(googleMapsUrl, '_blank'); }} className="ml-auto text-[10px] text-white/25 hover:text-[#C9A84C] transition font-body" data-testid={`guide-maps-${l.slug}`}>
               Google Maps
             </button>
           )}
