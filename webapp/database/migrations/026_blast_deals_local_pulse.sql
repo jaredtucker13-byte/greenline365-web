@@ -41,6 +41,7 @@ CREATE INDEX IF NOT EXISTS idx_consumer_profiles_first_biz ON consumer_profiles(
 
 ALTER TABLE consumer_profiles ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Service can manage consumer profiles" ON consumer_profiles;
 CREATE POLICY "Service can manage consumer profiles" ON consumer_profiles
   FOR ALL USING (auth.role() = 'service_role');
 
@@ -135,12 +136,15 @@ CREATE INDEX IF NOT EXISTS idx_blast_deals_active ON blast_deals(status, expires
 
 ALTER TABLE blast_deals ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Business owners can manage own deals" ON blast_deals;
 CREATE POLICY "Business owners can manage own deals" ON blast_deals
   FOR ALL USING (created_by = auth.uid());
 
+DROP POLICY IF EXISTS "Public can view active deals" ON blast_deals;
 CREATE POLICY "Public can view active deals" ON blast_deals
   FOR SELECT USING (status = 'active' AND expires_at > NOW());
 
+DROP POLICY IF EXISTS "Service can manage all deals" ON blast_deals;
 CREATE POLICY "Service can manage all deals" ON blast_deals
   FOR ALL USING (auth.role() = 'service_role');
 
@@ -206,11 +210,13 @@ CREATE INDEX IF NOT EXISTS idx_deal_redemptions_scanned ON deal_redemptions(scan
 
 ALTER TABLE deal_redemptions ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Business owners can view redemptions on own deals" ON deal_redemptions;
 CREATE POLICY "Business owners can view redemptions on own deals" ON deal_redemptions
   FOR SELECT USING (
     deal_id IN (SELECT id FROM blast_deals WHERE created_by = auth.uid())
   );
 
+DROP POLICY IF EXISTS "Service can manage all redemptions" ON deal_redemptions;
 CREATE POLICY "Service can manage all redemptions" ON deal_redemptions
   FOR ALL USING (auth.role() = 'service_role');
 
@@ -252,6 +258,7 @@ CREATE INDEX IF NOT EXISTS idx_cb_links_listing ON consumer_business_links(listi
 
 ALTER TABLE consumer_business_links ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Business owners can view own clientele" ON consumer_business_links;
 CREATE POLICY "Business owners can view own clientele" ON consumer_business_links
   FOR ALL USING (
     business_id IN (
@@ -259,6 +266,7 @@ CREATE POLICY "Business owners can view own clientele" ON consumer_business_link
     )
   );
 
+DROP POLICY IF EXISTS "Service can manage all links" ON consumer_business_links;
 CREATE POLICY "Service can manage all links" ON consumer_business_links
   FOR ALL USING (auth.role() = 'service_role');
 
@@ -320,7 +328,8 @@ See you soon!
 — The {{business_name}} Team',
   false, -- Appears from the business only
   'retail'
-);
+)
+ON CONFLICT (template_name) DO NOTHING;
 
 -- ===== EMAIL 2: Post-Purchase Thank You =====
 -- Sent ~5 min after QR scan at the register.
@@ -349,7 +358,8 @@ The {{business_name}} Team
 Powered by GreenLine 365',
   true, -- Co-branded: business + GL365
   'retail'
-);
+)
+ON CONFLICT (template_name) DO NOTHING;
 
 -- Followup discount section (injected when owner has it enabled):
 -- "As a thank you, here''s something for your next visit:
@@ -364,6 +374,7 @@ Powered by GreenLine 365',
 
 ALTER TABLE deal_email_templates ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Service can manage email templates" ON deal_email_templates;
 CREATE POLICY "Service can manage email templates" ON deal_email_templates
   FOR ALL USING (auth.role() = 'service_role');
 
@@ -420,9 +431,11 @@ CREATE INDEX IF NOT EXISTS idx_pulse_fb_zip ON pulse_feedback(zip_code);
 
 ALTER TABLE pulse_feedback ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Business owners can view own feedback" ON pulse_feedback;
 CREATE POLICY "Business owners can view own feedback" ON pulse_feedback
   FOR ALL USING (user_id = auth.uid());
 
+DROP POLICY IF EXISTS "Service can manage all feedback" ON pulse_feedback;
 CREATE POLICY "Service can manage all feedback" ON pulse_feedback
   FOR ALL USING (auth.role() = 'service_role');
 

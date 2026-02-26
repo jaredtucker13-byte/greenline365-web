@@ -79,9 +79,11 @@ CREATE INDEX IF NOT EXISTS idx_feature_registry_types ON feature_registry USING 
 
 ALTER TABLE feature_registry ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Anyone can read features" ON feature_registry;
 CREATE POLICY "Anyone can read features" ON feature_registry
   FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "Service can manage features" ON feature_registry;
 CREATE POLICY "Service can manage features" ON feature_registry
   FOR ALL USING (auth.role() = 'service_role');
 
