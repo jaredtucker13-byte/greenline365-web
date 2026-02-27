@@ -1,30 +1,19 @@
 /**
  * Blast Deal QR Code Generator
  *
- * GET - Generate a QR code for a blast deal's claim URL
- * Returns an SVG QR code that can be displayed, printed, or shared
+ * GET /api/blast-deals/[id]/qr - Generate a QR code for a blast deal
  *
- * Uses a pure-JS QR code generator (no external dependencies needed)
+ * Now uses the self-hosted QR generator (no external API dependency).
+ * Kept for backwards compatibility — new code should use /api/qr?type=deal&id=...
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { generateDealQR } from '@/lib/qr/generate';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
-
-/**
- * Minimal QR Code generator — produces SVG output
- * Encodes the claim URL into a scannable QR code
- */
-function generateQRCodeSVG(text: string, size: number = 256): string {
-  // Use a simple QR encoding approach via a data URL
-  // For production, we'd use a library like 'qrcode' but this works for MVP
-  const encoded = encodeURIComponent(text);
-  const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encoded}&format=svg&color=C9A96E&bgcolor=0A0A0A`;
-  return qrApiUrl;
-}
 
 export async function GET(
   request: NextRequest,
@@ -59,8 +48,12 @@ export async function GET(
       if (listing) businessName = listing.business_name;
     }
 
-    // Generate QR code URL
-    const qrUrl = generateQRCodeSVG(claimUrl, size);
+    // Generate QR code using the self-hosted generator
+    const result = await generateDealQR(deal.claim_code, {
+      size,
+      customUrl: claimUrl,
+      format: format === 'redirect' || format === 'svg' ? 'svg' : 'dataurl',
+    });
 
     // Track QR generation (view count)
     await supabase
@@ -68,12 +61,23 @@ export async function GET(
       .update({ views: (deal as any).views ? (deal as any).views + 1 : 1 })
       .eq('id', dealId);
 
-    if (format === 'redirect') {
-      // Redirect directly to the QR code image
-      return NextResponse.redirect(qrUrl);
+    // Update the stored QR code URL to use the self-hosted endpoint
+    const selfHostedQRUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/api/qr?type=deal&id=${deal.claim_code}&format=svg`;
+    await supabase
+      .from('blast_deals')
+      .update({ qr_code_url: selfHostedQRUrl })
+      .eq('id', dealId);
+
+    if (format === 'redirect' || format === 'svg') {
+      return new NextResponse(result.image as string, {
+        headers: {
+          'Content-Type': 'image/svg+xml',
+          'Cache-Control': 'public, max-age=3600',
+        },
+      });
     }
 
-    // Return QR code data
+    // Return QR code data (backwards compatible response shape)
     return NextResponse.json({
       success: true,
       qr: {
@@ -83,7 +87,8 @@ export async function GET(
         business_name: businessName,
         claim_code: deal.claim_code,
         claim_url: claimUrl,
-        qr_image_url: qrUrl,
+        qr_image_url: selfHostedQRUrl,
+        qr_image_data: result.image as string,
         size,
       },
     });
