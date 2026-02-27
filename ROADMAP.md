@@ -1433,6 +1433,142 @@ Leagues drive venue traffic. The Directory is the foundation.
 
 ---
 
+## Target Buyers — Who Writes the Check
+
+### 1. City Passport Challenges — Buyers
+
+| Buyer | Title / Role | Price Point | Why They Say Yes |
+|---|---|---|---|
+| Restaurant group owner | Owner of 3-5 locations | $99/challenge | Cheaper than a Yelp ad, drives foot traffic across all locations |
+| BID / Main Street director | Executive Director (e.g., Ybor City Development Corp) | $349/campaign | Already has marketing budget to promote the district |
+| Tourism board marketing manager | Visit Tampa Bay, marketing coordinator | $349-$799/campaign | "Tampa Foodie Trail" — they spend $50K+/yr on tourism campaigns |
+| Chamber of Commerce | Events coordinator | $79/mo recurring | Promotes member businesses — built into member services budget |
+| Brewery/taproom owner | Owner-operator | $79/mo recurring | "Visit 5 Tampa breweries" challenge — drives new customers |
+| Hotel concierge partner | Hotel GM or marketing director | $349/campaign | Recommend challenges to hotel guests — tourism play |
+
+### 2. Event Check-In — Buyers
+
+| Buyer | Title / Role | Price Point | Why They Say Yes |
+|---|---|---|---|
+| Farmer's market organizer | Market manager (often 1 person) | $19/event | Replaces the clipboard. Gets attendee data for sponsors |
+| Non-profit event coordinator | Development director | $39/event | Charity 5K check-in — needs headcount for donor reporting |
+| Block party organizer | HOA president or neighborhood leader | $19/event | Proves attendance to the city for permits |
+| Church/community center admin | Office manager or pastor | $69/mo unlimited | Weekly events: fish fry, youth group, bingo night |
+| Festival production company | Event producer / operations manager | $79/event | Real-time headcount = fire marshal compliance |
+| Running club / race director | Race director | $39-$79/event | Replaces expensive race timing software for casual events |
+| Fitness studio / yoga instructor | Studio owner or independent instructor | $19/event | Workshops, pop-up classes in the park |
+| Corporate event planner | HR coordinator or admin assistant | $39/event | Company picnic, team-building. Expense report friendly |
+
+### 3. Loyalty Program Engine — Buyers
+
+| Buyer | Title / Role | Price Point | Why They Say Yes |
+|---|---|---|---|
+| Coffee shop owner | Owner-operator | $15/mo | Replaces paper punch card. "Visit 10, free coffee" — already does this manually |
+| Restaurant owner (single location) | Owner or GM | $29/mo | Knows regulars by face but not by data |
+| Barbershop / salon owner | Owner-operator | $15/mo | Clients already come regularly — now track and reward it |
+| Boutique retail owner | Clothing/gift shop owner | $29/mo | "Spend $500 lifetime → 10% off next purchase" |
+| Auto detail / car wash owner | Owner-operator | $15/mo | Wash clubs are already a thing — this digitizes it |
+| Ice cream / frozen yogurt shop | Owner (often a franchise) | $15/mo | Perfect for families. Kids beg to go back for the next stamp |
+| Pet groomer / vet clinic | Owner or office manager | $29/mo | Pet owners are the most loyal repeat customers on earth |
+| Existing GL365 Premium subscriber | Already paying $89/mo | Free (included) | "You already have this — just turn it on" |
+
+### 4. Creator & Services Marketplace — Buyers
+
+| Buyer | Title / Role | Price Point | Why They Say Yes |
+|---|---|---|---|
+| Wedding / event photographer | Self-employed | $25/mo | Portfolio + booking page. Currently paying $30+/mo for Squarespace |
+| Mobile DJ | Self-employed | $25/mo | Needs booking page, reviews, local discoverability |
+| Independent caterer | Solo operator | $25/mo | "Request a Quote" replaces DMs and phone tag |
+| Handyman / home repair | Self-employed tradesperson | $25/mo | Thumbtack charges $15-75 PER LEAD. This is flat rate |
+| Private tutor | Independent (math, SAT prep, music) | $25/mo | Parents search locally — reviews build trust |
+| Personal trainer (outdoor/mobile) | Independent trainer | $25/mo | Trains in parks, needs visibility beyond Instagram |
+| House cleaner / maid service | Solo operator or small team | $25/mo | Referral-based business — reviews are everything |
+| Pet sitter / dog walker | Self-employed (Rover competitor) | $25/mo | No 20% platform fee like Rover takes |
+| Local artisan (candles, soap, jewelry) | Maker / Etsy seller wanting local customers | Free-$25/mo | Portfolio for farmer's markets + online presence |
+| Lawn care / landscaping | Owner-operator | $25/mo | Seasonal demand — needs to be found when people search |
+
+### 5. Neighborhood Safety — Buyers
+
+| Buyer | Title / Role | Price Point | Why They Say Yes |
+|---|---|---|---|
+| HOA president | Volunteer board president | $49/mo | Replaces the HOA email chain nobody reads |
+| Property management company | Community association manager (CAM) | $49/mo per community | Manages 10-50 communities — $49 each is nothing vs current software |
+| Neighborhood association leader | Volunteer coordinator | $2.99/household | "Less than a coffee/month for safety alerts" |
+| Gated community board | HOA board (votes on expenditures) | $49/mo | Resident verification is a real security concern they already pay for |
+| Local security company (ADT, etc.) | Sales manager or regional marketing | $199/mo sponsor | Logo on every alert — brand placement in the right context |
+| Insurance agency (State Farm, Allstate) | Local agent / agency owner | $199/mo sponsor | "Home safety tips brought to you by..." — relevant, non-intrusive |
+| Apartment complex management | Property manager | $49/mo | Resident communication, maintenance visibility, event coordination |
+
+### 6. Rec League & Parks — Buyers
+
+| Buyer | Title / Role | Price Point | Why They Say Yes |
+|---|---|---|---|
+| Bowling league organizer | League secretary (usually a volunteer) | $99/season | Currently using paper or a free spreadsheet |
+| Cornhole league organizer | Guy whose backyard league grew | $99-$228/season | 20+ players weekly — needs real standings and scheduling |
+| Bar trivia host | Trivia MC or bar manager | $99/season | Track team standings across weeks, generate repeat customers |
+| Pickleball group organizer | Person managing the court group chat | $99/season | Court scheduling + match results + standings |
+| Dart league commissioner | Commissioner (often the bar owner) | $228/season | Formal league — needs official standings, schedule management |
+| Parks & Rec coordinator | Recreation program coordinator | $199/mo | One rec center: court bookings, youth leagues, event check-in |
+| City recreation director | Director of Parks & Recreation | $999/mo | City-wide: all parks, all facilities, all leagues |
+| YMCA / Boys & Girls Club | Program director | $199/mo | Youth sports leagues, facility scheduling, parent communication |
+| Church recreation coordinator | Youth pastor or activities director | $99/season | Church basketball, volleyball, game nights |
+
+### 7. Real Estate Open House — Buyers
+
+| Buyer | Title / Role | Price Point | Why They Say Yes |
+|---|---|---|---|
+| Solo real estate agent | Licensed realtor (independent) | $15/event or $49/mo | Currently using a paper sign-in sheet — loses half the leads |
+| Real estate team lead | Team lead with 3-5 agents | $49/mo | All team open houses funneling into one dashboard |
+| Brokerage managing broker | Managing broker / office manager | $199/mo (10 agents) | Standardizes lead capture across the office |
+| Large brokerage operations | VP of Operations (KW, RE/MAX, etc.) | $499/mo (50 agents) | Enterprise deal, office-level analytics |
+| New construction sales office | Sales manager at a homebuilder | $49/mo | Model home visitors tracked automatically |
+| Commercial real estate broker | CRE agent showing office/retail space | $15/event | Fewer events, higher-value leads. $15/showing is nothing |
+
+### 8. City Intelligence Data — Buyers
+
+| Buyer | Title / Role | Price Point | Why They Say Yes |
+|---|---|---|---|
+| Commercial real estate analyst | Market analyst at CBRE, JLL | $499-$999/report | "Which neighborhoods have foot traffic growth?" — informs $10M+ decisions |
+| City planner | Urban planner or economic development director | $299/report | "Where should we put the new community center?" — data-driven |
+| Tourism board researcher | Research director at Visit Tampa Bay | $799/quarter | "What was Gasparilla's economic impact?" — justifies their own budget |
+| Franchise development manager | Site selection for Chick-fil-A, Starbucks, etc. | $999/report | "Where should we open next in Tampa?" |
+| Small business lender | SBA lender or community bank loan officer | $499/mo | "Is this neighborhood growing?" — loan risk assessment |
+| University researcher | Professor / grad researcher (urban studies) | $299/report | Academic research, grant-funded |
+| Insurance underwriter | Regional underwriter | $499/mo | Neighborhood risk profiles, activity patterns |
+
+### 9. Sponsorship Layer — Buyers
+
+| Buyer | Title / Role | Price Point | Why They Say Yes |
+|---|---|---|---|
+| Pizza shop owner | Owner-operator | $39/mo | "Order with code GAMENIGHT for 15% off" — shown when families are hungry |
+| Local brewery / bar owner | Owner or marketing manager | $79/mo | Logo on the leaderboard league players check every week |
+| Restaurant wanting event traffic | Owner or GM | $149/tournament | "The Tony's Pizza Invitational" — title sponsor |
+| Local gym / fitness studio | Owner or marketing manager | $99/mo | Loop stop sponsor — AI routes people past their door |
+| Real estate agent (personal brand) | Individual agent | $199/mo | Face and brand in the activity feed of their target neighborhood |
+| Insurance agent (local) | Local State Farm / Allstate agent | $399/mo bundle | Everywhere in the ecosystem — maximum local brand presence |
+| Car dealership | Marketing manager | $199/mo | Cheaper and more targeted than radio ads |
+| Bank / credit union (local branch) | Branch manager or regional marketing | $79/mo | "Season standings brought to you by Suncoast Credit Union" |
+| Urgent care / medical practice | Practice administrator | $39/mo | "Need a doctor? We're open late" — shown to families in the area |
+| Auto repair / tire shop | Owner | $39/mo | Contextual: shown to families in the neighborhood |
+
+---
+
+### The Common Thread Across All 9 Streams
+
+**Small decisions by real people.** Almost every buyer above is either:
+1. **A business owner** making a $15-$199/mo decision on their own (no committee, no procurement)
+2. **A solo operator** spending $25-$49/mo as a business expense
+3. **A program coordinator** with a small discretionary budget ($99-$999/mo)
+4. **A marketing manager** at a mid-size org with an existing ad budget they're reallocating
+
+The only exceptions are:
+- **City-wide Parks deals** ($999+/mo) — government procurement, longer sales cycle
+- **Data products** ($299-$4,999) — B2B/B2G, need a sales team, but also need 50K+ users first
+
+**Every other sale can happen over a 5-minute conversation.** That's the power of low price points at launch.
+
+---
+
 ## Master Revenue Model — All Streams Combined
 
 ### Current Revenue Streams (Phase 1, Live Now)
