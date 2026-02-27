@@ -7,7 +7,9 @@ import MultiStepBookingForm from '../components/MultiStepBookingForm';
 import BookingWidget from '../components/BookingWidget';
 import DailyTrendHunter from '../components/DailyTrendHunter';
 import HeroSection from '../components/HeroSection';
-import { Button } from '@/components/ui/os';
+import PhoneDrawAnimation from '../components/PhoneDrawAnimation';
+import NetworkPipeline from '../components/NetworkPipeline';
+import { Button, FlipCard } from '@/components/ui/os';
 import { GlassCard, OSPanel } from '@/components/ui/os';
 import { NeonText } from '@/components/ui/os';
 import { useGSAP, gsap, ScrollTrigger, scrollAnimations } from '@/lib/gsap';
@@ -115,7 +117,7 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      {/* ═══════════ FEATURES — 3-Column GlassCard Grid ═══════════ */}
+      {/* ═══════════ FEATURES — 3-Column FlipCard Grid (Phase 5) ═══════════ */}
       <section className="py-20 relative">
         <div className="max-w-6xl mx-auto px-6">
           <div data-section-header className="text-center mb-14">
@@ -123,21 +125,57 @@ export default function ServicesPage() {
               Why Choose <NeonText variant="gradient" animate={false}>GreenLine365</NeonText>?
             </h2>
             <p className="text-white/60 max-w-xl mx-auto">Built for modern businesses who demand results</p>
+            <p className="text-white/30 text-xs mt-2">Tap any card to learn more</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { icon: '💡', title: 'AI-Powered Insights', desc: 'Get intelligent recommendations based on your business goals and market trends.' },
-              { icon: '📅', title: 'Smart Scheduling', desc: 'Seamlessly integrate with your calendar. Book demos, meetings, and follow-ups.' },
-              { icon: '⚡', title: 'Always-On System', desc: 'Your business runs 24/7 — even when you\'re off the clock.' }
+              {
+                icon: '💡', title: 'AI-Powered Insights',
+                desc: 'Get intelligent recommendations based on your business goals and market trends.',
+                backTitle: 'How AI Insights Work',
+                backDesc: 'Our AI analyzes local market data, customer behavior, and seasonal trends to give you actionable recommendations that drive real results.',
+                backCta: 'Try the Trend Hunter below',
+              },
+              {
+                icon: '📅', title: 'Smart Scheduling',
+                desc: 'Seamlessly integrate with your calendar. Book demos, meetings, and follow-ups.',
+                backTitle: 'Never Miss a Booking',
+                backDesc: 'Embeddable booking widget that syncs with your calendar, prevents double-bookings, and sends automatic confirmations and reminders.',
+                backCta: 'See the widget demo below',
+              },
+              {
+                icon: '⚡', title: 'Always-On System',
+                desc: 'Your business runs 24/7 — even when you\'re off the clock.',
+                backTitle: '24/7 Automation',
+                backDesc: 'AI chat handles customer questions, booking requests happen automatically, and trend alerts keep you ahead of the competition — all while you sleep.',
+                backCta: 'Try the AI chat in the corner',
+              }
             ].map((feature, i) => (
-              <GlassCard key={i} variant="strong" glow="green" className="p-8">
-                <div className="w-12 h-12 rounded-xl bg-gold/20 border border-gold/30 flex items-center justify-center mb-5 text-2xl">
-                  {feature.icon}
-                </div>
-                <h3 className="font-display font-bold text-white mb-3 text-xl">{feature.title}</h3>
-                <p className="text-white/70 leading-relaxed text-sm">{feature.desc}</p>
-              </GlassCard>
+              <FlipCard
+                key={i}
+                className="min-h-[240px]"
+                front={
+                  <div className="p-8">
+                    <div className="w-12 h-12 rounded-xl bg-gold/20 border border-gold/30 flex items-center justify-center mb-5 text-2xl">
+                      {feature.icon}
+                    </div>
+                    <h3 className="font-display font-bold text-white mb-3 text-xl">{feature.title}</h3>
+                    <p className="text-white/70 leading-relaxed text-sm">{feature.desc}</p>
+                    <div className="mt-4 text-gold/40 text-xs flex items-center gap-1">
+                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                      Tap to flip
+                    </div>
+                  </div>
+                }
+                back={
+                  <div className="p-8 flex flex-col justify-center h-full">
+                    <h3 className="font-display font-bold text-gold mb-3 text-lg">{feature.backTitle}</h3>
+                    <p className="text-white/80 leading-relaxed text-sm mb-4">{feature.backDesc}</p>
+                    <p className="text-gold text-xs font-semibold">{feature.backCta}</p>
+                  </div>
+                }
+              />
             ))}
           </div>
         </div>
@@ -177,6 +215,39 @@ export default function ServicesPage() {
         </div>
       </section>
 
+      {/* ═══════════ NETWORK PIPELINE — Data Flow Animation (Phase 5) ═══════════ */}
+      <section className="py-20 relative overflow-hidden">
+        <div className="circuit-bg absolute inset-0 opacity-20" />
+        <div className="max-w-6xl mx-auto px-6 relative z-10">
+          <div data-section-header className="text-center mb-14">
+            <h2 className="font-display font-bold text-white mb-3 text-2xl lg:text-4xl">
+              Your Content <span className="text-gold">Pipeline</span>
+            </h2>
+            <p className="text-white/60 max-w-xl mx-auto">
+              From camera roll to customers — watch how GreenLine365 transforms your content into growth
+            </p>
+          </div>
+
+          <NetworkPipeline />
+
+          <div className="flex justify-center mt-10 gap-8 text-center">
+            {[
+              { label: 'Input Sources', desc: 'Your photos, videos, reviews' },
+              { label: 'AI Engine', desc: 'Processes & optimizes' },
+              { label: 'Distribution', desc: 'Reaches your customers' },
+            ].map((step, i) => (
+              <div key={i} className="flex items-center gap-3">
+                {i > 0 && <div className="w-8 h-px bg-gold/30" />}
+                <div>
+                  <div className="text-gold text-xs font-bold">{step.label}</div>
+                  <div className="text-white/40 text-[10px]">{step.desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ═══════════ TESTIMONIAL ═══════════ */}
       <section className="py-16">
         <div className="max-w-3xl mx-auto px-6">
@@ -204,27 +275,14 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      {/* ═══════════ SOLUTION — 50/50 Split ═══════════ */}
+      {/* ═══════════ SOLUTION — Phone Draw Animation + Content (Phase 5) ═══════════ */}
       <section className="py-20 relative">
         <div className="aurora-bg" />
         <div className="max-w-6xl mx-auto px-6 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Image */}
-            <div data-slide-left className="relative">
-              <GlassCard variant="default" hover={false} className="p-0 overflow-hidden border border-gold/30">
-                <Image
-                  src="/images/barber-selfie.jpg"
-                  alt="Client capturing content"
-                  width={600}
-                  height={338}
-                  className="w-full aspect-video object-cover"
-                  loading="lazy"
-                />
-                <div className="absolute bottom-3 left-3 right-3 glass-gold px-3 py-1.5 rounded-full border border-gold/40 text-center">
-                  <span className="text-gold font-semibold text-xs">📸 Content = Customers</span>
-                </div>
-              </GlassCard>
-              <div className="absolute -inset-4 bg-gold/10 rounded-3xl blur-2xl -z-10" />
+            {/* Phone SVG Draw Animation */}
+            <div data-slide-left className="relative flex justify-center">
+              <PhoneDrawAnimation />
             </div>
 
             {/* Content */}
