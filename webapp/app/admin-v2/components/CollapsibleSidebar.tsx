@@ -42,6 +42,9 @@ const navItems = [
   { id: 'property-passport', label: 'Passports', icon: 'home', href: '/admin-v2/property-passport', feature: null },
   { id: 'filing-cabinet', label: 'Filing Cabinet', icon: 'cabinet', href: '/admin-v2/filing-cabinet', feature: null },
   { id: 'referral-network', label: 'Referral Network', icon: 'network', href: '/admin-v2/referral-network', feature: null },
+  // --- Directory (Platform Owner) ---
+  { id: 'divider-directory', label: 'DIRECTORY', icon: '', href: '', feature: null, isDivider: true, platformOwnerOnly: true },
+  { id: 'directory-manager', label: 'Directory Manager', icon: 'storefront', href: '/admin-v2/directory', feature: null, platformOwnerOnly: true },
   // --- Content & Tools ---
   { id: 'divider-tools', label: 'TOOLS', icon: '', href: '', feature: null, isDivider: true },
   { id: 'creative-studio', label: 'Creative Studio', icon: 'sparkles', href: '/admin-v2/creative-studio', feature: 'mockup_generator' },
@@ -180,6 +183,11 @@ const icons: Record<string, React.ReactElement> = {
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
     </svg>
   ),
+  storefront: (
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3.75c0 .414.336.75.75.75Z" />
+    </svg>
+  ),
 };
 
 export default function CollapsibleSidebar({ 
@@ -215,8 +223,12 @@ export default function CollapsibleSidebar({
   // Filter nav items based on features
   const visibleNavItems = useMemo(() => {
     return navItems.filter(item => {
-      // Always show dividers
-      if ((item as any).isDivider) return true;
+      // Show dividers (unless gated)
+      if ((item as any).isDivider) {
+        if ((item as any).platformOwnerOnly && !isPlatformOwner) return false;
+        if ((item as any).adminOnly && !isAdmin()) return false;
+        return true;
+      }
       
       // Platform owner only items (API Costs, etc.)
       if ((item as any).platformOwnerOnly && !isPlatformOwner) {
