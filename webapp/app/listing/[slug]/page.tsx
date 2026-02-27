@@ -31,6 +31,8 @@ interface Listing {
   total_photos_available: number;
   tags: string[];
   metadata: Record<string, any>;
+  business_hours: Record<string, { open: string; close: string; closed: boolean }> | null;
+  menu: { id: string; name: string; items: { id: string; name: string; description: string; price: string }[] }[] | null;
   directory_badges: { id: string; badge_type: string; badge_label: string; badge_color: string }[];
   related: RelatedListing[];
 }
@@ -864,7 +866,7 @@ export default function ListingDetailPage() {
                         <span className="text-[10px] text-white/30 font-body">{poll.response_count || 0} responses</span>
                       </div>
 
-                      {pollMessage?.pollId === poll.id && pollMessage.type === 'success' ? (
+                      {pollMessage && pollMessage.pollId === poll.id && pollMessage.type === 'success' ? (
                         <div className="text-center py-6">
                           <svg className="w-10 h-10 mx-auto mb-2 text-greenline" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
@@ -932,7 +934,7 @@ export default function ListingDetailPage() {
                             </div>
                           ))}
 
-                          {pollMessage?.pollId === poll.id && pollMessage.type === 'error' && (
+                          {pollMessage && pollMessage.pollId === poll.id && pollMessage.type === 'error' && (
                             <p className="text-xs text-red-400 font-body">{pollMessage.text}</p>
                           )}
 

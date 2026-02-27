@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
   const { data: stats } = await service.rpc('get_directory_admin_stats').maybeSingle();
 
   // Fallback stats if RPC doesn't exist
-  const fallbackStats = stats || {
+  const fallbackStats = (stats as Record<string, number> | null) || {
     total: count || 0,
     claimed: 0,
     unclaimed: 0,

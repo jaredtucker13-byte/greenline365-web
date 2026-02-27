@@ -246,7 +246,8 @@ export async function POST(request: NextRequest) {
       // ── invoice.payment_succeeded → confirm active ──
       case 'invoice.payment_succeeded': {
         const invoice = event.data.object as Stripe.Invoice;
-        const subscriptionId = typeof invoice.subscription === 'string' ? invoice.subscription : (invoice.subscription as any)?.id;
+        const sub = (invoice as any).subscription;
+        const subscriptionId = typeof sub === 'string' ? sub : sub?.id;
         console.log(`[STRIPE] Invoice paid: $${(invoice.amount_paid || 0) / 100} for subscription ${subscriptionId}`);
 
         if (subscriptionId) {
@@ -271,7 +272,8 @@ export async function POST(request: NextRequest) {
       // ── invoice.payment_failed → set to past_due ──
       case 'invoice.payment_failed': {
         const invoice = event.data.object as Stripe.Invoice;
-        const subscriptionId = typeof invoice.subscription === 'string' ? invoice.subscription : (invoice.subscription as any)?.id;
+        const sub = (invoice as any).subscription;
+        const subscriptionId = typeof sub === 'string' ? sub : sub?.id;
         console.error(`[STRIPE] Invoice payment FAILED: $${(invoice.amount_due || 0) / 100} for subscription ${subscriptionId}`);
 
         if (subscriptionId) {
