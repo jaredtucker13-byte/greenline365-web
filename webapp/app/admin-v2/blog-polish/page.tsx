@@ -1957,7 +1957,7 @@ export default function BlogPolishPage() {
                   </div>
 
                   {/* Results */}
-                  {trendingResults[trendingType] && trendingResults[trendingType]!.length > 0 && (
+                  {(trendingResults[trendingType]?.length ?? 0) > 0 && (
                     <div className="space-y-3 max-h-80 overflow-y-auto">
                       {trendingType === 'trending' && (trendingResults.trending as TrendingTopic[])?.map((topic, i) => (
                         <div key={i} className="p-3 rounded-xl bg-white/5 border border-white/10 hover:border-cyan-500/30 transition">
@@ -2042,7 +2042,7 @@ export default function BlogPolishPage() {
                   )}
 
                   {/* Empty State */}
-                  {(!trendingResults[trendingType] || trendingResults[trendingType]!.length === 0) && !trendingLoading && (
+                  {(trendingResults[trendingType]?.length ?? 0) === 0 && !trendingLoading && (
                     <div className="text-center py-6 text-white/40 text-sm">
                       Enter an industry and click Search to discover trending topics
                     </div>

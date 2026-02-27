@@ -164,9 +164,9 @@ export default function DirectoryClient() {
   useEffect(() => {
     // Load featured + all listings
     Promise.all([
-      fetch('/api/directory?limit=100').then(r => r.json()),
-      fetch('/api/directory?limit=6&featured=true').then(r => r.json()),
-    ]).then(([all, featured]) => {
+      fetch('/api/directory?limit=100').then(r => r.ok ? r.json() : []),
+      fetch('/api/directory?limit=6&featured=true').then(r => r.ok ? r.json() : []),
+    ]).catch(() => [[], []]).then(([all, featured]) => {
       const allArr = Array.isArray(all) ? all : [];
       const featArr = Array.isArray(featured) ? featured : [];
       setAllListings(allArr);
@@ -848,6 +848,7 @@ function SubcategoryCarouselRow({ label, subtitle, industry, searchTerm, sortBy,
       }
       try {
         const res = await fetch(`/api/directory?${params}`);
+        if (!res.ok) throw new Error(`Directory API error: ${res.status}`);
         let data = await res.json();
         if (!Array.isArray(data)) data = [];
 

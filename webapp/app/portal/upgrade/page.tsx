@@ -50,6 +50,7 @@ export default function UpgradePage() {
   useEffect(() => {
     fetch('/api/plans')
       .then((r) => (r.ok ? r.json() : null))
+      .catch(() => null)
       .then((data) => {
         if (data?.plans) {
           // Transform plan data with overrides

@@ -243,8 +243,13 @@ Remember: positive vibes only. Every trend is a revenue opportunity.`
   // Parse JSON from response
   const jsonMatch = content.match(/\{[\s\S]*\}/);
   if (jsonMatch) {
-    const parsed = JSON.parse(jsonMatch[0]);
-    return parsed.trends || [];
+    try {
+      const parsed = JSON.parse(jsonMatch[0]);
+      return parsed.trends || [];
+    } catch {
+      console.error('[Trend Hunter] Failed to parse JSON from AI response');
+      return [];
+    }
   }
 
   return [];
