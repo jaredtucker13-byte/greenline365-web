@@ -1,3 +1,10 @@
+<!-- AGENT METADATA
+  status: active
+  updated: 2026-02-27
+  scope: Full 3-engine vision, revenue model, Engine 1/2/3 specs, future features
+  read-when: You need to understand the product roadmap or long-term vision
+-->
+
 # GreenLine365 Platform Roadmap
 
 ## Vision: City-Wide Operating System

@@ -1,0 +1,89 @@
+# GreenLine365
+
+> GreenLine365 is an AI-powered business automation platform for local businesses. It combines a premium business directory, AI content creation, automated scheduling, and local trend tracking into one operating system.
+
+## What is GreenLine365?
+
+GreenLine365 is a community operating system for local businesses based in Tampa Bay, Florida. It helps small businesses get discovered, manage their online presence, and automate their marketing — all powered by AI.
+
+The platform has three core engines:
+1. Directory Engine (Live) — Business discovery, verified listings, reviews, tier-based subscriptions
+2. Lifestyle & Entertainment Engine (Coming Soon) — Social discovery loops and local experiences
+3. Competitive League Engine (Coming Soon) — Amateur sports management and leaderboards
+
+## Who is it for?
+
+- Local business owners who want to be found online
+- Service businesses (HVAC, plumbing, electrical, landscaping) who miss calls after hours
+- Restaurants, bars, and nightlife venues who want reputation management
+- Property managers and homeowners who need a "Carfax for Homes"
+- Anyone in Tampa Bay who wants to discover local businesses
+
+## Core Features
+
+### Business Directory
+- 16 business categories with sub-category filtering
+- Individual listing pages with contact info, reviews, gallery, badges, hours, and map
+- Three subscription tiers: Free ($0/mo), Pro ($45/mo), Premium ($89/mo)
+- Verified badges earned through customer feedback, not purchased
+- AI-powered review response drafts
+
+### AI Content Creation
+- Blog post generation (500-2000 words in under 2 minutes)
+- Social media captions optimized per platform
+- Email marketing copy and drip campaigns
+- SEO and AEO (AI Engine Optimization) built in
+- Brand voice learning — AI adapts to your tone
+
+### Automated Scheduling
+- 24/7 AI booking agent handles appointments
+- Real-time calendar availability
+- SMS and email reminders
+- Smart double-booking prevention
+
+### Local Trend Tracking (Live Local Pulse)
+- Real-time monitoring from 50+ data sources
+- Weather-based marketing alerts
+- Competitor activity tracking
+- Actionable content ideas based on local trends
+
+### Home Ledger (Property Passport)
+- Property history tracking — "Carfax for Homes"
+- Incident reporting with AI image analysis
+- Digital filing cabinet with AES-256 encryption
+- Contractor referral network with ratings
+
+### Blast Deals
+- Time-sensitive deals with QR code verification
+- Self-hosted QR generation (no external dependencies)
+- Universal scan system for all entity types
+
+## Pricing
+
+| Plan | Price | Best For |
+|------|-------|----------|
+| Free | $0/mo | Basic listing with limited features |
+| Pro | $45/mo | Verified badge, CTA buttons, priority search |
+| Premium | $89/mo | Full photos, analytics, lead capture, AI reviews |
+
+Consumer plans also available:
+- Consumer Plus: $4.99/mo — Loop access, identity passport, personal stats
+- Consumer Pro: $9.99/mo — Unlimited loops, AI recaps, priority matching
+
+## Contact
+
+- Website: https://greenline365.com
+- Email: greenline365help@gmail.com
+- Location: Tampa Bay, Florida
+- Founded: 2024
+
+## Links
+
+- Homepage: https://greenline365.com
+- Pricing: https://greenline365.com/pricing
+- Directory: https://greenline365.com/directory
+- Blog: https://greenline365.com/blog
+- About: https://greenline365.com/about
+- Features: https://greenline365.com/features/ai-content-creation
+- Book Demo: https://greenline365.com/book-demo
+- Register Business: https://greenline365.com/register-business

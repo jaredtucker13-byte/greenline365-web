@@ -1,0 +1,183 @@
+# GreenLine365 — Full Context for AI Agents
+
+> This document provides comprehensive context about GreenLine365 for AI systems that need deep understanding of the platform. For a shorter summary, see /llms.txt.
+
+---
+
+## Company Overview
+
+GreenLine365 is an AI-powered community operating system headquartered in Tampa Bay, Florida. Founded in 2024, it serves local businesses with a premium directory platform, AI-driven marketing automation, and property intelligence tools.
+
+**Mission:** Make every local business discoverable, reputable, and automated — powered by AI that works 24/7.
+
+**Design Philosophy:** "Bentley Standard" — premium dark-themed UI with champagne gold accents on charcoal/midnight blue backgrounds. Every interaction should feel luxury-grade.
+
+---
+
+## Platform Architecture
+
+### Three Engines
+
+**Engine 1: Directory & Business Tools (LIVE)**
+The foundation. A premium business directory with 16 categories, verified badges earned through customer feedback, and three subscription tiers. Businesses get discovered by consumers, manage their listings, and automate their marketing from a unified Command Center.
+
+Categories: Dining & Restaurants, Nightlife & Entertainment, Health & Wellness, Home Services, Professional Services, Automotive, Beauty & Personal Care, Shopping & Retail, Sports & Recreation, Education & Childcare, Real Estate, Technology, Events & Venues, Pets & Animals, Travel & Tourism, Community & Non-Profit.
+
+**Engine 2: Lifestyle & Entertainment Loops (PLANNED)**
+Social discovery engine where users explore their city through guided, gamified experiences. Every Loop stop is a directory listing — Loops drive foot traffic back to the Directory.
+
+Loop types include: Treasure/Scavenger Hunts, Special Events, Wellness Loops, History & Heritage Tours, Support Local Loops, and Volunteer Loops.
+
+**Engine 3: Competitive League Loops (PLANNED)**
+Professional-grade infrastructure for amateur competition. Turns any recurring game into a formal league with a "Digital Front Office."
+
+Sports: Bowling, Darts, Billiards, Flag Football, Pickleball, Cornhole, Esports, Trivia.
+
+### Revenue Model
+
+GL365 is the tool, not the bank. GL365 never touches game money, prize pools, or buy-ins.
+
+| Stream | Who Pays | Amount |
+|--------|----------|--------|
+| Directory Free | Business | $0/mo |
+| Directory Pro | Business | $45/mo |
+| Directory Premium | Business | $89/mo |
+| Consumer Plus | Individual | $4.99/mo |
+| Consumer Pro | Individual | $9.99/mo |
+| League Commissioner | League Creator | $228/season |
+| Marketplace Add-ons | Business | Varies |
+
+Add-ons: Coupons ($19/mo), Featured Boost ($29/wk), Polls ($150).
+
+---
+
+## Feature Deep Dives
+
+### Directory Listing System
+Every business gets a listing page at `/directory/[slug]` with:
+- Business name, description, category, sub-categories
+- Contact info (phone, email, website) with click-to-call tracking
+- Photo gallery (gated by tier — Free gets 1 placeholder, Pro gets 5, Premium unlimited)
+- Customer reviews with AI-powered sentiment analysis
+- Earned badges (not purchased — must hit reputation thresholds)
+- Operating hours with holiday overrides
+- Google Maps embed with directions
+- Menu editor (for restaurants/bars)
+- Marketplace add-ons display
+
+### Badge & Reputation System
+Badges are earned through customer feedback, not purchased. This is a core differentiator.
+
+Badge types and thresholds:
+- Intelligence Verified: Subscription-based (any paid tier)
+- Spotless Pro: 50+ polls averaging 4.7+, earned via "Mirror" QR (cleanliness)
+- Local Vibe Elite: 100+ polls averaging 4.8+, earned via "Front Door" QR (atmosphere)
+- Master Technician: 25+ resolution reports cleared by Command-Level managers
+
+Badge Decay: Time-weighted — recent reviews carry more weight. Badges fade to grayscale if no fresh feedback in 90 days.
+
+### AI Content Creation (Blog Auto-Polish)
+The Blog Auto-Polish system in the Command Center provides:
+- AI outline generation from topic/keywords
+- Full article writing (500-2000 words) with brand voice matching
+- AI headline suggestions (5 variants)
+- AI tag and meta description generation
+- Trending research via Perplexity Sonar
+- Auto image generation via OpenAI GPT Image 1
+- Batch image processing for all article images
+- Copyright compliance checker
+- Style library for saving/loading brand themes
+- Voice input for dictation-to-blog
+- SEO sidebar with real-time scoring
+
+### Home Ledger (Property Passport)
+A "Carfax for Homes" system that tracks property history:
+- Property Passport: Tracks all assets (HVAC, electrical, plumbing) with install dates, warranties, serial numbers
+- Incident Reporting: Photo-based incident documentation with AI image analysis
+- Filing Cabinet: AES-256 encrypted document storage for deeds, warranties, insurance
+- Referral Network: Contractor directory with ratings, used for incident resolution
+- Health Score: Dynamic score based on asset age, incident history, and maintenance frequency
+
+### Blast Deals
+Time-sensitive deals that businesses push to consumers:
+- Businesses create deals with expiration dates and claim limits
+- Each deal gets a unique QR code (self-hosted generation, no external API)
+- Consumers scan QR codes to claim deals
+- Universal scan system handles all entity types: deals, events, identity passports, game nights
+
+### Live Local Pulse
+Real-time local trend tracking:
+- Scans 50+ data sources every 3 hours
+- Weather-based marketing opportunities
+- Competitor activity monitoring
+- Converts trends into content ideas via "Forge It" bridge to Content Forge
+
+---
+
+## Frequently Asked Questions
+
+**What is GreenLine365?**
+GreenLine365 is an AI-powered business automation platform designed for local businesses. It combines a premium business directory with AI content creation, automated scheduling, local trend tracking, and property intelligence tools.
+
+**How much does it cost?**
+Basic directory listings are free. Pro tier is $45/month and includes verified badges, CTA buttons, and priority search. Premium is $89/month with full photo galleries, analytics, lead capture, and AI review responses.
+
+**Do I need a contract?**
+No contracts. Cancel anytime. Founding Members get locked-in pricing for life.
+
+**How do businesses get listed?**
+Businesses can register at greenline365.com/register-business or claim an existing listing that was added through our AI discovery pipeline.
+
+**What makes GreenLine365 different from Yelp or Google Business?**
+Three things: (1) Badges are earned through real customer feedback, not purchased — a business can't buy a good reputation. (2) AI automation is built in — content creation, scheduling, and trend tracking run 24/7. (3) The property intelligence layer (Home Ledger) connects service businesses directly to homeowners who need them.
+
+**Where does GreenLine365 operate?**
+Currently focused on Tampa Bay, Florida with plans to expand to other Florida cities and eventually nationwide.
+
+**Is my data secure?**
+Yes. Document storage uses AES-256 encryption. Authentication runs through Supabase with cookie-based sessions. Payment processing is handled by Stripe (PCI compliant). We never store credit card numbers.
+
+**How does the AI work?**
+GreenLine365 uses multiple AI models through OpenRouter: GPT-4o for content generation, Claude for classification and analysis, Perplexity Sonar for real-time research, and OpenAI for image generation. All AI features are designed to assist, not replace, business owners.
+
+---
+
+## Technical Stack
+
+- Framework: Next.js 16 with React 19
+- Database: PostgreSQL via Supabase
+- Auth: Supabase SSR with cookie-based sessions
+- Payments: Stripe with live keys
+- AI: OpenRouter (GPT-4o, Claude, Perplexity Sonar)
+- Image Gen: OpenAI GPT Image 1
+- Hosting: Vercel
+- Analytics: PostHog
+- Email: SendGrid + Gmail SMTP
+- Voice AI: Retell SDK (in development)
+- Styling: Tailwind CSS 3.4
+
+---
+
+## Contact & Links
+
+- Website: https://greenline365.com
+- Email: greenline365help@gmail.com
+- Location: Tampa Bay, Florida
+- Founded: 2024
+
+### Key Pages
+- Homepage: https://greenline365.com
+- Pricing: https://greenline365.com/pricing
+- Directory: https://greenline365.com/directory
+- Blog: https://greenline365.com/blog
+- About: https://greenline365.com/about
+- AI Content Creation: https://greenline365.com/features/ai-content-creation
+- Automated Scheduling: https://greenline365.com/features/automated-scheduling
+- Local Trend Tracking: https://greenline365.com/features/local-trend-tracking
+- AI Assistant: https://greenline365.com/features/ai-assistant
+- Book Demo: https://greenline365.com/book-demo
+- Register Business: https://greenline365.com/register-business
+- Newsletter: https://greenline365.com/newsletter
+- Trust & Security: https://greenline365.com/trust
+- Privacy Policy: https://greenline365.com/privacy
+- Terms of Service: https://greenline365.com/terms

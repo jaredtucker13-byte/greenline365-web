@@ -1,3 +1,10 @@
+<!-- AGENT METADATA
+  status: active
+  updated: 2026-02-19
+  scope: Voice booking agent launch gaps — Cal.com, phone numbers, multi-tenant routing
+  read-when: Working on Retell voice AI or voice booking features
+-->
+
 # Production Readiness Gap Analysis
 ## GreenLine365 Voice Booking Agent — SaaS Launch Checklist
 

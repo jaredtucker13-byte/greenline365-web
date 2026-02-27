@@ -1,3 +1,9 @@
+<!-- AGENT METADATA
+  status: superseded
+  superseded-by: memory/OPERATIONAL_BIBLE_V2.md
+  note: Do not use this file. Read OPERATIONAL_BIBLE_V2.md instead.
+-->
+
 # Greenline365 Operational Bible
 ## Version 2.0 | Core Philosophy: The Address-Centric Truth Layer
 

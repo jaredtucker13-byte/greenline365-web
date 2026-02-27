@@ -1,3 +1,9 @@
+<!-- AGENT METADATA
+  status: superseded
+  superseded-by: docs/reports/progress-report-2026-02-27.md
+  note: January 2026 data. Use the latest report in docs/reports/ instead.
+-->
+
 # GreenLine365 - Production Readiness Report
 ## Generated: January 12, 2026
 

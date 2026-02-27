@@ -1,3 +1,10 @@
+<!-- AGENT METADATA
+  status: active
+  updated: 2026-01-15
+  scope: Original product requirements, completed phases, architecture decisions
+  read-when: You need to understand what was built and why
+-->
+
 # GreenLine365 - Product Requirements Document
 
 ## Original Problem Statement

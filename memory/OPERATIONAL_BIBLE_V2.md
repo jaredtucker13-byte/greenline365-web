@@ -1,3 +1,11 @@
+<!-- AGENT METADATA
+  status: active
+  updated: 2026-02-27
+  supersedes: memory/OPERATIONAL_BIBLE.md
+  scope: Business rules, reputation system, badge mechanics, sales workflows, financial infrastructure
+  read-when: You need to understand how the product works as a business
+-->
+
 # Greenline365 Operational Bible — Volume 2
 ## Advanced Reputation Architecture, Sales Workflows & Financial Infrastructure
 
