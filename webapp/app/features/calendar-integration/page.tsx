@@ -46,7 +46,7 @@ export default function CalendarIntegrationPage() {
                 </p>
 
                 <div className="flex flex-wrap gap-4 mb-8">
-                  <Link href="/#booking">
+                  <Link href="/services#booking">
                     <Button variant="primary" size="lg">
                       Get Started
                     </Button>
@@ -289,7 +289,7 @@ export default function CalendarIntegrationPage() {
                 See your entire marketing operation in one view. Bookings, content, campaigns, and more.
               </p>
               <div className="flex flex-wrap gap-4 justify-center">
-                <Link href="/#booking">
+                <Link href="/services#booking">
                   <Button variant="primary" size="lg">
                     Book a Demo
                   </Button>

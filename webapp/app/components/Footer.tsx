@@ -9,7 +9,7 @@ export default function Footer() {
   // Hide footer on dashboard routes
   const isDashboardRoute = pathname?.startsWith('/admin-v2') || 
                            pathname?.startsWith('/dashboard') || 
-                           pathname?.startsWith('/god-mode');
+                           pathname?.startsWith('/portal');
 
   if (isDashboardRoute) {
     return null;

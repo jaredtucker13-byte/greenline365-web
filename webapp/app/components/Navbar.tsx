@@ -20,7 +20,7 @@ export default function Navbar() {
   // Hide navbar on dashboard routes
   const isDashboardRoute = pathname?.startsWith('/admin-v2') || 
                            pathname?.startsWith('/dashboard') || 
-                           pathname?.startsWith('/god-mode');
+                           pathname?.startsWith('/admin-v2');
 
   // Scroll detection for nav blur effect
   useEffect(() => {
@@ -246,7 +246,7 @@ export default function Navbar() {
                 <div className="flex items-center gap-2 ml-2">
                   {isSuperAdmin && (
                     <Link
-                      href="/god-mode"
+                      href="/admin-v2"
                       className="px-4 py-2 text-sm font-medium text-red-400 hover:text-red-300 transition-colors"
                     >
                       God Mode
@@ -386,7 +386,7 @@ export default function Navbar() {
                       <>
                         {isSuperAdmin && (
                           <Link
-                            href="/god-mode"
+                            href="/admin-v2"
                             onClick={() => setMobileMenuOpen(false)}
                             className="block w-full p-4 text-center text-xl font-semibold text-red-400 rounded-xl glass-gold"
                           >

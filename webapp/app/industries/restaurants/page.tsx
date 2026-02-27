@@ -38,7 +38,7 @@ export default function RestaurantsPage() {
                 </p>
                 
                 <div className="flex flex-wrap gap-4 mb-8">
-                  <Link href="/#booking">
+                  <Link href="/services#booking">
                     <Button variant="primary" size="lg">
                       Get Started Free
                     </Button>
@@ -333,7 +333,7 @@ export default function RestaurantsPage() {
               <p className="text-white/70 text-lg mb-8 max-w-2xl mx-auto">
                 Join 200+ restaurants using AI to increase reservations and reduce no-shows.
               </p>
-              <Link href="/#booking">
+              <Link href="/services#booking">
                 <Button variant="primary" size="lg">
                   Start Free Trial
                 </Button>

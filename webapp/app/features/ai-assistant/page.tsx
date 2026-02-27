@@ -38,7 +38,7 @@ export default function AIAssistantPage() {
                 </p>
 
                 <div className="flex flex-wrap gap-4 mb-8">
-                  <Link href="/#booking">
+                  <Link href="/services#booking">
                     <Button variant="primary" size="lg">
                       See It In Action
                     </Button>
@@ -264,7 +264,7 @@ export default function AIAssistantPage() {
                 Answer every customer, qualify every lead, and never miss an opportunity again.
               </p>
               <div className="flex flex-wrap gap-4 justify-center">
-                <Link href="/#booking">
+                <Link href="/services#booking">
                   <Button variant="primary" size="lg">
                     Book a Demo
                   </Button>

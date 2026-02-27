@@ -40,7 +40,7 @@ export default function AutomatedSchedulingPage() {
                 </p>
                 
                 <div className="flex flex-wrap gap-4 mb-8">
-                  <Link href="/#booking">
+                  <Link href="/services#booking">
                     <Button variant="primary" size="lg">
                       Book a Demo
                     </Button>
@@ -340,7 +340,7 @@ export default function AutomatedSchedulingPage() {
               <p className="text-white/70 text-lg mb-8 max-w-2xl mx-auto">
                 Join 500+ businesses that increased conversions by 40% with automated scheduling.
               </p>
-              <Link href="/#booking">
+              <Link href="/services#booking">
                 <Button variant="primary" size="lg">
                   Start Automating Bookings
                 </Button>

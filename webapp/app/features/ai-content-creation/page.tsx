@@ -45,7 +45,7 @@ export default function AIContentCreationPage() {
                   <Button variant="primary" size="lg" onClick={() => setShowDemo(true)}>
                     Try Content Generator
                   </Button>
-                  <Link href="/#booking">
+                  <Link href="/services#booking">
                     <Button variant="secondary" size="lg">
                       Schedule Demo →
                     </Button>
@@ -279,7 +279,7 @@ export default function AIContentCreationPage() {
               <p className="text-white/70 text-lg mb-8 max-w-2xl mx-auto">
                 Be an early adopter and scale your content production with AI without sacrificing quality.
               </p>
-              <Link href="/#booking">
+              <Link href="/services#booking">
                 <Button variant="primary" size="lg">
                   Get Started Free
                 </Button>

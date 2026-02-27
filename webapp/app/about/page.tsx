@@ -341,7 +341,7 @@ export default function AboutPage() {
                   Get Started Today
                 </Button>
               </Link>
-              <Link href="/#trend-demo">
+              <Link href="/services#trend-demo">
                 <Button variant="secondary" size="lg">
                   Try the Demo
                 </Button>

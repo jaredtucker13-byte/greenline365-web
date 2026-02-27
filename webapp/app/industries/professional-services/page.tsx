@@ -38,7 +38,7 @@ export default function ProfessionalServicesPage() {
                 </p>
                 
                 <div className="flex flex-wrap gap-4 mb-8">
-                  <Link href="/#booking">
+                  <Link href="/services#booking">
                     <Button variant="primary" size="lg">
                       Automate Your Practice
                     </Button>
@@ -358,7 +358,7 @@ export default function ProfessionalServicesPage() {
               <p className="text-white/70 text-lg mb-8 max-w-2xl mx-auto">
                 Join 300+ professional service providers using AI to scale their practices.
               </p>
-              <Link href="/#booking">
+              <Link href="/services#booking">
                 <Button variant="primary" size="lg">
                   Start Automating Today
                 </Button>

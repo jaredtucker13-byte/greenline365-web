@@ -40,7 +40,7 @@ export default function LocalTrendTrackingPage() {
                 </p>
                 
                 <div className="flex flex-wrap gap-4 mb-8">
-                  <Link href="/#booking">
+                  <Link href="/services#booking">
                     <Button variant="primary" size="lg">
                       Try Trend Hunter
                     </Button>
@@ -361,7 +361,7 @@ export default function LocalTrendTrackingPage() {
               <p className="text-white/70 text-lg mb-8 max-w-2xl mx-auto">
                 Join businesses using local trend intelligence to stay ahead of their market.
               </p>
-              <Link href="/#booking">
+              <Link href="/services#booking">
                 <Button variant="primary" size="lg">
                   Try Trend Hunter Free
                 </Button>

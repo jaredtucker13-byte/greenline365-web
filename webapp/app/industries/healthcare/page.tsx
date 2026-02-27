@@ -38,7 +38,7 @@ export default function HealthcarePage() {
                 </p>
                 
                 <div className="flex flex-wrap gap-4 mb-8">
-                  <Link href="/#booking">
+                  <Link href="/services#booking">
                     <Button variant="primary" size="lg">
                       Reduce No-Shows Now
                     </Button>
@@ -358,7 +358,7 @@ export default function HealthcarePage() {
               <p className="text-white/70 text-lg mb-8 max-w-2xl mx-auto">
                 Join 250+ healthcare providers using AI to reduce no-shows and administrative burden.
               </p>
-              <Link href="/#booking">
+              <Link href="/services#booking">
                 <Button variant="primary" size="lg">
                   Start Free Trial
                 </Button>

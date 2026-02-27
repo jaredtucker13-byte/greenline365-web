@@ -38,7 +38,7 @@ export default function RetailPage() {
                 </p>
                 
                 <div className="flex flex-wrap gap-4 mb-8">
-                  <Link href="/#booking">
+                  <Link href="/services#booking">
                     <Button variant="primary" size="lg">
                       Boost Foot Traffic
                     </Button>
@@ -333,7 +333,7 @@ export default function RetailPage() {
               <p className="text-white/70 text-lg mb-8 max-w-2xl mx-auto">
                 Join 150+ local retailers using AI to drive foot traffic and build community.
               </p>
-              <Link href="/#booking">
+              <Link href="/services#booking">
                 <Button variant="primary" size="lg">
                   Get Started Free
                 </Button>
