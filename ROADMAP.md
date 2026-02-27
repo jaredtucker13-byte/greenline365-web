@@ -207,40 +207,44 @@ Even without paying, AI pulls this data to be the ultimate local resource:
 
 ---
 
-## Family Profiles & Child Privacy System
+## Groups, Families & Social Game Night
 
-### Concept
-Parents manage the whole family from one account. Kids who don't have phones get **sub-profiles** under the parent — like Netflix profiles. The parent's phone is the controller. Each child gets their own QR code, avatar, stats, and game history without ever needing an email, phone, or account.
+### The Group Model — Not Just Families
+Instead of "family" being the only unit, everything is organized around **Groups**.
+One person can be in multiple groups. Groups can invite other groups. This is the social layer.
 
-### How Child Profiles Work
-1. Parent goes to `/account/family` → taps "Add Family Member"
-2. Enters child's name and age
-3. Takes a photo (becomes avatar + optional face vector for auto-tagging in photos/videos)
-4. System generates a permanent QR code for that child
-5. QR can be printed on a card, stuck on a phone case, or shown from parent's phone
-6. Child never needs an account, email, or device
+| Group Type | Example | Who Creates It |
+|---|---|---|
+| Family | The Tucker Family | Parent (manages child sub-profiles) |
+| Friends | Friday Night Crew | Anyone with a free account |
+| Neighbors | Oak Street Game Club | Anyone |
+| Coworkers | Office Trivia Team | Anyone |
+| Cross-Family | Tuckers + Smiths | Either group admin invites the other |
 
-### Privacy & Consent (COPPA-Aware)
-Before creating a child profile, parent sees a **clear consent modal**:
+### Database Schema — Groups
+```sql
+groups
+  id UUID PRIMARY KEY
+  name TEXT NOT NULL
+  slug TEXT UNIQUE -- for shareable URLs: /groups/tucker-family
+  type TEXT DEFAULT 'custom' -- 'family' | 'friends' | 'neighbors' | 'custom'
+  creator_id UUID REFERENCES auth.users NOT NULL
+  avatar_url TEXT
+  privacy TEXT DEFAULT 'private' -- 'private' | 'invite_only' | 'public'
+  created_at TIMESTAMPTZ DEFAULT NOW()
 
-**What GL365 does:**
-- Stores the photo as the child's avatar
-- Uses facial recognition ONLY to auto-tag the child in the family's own game night photos/videos (if toggled ON)
-- Keeps all data within the parent's family account
+group_members
+  group_id UUID REFERENCES groups
+  user_id UUID REFERENCES auth.users (nullable — null for child sub-profiles)
+  family_member_id UUID REFERENCES family_members (nullable — set for kids)
+  role TEXT DEFAULT 'member' -- 'admin' | 'member' | 'spectator'
+  joined_at TIMESTAMPTZ DEFAULT NOW()
+  UNIQUE(group_id, user_id)  -- one membership per person per group
+```
 
-**What GL365 NEVER does:**
-- Sells, shares, or transfers any child data
-- Uses child photos for advertising or training
-- Allows anyone outside the family group to see child profiles
-- Retains data after the parent deletes the profile
+### Child Sub-Profiles (Kids Without Phones)
+Parents manage child profiles under their account. Kids never need an email, phone, or device.
 
-### Parent Controls (Per Child, Toggleable Anytime)
-- **Face Auto-Tagging** — ON/OFF. If OFF, child plays and scores count, but AI won't scan for their face in group photos
-- **Include in AI Recaps** — ON/OFF. If OFF, recap mentions them by name but won't show their face in video collages
-- **Social Sharing** — ON/OFF. If OFF, child's profile/stats excluded when parent shares to social media
-- **Delete All Data** — Nuclear option. Wipes child's profile, photos, face vector, and all stats permanently and immediately
-
-### Database Schema
 ```sql
 family_members
   id UUID PRIMARY KEY
@@ -249,22 +253,127 @@ family_members
   age INT
   avatar_url TEXT
   face_vector JSONB -- opt-in, stored only if parent consents
-  qr_code TEXT UNIQUE -- permanent QR for check-ins
+  qr_code TEXT UNIQUE -- permanent QR for check-ins (printable card)
   privacy_settings JSONB DEFAULT '{"face_tagging": true, "ai_recaps": true, "social_sharing": false}'
   consent_granted_at TIMESTAMPTZ NOT NULL -- when parent accepted consent
   created_at TIMESTAMPTZ DEFAULT NOW()
 ```
 
-### Pages Required (5 new pages total)
-| Page | Purpose |
-|---|---|
-| `/account/family` | Manage family members, add/edit/remove child profiles, view QR codes |
-| `/game-night` | Start a new game night: pick a game, select players from family list |
-| `/game-night/[id]` | Active session: score entry, photo capture, live scoreboard |
-| `/game-night/[id]/recap` | AI-generated recap with photos, stats, shareable video collage |
-| `/account/family/[memberId]` | Individual profile: all-time stats, badges, game history |
+**How it works:**
+1. Parent goes to `/account/family` → taps "Add Family Member"
+2. Enters child's name, age, takes a photo (becomes avatar + optional face vector)
+3. System generates a permanent QR code — can be printed on a card or shown from parent's phone
+4. Child appears in the family group automatically
+5. Child can be added to any game night by tapping their name — no scanning needed at home
 
-Plus: extend existing `/account/settings` with per-child privacy toggles.
+### Privacy & Consent (COPPA-Aware)
+Before creating a child profile, parent sees a **clear consent modal**:
+
+**What GL365 does:**
+- Stores the photo as the child's avatar
+- Uses facial recognition ONLY to auto-tag the child in their own group's photos/videos (if toggled ON)
+- Keeps all data within the parent's family account
+
+**What GL365 NEVER does:**
+- Sells, shares, or transfers any child data
+- Uses child photos for advertising or training
+- Allows anyone outside the family/group to see child profiles
+- Retains data after the parent deletes the profile
+
+### Parent Controls (Per Child, Toggleable Anytime)
+- **Face Auto-Tagging** — ON/OFF. If OFF, child still plays, scores count, but AI won't scan for their face
+- **Include in AI Recaps** — ON/OFF. If OFF, recap mentions them by name but won't include their face
+- **Social Sharing** — ON/OFF. If OFF, child excluded when anyone shares to social media
+- **Delete All Data** — Nuclear button. Wipes profile, photos, face vector, stats — permanently and immediately
+
+---
+
+## Invites & Cross-Group Game Nights
+
+### How Invites Work
+Any group admin can invite another group (or individual) to a game night:
+
+1. Host opens `/game-night` → taps "New Game Night"
+2. Selects players from their own group
+3. Taps "Invite Another Group" → searches by name or shares an invite link
+4. Invited group's admin gets a notification → accepts/declines
+5. Both groups merge into one session — everyone sees the same scoreboard
+
+**Invite methods:**
+- **In-app notification** (if the other group is already on GL365)
+- **Share link** (text/email — recipient creates free account if they don't have one)
+- **QR scan** (in person — scan each other's group QR to join)
+
+### Cross-Family Game Night Example
+```
+Saturday Night Showdown (Mar 1)
+  Teams: Tucker Family vs. Smith Family
+  ├── Game 1: Trivial Pursuit — Smiths win (32-28)
+  ├── Game 2: Pictionary — Tuckers win (by 3 rounds)
+  └── Game 3: Uno — Smith kid (age 9) destroys everyone
+
+  Result: Smiths win 2-1
+  Rivalry Record: Tuckers lead series 5-4 all time
+```
+
+The AI knows the **rivalry history** between groups. Every cross-group matchup builds the narrative.
+
+---
+
+## Tournaments & Championships
+
+### How Tournaments Work
+When multiple groups want structured competition, anyone can create a **Tournament**:
+
+1. Creator picks the game (Monopoly, Trivia, Spades, etc.)
+2. Sets format: **Single elimination**, **Double elimination**, **Round robin**, or **Swiss**
+3. Sets schedule: all in one night OR spread across weeks
+4. Invites groups (or opens registration with a public link)
+5. Bracket auto-generates when registration closes
+6. Matches happen as regular game night sessions — results feed the bracket
+7. Championship match crowns the winner
+
+### Tournament Types
+- **House Tournament** — One family, bracket among individual members (Thanksgiving Monopoly championship)
+- **Neighborhood Cup** — 4-8 families in the neighborhood compete over a month
+- **Friends League** — Weekly trivia among friend groups, season standings, playoffs
+- **Open Tournament** — Public registration, anyone on GL365 in the area can join
+
+### Database Schema — Tournaments
+```sql
+tournaments
+  id UUID PRIMARY KEY
+  name TEXT NOT NULL
+  slug TEXT UNIQUE
+  game_type TEXT NOT NULL -- 'monopoly' | 'trivia' | 'spades' | 'custom'
+  format TEXT DEFAULT 'single_elimination' -- 'single_elim' | 'double_elim' | 'round_robin' | 'swiss'
+  creator_id UUID REFERENCES auth.users
+  status TEXT DEFAULT 'registration' -- 'registration' | 'active' | 'completed' | 'canceled'
+  max_participants INT
+  registration_open BOOLEAN DEFAULT true
+  schedule_type TEXT DEFAULT 'flexible' -- 'single_day' | 'weekly' | 'flexible'
+  rules JSONB
+  bracket JSONB -- auto-generated bracket structure
+  champion_group_id UUID REFERENCES groups -- winner
+  created_at TIMESTAMPTZ DEFAULT NOW()
+
+tournament_participants
+  tournament_id UUID REFERENCES tournaments
+  group_id UUID REFERENCES groups -- a group enters the tournament
+  seed INT -- seeding position (optional)
+  status TEXT DEFAULT 'active' -- 'active' | 'eliminated' | 'champion' | 'withdrew'
+  registered_at TIMESTAMPTZ DEFAULT NOW()
+```
+
+### The Championship Escalation Path
+```
+Family Game Night (weekly)
+  → Cross-Family Showdown (monthly — invited groups)
+    → Neighborhood Cup (quarterly — open tournament)
+      → City Championship (annual — top groups from all neighborhoods)
+```
+
+Each level is optional. Most people stay at family game night. But the path exists for people who want to compete. And every level drives more people onto the platform.
 
 ---
 
@@ -282,6 +391,7 @@ Game nights must be **completely flexible** — no rigid flows. The host control
 - **Rematch** — one-tap to start the same game with the same players
 - **Switch games** — mid-session, swap from Monopoly to Uno without ending the night
 - **Add/remove players** mid-game — someone shows up late or leaves early
+- **Invite mid-game** — another family shows up? Add them to the session live
 
 ### Session States
 ```
@@ -290,18 +400,19 @@ draft → active → paused → active → completed
                   canceled            recap generated
 ```
 
-### Game Night Flow (From Parent's Phone)
-1. Parent opens `/game-night` → taps "New Game Night"
-2. Picks the game (Monopoly, Uno, Scrabble, Poker, custom, etc.)
-3. Selects players from family list (tap to add — no QR scanning needed at home)
-4. Game starts — parent's phone becomes the scoreboard
-5. During play: snap photos anytime (auto-tagged if consent given)
-6. Game ends: enter final scores (or snap the board for AI parsing)
-7. AI generates recap: "Tyler destroyed Bella in Monopoly for the 3rd straight week."
-8. Parent can share recap to social media (respecting each child's privacy toggles)
+### Game Night Flow
+1. Host opens `/game-night` → taps "New Game Night"
+2. Picks the game from the Game Library (or creates custom)
+3. Selects players from their group(s) — tap to add, no scanning needed at home
+4. Optionally invites another group (link, notification, or QR)
+5. Game starts — host's phone becomes the scoreboard
+6. During play: snap photos anytime (auto-tagged if consent given)
+7. Game ends: enter final scores (or snap the board for AI parsing)
+8. AI generates recap covering the whole evening
+9. Host can share recap to social (respecting all privacy toggles)
 
 ### Multi-Game Nights
-A single "Game Night" session can contain **multiple games**:
+A single session can contain **multiple games**:
 ```
 Thursday Game Night (Feb 27)
 ├── Game 1: Uno (7:00 PM) — Winner: Bella
@@ -311,6 +422,34 @@ Overall MVP: Tyler (2 wins)
 ```
 
 The AI recap covers the whole evening, not just one game.
+
+### Shareable Recap Pages
+Every game night generates a public recap at `/recap/[id]`:
+- Games played, scores, winners
+- Best photos (respecting privacy toggles)
+- "Powered by GreenLine365" branding
+- CTA: "Track your game nights free — join GreenLine365"
+- Every share is an ad for the platform
+
+---
+
+## Pages Required (Full Game Night System)
+
+| Page | Purpose | Priority |
+|---|---|---|
+| `/account/groups` | Manage all your groups (family, friends, etc.) | Phase 2 |
+| `/account/groups/[id]` | Group detail: members, stats, history, invite link | Phase 2 |
+| `/account/family` | Manage child sub-profiles under parent account | Phase 2 |
+| `/account/family/[memberId]` | Child profile: all-time stats, badges, game history | Phase 2.5 |
+| `/game-night` | Start a game night: pick game, select players, invite groups | Phase 2.5 |
+| `/game-night/[id]` | Active session: score entry, photos, live scoreboard, controls | Phase 2.5 |
+| `/game-night/[id]/recap` | AI recap with photos, stats, shareable video collage | Phase 2.5 |
+| `/recap/[id]` | Public shareable recap (privacy-enforced) | Phase 2.5 |
+| `/tournaments` | Browse/create tournaments | Phase 3 |
+| `/tournaments/[id]` | Tournament bracket, schedule, results | Phase 3 |
+| `/invite/[code]` | Accept a group/game night invite (creates account if needed) | Phase 2.5 |
+
+Plus: extend `/account/settings` with per-child privacy toggles
 
 ---
 
@@ -322,10 +461,11 @@ Every interaction is a **Session** — a Loop, a League Match, a Poker Night, a 
 ```sql
 sessions
   id UUID PRIMARY KEY
-  type TEXT -- 'loop' | 'match' | 'poker' | 'game_night' | 'deal' | 'civic'
+  type TEXT -- 'loop' | 'match' | 'poker' | 'game_night' | 'deal' | 'civic' | 'tournament_match'
   creator_id UUID REFERENCES auth.users
   venue_id UUID REFERENCES directory_listings (nullable for home games)
   league_id UUID REFERENCES leagues (nullable)
+  tournament_id UUID REFERENCES tournaments (nullable)
   status TEXT -- 'draft' | 'active' | 'paused' | 'completed' | 'canceled'
   metadata JSONB -- fog_of_war_pins, blind_schedule, buy_in, rules, game_name, etc.
   started_at TIMESTAMPTZ
@@ -333,11 +473,39 @@ sessions
 
 session_participants
   session_id UUID REFERENCES sessions
-  user_id UUID REFERENCES auth.users
+  user_id UUID REFERENCES auth.users (nullable — null for child sub-profiles)
+  family_member_id UUID REFERENCES family_members (nullable — set for kids)
+  group_id UUID REFERENCES groups (nullable — which group they represent)
   role TEXT -- 'player' | 'spectator' | 'commissioner' | 'host'
   checked_in_at TIMESTAMPTZ
   checked_out_at TIMESTAMPTZ
   score JSONB -- flexible per game type
+
+-- Multi-game support within a session (e.g., 3 games in one evening)
+session_games
+  id UUID PRIMARY KEY
+  session_id UUID REFERENCES sessions
+  game_name TEXT NOT NULL -- 'Monopoly' | 'Uno' | 'Trivia' | custom
+  game_template_id UUID REFERENCES game_templates (nullable)
+  sequence INT -- order within the session (1, 2, 3...)
+  status TEXT -- 'active' | 'completed' | 'canceled'
+  winner_user_id UUID (nullable)
+  winner_family_member_id UUID (nullable)
+  winner_group_id UUID (nullable)
+  scores JSONB -- per-player scores for this specific game
+  started_at TIMESTAMPTZ
+  ended_at TIMESTAMPTZ
+
+-- Preloaded game templates so users don't start from scratch
+game_templates
+  id UUID PRIMARY KEY
+  name TEXT -- 'Monopoly' | 'Uno' | 'Scrabble' | etc.
+  category TEXT -- 'board_game' | 'card_game' | 'party_game' | 'sport' | 'custom'
+  scoring_type TEXT -- 'points' | 'wins' | 'ranks' | 'money' | 'custom'
+  default_player_count INT
+  icon TEXT -- emoji or icon reference
+  rules_summary TEXT
+  is_system BOOLEAN DEFAULT true -- system templates vs user-created
 ```
 
 ### Identity Passport (One Profile, Every Mode)
@@ -447,33 +615,41 @@ Leagues drive venue traffic. The Directory is the foundation.
 - [ ] Review responses UI in business portal
 - [ ] Analytics charts for paid tiers
 
-### Phase 2: Identity & Session Foundation
+### Phase 2: Identity, Groups & Session Foundation
 - [ ] `identity_passports` table + migration
-- [ ] `family_members` table + migration (child profiles with privacy settings)
-- [ ] `sessions` + `session_participants` tables
-- [ ] `leagues` table
+- [ ] `groups` + `group_members` tables
+- [ ] `family_members` table (child sub-profiles with privacy/consent)
+- [ ] `sessions` + `session_participants` + `session_games` tables
+- [ ] `game_templates` table + seed data (Monopoly, Uno, Scrabble, etc.)
 - [ ] Universal QR code generation (extends blast deals QR)
 - [ ] Identity Passport profile page
+- [ ] Group management pages (`/account/groups`, `/account/groups/[id]`)
 - [ ] Family management page (`/account/family`)
 - [ ] Consent & privacy modal for child profiles
+- [ ] Invite system (link, notification, QR) + `/invite/[code]` accept page
 
 ### Phase 2.5: Game Night MVP (Free Tier Funnel)
-- [ ] Game Night start page (`/game-night`)
+- [ ] Game Night start page (`/game-night`) — pick game, select players, invite groups
 - [ ] Active session page (`/game-night/[id]`) — score entry, photos, live scoreboard
-- [ ] Session controls: pause, resume, cancel, reset, rematch, switch game
-- [ ] Multi-game support within one session
+- [ ] Session controls: pause, resume, cancel, reset, rematch, switch game, invite mid-game
+- [ ] Multi-game support within one session (`session_games`)
+- [ ] Cross-group game nights (Tuckers vs. Smiths)
 - [ ] AI recap generation (`/game-night/[id]/recap`)
+- [ ] Public shareable recap pages (`/recap/[id]`) with privacy enforcement
 - [ ] Family member stats page (`/account/family/[memberId]`)
 - [ ] Per-child privacy toggles in account settings
-- [ ] Social sharing with child privacy enforcement
+- [ ] Streak system (weekly streaks, rivalry records, monthly MVPs)
 
-### Phase 3: League MVP
-- [ ] Commissioner setup flow
+### Phase 3: Tournaments & Leagues
+- [ ] Tournament creation flow (format, game, registration)
+- [ ] Auto-bracket generation (single/double elim, round robin, swiss)
+- [ ] Tournament pages (`/tournaments`, `/tournaments/[id]`)
+- [ ] Commissioner setup flow for paid leagues
 - [ ] League hub page (`/leagues/[slug]`)
-- [ ] Manual score entry
-- [ ] Leaderboard component
+- [ ] Leaderboard component (reused across game night, tournaments, leagues)
 - [ ] AI match recap generation
 - [ ] Poker ledger (buy-in/cashout tracking)
+- [ ] Championship escalation: family → cross-family → neighborhood → city
 
 ### Phase 4: Loops MVP
 - [ ] Loop template creator
