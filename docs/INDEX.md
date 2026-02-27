@@ -36,6 +36,7 @@
 | `brainstorming/founding-members-SOT.md` | Founding Members program: 50 directory + 30 booking spots, pricing, benefits |
 | `brainstorming/email-outreach-sequence.md` | 5-email drip sequence for business outreach. Templates + triggers defined. |
 | `brainstorming/home-ledger-launch.md` | Home Ledger launch plan: landing page, naming, positioning |
+| `brainstorming/home-ledger-vision-deep-dive.md` | **NEW** — Full Home Ledger ecosystem vision: Digital Employee, QR Unit Passport, Forensic Documentation, Health Scores, Universal Accountability Grid |
 | `brainstorming/live-local-pulse-spec.md` | Live Local Pulse: tier gating, fallback engine, ZIP personalization |
 | `brainstorming/loops-brainstorming.md` | Engine 2 Lifestyle Loops: scavenger hunts, fog-of-war, session graphs |
 | `brainstorming/pricing-strategy.md` | Pricing research: tier structure, competitor analysis, margin targets |

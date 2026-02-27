@@ -261,7 +261,7 @@ This is the cheapest customer acquisition channel GL365 will ever have. $19/mo f
 ### REMAINING OPEN QUESTIONS
 - Should /home-ledger landing page be updated to reflect the freemium model + founding member offer before outreach? **DECISION: YES — update immediately before outreach.**
 - The Filing Cabinet "CPA Export" feature — confirmed as Paid-tier only (see above)
-- Incidents module — is digital signature collection already functional? **ANSWER: YES — fully built with secure tokens, acknowledge/refuse, IP logging, 30-day expiry.**
+- Incidents module — is digital signature collection already functional? **ANSWER: The infrastructure exists (secure tokens, acknowledge/refuse, IP logging, 30-day expiry) but signatures are NOT required. Decision: Forensic documentation (GPS + Timestamps + Service Order screenshots) is sufficient proof. Signature is optional, not mandatory. See `home-ledger-vision-deep-dive.md` Section VIII for full "Proof of Presence" protocol.**
 - Founding member badge/indicator — should founding homeowners get a visible badge on their Ledger? **DECISION: YES — "Founding Member — Est. 2026" badge. Proves data vintage at resale.**
 
 ---
@@ -309,11 +309,19 @@ The Home Ledger Founding Member program is **entirely new** — there is no exis
 
 ---
 
+## DEEP VISION DOCUMENT — REFERENCE
+
+> **NEW (2026-02-27):** The full Home Ledger ecosystem vision — including the Three-Layer Data Architecture, Digital Employee model, QR Unit Passport system, Forensic Documentation Protocol, Universal Accountability Grid, and per-asset Health Scores — is documented in `docs/brainstorming/home-ledger-vision-deep-dive.md`. Read that document for the complete technical and strategic vision.
+
+---
+
 ## BRAIN ECOSYSTEM — SECOND BRAIN PRD & BRAINSTORMING
 
 Added: 2026-02-22
 
-Context: Full brainstorming session covering the GL365 "Second Brain" architecture, Slack integration, smart routing, GAS automations, Restaurant Brain vertical, pricing reconciliation, and engineering sequencing.
+Context: Full brainstorming session covering the GL365 "Second Brain" architecture, Slack integration, smart routing, Restaurant Brain vertical, pricing reconciliation, and engineering sequencing.
+
+> **DEPRECATION NOTICE (2026-02-27):** All references to Google Apps Script (GAS) and the `gas-automator` in this section and elsewhere are DEPRECATED. The platform will NOT use GAS for any automation. Disregard GAS-related information.
 
 ### THE SECOND BRAIN — WHAT IT IS
 
@@ -406,9 +414,9 @@ A property with stains but no resolutions is a red flag. A property with stains 
 - Basic status enum (triage → active → resolved)
 
 **Phase 2 — Automation Layer**
-- GAS Calendar sync (bidirectional)
-- GAS Weekly digest script
-- Google Form → Brain anonymous input pipeline
+- ~~GAS Calendar sync~~ → **DEPRECATED — GAS removed from platform**
+- ~~GAS Weekly digest script~~ → **DEPRECATED — GAS removed from platform**
+- Anonymous input pipeline (non-GAS approach TBD)
 
 **Phase 3 — Team Features**
 - Scope enum (private/team/org) on all Brain items
