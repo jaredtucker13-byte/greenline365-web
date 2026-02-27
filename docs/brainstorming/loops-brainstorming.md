@@ -12,6 +12,10 @@ File: docs/brainstorming/loops-brainstorming.md
 
 GL365 is NOT a bank. GL365 does NOT process payments. The QR Shield system charges a per-scan transaction fee to the business. The business passes that cost along to the consumer however they choose. GL365 never touches the actual payment between consumer and business.
 
+## SPONSORSHIP MODEL — KEY DECISION (2026-02-27)
+
+**All Lifestyle Loops and Competitive League experiences are SPONSORED BY GL365.** These are not directly monetized products that businesses or users pay for. GL365 funds and operates these engines as platform-level engagement tools. They drive foot traffic to directory businesses, keep users on the platform, and build the community flywheel. The revenue engine is the Directory (listings, subscriptions, Command Center, Home Ledger) — Loops and Leagues are the magnets that feed it.
+
 ---
 
 ## ARCHITECTURE: TWO SEPARATE ENGINES
