@@ -433,6 +433,290 @@ Every game night generates a public recap at `/recap/[id]`:
 
 ---
 
+## Gamification Engine
+
+### XP & Leveling
+Every player earns XP for everything — not just winning, *participating*:
+
+| Action | XP |
+|---|---|
+| Show up to game night | +10 |
+| Complete a game (even if you lose) | +5 |
+| Win a game | +15 |
+| Win the overall evening (most wins) | +25 |
+| Break someone's winning streak | +10 |
+| Take a photo during game night | +5 |
+| Invite a new group to play | +20 |
+| Correct prediction on who would win | +10 |
+| Earn a new achievement badge | +15 |
+| Share a recap to social media | +5 |
+
+**Level Titles:**
+```
+Level 1-5:    Rookie
+Level 6-15:   Regular
+Level 16-30:  Veteran
+Level 31-50:  Legend
+Level 51+:    Hall of Famer
+```
+
+Level shows on your profile, in game sessions, and on leaderboards. Kids get the same system.
+
+### Achievement Badges (Context-Aware)
+The AI detects **moments** and awards badges. You don't know what badges exist until you earn them — discovery is part of the fun.
+
+| Badge | How You Earn It |
+|---|---|
+| Comeback Kid | Won after being in last place halfway through |
+| Streak Breaker | Beat someone on a 5+ game winning streak |
+| Iron Throne | Won 5 games of the same type in a row |
+| Night Owl | Finished a game after midnight |
+| The Closer | Won the last game of the evening 5 times |
+| Variety Pack | Played 10 different games in one month |
+| Giant Killer | A child beats an adult in a strategy game |
+| Perfect Host | Hosted 10 game nights |
+| Social Butterfly | Played with 5 different groups |
+| Dynasty | Your group won a tournament |
+| Underdog | Won as the lowest-seeded player/group in a tournament |
+| Grudge Match | Won against a rival after losing 3+ in a row to them |
+| Century Club | Played 100 total games |
+| Marathon | Game night lasted 4+ hours |
+| Photo Bomb | Took 10+ photos in one session |
+
+### Live AI Commentary ("The Color Commentator")
+During the game, after each score entry, the AI drops real-time commentary as a notification/banner:
+
+> "Tyler takes the lead! He's now won 3 of the last 4 rounds. Can anyone stop this kid?"
+
+> "UPSET ALERT: Bella is about to beat Dad for the first time in Scrabble. She's up by 23 points with 4 tiles left."
+
+> "Fun fact: Mom has never lost a game of Uno when she goes first. She just went first."
+
+This is what makes people laugh, screenshot it, and share it. The AI becomes the **narrator of your life.**
+
+### Game Night Modifiers ("The Spice Wheel")
+Before each game, the host can optionally spin a modifier wheel that adds a twist:
+
+| Modifier | What It Does |
+|---|---|
+| Double Stakes | This game counts for 2x XP |
+| Handicap | Current leader starts with a disadvantage |
+| Mystery Pick | AI randomly selects the next game |
+| Revenge Match | Whoever lost last game picks the next one |
+| Speed Round | 50% time limit on turns |
+| Wildcard | One random rule change mid-game (AI decides) |
+| Photo Challenge | Bonus XP if everyone takes a photo during the game |
+
+Totally optional. Never forced. But once people discover it, they'll use it every time.
+
+### Rivalry Engine
+When two players or groups face each other repeatedly, the AI builds a rivalry profile:
+
+```
+Tucker Family vs. Smith Family
+  Head-to-Head: Tuckers lead 14-11 (all time)
+  Current Streak: Smiths on a 3-game run
+  Most Contested Game: Trivial Pursuit (7-7 tie)
+  Biggest Blowout: Tuckers won Monopoly by $4,200
+
+  "The Smiths have clawed their way back after a brutal 5-game
+  losing streak in October. Tyler Tucker still hasn't forgiven
+  the Smith kid for that Uno reverse card heard 'round the world."
+```
+
+Auto-generated from session data. The AI writes it like a sports journalist. Every matchup adds a chapter.
+
+### Predictions — Bet With XP, Not Money
+Before each game, every player (and spectators) can predict the winner. Correct predictions earn bonus XP.
+
+The AI also makes its prediction:
+> "AI Pick: Tyler (62% win probability based on 47 Monopoly games). Upset potential: Bella (hot streak)."
+
+No money. Just bragging rights and XP. Kids love it. When the AI is wrong, it becomes a moment.
+
+### "Previously On..." Opener
+When a group starts a new game night, the AI opens with a narrative recap:
+
+> "Previously on Tucker Family Game Night: Dad's 7-game Scrabble dynasty came to a shocking end when Bella deployed a triple word score on 'QUIXOTIC' for 98 points. Mom maintained her Uno streak at 4. Tonight... can Tyler be convinced to play Risk again?"
+
+10 seconds of text that makes everyone laugh before games start. Builds continuity — your game nights have a *story arc.*
+
+### Digital Trading Cards
+After each game night, the AI generates a trading card for the MVP:
+
+```
+┌─────────────────────────┐
+│  [Player Photo]         │
+│                         │
+│  TYLER TUCKER           │
+│  "The Monopoly Mogul"   │
+│                         │
+│  Level: 23 (Veteran)    │
+│  Win Rate: 68%          │
+│  Best Game: Monopoly    │
+│  Streak: 4 wins         │
+│                         │
+│  Feb 27, 2026           │
+│  ★★★★☆ (Rare)          │
+└─────────────────────────┘
+```
+
+**Rarity based on the moment:**
+- **Common** — Regular win
+- **Rare** — Won 3+ in one night
+- **Epic** — Broke a 10+ game streak or comeback win
+- **Legendary** — Won a tournament championship
+
+Collectible. Shareable. Kids will obsess over these.
+
+### Seasonal Events
+The platform changes with real-world seasons:
+
+| Season | Event | Special Badge |
+|---|---|---|
+| Fall | Harvest Tournament | Pumpkin Crown |
+| Winter | Holiday Championship | Snowflake Legend |
+| Spring | March Madness Bracket | Bracket Buster |
+| Summer | Outdoor Games Season | Sun Champion |
+
+Seasonal leaderboards reset. Everyone starts fresh. New badges to earn. Creates urgency.
+
+### Rage Quit Protection & Badge Decay
+**Problem:** Someone losing badly quits the app mid-game. Ruins the data, ruins the vibe.
+**Solution:** Completing games is rewarded. Quitting is penalized. Sportsmanship is a stat.
+
+#### Completion Bonus
+Players who finish every game in a session get a **Completion Bonus**:
+- +15 XP per game completed (on top of regular XP)
+- "Sportsmanship" stat tracked on profile (% of games completed)
+- 100% completion in a month → **"Good Sport" badge**
+- 10 consecutive game nights with 100% completion → **"Iron Will" badge**
+
+#### Badge Decay System
+Badges aren't permanent trophies — some require maintenance:
+
+**Decayable badges** (lose them if you stop earning them):
+- "Iron Throne" (5 wins in a row) → decays if you quit 2 games in a month
+- "Good Sport" → requires 90%+ completion rate, recalculated monthly
+- "Streak" badges → break the streak and the badge grays out (but record stays in history)
+- Seasonal badges → expire at end of season (archived in trophy case, not active)
+
+**Permanent badges** (earned forever once unlocked):
+- "Century Club" (100 games)
+- "Giant Killer" (first time moments)
+- "Dynasty" (tournament wins)
+- All "first time" achievements
+
+#### What Happens When Someone Rage Quits
+1. **Game continues without them** — remaining players can still finish and log scores
+2. **Quitter gets 0 XP** for that game (no completion bonus)
+3. **"DNF" (Did Not Finish)** recorded on their profile for that game
+4. **Sportsmanship score drops** — visible on their profile
+5. **3+ DNFs in a month** → temporary loss of prediction privileges (can't predict winners)
+6. **AI calls it out in the recap** (playfully): "Dad rage-quit Monopoly at 9:17 PM after landing on Boardwalk with a hotel. His Sportsmanship rating drops to 78%."
+
+#### The "Comeback Incentive"
+If someone quits but comes back to the NEXT game night:
+- **No additional penalty** — we want them back
+- **"Redemption Arc" bonus XP** if they complete every game next session
+- AI narrates: "After last week's infamous walkout, Dad returned with something to prove..."
+
+**Philosophy:** Punish the quit, but reward the return. Never lock someone out. The goal is to make completing games feel so good (XP, badges, commentary) that quitting feels like you're leaving money on the table.
+
+### Game Night Score (Group Health Metric)
+Each group gets a composite score measuring how vibrant their game nights are:
+
+```
+Tucker Family Game Night Score: 87/100
+
+Frequency:        ★★★★★  (weekly for 6 weeks straight)
+Variety:          ★★★★☆  (8 different games this month)
+Competitiveness:  ★★★★★  (average margin of victory: 12%)
+Participation:    ★★★☆☆  (3/5 members play regularly)
+Engagement:       ★★★★☆  (photos + shares + invites)
+```
+
+Subtle nudge: "Our Participation score dropped — let's get Mom to play this week."
+
+### Database Schema — Gamification
+```sql
+-- XP and leveling
+player_xp
+  id UUID PRIMARY KEY
+  user_id UUID REFERENCES auth.users (nullable)
+  family_member_id UUID REFERENCES family_members (nullable)
+  xp_total INT DEFAULT 0
+  level INT DEFAULT 1
+  current_streak INT DEFAULT 0 -- consecutive weeks with a game night
+  longest_streak INT DEFAULT 0
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+
+-- Achievement badges earned
+player_achievements
+  id UUID PRIMARY KEY
+  user_id UUID REFERENCES auth.users (nullable)
+  family_member_id UUID REFERENCES family_members (nullable)
+  badge_slug TEXT NOT NULL -- 'comeback_kid' | 'iron_throne' | etc.
+  earned_at TIMESTAMPTZ DEFAULT NOW()
+  session_id UUID REFERENCES sessions -- which session triggered it
+  metadata JSONB -- context: what game, who they beat, etc.
+  UNIQUE(user_id, badge_slug) -- one badge per person (first earn only)
+
+-- Rivalry tracking between players/groups
+rivalries
+  id UUID PRIMARY KEY
+  entity_a_type TEXT -- 'user' | 'family_member' | 'group'
+  entity_a_id UUID
+  entity_b_type TEXT
+  entity_b_id UUID
+  wins_a INT DEFAULT 0
+  wins_b INT DEFAULT 0
+  current_streak_holder TEXT -- 'a' | 'b' | null
+  current_streak_count INT DEFAULT 0
+  total_matches INT DEFAULT 0
+  last_match_at TIMESTAMPTZ
+  narrative JSONB -- AI-generated rivalry story chapters
+  UNIQUE(entity_a_id, entity_b_id)
+
+-- Predictions per game
+game_predictions
+  id UUID PRIMARY KEY
+  session_game_id UUID REFERENCES session_games
+  predictor_user_id UUID REFERENCES auth.users (nullable)
+  predictor_family_member_id UUID REFERENCES family_members (nullable)
+  predicted_winner_user_id UUID (nullable)
+  predicted_winner_family_member_id UUID (nullable)
+  predicted_winner_group_id UUID (nullable)
+  was_correct BOOLEAN -- set after game completes
+  created_at TIMESTAMPTZ DEFAULT NOW()
+
+-- Trading cards generated after sessions
+trading_cards
+  id UUID PRIMARY KEY
+  user_id UUID REFERENCES auth.users (nullable)
+  family_member_id UUID REFERENCES family_members (nullable)
+  session_id UUID REFERENCES sessions
+  title TEXT -- "The Monopoly Mogul"
+  rarity TEXT -- 'common' | 'rare' | 'epic' | 'legendary'
+  stats JSONB -- win_rate, streak, best_game, etc.
+  image_url TEXT -- AI-generated card image
+  created_at TIMESTAMPTZ DEFAULT NOW()
+
+-- Seasonal events
+seasonal_events
+  id UUID PRIMARY KEY
+  name TEXT -- 'Harvest Tournament 2026'
+  season TEXT -- 'fall' | 'winter' | 'spring' | 'summer'
+  year INT
+  badge_slug TEXT -- special seasonal badge
+  starts_at TIMESTAMPTZ
+  ends_at TIMESTAMPTZ
+  leaderboard JSONB -- seasonal rankings
+  status TEXT DEFAULT 'upcoming' -- 'upcoming' | 'active' | 'completed'
+```
+
+---
+
 ## Pages Required (Full Game Night System)
 
 | Page | Purpose | Priority |
@@ -635,10 +919,25 @@ Leagues drive venue traffic. The Directory is the foundation.
 - [ ] Multi-game support within one session (`session_games`)
 - [ ] Cross-group game nights (Tuckers vs. Smiths)
 - [ ] AI recap generation (`/game-night/[id]/recap`)
+- [ ] "Previously On..." AI opener for returning groups
 - [ ] Public shareable recap pages (`/recap/[id]`) with privacy enforcement
 - [ ] Family member stats page (`/account/family/[memberId]`)
 - [ ] Per-child privacy toggles in account settings
+- [ ] XP system + leveling (`player_xp` table)
+- [ ] Achievement badges — context-aware, surprise discovery (`player_achievements`)
+- [ ] Live AI Commentary during score entry ("The Color Commentator")
+- [ ] Predictions — pick the winner before each game for bonus XP
+- [ ] Rivalry tracking between players and groups (`rivalries` table)
 - [ ] Streak system (weekly streaks, rivalry records, monthly MVPs)
+- [ ] Game Night Score (group health metric)
+
+### Phase 2.75: Gamification Polish
+- [ ] Game Night Modifiers / Spice Wheel (optional twists before each game)
+- [ ] Digital Trading Cards for MVP of each session
+- [ ] Seasonal Events (Harvest Tournament, Holiday Championship, etc.)
+- [ ] Seasonal leaderboard resets with special badges
+- [ ] Card collection gallery on player profiles
+- [ ] Rivalry narrative generation (AI-written sports journalist style)
 
 ### Phase 3: Tournaments & Leagues
 - [ ] Tournament creation flow (format, game, registration)
