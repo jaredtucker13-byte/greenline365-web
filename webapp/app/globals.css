@@ -267,8 +267,8 @@ textarea:focus {
 }
 
 .gsap-hover-lift:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 20px 40px rgba(201, 169, 110, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
 }
 
 @keyframes pulse-ring {
@@ -359,36 +359,35 @@ textarea:focus {
   background-size: 20px 20px;
 }
 
-/* Glow Text */
+/* Glow Text — restrained luxury, subtle warmth */
 .glow-text {
-  text-shadow: 0 0 10px rgba(201, 169, 110, 0.5);
+  text-shadow: 0 0 8px rgba(201, 169, 110, 0.25);
 }
 
 .glow-text-teal {
-  text-shadow: 0 0 10px rgba(201, 169, 110, 0.4);
+  text-shadow: 0 0 8px rgba(201, 169, 110, 0.2);
 }
 
-/* Card Hover Effect */
+/* Card Hover Effect — subtle lift, no neon glow */
 .card-hover {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .card-hover:hover {
-  transform: translateY(-4px);
-  box-shadow: 
-    0 12px 40px 0 rgba(0, 0, 0, 0.5),
-    0 0 20px rgba(201, 169, 110, 0.2);
+  transform: translateY(-2px);
+  box-shadow:
+    0 8px 30px 0 rgba(0, 0, 0, 0.4),
+    0 1px 0 rgba(201, 169, 110, 0.08);
 }
 
-/* Loading Spinner with Neon */
+/* Loading Spinner — refined gold */
 .spinner-neon {
-  border: 3px solid rgba(201, 169, 110, 0.1);
+  border: 2px solid rgba(201, 169, 110, 0.1);
   border-top-color: #C9A96E;
   border-radius: 50%;
   width: 40px;
   height: 40px;
   animation: spin 1s linear infinite;
-  box-shadow: 0 0 15px rgba(201, 169, 110, 0.3);
 }
 
 @keyframes spin {
@@ -478,13 +477,13 @@ textarea:focus {
   z-index: 3;
 }
 
-/* OS Card hover state */
+/* OS Card hover state — restrained luxury lift */
 .os-card:hover {
-  border-color: rgba(201,169,110,0.3);
-  box-shadow: 
-    0 0 30px rgba(201,169,110,0.1),
-    0 12px 40px rgba(0,0,0,0.5);
-  transform: translateY(-4px);
+  border-color: rgba(201,169,110,0.25);
+  box-shadow:
+    0 8px 30px rgba(0,0,0,0.4),
+    0 1px 0 rgba(201,169,110,0.06);
+  transform: translateY(-2px);
 }
 
 /* Aurora background effect - floating behind cards */

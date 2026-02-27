@@ -105,70 +105,71 @@ export default function HeroSection() {
 
           {/* ── Left: Text Content ── */}
           <div>
-            {/* Status badge */}
+            {/* Brand badge */}
             <motion.div
               data-hero-status
-              className="mb-8 inline-flex items-center gap-2 px-4 py-2 glass-gold rounded-full border border-gold/25"
+              className="mb-8 inline-flex items-center gap-2"
             >
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-gold opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-gold" />
-              </span>
-              <span className="text-xs font-semibold text-gold tracking-widest">STATUS: ONLINE</span>
+              <span className="text-gold/60 text-sm font-light tracking-[0.15em]">GreenLine365</span>
             </motion.div>
 
-            {/* Headline — line-by-line reveal */}
-            <h1 className="font-display font-bold mb-6 leading-[1.1]" style={{ fontSize: 'clamp(2.25rem, 5vw, 3.75rem)' }}>
-              <span data-hero-line className="block text-white">
-                The Operating System
-              </span>
-              <span data-hero-line className="block text-white">
-                for the
+            {/* Headline — editorial uppercase reveal */}
+            <h1 className="font-display font-bold mb-4 leading-[1.05] tracking-tight" style={{ fontSize: 'clamp(2.5rem, 5.5vw, 4rem)' }}>
+              <span data-hero-line className="block text-[#F0ECE4]">
+                THE STANDARD,
               </span>
               <span data-hero-line className="block">
-                <NeonText variant="gradient" glow animate={false}>
-                  Local Economy
+                <NeonText variant="gradient" animate={false}>
+                  REDEFINED.
                 </NeonText>
               </span>
             </h1>
 
+            {/* Tagline — wide tracking, editorial */}
+            <p
+              data-hero-sub
+              className="text-gold/70 mb-8 text-xs tracking-[0.25em] uppercase font-medium"
+            >
+              Curated. Verified. Unrivaled.
+            </p>
+
             {/* Sub-copy */}
             <p
               data-hero-sub
-              className="text-white/60 mb-8 leading-relaxed max-w-lg"
-              style={{ fontSize: 'clamp(1rem, 2vw, 1.2rem)' }}
+              className="text-[#F0ECE4]/50 mb-8 leading-relaxed max-w-lg font-light"
+              style={{ fontSize: 'clamp(0.95rem, 1.8vw, 1.1rem)' }}
             >
-              Stop competing with algorithms. Start running infrastructure that
-              connects <span className="text-gold font-medium">local life</span> with
+              The operating system for the local economy. Connecting{' '}
+              <span className="text-gold font-normal">local life</span> with
               local commerce — powered by AI, built for the real world.
             </p>
 
             {/* CTAs */}
-            <div data-hero-cta className="flex flex-wrap gap-4 mb-10">
+            <div data-hero-cta className="flex flex-wrap gap-4 mb-12">
               <Link
                 href="/waitlist"
-                className="btn-primary inline-flex items-center justify-center text-base px-7 py-3.5 font-semibold transition-all duration-300 hover:scale-[1.03] active:scale-[0.98]"
+                className="btn-primary inline-flex items-center justify-center px-8 py-3.5 transition-all duration-300"
               >
-                Start Your Engine
+                Search Directory
               </Link>
               <Link
                 href="/demo-calendar"
-                className="btn-secondary inline-flex items-center justify-center text-base px-7 py-3.5 font-semibold transition-all duration-300 hover:scale-[1.03] active:scale-[0.98]"
+                className="btn-secondary inline-flex items-center justify-center px-8 py-3.5 transition-all duration-300"
               >
                 Book a Demo
               </Link>
             </div>
 
-            {/* Stats row */}
-            <div data-hero-stats className="flex gap-8 max-w-md">
+            {/* Stats row — restrained, editorial */}
+            <div data-hero-stats className="flex gap-10 max-w-md">
               {[
                 { value: 'AI', label: 'Powered' },
                 { value: '24/7', label: 'Always On' },
                 { value: '100%', label: 'Local Focus' },
               ].map((stat) => (
                 <div key={stat.label} className="text-center">
-                  <div className="text-2xl font-display font-bold text-gold">{stat.value}</div>
-                  <div className="text-xs text-white/40 mt-1 tracking-wide">{stat.label}</div>
+                  <div className="text-xl font-display font-semibold text-gold">{stat.value}</div>
+                  <div className="text-[10px] text-[#F0ECE4]/30 mt-1 tracking-[0.2em] uppercase">{stat.label}</div>
                 </div>
               ))}
             </div>

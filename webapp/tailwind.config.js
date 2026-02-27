@@ -93,13 +93,15 @@ module.exports = {
         'bentley-gradient': 'linear-gradient(180deg, #0D1B2A 0%, #1C1C1E 100%)',
       },
       boxShadow: {
-        'neon-green': '0 0 20px rgba(201, 169, 110, 0.3), 0 0 40px rgba(201, 169, 110, 0.15)',
-        'neon-teal': '0 0 20px rgba(201, 169, 110, 0.25), 0 0 40px rgba(201, 169, 110, 0.12)',
-        'neon-amber': '0 0 20px rgba(255, 149, 0, 0.3), 0 0 40px rgba(255, 149, 0, 0.15)',
+        // Restrained luxury - subtle glows, not neon
+        'neon-green': '0 2px 12px rgba(201, 169, 110, 0.15)',
+        'neon-teal': '0 2px 12px rgba(201, 169, 110, 0.12)',
+        'neon-amber': '0 2px 12px rgba(201, 169, 110, 0.15)',
         'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
         'glass-sm': '0 4px 16px 0 rgba(0, 0, 0, 0.25)',
-        'gold-glow': '0 0 20px rgba(201, 169, 110, 0.25), 0 0 60px rgba(201, 169, 110, 0.1)',
-        'intel-glow': '0 0 24px rgba(201, 169, 110, 0.35), 0 0 64px rgba(201, 169, 110, 0.15)',
+        'gold-glow': '0 2px 16px rgba(201, 169, 110, 0.15), 0 0 40px rgba(201, 169, 110, 0.06)',
+        'gold-glow-strong': '0 0 20px rgba(201, 169, 110, 0.25), 0 0 60px rgba(201, 169, 110, 0.1)',
+        'intel-glow': '0 4px 20px rgba(201, 169, 110, 0.2)',
       },
       backdropBlur: { 'xs': '2px' },
       animation: {
@@ -183,48 +185,74 @@ module.exports = {
           'background-size': '200% auto',
           'animation': 'shimmer 3s linear infinite',
         },
+        // Luxury editorial typography utilities
+        '.text-editorial': {
+          'font-family': 'Montserrat, system-ui, sans-serif',
+          'text-transform': 'uppercase',
+          'letter-spacing': '0.15em',
+        },
+        '.text-editorial-wide': {
+          'font-family': 'Montserrat, system-ui, sans-serif',
+          'text-transform': 'uppercase',
+          'letter-spacing': '0.25em',
+        },
+        '.text-cream': {
+          'color': '#F0ECE4',
+        },
+        '.text-cream-muted': {
+          'color': 'rgba(240, 236, 228, 0.6)',
+        },
       });
       addComponents({
+        // Primary: Solid champagne gold, dark text, editorial refinement
         '.btn-primary': {
-          'padding': '0.75rem 1.5rem',
+          'padding': '0.75rem 2rem',
           'background': 'linear-gradient(135deg, #C9A96E 0%, #D9C48F 100%)',
           'color': '#0D1B2A',
           'font-weight': '600',
-          'border-radius': '9999px',
-          'box-shadow': '0 0 20px rgba(201, 169, 110, 0.3)',
+          'font-size': '0.8125rem',
+          'letter-spacing': '0.1em',
+          'text-transform': 'uppercase',
+          'border-radius': '6px',
+          'border': '1px solid rgba(201, 169, 110, 0.6)',
           'transition': 'all 0.3s ease',
           '&:hover': {
-            'transform': 'translateY(-2px)',
-            'box-shadow': '0 0 30px rgba(201, 169, 110, 0.5)',
+            'transform': 'translateY(-1px)',
+            'box-shadow': '0 4px 20px rgba(201, 169, 110, 0.25)',
           },
         },
+        // Secondary: Outlined, thin gold border, restrained elegance
         '.btn-secondary': {
-          'padding': '0.75rem 1.5rem',
-          'background': 'rgba(201, 169, 110, 0.1)',
-          'color': '#C9A96E',
-          'font-weight': '600',
-          'border-radius': '9999px',
-          'border': '1px solid rgba(201, 169, 110, 0.3)',
-          'box-shadow': '0 0 10px rgba(201, 169, 110, 0.1)',
-          'transition': 'all 0.3s ease',
-          '&:hover': {
-            'background': 'rgba(201, 169, 110, 0.2)',
-            'border-color': 'rgba(201, 169, 110, 0.6)',
-            'box-shadow': '0 0 20px rgba(201, 169, 110, 0.25)',
-          },
-        },
-        '.btn-ghost': {
-          'padding': '0.625rem 1.25rem',
+          'padding': '0.75rem 2rem',
           'background': 'transparent',
           'color': '#C9A96E',
           'font-weight': '500',
-          'border-radius': '9999px',
-          'border': '1px solid rgba(201, 169, 110, 0.4)',
+          'font-size': '0.8125rem',
+          'letter-spacing': '0.1em',
+          'text-transform': 'uppercase',
+          'border-radius': '6px',
+          'border': '1px solid rgba(201, 169, 110, 0.35)',
           'transition': 'all 0.3s ease',
           '&:hover': {
-            'background': 'rgba(201, 169, 110, 0.1)',
-            'border-color': 'rgba(201, 169, 110, 0.7)',
-            'box-shadow': '0 0 16px rgba(201, 169, 110, 0.2)',
+            'background': 'rgba(201, 169, 110, 0.08)',
+            'border-color': 'rgba(201, 169, 110, 0.6)',
+          },
+        },
+        // Ghost: Minimal, text-only with subtle border on hover
+        '.btn-ghost': {
+          'padding': '0.625rem 1.5rem',
+          'background': 'transparent',
+          'color': 'rgba(201, 169, 110, 0.8)',
+          'font-weight': '500',
+          'font-size': '0.8125rem',
+          'letter-spacing': '0.08em',
+          'text-transform': 'uppercase',
+          'border-radius': '6px',
+          'border': '1px solid transparent',
+          'transition': 'all 0.3s ease',
+          '&:hover': {
+            'color': '#C9A96E',
+            'border-color': 'rgba(201, 169, 110, 0.3)',
           },
         },
       });

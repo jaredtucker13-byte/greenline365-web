@@ -598,58 +598,47 @@ export default function ServicesPage() {
         <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-os-dark to-transparent" />
       </section>
 
-      {/* ═══════════ BIG CTA BAND (Phase 6) ═══════════ */}
+      {/* ═══════════ BIG CTA BAND (Phase 6) — Refined Luxury ═══════════ */}
       <section className="py-24 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-gold/15 via-gold/8 to-gold/12" />
-        <div className="circuit-bg absolute inset-0 opacity-20" />
-        {/* Animated glow orbs */}
-        <div className="absolute top-0 left-1/4 w-[400px] h-[400px] bg-gold/10 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-0 right-1/4 w-[300px] h-[300px] bg-gold/8 rounded-full blur-[100px] pointer-events-none" />
+        {/* Subtle warm gradient — no circuit board pattern */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0A0E18] via-[#0D1220] to-[#0A0E18]" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-2xl h-[1px] bg-gradient-to-r from-transparent via-gold/20 to-transparent" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-2xl h-[1px] bg-gradient-to-r from-transparent via-gold/20 to-transparent" />
+        {/* Restrained ambient glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-gold/[0.03] rounded-full blur-[100px] pointer-events-none" />
 
         <div className="relative z-10 max-w-4xl mx-auto text-center px-6">
-          <div className="inline-flex items-center gap-2 px-4 py-2 glass-gold rounded-full border border-gold/30 mb-6">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-gold opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-gold" />
-            </span>
-            <span className="text-xs font-semibold text-gold tracking-widest">SYSTEM READY</span>
-          </div>
+          <p className="text-gold/50 text-xs tracking-[0.3em] uppercase mb-8 font-medium">The Next Step</p>
 
-          <h2 className="font-display font-bold text-white mb-6 text-3xl lg:text-5xl">
+          <h2 className="font-display font-bold text-[#F0ECE4] mb-6 text-3xl lg:text-5xl tracking-tight leading-[1.1]">
             Ready to <NeonText variant="gradient" animate={false}>Transform</NeonText> Your Business?
           </h2>
-          <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-[#F0ECE4]/40 mb-10 max-w-2xl mx-auto leading-relaxed font-light">
             Join local businesses already using GreenLine365 to automate their marketing, fill their calendar, and grow their revenue.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-10">
             <Link
               href="/waitlist"
-              className="btn-primary inline-flex items-center justify-center text-lg px-8 py-4 font-semibold transition-all duration-300 hover:scale-[1.03] active:scale-[0.98]"
+              className="btn-primary inline-flex items-center justify-center px-10 py-4 transition-all duration-300"
             >
-              Start Your Engine
+              Get Started
             </Link>
             <Link
               href="/demo-calendar"
-              className="btn-secondary inline-flex items-center justify-center text-lg px-8 py-4 font-semibold transition-all duration-300 hover:scale-[1.03] active:scale-[0.98]"
+              className="btn-secondary inline-flex items-center justify-center px-10 py-4 transition-all duration-300"
             >
               Book a Demo
             </Link>
           </div>
 
-          <div className="flex justify-center gap-8 text-sm text-white/50">
-            <span className="flex items-center gap-1.5">
-              <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-              Free to start
-            </span>
-            <span className="flex items-center gap-1.5">
-              <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-              No credit card
-            </span>
-            <span className="flex items-center gap-1.5">
-              <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-              Cancel anytime
-            </span>
+          <div className="flex justify-center gap-8 text-[#F0ECE4]/30 text-xs tracking-wide">
+            {['Free to start', 'No credit card', 'Cancel anytime'].map((text, i) => (
+              <span key={i} className="flex items-center gap-1.5">
+                <span className="text-gold/50">—</span>
+                {text}
+              </span>
+            ))}
           </div>
         </div>
       </section>
