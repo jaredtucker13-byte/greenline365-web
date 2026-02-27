@@ -23,6 +23,9 @@ export default function EditListingPage() {
     subcategories: [] as string[],
     tags: [] as string[],
     video_url: '',
+    owner_video_url: '',
+    owner_name: '',
+    owner_bio: '',
   });
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -43,6 +46,9 @@ export default function EditListingPage() {
         subcategories: activeListing.subcategories || [],
         tags: activeListing.tags || [],
         video_url: (activeListing.metadata?.video_url as string) || '',
+        owner_video_url: (activeListing.metadata?.owner_video_url as string) || '',
+        owner_name: (activeListing.metadata?.owner_name as string) || '',
+        owner_bio: (activeListing.metadata?.owner_bio as string) || '',
       });
     }
   }, [activeListing]);
@@ -289,6 +295,75 @@ export default function EditListingPage() {
             </div>
             <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-os-dark-900/60">
               <UpgradeCTA feature="Video Embed" variant="inline" />
+            </div>
+          </div>
+        )}
+
+        {/* Premium-only: Meet the Owner */}
+        {activeListing.tier === 'premium' ? (
+          <div className="rounded-xl border border-gold/15 p-5" style={{ background: 'rgba(201,168,76,0.03)' }}>
+            <div className="flex items-center gap-2 mb-3">
+              <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+              </svg>
+              <label className="block text-sm font-medium text-gold">
+                Meet the Owner
+              </label>
+            </div>
+            <p className="text-xs text-white/40 mb-4">
+              Introduce yourself to your customers. Add a personal video, your name, and a short bio. This appears as a dedicated section on your listing.
+            </p>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-white/60 mb-1">Your Name</label>
+                <input
+                  type="text"
+                  value={form.owner_name}
+                  onChange={(e) => setForm({ ...form, owner_name: e.target.value })}
+                  placeholder="e.g., John Smith, Owner"
+                  className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:border-neon-green-500 focus:outline-none focus:ring-1 focus:ring-neon-green-500"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-white/60 mb-1">Short Bio</label>
+                <textarea
+                  value={form.owner_bio}
+                  onChange={(e) => setForm({ ...form, owner_bio: e.target.value })}
+                  placeholder="Tell your customers a bit about yourself and why you started this business..."
+                  rows={3}
+                  maxLength={300}
+                  className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:border-neon-green-500 focus:outline-none focus:ring-1 focus:ring-neon-green-500 resize-none"
+                />
+                <span className="text-[10px] text-white/30 mt-1 block text-right">{form.owner_bio.length}/300</span>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-white/60 mb-1">Introduction Video URL</label>
+                <input
+                  type="url"
+                  value={form.owner_video_url}
+                  onChange={(e) => setForm({ ...form, owner_video_url: e.target.value })}
+                  placeholder="https://youtube.com/watch?v=..."
+                  className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:border-neon-green-500 focus:outline-none focus:ring-1 focus:ring-neon-green-500"
+                />
+                {form.owner_video_url && (
+                  <p className="mt-1 text-xs text-neon-green-500/70">
+                    Your intro video will appear in a &quot;Meet the Owner&quot; section on your listing.
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="relative rounded-xl border border-white/10 bg-white/5 p-4 opacity-60">
+            <div className="flex items-center gap-2 mb-2">
+              <svg className="w-4 h-4 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+              </svg>
+              <label className="block text-sm font-medium text-white/40">Meet the Owner</label>
+            </div>
+            <div className="mt-1 h-10 rounded-lg bg-white/5" />
+            <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-os-dark-900/60">
+              <UpgradeCTA feature="Meet the Owner Video" variant="inline" />
             </div>
           </div>
         )}

@@ -76,6 +76,12 @@ export default function ListingDetailPage() {
   const [reviewSort, setReviewSort] = useState<'newest' | 'highest' | 'lowest'>('newest');
   const [showCallModal, setShowCallModal] = useState(false);
   const [phoneCopied, setPhoneCopied] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [polls, setPolls] = useState<any[]>([]);
+  const [pollResponses, setPollResponses] = useState<Record<string, Record<string, any>>>({});
+  const [submittingPoll, setSubmittingPoll] = useState<string | null>(null);
+  const [pollMessage, setPollMessage] = useState<{ pollId: string; text: string; type: 'success' | 'error' } | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -95,6 +101,11 @@ export default function ListingDetailPage() {
         fetch(`/api/directory/reviews?listing_id=${data.id}`)
           .then(r => r.json())
           .then(d => { setReviews(d.reviews || []); setReviewStats({ total: d.total, average_rating: d.average_rating }); })
+          .catch(() => {});
+        // Load polls
+        fetch(`/api/directory/addons/polls?listing_id=${data.id}`)
+          .then(r => r.json())
+          .then(d => setPolls(d.polls || []))
           .catch(() => {});
       }
       setLoading(false);
@@ -141,6 +152,35 @@ export default function ListingDetailPage() {
     }
     setSubmittingReview(false);
     setTimeout(() => setReviewMessage(''), 4000);
+  };
+
+  const submitPollResponse = async (pollId: string) => {
+    if (!listing) return;
+    const answers = pollResponses[pollId];
+    if (!answers || Object.keys(answers).length === 0) {
+      setPollMessage({ pollId, text: 'Please answer at least one question.', type: 'error' });
+      setTimeout(() => setPollMessage(null), 3000);
+      return;
+    }
+    setSubmittingPoll(pollId);
+    const res = await fetch('/api/directory/addons/polls', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ listing_id: listing.id, poll_id: pollId, answers }),
+    });
+    if (res.ok) {
+      setPollMessage({ pollId, text: 'Thanks for your feedback!', type: 'success' });
+      setPollResponses(prev => { const next = { ...prev }; delete next[pollId]; return next; });
+      // Reload polls to update response count
+      fetch(`/api/directory/addons/polls?listing_id=${listing.id}`)
+        .then(r => r.json())
+        .then(d => setPolls(d.polls || []))
+        .catch(() => {});
+    } else {
+      setPollMessage({ pollId, text: 'Failed to submit. Please try again.', type: 'error' });
+    }
+    setSubmittingPoll(null);
+    setTimeout(() => setPollMessage(null), 4000);
   };
 
   if (loading) {
@@ -362,6 +402,60 @@ export default function ListingDetailPage() {
               </motion.div>
             )}
 
+            {/* Meet the Owner — Premium tier only */}
+            {listing.tier === 'premium' && listing.is_claimed && listing.metadata?.owner_video_url && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.09 }}
+                className="rounded-2xl border border-gold/20 overflow-hidden"
+                style={{ background: 'rgba(201,168,76,0.04)' }}
+                data-testid="meet-the-owner"
+              >
+                <div className="flex items-center gap-2 px-4 py-3 border-b border-gold/10">
+                  <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                  </svg>
+                  <span className="text-xs font-heading font-semibold text-gold uppercase tracking-wider">
+                    Meet {listing.metadata.owner_name ? listing.metadata.owner_name : 'the Owner'}
+                  </span>
+                </div>
+                {listing.metadata.owner_bio && (
+                  <div className="px-4 py-3 border-b border-gold/5">
+                    <p className="text-xs text-white/60 font-body leading-relaxed">{listing.metadata.owner_bio}</p>
+                  </div>
+                )}
+                <div className="relative aspect-video">
+                  {listing.metadata.owner_video_url.includes('youtube.com') || listing.metadata.owner_video_url.includes('youtu.be') ? (
+                    <iframe
+                      src={listing.metadata.owner_video_url.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/')}
+                      className="w-full h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      title={`Meet the owner of ${listing.business_name}`}
+                    />
+                  ) : listing.metadata.owner_video_url.includes('vimeo.com') ? (
+                    <iframe
+                      src={listing.metadata.owner_video_url.replace('vimeo.com/', 'player.vimeo.com/video/')}
+                      className="w-full h-full"
+                      allow="autoplay; fullscreen; picture-in-picture"
+                      allowFullScreen
+                      title={`Meet the owner of ${listing.business_name}`}
+                    />
+                  ) : (
+                    <video
+                      src={listing.metadata.owner_video_url}
+                      controls
+                      className="w-full h-full object-cover"
+                      poster={listing.cover_image_url || undefined}
+                    >
+                      Your browser does not support the video tag.
+                    </video>
+                  )}
+                </div>
+              </motion.div>
+            )}
+
             {/* Photo Gallery */}
             {photos.length > 0 && (
               <motion.div
@@ -372,13 +466,23 @@ export default function ListingDetailPage() {
                 style={{ background: 'rgba(255,255,255,0.03)' }}
                 data-testid="photo-gallery"
               >
-                {/* Main Photo */}
-                <div className="relative aspect-video">
+                {/* Main Photo — click to open lightbox */}
+                <div
+                  className="relative aspect-video cursor-pointer group"
+                  onClick={() => { setLightboxIndex(activePhoto); setLightboxOpen(true); }}
+                >
                   <img
                     src={photos[activePhoto]}
                     alt={`${listing.business_name} photo ${activePhoto + 1}`}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
                   />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 backdrop-blur-sm rounded-full p-3">
+                      <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9m11.25-5.25v4.5m0-4.5h-4.5m4.5 0L15 9m-11.25 11.25v-4.5m0 4.5h4.5m-4.5 0L9 15m11.25 5.25v-4.5m0 4.5h-4.5m4.5 0L15 15" />
+                      </svg>
+                    </div>
+                  </div>
                   {photos.length > 1 && (
                     <div className="absolute bottom-3 right-3 px-2.5 py-1 rounded-full text-xs font-heading font-semibold text-white/80 backdrop-blur-sm" style={{ background: 'rgba(0,0,0,0.6)' }}>
                       {activePhoto + 1} / {photos.length}
@@ -718,6 +822,119 @@ export default function ListingDetailPage() {
               )}
             </motion.div>
 
+            {/* ─── COMMUNITY POLLS ─── */}
+            {polls.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.28 }}
+                className="rounded-2xl border border-white/10 p-6"
+                style={{ background: 'rgba(255,255,255,0.03)' }}
+                data-testid="community-polls"
+              >
+                <div className="flex items-center gap-2 mb-6">
+                  <svg className="w-5 h-5 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />
+                  </svg>
+                  <h3 className="text-sm font-heading font-semibold text-white uppercase tracking-wider">Community Polls</h3>
+                </div>
+
+                <div className="space-y-6">
+                  {polls.map((poll: any) => (
+                    <div key={poll.id} className="rounded-xl border border-white/5 p-4" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                      <div className="flex items-center justify-between mb-4">
+                        <h4 className="text-sm font-heading font-semibold text-gold">{poll.title}</h4>
+                        <span className="text-[10px] text-white/30 font-body">{poll.response_count || 0} responses</span>
+                      </div>
+
+                      {pollMessage?.pollId === poll.id && pollMessage.type === 'success' ? (
+                        <div className="text-center py-6">
+                          <svg className="w-10 h-10 mx-auto mb-2 text-greenline" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                          </svg>
+                          <p className="text-sm text-greenline font-heading font-semibold">{pollMessage.text}</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          {poll.questions?.map((q: any) => (
+                            <div key={q.id}>
+                              <label className="text-xs text-white/70 font-body block mb-2">
+                                {q.text}
+                                {q.required && <span className="text-gold/50 ml-1">*</span>}
+                              </label>
+                              {q.type === 'rating' && (
+                                <div className="flex gap-1">
+                                  {[1, 2, 3, 4, 5].map(s => (
+                                    <button
+                                      key={s}
+                                      onClick={() => setPollResponses(prev => ({
+                                        ...prev,
+                                        [poll.id]: { ...(prev[poll.id] || {}), [q.id]: s }
+                                      }))}
+                                      className="p-1"
+                                    >
+                                      <svg className="w-6 h-6 transition-colors" fill={s <= (pollResponses[poll.id]?.[q.id] || 0) ? '#C9A84C' : 'none'} stroke={s <= (pollResponses[poll.id]?.[q.id] || 0) ? '#C9A84C' : '#555'} strokeWidth={1.5} viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                                      </svg>
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+                              {q.type === 'choice' && q.options && (
+                                <div className="flex flex-wrap gap-2">
+                                  {q.options.map((opt: string) => (
+                                    <button
+                                      key={opt}
+                                      onClick={() => setPollResponses(prev => ({
+                                        ...prev,
+                                        [poll.id]: { ...(prev[poll.id] || {}), [q.id]: opt }
+                                      }))}
+                                      className={`px-3 py-1.5 rounded-full text-xs font-body transition-all ${
+                                        pollResponses[poll.id]?.[q.id] === opt
+                                          ? 'bg-gold/20 text-gold border border-gold/30'
+                                          : 'text-white/40 border border-white/10 hover:text-white/60 hover:border-white/20'
+                                      }`}
+                                    >
+                                      {opt}
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+                              {q.type === 'text' && (
+                                <textarea
+                                  value={pollResponses[poll.id]?.[q.id] || ''}
+                                  onChange={e => setPollResponses(prev => ({
+                                    ...prev,
+                                    [poll.id]: { ...(prev[poll.id] || {}), [q.id]: e.target.value }
+                                  }))}
+                                  placeholder="Share your thoughts..."
+                                  rows={2}
+                                  className="w-full px-3 py-2 rounded-lg text-xs bg-white/5 text-white border border-white/10 focus:outline-none focus:border-gold/30 font-body resize-none placeholder-white/30"
+                                />
+                              )}
+                            </div>
+                          ))}
+
+                          {pollMessage?.pollId === poll.id && pollMessage.type === 'error' && (
+                            <p className="text-xs text-red-400 font-body">{pollMessage.text}</p>
+                          )}
+
+                          <button
+                            onClick={() => submitPollResponse(poll.id)}
+                            disabled={submittingPoll === poll.id}
+                            className="px-5 py-2.5 rounded-xl text-xs font-bold font-heading text-[#0A0A0A] transition-all active:scale-95 hover:scale-[1.03] disabled:opacity-50"
+                            style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C97A)', boxShadow: '0 0 16px rgba(201,168,76,0.3)' }}
+                          >
+                            {submittingPoll === poll.id ? 'Submitting...' : 'Submit Feedback'}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
             {/* Related Businesses */}
             {listing.related?.length > 0 && (
               <motion.div
@@ -1052,6 +1269,90 @@ export default function ListingDetailPage() {
               Powered by GreenLine365
             </p>
           </motion.div>
+        </div>
+      )}
+
+      {/* ─── PHOTO LIGHTBOX ─── */}
+      {lightboxOpen && photos.length > 0 && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          onClick={() => setLightboxOpen(false)}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') setLightboxOpen(false);
+            if (e.key === 'ArrowRight') setLightboxIndex(prev => (prev + 1) % photos.length);
+            if (e.key === 'ArrowLeft') setLightboxIndex(prev => (prev - 1 + photos.length) % photos.length);
+          }}
+          tabIndex={0}
+          role="dialog"
+          aria-label="Photo gallery lightbox"
+        >
+          <div className="absolute inset-0 bg-black/90 backdrop-blur-md" />
+
+          {/* Close */}
+          <button
+            onClick={() => setLightboxOpen(false)}
+            className="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white"
+          >
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+
+          {/* Counter */}
+          <div className="absolute top-4 left-4 z-10 px-3 py-1.5 rounded-full text-xs font-heading font-semibold text-white/80 bg-white/10 backdrop-blur-sm">
+            {lightboxIndex + 1} / {photos.length}
+          </div>
+
+          {/* Previous Arrow */}
+          {photos.length > 1 && (
+            <button
+              onClick={(e) => { e.stopPropagation(); setLightboxIndex(prev => (prev - 1 + photos.length) % photos.length); }}
+              className="absolute left-4 z-10 w-12 h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white"
+            >
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+              </svg>
+            </button>
+          )}
+
+          {/* Main Image */}
+          <motion.img
+            key={lightboxIndex}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.2 }}
+            src={photos[lightboxIndex]}
+            alt={`${listing.business_name} photo ${lightboxIndex + 1}`}
+            className="relative z-[5] max-w-[90vw] max-h-[85vh] object-contain rounded-lg"
+            onClick={(e) => e.stopPropagation()}
+          />
+
+          {/* Next Arrow */}
+          {photos.length > 1 && (
+            <button
+              onClick={(e) => { e.stopPropagation(); setLightboxIndex(prev => (prev + 1) % photos.length); }}
+              className="absolute right-4 z-10 w-12 h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white"
+            >
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+              </svg>
+            </button>
+          )}
+
+          {/* Thumbnail strip */}
+          {photos.length > 1 && (
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-2 p-2 rounded-xl bg-black/50 backdrop-blur-sm max-w-[90vw] overflow-x-auto">
+              {photos.map((photo, i) => (
+                <button
+                  key={i}
+                  onClick={(e) => { e.stopPropagation(); setLightboxIndex(i); }}
+                  className={`flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden border-2 transition-all ${i === lightboxIndex ? 'border-gold scale-105' : 'border-transparent opacity-50 hover:opacity-80'}`}
+                >
+                  <img src={photo} alt="" className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
