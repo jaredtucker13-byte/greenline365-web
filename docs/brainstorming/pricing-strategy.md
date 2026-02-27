@@ -63,11 +63,34 @@ These are sold through email outreach only. NOT on the public pricing page.
   - This needs to be decided BEFORE Email 3 of the outreach sequence can be finalized
 - **DECISION NEEDED: What is the Booking System base price?**
 
-### GL365 Home Ledger
-- Status: Standalone pricing TBD — currently only available as part of Command Center
-- Question: Is there a standalone Home Ledger tier for homeowners/property managers who don't need the full Booking System?
-- If yes, suggested positioning: $29-49/mo standalone, included in all Command Center tiers
-- **DECISION NEEDED: Is Home Ledger a standalone product or bundle-only?**
+### GL365 Home Ledger — DECISION MADE (2026-02-27)
+- **Status: STANDALONE PRODUCT with FREEMIUM model**
+- Home Ledger is a standalone product. Homeowners and property managers can buy it without the Command Center.
+- This creates a **Dual-Sided Marketplace**: B2B (contractors pay for the Command Center) + B2C (homeowners pay for Home Ledger to protect their asset).
+
+#### Freemium Tiers
+
+| Tier | Price | Access | How It's Activated |
+|------|-------|--------|--------------------|
+| Free (Read-Only) | $0/mo | Health Scores visible, Certificates of Success visible, locked Filing Cabinet, locked CPA Export, cannot upload DIY repairs | Activated when a **Verified Greenline Pro** scans the homeowner's property QR code. Homeowner gets their Ledger for free. |
+| Full Access | $29/mo | Full Filing Cabinet, CPA Export, DIY repair uploads, full document storage, invite any contractor to scan QR and log work | Homeowner upgrades via self-serve checkout |
+
+#### Strategic Rationale
+- **"Anti-Hostage" Play:** Homeowners own their data. They can invite ANY contractor to scan their QR code and see the property history. This forces contractors to perform, knowing the homeowner has the data to walk away.
+- **"Home Equity Insurance" Psychology:** Homeowners see this as protecting their investment, not buying software. For $29/mo, every dollar spent on repairs is "Verified" and "Stain-Free" — pays for itself at resale.
+- **Directory Integration:** When a homeowner's asset health drops (e.g., Water Heater at 40%), the Ledger shows a CTA: "Connect with a Verified Greenline Pro." This feeds leads back into the B2B directory — the "Main Thing."
+- **Property Managers:** Per-property pricing. A PM with 50 houses pays $29/mo per property for a portfolio-wide command view.
+
+#### What the Consumer Dashboard Looks Like
+- Stripped-down "Obsidian Silk" luxury aesthetic (dark theme, gold accents)
+- Health Scores per property
+- Certificates of Success (verified repairs)
+- Filing Cabinet (locked on Free, full on Paid)
+- "Connect with a Verified Greenline Pro" button when scores drop
+
+#### Included in Command Center Tiers
+- All Command Center tiers (Tier 1/2/3) include full Home Ledger access at no extra cost.
+- Standalone pricing is for homeowners/property managers who do NOT need the Command Center.
 
 ### Live Local Pulse Add-On
 - Status: Feature gated, pricing TBD

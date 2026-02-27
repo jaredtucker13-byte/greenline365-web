@@ -119,13 +119,117 @@ These are the industries most likely to pay for the Home Ledger:
 
 ---
 
-## OPEN QUESTIONS
-- Is the Home Ledger sold separately or only as part of the Command Center bundle?
-- Is there a standalone pricing tier for Home Ledger only? (e.g., a homeowner who doesn't need the booking system or content calendar)
-- What is the founding member offer for Home Ledger specifically? (Currently only Booking System has a defined founding member offer)
-- Should /home-ledger be built before the first property manager outreach begins?
-- The Filing Cabinet "CPA Export" feature — is this a premium feature or included?
+## DECISIONS MADE (2026-02-27)
+
+### Home Ledger is a STANDALONE PRODUCT with FREEMIUM model
+
+**Decision:** Option 1 — Standalone with a Free plan.
+
+The Home Ledger is NOT bundle-only. It is a standalone B2C product for homeowners and property managers who do NOT need the full Command Center. This creates a **Dual-Sided Marketplace of Trust:**
+- **B2B side:** Contractors pay for the Command Center ("Digital Employee") to handle sales, booking, and liability.
+- **B2C side:** Homeowners pay for the Home Ledger ("Home Health Record") to protect their asset.
+
+---
+
+### STANDALONE PRICING — FREEMIUM TIERS
+
+#### Free Tier (Read-Only) — $0/mo
+**How it's activated:** A Verified Greenline Pro scans the homeowner's property QR code during a service visit. The homeowner automatically receives a free, read-only Home Ledger for that address.
+
+**What's included (Free):**
+- Health Scores visible (per-system breakdown: HVAC, plumbing, roofing, electrical, etc.)
+- Certificates of Success visible (verified repairs completed by Greenline Pros)
+- Stain/Resolution history visible (see what happened and how it was fixed)
+- "Connect with a Verified Greenline Pro" button (feeds leads back to the directory)
+
+**What's locked (Free):**
+- Filing Cabinet (document storage — receipts, warranties, contracts, tax docs)
+- CPA Export (tax-ready document bundles)
+- DIY Repair uploads (homeowner cannot log their own work)
+- Contractor invitation (cannot invite new contractors to scan their QR)
+
+**Psychology:** The homeowner sees their home's "medical chart" for free. They see the scores, the verified work, the history. But they can't upload their own documents or export for taxes. The value is obvious — the upgrade sells itself.
+
+#### Full Access Tier — $29/mo
+**How it's activated:** Homeowner upgrades via self-serve checkout from within their Ledger dashboard.
+
+**What's unlocked:**
+- Full Filing Cabinet — AES-256 encrypted document storage (receipts, warranties, contracts, insurance docs, tax records)
+- CPA Export — one-click tax-ready document bundle for accountants
+- DIY Repair uploads — homeowner can log their own work with photos, dates, costs
+- Contractor Invitation — homeowner can invite ANY contractor to scan their QR and log verified work
+- Full document history with search and filtering
+
+---
+
+### THE "ANTI-HOSTAGE" PLAY
+
+> "If we want to shape the industry by accountability, the homeowner must be the ultimate owner of their home's Medical Record."
+
+If the Ledger is only available through a contractor's subscription, the homeowner is "handcuffed" to the system through a business. By making it standalone:
+- The homeowner pays their own $29/mo and **owns the digital key** to their home.
+- They can invite any contractor to scan their QR code and see the full history.
+- This forces contractors to perform, knowing the homeowner has the data to walk away at any time.
+- No contractor lock-in. No data hostage situations. The homeowner is the gatekeeper.
+
+---
+
+### THE "HOME EQUITY INSURANCE" PSYCHOLOGY
+
+Homeowners will NOT see this as "software." They will see it as **Home Equity Insurance.**
+
+For $29/mo, they ensure that every dollar spent on a roof, a water heater, or an AC unit is:
+- **Verified** — logged by a Greenline Pro with EXIF/GPS-stamped photos
+- **Stain-Free** — every incident has a documented resolution
+- **Tax-Ready** — CPA Export bundles everything for deductions
+
+This pays for itself ten times over when the home is sold. A buyer looking at two identical houses will choose the one with a verified GL365 Home Ledger showing clean history over the one with a folder of crumpled receipts.
+
+---
+
+### THE CONSUMER DASHBOARD
+
+The standalone homeowner dashboard is a stripped-down, beautiful experience:
+- **"Obsidian Silk" aesthetic** — dark theme with gold (#C9A84C) accents, luxury feel
+- **Health Scores** — per-system breakdown with color-coded indicators
+- **Certificates of Success** — verified repair completions
+- **Filing Cabinet** — document storage (locked on Free, full on Paid)
+- **"Connect with a Verified Greenline Pro" button** — appears when any system health drops below threshold
+
+**The directory integration is built in.** When a homeowner's Water Heater health drops to 40%, the Ledger doesn't just show a red light — it shows: **"Connect with a Verified Greenline Pro"** → routes to the GL365 directory. This closes the loop between B2C (homeowner) and B2B (contractor).
+
+---
+
+### PROPERTY MANAGER MODEL
+
+Property managers are a key segment for standalone Home Ledger:
+- **Per-property pricing:** $29/mo per property
+- A PM managing 50 houses pays $29 × 50 = $1,450/mo for portfolio-wide visibility
+- Each property gets its own Ledger with independent health scores
+- PM gets a portfolio dashboard showing all properties, sorted by health
+- Flags "bad actor" technicians — if the same contractor appears on multiple properties with declining scores, the PM sees the pattern
+
+---
+
+### REVENUE MODEL — DUAL-SIDED MARKETPLACE
+
+| Revenue Stream | Payer | What They Get |
+|---------------|-------|---------------|
+| Command Center (Tier 1/2/3) | Contractors & Service Businesses | AI booking, marketing, reputation, property intelligence — the "Digital Employee" |
+| Home Ledger ($29/mo) | Homeowners & Property Managers | Property health tracking, document vault, CPA export — the "Home Health Record" |
+| Directory (Free/$45/$89) | All Businesses | Public listing visibility, reviews, booking CTAs |
+| Transaction Fees ($0.60) | Directory-Only Businesses | Pay per customer interaction (waived for subscribers) |
+
+**The result:** GL365 is not just a service tool. It is a dual-sided marketplace where trust flows in both directions.
+
+---
+
+### REMAINING OPEN QUESTIONS
+- What is the founding member offer for Home Ledger specifically? (Consider: first 100 homeowners get locked-in $19/mo for life?)
+- Should /home-ledger landing page be updated to reflect the freemium model before outreach?
+- The Filing Cabinet "CPA Export" feature — confirmed as Paid-tier only (see above)
 - Incidents module — is digital signature collection already functional?
+- Property manager bulk pricing — is there a volume discount (e.g., 20+ properties = $24/mo each)?
 
 ---
 
