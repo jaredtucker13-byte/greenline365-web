@@ -178,12 +178,44 @@ export async function GET(request: NextRequest) {
 
   // Sort: if user location provided, sort by distance first (then weighted ranking)
   if (userLat && userLng) {
-    listings.sort((a: any, b: any) => {
-      if (a.distance !== null && b.distance !== null) return a.distance - b.distance;
-      if (a.distance !== null) return -1;
-      if (b.distance !== null) return 1;
-      return 0;
-    });
+    // Check if any listings have distance data (geocoded coordinates)
+    const hasDistanceData = listings.some((l: any) => l.distance !== null);
+
+    if (hasDistanceData) {
+      // Sort by actual distance when geocoded coordinates are available
+      listings.sort((a: any, b: any) => {
+        if (a.distance !== null && b.distance !== null) return a.distance - b.distance;
+        if (a.distance !== null) return -1;
+        if (b.distance !== null) return 1;
+        return 0;
+      });
+    } else {
+      // Fallback: use reverse-geocoded city from user coordinates
+      // Determine user's approximate city by checking which city's listings are closest
+      // For now, use the user_city param if available, or boost same-zip listings
+      const userZip = searchParams.get('user_zip');
+      const userCity = searchParams.get('user_city');
+
+      if (userCity || userZip) {
+        // Boost listings from the user's city/zip to the top, then apply weighted ranking
+        listings.sort((a: any, b: any) => {
+          const aMatch = (userCity && a.city?.toLowerCase() === userCity.toLowerCase()) ||
+                         (userZip && a.zip_code === userZip);
+          const bMatch = (userCity && b.city?.toLowerCase() === userCity.toLowerCase()) ||
+                         (userZip && b.zip_code === userZip);
+          if (aMatch && !bMatch) return -1;
+          if (!aMatch && bMatch) return 1;
+          // Within same city/non-city groups, use weighted ranking
+          const aWeight = a.search_weight || 1;
+          const bWeight = b.search_weight || 1;
+          if (aWeight !== bWeight) return bWeight - aWeight;
+          return (b.trust_score || 0) - (a.trust_score || 0);
+        });
+      } else {
+        // No city info available — just use weighted ranking
+        return NextResponse.json(applyWeightedRanking(listings));
+      }
+    }
     return NextResponse.json(listings);
   }
 

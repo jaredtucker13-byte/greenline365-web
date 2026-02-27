@@ -157,6 +157,7 @@ export default function DirectoryClient() {
   const [cityFilter, setCityFilter] = useState('');
   const [maxDistance, setMaxDistance] = useState(0);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [userCity, setUserCity] = useState('');
   const [totalListingCount, setTotalListingCount] = useState(0);
 
   // Exact stat counters — no fake numbers
@@ -177,10 +178,21 @@ export default function DirectoryClient() {
       setLoading(false);
     }).catch(() => setLoading(false));
 
-    // Request geolocation
+    // Request geolocation + reverse geocode to get user's city
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        pos => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        pos => {
+          const { latitude, longitude } = pos.coords;
+          setUserLocation({ lat: latitude, lng: longitude });
+          // Reverse geocode to get city name (uses free OpenStreetMap Nominatim API)
+          fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10`)
+            .then(r => r.json())
+            .then(data => {
+              const city = data?.address?.city || data?.address?.town || data?.address?.village || '';
+              if (city) setUserCity(city);
+            })
+            .catch(() => {});
+        },
         () => {}
       );
     }
@@ -205,7 +217,17 @@ export default function DirectoryClient() {
   }).sort((a, b) => {
     if (sortBy === 'highest') return (b.avg_feedback_rating || 0) - (a.avg_feedback_rating || 0);
     if (sortBy === 'most-reviews') return (b.total_feedback_count || 0) - (a.total_feedback_count || 0);
-    if (sortBy === 'nearest' && userLocation) return (a.distance ?? 9999) - (b.distance ?? 9999);
+    if (sortBy === 'nearest' && userLocation) {
+      // If distance data available, use it
+      if (a.distance != null || b.distance != null) return (a.distance ?? 9999) - (b.distance ?? 9999);
+      // Fallback: boost same-city listings to top
+      if (userCity) {
+        const aMatch = a.city?.toLowerCase() === userCity.toLowerCase();
+        const bMatch = b.city?.toLowerCase() === userCity.toLowerCase();
+        if (aMatch && !bMatch) return -1;
+        if (!aMatch && bMatch) return 1;
+      }
+    }
     return 0;
   });
 
@@ -253,6 +275,7 @@ export default function DirectoryClient() {
           setCityFilter={setCityFilter}
           availableCities={availableCities}
           userLocation={userLocation}
+          userCity={userCity}
           onViewAll={(sub) => { setActiveSubcategory(sub); setShowListings(true); setShowGroupedBrowse(false); }}
           onBack={() => { setShowGroupedBrowse(false); setActiveCategory(''); }}
         />
@@ -833,7 +856,7 @@ function ListingCard({ listing: l, index: i }: { listing: Listing; index: number
 
 
 // ─── Subcategory Carousel Row ──────────────────────────────────────
-function SubcategoryCarouselRow({ label, subtitle, industry, searchTerm, sortBy, cityFilter, userLocation, onViewAll }: {
+function SubcategoryCarouselRow({ label, subtitle, industry, searchTerm, sortBy, cityFilter, userLocation, userCity, onViewAll }: {
   label: string;
   subtitle: string;
   industry: string;
@@ -841,6 +864,7 @@ function SubcategoryCarouselRow({ label, subtitle, industry, searchTerm, sortBy,
   sortBy: string;
   cityFilter: string;
   userLocation: { lat: number; lng: number } | null;
+  userCity: string;
   onViewAll: () => void;
 }) {
   const [items, setItems] = useState<Listing[]>([]);
@@ -857,6 +881,7 @@ function SubcategoryCarouselRow({ label, subtitle, industry, searchTerm, sortBy,
         params.set('lat', String(userLocation.lat));
         params.set('lng', String(userLocation.lng));
       }
+      if (userCity && !cityFilter) params.set('user_city', userCity);
       try {
         const res = await fetch(`/api/directory?${params}`);
         if (!res.ok) throw new Error(`Directory API error: ${res.status}`);
@@ -884,7 +909,7 @@ function SubcategoryCarouselRow({ label, subtitle, industry, searchTerm, sortBy,
       setLoading(false);
     };
     fetchData();
-  }, [industry, searchTerm, sortBy, cityFilter, userLocation?.lat]);
+  }, [industry, searchTerm, sortBy, cityFilter, userLocation?.lat, userCity]);
 
   const scroll = (dir: 'left' | 'right') => {
     if (!scrollRef.current) return;
@@ -971,7 +996,7 @@ function SubcategoryCarouselRow({ label, subtitle, industry, searchTerm, sortBy,
 }
 
 // ─── Grouped Browse View ───────────────────────────────────────────
-function GroupedBrowseView({ activeCategory, sortBy, setSortBy, cityFilter, setCityFilter, availableCities, userLocation, onViewAll, onBack }: {
+function GroupedBrowseView({ activeCategory, sortBy, setSortBy, cityFilter, setCityFilter, availableCities, userLocation, userCity, onViewAll, onBack }: {
   activeCategory: string;
   sortBy: string;
   setSortBy: (s: any) => void;
@@ -979,6 +1004,7 @@ function GroupedBrowseView({ activeCategory, sortBy, setSortBy, cityFilter, setC
   setCityFilter: (s: string) => void;
   availableCities: string[];
   userLocation: { lat: number; lng: number } | null;
+  userCity: string;
   onViewAll: (sub: string) => void;
   onBack: () => void;
 }) {
@@ -1053,6 +1079,7 @@ function GroupedBrowseView({ activeCategory, sortBy, setSortBy, cityFilter, setC
             sortBy={sortBy}
             cityFilter={cityFilter}
             userLocation={userLocation}
+            userCity={userCity}
             onViewAll={() => onViewAll(row.id)}
           />
         ))}
