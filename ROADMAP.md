@@ -638,6 +638,343 @@ Engagement:       ★★★★☆  (photos + shares + invites)
 
 Subtle nudge: "Our Participation score dropped — let's get Mom to play this week."
 
+---
+
+## TV & Cast Mode (Big Screen Experience)
+
+### Concept
+Turn the family TV or computer into the **Game Night command center**. The phone is the remote control; the big screen is the show. No special hardware, no app install — just a URL on any device with a browser.
+
+### How It Works
+1. Host starts a game night on their phone
+2. Taps "Cast to TV" → gets a short URL or QR code (e.g., `/game-night/abc123/tv`)
+3. Opens that URL on the TV's browser (smart TV, Chromecast, laptop → HDMI, Fire Stick browser, etc.)
+4. TV enters **Big Screen Mode** — full-screen, large text, dark background, optimized for 10-foot viewing distance
+5. Phone stays as the controller — enter scores, snap photos, manage players
+6. TV auto-updates in real-time via WebSocket (or SSE/polling fallback)
+
+### What Shows on the TV
+
+#### Pre-Game: "Previously On..." Opener
+- Full-screen cinematic intro with the AI narrative
+- Shows rivalry records, streak stats, last session highlights
+- Background music (optional, toggleable) — subtle game night ambiance
+- Transitions into the scoreboard when the first game starts
+
+#### During Game: Live Scoreboard
+- **Giant scoreboard** with player names, avatars, current scores
+- Score changes animate in (numbers roll up, color flash on updates)
+- **Sound effects** on score entry:
+  - Score update: satisfying "ding"
+  - Take the lead: triumphant horn
+  - Big comeback: dramatic crescendo
+  - Achievement unlocked: badge sound + visual overlay
+  - Streak broken: record scratch
+- **Live AI commentary** scrolls across the bottom like a sports ticker
+- **Turn timer** (optional, for turn-based games): visible countdown with escalating tick sound in the last 10 seconds
+- **Prediction bar** at top: "Tyler 62% | Bella 25% | Dad 13%" — updates live
+
+#### Between Games: Intermission Screen
+- Results from the last game with winner spotlight
+- "MVP so far" highlight
+- Upcoming game announcement
+- Fun stats: "Dad has won 0 games tonight. Historic drought."
+- "Next Game Starts in..." countdown (if host sets a break timer)
+
+#### Post-Game: Evening Recap
+- Full recap on the big screen — scores, photos, badges earned, XP gained
+- Trading card reveal (if MVP card was generated)
+- Group Game Night Score update
+- "Powered by GreenLine365" outro with share CTA QR code
+
+### Which Features Get TV Mode (Logically Scoped)
+
+Not everything belongs on a TV. Here's the logic:
+
+| Feature | TV Mode? | Why |
+|---|---|---|
+| Live Scoreboard | YES | The whole point — big visible scores |
+| Turn Timer | YES | Visible countdown for everyone at the table |
+| AI Commentary | YES | Scrolling ticker — makes everyone laugh |
+| "Previously On..." Opener | YES | Cinematic intro sets the tone |
+| Achievement Unlocked | YES | Badge popup with sound — celebratory moment |
+| Prediction Results | YES | "AI said Tyler... Tyler wins! AI was right!" |
+| Score Entry | NO | Phone only — the host enters scores on their device |
+| Photo Capture | NO | Phone camera only |
+| Player Management | NO | Phone only — add/remove players |
+| Settings/Privacy | NO | Phone only — never on a shared screen |
+| Rivalry Deep Dive | NO | Too detailed for a glance — phone/profile thing |
+| Badge Decay Warnings | NO | Personal — not for the family TV |
+
+### Technical Approach
+- **Route:** `/game-night/[id]/tv` — separate route with TV-optimized layout
+- **No auth required on TV** — the URL is the access token (short-lived, session-scoped)
+- **WebSocket sync** — phone pushes score updates → server → TV receives via WebSocket
+- **SSE fallback** — Server-Sent Events if WebSocket isn't available on the TV browser
+- **Polling last resort** — 2-second polling for the most basic smart TV browsers
+- **Web Audio API** — Sound effects via the browser. Host can mute/adjust volume from phone
+- **CSS for 10ft UI** — Minimum 48px font for scores, 32px for names, high contrast, no tiny text
+- **Auto-dim** — If no activity for 5 minutes, scoreboard dims (screen burn prevention)
+- **Responsive** — Works on 720p, 1080p, and 4K displays
+
+### Database Schema — TV Mode
+```sql
+-- No new tables needed. TV mode reads from existing session data.
+-- One addition to sessions metadata:
+
+sessions.metadata.tv_mode JSONB
+  enabled BOOLEAN DEFAULT false
+  access_token TEXT -- short random token for TV URL auth
+  sound_enabled BOOLEAN DEFAULT true
+  show_predictions BOOLEAN DEFAULT true
+  show_commentary BOOLEAN DEFAULT true
+  theme TEXT DEFAULT 'dark' -- 'dark' | 'neon' | 'classic'
+  timer_default_seconds INT -- null = no timer
+```
+
+---
+
+## Community Leaderboards & Public Game Night Hub
+
+### Concept
+Game Night isn't just a private family thing — it's a **community activity**. Groups that opt in can appear on **public leaderboards**, driving friendly competition between families, friend groups, and neighborhoods across the city. This is GL365's social discovery layer for games.
+
+### The Community Hub (`/community`)
+Central page for all public game activity in the city. Think of it as the "ESPN homepage" for your local game night scene.
+
+#### Sections:
+1. **City Leaderboard** — Top groups ranked by Game Night Score
+2. **This Week's Action** — Active game nights, upcoming tournaments, recent results
+3. **Rising Stars** — New groups climbing the ranks fast
+4. **Rivalry of the Week** — AI-selected most dramatic matchup
+5. **Tournament Corner** — Open registration, brackets in progress, recent champions
+6. **Hall of Fame** — All-time records, legendary moments, top streaks
+
+### Leaderboard Types
+
+| Leaderboard | Metric | Resets |
+|---|---|---|
+| Game Night Score | Composite (frequency, variety, competitiveness, participation, engagement) | Never (all-time) |
+| Monthly MVP | Most XP earned in a calendar month | Monthly |
+| Win Rate Kings | Highest win % (minimum 10 games) | Seasonal |
+| Streak Watch | Current longest active streak (weekly game nights) | Breaks when streak breaks |
+| Most Competitive Rivalry | Closest head-to-head record between two groups | Never |
+| Tournament Champions | Groups with the most tournament wins | Seasonal |
+| New Group of the Month | Highest Game Night Score in first 30 days | Monthly |
+
+### Privacy & Opt-In
+**Nothing is public by default.** Groups must explicitly opt in to community visibility:
+
+- **Private** (default) — Group doesn't appear anywhere public. Stats are internal only.
+- **Leaderboard Only** — Group name + Game Night Score appear on community leaderboards. No details.
+- **Public Profile** — Full group page visible: stats, game history, rivalries, badges. Photos still respect individual privacy toggles.
+
+Toggle in `/account/groups/[id]/settings` → "Community Visibility"
+
+### Public Group Pages (`/community/groups/[slug]`)
+When a group opts into public visibility, they get a shareable page:
+
+```
+Tucker Family Game Night
+  City Rank: #3 in Tampa Bay
+  Game Night Score: 87/100
+  Games Played: 142 (all time)
+  Favorite Game: Monopoly (played 47 times)
+  Active Streak: 6 weeks
+  Members: 5
+
+  Recent Results:
+  ├── Feb 26: Tuckers beat Smiths 2-1 (Monopoly, Uno, Scrabble)
+  ├── Feb 19: Tucker Family Night — Tyler MVP (3 wins)
+  └── Feb 12: Neighborhood Cup Round 2 — Tuckers advance
+
+  Rivalries:
+  └── vs. Smith Family: 14-11 (Tuckers lead)
+
+  Achievements: 🏆 Dynasty, ⚡ Iron Will, 🃏 Variety Pack
+```
+
+### Community Activity Feed
+The `/community` page has a real-time activity feed (opt-in groups only):
+- "The Tucker Family just completed their 6th consecutive weekly game night!"
+- "New rivalry forming: Johnson Crew and Oak Street Gang are 3-3 after tonight"
+- "UPSET: The Smith Kids beat the Parents for the first time in Risk!"
+- "Spring Tournament registration is open — 4 spots left"
+
+### City-Level Aggregation
+Since GL365 is city-focused, leaderboards are scoped by city/region:
+- `/community?city=tampa` — Tampa Bay leaderboard
+- `/community?city=orlando` — Orlando leaderboard
+- Eventually: inter-city championships
+
+### Pages Required
+
+| Page | Purpose | Priority |
+|---|---|---|
+| `/community` | Hub for all public game activity — leaderboards, feed, tournaments | Phase 2.5 |
+| `/community/leaderboards` | Detailed leaderboard views with filters (monthly, all-time, by game) | Phase 2.5 |
+| `/community/groups/[slug]` | Public group profile page (opted-in groups only) | Phase 2.5 |
+| `/community/rivalries` | Top rivalries across the city | Phase 2.75 |
+| `/community/hall-of-fame` | All-time records and legendary moments | Phase 3 |
+
+### Database Schema — Community Leaderboards
+```sql
+-- Group visibility setting (add to groups table)
+groups.community_visibility TEXT DEFAULT 'private' -- 'private' | 'leaderboard' | 'public'
+groups.city TEXT -- 'tampa' | 'orlando' | etc. (for city-scoped boards)
+
+-- Materialized leaderboard (rebuilt nightly or on score change)
+community_leaderboard
+  id UUID PRIMARY KEY
+  group_id UUID REFERENCES groups
+  city TEXT NOT NULL
+  game_night_score INT -- cached composite score
+  total_games INT
+  total_sessions INT
+  win_rate NUMERIC
+  current_streak INT
+  monthly_xp INT
+  rank INT -- computed rank within city
+  period TEXT DEFAULT 'all_time' -- 'all_time' | 'monthly' | 'seasonal'
+  computed_at TIMESTAMPTZ DEFAULT NOW()
+  UNIQUE(group_id, period)
+
+-- Community activity feed (for the real-time feed)
+community_feed
+  id UUID PRIMARY KEY
+  group_id UUID REFERENCES groups (nullable)
+  event_type TEXT -- 'game_completed' | 'streak_milestone' | 'rivalry_update' | 'tournament_result' | 'badge_earned'
+  headline TEXT -- "The Tucker Family completed their 6th straight week!"
+  detail JSONB -- structured data for rich rendering
+  city TEXT
+  created_at TIMESTAMPTZ DEFAULT NOW()
+```
+
+---
+
+## Game Maker Partnership System (QR Scorecards)
+
+### Concept
+Build the infrastructure now so that one day, game makers (Hasbro, Mattel, indie publishers) can integrate directly with GL365. The dream: every board game box includes a GL365 QR code. Scan it, and the game is auto-detected, scoring template loads, and players can photograph the official scorecard to auto-capture results.
+
+### How It Works Today (Without Partnerships)
+
+1. **Manual game selection** — Host picks "Monopoly" from the Game Library
+2. **Manual score entry** — Host types in scores or ranks
+3. **Photo of board** — Optional photo, Gemini Vision extracts what it can (best effort)
+
+### How It Works With Game Maker Integration
+
+1. **QR on game box or scorecard** — Player scans it with their phone
+2. **Auto-detection** — System recognizes the game, loads the correct template
+3. **Official scorecard photo** — Player takes a photo of the game's official paper scorecard
+4. **AI parses the scorecard** — Gemini Vision knows the exact scorecard format for this game
+5. **Scores auto-populate** — Verified and editable before confirming
+6. **Game-specific stats** — Deeper stats unique to each game (Monopoly: properties owned, Scrabble: highest single word, etc.)
+
+### The Partnership API
+
+For game makers who want to integrate:
+
+```
+POST /api/partners/games — Register a new game
+  {
+    name: "Settlers of Catan",
+    publisher: "Catan Studio",
+    scoring_type: "points",
+    win_condition: "first_to_10",
+    scorecard_format: { ... },  // Layout description for AI parsing
+    qr_identifier: "catan-base-2025",  // Encoded in their QR codes
+    stats_schema: {  // Game-specific stats to track
+      "longest_road": "boolean",
+      "largest_army": "boolean",
+      "victory_points": "integer",
+      "resource_totals": "object"
+    }
+  }
+
+GET /api/partners/games/:id/stats — Aggregate anonymized play data
+  Response: {
+    total_plays: 847293,
+    avg_game_length_minutes: 72,
+    avg_players: 3.8,
+    win_condition_distribution: { "points": 62%, "domination": 38% }
+  }
+```
+
+**What game makers get:**
+- Anonymized play data (how many people play their game, avg game length, player counts)
+- Featured placement in the Game Library
+- "Official GL365 Partner" badge on game template
+- Branded scoring experience (their colors, logo on the scoreboard)
+- Analytics dashboard: which cities play their game most, trending up/down
+
+**What GL365 gets:**
+- QR codes in game boxes = free distribution and user acquisition
+- Better score parsing (official scorecard formats → higher accuracy)
+- Revenue from partnership fees (featured placement, data access)
+- Legitimacy as "the platform" for board game tracking
+
+### Scorecard Recognition System
+
+The core tech that makes this work — with or without partnerships:
+
+#### Without Partnership (Community-Trained)
+- Users snap photos of scoreboards/scorecards
+- Gemini Vision does best-effort parsing
+- User confirms/corrects → that correction trains the system
+- Over time, community corrections build a recognition model per game
+- Crowdsourced accuracy: after 100 corrections for Monopoly scorecards, the system gets very good
+
+#### With Partnership (Official Format)
+- Game maker provides the exact scorecard layout
+- AI knows exactly where to look for each player's score
+- Near-perfect accuracy from day one
+- Can read game-specific data (not just final scores)
+
+### Database Schema — Game Maker Partnerships
+```sql
+-- Partner game templates (extends game_templates)
+game_templates.partner_id UUID REFERENCES partners (nullable)
+game_templates.qr_identifier TEXT UNIQUE -- what their QR encodes
+game_templates.scorecard_format JSONB -- layout for AI parsing
+game_templates.stats_schema JSONB -- game-specific stats definition
+game_templates.branding JSONB -- logo_url, primary_color, secondary_color
+
+-- Partner accounts
+partners
+  id UUID PRIMARY KEY
+  name TEXT NOT NULL -- 'Hasbro' | 'Catan Studio' | etc.
+  slug TEXT UNIQUE
+  contact_email TEXT
+  api_key TEXT UNIQUE -- for API access
+  logo_url TEXT
+  tier TEXT DEFAULT 'basic' -- 'basic' | 'premium' | 'enterprise'
+  status TEXT DEFAULT 'pending' -- 'pending' | 'active' | 'suspended'
+  created_at TIMESTAMPTZ DEFAULT NOW()
+
+-- Scorecard recognition training data
+scorecard_scans
+  id UUID PRIMARY KEY
+  game_template_id UUID REFERENCES game_templates
+  image_url TEXT -- the photo
+  raw_ai_result JSONB -- what Gemini returned
+  user_corrected JSONB -- what the user fixed (null if AI was correct)
+  was_correct BOOLEAN -- did AI get it right?
+  session_game_id UUID REFERENCES session_games
+  created_at TIMESTAMPTZ DEFAULT NOW()
+```
+
+### Revenue from Partnerships
+
+| Tier | Price | What They Get |
+|---|---|---|
+| Basic | Free | Game in library, community QR support, basic analytics |
+| Premium | $500/mo | Official scorecard format, featured placement, full analytics |
+| Enterprise | Custom | Co-branded experience, exclusive promotions, API access |
+
+This is a **long-term play**. Build the scanning and template infrastructure now. Partnerships come when GL365 has critical mass.
+
 ### Database Schema — Gamification
 ```sql
 -- XP and leveling
@@ -717,18 +1054,25 @@ seasonal_events
 
 ---
 
-## Pages Required (Full Game Night System)
+## Pages Required (Full Platform)
 
 | Page | Purpose | Priority |
 |---|---|---|
 | `/account/groups` | Manage all your groups (family, friends, etc.) | Phase 2 |
 | `/account/groups/[id]` | Group detail: members, stats, history, invite link | Phase 2 |
+| `/account/groups/[id]/settings` | Group settings: community visibility, privacy | Phase 2 |
 | `/account/family` | Manage child sub-profiles under parent account | Phase 2 |
 | `/account/family/[memberId]` | Child profile: all-time stats, badges, game history | Phase 2.5 |
 | `/game-night` | Start a game night: pick game, select players, invite groups | Phase 2.5 |
 | `/game-night/[id]` | Active session: score entry, photos, live scoreboard, controls | Phase 2.5 |
+| `/game-night/[id]/tv` | TV/Cast Mode: full-screen scoreboard for big screens | Phase 2.5 |
 | `/game-night/[id]/recap` | AI recap with photos, stats, shareable video collage | Phase 2.5 |
 | `/recap/[id]` | Public shareable recap (privacy-enforced) | Phase 2.5 |
+| `/community` | Public hub: leaderboards, activity feed, tournaments, hall of fame | Phase 2.5 |
+| `/community/leaderboards` | Detailed leaderboard views with filters (monthly, all-time, by game) | Phase 2.5 |
+| `/community/groups/[slug]` | Public group profile page (opted-in groups only) | Phase 2.5 |
+| `/community/rivalries` | Top rivalries across the city | Phase 2.75 |
+| `/community/hall-of-fame` | All-time records and legendary moments | Phase 3 |
 | `/tournaments` | Browse/create tournaments | Phase 3 |
 | `/tournaments/[id]` | Tournament bracket, schedule, results | Phase 3 |
 | `/invite/[code]` | Accept a group/game night invite (creates account if needed) | Phase 2.5 |
@@ -930,6 +1274,24 @@ Leagues drive venue traffic. The Directory is the foundation.
 - [ ] Rivalry tracking between players and groups (`rivalries` table)
 - [ ] Streak system (weekly streaks, rivalry records, monthly MVPs)
 - [ ] Game Night Score (group health metric)
+- [ ] **TV/Cast Mode** (`/game-night/[id]/tv`) — full-screen scoreboard for big screens
+  - [ ] WebSocket sync: phone controls → server → TV display
+  - [ ] 10ft UI: giant scores, player avatars, high-contrast dark theme
+  - [ ] Sound effects via Web Audio API (score ding, lead change horn, achievement unlock)
+  - [ ] Turn timer with visual countdown and escalating tick sound
+  - [ ] "Previously On..." cinematic opener on TV
+  - [ ] Live AI commentary scrolling ticker
+  - [ ] Between-game intermission screen (results, MVP, fun stats)
+  - [ ] Evening recap display with trading card reveals
+  - [ ] Auto-dim for screen burn prevention
+  - [ ] No auth on TV — session-scoped access token in URL
+- [ ] **Community Hub** (`/community`) — public game night activity center
+  - [ ] City leaderboard — top groups by Game Night Score
+  - [ ] Activity feed — real-time events from opted-in groups
+  - [ ] Rising stars, rivalry of the week, tournament corner
+  - [ ] Community visibility opt-in for groups (private/leaderboard/public)
+- [ ] **Community Leaderboards** (`/community/leaderboards`) — filtered views (monthly, all-time, by game)
+- [ ] **Public Group Pages** (`/community/groups/[slug]`) — shareable group profiles for opted-in groups
 
 ### Phase 2.75: Gamification Polish
 - [ ] Game Night Modifiers / Spice Wheel (optional twists before each game)
@@ -938,6 +1300,9 @@ Leagues drive venue traffic. The Directory is the foundation.
 - [ ] Seasonal leaderboard resets with special badges
 - [ ] Card collection gallery on player profiles
 - [ ] Rivalry narrative generation (AI-written sports journalist style)
+- [ ] Community rivalries page (`/community/rivalries`)
+- [ ] Scorecard photo scanning — Gemini Vision best-effort parsing for any game
+- [ ] User correction training loop — corrections improve future accuracy per game
 
 ### Phase 3: Tournaments & Leagues
 - [ ] Tournament creation flow (format, game, registration)
@@ -949,6 +1314,18 @@ Leagues drive venue traffic. The Directory is the foundation.
 - [ ] AI match recap generation
 - [ ] Poker ledger (buy-in/cashout tracking)
 - [ ] Championship escalation: family → cross-family → neighborhood → city
+- [ ] Community Hall of Fame (`/community/hall-of-fame`) — all-time records, legendary moments
+
+### Phase 3.5: Game Maker Partnerships & Scorecard Intelligence
+- [ ] Partner registration system (`partners` table)
+- [ ] Partner API endpoints (register games, get anonymized play data)
+- [ ] QR code scanning — scan game box QR to auto-detect and load game template
+- [ ] Official scorecard format integration — AI knows exact layout for partner games
+- [ ] Game-specific stats schemas (Monopoly properties, Scrabble word scores, etc.)
+- [ ] Partner branding on scoring experience (logo, colors)
+- [ ] Partner analytics dashboard (play counts, city distribution, trending data)
+- [ ] Scorecard recognition training pipeline — community corrections improve accuracy
+- [ ] Featured game placement in Game Library for Premium/Enterprise partners
 
 ### Phase 4: Loops MVP
 - [ ] Loop template creator
