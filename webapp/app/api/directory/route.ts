@@ -66,10 +66,22 @@ function applyPhotoGating(listing: any) {
   };
 }
 
-/** Sort listings by weighted ranking: Property Intelligence > Paid tiers > Free */
+/** Check if a listing has an active featured boost add-on */
+function hasFeaturedBoost(listing: any): boolean {
+  const boost = listing.metadata?.addons?.featured_boost;
+  if (!boost?.active || !boost?.expires_at) return false;
+  return new Date(boost.expires_at) > new Date();
+}
+
+/** Sort listings by weighted ranking: Featured Boost > Property Intelligence > Paid tiers > Free */
 function applyWeightedRanking(listings: any[]) {
   return listings.sort((a, b) => {
-    // Property Intelligence badge holders first
+    // Featured Boost holders first (paid marketplace add-on)
+    const aFeatured = hasFeaturedBoost(a);
+    const bFeatured = hasFeaturedBoost(b);
+    if (aFeatured && !bFeatured) return -1;
+    if (!aFeatured && bFeatured) return 1;
+    // Property Intelligence badge holders next
     if (a.has_property_intelligence && !b.has_property_intelligence) return -1;
     if (!a.has_property_intelligence && b.has_property_intelligence) return 1;
     // Then by search weight (premium > pro > free)
