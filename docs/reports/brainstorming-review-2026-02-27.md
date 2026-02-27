@@ -53,6 +53,8 @@
 
 **Verdict:** The email plumbing exists but it's manual-only. The entire automation layer (trigger → schedule → track → tag) is missing. This blocks the founding member funnel.
 
+**New requirement (2026-02-27):** The $400 Digital Infrastructure Audit pipeline is already built as a manual workflow. The email sequence needs a CTA where businesses can **request** the audit — it's a free value bomb to drive email engagement, not pushed unsolicited. Jared manually runs the audit per company, saves it, and attaches it to the outreach email.
+
 ---
 
 ### 3. Live Local Pulse — 55% Built
@@ -197,16 +199,21 @@ Based on CLAUDE.md priorities, revenue impact, and dependency chains:
 
 ---
 
-## V. OPEN QUESTIONS FOR JARED
+## V. DECISIONS RESOLVED (2026-02-27 — Jared)
 
-These decisions block implementation:
+| # | Question | Answer |
+|---|----------|--------|
+| 1 | Booking System base monthly price | **$1,500/mo** (Operator tier in `docs/specs/pricing.md`). Founding members get $500 off = **$1,000/mo for life** |
+| 2 | Canonical pricing model | **`docs/specs/pricing.md` is the SOT**. Operator $1,500 / Commander $2,500 / Sovereign $3,500. Jared doesn't love the tier names — open to renaming |
+| 3 | Home Ledger standalone or bundle? | **Standalone product** — separate pricing, not bundle-only |
+| 4 | 50-spot founding member cap | **Total across all categories** — not per-category |
+| 5 | Founding member verification | **First come, first serve** — no verification gate |
+| 6 | $400 Digital Infrastructure Audit | **Pipeline is built**. Manual workflow — Jared starts it per company, saves audit, attaches to email. The email sequence should include a way for businesses to **request** the audit (value bomb to drive email engagement, not pushed unsolicited) |
 
-1. **What is the Booking System base monthly price?** (Blocks Email 3 and founding member math)
-2. **Is the Operator/Commander/Sovereign pricing in `docs/specs/pricing.md` the final model?** (Conflicts with Starter/Growth/Scale from Gemini PRD)
-3. **Is Home Ledger standalone or bundle-only?** (Affects pricing page and outreach)
-4. **Should the 50-spot founding member cap be per-category or total?**
-5. **How should founding member verification work?** (Business license? Phone call? Self-serve?)
-6. **Is the $400 Digital Infrastructure Audit tripwire (from master-spec) active?**
+### Still Open
+- **Tier name alternatives** — Jared doesn't like Operator/Commander/Sovereign. Needs new names.
+- **Home Ledger standalone price** — Confirmed standalone, but what's the monthly rate? (`pricing-strategy.md` suggests $29-49/mo)
+- **Live Local Pulse pricing** — Standalone add-on or tier-included?
 
 ---
 
