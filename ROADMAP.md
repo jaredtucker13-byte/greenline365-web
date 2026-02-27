@@ -207,6 +207,113 @@ Even without paying, AI pulls this data to be the ultimate local resource:
 
 ---
 
+## Family Profiles & Child Privacy System
+
+### Concept
+Parents manage the whole family from one account. Kids who don't have phones get **sub-profiles** under the parent — like Netflix profiles. The parent's phone is the controller. Each child gets their own QR code, avatar, stats, and game history without ever needing an email, phone, or account.
+
+### How Child Profiles Work
+1. Parent goes to `/account/family` → taps "Add Family Member"
+2. Enters child's name and age
+3. Takes a photo (becomes avatar + optional face vector for auto-tagging in photos/videos)
+4. System generates a permanent QR code for that child
+5. QR can be printed on a card, stuck on a phone case, or shown from parent's phone
+6. Child never needs an account, email, or device
+
+### Privacy & Consent (COPPA-Aware)
+Before creating a child profile, parent sees a **clear consent modal**:
+
+**What GL365 does:**
+- Stores the photo as the child's avatar
+- Uses facial recognition ONLY to auto-tag the child in the family's own game night photos/videos (if toggled ON)
+- Keeps all data within the parent's family account
+
+**What GL365 NEVER does:**
+- Sells, shares, or transfers any child data
+- Uses child photos for advertising or training
+- Allows anyone outside the family group to see child profiles
+- Retains data after the parent deletes the profile
+
+### Parent Controls (Per Child, Toggleable Anytime)
+- **Face Auto-Tagging** — ON/OFF. If OFF, child plays and scores count, but AI won't scan for their face in group photos
+- **Include in AI Recaps** — ON/OFF. If OFF, recap mentions them by name but won't show their face in video collages
+- **Social Sharing** — ON/OFF. If OFF, child's profile/stats excluded when parent shares to social media
+- **Delete All Data** — Nuclear option. Wipes child's profile, photos, face vector, and all stats permanently and immediately
+
+### Database Schema
+```sql
+family_members
+  id UUID PRIMARY KEY
+  parent_user_id UUID REFERENCES auth.users NOT NULL
+  display_name TEXT NOT NULL
+  age INT
+  avatar_url TEXT
+  face_vector JSONB -- opt-in, stored only if parent consents
+  qr_code TEXT UNIQUE -- permanent QR for check-ins
+  privacy_settings JSONB DEFAULT '{"face_tagging": true, "ai_recaps": true, "social_sharing": false}'
+  consent_granted_at TIMESTAMPTZ NOT NULL -- when parent accepted consent
+  created_at TIMESTAMPTZ DEFAULT NOW()
+```
+
+### Pages Required (5 new pages total)
+| Page | Purpose |
+|---|---|
+| `/account/family` | Manage family members, add/edit/remove child profiles, view QR codes |
+| `/game-night` | Start a new game night: pick a game, select players from family list |
+| `/game-night/[id]` | Active session: score entry, photo capture, live scoreboard |
+| `/game-night/[id]/recap` | AI-generated recap with photos, stats, shareable video collage |
+| `/account/family/[memberId]` | Individual profile: all-time stats, badges, game history |
+
+Plus: extend existing `/account/settings` with per-child privacy toggles.
+
+---
+
+## Game Night Session Management
+
+### Flexibility Rules
+Game nights must be **completely flexible** — no rigid flows. The host controls everything:
+
+- **Start** a game night anytime (no scheduling required)
+- **Pause** mid-game (dinner break, someone has to leave, etc.)
+- **Resume** where you left off
+- **Cancel** at any point — scores from that session are discarded (with confirmation)
+- **Reset** a game in progress — start fresh without creating a new session
+- **End early** — partial game still counts, stats still update
+- **Rematch** — one-tap to start the same game with the same players
+- **Switch games** — mid-session, swap from Monopoly to Uno without ending the night
+- **Add/remove players** mid-game — someone shows up late or leaves early
+
+### Session States
+```
+draft → active → paused → active → completed
+                     ↓                    ↓
+                  canceled            recap generated
+```
+
+### Game Night Flow (From Parent's Phone)
+1. Parent opens `/game-night` → taps "New Game Night"
+2. Picks the game (Monopoly, Uno, Scrabble, Poker, custom, etc.)
+3. Selects players from family list (tap to add — no QR scanning needed at home)
+4. Game starts — parent's phone becomes the scoreboard
+5. During play: snap photos anytime (auto-tagged if consent given)
+6. Game ends: enter final scores (or snap the board for AI parsing)
+7. AI generates recap: "Tyler destroyed Bella in Monopoly for the 3rd straight week."
+8. Parent can share recap to social media (respecting each child's privacy toggles)
+
+### Multi-Game Nights
+A single "Game Night" session can contain **multiple games**:
+```
+Thursday Game Night (Feb 27)
+├── Game 1: Uno (7:00 PM) — Winner: Bella
+├── Game 2: Monopoly (7:45 PM) — Winner: Tyler (by bankruptcy)
+└── Game 3: Scrabble (9:15 PM) — Winner: Mom
+Overall MVP: Tyler (2 wins)
+```
+
+The AI recap covers the whole evening, not just one game.
+
+---
+
 ## Shared Infrastructure: The Universal Primitives
 
 ### The Session (Universal Container)
@@ -332,18 +439,33 @@ Leagues drive venue traffic. The Directory is the foundation.
 
 ### Phase 1: Shore Up the Sellable Product (NOW)
 - [x] Click-to-call modal
-- [ ] Support page
-- [ ] Portal video URL field (Premium)
-- [ ] Blast Deals consumer browse page
-- [ ] Community & Civic category expansion
+- [x] Support page (FAQ, contact form, quick links)
+- [x] Portal video URL field (Premium tier, metadata JSONB)
+- [x] Blast Deals consumer browse page (`/deals`)
+- [x] Community & Civic category expansion (8 new categories)
 - [ ] Portal onboarding validation
+- [ ] Review responses UI in business portal
+- [ ] Analytics charts for paid tiers
 
 ### Phase 2: Identity & Session Foundation
 - [ ] `identity_passports` table + migration
+- [ ] `family_members` table + migration (child profiles with privacy settings)
 - [ ] `sessions` + `session_participants` tables
 - [ ] `leagues` table
 - [ ] Universal QR code generation (extends blast deals QR)
 - [ ] Identity Passport profile page
+- [ ] Family management page (`/account/family`)
+- [ ] Consent & privacy modal for child profiles
+
+### Phase 2.5: Game Night MVP (Free Tier Funnel)
+- [ ] Game Night start page (`/game-night`)
+- [ ] Active session page (`/game-night/[id]`) — score entry, photos, live scoreboard
+- [ ] Session controls: pause, resume, cancel, reset, rematch, switch game
+- [ ] Multi-game support within one session
+- [ ] AI recap generation (`/game-night/[id]/recap`)
+- [ ] Family member stats page (`/account/family/[memberId]`)
+- [ ] Per-child privacy toggles in account settings
+- [ ] Social sharing with child privacy enforcement
 
 ### Phase 3: League MVP
 - [ ] Commissioner setup flow
@@ -351,7 +473,6 @@ Leagues drive venue traffic. The Directory is the foundation.
 - [ ] Manual score entry
 - [ ] Leaderboard component
 - [ ] AI match recap generation
-- [ ] Game Night mode (board games, card games)
 - [ ] Poker ledger (buy-in/cashout tracking)
 
 ### Phase 4: Loops MVP
