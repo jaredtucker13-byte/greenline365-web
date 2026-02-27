@@ -214,7 +214,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           {post.category && (
             <div 
               className="text-sm font-semibold mb-4 uppercase tracking-wide"
-              style={{ color: style?.colors?.primary || '#C9A96E' }}
+              style={{ color: style?.colors?.primary || '#C9A84C' }}
             >
               {post.category}
             </div>
@@ -302,7 +302,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                   key={tag}
                   className="px-3 py-1 rounded-full text-xs"
                   style={{
-                    backgroundColor: `${style?.colors?.primary || '#C9A96E'}10`,
+                    backgroundColor: `${style?.colors?.primary || '#C9A84C'}10`,
                     color: style?.colors?.textMuted || '#666',
                   }}
                 >
@@ -316,10 +316,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           <div 
             className="mt-16 p-8 rounded-2xl text-center"
             style={{
-              backgroundColor: `${style?.colors?.primary || '#C9A96E'}10`,
+              backgroundColor: `${style?.colors?.primary || '#C9A84C'}10`,
               borderWidth: '1px',
               borderStyle: 'solid',
-              borderColor: `${style?.colors?.primary || '#C9A96E'}20`,
+              borderColor: `${style?.colors?.primary || '#C9A84C'}20`,
             }}
           >
             <h3 
@@ -337,7 +337,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             <Link
               href="/"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-white transition hover:opacity-90"
-              style={{ backgroundColor: style?.colors?.primary || '#C9A96E' }}
+              style={{ backgroundColor: style?.colors?.primary || '#C9A84C' }}
             >
               Get Started Free
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

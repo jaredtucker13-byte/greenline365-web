@@ -2,5 +2,15 @@
   "framework": "nextjs",
   "buildCommand": "yarn build",
   "installCommand": "yarn install",
-  "outputDirectory": ".next"
+  "outputDirectory": ".next",
+  "crons": [
+    {
+      "path": "/api/cron/trend-scanner",
+      "schedule": "0 */3 * * *"
+    },
+    {
+      "path": "/api/cron/orchestrator",
+      "schedule": "0 * * * *"
+    }
+  ]
 }

@@ -35,7 +35,7 @@ export async function GET(
   const allPhotos: string[] = listing.gallery_images || [];
   const industry = listing.industry || 'services';
   const placeholder = getPlaceholderImage(industry);
-  const claimable = isClaimable(listing.business_name || '');
+  const claimable = isClaimable(listing.business_name || '', industry);
 
   // Non-claimable: show photos freely
   const isFreeOrUnclaimed = claimable && (tier === 'free' || !isClaimed);
@@ -55,6 +55,17 @@ export async function GET(
     .neq('id', listing.id)
     .limit(4);
 
+  // Fetch menu data if available (Pro/Premium only)
+  let menuData = null;
+  if (tier !== 'free' && isClaimed) {
+    const { data: menu } = await supabase
+      .from('listing_menus')
+      .select('sections')
+      .eq('listing_id', listing.id)
+      .single();
+    if (menu?.sections) menuData = menu.sections;
+  }
+
   return NextResponse.json({
     ...listing,
     gallery_images: visiblePhotos,
@@ -67,5 +78,6 @@ export async function GET(
     is_claimable: claimable,
     directory_badges: (listing.directory_badges || []).filter((b: any) => b.is_active),
     related: related || [],
+    menu: menuData,
   });
 }

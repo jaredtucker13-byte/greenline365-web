@@ -154,7 +154,7 @@ export default function BusinessDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-midnight-900 flex items-center justify-center pt-20">
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center pt-20">
         <div className="flex items-center gap-3">
           <div className="w-5 h-5 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
           <span className="text-white/50 font-body text-sm">Loading dashboard...</span>
@@ -166,7 +166,7 @@ export default function BusinessDashboard() {
   // No listings — show claim or register prompt
   if (listings.length === 0) {
     return (
-      <div className="min-h-screen bg-midnight-900 pt-24 px-6">
+      <div className="min-h-screen bg-[#0A0A0A] pt-24 px-6">
         <div className="max-w-2xl mx-auto text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <div className="w-20 h-20 mx-auto mb-6 rounded-2xl border border-gold/20 bg-gold/5 flex items-center justify-center">
@@ -183,8 +183,8 @@ export default function BusinessDashboard() {
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link
                 href="/"
-                className="px-6 py-3 rounded-xl text-sm font-semibold font-heading text-midnight-900 transition-all hover:scale-[1.02]"
-                style={{ background: 'linear-gradient(135deg, #C9A96E, #E6D8B5)' }}
+                className="px-6 py-3 rounded-xl text-sm font-semibold font-heading text-[#0A0A0A] transition-all hover:scale-[1.02]"
+                style={{ background: 'linear-gradient(135deg, #C9A84C, #E6D8B5)' }}
                 data-testid="find-listing-btn"
               >
                 Find My Business in Directory
@@ -207,7 +207,7 @@ export default function BusinessDashboard() {
   const tierFeatures = TIER_FEATURES[tier];
 
   return (
-    <div className="min-h-screen bg-midnight-900 pt-24 pb-16 px-6" data-testid="business-dashboard">
+    <div className="min-h-screen bg-[#0A0A0A] pt-24 pb-16 px-6" data-testid="business-dashboard">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
@@ -229,7 +229,7 @@ export default function BusinessDashboard() {
               <span
                 className="px-3 py-1.5 rounded-full text-xs font-heading font-bold uppercase tracking-wider"
                 style={{
-                  background: tier === 'premium' ? 'linear-gradient(135deg, #C9A96E, #E6D8B5)' : tier === 'pro' ? 'linear-gradient(135deg, #3B82F6, #60A5FA)' : 'rgba(255,255,255,0.1)',
+                  background: tier === 'premium' ? 'linear-gradient(135deg, #C9A84C, #E6D8B5)' : tier === 'pro' ? 'linear-gradient(135deg, #3B82F6, #60A5FA)' : 'rgba(255,255,255,0.1)',
                   color: tier === 'free' ? '#A8A9AD' : '#0D1B2A',
                 }}
                 data-testid="current-tier-badge"
@@ -303,10 +303,10 @@ export default function BusinessDashboard() {
                     <span className="text-6xl font-heading font-light text-white/10">{activeListing?.business_name[0]}</span>
                   </div>
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-midnight-900/80 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A]/80 to-transparent" />
                 <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
                   <div>
-                    <span className="text-[10px] px-2 py-1 rounded-full backdrop-blur-sm capitalize font-body bg-midnight-900/70 text-white/60">
+                    <span className="text-[10px] px-2 py-1 rounded-full backdrop-blur-sm capitalize font-body bg-[#0A0A0A]/70 text-white/60">
                       {activeListing?.industry?.replace(/-/g, ' ')}
                     </span>
                   </div>
@@ -405,8 +405,8 @@ export default function BusinessDashboard() {
                       <button
                         onClick={handleSave}
                         disabled={saving}
-                        className="px-6 py-3 rounded-xl text-sm font-bold font-heading text-midnight-900 transition-all hover:scale-[1.02] disabled:opacity-50"
-                        style={{ background: 'linear-gradient(135deg, #C9A96E, #E6D8B5)' }}
+                        className="px-6 py-3 rounded-xl text-sm font-bold font-heading text-[#0A0A0A] transition-all hover:scale-[1.02] disabled:opacity-50"
+                        style={{ background: 'linear-gradient(135deg, #C9A84C, #E6D8B5)' }}
                         data-testid="save-btn"
                       >
                         {saving ? 'Saving...' : 'Save Changes'}
@@ -464,7 +464,7 @@ export default function BusinessDashboard() {
                     </div>
                     {/* Rating */}
                     <div className="flex items-center gap-3 pt-2">
-                      <div className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold" style={{ background: 'rgba(201,169,110,0.12)', color: '#C9A96E' }}>
+                      <div className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold" style={{ background: 'rgba(201,169,110,0.12)', color: '#C9A84C' }}>
                         <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
                         {activeListing?.avg_feedback_rating ? activeListing.avg_feedback_rating.toFixed(1) : 'New'}
                       </div>
@@ -499,7 +499,7 @@ export default function BusinessDashboard() {
                     <div key={i} className="relative aspect-square rounded-xl overflow-hidden border border-white/5">
                       <img src={img} alt={`Photo ${i + 1}`} className="w-full h-full object-cover" />
                       {((tier === 'free' && i >= 1) || (tier === 'pro' && i >= 2)) && (
-                        <div className="absolute inset-0 bg-midnight-900/80 flex items-center justify-center backdrop-blur-sm">
+                        <div className="absolute inset-0 bg-[#0A0A0A]/80 flex items-center justify-center backdrop-blur-sm">
                           <svg className="w-5 h-5 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
                           </svg>
@@ -570,8 +570,8 @@ export default function BusinessDashboard() {
                   )}
                   <button
                     onClick={() => handleUpgrade('premium')}
-                    className="w-full px-4 py-3 rounded-xl text-sm font-bold font-heading text-midnight-900 transition-all hover:scale-[1.02]"
-                    style={{ background: 'linear-gradient(135deg, #C9A96E, #E6D8B5)' }}
+                    className="w-full px-4 py-3 rounded-xl text-sm font-bold font-heading text-[#0A0A0A] transition-all hover:scale-[1.02]"
+                    style={{ background: 'linear-gradient(135deg, #C9A84C, #E6D8B5)' }}
                     data-testid="upgrade-premium-btn"
                   >
                     {tier === 'free' ? 'Upgrade to Premium — $89/mo' : 'Upgrade to Premium — $89/mo'}

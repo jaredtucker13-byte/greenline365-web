@@ -1220,7 +1220,7 @@ export default function BlogPolishPage() {
         osc2.stop(audioContext.currentTime + 0.3);
       }, 150);
     } catch (e) {
-      console.log('Could not play notification sound');
+      // Audio not supported in this browser
     }
   };
 
@@ -1273,7 +1273,7 @@ export default function BlogPolishPage() {
         navigator.vibrate([100, 50, 100, 50, 200]);
       }
     } catch (e) {
-      console.log('Could not play completion sound');
+      // Audio not supported in this browser
     }
   };
 
@@ -1534,17 +1534,13 @@ export default function BlogPolishPage() {
         category: String(post.category || ''),
         moodHint: moodHint ? String(moodHint) : undefined,
       };
-      console.log('[Style] Starting style analysis...', requestBody.title, 'content length:', requestBody.content.length);
-      
       const response = await fetch('/api/blog/images', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestBody),
       });
 
-      console.log('[Style] Response status:', response.status, response.ok);
       const data = await response.json();
-      console.log('[Style] Response data success:', data.success, 'themeName:', data.styleGuide?.themeName, 'error:', data.error);
       
       if (response.ok && data.success && data.styleGuide) {
         setPageStyle(data.styleGuide);
