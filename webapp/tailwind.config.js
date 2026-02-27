@@ -161,6 +161,12 @@ module.exports = {
           '-webkit-backdrop-filter': 'blur(10px)',
           'border': '1px solid rgba(201, 169, 110, 0.2)',
         },
+        '.glass-teal': {
+          'background': 'rgba(230, 216, 181, 0.05)',
+          'backdrop-filter': 'blur(10px)',
+          '-webkit-backdrop-filter': 'blur(10px)',
+          'border': '1px solid rgba(230, 216, 181, 0.15)',
+        },
         '.text-gradient-gold': {
           'background': 'linear-gradient(135deg, #C9A96E 0%, #E6D8B5 50%, #C9A96E 100%)',
           '-webkit-background-clip': 'text',
