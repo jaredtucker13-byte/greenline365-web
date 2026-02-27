@@ -967,13 +967,45 @@ scorecard_scans
 
 ### Revenue from Partnerships
 
-| Tier | Price | What They Get |
-|---|---|---|
-| Basic | Free | Game in library, community QR support, basic analytics |
-| Premium | $500/mo | Official scorecard format, featured placement, full analytics |
-| Enterprise | Custom | Co-branded experience, exclusive promotions, API access |
+| Tier | Price | Games Allowed | Who It's For |
+|---|---|---|---|
+| Basic | Free | Up to 3 | Indie creators, Kickstarter publishers, local game designers |
+| Premium | $500/mo | Up to 5 (+$150/mo per extra game) | Established publishers: Catan Studio, Exploding Kittens, Czech Games |
+| Professional | $2,000/mo | Up to 25 (+$100/mo per extra game) | Multi-title publishers: Asmodee brands, Ravensburger, Spin Master |
+| Enterprise | Custom (starts ~$5K/mo) | Unlimited | Hasbro, Mattel — 50+ title catalogs |
 
-This is a **long-term play**. Build the scanning and template infrastructure now. Partnerships come when GL365 has critical mass.
+#### What Each Tier Gets
+
+| Feature | Basic | Premium | Professional | Enterprise |
+|---|---|---|---|---|
+| Game in library | YES | YES | YES | YES |
+| Community QR support | YES | YES | YES | YES |
+| Basic play count data | YES | YES | YES | YES |
+| Official scorecard format | — | YES | YES | YES |
+| Featured placement in Game Library | — | YES | YES | YES |
+| "Official GL365 Partner" badge | — | YES | YES | YES |
+| Branded scoring experience (logo + colors) | — | YES | YES | YES |
+| Full analytics dashboard (per game) | — | YES | YES | YES |
+| Portfolio dashboard (compare all titles) | — | — | YES | YES |
+| Promotional tools (discount codes, challenges) | — | — | YES | YES |
+| API access (pull data into their BI tools) | — | — | YES | YES |
+| Co-branded experience (custom themes, sounds, badges) | — | — | — | YES |
+| QR codes in physical game boxes | — | — | — | YES |
+| Exclusive city sponsorships | — | — | — | YES |
+| Dedicated account manager | — | — | — | YES |
+| Custom integrations | — | — | — | YES |
+
+#### Revenue Projections (At Scale)
+```
+50 indie publishers (Free)         = $0/mo      (but fills the game catalog)
+30 Premium publishers ($500/mo)    = $15,000/mo
+10 Professional publishers ($2K/mo) = $20,000/mo
+3 Enterprise deals (~$10K/mo avg)  = $30,000/mo
+                                     ─────────
+                            Total  = $65,000/mo ($780K/year)
+```
+
+This is a **long-term play**. Build the scanning and template infrastructure now. Partnerships come when GL365 has critical mass. But the revenue potential is significant — and it compounds because every QR code in a game box is a free user acquisition channel.
 
 ### Database Schema — Gamification
 ```sql
