@@ -74,6 +74,8 @@ export default function ListingDetailPage() {
   const [submittingReview, setSubmittingReview] = useState(false);
   const [reviewMessage, setReviewMessage] = useState('');
   const [reviewSort, setReviewSort] = useState<'newest' | 'highest' | 'lowest'>('newest');
+  const [showCallModal, setShowCallModal] = useState(false);
+  const [phoneCopied, setPhoneCopied] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -779,9 +781,9 @@ export default function ListingDetailPage() {
               {(listing.phone || listing.website) && (
                 <div className="space-y-2 mb-5" data-testid="cta-buttons">
                   {listing.phone && (
-                    <a
-                      href={`tel:${cleanPhone(listing.phone)}`}
-                      className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-bold font-heading text-[#0A0A0A] transition-all hover:scale-[1.02]"
+                    <button
+                      onClick={() => { setShowCallModal(true); trackEvent('call'); }}
+                      className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-bold font-heading text-[#0A0A0A] transition-all hover:scale-[1.02] cursor-pointer"
                       style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C97A)', boxShadow: '0 0 16px rgba(201,168,76,0.3)' }}
                       data-testid="cta-call-now"
                     >
@@ -789,7 +791,7 @@ export default function ListingDetailPage() {
                         <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                       </svg>
                       Call Now
-                    </a>
+                    </button>
                   )}
                   {listing.website && (
                     <a
@@ -811,13 +813,12 @@ export default function ListingDetailPage() {
               <div className="space-y-3">
                 {/* Phone */}
                 {listing.phone && (
-                  <a
-                    href={`tel:${cleanPhone(listing.phone)}`}
-                    onClick={() => trackEvent('call')}
-                    className="flex items-center gap-3 w-full p-3 rounded-xl border border-white/10 hover:border-gold/30 hover:bg-gold/5 transition-all group"
+                  <button
+                    onClick={() => { setShowCallModal(true); trackEvent('call'); }}
+                    className="flex items-center gap-3 w-full p-3 rounded-xl border border-white/10 hover:border-gold/30 hover:bg-gold/5 transition-all group text-left cursor-pointer"
                     data-testid="contact-phone"
                   >
-                    <div className="w-9 h-9 rounded-lg bg-gold/10 flex items-center justify-center">
+                    <div className="w-9 h-9 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0">
                       <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                       </svg>
@@ -826,7 +827,7 @@ export default function ListingDetailPage() {
                       <span className="text-xs text-white/40 font-body block">Phone</span>
                       <span className="text-sm text-white font-medium font-body group-hover:text-gold transition-colors">{listing.phone}</span>
                     </div>
-                  </a>
+                  </button>
                 )}
 
                 {/* Website */}
@@ -955,6 +956,104 @@ export default function ListingDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Click-to-Call Modal — keeps user on the website */}
+      {showCallModal && listing.phone && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          onClick={() => { setShowCallModal(false); setPhoneCopied(false); }}
+        >
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+
+          {/* Modal */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="relative w-full max-w-sm rounded-2xl border border-white/10 p-6 text-center"
+            style={{ background: 'rgba(20,20,20,0.98)', backdropFilter: 'blur(24px)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close button */}
+            <button
+              onClick={() => { setShowCallModal(false); setPhoneCopied(false); }}
+              className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors text-white/40 hover:text-white"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            {/* Phone icon */}
+            <div className="w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center" style={{ background: 'linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.05))' }}>
+              <svg className="w-7 h-7 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+              </svg>
+            </div>
+
+            <h3 className="text-lg font-heading font-semibold text-white mb-1">
+              Call {listing.business_name}
+            </h3>
+            <p className="text-white/40 text-xs font-body mb-5">
+              via GreenLine365 Directory
+            </p>
+
+            {/* Phone number display */}
+            <div className="rounded-xl border border-gold/20 bg-gold/5 py-3 px-4 mb-4">
+              <span className="text-2xl font-heading font-bold text-gold tracking-wide">
+                {listing.phone}
+              </span>
+            </div>
+
+            {/* Action buttons */}
+            <div className="space-y-2">
+              {/* Copy number */}
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(listing.phone!).then(() => {
+                    setPhoneCopied(true);
+                    setTimeout(() => setPhoneCopied(false), 2000);
+                  });
+                }}
+                className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold font-heading text-[#0A0A0A] transition-all hover:scale-[1.02] cursor-pointer"
+                style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C97A)', boxShadow: '0 0 16px rgba(201,168,76,0.3)' }}
+              >
+                {phoneCopied ? (
+                  <>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    Copy Number
+                  </>
+                )}
+              </button>
+
+              {/* Open dialer (secondary option) */}
+              <a
+                href={`tel:${cleanPhone(listing.phone)}`}
+                className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold font-heading text-gold border border-gold/30 hover:bg-gold/5 transition-all"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                </svg>
+                Open Dialer
+              </a>
+            </div>
+
+            {/* Branding footer */}
+            <p className="text-[10px] text-white/20 font-body mt-4">
+              Powered by GreenLine365
+            </p>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }
