@@ -1,222 +1,380 @@
-# Email Sequence Review — Best Practices for Pre-Launch, No Social Proof
+# GreenLine365 — Email Sequence Master Map
 
-Status: Review Notes | Internal Only
+Status: Brainstorming | Internal Only
 Created: 2026-02-27
-Reviews: docs/brainstorming/email-outreach-sequence.md
-Context: GreenLine365 has NOT launched. Zero customers. Zero testimonials. Zero revenue proof.
+Author: Jared Tucker + Claude review
+Context: Pre-launch. Zero customers. Zero social proof. Two senders (SendGrid + Gmail SMTP).
 
 ---
 
-## HONEST ASSESSMENT OF WHAT YOU HAVE
+## THE PROBLEM THIS DOC SOLVES
 
-The 5-email sequence in `email-outreach-sequence.md` is structurally solid. The instincts are right:
-- Lead with value, not a pitch
-- Earn the next email before sending it
-- Personal tone from the founder, not corporate marketing
-- Scarcity that's real (30 spots is a real cap, not fake urgency)
-
-But there are **5 specific gaps** that will cause problems if you try to automate and send this as-is.
+GL365 doesn't have one email sequence — it has many. They serve different audiences, fire from different triggers, and have completely different goals. This doc maps ALL of them so nothing gets confused, duplicated, or forgotten.
 
 ---
 
-## GAP 1: NO DAY 0 EMAIL (THE MISSING FIRST TOUCH)
-
-**Problem:** Your sequence starts at Day 1, but nothing happens at Day 0 when they actually claim the listing. That's a missed moment — the business owner is most engaged the moment they sign up.
-
-**Best practice:** Send an immediate confirmation email within 60 seconds of listing claim. This isn't part of the "sales sequence" — it's transactional. But it sets the tone for everything that follows.
-
-**Recommended Day 0 email:**
+## SEQUENCE MAP — EVERY EMAIL FLOW GL365 NEEDS
 
 ```
-Subject: Your listing is live — [Business Name] on GreenLine365
+┌─────────────────────────────────────────────────────────┐
+│                    COLD (YOU → THEM)                     │
+│                                                         │
+│  SEQ A: Claim Your Listing Outreach                     │
+│  Trigger: You find a business to add to directory       │
+│  Goal: Get them to claim their listing                  │
+│  Status: BUILT (campaigns/send route + templates)       │
+│                                                         │
+│  SEQ B: Cold Outreach to Booking System                 │
+│  Trigger: You manually identify a prospect              │
+│  Goal: Book a 15-min founding member call               │
+│  Status: DRAFTED (email-outreach-sequence.md)           │
+│                                                         │
+├─────────────────────────────────────────────────────────┤
+│                  WARM (THEY ACTED → AUTO)                │
+│                                                         │
+│  SEQ C: Post-Claim Welcome Sequence ← NEEDS WORK       │
+│  Trigger: Business claims their listing                 │
+│  Goal: Activate them, get them using the listing        │
+│  Status: NOT STARTED                                    │
+│                                                         │
+│  SEQ D: Post-Claim → Founding Member Nurture            │
+│  Trigger: Follows Seq C after activation                │
+│  Goal: Warm them toward booking system offer            │
+│  Status: DRAFTED (email-outreach-sequence.md emails 1-5)│
+│                                                         │
+│  SEQ E: Waitlist / Newsletter Verification              │
+│  Trigger: Someone joins waitlist or newsletter          │
+│  Goal: Verify email, confirm subscription               │
+│  Status: BUILT (verify-email + sendgrid-sender)         │
+│                                                         │
+├─────────────────────────────────────────────────────────┤
+│                 TRANSACTIONAL (SYSTEM → THEM)            │
+│                                                         │
+│  SEQ F: Email Verification (code-based)                 │
+│  Trigger: Signup / form submission                      │
+│  Goal: Verify the email is real                         │
+│  Status: BUILT (gmail-sender + sendgrid-sender)         │
+│                                                         │
+│  SEQ G: Access Code Invite                              │
+│  Trigger: Admin sends invite from dashboard             │
+│  Goal: Get them to create account with code             │
+│  Status: BUILT (admin/send-invite route)                │
+│                                                         │
+│  SEQ H: Booking Confirmations & Reminders               │
+│  Trigger: Appointment booked through widget             │
+│  Goal: Confirm booking, reduce no-shows                 │
+│  Status: NOT STARTED                                    │
+│                                                         │
+│  SEQ I: Blast Deal Notifications                        │
+│  Trigger: Business publishes a deal                     │
+│  Goal: Notify subscribed consumers                      │
+│  Status: BUILT (blast-deals/outblast route)             │
+│                                                         │
+├─────────────────────────────────────────────────────────┤
+│               FUTURE (NOT BUILT, NOT URGENT)            │
+│                                                         │
+│  SEQ J: Review Request Sequence                         │
+│  Trigger: Consumer visits a listing / completes booking │
+│  Goal: Get them to leave a review                       │
+│                                                         │
+│  SEQ K: Subscription Lifecycle (Upgrade/Downgrade)      │
+│  Trigger: Stripe events (trial ending, payment failed)  │
+│  Goal: Retain paid subscribers, recover failed payments  │
+│                                                         │
+│  SEQ L: Re-engagement (Dormant Listings)                │
+│  Trigger: Business hasn't logged in for 30+ days        │
+│  Goal: Bring them back, show what they're missing       │
+│                                                         │
+│  SEQ M: Referral / Ambassador Program                   │
+│  Trigger: Business hits milestone (first review, etc.)  │
+│  Goal: Get them to refer other businesses               │
+│                                                         │
+│  SEQ N: Consumer Welcome Sequence                       │
+│  Trigger: Consumer creates account                      │
+│  Goal: Get them using directory, leaving reviews        │
+│                                                         │
+│  SEQ O: Weekly/Monthly Digest                           │
+│  Trigger: Cron (weekly)                                 │
+│  Goal: Keep businesses engaged with platform stats      │
+│  Status: PARTIALLY BUILT (brain/weekly-recap route)     │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
+```
+
+---
+
+## WHAT'S ALREADY BUILT (CODE EXISTS)
+
+### SEQ A: Claim Your Listing Outreach
+**File:** `webapp/app/api/campaigns/[id]/send/route.ts`
+**Sender:** Gmail SMTP (`lib/email/gmail-sender.ts`)
+**Templates built:**
+1. `initial_outreach` — "Your business is live on GreenLine365. Claim it to update your information."
+2. `value_bomb` — "We ran a free audit for [Business Name]" + after-hours Google Maps screenshot
+3. `demo_invite` — "Try our AI receptionist — live right now" + phone number
+4. Generic follow-up — "Just checking in about [Business Name]'s listing"
+
+**What this sequence IS:** You (Jared) reach out to businesses that are already in the directory (pre-populated) but haven't claimed their listing. The framing is: "We built this community resource. Your business is already listed. Come confirm your info is correct."
+
+**What this sequence is NOT:** It's NOT the post-claim nurture. It's NOT the founding member pitch. It ends when they claim.
+
+### SEQ E: Waitlist / Newsletter Verification
+**File:** `webapp/app/api/waitlist/route.ts` + `webapp/app/api/verify-email/route.ts`
+**Sender:** SendGrid (waitlist) / Gmail (verify-email)
+**Status:** Functional. Sends 6-digit code or magic link.
+
+### SEQ F: Email Verification
+**File:** `webapp/lib/email/sendgrid-sender.ts` + `webapp/lib/email/gmail-sender.ts`
+**Status:** Both work. Two parallel systems (see SendGrid audit section below).
+
+### SEQ G: Access Code Invite
+**File:** `webapp/app/api/admin/send-invite/route.ts`
+**Sender:** SendGrid (direct fetch)
+**Status:** Functional. Generates code + sends branded invite email.
+
+### SEQ I: Blast Deal Notifications
+**File:** `webapp/app/api/blast-deals/outblast/route.ts`
+**Sender:** SendGrid (direct fetch)
+**Status:** Functional.
+
+---
+
+## WHAT NEEDS BRAINSTORMING NOW
+
+### SEQ C: Post-Claim Welcome Sequence (PRIORITY)
+
+This is the gap the user identified. When a business CLAIMS their listing, what happens next?
+
+**Trigger:** Business completes the claim flow (verified ownership)
+**Audience:** Engaged business owner who just took action — warmest lead you'll get
+**Goal:** Get them to ACTIVATE — complete their profile, add photos, see value immediately
+
+**Why this matters:** The claim is the most important conversion event in the entire funnel. If you don't capitalize on it within 48 hours, the business owner moves on and forgets about you. This sequence is about activation, not selling.
+
+**Recommended sequence (no social proof needed):**
+
+#### Email C1: Instant Confirmation (Day 0, within 60 seconds)
+```
+Subject: You're in — [Business Name] is claimed
 
 Hey [First Name],
 
-Your business is officially on the map.
+Done. [Business Name] is officially yours on GreenLine365.
 
-Here's your live listing: [DIRECT LINK TO THEIR LISTING]
+Here's your listing: [DIRECT LINK]
 
-Take a look — if anything needs updating (hours, photos, description),
-just reply to this email and I'll handle it personally.
+Three quick things you can do right now:
+1. Add your best photo (listings with photos get 3x more views)
+2. Update your hours (we pulled what we could, but you know best)
+3. Add a description in your own words
 
-Welcome to the directory.
+If anything looks off, just reply to this email. I'll fix it personally.
 
 — Jared
-GreenLine365
 ```
 
-**Why this works without social proof:**
-- It delivers immediate proof that something happened (their listing is live)
-- The "reply and I'll handle it" line opens a conversation channel
-- No pitch, no upsell, no "join 500 businesses" claims
-- It's useful — they'll click to see their own listing
+**Why it works pre-launch:**
+- Delivers immediate value (their listing, their link)
+- Specific CTAs that are easy to do right now
+- "3x more views" is a general directory stat, not a GL365 claim — honest
+- Reply-to opens conversation
+- No upsell, no pitch, no "join 10,000 businesses"
 
-**Technical note:** This should go through SendGrid (not Gmail) since it's transactional and time-sensitive. Your `/api/waitlist/route.ts` already imports from `sendgrid-sender.ts` — same pattern.
+#### Email C2: Profile Completion Nudge (Day 2)
 
----
-
-## GAP 2: EMAIL 1 DEPENDS ON DATA THAT MAY NOT EXIST
-
-**Problem:** Email 1 (the Value Bomb) is built around a "Local Pulse snapshot" for their ZIP + industry. But Local Pulse is only fully live for ZIP 33619, and the AI-generated insights need real data to be credible. If the insight is generic or obviously made up, you lose trust on the first real email.
-
-**Best practice for pre-launch:** Have 3 tiers of Email 1 content, in order of preference:
-
-1. **Real Local Pulse data** — If you have genuine search/demand data for their ZIP + category, use it. This is the gold standard.
-2. **Seasonal industry insight** — If no real data, use a researched seasonal angle. Example for HVAC in Feb: "AC tune-up searches historically spike 40% in Tampa Bay between March and April. Businesses that post preventive maintenance offers in February capture early demand." This is true, useful, and doesn't require your platform data.
-3. **Competitive gap observation** — Look at their actual listing and provide one specific, actionable improvement. Example: "I noticed [Business Name] doesn't have any photos on the listing yet. Listings with 5+ photos get 3x more clicks in local directories (Google's own data). Want me to help you add some?" This requires zero platform data — just eyes on their listing.
-
-**Key principle:** The value bomb must be genuinely valuable. A vague AI-generated paragraph that reads like ChatGPT filler will kill the sequence. Better to send a shorter, more specific email than a longer generic one.
-
----
-
-## GAP 3: EMAIL 2 NEEDS ASSETS THAT DON'T EXIST YET
-
-**Problem:** Email 2 requires "[SCREENSHOT or GIF: Command Center dashboard]" tailored to their industry. Those don't exist. You can't send this email until you build those assets.
-
-**Before you can send Email 2, you need:**
-- At minimum: 1 generic Command Center screenshot that looks real and populated
-- Ideal: 3-4 industry-specific screenshots (HVAC, restaurant, fitness, professional services cover most of Tampa Bay)
-- Best: A 30-60 second Loom video walking through the dashboard
-
-**Workaround if you want to launch the sequence before building assets:**
-
-Replace the screenshot approach with a "what I'd build for you" approach — describe it instead of showing it:
+Only send if they HAVEN'T completed their profile (photos, hours, description).
 
 ```
+Subject: Quick tip for [Business Name]
+
 Hey [First Name],
 
-I've been mapping out what a full operations setup would look like
-for a [their industry] business in [their area].
+Just a heads up — your listing is live but it's missing [photos / hours / a description].
 
-Here's the short version of what I'd configure:
+Listings with complete profiles show up higher in search results and
+get significantly more clicks. Takes about 5 minutes.
 
-→ A booking page that captures appointments 24/7
-  (even at 2am when someone finds you on Google)
-→ Automated reminders that cut no-shows in half
-→ A weekly content calendar so you're posting consistently
-  without thinking about it
-→ Real-time alerts when demand spikes in your ZIP code
+→ Update your listing: [LINK TO THEIR PORTAL/EDIT PAGE]
 
-I'm not asking you to sign up for anything. I just want to know —
-does any of that sound useful for how you actually run [Business Name]?
+If you want, send me a few photos by replying to this email and I'll
+upload them for you. Happy to do it.
 
 — Jared
 ```
 
-**Why this works without a screenshot:** You're asking for their input, which is more engaging than showing them a dashboard they can't touch. And it sidesteps the "show me social proof" problem entirely — you're asking THEM to validate the idea, which makes them a collaborator, not a prospect.
+**Skip this email if:** They already uploaded photos + set hours + wrote a description. Don't nag people who already did the thing.
+
+#### Email C3: First Value Delivery (Day 5)
+
+```
+Subject: Something useful for [Business Name]
+
+Hey [First Name],
+
+I pulled together a quick snapshot of what's happening in [their
+industry] around [their ZIP / area] this week.
+
+[ONE SPECIFIC, USEFUL INSIGHT — same tiered approach:]
+- Tier 1: Real Local Pulse data if available
+- Tier 2: Seasonal industry trend (researched, true)
+- Tier 3: One specific observation about their online presence
+
+No ask here. Just thought it might be useful.
+
+— Jared
+```
+
+**This is the bridge email.** After this, the business owner has:
+1. A live listing (C1)
+2. A complete profile (C2)
+3. Received genuine value with zero ask (C3)
+
+They're now warm enough for Sequence D (the founding member nurture) to begin.
+
+#### Email C4: Founding Member Tease (Day 8)
+
+This is where Seq C hands off to Seq D. See `email-outreach-sequence.md` for the full nurture flow.
+
+```
+Subject: I'm building something for businesses like [Business Name]
+
+Hey [First Name],
+
+Since you claimed your listing, I wanted to give you a heads-up on
+something I'm putting together for a small group of businesses in
+the Tampa Bay area.
+
+Not ready to share the details yet — still finalizing it. But you're
+on my short list of people I want to tell first.
+
+I'll follow up in a few days with more.
+
+— Jared
+```
+
+**Why tease instead of pitch:** They just claimed a free listing. Going from "free directory listing" to "buy my booking system" in 8 days is too fast. The tease creates anticipation without asking for anything.
 
 ---
 
-## GAP 4: EMAIL 3 HAS NO PRICE ANCHOR
+### SEQ A REVIEW: Claim Your Listing (Cold Outreach)
 
-**Problem:** Email 3 offers "$500 off setup" and "$500 off per month" — but off of what? If the business owner doesn't know the base price, the discount is meaningless. "$500 off" could mean "it normally costs $600" or "it normally costs $5,000." Those feel very different.
+This is the "come claim your free listing" email. It's already built in the campaigns route. Here's what's good and what needs work:
 
-**Options (pick one before sending Email 3):**
+**What's good:**
+- The `initial_outreach` template frames it as a community resource, not a sales email
+- "Claim it to update your information" is the right CTA — it's about accuracy, not buying
+- Unsubscribe link included
+- Plain, professional design
 
-**Option A: State the base price, then the discount**
-"The standard rate for the GL365 Booking System will be $X/month when it goes public. Founding members lock in at $X minus $500/month — for life."
+**What needs work:**
 
-**Option B: Skip dollar discounts, lead with value framing**
-"Founding members get lifetime pricing that will never increase, priority support directly from me, and beta access to every new feature before it's public. I'll walk you through the exact pricing on our call."
+1. **The subject line is missing personality.** Currently implied as just "GreenLine365" or similar. Better options:
+   - "Is this info correct for [Business Name]?"
+   - "[Business Name] is on the map — just need you to confirm"
+   - "Quick question about [Business Name]"
 
-**Option C: Use "value stack" without revealing price**
-List everything they get, assign perceived values, then say the founding member rate is revealed on the call. This works well for high-ticket B2B where the price needs context.
+2. **The body should feel like a request for help, not a notification.** The current template says "has been added to GreenLine365 — Florida's premium verified business directory." That sounds like marketing. Better:
+   - "We're building a community business directory for the Tampa Bay area, and [Business Name] is one of the businesses we've included."
+   - "We want to make sure we got your information right. Can you take a quick look?"
 
-**Recommendation for your stage:** Option B. You don't have market validation on your pricing yet. Locking yourself into "$500 off" in an automated email before you know your base price is risky. Better to create the desire and reveal pricing live on the call where you can read their reaction.
+3. **The CTA "View Your Listing" is good.** Keep it. When they click, they see their own business — that's compelling.
 
----
-
-## GAP 5: NO SOCIAL PROOF REPLACEMENT STRATEGY
-
-**Problem:** Every email implicitly raises the question: "Why should I trust this?" Normal sequences answer that with testimonials, case studies, logos, or numbers ("10,000 businesses use..."). You have none of that.
-
-**What replaces social proof when you have zero customers:**
-
-### 1. Founder credibility (use in Email 1 and 3)
-You're a real person in Tampa building this for local businesses. That's not a weakness — it's a differentiator from faceless SaaS companies. Lean into it:
-- "I'm based in Tampa Bay and building this specifically for businesses in our area"
-- "I've spent the last [X months] building this because I kept seeing the same problem..."
-Don't overdo it. One or two lines. Not your life story.
-
-### 2. Specificity as a proxy for credibility
-The more specific and tailored your email is, the more it signals competence. Generic emails scream "mass blast." A line like "I noticed [Business Name] is the only [industry] in [their ZIP] without a booking page" shows you actually looked at their business. That builds more trust than any testimonial.
-
-### 3. The "founding class" frame
-You're already doing this with "first 30 businesses." Reinforce it:
-- "You'd be part of the founding class of 2026"
-- "The first businesses in set the standard for everyone who comes after"
-This turns "we have no customers" into "you'd be the first — and that means influence."
-
-### 4. Risk reversal
-Without social proof, the perceived risk is higher. Lower it:
-- "No contract. No commitment until you see it running."
-- "If it doesn't save you time in the first 30 days, I'll refund every penny and you keep the listing."
-- "This is a 15-minute call, not a sales pitch. If it's not a fit, I'll tell you."
-
-### 5. Progress signals
-You can't say "500 businesses trust us" but you CAN say:
-- "We've mapped every business in [X] ZIP codes across Tampa Bay"
-- "The directory already has [X] listings across [Y] categories"
-- "The Local Pulse system is tracking real-time demand data for [X] industries"
-These are platform credibility signals, not customer testimonials. They show the thing is real and active.
+4. **No follow-up sequence in the campaigns route.** The `value_bomb` and `demo_invite` templates exist but they're part of a DIFFERENT pitch (the booking system audit angle). For Seq A, the follow-up should stay focused on claiming:
+   - Follow-up 1 (Day 5): "Just checking — did you get a chance to look at your listing?"
+   - Follow-up 2 (Day 12): "Last note about [Business Name] on GreenLine365" (graceful exit)
 
 ---
 
-## REVISED SEQUENCE TIMELINE (RECOMMENDED)
+### SEQ B vs SEQ D: CLARIFYING THE CONFUSION
 
-| Day | Email | Key Change from Current Draft |
-|-----|-------|-------------------------------|
-| 0 | **Listing Confirmation** (NEW) | Immediate. Transactional. Link to their live listing. |
-| 1 | **Value Bomb** | Use tiered content strategy (real data > seasonal > competitive gap). Plain text format. |
-| 4 | **Soft Reveal** | Description-based, not screenshot-dependent. Ask for their input. |
-| 8 | **Founding Member Offer** | Drop dollar amounts. Lead with value. Reveal pricing on call. |
-| 14 | **Follow-Up** | Keep as-is. Short, no re-pitch. |
-| 21 | **Graceful Exit** | Keep as-is. Add one new line: "Your listing stays live regardless." (already there — good) |
+The `email-outreach-sequence.md` doc currently mixes two things:
+- **Seq B (Cold booking system outreach):** You manually reach out to a prospect you've identified, pitching the booking system directly. No prior relationship.
+- **Seq D (Post-claim nurture to founding member):** A business already claimed their listing. You've built trust through Seq C. Now you warm them toward the booking system.
 
----
+**These should be separate sequences because:**
+- Seq B is cold. Seq D is warm.
+- Seq B needs to establish credibility from scratch. Seq D can reference their existing listing.
+- Seq B has lower conversion rates (1-3%). Seq D should convert higher (5-10%+) because trust is already built.
+- Seq B might come from a different sender identity or tone than Seq D.
 
-## DELIVERABILITY CHECKLIST (BEFORE SENDING ANYTHING)
-
-These are non-negotiable for a new domain sending business emails:
-
-- [ ] **SPF record** on greenline365.com — authorizes SendGrid to send on your behalf
-- [ ] **DKIM record** — SendGrid provides this during domain authentication setup
-- [ ] **DMARC record** — start with `p=none` to monitor, move to `p=quarantine` after 2 weeks
-- [ ] **Domain authentication in SendGrid** — verify greenline365.com as a sender domain (not just a single sender address)
-- [ ] **Dedicated sending address** — use jared@greenline365.com for the sequence (personal), hello@greenline365.com for transactional (Day 0 confirmation)
-- [ ] **Warm the domain** — Do NOT send 50 emails on day 1. Start with 5-10/day for the first week, ramp to 20/day in week 2, full volume by week 3
-- [ ] **Physical address in footer** — CAN-SPAM requires it. Even a PO Box works.
-- [ ] **Unsubscribe link** — Every email needs one. Your `sendgrid-sender.ts` already includes this in the HTML template — make sure the plain-text sequence emails include it too
-- [ ] **Reply-to address** — Set to jared@greenline365.com so replies actually reach you. This is already handled in your Gmail sender but verify it for SendGrid sends too.
+**The current email-outreach-sequence.md is really Seq D** (it assumes they've already claimed a listing). That's fine — just label it correctly and don't try to use the same emails for cold outreach to strangers.
 
 ---
 
-## SENDGRID-SPECIFIC SETUP TASKS
+## THE NO SOCIAL PROOF PLAYBOOK
 
-To actually send this sequence through SendGrid:
+Applies to ALL sequences. Pre-launch rules:
 
-1. **Domain Authentication** — In SendGrid dashboard → Settings → Sender Authentication → Authenticate Your Domain. This gives you the DNS records (SPF, DKIM, CNAME) to add to your domain registrar.
+### What you CAN say (honest):
+- "We're building a community business directory for Tampa Bay"
+- "Your business is one of [X] listed in the [category] section"
+- "The directory covers [X] ZIP codes across [region]"
+- "I'm building this because [genuine reason]"
+- "Listings with complete profiles perform better in local search" (generally true across all directories)
 
-2. **Verified Sender** — Add jared@greenline365.com as a verified sender identity. SendGrid requires this before you can send from that address.
+### What you CANNOT say (no proof yet):
+- Any specific conversion or performance numbers about GL365
+- "Businesses trust us" / "Join hundreds of businesses"
+- Testimonials or case studies (you have none)
+- ROI claims specific to your platform
+- "Our AI has helped businesses increase..."
 
-3. **API Key Scope** — Your current `SENDGRID_API_KEY` env var needs `Mail Send` permission at minimum. For tracking opens/clicks, also need `Tracking` permission.
-
-4. **Event Webhooks (for automation triggers)** — To track opens, clicks, and replies (needed for your automation triggers table), set up SendGrid Event Webhooks pointing to an API route like `/api/email/webhooks/sendgrid`. This feeds back into your sequence logic (pause on reply, advance on click, etc.).
-
-5. **Suppression Groups** — Create a suppression group for "Business Outreach" so unsubscribes from the sequence don't affect transactional emails (verification codes, listing confirmations).
+### What REPLACES social proof:
+1. **Specificity** — The more specific your emails are to THEIR business, the more credible you seem
+2. **Founder transparency** — "I'm Jared, I'm building this in Tampa" > "Our team of experts"
+3. **The directory itself IS the proof** — When they click "View Your Listing" and see their business on a real, professional-looking platform, that's worth more than any testimonial
+4. **Helping without asking** — Every email that delivers value with zero ask builds credibility
+5. **Founding class scarcity** — "Be the first" is honest and compelling when you actually ARE early
 
 ---
 
-## BOTTOM LINE
+## SENDGRID SETUP STATUS
 
-Your instincts on the sequence are good. The structure is right. The gaps are:
-1. Missing Day 0 confirmation (easy fix)
-2. Email 1 data dependency (solve with tiered fallback)
-3. Email 2 asset dependency (solve by switching to description format)
-4. Email 3 pricing not finalized (solve by moving price reveal to the call)
-5. No explicit social proof replacement (solve with founder credibility + specificity + risk reversal)
+From the codebase audit:
 
-The biggest risk isn't the email copy — it's deliverability. If your domain isn't authenticated with SendGrid properly, these emails land in spam and nothing else matters. Nail the deliverability checklist first, then polish the copy.
+| What | Where | Status |
+|------|-------|--------|
+| `@sendgrid/mail` package | package.json | Installed (v8.1.6) |
+| SendGrid sender module | `lib/email/sendgrid-sender.ts` | Built, needs `SENDGRID_API_KEY` |
+| Gmail sender module | `lib/email/gmail-sender.ts` | Built, needs `GMAIL_APP_PASSWORD` |
+| Waitlist emails | `/api/waitlist` | Uses SendGrid sender |
+| CRM verification resend | `/api/crm/resend-verification` | Uses SendGrid sender |
+| Verification emails | `/api/verify-email` | Uses Gmail sender |
+| Campaign sends (Seq A) | `/api/campaigns/[id]/send` | Uses Gmail sender |
+| Admin invites (Seq G) | `/api/admin/send-invite` | Uses SendGrid (direct fetch) |
+| Blast deals (Seq I) | `/api/blast-deals/outblast` | Uses SendGrid (direct fetch) |
+| Health check | `/api/health` | Checks for `SENDGRID_API_KEY` |
+
+**Inconsistency note:** Some routes use the `sendgrid-sender.ts` module (uses `@sendgrid/mail` npm package), others call the SendGrid API directly via `fetch`. Both work, but it's two patterns for the same thing. Not broken, but worth unifying eventually.
+
+**To make everything work, set in Vercel env vars:**
+- `SENDGRID_API_KEY` — from SendGrid dashboard
+- `SENDGRID_FROM_EMAIL` — the verified sender address
+- `GMAIL_USER` — greenline365help@gmail.com
+- `GMAIL_APP_PASSWORD` — 16-char app password from Google
+
+**Before sending outreach emails, also need:**
+- [ ] SPF record on greenline365.com (authorizes SendGrid)
+- [ ] DKIM record (from SendGrid domain authentication)
+- [ ] DMARC record (`v=DMARC1; p=none; rua=mailto:...`)
+- [ ] Domain authenticated in SendGrid dashboard
+- [ ] Domain warmup plan (5-10 emails/day week 1, ramp up)
+- [ ] Physical mailing address in email footers (CAN-SPAM)
+- [ ] Suppression groups configured (separate outreach from transactional)
+
+---
+
+## WHAT TO BUILD NEXT (PRIORITY ORDER)
+
+1. **Seq C: Post-Claim Welcome** — This is the missing piece. When a business claims their listing, they need an immediate confirmation + activation nudge + value delivery before any pitch starts.
+
+2. **Seq A: Improve the claim outreach subject/body** — The templates are built but the copy needs the tweaks described above. Small changes, big impact on open rates.
+
+3. **SendGrid domain authentication** — Nothing else matters if emails land in spam.
+
+4. **Seq D: Finalize the founding member nurture** — Once Seq C is working and you have businesses claiming listings, this sequence picks up where C leaves off.
+
+5. **Everything else** — Seqs H through O are future. Don't build them until you have businesses flowing through A → C → D.
 
 ---
 
