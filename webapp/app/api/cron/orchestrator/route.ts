@@ -27,8 +27,11 @@ const supabase = createClient(
 function verifyCronAuth(request: NextRequest): boolean {
   const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
-  if (cronSecret) return authHeader === `Bearer ${cronSecret}`;
-  return true;
+  if (!cronSecret) {
+    console.error('[CRON] CRON_SECRET not configured — rejecting request');
+    return false;
+  }
+  return authHeader === `Bearer ${cronSecret}`;
 }
 
 // ── Types ───────────────────────────────────────────────────
@@ -43,7 +46,7 @@ interface TaskResult {
 // ── Task 1: Health Checks (calls /api/health) ───────────────
 
 async function checkServiceHealth(): Promise<TaskResult> {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
 
   try {
     const res = await fetch(`${siteUrl}/api/health`, {

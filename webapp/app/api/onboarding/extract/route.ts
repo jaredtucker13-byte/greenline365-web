@@ -253,7 +253,7 @@ async function extractFromWebsite(url: string): Promise<{
 }> {
   try {
     // Use existing scrape endpoint
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
     const scrapeResponse = await fetch(`${baseUrl}/api/scrape`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

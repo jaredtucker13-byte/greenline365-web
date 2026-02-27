@@ -9,8 +9,10 @@ import { createClient } from '@/lib/supabase/server';
  */
 
 // Admin emails that can see all logs
+// Add additional admins via ADMIN_EMAILS env var (comma-separated)
 const ADMIN_EMAILS = [
   'greenline365help@gmail.com',
+  ...(process.env.ADMIN_EMAILS?.split(',').map(e => e.trim()).filter(Boolean) || []),
 ];
 
 export async function GET(request: NextRequest) {

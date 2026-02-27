@@ -6,11 +6,11 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-// Cal.com Configuration
+// Cal.com Configuration — set via environment variables
 const CALCOM_API_KEY = process.env.CALCOM_API_KEY || '';
-const CALCOM_EVENT_TYPE_ID = process.env.CALCOM_EVENT_TYPE_ID || '4233765';
-const CALCOM_USERNAME = process.env.CALCOM_USERNAME || 'jared-tucker-2gdr7e';
-const CALCOM_TIMEZONE = 'America/New_York';
+const CALCOM_EVENT_TYPE_ID = process.env.CALCOM_EVENT_TYPE_ID || '';
+const CALCOM_USERNAME = process.env.CALCOM_USERNAME || '';
+const CALCOM_TIMEZONE = process.env.CALCOM_TIMEZONE || 'America/New_York';
 
 // =====================================================
 // MCP TOOL DEFINITIONS
@@ -968,7 +968,7 @@ async function executeTool(toolName: string, args: Record<string, any>, tenant: 
       }
       
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL || 'http://localhost:3000';
+        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
         const response = await fetch(`${baseUrl}/api/twilio/send`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -1019,7 +1019,7 @@ async function executeTool(toolName: string, args: Record<string, any>, tenant: 
       message += '\n\nReply YES to confirm or call us to reschedule.';
       
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL || 'http://localhost:3000';
+        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
         const response = await fetch(`${baseUrl}/api/twilio/send`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -1068,7 +1068,7 @@ async function executeTool(toolName: string, args: Record<string, any>, tenant: 
       message += '\n\n- The GreenLine365 Team';
       
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL || 'http://localhost:3000';
+        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
         const response = await fetch(`${baseUrl}/api/twilio/send`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -1098,7 +1098,7 @@ async function executeTool(toolName: string, args: Record<string, any>, tenant: 
       const message = `Hi! Just texted you from our call. To make sure I get your info exactly right, please reply with:\n\nFull Name:\nEmail:\n\nThanks!`;
       
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL || 'http://localhost:3000';
+        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
         const response = await fetch(`${baseUrl}/api/twilio/send`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

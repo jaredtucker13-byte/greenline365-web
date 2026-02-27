@@ -82,7 +82,7 @@ function detectBookingIntent(message: string, history: Msg[]): BookingIntent | n
 }
 
 async function handleBookingIntent(intent: BookingIntent, message: string, history: Msg[]): Promise<string | null> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
   
   try {
     if (intent.type === 'availability' && intent.date) {
