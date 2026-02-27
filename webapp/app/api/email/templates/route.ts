@@ -1,14 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { requireAdmin } from '@/lib/auth/middleware';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-// GET /api/email/templates - List all templates
-// POST /api/email/templates - Create new template
+// GET /api/email/templates - List all templates (admin only)
+// POST /api/email/templates - Create new template (admin only)
 export async function GET(request: NextRequest) {
+  const auth = await requireAdmin(request);
+  if (auth instanceof Response) return auth;
+
   try {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
@@ -38,6 +42,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const auth = await requireAdmin(request);
+  if (auth instanceof Response) return auth;
+
   try {
     const body = await request.json();
     const { name, description, category, subject, preview_text, html_content, plain_content, variables } = body;

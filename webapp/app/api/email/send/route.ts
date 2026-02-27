@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { requireAdmin } from '@/lib/auth/middleware';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -61,8 +62,11 @@ async function sendViaEmail(to: string, subject: string, htmlContent: string, pl
   return { success: true, messageId: response.headers.get('x-message-id') };
 }
 
-// POST /api/email/send - Send an email
+// POST /api/email/send - Send an email (admin only)
 export async function POST(request: NextRequest) {
+  const auth = await requireAdmin(request);
+  if (auth instanceof Response) return auth;
+
   try {
     const body: SendEmailRequest = await request.json();
     const { to, subject, html_content, plain_content, template_id, variables = {}, campaign_id } = body;

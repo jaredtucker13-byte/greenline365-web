@@ -9,9 +9,14 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import DOMPurify from 'dompurify';
 import { LivingCanvasImage, DropCapImage, ShapedText, FrameConfig } from './ImageContainers';
 import { SHAPE_PRESETS, getShapeDefinition } from './css-shapes';
 import { ExtractedPalette, extractColorsFromImage, DEFAULT_PALETTE, applyPaletteToElement, generateGradient } from './color-extraction';
+
+function sanitizeHtml(html: string): string {
+  return DOMPurify.sanitize(html, { ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a', 'p', 'br', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'span', 'div'], ALLOWED_ATTR: ['href', 'target', 'rel', 'class', 'style'] });
+}
 
 // ============================================
 // TYPES
@@ -170,7 +175,7 @@ function SFlowTemplate({
                   )}
                   <div 
                     className="text-lg leading-relaxed opacity-90"
-                    dangerouslySetInnerHTML={{ __html: textContent.content || '' }}
+                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(textContent.content || '') }}
                   />
                 </div>
               </div>
@@ -295,7 +300,7 @@ function DropCapTemplate({
         )}
         
         {/* Text content */}
-        <div dangerouslySetInnerHTML={{ __html: textContent?.content || '' }} />
+        <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(textContent?.content || '') }} />
       </div>
     </div>
   );
@@ -369,7 +374,7 @@ function HeroFeatureTemplate({
           <div 
             className="prose prose-invert prose-lg max-w-none"
             style={{ color: palette.text }}
-            dangerouslySetInnerHTML={{ __html: bodyText.content }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(bodyText.content) }}
           />
         </div>
       )}
@@ -504,7 +509,7 @@ function CircularFocusTemplate({
                 {textContent.title}
               </h2>
             )}
-            <div dangerouslySetInnerHTML={{ __html: textContent.content }} />
+            <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(textContent.content) }} />
           </div>
         )}
         
