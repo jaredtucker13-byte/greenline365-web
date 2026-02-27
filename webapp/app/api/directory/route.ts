@@ -103,6 +103,7 @@ export async function GET(request: NextRequest) {
   const slug = searchParams.get('slug');
   const destination = searchParams.get('destination');
   const tourismCategory = searchParams.get('tourism_category');
+  const featured = searchParams.get('featured');
   const limit = parseInt(searchParams.get('limit') || '24');
   const userLat = parseFloat(searchParams.get('lat') || '0');
   const userLng = parseFloat(searchParams.get('lng') || '0');
@@ -140,6 +141,11 @@ export async function GET(request: NextRequest) {
   if (search) query = query.or(`business_name.ilike.%${search}%,description.ilike.%${search}%,industry.ilike.%${search}%`);
   if (destination) query = query.contains('tags', [`destination:${destination}`]);
   if (tourismCategory) query = query.contains('tags', [`tourism:${tourismCategory}`]);
+
+  // Featured: return only premium/pro claimed listings (the "Featured" showcase)
+  if (featured === 'true') {
+    query = query.eq('is_claimed', true).in('tier', ['premium', 'pro']);
+  }
 
   const { data, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

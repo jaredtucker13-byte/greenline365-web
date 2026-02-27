@@ -47,6 +47,19 @@ interface RelatedListing {
   metadata: Record<string, any>;
 }
 
+/** Ensure a URL has a protocol prefix */
+function ensureProtocol(url: string): string {
+  if (!url) return url;
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  return `https://${url}`;
+}
+
+/** Clean phone for tel: link (strip non-numeric except leading +) */
+function cleanPhone(phone: string): string {
+  if (!phone) return phone;
+  return phone.replace(/[^\d+]/g, '');
+}
+
 export default function ListingDetailPage() {
   const params = useParams();
   const slug = params.slug as string;
@@ -299,6 +312,53 @@ export default function ListingDetailPage() {
                 </div>
               )}
             </motion.div>
+
+            {/* Featured Video — Premium tier only */}
+            {listing.tier === 'premium' && listing.is_claimed && listing.metadata?.video_url && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.08 }}
+                className="rounded-2xl border border-gold/20 overflow-hidden"
+                style={{ background: 'rgba(201,168,76,0.04)' }}
+                data-testid="featured-video"
+              >
+                <div className="flex items-center gap-2 px-4 py-3 border-b border-gold/10">
+                  <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" />
+                  </svg>
+                  <span className="text-xs font-heading font-semibold text-gold uppercase tracking-wider">Featured Video</span>
+                </div>
+                <div className="relative aspect-video">
+                  {listing.metadata.video_url.includes('youtube.com') || listing.metadata.video_url.includes('youtu.be') ? (
+                    <iframe
+                      src={listing.metadata.video_url.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/')}
+                      className="w-full h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      title={`${listing.business_name} video`}
+                    />
+                  ) : listing.metadata.video_url.includes('vimeo.com') ? (
+                    <iframe
+                      src={listing.metadata.video_url.replace('vimeo.com/', 'player.vimeo.com/video/')}
+                      className="w-full h-full"
+                      allow="autoplay; fullscreen; picture-in-picture"
+                      allowFullScreen
+                      title={`${listing.business_name} video`}
+                    />
+                  ) : (
+                    <video
+                      src={listing.metadata.video_url}
+                      controls
+                      className="w-full h-full object-cover"
+                      poster={listing.cover_image_url || undefined}
+                    >
+                      Your browser does not support the video tag.
+                    </video>
+                  )}
+                </div>
+              </motion.div>
+            )}
 
             {/* Photo Gallery */}
             {photos.length > 0 && (
@@ -715,12 +775,12 @@ export default function ListingDetailPage() {
             >
               <h3 className="text-sm font-heading font-semibold text-white uppercase tracking-wider mb-5">Contact</h3>
 
-              {/* CTA Buttons — Pro/Premium only */}
-              {listing.tier !== 'free' && listing.is_claimed && (
+              {/* CTA Buttons — show for all listings with contact info */}
+              {(listing.phone || listing.website) && (
                 <div className="space-y-2 mb-5" data-testid="cta-buttons">
                   {listing.phone && (
                     <a
-                      href={`tel:${listing.phone}`}
+                      href={`tel:${cleanPhone(listing.phone)}`}
                       className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-bold font-heading text-[#0A0A0A] transition-all hover:scale-[1.02]"
                       style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C97A)', boxShadow: '0 0 16px rgba(201,168,76,0.3)' }}
                       data-testid="cta-call-now"
@@ -733,7 +793,7 @@ export default function ListingDetailPage() {
                   )}
                   {listing.website && (
                     <a
-                      href={listing.website}
+                      href={ensureProtocol(listing.website)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold font-heading text-gold border border-gold/30 hover:bg-gold/5 transition-all"
@@ -752,7 +812,7 @@ export default function ListingDetailPage() {
                 {/* Phone */}
                 {listing.phone && (
                   <a
-                    href={`tel:${listing.phone}`}
+                    href={`tel:${cleanPhone(listing.phone)}`}
                     onClick={() => trackEvent('call')}
                     className="flex items-center gap-3 w-full p-3 rounded-xl border border-white/10 hover:border-gold/30 hover:bg-gold/5 transition-all group"
                     data-testid="contact-phone"
@@ -772,7 +832,7 @@ export default function ListingDetailPage() {
                 {/* Website */}
                 {listing.website && (
                   <a
-                    href={listing.website}
+                    href={ensureProtocol(listing.website)}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => trackEvent('website')}

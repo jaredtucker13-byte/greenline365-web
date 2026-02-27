@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { createClient } from '@/lib/supabase/client';
 
 const TIERS = [
   {
@@ -82,6 +83,60 @@ const MARKETPLACE = [
 
 export default function PricingPage() {
   const [annual, setAnnual] = useState(false);
+  const [loadingTier, setLoadingTier] = useState<string | null>(null);
+
+  // Smart CTA: if user is logged in with a listing, go directly to Stripe checkout
+  const handleUpgrade = useCallback(async (tierId: string) => {
+    if (tierId === 'free') return; // Free tier just navigates via Link
+
+    setLoadingTier(tierId);
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        // Not logged in — redirect to register
+        window.location.href = `/register-business?tier=${tierId}`;
+        return;
+      }
+
+      // Check if user has a listing
+      const { data: listing } = await supabase
+        .from('directory_listings')
+        .select('id')
+        .eq('claimed_by', user.id)
+        .maybeSingle();
+
+      if (!listing) {
+        // Has account but no listing — go to register
+        window.location.href = `/register-business?tier=${tierId}`;
+        return;
+      }
+
+      // User has a listing — create Stripe checkout directly
+      const response = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tier: tierId,
+          listing_id: listing.id,
+          origin_url: window.location.origin,
+        }),
+      });
+
+      const data = await response.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        // Fallback to register
+        window.location.href = `/register-business?tier=${tierId}`;
+      }
+    } catch {
+      window.location.href = `/register-business?tier=${tierId}`;
+    } finally {
+      setLoadingTier(null);
+    }
+  }, []);
 
   return (
     <div className="min-h-screen bg-white">
@@ -148,26 +203,33 @@ export default function PricingPage() {
                 <p className="text-xs text-zinc-500 mb-6">{tier.description}</p>
 
                 {/* CTA */}
-                <Link
-                  href={tier.ctaHref}
-                  className={`block w-full text-center py-3 rounded-xl text-sm font-bold transition-all ${
-                    tier.highlight
-                      ? 'text-black hover:opacity-90'
-                      : tier.id === 'free'
-                        ? 'text-zinc-700 border border-zinc-300 hover:border-zinc-500'
+                {tier.id === 'free' ? (
+                  <Link
+                    href={tier.ctaHref}
+                    className="block w-full text-center py-3 rounded-xl text-sm font-bold transition-all text-zinc-700 border border-zinc-300 hover:border-zinc-500"
+                    data-testid={`pricing-cta-${tier.id}`}
+                  >
+                    {tier.cta}
+                  </Link>
+                ) : (
+                  <button
+                    onClick={() => handleUpgrade(tier.id)}
+                    disabled={loadingTier === tier.id}
+                    className={`block w-full text-center py-3 rounded-xl text-sm font-bold transition-all disabled:opacity-70 ${
+                      tier.highlight
+                        ? 'text-black hover:opacity-90'
                         : 'text-white hover:opacity-90'
-                  }`}
-                  style={
-                    tier.highlight
-                      ? { background: 'linear-gradient(135deg, #FF8C00, #FFB800)' }
-                      : tier.id === 'free'
-                        ? {}
+                    }`}
+                    style={
+                      tier.highlight
+                        ? { background: 'linear-gradient(135deg, #FF8C00, #FFB800)' }
                         : { background: '#1a1a1a' }
-                  }
-                  data-testid={`pricing-cta-${tier.id}`}
-                >
-                  {tier.cta}
-                </Link>
+                    }
+                    data-testid={`pricing-cta-${tier.id}`}
+                  >
+                    {loadingTier === tier.id ? 'Loading...' : tier.cta}
+                  </button>
+                )}
 
                 {/* Features */}
                 <div className="mt-6 space-y-3">
