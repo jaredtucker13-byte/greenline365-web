@@ -12,6 +12,12 @@
 | `reports/progress-report-2026-02-27.md` | Feb 27 | **READ THIS** — Full platform audit. 73 pages, 160+ APIs, scorecard, priority build list. |
 | `reports/progress-report-2026-02-25.md` | Feb 25 | Cross-reference of 6 brainstorming docs vs live codebase. System-by-system gaps. |
 
+## Setup Guides
+
+| File | Summary |
+|------|---------|
+| `STRIPE_SETUP_GUIDE.md` | **Step-by-step** — Create Stripe account, products, webhook, env vars, test purchase, go live |
+
 ## Architecture & Specs
 
 | File | Summary |
