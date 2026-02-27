@@ -88,6 +88,18 @@ These are sold through email outreach only. NOT on the public pricing page.
 - Filing Cabinet (locked on Free, full on Paid)
 - "Connect with a Verified Greenline Pro" button when scores drop
 
+#### Founding Member Offer — Home Ledger (DECIDED 2026-02-27)
+- **First 500 homeowners** get locked-in at **$19/mo for life**
+- Same Full Access features — just a permanent price lock
+- 500 founding homeowners = viral growth engine: each one pressures their contractors to join GL365, tells their neighbors, and actively shops for Verified Greenline Pros
+- This is the cheapest customer acquisition channel GL365 will ever have
+
+#### Property Manager Bulk Pricing (DECIDED 2026-02-27)
+| Properties | Per-Property Price |
+|---|---|
+| 1-19 properties | $29/mo each |
+| 20+ properties | **$24/mo each** |
+
 #### Included in Command Center Tiers
 - All Command Center tiers (Tier 1/2/3) include full Home Ledger access at no extra cost.
 - Standalone pricing is for homeowners/property managers who do NOT need the Command Center.
@@ -117,10 +129,11 @@ These are sold through email outreach only. NOT on the public pricing page.
 
 ## FOUNDING MEMBER PRICING SUMMARY
 
-| Program | Cap | Discount | Ongoing |
-|---------|-----|----------|---------|
-| Booking System Founding Members | 30 | $500 off setup | $500/mo off for life + beta + 25% new features |
-| Directory Founding Members | 50 | Featured placement + priority support | Locked-in listing rate forever |
+| Program | Cap | Offer | Ongoing |
+|---------|-----|-------|---------|
+| Booking System Founding Members | 30 businesses | $500 off setup | $500/mo off for life + beta + 25% new features |
+| Directory Founding Members | 50 businesses | Featured placement + priority support | Locked-in listing rate forever |
+| **Home Ledger Founding Members** | **500 homeowners** | **$19/mo (vs $29 standard)** | **Price locked for life — never increases** |
 
 ---
 
@@ -150,5 +163,5 @@ This routes Command Center interest to a booking call without creating confusion
 
 ---
 
-Last updated: 2026-02-21
-Status: Directory pricing is live and confirmed. Back-end pricing is all TBD. This doc should be updated every time a pricing decision is made. Move confirmed decisions to docs/specs/pricing.md when finalized.
+Last updated: 2026-02-27
+Status: Directory pricing live. Home Ledger standalone freemium confirmed ($0 free / $29 full / $19 founding). PM bulk pricing confirmed ($24/mo at 20+ units). Booking System base price still TBD. Move confirmed decisions to docs/specs/pricing.md when finalized.

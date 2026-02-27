@@ -224,12 +224,45 @@ Property managers are a key segment for standalone Home Ledger:
 
 ---
 
+### FOUNDING MEMBER OFFER — HOME LEDGER (DECIDED 2026-02-27)
+
+**First 500 homeowners get locked-in at $19/mo for life.**
+
+| | Standard | Founding Member (500 spots) |
+|---|---|---|
+| Monthly Price | $29/mo | **$19/mo — locked for life** |
+| Cap | Unlimited | First 500 homeowners |
+| Features | Full Access tier | Full Access tier (identical) |
+| Price Lock | Subject to future increases | **Never increases** |
+
+**Why 500 (not 50 or 100):**
+This is a B2C consumer product, not a B2B enterprise play. 500 founding homeowners creates a critical mass that generates organic viral growth. Each founding member becomes an evangelist who:
+1. **Pressures their contractors** — "Why aren't you on Greenline365? My last plumber logged everything."
+2. **Tells their neighbors** — "I pay $19/mo and every repair on my house is verified. When I sell, this pays for itself."
+3. **Shops for Greenline Pros** — Homeowners actively seek out service providers who use GL365, which grows the B2B directory organically without outbound sales.
+
+**The flywheel:** Founding homeowners → demand verified contractors → contractors join GL365 directory → more homeowners get free Ledgers via Pro scans → more upgrades → more demand for verified contractors.
+
+This is the cheapest customer acquisition channel GL365 will ever have. $19/mo founding members are not a discount — they are a growth investment.
+
+---
+
+### PROPERTY MANAGER BULK PRICING (DECIDED 2026-02-27)
+
+| Properties | Per-Property Price | Monthly Total Example |
+|---|---|---|
+| 1-19 properties | $29/mo each | 10 props = $290/mo |
+| 20+ properties | **$24/mo each** | 50 props = $1,200/mo |
+
+**Why $24:** A PM managing 20+ units is a high-value, low-churn customer. The $5/property discount (17% off) rewards commitment and makes GL365 the obvious choice over spreadsheets or generic property management software. At 50 properties, the PM pays $1,200/mo — serious recurring revenue with near-zero support cost per unit.
+
+---
+
 ### REMAINING OPEN QUESTIONS
-- What is the founding member offer for Home Ledger specifically? (Consider: first 100 homeowners get locked-in $19/mo for life?)
-- Should /home-ledger landing page be updated to reflect the freemium model before outreach?
+- Should /home-ledger landing page be updated to reflect the freemium model + founding member offer before outreach?
 - The Filing Cabinet "CPA Export" feature — confirmed as Paid-tier only (see above)
 - Incidents module — is digital signature collection already functional?
-- Property manager bulk pricing — is there a volume discount (e.g., 20+ properties = $24/mo each)?
+- Founding member badge/indicator — should founding homeowners get a visible badge on their Ledger? (e.g., "Founding Member — Est. 2026")
 
 ---
 
@@ -359,5 +392,5 @@ A property with stains but no resolutions is a red flag. A property with stains 
 
 ---
 
-Last updated: 2026-02-22
-Status: Strategic pivot documented. Brain ecosystem PRD appended. Pricing reconciliation flagged. Engineering sequence proposed.
+Last updated: 2026-02-27
+Status: Standalone freemium product confirmed. Founding member offer (500 homeowners at $19/mo for life) decided. PM bulk pricing ($24/mo at 20+ units) decided. Brain ecosystem PRD appended. Engineering sequence proposed.
