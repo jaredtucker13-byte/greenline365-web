@@ -38,25 +38,85 @@ interface Listing {
 }
 
 // ─── Category & Subcategory Map ────────────────────────────────────
+// Industries where businesses should NOT show "Claim Listing" (chains, franchises, emergency services)
+const NON_CLAIMABLE_INDUSTRIES = ['convenience-grocery', 'emergency-services'];
+
 const CATEGORIES = [
-  { id: 'services', label: 'Services', sub: 'HVAC, Plumbing, Electrical & More', img: '/images/categories/services.png',
-    subcategories: ['All', 'HVAC', 'Plumbing', 'Electrical', 'Roofing', 'General Contractors', 'Landscaping', 'Pest Control', 'Cleaning'] },
+  // === HOME SERVICES (The Big Five + all trades) ===
+  { id: 'services', label: 'Home Services', sub: 'HVAC, Plumbing, Electrical & Every Trade', img: '/images/categories/services.png',
+    subcategories: [
+      'All',
+      // Big Five
+      'HVAC', 'Plumbing', 'Electrical', 'Roofing', 'Pest Control',
+      // Cleaning & Maintenance
+      'House Cleaning', 'Carpet Cleaning', 'Pressure Washing', 'Window Cleaning', 'Junk Removal',
+      // Exterior & Landscaping
+      'Lawn Care', 'Landscaping', 'Tree Service', 'Pool & Spa', 'Fencing', 'Irrigation',
+      // Interior & Finishing
+      'Painting', 'Flooring', 'Handyman', 'Kitchen & Bath', 'Windows & Doors', 'Garage Doors', 'Gutters',
+      // Tech & Security
+      'Smart Home', 'Security Systems', 'Home Theater',
+      // Structural & Specialty
+      'Foundations', 'Masonry', 'Insulation', 'Mold Remediation', 'Water Damage',
+      // General
+      'General Contractors', 'Locksmith', 'Appliance Repair', 'Septic & Sewer',
+    ] },
+
+  // === AUTOMOTIVE ===
+  { id: 'automotive', label: 'Automotive', sub: 'Repairs, dealers & body shops', img: '/images/categories/services.png',
+    subcategories: ['All', 'Auto Repair', 'Oil Change', 'Tire Shops', 'Body Shops', 'Car Dealers', 'Auto Parts', 'Towing', 'Car Wash', 'Auto Detailing', 'EV Charging'] },
+
+  // === MARINE & OUTDOOR (Key West / Coastal Florida) ===
+  { id: 'marine-outdoor', label: 'Marine & Outdoor', sub: 'Boats, docks & outdoor adventure', img: '/images/categories/destinations.png',
+    subcategories: ['All', 'Boat Repair', 'Marine Mechanics', 'Dock & Lift', 'Boat Cleaning', 'Fishing Charters', 'Kayak & Paddleboard', 'Dive Shops', 'Marinas'] },
+
+  // === DINING ===
   { id: 'dining', label: 'Dining', sub: 'Cafes, casual & fine dining', img: '/images/categories/dining.png',
-    subcategories: ['All', 'Fine Dining', 'Casual', 'Cafes & Bakeries', 'Food Trucks', 'Seafood'] },
-  { id: 'health-wellness', label: 'Health & Wellness', sub: 'Doctors, dentists & more', img: '/images/categories/health-wellness.png',
-    subcategories: ['All', 'Dental Offices', 'Physical Therapy', 'Medical Clinics', 'Mental Health', 'Fitness'] },
+    subcategories: ['All', 'Fine Dining', 'Casual', 'Cafes & Bakeries', 'Food Trucks', 'Seafood', 'BBQ', 'Pizza', 'Mexican', 'Asian', 'Italian', 'Breakfast & Brunch', 'Vegan & Vegetarian'] },
+
+  // === HEALTH & WELLNESS ===
+  { id: 'health-wellness', label: 'Health & Wellness', sub: 'Doctors, dentists, fitness & more', img: '/images/categories/health-wellness.png',
+    subcategories: ['All', 'Dental Offices', 'Physical Therapy', 'Medical Clinics', 'Mental Health', 'Fitness', 'Chiropractors', 'Optometrists', 'Urgent Care', 'Pharmacies', 'Dermatology', 'Orthopedics'] },
+
+  // === STYLE & SHOPPING ===
   { id: 'style-shopping', label: 'Style & Shopping', sub: 'Fashion, grooming & retail', img: '/images/categories/style-shopping.png',
-    subcategories: ['All', 'Barbershops', 'Salons', 'Boutiques', 'Auto Detailing', 'Jewelry'] },
+    subcategories: ['All', 'Barbershops', 'Salons', 'Nail Salons', 'Spas', 'Boutiques', 'Jewelry', 'Tattoo & Piercing', 'Dry Cleaning & Laundry'] },
+
+  // === NIGHTLIFE ===
   { id: 'nightlife', label: 'Nightlife', sub: 'Bars, lounges & live music', img: '/images/categories/nightlife.png',
-    subcategories: ['All', 'Cocktail Bars', 'Sports Bars', 'Live Music', 'Clubs', 'Breweries'] },
+    subcategories: ['All', 'Cocktail Bars', 'Sports Bars', 'Live Music', 'Clubs', 'Breweries', 'Wine Bars', 'Hookah Lounges', 'Karaoke'] },
+
+  // === CONVENIENCE & GROCERY (non-claimable) ===
+  { id: 'convenience-grocery', label: 'Convenience & Grocery', sub: 'Publix, Walmart, gas stations & more', img: '/images/categories/services.png',
+    subcategories: ['All', 'Grocery Stores', 'Convenience Stores', 'Gas Stations', 'Supermarkets', 'Specialty Foods', 'Liquor Stores', 'Farmers Markets'] },
+
+  // === EMERGENCY SERVICES (non-claimable) ===
+  { id: 'emergency-services', label: 'Emergency Services', sub: 'Fire, police, hospitals & urgent care', img: '/images/categories/health-wellness.png',
+    subcategories: ['All', 'Fire Stations', 'Police Stations', 'Hospitals', 'Emergency Rooms', 'Poison Control', 'Crisis Centers'] },
+
+  // === FAMILY ENTERTAINMENT ===
   { id: 'family-entertainment', label: 'Family Entertainment', sub: 'Fun for all ages', img: '/images/categories/family-entertainment.png',
-    subcategories: ['All', 'Theme Parks', 'Arcades', 'Mini Golf', 'Bowling', 'Water Parks'] },
+    subcategories: ['All', 'Theme Parks', 'Arcades', 'Mini Golf', 'Bowling', 'Water Parks', 'Zoos & Aquariums', 'Trampoline Parks', 'Escape Rooms'] },
+
+  // === DESTINATIONS ===
   { id: 'destinations', label: 'Destinations', sub: 'Florida city guides', img: '/images/categories/destinations.png',
-    subcategories: ['All', 'Beaches', 'Museums', 'Parks', 'Historic Sites', 'Tours'] },
+    subcategories: ['All', 'Beaches', 'Museums', 'Parks', 'Historic Sites', 'Tours', 'Nature Trails', 'State Parks'] },
+
+  // === HOTELS & LODGING ===
   { id: 'hotels-lodging', label: 'Hotels & Lodging', sub: 'Where to stay', img: '/images/categories/destinations.png',
-    subcategories: ['All', 'Hotels', 'Resorts', 'Vacation Rentals', 'Boutique Hotels', 'B&Bs'] },
+    subcategories: ['All', 'Hotels', 'Resorts', 'Vacation Rentals', 'Boutique Hotels', 'B&Bs', 'Hostels', 'RV Parks'] },
+
+  // === PROFESSIONAL SERVICES ===
   { id: 'professional-services', label: 'Professional Services', sub: 'Legal, finance & consulting', img: '/images/categories/services.png',
-    subcategories: ['All', 'Attorneys', 'Accountants', 'Insurance', 'Real Estate', 'Financial Advisors'] },
+    subcategories: ['All', 'Attorneys', 'Accountants', 'Insurance', 'Real Estate', 'Financial Advisors', 'IT Services', 'Marketing Agencies', 'Notary'] },
+
+  // === EDUCATION & CHILDCARE ===
+  { id: 'education', label: 'Education & Childcare', sub: 'Schools, tutoring & daycare', img: '/images/categories/services.png',
+    subcategories: ['All', 'Preschools', 'Daycare', 'Tutoring', 'Driving Schools', 'Music Lessons', 'Dance Studios', 'Martial Arts', 'Language Schools'] },
+
+  // === PETS ===
+  { id: 'pets', label: 'Pets', sub: 'Vets, grooming & boarding', img: '/images/categories/services.png',
+    subcategories: ['All', 'Veterinarians', 'Pet Grooming', 'Pet Boarding', 'Pet Stores', 'Dog Training', 'Pet Sitting', 'Aquarium & Fish'] },
 ];
 
 function Stars({ rating, size = 14 }: { rating: number; size?: number }) {
@@ -916,10 +976,13 @@ function GroupedBrowseView({ activeCategory, sortBy, setSortBy, cityFilter, setC
     : CATEGORIES.map(c => ({ id: c.id, label: c.label, sub: c.sub, searchTerm: '' }));
 
   const industryMap: Record<string, string> = {
-    'services': 'services', 'dining': 'dining', 'health-wellness': 'health-wellness',
+    'services': 'services', 'automotive': 'automotive', 'marine-outdoor': 'marine-outdoor',
+    'dining': 'dining', 'health-wellness': 'health-wellness',
     'style-shopping': 'style-shopping', 'nightlife': 'nightlife',
+    'convenience-grocery': 'convenience-grocery', 'emergency-services': 'emergency-services',
     'family-entertainment': 'family-entertainment', 'destinations': 'destinations',
     'hotels-lodging': 'destinations', 'professional-services': 'services',
+    'education': 'education', 'pets': 'pets',
   };
 
   return (

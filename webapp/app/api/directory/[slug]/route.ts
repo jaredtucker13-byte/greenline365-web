@@ -35,7 +35,7 @@ export async function GET(
   const allPhotos: string[] = listing.gallery_images || [];
   const industry = listing.industry || 'services';
   const placeholder = getPlaceholderImage(industry);
-  const claimable = isClaimable(listing.business_name || '');
+  const claimable = isClaimable(listing.business_name || '', industry);
 
   // Non-claimable: show photos freely
   const isFreeOrUnclaimed = claimable && (tier === 'free' || !isClaimed);

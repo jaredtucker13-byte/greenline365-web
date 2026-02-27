@@ -15,7 +15,7 @@ function applyPhotoGating(listing: any) {
   const allPhotos: string[] = listing.gallery_images || [];
   const industry = listing.industry || 'services';
   const placeholder = getPlaceholderImage(industry);
-  const claimable = isClaimable(listing.business_name || '');
+  const claimable = isClaimable(listing.business_name || '', industry);
 
   // Non-claimable businesses (chains, hospitals, etc): show photos freely
   if (!claimable) {
