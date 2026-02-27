@@ -50,8 +50,8 @@ const NON_CLAIMABLE_KEYWORDS = [
   'regions bank', 'suntrust', 'truist',
 ];
 
-/** Industries that never show "Claim Listing" */
-const NON_CLAIMABLE_INDUSTRIES = ['convenience-grocery', 'emergency-services'];
+/** Industries that never show "Claim Listing" — non-profits and civic orgs are community resources, not sales targets */
+const NON_CLAIMABLE_INDUSTRIES = ['convenience-grocery', 'emergency-services', 'civic_nonprofit'];
 
 /**
  * Check if a listing should show the "Claim Listing" CTA.
