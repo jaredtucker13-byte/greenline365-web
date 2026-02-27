@@ -259,10 +259,53 @@ This is the cheapest customer acquisition channel GL365 will ever have. $19/mo f
 ---
 
 ### REMAINING OPEN QUESTIONS
-- Should /home-ledger landing page be updated to reflect the freemium model + founding member offer before outreach?
+- Should /home-ledger landing page be updated to reflect the freemium model + founding member offer before outreach? **DECISION: YES — update immediately before outreach.**
 - The Filing Cabinet "CPA Export" feature — confirmed as Paid-tier only (see above)
-- Incidents module — is digital signature collection already functional?
-- Founding member badge/indicator — should founding homeowners get a visible badge on their Ledger? (e.g., "Founding Member — Est. 2026")
+- Incidents module — is digital signature collection already functional? **ANSWER: YES — fully built with secure tokens, acknowledge/refuse, IP logging, 30-day expiry.**
+- Founding member badge/indicator — should founding homeowners get a visible badge on their Ledger? **DECISION: YES — "Founding Member — Est. 2026" badge. Proves data vintage at resale.**
+
+---
+
+## CODEBASE AUDIT — STRATEGIC EXECUTION GAPS (2026-02-27)
+
+Cross-examination of the strategic plan against the actual codebase. Identifies what's built, what's schema-ready, and what needs to be built from scratch.
+
+### PRODUCTION READY (Use Now)
+| Component | Location | Status |
+|-----------|----------|--------|
+| Incident Report PDF | `webapp/lib/pdf/IncidentReportPDF.tsx` (927 lines) | Professional multi-section report with evidence gallery, AI analysis, signatures, audit trail |
+| AI Image Analysis | `webapp/app/api/incidents/analyze/route.ts` | Claude Opus 4.6 HVAC damage detection — mold, water, structural, safety |
+| AI Report Generation | `webapp/app/api/incidents/generate-report/route.ts` | Compiles all image analyses into structured findings, risk assessment, recommendations |
+| PDF Generation API | `webapp/app/api/incidents/generate-pdf/route.ts` | Generates, SHA-256 hashes, stores to Supabase |
+| Digital Signatures | `webapp/app/sign/[token]/page.tsx` + API | Secure token links, acknowledge/refuse, IP/user-agent logging, 30-day expiry |
+| Filing Cabinet + CPA Export | `webapp/app/admin-v2/filing-cabinet/page.tsx` | Document vault with CSV export (file name, category, amount, date) |
+| Photo Upload | `webapp/app/api/incidents/upload/route.ts` | Multi-image upload to Supabase storage |
+| /home-ledger Page Shell | `webapp/app/home-ledger/page.tsx` (322 lines) | Obsidian Silk landing page — structure good, copy needs freemium rewrite |
+| Directory Badge System (B2B) | `directory_badges` table + API | 7 badge types, ghost/active states, renders on listing cards |
+
+### SCHEMA READY — NEEDS WIRING (Quick Lifts)
+| Component | What Exists | What's Missing |
+|-----------|-------------|----------------|
+| EXIF/GPS Extraction | `exif_data` JSONB column on `incident_images` with `gps_lat`, `gps_lng`, `taken_at`, `device`, `camera_make` | No EXIF parsing library installed. Upload handler creates empty object. **Fix: Install `exifr`, extract on upload.** |
+| GPS in PDFs | `IncidentReportPDF.tsx` line 599-603: renders GPS if `image.exif_data?.gps_lat` exists | Data never populated, so conditional never fires. Wiring EXIF extraction fixes this automatically. |
+| Photo Timestamps | `taken_at` column on `incident_images` | Never populated from EXIF. Same fix as above. |
+
+### NEEDS TO BE BUILT (New Work)
+| Component | Priority | Notes |
+|-----------|----------|-------|
+| /home-ledger page rewrite | HIGH | Add freemium tier comparison, $19 founding offer with urgency counter, "Free Home Health Score" hook, "Connect with Verified Pro" CTA |
+| Home Ledger Founding Member DB schema | HIGH | New table: `home_ledger_members` with tier (free/paid/founding), price_locked_at, enrolled_at, founding_member_number. Counter for "X of 500 spots remaining." |
+| Founding Member enrollment + payment | HIGH | Stripe Checkout for $19/mo founding or $29/mo standard. Self-serve from landing page. |
+| "Founding Member — Est. 2026" badge | MEDIUM | New badge type for homeowner Ledger dashboard. Proves data vintage at resale. |
+| Standalone homeowner dashboard | HIGH | Stripped-down consumer view separate from Command Center. Health scores, certificates, locked/unlocked Filing Cabinet. |
+| "Proof of Presence" PDF template | MEDIUM | New PDF document type combining GPS-verified photos + CRM screenshots + timestamps. Built on existing @react-pdf/renderer infrastructure. |
+| ServiceTitan/CRM screenshot upload | MEDIUM | New upload field in incident flow for professional work order screenshots. Links Home Ledger to external CRM records. |
+| "Connect with Verified Greenline Pro" CTA | MEDIUM | Triggered when any asset health score drops below threshold. Routes to GL365 directory. Closes B2C→B2B loop. |
+| Property Manager portfolio dashboard | LOW (for now) | Multi-property view, sorted by health, bulk pricing logic ($24/mo at 20+ units), bad-actor contractor flagging. |
+| Clean Bill of Health (CBoH) document | LOW (for now) | Documented in `memory/AUDIT_SYSTEM_SPEC.md` but no code. Issued when all incidents resolved. |
+
+### KEY TECHNICAL NOTE
+The Home Ledger Founding Member program is **entirely new** — there is no existing homeowner membership infrastructure in the codebase. The B2B founding member programs (Directory: 50 businesses, Booking: 30 businesses) are documented in brainstorming only with zero code implementation. The homeowner program (500 at $19/mo) was decided on 2026-02-27 and has no prior documentation.
 
 ---
 
