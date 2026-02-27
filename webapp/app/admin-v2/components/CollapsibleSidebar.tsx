@@ -406,6 +406,56 @@ export default function CollapsibleSidebar({
         })}
       </nav>
 
+      {/* Quick Switch — Navigate between Platform, Portal, and Directory */}
+      {!isCollapsed && isPlatformOwner && (
+        <div className="p-3 space-y-1" style={{ borderTop: '1px solid var(--theme-glass-border)' }}>
+          <span className="text-[9px] font-semibold uppercase tracking-[0.15em] px-2 block mb-1.5" style={{ color: 'var(--theme-text-muted)' }}>
+            SWITCH VIEW
+          </span>
+          <Link
+            href="/admin-v2"
+            className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-all hover:bg-white/5"
+            style={{ color: 'var(--theme-text-secondary)' }}
+          >
+            <svg className="w-4 h-4" style={{ color: '#39FF14' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            Command Center
+          </Link>
+          <Link
+            href="/portal"
+            className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-all hover:bg-white/5"
+            style={{ color: 'var(--theme-text-secondary)' }}
+          >
+            <svg className="w-4 h-4" style={{ color: '#C9A84C' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3.75c0 .414.336.75.75.75Z" />
+            </svg>
+            My Listing Portal
+          </Link>
+          <Link
+            href="/admin-v2/directory"
+            className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-all hover:bg-white/5"
+            style={{ color: 'var(--theme-text-secondary)' }}
+          >
+            <svg className="w-4 h-4" style={{ color: '#8B5CF6' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
+            </svg>
+            Directory Manager
+          </Link>
+          <a
+            href="/"
+            className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-all hover:bg-white/5"
+            style={{ color: 'var(--theme-text-muted)' }}
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+            </svg>
+            View Public Site
+          </a>
+        </div>
+      )}
+
       {/* Action Buttons */}
       {!isCollapsed && (
         <div className="p-4 space-y-2" style={{ borderTop: '1px solid var(--theme-glass-border)' }}>
