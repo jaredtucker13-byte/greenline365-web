@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { BadgeDisplay } from '@/components/ui/os/BadgeDisplay';
 
 interface Listing {
   id: string;
@@ -353,6 +354,22 @@ export default function ListingDetailPage() {
                   </span>
                 </div>
               )}
+            </motion.div>
+
+            {/* Reputation Badges — 7 industry badges */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.06 }}
+              className="rounded-2xl border border-white/10 p-5"
+              style={{ background: 'rgba(255,255,255,0.03)' }}
+              data-testid="reputation-badges"
+            >
+              <BadgeDisplay
+                earnedBadges={listing.directory_badges || []}
+                tier={listing.tier}
+                isClaimed={listing.is_claimed}
+              />
             </motion.div>
 
             {/* Featured Video — Premium tier only */}
@@ -994,8 +1011,8 @@ export default function ListingDetailPage() {
             >
               <h3 className="text-sm font-heading font-semibold text-white uppercase tracking-wider mb-5">Contact</h3>
 
-              {/* CTA Buttons — show for all listings with contact info */}
-              {(listing.phone || listing.website) && (
+              {/* CTA Buttons — Pro+ tier only (free tier sees contact info below but not prominent CTAs) */}
+              {listing.tier !== 'free' && (listing.phone || listing.website) && (
                 <div className="space-y-2 mb-5" data-testid="cta-buttons">
                   {listing.phone && (
                     <button

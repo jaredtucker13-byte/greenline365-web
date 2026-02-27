@@ -9,6 +9,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { BadgeDisplay } from '@/components/ui/os/BadgeDisplay';
 
 interface Listing {
   id: string;
@@ -805,7 +806,17 @@ function ListingCard({ listing: l, index: i }: { listing: Listing; index: number
             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
             {l.city}, {l.state}
             {l.distance != null && <span style={{ color: 'rgba(201,168,76,0.6)' }} className="ml-1">({l.distance} mi)</span>}
+            {l.tier !== 'free' && l.is_claimed && (
+              <span className="inline-flex items-center gap-0.5 ml-1 text-[9px] font-heading font-bold uppercase text-emerald-400/80">
+                <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                Verified
+              </span>
+            )}
           </p>}
+          {/* Compact badge row */}
+          <div className="mb-2">
+            <BadgeDisplay earnedBadges={l.directory_badges || []} tier={l.tier} isClaimed={l.is_claimed ?? false} compact />
+          </div>
           {l.description && <p className="text-xs text-white/35 line-clamp-2 mb-3 font-body">{l.description}</p>}
           <div className="flex items-center justify-between">
             <span className="btn-ghost text-xs px-3 py-1.5 rounded-full" data-testid={`view-details-${l.slug}`}>View Details</span>
