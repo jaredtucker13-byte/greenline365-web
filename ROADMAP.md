@@ -1263,6 +1263,250 @@ Leagues drive venue traffic. The Directory is the foundation.
 
 ---
 
+## Future Revenue Streams — Platform Expansion Pricing
+
+**Pricing Philosophy:** GL365 is a startup. Launch prices are intentionally low to drive adoption. Every price below includes a "Launch" column (what we charge now to get users in the door) and an "Established" column (what we raise to once the value is proven and adoption is strong). The jump should feel justified — more features, more data, more users on the platform backing the value.
+
+---
+
+### 1. City Passport — Local Business Challenges
+
+**What it is:** Gamified exploration challenges — "Visit 5 coffee shops in Tampa this month → earn the Caffeine Explorer badge." Businesses opt in through their existing directory listing. Consumers scan QR at each stop (uses existing Blast Deals QR infra). Completing a challenge earns XP on their Identity Passport.
+
+**Who pays:** Businesses who want to sponsor/create featured challenges.
+
+| Product | Launch Price | Established Price | Notes |
+|---|---|---|---|
+| Participate in challenges | Free (consumer) | Free | Always free — this is engagement |
+| Business opt-in to challenges | Free (included in directory listing) | Free | More stops = better challenges |
+| Sponsored challenge (featured + promoted) | $99/challenge | $249/challenge | "Complete the Ybor Taco Trail" — sponsored by a restaurant group |
+| Multi-stop campaign (5+ businesses, co-branded) | $349/campaign | $799/campaign | Tourism boards, BIDs, restaurant groups |
+| Recurring monthly challenge | $79/mo | $199/mo | Auto-renews, always featured |
+
+**Why these prices work at launch:** $99 for a sponsored challenge is cheaper than a single Facebook ad campaign and generates real foot traffic. Easy yes for a local business. Room to triple the price once we can show conversion data.
+
+---
+
+### 2. Event Check-In & Ticketing
+
+**What it is:** Any local event (block party, farmer's market, concert, 5K run) uses GL365 as the check-in system. Organizer creates a Session (type: 'event'). Attendees scan QR → checked in via Identity Passport. Real-time headcount. Post-event AI recap.
+
+**Who pays:** Event organizers.
+
+| Product | Launch Price | Established Price | Notes |
+|---|---|---|---|
+| Single event (up to 50 attendees) | $19/event | $39/event | Farmer's markets, meetups, small gatherings |
+| Single event (up to 200 attendees) | $39/event | $79/event | Block parties, charity runs, concerts in the park |
+| Single event (up to 1,000 attendees) | $79/event | $149/event | Festivals, large community events |
+| Monthly unlimited events | $69/mo | $149/mo | Recurring organizers (weekly farmer's markets, monthly meetups) |
+| Annual unlimited | $549/yr | $1,199/yr | Saves ~35% vs monthly, locks in commitment |
+| AI recap + photo package add-on | $9/event | $19/event | Auto-generated recap with tagged photos, shareable link |
+
+**Why these prices work at launch:** $19 for a check-in system at a farmer's market is a no-brainer. The real cost of managing a sign-in sheet + post-event follow-up is hours of time. We're replacing clipboards with QR codes.
+
+---
+
+### 3. Loyalty Program Engine
+
+**What it is:** Any business on the directory runs a loyalty program through GL365. "Visit 10 times → earn a free coffee." Consumer scans QR each visit. Their Identity Passport tracks all loyalty across every business. One app replaces every punch card in their wallet.
+
+**Who pays:** Businesses (add-on to directory subscription).
+
+| Product | Launch Price | Established Price | Notes |
+|---|---|---|---|
+| Basic loyalty (visits tracked, 1 reward tier) | $15/mo | $29/mo | Simple punch-card replacement |
+| Standard loyalty (multiple reward tiers, custom rewards) | $29/mo | $59/mo | "5 visits = free cookie, 10 = free drink, 25 = free meal" |
+| Premium loyalty (analytics, segmentation, push notifications) | $49/mo | $99/mo | Know who your best regulars are, re-engage lapsed customers |
+| Included free in Directory Premium ($89/mo) | Basic loyalty tier | Standard loyalty tier | Upsells directory subscriptions |
+
+**Why these prices work at launch:** $15/mo for a digital loyalty system is less than the cost of printing punch cards. Businesses already pay $20+/mo for standalone loyalty apps. GL365 bundles it into the ecosystem they're already on.
+
+---
+
+### 4. Local Creator & Services Marketplace
+
+**What it is:** Photographers, DJs, caterers, handymen, tutors, pet sitters — anyone in the gig/freelance and artisan directory categories gets a full service profile. Portfolio, booking requests, reviews. "Request a Quote" button feeds into CRM as a lead.
+
+**Who pays:** Service providers (subscription), plus optional transaction lead fees.
+
+| Product | Launch Price | Established Price | Notes |
+|---|---|---|---|
+| Basic creator listing | Free | Free | Photo, bio, category, reviews — same as any directory listing |
+| Creator Pro (portfolio, booking, lead capture) | $25/mo | $49/mo | Up to 20 portfolio items, booking calendar, quote requests |
+| Creator Premium (featured, AI-written profile, unlimited portfolio) | $45/mo | $89/mo | AI writes service descriptions, featured in search results |
+| Lead fee (per qualified booking request) | $2/lead | $5/lead | Only charged when a consumer submits a request — pay for results |
+
+**Why these prices work at launch:** $25/mo for a full service profile with lead capture is dirt cheap compared to Thumbtack ($15-75 per lead), Bark ($5-30 per lead), or HomeAdvisor ($15-100 per lead). We're offering subscriptions, not per-lead gouging.
+
+---
+
+### 5. Neighborhood Safety & Community Groups
+
+**What it is:** Neighborhood groups with a safety layer — suspicious activity alerts, lost pet alerts, power outage check-ins, severe weather coordination. Think Nextdoor but inside the GL365 ecosystem, feeding into Game Night discovery and local business engagement.
+
+**Who pays:** This is mostly free (civic utility, top-of-funnel for everything else). Premium features for verified neighborhoods.
+
+| Product | Launch Price | Established Price | Notes |
+|---|---|---|---|
+| Basic neighborhood group | Free | Free | Always free — civic utility drives adoption |
+| Verified Neighborhood (admin tools, emergency alerts, resident verification) | $2.99/mo per household | $5.99/mo per household | Block-level admin, priority alerts, verified resident badges |
+| HOA / Property Management integration | $49/mo | $99/mo | Bulk resident management, announcement tools, vote/survey |
+| Sponsored safety feature (local security company, insurance) | $199/mo | $499/mo | "Neighborhood Watch powered by ADT" — brand placement |
+
+**Why these prices work at launch:** $2.99/household for a verified neighborhood is cheaper than a single Nextdoor ad. The real value is that every household on the platform is now a potential Game Night user, directory browser, and Loop participant. This is the acquisition play.
+
+---
+
+### 6. Rec League & Parks Department Scheduling
+
+**What it is:** Parks & Rec departments use GL365 to manage court reservations, rec league signups, standings, and scheduling. Individual rec league commissioners use it for their own leagues (bowling, softball, cornhole, etc.).
+
+**Who pays:** League commissioners (existing pricing) + government/civic partnerships.
+
+| Product | Launch Price | Established Price | Notes |
+|---|---|---|---|
+| League Commissioner (existing) | $228/season | $228/season | Already defined — no change |
+| League Commissioner Lite (casual, <8 teams) | $99/season | $149/season | Smaller leagues, fewer features |
+| Parks & Rec Department (single facility) | $199/mo | $499/mo | Court reservations, league management, event check-in |
+| Parks & Rec Department (city-wide, all facilities) | $999/mo | $2,499/mo | Unlimited facilities, city dashboard, public recreation portal |
+| Facility booking widget (embeddable on city website) | Included in Parks tier | Included | White-labeled, drops into existing .gov sites |
+
+**Why these prices work at launch:** $199/mo for a parks scheduling system is a fraction of what cities pay for legacy recreation management software ($500-2K+/mo). We're undercutting the market with a modern, mobile-first product and we can raise prices once the city is dependent on it.
+
+---
+
+### 7. Real Estate Open House Check-In
+
+**What it is:** Realtors place a GL365 QR code at open houses. Visitors scan in → auto-logged on Identity Passport. Realtor gets a lead list with contact info. AI generates follow-up email drafts. Visitors can review the neighborhood on GL365.
+
+**Who pays:** Individual realtors and brokerages.
+
+| Product | Launch Price | Established Price | Notes |
+|---|---|---|---|
+| Single open house check-in | $15/event | $29/event | QR code, attendee list, basic export |
+| Monthly unlimited (individual agent) | $49/mo | $99/mo | Unlimited open houses, CRM integration, AI follow-up drafts |
+| Brokerage account (up to 10 agents) | $199/mo | $399/mo | Multi-agent dashboard, team lead routing, brand consistency |
+| Brokerage account (up to 50 agents) | $499/mo | $999/mo | Large brokerages, office-level analytics, custom branding |
+| AI follow-up email drafts (add-on) | $5/open house | $9/open house | Personalized emails drafted per attendee based on visit data |
+
+**Why these prices work at launch:** $15 for a digital open house sign-in is nothing — realtors spend $200+ on open house marketing. The AI follow-up emails alone save hours. $49/mo unlimited is a fraction of what they pay for CRM tools like BoomTown ($750/mo) or Follow Up Boss ($69/mo per agent).
+
+---
+
+### 8. City Intelligence Data Products (Anonymized)
+
+**What it is:** At scale, GL365 has behavioral data nobody else has — where people go, when, what they do, what games they play, what businesses they visit. Anonymized and aggregated, this is gold for city planners, commercial real estate firms, tourism boards, and researchers.
+
+**Who pays:** Municipal governments, commercial real estate firms, tourism boards, market researchers.
+
+| Product | Launch Price | Established Price | Notes |
+|---|---|---|---|
+| Standard city report (single neighborhood, quarterly) | $299/report | $999/report | Foot traffic patterns, business density, activity trends |
+| Custom analytics package (specific questions answered) | $999/report | $4,999/report | "Where do 25-35 year olds eat on Friday nights in SoHo?" |
+| Ongoing data subscription (monthly dashboards) | $499/mo | $1,999/mo | Real-time anonymized city intelligence dashboard |
+| Tourism board package (seasonal insights + event impact) | $799/quarter | $2,499/quarter | "What was the economic impact of Gasparilla on local businesses?" |
+| API access (raw anonymized data feed) | $1,499/mo | $4,999/mo | For firms with their own BI tools — pipe GL365 data into Tableau, etc. |
+
+**Why these prices work at launch:** $299 for a neighborhood report is accessible for a small real estate firm. The data gets more valuable as GL365 grows — a report when we have 10K users is interesting, but when we have 100K users it's priceless. Prices should scale with data quality.
+
+**Important:** This stream only activates when GL365 has significant user scale (50K+ active users in a metro area). Don't sell data products until the data is actually meaningful.
+
+---
+
+### 9. Sponsorship Layer (Non-Intrusive, Context-Aware)
+
+**What it is:** Local businesses sponsor things people are already using — game nights, leagues, tournaments, community feeds. Not banner ads. Contextual, useful integrations: "Tonight's Game Night is sponsored by Tony's Pizza — order with code GAMENIGHT for 15% off."
+
+**Who pays:** Local businesses (must already have an active directory listing).
+
+| Product | Launch Price | Established Price | Notes |
+|---|---|---|---|
+| Game Night sponsor (logo + deal shown on session pages) | $39/mo | $79/mo | Appears on all game nights within 5-mile radius |
+| League sponsor (logo on leaderboard + standings page) | $79/mo | $199/mo | Branded leaderboard, mention in AI recaps |
+| Tournament title sponsor | $149/tournament | $349/tournament | "The Tony's Pizza Invitational" — logo everywhere |
+| Community hub sponsor (featured in activity feed) | $199/mo | $499/mo | Premium placement in the community feed |
+| Loop stop sponsor (priority routing + branded check-in) | $99/mo | $249/mo | AI Scout prioritizes their location on nearby Loops |
+| City Passport challenge sponsor | $99/challenge | $249/challenge | Same as #1 above — cross-listed here for visibility |
+| Bundle: Full sponsorship package (all of the above) | $399/mo | $999/mo | Saves ~40% vs individual. For businesses that want maximum visibility |
+
+**Why these prices work at launch:** $39/mo for game night sponsorship is less than a single pizza. The business is already paying for a directory listing — this is a natural upsell. "You're already on GL365. Want to be the pizza people order during game night?" Easy sell.
+
+---
+
+## Master Revenue Model — All Streams Combined
+
+### Current Revenue Streams (Phase 1, Live Now)
+
+| Stream | Price Range | Year 1 Realistic | Year 2 Growth |
+|---|---|---|---|
+| Directory Free | $0 | $0 (user acquisition) | $0 |
+| Directory Pro | $45/mo | 100 businesses × $45 = $54K/yr | 300 × $45 = $162K/yr |
+| Directory Premium | $89/mo | 40 businesses × $89 = $42.7K/yr | 120 × $89 = $128K/yr |
+| Consumer Plus | $4.99/mo | 200 users × $4.99 = $12K/yr | 1,000 × $4.99 = $60K/yr |
+| Consumer Pro | $9.99/mo | 50 users × $9.99 = $6K/yr | 300 × $9.99 = $36K/yr |
+| Marketplace Add-ons | $19-$150 | ~$18K/yr | ~$60K/yr |
+| **Subtotal** | | **~$133K/yr** | **~$446K/yr** |
+
+### Phase 2-3 Revenue Streams (6-18 months)
+
+| Stream | Price Range | Year 1 After Launch | Year 2 Growth |
+|---|---|---|---|
+| League Commissioners | $99-$228/season | 30 leagues = $20K/yr | 150 leagues = $95K/yr |
+| Game Night (Free tier, drives upgrades) | $0 | $0 (funnel) | $0 (funnel) |
+| Loyalty Program add-on | $15-$49/mo | 50 businesses × $25 avg = $15K/yr | 200 × $35 avg = $84K/yr |
+| Event Check-In | $19-$79/event | 100 events × $35 avg = $3.5K/yr | 500 events + 20 monthly = $34K/yr |
+| Sponsorship Layer | $39-$399/mo | 20 sponsors × $79 avg = $19K/yr | 80 × $149 avg = $143K/yr |
+| **Subtotal** | | **~$58K/yr** | **~$356K/yr** |
+
+### Phase 3.5-4 Revenue Streams (18-36 months)
+
+| Stream | Price Range | Year 1 After Launch | Year 2 Growth |
+|---|---|---|---|
+| Game Maker Partnerships | $500-$10K+/mo | 10 Premium + 3 Pro = $132K/yr | 30P + 10Pro + 2Ent = $660K/yr |
+| Creator Marketplace | $25-$89/mo | 75 creators × $30 avg = $27K/yr | 300 × $45 avg = $162K/yr |
+| Real Estate Check-In | $15-$499/mo | 20 agents × $49 avg = $12K/yr | 80 agents + 5 brokerages = $86K/yr |
+| City Passport Challenges | $79-$349/campaign | 30 challenges = $5K/yr | 150 challenges = $30K/yr |
+| **Subtotal** | | **~$176K/yr** | **~$938K/yr** |
+
+### Phase 5+ Revenue Streams (36+ months, requires scale)
+
+| Stream | Price Range | Year 1 After Launch | Year 2 Growth |
+|---|---|---|---|
+| Parks & Rec Departments | $199-$2,499/mo | 3 facilities × $199 = $7K/yr | 2 cities × $999 = $24K/yr |
+| Neighborhood Safety (Verified) | $2.99/mo/household | 200 households = $7.2K/yr | 2,000 households = $72K/yr |
+| City Intelligence Data Products | $299-$4,999 | 5 reports = $3K/yr | $499/mo sub × 5 + reports = $42K/yr |
+| **Subtotal** | | **~$17K/yr** | **~$138K/yr** |
+
+### Total Revenue Trajectory
+
+```
+                    Year 1        Year 2        Year 3 (projected)
+                    ──────        ──────        ──────────────────
+Current streams     $133K         $446K         $650K
+Phase 2-3           $58K          $356K         $550K
+Phase 3.5-4         $176K         $938K         $1.5M
+Phase 5+            $17K          $138K         $400K
+                    ──────        ──────        ──────
+TOTAL               $384K         $1.88M        $3.1M
+```
+
+**Key assumptions:**
+- Single metro area (Tampa Bay) in Year 1
+- Second metro expansion begins Year 2
+- Established pricing kicks in ~Month 18 (increases all numbers ~60-100%)
+- Game Night is free and acts as the primary user acquisition funnel
+- Every feature feeds the directory. The directory feeds everything else.
+
+**The price increase justification story:**
+1. Launch: "We're new, try us cheap"
+2. 6 months: "Here's the data proving your ROI"
+3. 12 months: "Price goes up for new customers, you're locked at launch rate for 6 more months"
+4. 18 months: "Everyone's at established pricing now — and here's the 3 new features that make it worth it"
+
+This is the standard SaaS playbook. Grandfather early adopters, prove value, then raise prices with new features as the justification.
+
+---
+
 ## Build Priority
 
 ### Phase 1: Shore Up the Sellable Product (NOW)
@@ -1359,18 +1603,93 @@ Leagues drive venue traffic. The Directory is the foundation.
 - [ ] Scorecard recognition training pipeline — community corrections improve accuracy
 - [ ] Featured game placement in Game Library for Premium/Enterprise partners
 
+### Phase 3.75: Platform Revenue Expansion
+- [ ] **Loyalty Program Engine**
+  - [ ] `loyalty_programs` table (business_id, reward tiers, visit thresholds)
+  - [ ] `loyalty_visits` table (user_id, business_id, visited_at, qr_scan_id)
+  - [ ] `loyalty_rewards` table (earned rewards, redeemed status, expiry)
+  - [ ] QR scan → loyalty visit auto-logging (extends existing Blast Deals QR)
+  - [ ] Business portal: create/manage loyalty program
+  - [ ] Consumer view: loyalty card in Identity Passport, progress bars
+  - [ ] Push notification: "1 more visit until your free coffee!"
+  - [ ] Pricing integration: Basic ($15/mo), Standard ($29/mo), Premium ($49/mo)
+  - [ ] Include Basic loyalty free in Directory Premium ($89/mo) tier
+- [ ] **Sponsorship Layer**
+  - [ ] `sponsorships` table (business_id, type, target, start/end, amount)
+  - [ ] Sponsor display component (logo + deal, context-aware placement)
+  - [ ] Game Night sponsor: show sponsor on session pages within radius
+  - [ ] League sponsor: logo on leaderboard + mention in AI recaps
+  - [ ] Tournament title sponsor: branded tournament pages
+  - [ ] Community hub sponsor: featured in activity feed
+  - [ ] Business portal: browse & purchase sponsorship packages
+  - [ ] Pricing: Game Night ($39/mo), League ($79/mo), Tournament ($149/event), Hub ($199/mo), Bundle ($399/mo)
+- [ ] **Event Check-In System**
+  - [ ] Session type: 'event' with attendee capacity tiers
+  - [ ] Event creation page (`/events/new`) — name, date, venue, capacity
+  - [ ] Event QR code generation (scan to check in)
+  - [ ] Real-time headcount dashboard for organizers
+  - [ ] Attendee list export (CSV, PDF)
+  - [ ] Post-event AI recap generation
+  - [ ] Pricing: Single ($19-$79/event by size), Monthly ($69/mo), Annual ($549/yr)
+- [ ] **City Passport Challenges**
+  - [ ] `challenges` table (name, type, stops, sponsor, reward)
+  - [ ] `challenge_progress` table (user_id, challenge_id, stops_completed)
+  - [ ] Challenge creation flow (multi-stop, single-category or mixed)
+  - [ ] Consumer challenge browser + progress tracker
+  - [ ] QR scan at each stop → auto-progress update
+  - [ ] Badge/XP reward on challenge completion
+  - [ ] Business portal: sponsor a challenge ($99/challenge launch price)
+  - [ ] Featured challenges on community hub
+
 ### Phase 4: Loops MVP
 - [ ] Loop template creator
 - [ ] Fog of War map component
 - [ ] QR check-in at venues
 - [ ] Self-healing route logic (weather/traffic)
 - [ ] AI-generated loop recap
+- [ ] Loop stop sponsorship integration ($99/mo per sponsored stop)
 
-### Phase 5: Community Layer
+### Phase 4.5: Creator Marketplace & Real Estate
+- [ ] **Creator & Services Marketplace**
+  - [ ] Extended directory profile for gig/artisan categories: portfolio, booking calendar
+  - [ ] "Request a Quote" flow → CRM lead capture
+  - [ ] Creator Pro features ($25/mo): up to 20 portfolio items, booking calendar
+  - [ ] Creator Premium features ($45/mo): AI profile writing, featured search placement
+  - [ ] Lead fee tracking ($2/lead at launch)
+- [ ] **Real Estate Open House Check-In**
+  - [ ] Session type: 'open_house' with realtor-specific fields
+  - [ ] Open house QR code generation
+  - [ ] Attendee capture with contact info
+  - [ ] AI follow-up email draft generation ($5/event add-on)
+  - [ ] Agent dashboard: all open houses, lead lists, export
+  - [ ] Brokerage accounts: multi-agent management ($199/mo up to 10 agents)
+
+### Phase 5: Community Layer & Neighborhoods
 - [ ] Community Badge for non-profits
 - [ ] Public resource data connectors (Parks API, Transit API)
 - [ ] Volunteer matching via Scout Agent
 - [ ] Civic Loops (History, Volunteer, Support Local)
+- [ ] **Neighborhood Safety & Community Groups**
+  - [ ] Neighborhood group type with location/boundary definition
+  - [ ] Safety alert posting (suspicious activity, lost pets, weather)
+  - [ ] Verified Neighborhood tier ($2.99/mo/household): admin tools, resident verification
+  - [ ] HOA/Property Management integration ($49/mo): bulk management, announcements, surveys
+  - [ ] Sponsored safety features ($199/mo): brand placement on safety tools
+
+### Phase 5.5: Civic & Government Partnerships
+- [ ] **Parks & Rec Scheduling**
+  - [ ] Facility/court booking system (calendar, time slots, capacity)
+  - [ ] Rec league signup integration (extends existing league system)
+  - [ ] Public recreation portal (embeddable widget for .gov sites)
+  - [ ] Single facility tier ($199/mo), City-wide tier ($999/mo)
+- [ ] **City Intelligence Data Products**
+  - [ ] Anonymized data aggregation pipeline (privacy-first, no PII)
+  - [ ] Standard city report template (neighborhood foot traffic, activity trends)
+  - [ ] Custom analytics query builder (internal tool for generating reports)
+  - [ ] Ongoing dashboard subscription product ($499/mo)
+  - [ ] Tourism board seasonal impact reports ($799/quarter)
+  - [ ] API access for enterprise data consumers ($1,499/mo)
+  - [ ] **Requires 50K+ active users before selling** — data must be meaningful
 
 ---
 
