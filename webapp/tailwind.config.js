@@ -192,6 +192,21 @@ module.exports = {
             'box-shadow': '0 0 30px rgba(201, 169, 110, 0.5)',
           },
         },
+        '.btn-secondary': {
+          'padding': '0.75rem 1.5rem',
+          'background': 'rgba(201, 169, 110, 0.1)',
+          'color': '#C9A96E',
+          'font-weight': '600',
+          'border-radius': '9999px',
+          'border': '1px solid rgba(201, 169, 110, 0.3)',
+          'box-shadow': '0 0 10px rgba(201, 169, 110, 0.1)',
+          'transition': 'all 0.3s ease',
+          '&:hover': {
+            'background': 'rgba(201, 169, 110, 0.2)',
+            'border-color': 'rgba(201, 169, 110, 0.6)',
+            'box-shadow': '0 0 20px rgba(201, 169, 110, 0.25)',
+          },
+        },
         '.btn-ghost': {
           'padding': '0.625rem 1.25rem',
           'background': 'transparent',

@@ -229,6 +229,38 @@ textarea:focus {
   }
 }
 
+/* ─── GSAP Nav Scrolled State ─── */
+.main-nav {
+  transition: background 0.4s ease, backdrop-filter 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.main-nav.nav-scrolled {
+  background: rgba(5, 11, 24, 0.85) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-bottom: 1px solid rgba(201, 169, 110, 0.15) !important;
+  box-shadow:
+    0 4px 30px rgba(0, 0, 0, 0.3),
+    0 1px 0 rgba(201, 169, 110, 0.1) !important;
+}
+
+/* Nav neon accent line - only visible when scrolled */
+.main-nav::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 5%;
+  right: 5%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201, 169, 110, 0.3), transparent);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.main-nav.nav-scrolled::after {
+  opacity: 1;
+}
+
 /* GSAP hover lift effect */
 .gsap-hover-lift {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
