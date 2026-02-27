@@ -1569,7 +1569,496 @@ The only exceptions are:
 
 ---
 
-## Master Revenue Model — All Streams Combined
+## Automation Blueprint — Every Stream Runs Itself
+
+**The rule:** If a human at GL365 has to touch it, it doesn't ship. Every revenue stream must be fully self-service — signup, configuration, payment, delivery, and reporting. Zero manual intervention. The only time a GL365 human gets involved is Enterprise deals ($5K+/mo) and government contracts ($999+/mo), because those buyers expect a conversation.
+
+### The 4 Infrastructure Pillars That Power Everything
+
+These already exist or are already planned. Every automated revenue stream below is just a **new UI on top of these same 4 systems:**
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    GL365 Automation Stack                     │
+│                                                               │
+│  1. STRIPE BILLING (Live)                                     │
+│     └─ Handles ALL payments: subscriptions, one-time,         │
+│        usage-based, add-ons, upgrades, downgrades, refunds    │
+│                                                               │
+│  2. BUSINESS PORTAL (Live, 8 pages)                           │
+│     └─ Self-service hub. Every business feature is a new      │
+│        tab or page in the portal they already use              │
+│                                                               │
+│  3. QR CODE + SESSION SYSTEM (Planned)                        │
+│     └─ Universal check-in. Every scan creates a record.       │
+│        Loyalty visits, event check-ins, challenge stops,      │
+│        open house sign-ins — all the same QR scan → log       │
+│                                                               │
+│  4. IDENTITY PASSPORT (Planned)                               │
+│     └─ Consumer's universal profile. Every interaction        │
+│        across every stream feeds into one identity.            │
+│        Loyalty cards, event history, challenge progress,       │
+│        game stats — all in one place                          │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**The pattern is always the same:**
+1. Business/creator/organizer signs up via self-service portal
+2. They configure their product (challenge, loyalty program, event, sponsorship)
+3. They pay via Stripe (auto-billed, no invoicing)
+4. The product goes live immediately (no approval queue)
+5. Consumers interact via QR scan or app
+6. Analytics auto-populate in the portal dashboard
+7. GL365 touches nothing
+
+---
+
+### Stream 1: City Passport Challenges — Automation
+
+**Business side (portal):**
+```
+Business Portal → "Challenges" tab (new)
+  → "Create a Challenge" button
+  → Pick type: Single-stop or Multi-stop
+  → If multi-stop: invite other businesses (they accept via notification)
+  → Set reward: badge name, XP amount, or "Show this coupon on completion"
+  → Set duration: one-time or recurring monthly
+  → Preview challenge card
+  → Pay via Stripe: $99 one-time or $79/mo recurring
+  → Challenge goes live immediately in consumer app
+  → Dashboard shows: participants, completion rate, foot traffic per stop
+```
+
+**Consumer side (app):**
+```
+Consumer → Browse Challenges (in Community Hub or City Passport page)
+  → Tap "Join Challenge"
+  → Visit each stop → scan QR (same Blast Deals QR already at the business)
+  → Progress bar updates automatically
+  → Complete all stops → badge unlocked, XP awarded, coupon displayed
+  → No human at GL365 involved at any step
+```
+
+**Multi-stop campaigns ($349):**
+```
+Lead business creates challenge → invites partner businesses by email/in-app
+  → Each partner accepts with one tap (they're already on GL365)
+  → Lead business pays the $349 (or splits — Stripe handles split billing)
+  → All stops auto-linked
+  → Each business sees their own traffic in their own dashboard
+```
+
+**What's automated:** Everything. Challenge creation, partner invitations, payment, publishing, QR scanning, progress tracking, badge awarding, analytics.
+
+**What's NOT automated:** Tourism board campaigns ($799) — these are larger deals where someone at GL365 may hop on a call. But even these could be self-service if the tourism board has a GL365 account.
+
+---
+
+### Stream 2: Event Check-In — Automation
+
+**Organizer side:**
+```
+Anyone with a GL365 account → "Create Event" (new page: /events/new)
+  → Enter: event name, date, time, venue (pick from directory or enter address)
+  → Select capacity tier: 50 / 200 / 1,000
+  → Price auto-calculated: $19 / $39 / $79
+  → Or toggle "Monthly Unlimited" → $69/mo subscription
+  → Pay via Stripe
+  → System generates unique QR code for the event
+  → Organizer prints QR or displays on phone/tablet at the door
+  → Dashboard (live during event): real-time headcount, attendee list
+  → Post-event: attendee export (CSV), optional AI recap ($9 add-on, one-click purchase)
+```
+
+**Attendee side:**
+```
+Attendee arrives → scans event QR with phone camera (no app needed, opens web)
+  → If GL365 account: auto-checked in via Identity Passport
+  → If no account: quick name + email form (creates lead, optional account creation)
+  → Organizer's dashboard updates instantly (WebSocket)
+  → Attendee gets: "You're checked in! ✓" confirmation page
+```
+
+**What's automated:** Event creation, payment, QR generation, check-in, real-time headcount, attendee export, AI recap generation.
+
+**What's NOT automated:** Nothing. This is 100% self-service from start to finish. Even the AI recap is auto-generated — organizer clicks "Generate Recap" and it runs.
+
+---
+
+### Stream 3: Loyalty Program — Automation
+
+**Business side (portal):**
+```
+Business Portal → "Loyalty" tab (new)
+  → Toggle: "Enable Loyalty Program"
+  → If on Free directory listing: shown upgrade prompt ("Upgrade to add loyalty")
+  → If on Pro ($45/mo): shown loyalty add-on pricing ($15/mo Basic, $29/mo Standard)
+  → If on Premium ($89/mo): Basic loyalty included free, Standard $29/mo, Premium $49/mo
+  → Configure rewards:
+    Basic: "Visit X times → get [reward description]"
+    Standard: Multiple tiers ("5 visits = free cookie, 10 = free drink, 25 = free meal")
+    Premium: + segmentation, push notifications, lapsed customer re-engagement
+  → Pay via Stripe (added to existing subscription as line item)
+  → Loyalty program goes live immediately
+  → Same QR code already at their business handles loyalty scans
+  → Dashboard shows: total loyalty members, visit frequency, rewards redeemed, top customers
+```
+
+**Consumer side:**
+```
+Consumer visits business → scans existing QR code (same one for Blast Deals)
+  → System detects: this business has a loyalty program
+  → If first visit: "Welcome! You're now earning rewards at [Business Name]"
+  → If returning: "Visit 4 of 10 — 6 more until your free coffee!"
+  → All loyalty cards live in Identity Passport → one screen, every business
+  → Push notification when close to a reward: "1 more visit until your free cookie!"
+  → Reward earned → shows coupon/code on phone → business honors it
+```
+
+**What's automated:** Program setup, billing (added to existing Stripe subscription), visit tracking (via existing QR scans), reward calculation, notifications, consumer-facing loyalty cards.
+
+**What's NOT automated:** The business actually giving the free coffee. That's on them. GL365 just shows the coupon.
+
+---
+
+### Stream 4: Creator Marketplace — Automation
+
+**Creator side:**
+```
+Creator signs up for GL365 (free account)
+  → Claims/creates their directory listing in a gig/artisan category
+  → Listing page shows: "Upgrade to Creator Pro for portfolio, booking & lead capture"
+  → Tap "Upgrade" → Stripe checkout → $25/mo or $45/mo
+  → Portal unlocks Creator tools:
+    - Portfolio: upload up to 20 images/videos of work (unlimited on Premium)
+    - Booking calendar: set availability, block out dates
+    - "Request a Quote" form: auto-generates on their public listing page
+    - AI profile writer (Premium): answer 5 questions → AI writes the full profile
+  → Listing page now shows portfolio gallery + "Request a Quote" button + reviews
+```
+
+**Consumer side:**
+```
+Consumer searches "photographer Tampa" on GL365
+  → Creator Pro/Premium listings appear with portfolio and booking button
+  → Consumer taps "Request a Quote"
+  → Fills out: event type, date, budget range, message
+  → Creator gets notification + email (same CRM lead system businesses already use)
+  → Creator responds via portal or email
+  → Lead fee ($2) auto-charged to creator's Stripe subscription
+  → GL365 never brokers the deal — just connects them
+```
+
+**What's automated:** Signup, portfolio building, AI profile generation, booking forms, lead routing, lead fee billing, search ranking.
+
+**What's NOT automated:** The creator actually responding to leads and doing the work. That's their job.
+
+---
+
+### Stream 5: Neighborhood Safety — Automation
+
+**Group creation:**
+```
+Any GL365 user → "Create Group" → select type: "Neighborhood"
+  → Enter neighborhood name, draw boundary on map (or enter zip/address)
+  → Invite neighbors: share link via text, email, Nextdoor, or print flyer with QR
+  → Group is live immediately (free tier)
+  → Post alerts: suspicious activity, lost pets, weather, power outages
+  → All members get notifications
+```
+
+**Verified upgrade:**
+```
+Group admin → "Upgrade to Verified Neighborhood"
+  → Stripe checkout: $2.99/mo per household
+  → Billing: admin pays for the whole group OR each household pays individually
+    (Stripe handles both models — admin-paid or split-billing)
+  → Verified features unlock:
+    - Resident verification (ID check or address confirmation)
+    - Priority emergency alerts (push + SMS)
+    - Admin tools: member management, announcement scheduling, polls/votes
+    - "Verified Resident" badge on profiles
+```
+
+**HOA integration:**
+```
+Property manager creates group → selects "HOA / Property Management"
+  → $49/mo via Stripe
+  → Bulk import residents (CSV upload or integration with their management software)
+  → Announcement tools, vote/survey builder, maintenance request visibility
+  → Self-service from start to finish
+```
+
+**Sponsor:**
+```
+Local security company / insurance agent → already has GL365 business listing
+  → Business Portal → "Sponsorships" tab → select "Neighborhood Safety Sponsor"
+  → Pick radius or specific neighborhoods
+  → Upload logo, write tagline
+  → Pay $199/mo via Stripe
+  → Logo auto-appears on safety alerts and group pages within selected area
+  → No human at GL365 approves it — automated content policy check only
+```
+
+**What's automated:** Group creation, invitations, posting, notifications, verified upgrade billing, HOA import, sponsor self-service.
+
+**What's NOT automated:** Resident verification for Verified Neighborhoods may need a lightweight automated check (address confirmation via a mailed postcard code, or matching a utility bill — can be built later). V1 can use self-attestation.
+
+---
+
+### Stream 6: Rec League & Parks — Automation
+
+**Commissioner self-service (already planned):**
+```
+Commissioner signs up → "Create League"
+  → Pick sport/game type, season length, number of teams
+  → System auto-selects tier:
+    - <8 teams: Lite ($99/season)
+    - 8+ teams: Standard ($228/season)
+  → Pay via Stripe
+  → League hub page auto-generates (/leagues/[slug])
+  → Commissioner manages everything in portal:
+    - Create schedule (auto-generated based on team count + weeks)
+    - Enter scores (or let team captains enter + commissioner confirms)
+    - Standings auto-calculate
+    - AI recaps auto-generate after each match
+  → Players join via invite link → free GL365 account
+```
+
+**Parks & Rec self-service:**
+```
+Parks coordinator signs up → "Create Facility"
+  → Enter: facility name, address, amenities (courts, fields, rooms)
+  → Set available time slots per amenity
+  → Set booking rules: max duration, advance booking window, member-only times
+  → Pay $199/mo via Stripe
+  → Public booking page auto-generates (/facilities/[slug])
+  → Residents browse availability → book a court → confirmation email
+  → Coordinator dashboard: utilization rates, popular times, revenue (if charging booking fees)
+  → City-wide tier ($999/mo): all facilities on one dashboard, single payment
+```
+
+**Embeddable widget for .gov sites:**
+```
+Parks coordinator → "Get Embed Code"
+  → Copy/paste an iframe or JavaScript snippet
+  → Drops into existing city website
+  → White-labeled: shows city branding, not GL365
+  → Residents book through the city website → data flows back to GL365 dashboard
+```
+
+**What's automated:** League creation, scheduling, scoring, standings, AI recaps, facility setup, booking, embeddable widget generation.
+
+**What's NOT automated:** City-wide Parks deals ($999/mo) will likely need a demo call. But the product itself is still self-service once they sign up. The call is just to close the deal, not to set anything up.
+
+---
+
+### Stream 7: Real Estate Open House — Automation
+
+**Agent self-service:**
+```
+Realtor signs up for GL365 → "I'm a Real Estate Professional"
+  → Select: Individual ($49/mo unlimited) or Single Event ($15/event)
+  → Pay via Stripe
+  → "Create Open House" button:
+    - Enter property address (auto-fills from MLS data if available)
+    - Set date/time
+    - Upload property photos (optional)
+    - System generates unique QR code + printable sign-in sheet with QR
+  → Print QR → place at open house entrance
+  → During event: live dashboard shows check-ins as they happen
+  → After event: one-click export attendee list (name, email, phone)
+  → AI follow-up add-on ($5): click "Generate Follow-Ups" → AI drafts personalized email for each attendee
+```
+
+**Visitor side:**
+```
+Visitor arrives at open house → scans QR
+  → If GL365 account: auto-checked in (name, email pre-filled from Identity Passport)
+  → If no account: quick form (name, email, phone, "Are you working with an agent?")
+  → Optional: "Rate this neighborhood" prompt (feeds GL365 review system)
+  → Visitor gets: property details page, neighborhood info, nearby listings
+```
+
+**Brokerage self-service:**
+```
+Managing broker → "Create Brokerage Account"
+  → Select tier: 10 agents ($199/mo) or 50 agents ($499/mo)
+  → Pay via Stripe
+  → Invite agents via email → they join the brokerage account
+  → Each agent creates their own open houses under the brokerage umbrella
+  → Managing broker sees: all open houses, all leads, all agents — one dashboard
+  → Lead routing: leads auto-assigned to the listing agent
+```
+
+**What's automated:** Account creation, open house setup, QR generation, check-in, lead capture, attendee export, AI follow-up drafts, brokerage management.
+
+**What's NOT automated:** Nothing. Even brokerage onboarding is self-service. The realtor world is used to signing up for tools online.
+
+---
+
+### Stream 8: City Intelligence Data — Automation
+
+**This is the one exception.** Data products are harder to fully automate because:
+- Custom reports require understanding what the buyer actually wants
+- Data quality depends on GL365 having 50K+ users (not there yet)
+- Government/enterprise buyers expect a conversation
+
+**But the templated reports CAN be automated:**
+```
+GL365 Data Portal (separate product page: /data or /intelligence)
+  → Browse available report templates:
+    - "Neighborhood Foot Traffic Report" ($299)
+    - "Restaurant & Nightlife Trends" ($299)
+    - "Seasonal Event Impact Analysis" ($799)
+    - "Franchise Site Selection Report" ($999)
+  → Select report → pick neighborhood/city/region
+  → Pay via Stripe
+  → System auto-generates report from aggregated anonymized data
+  → PDF + interactive dashboard delivered to buyer's email
+  → Report uses pre-built SQL queries + AI narrative generation
+  → No human at GL365 writes anything — it's all templated
+```
+
+**Ongoing subscriptions (automated):**
+```
+Buyer → "Subscribe to Monthly Dashboard" ($499/mo)
+  → Stripe subscription
+  → Dashboard auto-refreshes with new data each month
+  → Automated email: "Your February City Intelligence report is ready"
+  → Buyer logs into their dashboard anytime
+```
+
+**Custom reports ($999+) — semi-automated:**
+```
+Buyer submits request via form → describes what they want
+  → AI drafts a report scope based on available data
+  → GL365 team reviews scope (5 minutes — is this answerable with our data?)
+  → If yes: auto-generate report from templates + custom queries
+  → If no: reply with "We don't have enough data for this yet"
+  → The goal: get to a point where even custom reports are AI-generated
+    with minimal human review
+```
+
+**What's automated:** Templated reports, subscriptions, dashboards, delivery.
+
+**What's NOT automated (yet):** Custom reports need light human review. API access setup may need a brief onboarding. These are the $999+ products — the unit economics support a quick human touch.
+
+---
+
+### Stream 9: Sponsorship Layer — Automation
+
+**Business side (portal):**
+```
+Business Portal → "Sponsorships" tab (new)
+  → Browse available sponsorship types:
+    ┌─────────────────────────────────────────────────┐
+    │ 🎲 Game Night Sponsor         $39/mo            │
+    │    Your logo + deal on game nights near you      │
+    │                                                   │
+    │ 🏆 League Sponsor             $79/mo             │
+    │    Logo on leaderboards + mention in AI recaps   │
+    │                                                   │
+    │ 🏅 Tournament Title Sponsor   $149/tournament    │
+    │    "The [Your Name] Invitational"                │
+    │                                                   │
+    │ 📢 Community Hub Sponsor      $199/mo            │
+    │    Featured in the community activity feed        │
+    │                                                   │
+    │ 🗺️ Loop Stop Sponsor          $99/mo             │
+    │    AI Scout routes people past your door          │
+    │                                                   │
+    │ 📦 Full Bundle                $399/mo             │
+    │    Everything above — save 40%                    │
+    └─────────────────────────────────────────────────┘
+  → Select sponsorship → configure:
+    - Upload logo (or use one from their listing)
+    - Write tagline / deal ("Code GAMENIGHT for 15% off")
+    - Set radius (1 mile, 5 miles, city-wide)
+    - Set duration (monthly or per-event)
+  → Preview how it looks on a game night session / leaderboard / hub
+  → Pay via Stripe
+  → Sponsorship goes live immediately
+  → Dashboard shows: impressions, clicks, deal redemptions
+```
+
+**How it displays (automated):**
+```
+System logic (no human curation):
+  → Game Night starts within 5 miles of sponsor's location
+  → Sponsor's logo + deal auto-inserted on the session page
+  → AI recap mentions: "Tonight's Game Night sponsored by Tony's Pizza"
+  → If league sponsor: logo auto-placed on leaderboard component
+  → If tournament sponsor: tournament name auto-prefixed
+  → Content policy: automated check (no profanity, no competitor logos)
+  → No manual approval queue — goes live on purchase
+```
+
+**What's automated:** Browsing, purchasing, configuration, display logic, impression tracking, deal redemptions, billing.
+
+**What's NOT automated:** Nothing. The full bundle at $399/mo is still self-service. Business owners don't need a sales call for $399 — they need a preview of what their sponsorship looks like.
+
+---
+
+### The Self-Service Principle — One Portal, Every Product
+
+The key to making all of this automated is that **every B2B product is a tab in the same Business Portal they already use:**
+
+```
+Business Portal (existing, 8 pages)
+  ├── Dashboard ✅ (live)
+  ├── Listing Editor ✅ (live)
+  ├── Photos ✅ (live)
+  ├── Hours ✅ (live)
+  ├── Menu ✅ (live)
+  ├── Stats ✅ (live)
+  ├── Settings ✅ (live)
+  ├── Upgrade ✅ (live)
+  │
+  ├── Loyalty Program (NEW — Stream 3)
+  ├── Sponsorships (NEW — Stream 9)
+  ├── Challenges (NEW — Stream 1)
+  ├── Events (NEW — Stream 2)
+  └── Data & Reports (NEW — Stream 8, admin-only)
+```
+
+For B2C products (Creator Marketplace, Neighborhood Groups, Event Check-In, League Commissioner), the consumer/organizer gets their own dashboard page:
+
+```
+Consumer Account (/account)
+  ├── Identity Passport ✅ (planned)
+  ├── My Groups ✅ (planned)
+  ├── My Family ✅ (planned)
+  ├── My Game Nights ✅ (planned)
+  │
+  ├── My Loyalty Cards (NEW — Stream 3 consumer view)
+  ├── My Challenges (NEW — Stream 1 consumer view)
+  ├── My Events (NEW — Stream 2 organizer view)
+  ├── My Leagues (NEW — Stream 6 commissioner view)
+  ├── My Listings (NEW — Stream 4 creator view)
+  ├── My Open Houses (NEW — Stream 7 realtor view)
+  └── My Neighborhood (NEW — Stream 5)
+```
+
+**No new apps. No separate logins. No separate billing systems.** Everything is a feature inside the platform they're already using. One Stripe customer ID per user. One portal. One login.
+
+---
+
+### Automation Summary — All 9 Streams
+
+| # | Stream | Fully Automated? | Human Touch Needed? |
+|---|---|---|---|
+| 1 | City Passport Challenges | YES | Tourism board campaigns ($799) may want a call |
+| 2 | Event Check-In | YES | None — 100% self-service |
+| 3 | Loyalty Program | YES | None — toggle on, configure, done |
+| 4 | Creator Marketplace | YES | None — sign up, build profile, receive leads |
+| 5 | Neighborhood Safety | YES | Resident verification V1 = self-attestation |
+| 6 | Rec League & Parks | MOSTLY | City-wide Parks deals ($999+) need a demo call |
+| 7 | Real Estate Open House | YES | None — realtors are used to self-service tools |
+| 8 | City Intelligence Data | MOSTLY | Custom reports ($999+) need light review. Templates are auto |
+| 9 | Sponsorship Layer | YES | None — browse, preview, buy, live |
+
+**7 out of 9 are 100% automated.** The other 2 only need human touch for their highest-tier products ($999+), and even those are automated once the deal is closed.
 
 ### Current Revenue Streams (Phase 1, Live Now)
 
