@@ -166,12 +166,9 @@ export default function TacticalCommandCenter() {
 
   const handleEventClick = (event: CalendarEvent) => {
     setSelectedEvent(event);
-    // Could open a detail modal here
-    console.log('Event clicked:', event);
   };
 
   const handleScheduleContent = (content: any) => {
-    console.log('Content scheduled:', content);
     // Add to events
     const newEvent: CalendarEvent = {
       id: Date.now().toString(),
@@ -256,7 +253,7 @@ export default function TacticalCommandCenter() {
       {/* Collapsible Sidebar */}
       <CollapsibleSidebar
         activeItem="schedule"
-        onNewBooking={() => console.log('New booking')}
+        onNewBooking={() => {}}
         onNewContent={() => {
           setSelectedDate(new Date());
           setShowContentForge(true);

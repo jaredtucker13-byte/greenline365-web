@@ -5,6 +5,7 @@ import ChatWidget from './components/ChatWidget';
 import ScrollToTop from './components/ScrollToTop';
 import { ServiceWorkerProvider } from '@/lib/use-service-worker';
 import { AdminEditModeProvider } from '@/components/editor';
+import { ToastProvider } from '@/components/ui/os/Toast';
 import type { Metadata } from 'next';
 
 // ===========================================
@@ -253,13 +254,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen bg-obsidian">
         <ServiceWorkerProvider>
-          <AdminEditModeProvider>
-            <ScrollToTop />
-            <Navbar />
-            <main>{children}</main>
-            <ChatWidget />
-            <Footer />
-          </AdminEditModeProvider>
+          <ToastProvider>
+            <AdminEditModeProvider>
+              <ScrollToTop />
+              <Navbar />
+              <main>{children}</main>
+              <ChatWidget />
+              <Footer />
+            </AdminEditModeProvider>
+          </ToastProvider>
         </ServiceWorkerProvider>
       </body>
     </html>

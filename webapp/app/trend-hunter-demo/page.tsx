@@ -4,7 +4,7 @@ import DailyTrendHunter from '../components/DailyTrendHunter';
 
 export default function TrendHunterDemo() {
   const handleTrendsLoaded = (trends: any[]) => {
-    console.log('Trends loaded:', trends);
+    // Trends loaded callback — available for analytics
   };
 
   return (

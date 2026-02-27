@@ -319,13 +319,14 @@ export default function ChatWidget({
   const [userName, setUserName] = useState<string | null>(null);
   const [sessionId] = useState(() => generateId());
   const [currentMode, setCurrentMode] = useState<AssistantMode>('concierge');
-  
+  const [isMinimized, setIsMinimized] = useState(false);
+
   // Voice input state
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   // Get page context and set mode
   useEffect(() => {
@@ -345,6 +346,9 @@ export default function ChatWidget({
     
     const savedName = localStorage.getItem('gl365_user_name');
     if (savedName) setUserName(savedName);
+
+    const minimized = localStorage.getItem('gl365_chat_minimized');
+    if (minimized === 'true') setIsMinimized(true);
     
     // Load conversation history for this session (last 24 hours)
     const savedMessages = localStorage.getItem('gl365_chat_messages');
@@ -466,8 +470,12 @@ export default function ChatWidget({
   const sendMessage = useCallback(async (messageText?: string) => {
     const text = messageText || inputValue.trim();
     if (!text || isLoading) return;
-    
+
     setInputValue('');
+    // Reset textarea height after sending
+    if (inputRef.current) {
+      inputRef.current.style.height = 'auto';
+    }
     setIsLoading(true);
     
     // Check for name
@@ -491,13 +499,13 @@ export default function ChatWidget({
       // Build context-aware system prompt
       const systemPrompt = SYSTEM_PROMPTS[currentMode];
       const contextInfo = userName ? `\n\nUser's name: ${userName}` : '';
-      
+
       const apiMessages = [
         { role: 'system', content: systemPrompt + contextInfo },
         ...messages.slice(-10).map(m => ({ role: m.role, content: m.content })),
         { role: 'user', content: text },
       ];
-      
+
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -506,39 +514,78 @@ export default function ChatWidget({
           messages: apiMessages,
           mode: currentMode,
           sessionId,
+          stream: true,
         }),
       });
-      
+
       if (!response.ok) {
         throw new Error(`API error: ${response.status}`);
       }
-      
-      const data = await response.json();
-      const assistantReply = 
-        data?.choices?.[0]?.message?.content ??
-        data?.reply ??
-        data?.message ??
-        "I'm here to help! Could you rephrase that?";
-      
-      // Parse any content suggestions from the response
-      const suggestions = parseContentSuggestions(assistantReply);
-      
-      const assistantMessage: Message = {
-        id: generateId(),
-        role: 'assistant',
-        content: assistantReply,
+
+      // Create placeholder assistant message for streaming
+      const assistantId = generateId();
+      setMessages(prev => [...prev, {
+        id: assistantId,
+        role: 'assistant' as const,
+        content: '',
         timestamp: new Date(),
-        suggestions: suggestions.length > 0 ? suggestions : undefined,
         mode: currentMode,
-      };
-      
-      setMessages(prev => [...prev, assistantMessage]);
-      
-      // If in creative mode and we have suggestions, notify parent
-      if (suggestions.length > 0 && onContentSuggestion) {
-        suggestions.forEach(s => onContentSuggestion(s));
+      }]);
+
+      // Stream the response token by token
+      const contentType = response.headers.get('content-type') || '';
+      let fullContent = '';
+
+      if (contentType.includes('text/event-stream') && response.body) {
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value, { stream: true });
+          const lines = chunk.split('\n').filter(l => l.startsWith('data: '));
+
+          for (const line of lines) {
+            const raw = line.slice(6).trim();
+            if (raw === '[DONE]') continue;
+            try {
+              const parsed = JSON.parse(raw);
+              const delta = parsed?.choices?.[0]?.delta?.content;
+              if (delta) {
+                fullContent += delta;
+                setMessages(prev =>
+                  prev.map(m => m.id === assistantId ? { ...m, content: fullContent } : m)
+                );
+              }
+            } catch {}
+          }
+        }
+      } else {
+        // Non-streaming fallback
+        const data = await response.json();
+        fullContent =
+          data?.choices?.[0]?.message?.content ??
+          data?.reply ??
+          data?.message ??
+          "I'm here to help! Could you rephrase that?";
+        setMessages(prev =>
+          prev.map(m => m.id === assistantId ? { ...m, content: fullContent } : m)
+        );
       }
-      
+
+      // Parse any content suggestions from the complete response
+      const suggestions = parseContentSuggestions(fullContent);
+      if (suggestions.length > 0) {
+        setMessages(prev =>
+          prev.map(m => m.id === assistantId ? { ...m, suggestions } : m)
+        );
+        if (onContentSuggestion) {
+          suggestions.forEach(s => onContentSuggestion(s));
+        }
+      }
+
     } catch (error) {
       console.error('Chat error:', error);
       const errorMessage: Message = {
@@ -556,12 +603,23 @@ export default function ChatWidget({
 
   const handleToggle = () => {
     setIsOpen(prev => !prev);
-    
+
     if (!hasInteracted) {
       setShowTryMe(false);
       setHasInteracted(true);
       localStorage.setItem('gl365_chat_interacted', 'true');
     }
+  };
+
+  const handleMinimize = () => {
+    setIsOpen(false);
+    setIsMinimized(true);
+    localStorage.setItem('gl365_chat_minimized', 'true');
+  };
+
+  const handleRestore = () => {
+    setIsMinimized(false);
+    localStorage.removeItem('gl365_chat_minimized');
   };
 
   const handleQuickAction = (text: string) => {
@@ -610,6 +668,35 @@ export default function ChatWidget({
     );
   }
 
+  // When minimized, show only a small restore tab
+  if (isMinimized) {
+    return (
+      <motion.button
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        onClick={handleRestore}
+        className="fixed bottom-6 right-0 z-50 flex items-center gap-1.5 pl-3 pr-2 py-2 rounded-l-full backdrop-blur-xl border border-r-0 transition-all hover:pr-4"
+        style={{
+          backgroundColor: 'rgba(0,0,0,0.85)',
+          borderColor: `${styles.accent}40`,
+          boxShadow: `0 0 20px ${styles.accent}20`,
+        }}
+        aria-label="Open chat assistant"
+      >
+        <svg
+          className="w-4 h-4"
+          style={{ color: styles.accent }}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+        </svg>
+        <span className="text-xs font-medium" style={{ color: styles.accent }}>Chat</span>
+      </motion.button>
+    );
+  }
+
   return (
     <>
       {/* Try Me Tooltip */}
@@ -621,18 +708,18 @@ export default function ChatWidget({
             exit={{ opacity: 0, y: 10 }}
             className="fixed bottom-24 right-6 z-50"
           >
-            <div 
+            <div
               className="relative px-4 py-2 rounded-2xl text-sm font-semibold border backdrop-blur-xl shadow-lg"
-              style={{ 
+              style={{
                 backgroundColor: 'rgba(0,0,0,0.9)',
                 borderColor: `${styles.accent}50`,
                 color: styles.accent,
               }}
             >
               Try me ✨
-              <div 
+              <div
                 className="absolute -bottom-2 right-8 w-4 h-4 rotate-45 border-r border-b"
-                style={{ 
+                style={{
                   backgroundColor: 'rgba(0,0,0,0.9)',
                   borderColor: `${styles.accent}50`,
                 }}
@@ -643,56 +730,81 @@ export default function ChatWidget({
       </AnimatePresence>
 
       {/* Floating Button */}
-      <motion.button
-        onClick={handleToggle}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        className="fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full backdrop-blur-xl shadow-lg flex items-center justify-center transition-all"
-        style={{
-          backgroundColor: 'rgba(0,0,0,0.9)',
-          borderWidth: 1,
-          borderColor: `${styles.accent}40`,
-          boxShadow: `0 0 30px ${styles.accent}30`,
-        }}
-        aria-label={isOpen ? 'Close assistant' : 'Open assistant'}
-      >
-        <AnimatePresence mode="wait">
-          {isOpen ? (
-            <motion.svg
-              key="close"
-              initial={{ rotate: -90, opacity: 0 }}
-              animate={{ rotate: 0, opacity: 1 }}
-              exit={{ rotate: 90, opacity: 0 }}
-              className="w-7 h-7"
-              style={{ color: styles.accent }}
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </motion.svg>
-          ) : (
-            <motion.svg
-              key="chat"
-              initial={{ rotate: 90, opacity: 0 }}
-              animate={{ rotate: 0, opacity: 1 }}
-              exit={{ rotate: -90, opacity: 0 }}
-              className="w-7 h-7"
-              style={{ color: styles.accent }}
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </motion.svg>
-          )}
-        </AnimatePresence>
-        
-        {/* Pulse indicator for creative mode */}
-        {currentMode === 'creative' && !isOpen && (
-          <span className="absolute top-0 right-0 w-4 h-4 rounded-full bg-purple-500 animate-pulse" />
+      <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2">
+        {/* Hide / Minimize button — only visible when chat is closed */}
+        {!isOpen && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            onClick={handleMinimize}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            className="w-8 h-8 rounded-full backdrop-blur-xl flex items-center justify-center border transition-all"
+            style={{
+              backgroundColor: 'rgba(0,0,0,0.8)',
+              borderColor: 'rgba(255,255,255,0.1)',
+            }}
+            aria-label="Hide chat"
+            title="Hide chat"
+          >
+            <svg className="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </motion.button>
         )}
-      </motion.button>
+
+        <motion.button
+          onClick={handleToggle}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="w-16 h-16 rounded-full backdrop-blur-xl shadow-lg flex items-center justify-center transition-all relative"
+          style={{
+            backgroundColor: 'rgba(0,0,0,0.9)',
+            borderWidth: 1,
+            borderColor: `${styles.accent}40`,
+            boxShadow: `0 0 30px ${styles.accent}30`,
+          }}
+          aria-label={isOpen ? 'Close assistant' : 'Open assistant'}
+        >
+          <AnimatePresence mode="wait">
+            {isOpen ? (
+              <motion.svg
+                key="close"
+                initial={{ rotate: -90, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                exit={{ rotate: 90, opacity: 0 }}
+                className="w-7 h-7"
+                style={{ color: styles.accent }}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </motion.svg>
+            ) : (
+              <motion.svg
+                key="chat"
+                initial={{ rotate: 90, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                exit={{ rotate: -90, opacity: 0 }}
+                className="w-7 h-7"
+                style={{ color: styles.accent }}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </motion.svg>
+            )}
+          </AnimatePresence>
+
+          {/* Pulse indicator for creative mode */}
+          {currentMode === 'creative' && !isOpen && (
+            <span className="absolute top-0 right-0 w-4 h-4 rounded-full bg-purple-500 animate-pulse" />
+          )}
+        </motion.button>
+      </div>
 
       {/* Chat Window - Premium Design with Independent Scroll */}
       <AnimatePresence>
@@ -740,6 +852,7 @@ export default function ChatWidget({
               messagesEndRef={messagesEndRef}
               inputRef={inputRef}
               onClose={() => setIsOpen(false)}
+              onMinimize={handleMinimize}
               isExpanded={isExpanded}
               setIsExpanded={setIsExpanded}
               onContentSuggestion={onContentSuggestion}
@@ -772,8 +885,9 @@ interface ChatContentProps {
   styles: ReturnType<typeof getModeStyles>;
   quickActions: Array<{ text: string; icon: string }>;
   messagesEndRef: React.RefObject<HTMLDivElement | null>;
-  inputRef: React.RefObject<HTMLInputElement | null>;
+  inputRef: React.RefObject<HTMLTextAreaElement | null>;
   onClose?: () => void;
+  onMinimize?: () => void;
   isExpanded?: boolean;
   setIsExpanded?: (expanded: boolean) => void;
   onContentSuggestion?: (suggestion: ContentSuggestion) => void;
@@ -798,6 +912,7 @@ function ChatContent({
   messagesEndRef,
   inputRef,
   onClose,
+  onMinimize,
   isExpanded,
   setIsExpanded,
   onContentSuggestion,
@@ -862,6 +977,20 @@ function ChatContent({
               </button>
             )}
             
+            {/* Minimize button — hides widget entirely */}
+            {onMinimize && (
+              <button
+                onClick={onMinimize}
+                className="w-8 h-8 rounded-full border bg-black/40 hover:bg-black/60 transition-colors flex items-center justify-center"
+                style={{ borderColor: `${styles.accent}30` }}
+                title="Hide chat"
+              >
+                <svg className="w-4 h-4" style={{ color: styles.accent }} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+            )}
+
             {/* Close button */}
             {onClose && (
               <button
@@ -1013,30 +1142,35 @@ function ChatContent({
           </div>
         ))}
 
-        {/* Loading indicator */}
-        {isLoading && (
-          <div className="flex justify-start">
-            <div className="max-w-[85%] rounded-2xl rounded-bl-md px-4 py-3 bg-gray-800/80 border border-gray-700">
-              <div className="flex items-center gap-2">
-                <div className="flex gap-1">
-                  {[0, 1, 2].map((i) => (
-                    <span
-                      key={i}
-                      className="w-2 h-2 rounded-full animate-bounce"
-                      style={{ 
-                        backgroundColor: styles.accent,
-                        animationDelay: `${i * 150}ms`,
-                      }}
-                    />
-                  ))}
+        {/* Loading indicator - only show before first streaming token arrives */}
+        {isLoading && (() => {
+          const lastMsg = messages[messages.length - 1];
+          const isStreaming = lastMsg?.role === 'assistant' && lastMsg.content.length > 0;
+          if (isStreaming) return null;
+          return (
+            <div className="flex justify-start">
+              <div className="max-w-[85%] rounded-2xl rounded-bl-md px-4 py-3 bg-gray-800/80 border border-gray-700">
+                <div className="flex items-center gap-2">
+                  <div className="flex gap-1">
+                    {[0, 1, 2].map((i) => (
+                      <span
+                        key={i}
+                        className="w-2 h-2 rounded-full animate-bounce"
+                        style={{
+                          backgroundColor: styles.accent,
+                          animationDelay: `${i * 150}ms`,
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-xs text-gray-500">
+                    {currentMode === 'creative' ? 'Brainstorming...' : 'Thinking...'}
+                  </span>
                 </div>
-                <span className="text-xs text-gray-500">
-                  {currentMode === 'creative' ? 'Brainstorming...' : 'Thinking...'}
-                </span>
               </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         <div ref={messagesEndRef} />
       </div>
@@ -1056,11 +1190,11 @@ function ChatContent({
           </button>
         )}
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-end gap-2">
           {/* Voice Input Button */}
           <button
             onClick={toggleVoiceInput}
-            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+            className={`w-10 h-10 flex-shrink-0 rounded-xl flex items-center justify-center transition-all ${
               isListening 
                 ? 'bg-red-500/20 text-red-400 animate-pulse border border-red-500/50' 
                 : 'bg-gray-800/50 text-gray-400 hover:text-white hover:bg-gray-700/50 border border-gray-700/50'
@@ -1076,28 +1210,37 @@ function ChatContent({
             )}
           </button>
           
-          <input
+          <textarea
             ref={inputRef}
-            type="text"
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
+            onChange={(e) => {
+              setInputValue(e.target.value);
+              // Auto-resize: reset height then set to scrollHeight
+              e.target.style.height = 'auto';
+              e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
+            }}
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 sendMessage();
+                // Reset height after sending
+                if (inputRef.current) {
+                  inputRef.current.style.height = 'auto';
+                }
               }
             }}
-            placeholder={isListening 
-              ? "Listening..." 
-              : currentMode === 'creative' 
-                ? "Tell me what you're working on..." 
+            placeholder={isListening
+              ? "Listening..."
+              : currentMode === 'creative'
+                ? "Tell me what you're working on..."
                 : "Type your message..."}
-            className="flex-1 rounded-xl px-4 py-3 text-sm outline-none bg-gray-800/50 border text-white placeholder:text-gray-500 transition-all"
-            style={{ 
-              borderColor: isListening 
-                ? 'rgba(239, 68, 68, 0.5)' 
-                : inputValue 
-                  ? `${styles.accent}50` 
+            rows={1}
+            className="flex-1 rounded-xl px-4 py-3 text-sm outline-none bg-gray-800/50 border text-white placeholder:text-gray-500 transition-all resize-none"
+            style={{
+              borderColor: isListening
+                ? 'rgba(239, 68, 68, 0.5)'
+                : inputValue
+                  ? `${styles.accent}50`
                   : 'rgba(75,75,75,0.5)',
             }}
             disabled={isLoading}
@@ -1106,7 +1249,7 @@ function ChatContent({
           <button
             onClick={() => sendMessage()}
             disabled={isLoading || !inputValue.trim()}
-            className="w-11 h-11 rounded-xl flex items-center justify-center font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-11 h-11 flex-shrink-0 rounded-xl flex items-center justify-center font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed"
             style={{ 
               backgroundColor: styles.accent,
               color: 'black',
