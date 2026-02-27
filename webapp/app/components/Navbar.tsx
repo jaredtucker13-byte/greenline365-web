@@ -246,26 +246,30 @@ export default function Navbar() {
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                     </svg>
                   </Link>
-                  <Button variant="primary" size="sm">
-                    <Link href="/register-business" data-testid="nav-register-btn">
-                      Add Your Business
-                    </Link>
-                  </Button>
+                  <Link
+                    href="/register-business"
+                    data-testid="nav-register-btn"
+                    className="btn-primary inline-flex items-center justify-center text-sm px-4 py-2 font-medium transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+                  >
+                    Add Your Business
+                  </Link>
                 </div>
               ) : user ? (
                 <div className="flex items-center gap-2 ml-4">
                   {isSuperAdmin && (
-                    <Link href="/god-mode">
-                      <Button variant="ghost" size="sm" className="!text-red-400 !border-red-400/30 hover:!bg-red-400/10">
-                        God Mode
-                      </Button>
+                    <Link
+                      href="/god-mode"
+                      className="btn-ghost inline-flex items-center justify-center text-sm px-4 py-2 !text-red-400 !border-red-400/30 hover:!bg-red-400/10 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+                    >
+                      God Mode
                     </Link>
                   )}
                   {isAdmin && (
-                    <Link href="/dashboard">
-                      <Button variant="ghost" size="sm">
-                        Dashboard
-                      </Button>
+                    <Link
+                      href="/dashboard"
+                      className="btn-ghost inline-flex items-center justify-center text-sm px-4 py-2 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+                    >
+                      Dashboard
                     </Link>
                   )}
                   <Button
@@ -288,11 +292,13 @@ export default function Navbar() {
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                     </svg>
                   </Link>
-                  <Button variant="primary" size="sm">
-                    <Link href="/register-business" data-testid="nav-register-btn">
-                      Add Your Business
-                    </Link>
-                  </Button>
+                  <Link
+                    href="/register-business"
+                    data-testid="nav-register-btn"
+                    className="btn-primary inline-flex items-center justify-center text-sm px-4 py-2 font-medium transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+                  >
+                    Add Your Business
+                  </Link>
                 </div>
               )}
             </div>
@@ -418,20 +424,18 @@ export default function Navbar() {
                           <Link
                             href="/god-mode"
                             onClick={() => setMobileMenuOpen(false)}
+                            className="btn-ghost block w-full text-center text-lg px-8 py-4 !text-red-400 !border-red-400/30 hover:!bg-red-400/10 transition-all duration-300"
                           >
-                            <Button variant="ghost" size="lg" fullWidth className="!text-red-400 !border-red-400/30 hover:!bg-red-400/10">
-                              God Mode
-                            </Button>
+                            God Mode
                           </Link>
                         )}
                         {isAdmin && (
                           <Link
                             href="/dashboard"
                             onClick={() => setMobileMenuOpen(false)}
+                            className="btn-secondary block w-full text-center text-lg px-8 py-4 transition-all duration-300"
                           >
-                            <Button variant="secondary" size="lg" fullWidth>
-                              Dashboard
-                            </Button>
+                            Dashboard
                           </Link>
                         )}
                         <Button
@@ -449,18 +453,16 @@ export default function Navbar() {
                         <Link
                           href="/register-business"
                           onClick={() => setMobileMenuOpen(false)}
+                          className="btn-primary block w-full text-center text-lg px-8 py-4 font-semibold transition-all duration-300"
                         >
-                          <Button variant="primary" size="lg" fullWidth>
-                            Add Your Business
-                          </Button>
+                          Add Your Business
                         </Link>
                         <Link
                           href="/login"
                           onClick={() => setMobileMenuOpen(false)}
+                          className="btn-ghost block w-full text-center text-lg px-8 py-4 transition-all duration-300"
                         >
-                          <Button variant="ghost" size="lg" fullWidth>
-                            Sign In
-                          </Button>
+                          Sign In
                         </Link>
                       </>
                     )}

@@ -1,19 +1,14 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
 import Image from 'next/image';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import MultiStepBookingForm from '../components/MultiStepBookingForm';
 import BookingWidget from '../components/BookingWidget';
 import DailyTrendHunter from '../components/DailyTrendHunter';
-import PhoneMockup from '../components/PhoneMockup';
-import FloatingShapes from '../components/FloatingShapes';
+import HeroSection from '../components/HeroSection';
 import { Button } from '@/components/ui/os';
-import { NeonText } from '@/components/ui/os';
-import { GlassCard } from '@/components/ui/os';
-import { EditableRegion } from '@/components/editor';
 
 // Register GSAP plugins
 if (typeof window !== 'undefined') {
@@ -25,52 +20,8 @@ export default function ServicesPage() {
   const [showWidget, setShowWidget] = useState(false);
   
   // GSAP Refs
-  const heroRef = useRef<HTMLElement>(null);
   const featuresRef = useRef<HTMLElement>(null);
   const statsRef = useRef<HTMLElement>(null);
-  
-  // Hero GSAP Animation
-  useEffect(() => {
-    if (!heroRef.current) return;
-    
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-      
-      // Hero entrance sequence
-      tl.from('[data-hero-badge]', {
-        y: -40,
-        opacity: 0,
-        duration: 0.8,
-        delay: 0.2,
-      })
-      .from('[data-hero-title] span', {
-        y: 80,
-        opacity: 0,
-        duration: 0.9,
-        stagger: 0.1,
-      }, '-=0.4')
-      .from('[data-hero-subtitle]', {
-        y: 30,
-        opacity: 0,
-        duration: 0.7,
-      }, '-=0.5')
-      .from('[data-hero-cta]', {
-        y: 20,
-        opacity: 0,
-        scale: 0.9,
-        duration: 0.5,
-      }, '-=0.3')
-      .from('[data-hero-image]', {
-        x: 100,
-        opacity: 0,
-        duration: 1,
-        ease: 'power2.out',
-      }, '-=0.7');
-      
-    }, heroRef);
-    
-    return () => ctx.revert();
-  }, []);
   
   // Comprehensive scroll-triggered animations for all sections
   useEffect(() => {
@@ -400,85 +351,8 @@ export default function ServicesPage() {
 
   return (
     <main className="min-h-screen bg-os-dark relative">
-      {/* Floating 3D Shapes Background */}
-      <FloatingShapes />
-      
-      {/* ========== HERO SECTION - 50/50 Split ========== */}
-      <section ref={heroRef} className="relative min-h-[90vh] flex items-center overflow-hidden pt-20">
-        {/* Background Effects */}
-        <div className="absolute inset-0 bg-os-dark" />
-        <div 
-          className="absolute top-0 left-1/4 w-[800px] h-[800px] rounded-full bg-gradient-to-br from-gold-500/5 to-transparent blur-3xl gsap-glow"
-        />
-        <div 
-          className="absolute bottom-1/4 right-0 w-[500px] h-[500px] bg-gradient-radial from-gold-500/10 to-transparent blur-3xl gsap-glow-2"
-        />
-        
-        <div className="relative z-10 w-full max-w-[1280px] mx-auto px-4 sm:px-6">
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            {/* Left Column - Text Content */}
-            <div>
-              <div 
-                data-hero-badge
-                className="mb-6 inline-flex items-center gap-2 px-3 py-1.5 glass-gold rounded-full border border-gold-500/30"
-              >
-                <span 
-                  className="w-2 h-2 bg-gold rounded-full animate-pulse"
-                />
-                <span className="text-xs text-gold-400 font-semibold tracking-wide">STATUS: ONLINE</span>
-              </div>
-              
-              <EditableRegion pageSlug="home" regionKey="hero_title" type="text">
-                <h1 data-hero-title className="font-display font-bold mb-4 leading-tight overflow-hidden" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)' }}>
-                  <span className="text-white block">The Operating System</span>
-                  <span className="text-white block">for the</span>
-                  <span className="text-gold-400 block">Local Economy</span>
-                </h1>
-              </EditableRegion>
-              
-              <EditableRegion pageSlug="home" regionKey="hero_subtitle" type="text">
-                <p data-hero-subtitle className="text-white/70 mb-6 leading-relaxed max-w-xl" style={{ fontSize: 'clamp(1rem, 2vw, 1.25rem)' }}>
-                  Stop competing with algorithms. Start winning. Start running infrastructure that 
-                  connects <span className="text-gold-400 font-semibold">local life</span> with local commerce.
-                </p>
-              </EditableRegion>
-              
-              <div data-hero-cta className="flex flex-wrap gap-3 mb-8">
-                <Button variant="primary" size="lg" onClick={() => window.location.href = '/waitlist'} data-testid="hero-waitlist-btn">
-                  Join the Waitlist
-                </Button>
-                <Button variant="secondary" size="lg" onClick={() => setShowFullForm(true)} data-testid="hero-start-btn">
-                  Book a Demo →
-                </Button>
-              </div>
-              
-              <div data-hero-stats className="grid grid-cols-3 gap-6 max-w-md">
-                {[
-                  { value: 'New', label: 'Platform' },
-                  { value: 'AI', label: 'Powered' },
-                  { value: '24/7', label: 'Always On' }
-                ].map((stat, i) => (
-                  <div key={i} className="text-center px-2">
-                    <div className="text-2xl font-display font-bold text-gold-400">{stat.value}</div>
-                    <div className="text-xs text-white/50 mt-1">{stat.label}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            {/* Right Column - Interactive Phone Mockup */}
-            <div
-              data-hero-image
-              className="relative hidden lg:flex justify-center items-center"
-            >
-              <div className="absolute inset-0 bg-gold-500/20 blur-3xl rounded-full scale-75" />
-              <div className="relative z-10 gsap-float">
-                <PhoneMockup />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* ========== HERO SECTION ========== */}
+      <HeroSection />
 
       {/* ========== DISTRESSED OWNERS - Right After Hero ========== */}
       <section className="py-16 relative z-10" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
