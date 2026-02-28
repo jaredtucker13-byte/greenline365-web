@@ -189,11 +189,14 @@ html {
   background: rgba(201, 169, 110, 0.5);
 }
 
-/* Focus styles */
-input:focus,
-button:focus,
-select:focus,
-textarea:focus {
+/* Focus styles — visible ring for keyboard users, hidden for mouse */
+:focus-visible {
+  outline: 2px solid rgba(201, 169, 110, 0.7);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+:focus:not(:focus-visible) {
   outline: none;
 }
 

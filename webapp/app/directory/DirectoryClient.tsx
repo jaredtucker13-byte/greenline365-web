@@ -996,7 +996,7 @@ function GroupedBrowseView({ activeCategory, sortBy, setSortBy, cityFilter, setC
       <section className="relative bg-midnight-950 pt-20 pb-6 overflow-hidden">
         {currentCat && (
           <div className="absolute inset-0 opacity-15">
-            <img src={currentCat.img} alt="" className="w-full h-full object-cover" />
+            <img src={currentCat.img} alt={`${currentCat.label} category background`} className="w-full h-full object-cover" />
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-b from-midnight-900/60 to-midnight-950" />
