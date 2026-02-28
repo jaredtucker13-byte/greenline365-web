@@ -30,6 +30,8 @@ interface Listing {
   total_photos_available: number;
   tags: string[];
   metadata: Record<string, any>;
+  business_hours: Record<string, any> | null;
+  menu: any[] | null;
   directory_badges: { id: string; badge_type: string; badge_label: string; badge_color: string }[];
   related: RelatedListing[];
 }
