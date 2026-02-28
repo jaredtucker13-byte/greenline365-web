@@ -144,7 +144,7 @@ export default function PricingPage() {
       <section className="relative bg-[#0f0f0f] pt-28 pb-20 overflow-hidden">
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'url(/images/hero-directory.png)', backgroundSize: 'cover', backgroundPosition: 'center' }} />
         <div className="absolute inset-0 bg-gradient-to-b from-[#0f0f0f]/80 to-[#0f0f0f]" />
-        <div className="relative max-w-4xl mx-auto px-6 text-center">
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 text-center">
           <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-sm font-semibold uppercase tracking-widest mb-3" style={{ color: '#FF8C00' }}>
             Simple, Transparent Pricing
           </motion.p>
@@ -162,7 +162,7 @@ export default function PricingPage() {
       </section>
 
       {/* Pricing Cards */}
-      <section className="max-w-6xl mx-auto px-6 -mt-10 relative z-10" data-testid="pricing-cards">
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 -mt-10 relative z-10" data-testid="pricing-cards">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {TIERS.map((tier, i) => (
             <motion.div
@@ -258,7 +258,7 @@ export default function PricingPage() {
       </section>
 
       {/* Ghost Badge Visual */}
-      <section className="max-w-4xl mx-auto px-6 py-20 text-center" data-testid="badge-visual">
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 py-20 text-center" data-testid="badge-visual">
         <p className="text-sm font-semibold uppercase tracking-widest mb-3" style={{ color: '#FF8C00' }}>The Greenline365 Stamp of Approval</p>
         <h2 className="text-3xl font-bold text-[#1a1a1a] mb-4">Badges Are Earned, Never Bought</h2>
         <p className="text-zinc-500 max-w-lg mx-auto mb-10">
@@ -298,7 +298,7 @@ export default function PricingPage() {
 
       {/* Directory Marketplace */}
       <section className="bg-[#0f0f0f] py-20" data-testid="marketplace-section">
-        <div className="max-w-6xl mx-auto px-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <p className="text-sm font-semibold uppercase tracking-widest mb-3" style={{ color: '#FF8C00' }}>Directory Marketplace</p>
             <h2 className="text-3xl font-bold text-white mb-3">Power-Ups for Your Listing</h2>
@@ -343,7 +343,7 @@ export default function PricingPage() {
       </section>
 
       {/* FAQ / CTA */}
-      <section className="max-w-3xl mx-auto px-6 py-20 text-center">
+      <section className="max-w-3xl mx-auto px-4 sm:px-6 py-20 text-center">
         <h2 className="text-2xl font-bold text-[#1a1a1a] mb-4">Not sure which tier is right?</h2>
         <p className="text-zinc-500 mb-8">
           Start with Free — your listing goes live immediately with all 7 badges visible. Upgrade anytime as your reputation grows.

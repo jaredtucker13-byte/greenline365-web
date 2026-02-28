@@ -56,7 +56,7 @@ export default function ServicesPage() {
 
       {/* ═══════════ THE PROBLEM ═══════════ */}
       <section className="py-20 relative z-10">
-        <div className="max-w-6xl mx-auto px-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Image */}
             <div data-slide-left className="order-2 lg:order-1">
@@ -119,7 +119,7 @@ export default function ServicesPage() {
 
       {/* ═══════════ FEATURES — 3-Column FlipCard Grid (Phase 5) ═══════════ */}
       <section className="py-20 relative">
-        <div className="max-w-6xl mx-auto px-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div data-section-header className="text-center mb-14">
             <h2 className="font-display font-bold text-white mb-3 text-2xl lg:text-4xl">
               Why Choose <NeonText variant="gradient" animate={false}>GreenLine365</NeonText>?
@@ -183,7 +183,7 @@ export default function ServicesPage() {
 
       {/* ═══════════ HOW IT WORKS — OSPanel Cards ═══════════ */}
       <section className="py-20 relative">
-        <div className="max-w-6xl mx-auto px-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div data-section-header className="text-center mb-14">
             <h2 className="font-display font-bold text-white mb-3 text-2xl lg:text-4xl">
               How the <span className="text-gold">System</span> Works
@@ -218,7 +218,7 @@ export default function ServicesPage() {
       {/* ═══════════ NETWORK PIPELINE — Data Flow Animation (Phase 5) ═══════════ */}
       <section className="py-20 relative overflow-hidden">
         <div className="circuit-bg absolute inset-0 opacity-20" />
-        <div className="max-w-6xl mx-auto px-6 relative z-10">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
           <div data-section-header className="text-center mb-14">
             <h2 className="font-display font-bold text-white mb-3 text-2xl lg:text-4xl">
               Your Content <span className="text-gold">Pipeline</span>
@@ -250,7 +250,7 @@ export default function ServicesPage() {
 
       {/* ═══════════ TESTIMONIAL ═══════════ */}
       <section className="py-16">
-        <div className="max-w-3xl mx-auto px-6">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <GlassCard variant="strong" hover={false} className="p-8 md:p-10 text-center border border-gold/20">
             <div className="flex flex-col items-center gap-4">
               <div className="w-16 h-16 rounded-full bg-gold/20 flex items-center justify-center border border-gold/30">
@@ -278,7 +278,7 @@ export default function ServicesPage() {
       {/* ═══════════ SOLUTION — Phone Draw Animation + Content (Phase 5) ═══════════ */}
       <section className="py-20 relative">
         <div className="aurora-bg" />
-        <div className="max-w-6xl mx-auto px-6 relative z-10">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Phone SVG Draw Animation */}
             <div data-slide-left className="relative flex justify-center">
@@ -321,7 +321,7 @@ export default function ServicesPage() {
       {/* ═══════════ TREND HUNTER DEMO ═══════════ */}
       <section id="trend-demo" className="py-20 relative">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gold/10 rounded-full blur-3xl gsap-parallax pointer-events-none" />
-        <div className="max-w-6xl mx-auto px-6 relative z-10">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div data-slide-left className="text-center lg:text-left">
               <span className="text-gold text-xs font-bold tracking-widest uppercase mb-3 block">Try It Now - FREE</span>
@@ -352,7 +352,7 @@ export default function ServicesPage() {
 
       {/* ═══════════ FAQ — GlassCard Grid ═══════════ */}
       <section className="py-20">
-        <div className="max-w-6xl mx-auto px-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div data-section-header className="text-center mb-14">
             <h2 className="font-display font-bold text-white mb-3 text-2xl lg:text-4xl">
               Frequently Asked <span className="text-gold">Questions</span>
@@ -391,7 +391,7 @@ export default function ServicesPage() {
       {/* ═══════════ BOOKING — 50/50 Split ═══════════ */}
       <section className="py-20 relative" id="booking">
         <div className="aurora-bg" />
-        <div className="max-w-6xl mx-auto px-6 relative z-10">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
           <div className="grid lg:grid-cols-2 gap-8 items-stretch">
             {/* Value Prop */}
             <OSPanel data-slide-left className="flex flex-col justify-between">
@@ -477,7 +477,7 @@ export default function ServicesPage() {
 
       {/* ═══════════ PRODUCTS — 50/50 Splits ═══════════ */}
       <section className="py-20">
-        <div className="max-w-6xl mx-auto px-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div data-section-header className="text-center mb-14">
             <h2 className="font-display font-bold text-white mb-3 text-2xl lg:text-4xl">
               Our <span className="text-gold">Products</span>

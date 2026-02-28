@@ -89,7 +89,7 @@ export default function LoopsClient() {
         <div className="absolute inset-0 bg-gradient-to-b from-midnight-950 via-midnight-900 to-midnight-950" />
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-radial-gold opacity-10 blur-3xl rounded-full pointer-events-none" />
 
-        <div className="relative max-w-7xl mx-auto px-6 text-center">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-gold border border-gold/20 mb-6">
               <span className="w-2 h-2 rounded-full bg-gold animate-pulse" />
@@ -136,7 +136,7 @@ export default function LoopsClient() {
 
       {/* ─── BOOSTED SHOWCASE ─── */}
       <section className="py-16 bg-midnight-900" data-testid="loops-boosted-section">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <p className="text-xs font-heading font-semibold uppercase tracking-[0.2em] text-center mb-3 text-gold">Spotlight</p>
           <h2 className="text-3xl md:text-4xl font-heading font-light text-white text-center mb-3 tracking-tight">
             Featured <span className="font-semibold text-gradient-gold">Businesses</span>
@@ -150,7 +150,7 @@ export default function LoopsClient() {
       </section>
 
       {/* ─── LOOP CARDS GRID ─── */}
-      <section className="max-w-7xl mx-auto px-6 py-20">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-20">
         <p className="text-xs font-heading font-semibold uppercase tracking-[0.2em] text-center mb-3 text-gold">Curated Itineraries</p>
         <h2 className="text-3xl md:text-4xl font-heading font-light text-white text-center mb-3 tracking-tight">
           Browse <span className="font-semibold text-gradient-gold">Loops</span>
@@ -244,7 +244,7 @@ export default function LoopsClient() {
 
       {/* ─── EXPLORE BY DESTINATION ─── */}
       <section className="bg-charcoal-900 py-20">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <p className="text-xs font-heading font-semibold uppercase tracking-[0.2em] text-center mb-3 text-gold">Explore By Destination</p>
           <h2 className="text-3xl md:text-4xl font-heading font-light text-white text-center mb-3 tracking-tight">
             Pick Your <span className="font-semibold text-gradient-gold">Destination</span>
@@ -282,7 +282,7 @@ export default function LoopsClient() {
 
       {/* ─── CTA ─── */}
       <section className="py-20">
-        <div className="max-w-3xl mx-auto px-6 text-center">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
           <h2 className="text-3xl font-heading font-light text-white mb-4 tracking-tight">
             Have a Local Business?
           </h2>

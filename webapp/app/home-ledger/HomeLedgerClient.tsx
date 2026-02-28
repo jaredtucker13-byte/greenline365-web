@@ -63,7 +63,7 @@ export default function HomeLedgerClient() {
         <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-radial-gold opacity-5 blur-3xl rounded-full pointer-events-none" />
         <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-radial-green opacity-5 blur-3xl rounded-full pointer-events-none" />
 
-        <div className="relative max-w-5xl mx-auto px-6">
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-6">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center">
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-gold border border-gold/20 mb-6">
               <span className="w-2 h-2 rounded-full bg-gold animate-pulse" />
@@ -96,7 +96,7 @@ export default function HomeLedgerClient() {
 
       {/* ─── HOW IT WORKS ─── */}
       <section className="py-20 bg-charcoal-900">
-        <div className="max-w-5xl mx-auto px-6">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <p className="text-xs font-heading font-semibold uppercase tracking-[0.2em] text-center mb-3 text-gold">How It Works</p>
           <h2 className="text-3xl md:text-4xl font-heading font-light text-white text-center mb-4 tracking-tight">
             Three Steps to <span className="font-semibold text-gradient-gold">Property Intelligence</span>
@@ -134,7 +134,7 @@ export default function HomeLedgerClient() {
 
       {/* ─── FEATURES GRID ─── */}
       <section className="py-20">
-        <div className="max-w-5xl mx-auto px-6">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <p className="text-xs font-heading font-semibold uppercase tracking-[0.2em] text-center mb-3 text-gold">Capabilities</p>
           <h2 className="text-3xl md:text-4xl font-heading font-light text-white text-center mb-4 tracking-tight">
             Everything About Your <span className="font-semibold text-gradient-gold">Property</span>
@@ -168,7 +168,7 @@ export default function HomeLedgerClient() {
 
       {/* ─── USE CASES ─── */}
       <section className="py-20 bg-charcoal-900">
-        <div className="max-w-5xl mx-auto px-6">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <p className="text-xs font-heading font-semibold uppercase tracking-[0.2em] text-center mb-3 text-gold">Who It&apos;s For</p>
           <h2 className="text-3xl md:text-4xl font-heading font-light text-white text-center mb-14 tracking-tight">
             Built for <span className="font-semibold text-gradient-gold">Everyone</span> in the Property Ecosystem
@@ -222,7 +222,7 @@ export default function HomeLedgerClient() {
 
       {/* ─── TRUST / INTEGRATION ─── */}
       <section className="py-20">
-        <div className="max-w-4xl mx-auto px-6 text-center">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
           <p className="text-xs font-heading font-semibold uppercase tracking-[0.2em] text-center mb-3 text-gold">Integrated</p>
           <h2 className="text-3xl md:text-4xl font-heading font-light text-white mb-4 tracking-tight">
             Powered by the <span className="font-semibold text-gradient-gold">GL365 Directory</span>
@@ -249,7 +249,7 @@ export default function HomeLedgerClient() {
 
       {/* ─── CTA ─── */}
       <section className="py-20 bg-charcoal-900">
-        <div className="max-w-3xl mx-auto px-6 text-center">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-heading font-light text-white mb-4 tracking-tight">
             Ready to Know Your <span className="font-semibold text-gradient-gold">Property</span>?
           </h2>

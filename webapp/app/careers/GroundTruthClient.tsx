@@ -99,7 +99,7 @@ export default function GroundTruthClient() {
         <div className="absolute top-1/4 left-1/3 w-[600px] h-[600px] bg-radial-gold opacity-5 blur-3xl rounded-full pointer-events-none" />
         <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-radial-green opacity-5 blur-3xl rounded-full pointer-events-none" />
 
-        <div className="relative max-w-4xl mx-auto px-6 text-center">
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-gold border border-gold/20 mb-6">
               <span className="w-2 h-2 rounded-full bg-gold animate-pulse" />
@@ -123,7 +123,7 @@ export default function GroundTruthClient() {
 
       {/* ─── THE VISION ─── */}
       <section className="py-16 bg-charcoal-900">
-        <div className="max-w-4xl mx-auto px-6">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -144,7 +144,7 @@ export default function GroundTruthClient() {
 
       {/* ─── OPEN ROLES ─── */}
       <section className="py-20">
-        <div className="max-w-5xl mx-auto px-6">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <p className="text-xs font-heading font-semibold uppercase tracking-[0.2em] text-center mb-3 text-gold">Open Roles in the Empire</p>
           <h2 className="text-3xl md:text-4xl font-heading font-light text-white text-center mb-4 tracking-tight">
             Three Pillars of <span className="font-semibold text-gradient-gold">Ground Truth</span>
@@ -200,7 +200,7 @@ export default function GroundTruthClient() {
 
       {/* ─── THE PROMISE ─── */}
       <section className="py-16 bg-charcoal-900">
-        <div className="max-w-4xl mx-auto px-6">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               {
@@ -242,7 +242,7 @@ export default function GroundTruthClient() {
 
       {/* ─── EMAIL SIGNUP ─── */}
       <section className="py-20">
-        <div className="max-w-2xl mx-auto px-6 text-center">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 text-center">
           <p className="text-xs font-heading font-semibold uppercase tracking-[0.2em] text-center mb-3 text-gold">Join the Waiting List</p>
           <h2 className="text-3xl md:text-4xl font-heading font-light text-white mb-4 tracking-tight">
             Be First to <span className="font-semibold text-gradient-gold">Join the Force</span>
@@ -279,7 +279,7 @@ export default function GroundTruthClient() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="btn-primary px-6 py-3 rounded-full text-sm font-heading font-semibold whitespace-nowrap disabled:opacity-50"
+                className="btn-primary px-4 sm:px-6 py-3 rounded-full text-sm font-heading font-semibold disabled:opacity-50"
               >
                 {submitting ? 'Joining...' : 'Join the Waitlist'}
               </button>
@@ -298,7 +298,7 @@ export default function GroundTruthClient() {
 
       {/* ─── BACK TO DIRECTORY CTA ─── */}
       <section className="py-12 bg-charcoal-900">
-        <div className="max-w-3xl mx-auto px-6 text-center">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
           <p className="text-white/40 font-body text-sm mb-4">In the meantime, explore the directory that started it all.</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/" className="btn-primary px-6 py-3 rounded-full text-sm inline-block">

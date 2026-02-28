@@ -185,7 +185,7 @@ export default function DestinationGuideClient({ slug }: { slug: string }) {
         <div className="absolute top-20 left-1/4 w-96 h-96 rounded-full opacity-[0.04]" style={{ background: 'radial-gradient(circle, #C9A84C 0%, transparent 70%)' }} />
         <div className="absolute bottom-10 right-1/4 w-64 h-64 rounded-full opacity-[0.03]" style={{ background: 'radial-gradient(circle, #C9A84C 0%, transparent 70%)' }} />
 
-        <div className="relative max-w-6xl mx-auto px-6 flex flex-col justify-center" style={{ minHeight: '60vh' }}>
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 flex flex-col justify-center" style={{ minHeight: '60vh' }}>
           {/* Breadcrumb */}
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
             <Link href="/" className="inline-flex items-center gap-2 text-sm text-white/30 hover:text-gold transition font-body mb-8" data-testid="breadcrumb-home">
@@ -255,7 +255,7 @@ export default function DestinationGuideClient({ slug }: { slug: string }) {
       </section>
 
       {/* ─── View Toggle ─── */}
-      <section className="max-w-6xl mx-auto px-6 pt-4 pb-2">
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-4 pb-2">
         <div className="flex items-center gap-2">
           <button
             onClick={() => setActiveView('explore')}
@@ -284,7 +284,7 @@ export default function DestinationGuideClient({ slug }: { slug: string }) {
         <>
           {/* ─── Featured Businesses ─── */}
           {!loading && featured.length > 0 && (
-            <section className="max-w-6xl mx-auto px-6 py-10" data-testid="featured-section">
+            <section className="max-w-6xl mx-auto px-4 sm:px-6 py-10" data-testid="featured-section">
               <div className="flex items-center gap-3 mb-8">
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(201, 168, 76, 0.1)', border: '1px solid rgba(201, 168, 76, 0.2)' }}>
                   <svg className="w-5 h-5 text-[#C9A84C]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -307,7 +307,7 @@ export default function DestinationGuideClient({ slug }: { slug: string }) {
 
           {/* ─── Top Rated ─── */}
           {!loading && topRated.length > 0 && (
-            <section className="max-w-6xl mx-auto px-6 py-10 border-t border-white/5" data-testid="top-rated-section">
+            <section className="max-w-6xl mx-auto px-4 sm:px-6 py-10 border-t border-white/5" data-testid="top-rated-section">
               <div className="flex items-center gap-3 mb-8">
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(201, 168, 76, 0.1)', border: '1px solid rgba(201, 168, 76, 0.2)' }}>
                   <svg className="w-5 h-5 text-[#C9A84C]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -329,7 +329,7 @@ export default function DestinationGuideClient({ slug }: { slug: string }) {
           )}
 
           {/* ─── Voted Best — Coming Soon ─── */}
-          <section className="max-w-6xl mx-auto px-6 py-12 border-t border-white/5" data-testid="voted-best-section">
+          <section className="max-w-6xl mx-auto px-4 sm:px-6 py-12 border-t border-white/5" data-testid="voted-best-section">
             <div className="relative rounded-2xl overflow-hidden border border-[#C9A84C]/10" style={{ background: 'rgba(201, 168, 76, 0.03)' }}>
               <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute top-1/2 left-0 w-full h-[1px] opacity-5" style={{ background: 'linear-gradient(90deg, transparent, #C9A84C, transparent)' }} />
@@ -369,7 +369,7 @@ export default function DestinationGuideClient({ slug }: { slug: string }) {
 
           {/* ─── Category Overview Grid ─── */}
           {!loading && activeIndustries.length > 0 && (
-            <section className="max-w-6xl mx-auto px-6 py-10 border-t border-white/5" data-testid="category-overview">
+            <section className="max-w-6xl mx-auto px-4 sm:px-6 py-10 border-t border-white/5" data-testid="category-overview">
               <div className="flex items-center justify-between mb-8">
                 <div>
                   <h2 className="text-xl font-heading font-semibold text-white">Browse by Category</h2>
@@ -412,7 +412,7 @@ export default function DestinationGuideClient({ slug }: { slug: string }) {
           {/* ─── Tourism Section Tabs ─── */}
           <section className="border-t border-white/5">
             <div className="sticky top-0 z-30 bg-[#0A0A0A]/95 backdrop-blur-xl border-b border-white/5" data-testid="section-nav">
-              <div className="max-w-6xl mx-auto px-6">
+              <div className="max-w-6xl mx-auto px-4 sm:px-6">
                 <div className="flex overflow-x-auto gap-1 py-3 scrollbar-hide">
                   {SECTIONS.map(section => {
                     const count = (listings[section.id] || []).length;
@@ -446,7 +446,7 @@ export default function DestinationGuideClient({ slug }: { slug: string }) {
             </div>
 
             {/* Section Content */}
-            <div className="max-w-6xl mx-auto px-6 py-10" data-testid="section-content">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10" data-testid="section-content">
               <AnimatePresence mode="wait">
                 <motion.div key={activeSection} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
                   <div className="flex items-center gap-3 mb-8">
@@ -496,7 +496,7 @@ export default function DestinationGuideClient({ slug }: { slug: string }) {
         </>
       ) : (
         /* ─── Browse by Industry Category View ─── */
-        <section className="max-w-6xl mx-auto px-6 py-10" data-testid="browse-view">
+        <section className="max-w-6xl mx-auto px-4 sm:px-6 py-10" data-testid="browse-view">
           <div className="mb-8">
             <h2 className="text-2xl font-heading font-light text-white mb-2">All Categories in {dest.label}</h2>
             <p className="text-sm text-white/30 font-body">{totalIndustryCount} businesses across {activeIndustries.length} categories</p>
@@ -564,7 +564,7 @@ export default function DestinationGuideClient({ slug }: { slug: string }) {
 
       {/* ─── Add Your Business CTA ─── */}
       <section className="border-t border-white/5 py-16" data-testid="add-business-cta">
-        <div className="max-w-6xl mx-auto px-6 text-center">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center">
           <h3 className="text-2xl font-heading font-light text-white mb-4">
             Own a business in <span className="text-[#C9A84C]">{dest.label}</span>?
           </h3>
@@ -587,7 +587,7 @@ export default function DestinationGuideClient({ slug }: { slug: string }) {
       {/* ─── All Destinations CTA ─── */}
       {/* ─── Explore More Destinations ─── */}
       <section className="border-t border-white/5 py-16" data-testid="other-destinations">
-        <div className="max-w-6xl mx-auto px-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <h3 className="text-lg font-heading font-semibold text-white mb-8 text-center">Explore More Destinations</h3>
 
           {Object.keys(destinationsByRegion).length > 0 ? (
@@ -747,7 +747,7 @@ function DestinationLoops({ destinationSlug, destinationLabel }: { destinationSl
 
   return (
     <section className="border-t border-white/5 py-16" data-testid="destination-loops">
-      <div className="max-w-6xl mx-auto px-6">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between mb-8">
           <div>
             <p className="text-xs font-heading font-semibold uppercase tracking-[0.2em] text-gold mb-1">Experiences</p>

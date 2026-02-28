@@ -127,7 +127,7 @@ export default function DemoCalendarPage() {
 
   return (
     <div className="pt-24 py-12">
-      <div className="max-w-2xl mx-auto px-6">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6">
         {/* Header */}
         <div className="text-center mb-12">
           <motion.h1 

@@ -62,6 +62,100 @@ function cleanPhone(phone: string): string {
   return phone.replace(/[^\d+]/g, '');
 }
 
+/** Day abbreviations and full names */
+const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const;
+const DAY_NAMES: Record<string, string> = { mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday', sun: 'Sunday' };
+const DAY_FULL_TO_SHORT: Record<string, string> = { monday: 'mon', tuesday: 'tue', wednesday: 'wed', thursday: 'thu', friday: 'fri', saturday: 'sat', sunday: 'sun' };
+
+interface NormalizedHours {
+  [day: string]: { display: string; closed: boolean };
+}
+
+/**
+ * Normalize business_hours from any of the 3 storage formats into a consistent structure.
+ * Format A: { weekday_text: ["Monday: 9:00 AM – 5:00 PM", ...] } or { hours: [...] }
+ * Format B: { monday: "Monday: 9:00 AM – 5:00 PM", ... }
+ * Format C: { mon: { open: "9:00", close: "17:00", closed?: boolean }, ... }
+ */
+function normalizeBusinessHours(raw: Record<string, any> | null): NormalizedHours | null {
+  if (!raw || Object.keys(raw).length === 0) return null;
+
+  const result: NormalizedHours = {};
+
+  // Format A: weekday_text array or hours array
+  const textArray = raw.weekday_text || raw.hours;
+  if (Array.isArray(textArray) && textArray.length > 0) {
+    for (const entry of textArray) {
+      if (typeof entry !== 'string') continue;
+      const colonIdx = entry.indexOf(':');
+      if (colonIdx === -1) continue;
+      const dayName = entry.slice(0, colonIdx).trim().toLowerCase();
+      const timeStr = entry.slice(colonIdx + 1).trim();
+      const shortDay = DAY_FULL_TO_SHORT[dayName] || dayName.slice(0, 3);
+      if (DAY_KEYS.includes(shortDay as any)) {
+        const isClosed = /closed/i.test(timeStr);
+        result[shortDay] = { display: isClosed ? 'Closed' : timeStr, closed: isClosed };
+      }
+    }
+    if (Object.keys(result).length > 0) return result;
+  }
+
+  // Format B: { monday: "Monday: 9:00 AM – 5:00 PM", ... } or { monday: "9:00 AM – 5:00 PM", ... }
+  const fullDayKeys = Object.keys(raw).filter(k => DAY_FULL_TO_SHORT[k.toLowerCase()]);
+  if (fullDayKeys.length > 0) {
+    for (const key of fullDayKeys) {
+      const shortDay = DAY_FULL_TO_SHORT[key.toLowerCase()];
+      const val = raw[key];
+      if (typeof val === 'string') {
+        // Strip leading "Monday: " prefix if present
+        const cleaned = val.replace(/^[a-z]+:\s*/i, '').trim();
+        const isClosed = /closed/i.test(cleaned);
+        result[shortDay] = { display: isClosed ? 'Closed' : cleaned, closed: isClosed };
+      }
+    }
+    if (Object.keys(result).length > 0) return result;
+  }
+
+  // Format C: { mon: { open: "9:00", close: "17:00", closed?: boolean }, ... }
+  const shortDayKeys = Object.keys(raw).filter(k => DAY_KEYS.includes(k as any));
+  if (shortDayKeys.length > 0) {
+    for (const day of shortDayKeys) {
+      const val = raw[day];
+      if (val && typeof val === 'object') {
+        if (val.closed) {
+          result[day] = { display: 'Closed', closed: true };
+        } else if (val.open && val.close) {
+          result[day] = { display: `${val.open} – ${val.close}`, closed: false };
+        } else {
+          result[day] = { display: '—', closed: false };
+        }
+      }
+    }
+    if (Object.keys(result).length > 0) return result;
+  }
+
+  return null;
+}
+
+/** Get current day abbreviation */
+function getTodayShort(): string {
+  return new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase().slice(0, 3);
+}
+
+/** Determine open/closed status from normalized hours */
+function getOpenStatus(hours: NormalizedHours | null): { isOpen: boolean; label: string } | null {
+  if (!hours) return null;
+  const today = getTodayShort();
+  const todayHours = hours[today];
+  if (!todayHours) return null;
+  if (todayHours.closed) return { isOpen: false, label: 'Closed Today' };
+  // If we have display text, show as "Open" (we can't always determine exact time)
+  if (todayHours.display && todayHours.display !== '—') {
+    return { isOpen: true, label: `Open · ${todayHours.display}` };
+  }
+  return null;
+}
+
 export default function ListingDetailPage() {
   const params = useParams();
   const slug = params.slug as string;
@@ -178,7 +272,8 @@ export default function ListingDetailPage() {
   const googleRating = listing.metadata?.google_rating;
   const googleReviews = listing.metadata?.google_review_count;
   const googleMapsUrl = listing.metadata?.google_maps_url;
-  const businessHours = listing.business_hours as Record<string, { open: string; close: string; closed: boolean }> | null;
+  const normalizedHours = normalizeBusinessHours(listing.business_hours);
+  const openStatus = getOpenStatus(normalizedHours);
   const menuSections = listing.menu as { id: string; name: string; items: { id: string; name: string; description: string; price: string }[] }[] | null;
 
   return (
@@ -243,19 +338,19 @@ export default function ListingDetailPage() {
         )}
       </section>
 
-      <div className="max-w-6xl mx-auto px-6 -mt-16 relative z-10">
-        <div className="grid lg:grid-cols-3 gap-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 -mt-16 relative z-10 overflow-hidden">
+        <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Business Header */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="rounded-2xl border border-white/10 p-6 backdrop-blur-xl"
+              className="rounded-2xl border border-white/10 p-4 sm:p-6 backdrop-blur-xl"
               style={{ background: 'rgba(10,10,10,0.9)' }}
               data-testid="listing-header"
             >
-              <div className="flex items-start justify-between gap-4 flex-wrap">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                 <div className="flex-1 min-w-0">
                   <span className="text-[10px] px-2.5 py-1 rounded-full font-heading font-semibold uppercase tracking-wider text-gold/70 border border-gold/20 bg-gold/5">
                     {listing.industry.replace(/-/g, ' ')}
@@ -278,11 +373,23 @@ export default function ListingDetailPage() {
                       )}
                     </div>
                   )}
+                  {openStatus && (
+                    <div className="flex items-center gap-2 mt-1.5">
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-heading font-semibold ${
+                        openStatus.isOpen
+                          ? 'bg-greenline/15 text-greenline border border-greenline/20'
+                          : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                      }`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${openStatus.isOpen ? 'bg-greenline' : 'bg-red-400'}`} />
+                        {openStatus.label}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Rating */}
                 {googleRating && (
-                  <div className="flex flex-col items-end gap-1">
+                  <div className="flex flex-col items-start sm:items-end gap-1 flex-shrink-0">
                     <div className="flex items-center gap-2 px-3 py-2 rounded-xl border border-gold/20 bg-gold/5">
                       <svg className="w-5 h-5 text-gold" fill="currentColor" viewBox="0 0 24 24"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
                       <span className="text-xl font-heading font-bold text-white">{googleRating}</span>
@@ -414,33 +521,37 @@ export default function ListingDetailPage() {
             )}
 
             {/* ─── BUSINESS HOURS ─── */}
-            {businessHours && Object.keys(businessHours).length > 0 && (
+            {normalizedHours && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.15 }}
-                className="rounded-2xl border border-white/10 p-6"
+                className="rounded-2xl border border-white/10 p-4 sm:p-6"
                 style={{ background: 'rgba(255,255,255,0.03)' }}
                 data-testid="business-hours"
               >
-                <h3 className="text-sm font-heading font-semibold text-white uppercase tracking-wider mb-4">Business Hours</h3>
-                <div className="space-y-2">
-                  {['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map(day => {
-                    const hours = businessHours[day];
-                    const dayNames: Record<string, string> = { mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday', sun: 'Sunday' };
-                    const today = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase().slice(0, 3);
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-heading font-semibold text-white uppercase tracking-wider">Business Hours</h3>
+                  {openStatus && (
+                    <span className={`text-xs font-heading font-semibold ${openStatus.isOpen ? 'text-greenline' : 'text-red-400'}`}>
+                      {openStatus.isOpen ? 'Open Now' : 'Closed'}
+                    </span>
+                  )}
+                </div>
+                <div className="space-y-1.5">
+                  {DAY_KEYS.map(day => {
+                    const hours = normalizedHours[day];
+                    const today = getTodayShort();
                     const isToday = day === today;
                     return (
                       <div key={day} className={`flex items-center justify-between py-2 px-3 rounded-lg ${isToday ? 'bg-[rgba(201,168,76,0.08)] border border-[rgba(201,168,76,0.15)]' : ''}`}>
-                        <span className={`text-sm font-body ${isToday ? 'text-[#C9A84C] font-semibold' : 'text-white/60'}`}>
-                          {dayNames[day]}
+                        <span className={`text-sm font-body flex-shrink-0 ${isToday ? 'text-[#C9A84C] font-semibold' : 'text-white/60'}`}>
+                          {DAY_NAMES[day]}
                           {isToday && <span className="ml-2 text-[10px] text-[#C9A84C]/60 uppercase">Today</span>}
                         </span>
-                        {hours?.closed ? (
-                          <span className="text-sm text-white/30 font-body">Closed</span>
-                        ) : hours?.open && hours?.close ? (
-                          <span className={`text-sm font-body ${isToday ? 'text-white font-medium' : 'text-white/60'}`}>
-                            {hours.open} — {hours.close}
+                        {hours ? (
+                          <span className={`text-sm font-body text-right ${hours.closed ? 'text-white/30' : isToday ? 'text-white font-medium' : 'text-white/60'}`}>
+                            {hours.display}
                           </span>
                         ) : (
                           <span className="text-sm text-white/20 font-body">—</span>
@@ -496,7 +607,7 @@ export default function ListingDetailPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="rounded-2xl border border-gold/15 p-6"
+                className="rounded-2xl border border-gold/15 p-4 sm:p-6"
                 style={{ background: 'rgba(201,168,76,0.04)' }}
                 data-testid="claim-section"
               >
@@ -546,7 +657,7 @@ export default function ListingDetailPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.25 }}
-              className="rounded-2xl border border-white/10 p-6"
+              className="rounded-2xl border border-white/10 p-4 sm:p-6"
               style={{ background: 'rgba(255,255,255,0.03)' }}
               data-testid="gl365-reviews-section"
             >
@@ -569,7 +680,7 @@ export default function ListingDetailPage() {
                 }));
                 const maxCount = Math.max(...ratingCounts.map(r => r.count), 1);
                 return (
-                  <div className="flex gap-6 mb-6 pb-6 border-b border-white/5">
+                  <div className="flex gap-4 sm:gap-6 mb-6 pb-6 border-b border-white/5">
                     {/* Big number */}
                     <div className="text-center flex-shrink-0" data-testid="rating-summary">
                       <span className="text-4xl font-heading font-bold text-white block">{reviewStats.average_rating}</span>
@@ -766,7 +877,7 @@ export default function ListingDetailPage() {
                 <h3 className="text-sm font-heading font-semibold text-white uppercase tracking-wider mb-4">
                   More {listing.industry.replace(/-/g, ' ')} in {listing.city}
                 </h3>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
                   {listing.related.map((r) => (
                     <Link
                       key={r.id}
@@ -808,7 +919,7 @@ export default function ListingDetailPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="rounded-2xl border border-white/10 p-6 sticky top-24"
+              className="rounded-2xl border border-white/10 p-4 sm:p-6 sticky top-24"
               style={{ background: 'rgba(10,10,10,0.9)', backdropFilter: 'blur(16px)' }}
               data-testid="contact-card"
             >
@@ -882,9 +993,9 @@ export default function ListingDetailPage() {
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
                       </svg>
                     </div>
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <span className="text-xs text-white/40 font-body block">Website</span>
-                      <span className="text-sm text-white font-medium font-body group-hover:text-gold transition-colors truncate block">{listing.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}</span>
+                      <span className="text-sm text-white font-medium font-body group-hover:text-gold transition-colors truncate block max-w-full">{listing.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}</span>
                     </div>
                   </a>
                 )}
@@ -959,10 +1070,11 @@ export default function ListingDetailPage() {
                 <div className="mt-5 pt-5 border-t border-white/5" data-testid="listing-map">
                   <p className="text-[10px] text-white/30 font-heading uppercase tracking-wider mb-3">Location</p>
                   {process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ? (
-                    <div className="rounded-xl overflow-hidden border border-white/5" style={{ aspectRatio: '4/3' }}>
+                    <div className="rounded-xl overflow-hidden border border-white/5 w-full" style={{ aspectRatio: '4/3' }}>
                       <iframe
                         width="100%"
                         height="100%"
+                        className="max-w-full"
                         style={{ border: 0 }}
                         loading="lazy"
                         referrerPolicy="no-referrer-when-downgrade"

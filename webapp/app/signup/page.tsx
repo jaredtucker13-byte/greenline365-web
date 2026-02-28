@@ -117,7 +117,7 @@ export default function SignUpPage() {
   if (success) {
     return (
       <div className="py-20">
-        <div className="max-w-md mx-auto px-6">
+        <div className="max-w-md mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -141,7 +141,7 @@ export default function SignUpPage() {
   if (magicLinkSent) {
     return (
       <div className="py-20">
-        <div className="max-w-md mx-auto px-6">
+        <div className="max-w-md mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -176,7 +176,7 @@ export default function SignUpPage() {
 
   return (
     <div className="pt-24 py-12">
-      <div className="max-w-md mx-auto px-6">
+      <div className="max-w-md mx-auto px-4 sm:px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

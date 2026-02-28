@@ -85,7 +85,7 @@ export default function BoostedShowcase({ className = '', showSponsoredLabel = t
     return (
       <div className={`flex gap-4 overflow-hidden ${className}`}>
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="flex-shrink-0 w-64 h-48 rounded-xl bg-white/5 animate-pulse" />
+          <div key={i} className="flex-shrink-0 w-52 sm:w-64 h-48 rounded-xl bg-white/5 animate-pulse" />
         ))}
       </div>
     );
@@ -120,7 +120,7 @@ export default function BoostedShowcase({ className = '', showSponsoredLabel = t
           <Link
             key={listing.id}
             href={`/listing/${listing.slug}`}
-            className="flex-shrink-0 w-64 rounded-xl overflow-hidden border border-white/10 hover:border-gold/30 transition-all duration-300 snap-start group/card bg-midnight-900/50 hover:bg-midnight-900/80"
+            className="flex-shrink-0 w-52 sm:w-64 rounded-xl overflow-hidden border border-white/10 hover:border-gold/30 transition-all duration-300 snap-start group/card bg-midnight-900/50 hover:bg-midnight-900/80"
             data-testid={`boosted-card-${listing.slug}`}
           >
             {/* Image */}

@@ -309,7 +309,7 @@ export default function DirectoryClient() {
             </div>
 
             {/* Hero Content */}
-            <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
+            <div className="relative z-10 text-center px-4 sm:px-6 max-w-4xl mx-auto">
               {/* Gold accent line above headline */}
               <motion.div
                 initial={{ scaleX: 0 }}
@@ -416,7 +416,7 @@ export default function DirectoryClient() {
           {/* ═══════════════════════════════════════════════════════════
               BROWSE BY CATEGORY
               ═══════════════════════════════════════════════════════════ */}
-          <section id="categories" className="max-w-7xl mx-auto px-6 py-20" data-testid="categories-section">
+          <section id="categories" className="max-w-7xl mx-auto px-4 sm:px-6 py-20" data-testid="categories-section">
             <p className="text-xs font-heading font-semibold uppercase tracking-[0.2em] text-center mb-3" style={{ color: '#C9A84C' }}>Browse By Category</p>
             <h2 className="text-3xl md:text-4xl font-heading font-light text-white text-center mb-3 tracking-tight">
               Explore <span className="text-gradient-gold font-semibold">Categories</span>
@@ -446,7 +446,7 @@ export default function DirectoryClient() {
               FEATURED LISTINGS
               ═══════════════════════════════════════════════════════════ */}
           <section className="py-20" style={{ background: 'linear-gradient(180deg, #080808 0%, #0A0A0A 50%, #080808 100%)' }} data-testid="featured-listings-section">
-            <div className="max-w-7xl mx-auto px-6">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6">
               <p className="text-xs font-heading font-semibold uppercase tracking-[0.2em] text-center mb-3" style={{ color: '#C9A84C' }}>Showcase</p>
               <h2 className="text-3xl md:text-4xl font-heading font-light text-white text-center mb-3 tracking-tight">
                 Featured <span className="text-gradient-gold font-semibold">Listings</span>
@@ -497,7 +497,7 @@ export default function DirectoryClient() {
           <section className="section-gradient-blue-gold py-24 bg-gold-accent-top" data-testid="destination-guides-section">
             <div className="section-divider-gold max-w-5xl mx-auto mb-16" />
 
-            <div className="max-w-7xl mx-auto px-6">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6">
               <div className="text-center mb-14 corner-filigree py-8 px-4">
                 <p className="text-xs font-heading font-semibold uppercase tracking-[0.25em] mb-4" style={{ color: 'rgba(201,168,76,0.7)' }}>Curated Travel Guides</p>
                 <h2 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-light text-white tracking-tight mb-4">
@@ -547,7 +547,7 @@ export default function DirectoryClient() {
             <div className="absolute inset-0 circuit-bg opacity-30" />
             <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(201,168,76,0.04) 0%, transparent 60%)' }} />
 
-            <div className="relative max-w-5xl mx-auto px-6 text-center">
+            <div className="relative max-w-5xl mx-auto px-4 sm:px-6 text-center">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border mb-8" style={{ borderColor: 'rgba(201,168,76,0.3)', background: 'rgba(201,168,76,0.05)' }}>
                 <svg className="w-4 h-4" style={{ color: '#C9A84C' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
@@ -579,7 +579,7 @@ export default function DirectoryClient() {
               VALUE PROPOSITION — Why GreenLine365
               ═══════════════════════════════════════════════════════════ */}
           <section className="py-20" style={{ background: '#0A0A0A' }} data-testid="value-prop-section">
-            <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 grid md:grid-cols-2 gap-8 md:gap-16 items-center">
               <div>
                 <h2 className="text-3xl font-heading font-light text-white mb-4 tracking-tight">A <span className="text-gradient-gold font-semibold">Trusted</span> Resource for Finding Local Pros</h2>
                 <p className="text-white/55 mb-10 leading-relaxed font-body">Whether you need emergency plumbing, a master electrician, or the best barber in town — our directory connects you with verified, accountable businesses.</p>
@@ -610,7 +610,7 @@ export default function DirectoryClient() {
               COMING SOON — Voted Best (Poll-Driven)
               ═══════════════════════════════════════════════════════════ */}
           <section className="py-16 relative" data-testid="voted-best-section">
-            <div className="max-w-4xl mx-auto px-6 text-center">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
               <div className="section-divider-gold mx-auto mb-12" />
               <p className="text-xs font-heading font-semibold uppercase tracking-[0.25em] mb-4" style={{ color: 'rgba(201,168,76,0.5)' }}>Coming Soon</p>
               <h2 className="text-2xl sm:text-3xl font-heading font-light text-white tracking-tight mb-4">
@@ -643,7 +643,7 @@ export default function DirectoryClient() {
             )}
             <div className="absolute inset-0 bg-gradient-to-b from-[#050505]/60 via-[#050505]/80 to-[#050505]" />
 
-            <div className="relative max-w-7xl mx-auto px-6">
+            <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
               <button onClick={() => { setShowListings(false); setShowGroupedBrowse(true); setActiveCategory(''); }} className="text-sm text-white/40 hover:text-white mb-6 flex items-center gap-2 transition font-body" data-testid="back-to-explore-btn">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                 Back to All Categories
