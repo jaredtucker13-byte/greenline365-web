@@ -55,6 +55,13 @@ export async function GET(
     .neq('id', listing.id)
     .limit(4);
 
+  // Get menu data if available
+  const { data: menuData } = await supabase
+    .from('listing_menus')
+    .select('sections')
+    .eq('listing_id', listing.id)
+    .single();
+
   return NextResponse.json({
     ...listing,
     gallery_images: visiblePhotos,
@@ -66,6 +73,7 @@ export async function GET(
     is_placeholder_image: isFreeOrUnclaimed && claimable && !allPhotos[0] && !listing.cover_image_url,
     is_claimable: claimable,
     directory_badges: (listing.directory_badges || []).filter((b: any) => b.is_active),
+    menu_sections: menuData?.sections || [],
     related: related || [],
   });
 }
