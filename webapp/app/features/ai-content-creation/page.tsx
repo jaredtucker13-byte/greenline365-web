@@ -23,18 +23,18 @@ export default function AIContentCreationPage() {
         {/* Hero Section */}
         <section className="relative min-h-[70vh] flex items-center overflow-hidden pt-32 pb-20">
           <div className="absolute inset-0 bg-os-dark" />
-          <div className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-neon-green-500/10 to-transparent blur-3xl" />
+          <div className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-gold-500/10 to-transparent blur-3xl" />
           
           <div className="relative z-10 w-full max-w-[1200px] mx-auto px-4 sm:px-6">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>
-                <div className="mb-4 inline-flex items-center gap-2 px-3 py-1.5 glass-green rounded-full border border-neon-green-500/30">
-                  <span className="w-2 h-2 bg-neon-green-500 rounded-full animate-pulse" />
-                  <span className="text-xs text-neon-green-400 font-semibold tracking-wide">AI CONTENT ENGINE</span>
+                <div className="mb-4 inline-flex items-center gap-2 px-3 py-1.5 glass-gold rounded-full border border-gold-500/30">
+                  <span className="w-2 h-2 bg-gold-500 rounded-full animate-pulse" />
+                  <span className="text-xs text-gold-400 font-semibold tracking-wide">AI CONTENT ENGINE</span>
                 </div>
                 
                 <h1 className="font-display font-bold text-white mb-6" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', lineHeight: '1.1' }}>
-                  AI-Powered Content Creation <span className="text-neon-green-500">at Scale</span>
+                  AI-Powered Content Creation <span className="text-gold-500">at Scale</span>
                 </h1>
                 
                 <p className="text-white/70 text-lg mb-8 leading-relaxed">
@@ -59,7 +59,7 @@ export default function AIContentCreationPage() {
                     { value: '50+', label: 'Content Types' }
                   ].map((stat, i) => (
                     <div key={i} className="text-center">
-                      <div className="text-3xl font-display font-bold text-neon-green-500">{stat.value}</div>
+                      <div className="text-3xl font-display font-bold text-gold-500">{stat.value}</div>
                       <div className="text-sm text-white/50 mt-1">{stat.label}</div>
                     </div>
                   ))}
@@ -81,32 +81,32 @@ export default function AIContentCreationPage() {
                     
                     <div className="space-y-3">
                       <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 rounded-full bg-neon-green-500/20 flex items-center justify-center">
-                          <svg className="w-2.5 h-2.5 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <div className="w-4 h-4 rounded-full bg-gold-500/20 flex items-center justify-center">
+                          <svg className="w-2.5 h-2.5 text-gold-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                           </svg>
                         </div>
                         <span className="text-white/80 text-sm">Blog posts (500-2000 words)</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 rounded-full bg-neon-green-500/20 flex items-center justify-center">
-                          <svg className="w-2.5 h-2.5 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <div className="w-4 h-4 rounded-full bg-gold-500/20 flex items-center justify-center">
+                          <svg className="w-2.5 h-2.5 text-gold-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                           </svg>
                         </div>
                         <span className="text-white/80 text-sm">Social media captions</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 rounded-full bg-neon-green-500/20 flex items-center justify-center">
-                          <svg className="w-2.5 h-2.5 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <div className="w-4 h-4 rounded-full bg-gold-500/20 flex items-center justify-center">
+                          <svg className="w-2.5 h-2.5 text-gold-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                           </svg>
                         </div>
                         <span className="text-white/80 text-sm">Email marketing copy</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 rounded-full bg-neon-green-500/20 flex items-center justify-center">
-                          <svg className="w-2.5 h-2.5 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <div className="w-4 h-4 rounded-full bg-gold-500/20 flex items-center justify-center">
+                          <svg className="w-2.5 h-2.5 text-gold-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                           </svg>
                         </div>
@@ -125,7 +125,7 @@ export default function AIContentCreationPage() {
           <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
             <div className="text-center mb-16">
               <h2 className="font-display font-bold text-white mb-3 text-4xl">
-                How Does <span className="text-neon-green-500">AI Content Creation</span> Work?
+                How Does <span className="text-gold-500">AI Content Creation</span> Work?
               </h2>
               <p className="text-white/60 max-w-2xl mx-auto text-lg">
                 Simple, fast, and effective content generation in four steps
@@ -159,14 +159,14 @@ export default function AIContentCreationPage() {
                   icon: '🚀'
                 }
               ].map((step, i) => (
-                <div key={i} className="os-card p-8 hover:border-neon-green-500/50 transition-all duration-300">
+                <div key={i} className="os-card p-8 hover:border-gold-500/50 transition-all duration-300">
                   <div className="flex items-start gap-5">
                     <div className="icon-glass flex-shrink-0 text-2xl">
                       {step.icon}
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <span className="text-neon-green-500 text-xs font-bold tracking-wider">{step.num}</span>
+                        <span className="text-gold-500 text-xs font-bold tracking-wider">{step.num}</span>
                         <h3 className="text-white font-bold text-xl">{step.title}</h3>
                       </div>
                       <p className="text-white/70 leading-relaxed">{step.desc}</p>
@@ -183,7 +183,7 @@ export default function AIContentCreationPage() {
           <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
             <div className="text-center mb-16">
               <h2 className="font-display font-bold text-white mb-3 text-4xl">
-                Why Choose Our <span className="text-neon-green-500">AI Content Engine</span>?
+                Why Choose Our <span className="text-gold-500">AI Content Engine</span>?
               </h2>
             </div>
             
@@ -237,7 +237,7 @@ export default function AIContentCreationPage() {
           <div className="max-w-[1000px] mx-auto px-4 sm:px-6">
             <div className="text-center mb-16">
               <h2 className="font-display font-bold text-white mb-3 text-4xl">
-                Frequently Asked <span className="text-neon-green-500">Questions</span>
+                Frequently Asked <span className="text-gold-500">Questions</span>
               </h2>
             </div>
             
@@ -274,7 +274,7 @@ export default function AIContentCreationPage() {
           <div className="max-w-[1000px] mx-auto px-4 sm:px-6">
             <div className="os-card p-12 text-center">
               <h2 className="font-display font-bold text-white mb-4 text-3xl">
-                Start Creating Content <span className="text-neon-green-500">10x Faster</span>
+                Start Creating Content <span className="text-gold-500">10x Faster</span>
               </h2>
               <p className="text-white/70 text-lg mb-8 max-w-2xl mx-auto">
                 Be an early adopter and scale your content production with AI without sacrificing quality.

@@ -58,11 +58,11 @@ const glassmorphismTheme: Theme = {
   id: 'glassmorphism',
   name: 'Glassmorphism',
   description: 'Premium frosted glass aesthetic with nature backdrop',
-  preview: 'linear-gradient(135deg, rgba(132,169,140,0.3), rgba(82,121,111,0.3))',
+  preview: 'linear-gradient(135deg, rgba(201,169,110,0.3), rgba(82,121,111,0.3))',
   colors: {
-    primary: '#84A98C',
-    secondary: '#52796F',
-    accent: '#A7C957',
+    primary: '#C9A96E',
+    secondary: '#9A7A3E',
+    accent: '#D9C48F',
     
     bgPrimary: 'rgba(0,0,0,0.5)',
     bgSecondary: 'rgba(255,255,255,0.08)',
@@ -76,7 +76,7 @@ const glassmorphismTheme: Theme = {
     textPrimary: '#FFFFFF',
     textSecondary: 'rgba(255,255,255,0.7)',
     textMuted: 'rgba(255,255,255,0.5)',
-    textAccent: '#A7C957',
+    textAccent: '#D9C48F',
     
     success: '#C9A96E',
     warning: '#F59E0B',
@@ -84,7 +84,7 @@ const glassmorphismTheme: Theme = {
     info: '#3B82F6',
     
     shadowColor: 'rgba(0,0,0,0.36)',
-    glowColor: 'rgba(132,169,140,0.4)',
+    glowColor: 'rgba(201,169,110,0.4)',
   }
 };
 
@@ -195,7 +195,7 @@ const sunsetOrangeTheme: Theme = {
 
 // Neon Green Theme (Original tactical)
 const neonGreenTheme: Theme = {
-  id: 'neon-green',
+  id: 'gold',
   name: 'Neon Tactical',
   description: 'High-tech tactical command center aesthetic',
   preview: 'linear-gradient(135deg, rgba(57,255,20,0.3), rgba(12,226,147,0.3))',

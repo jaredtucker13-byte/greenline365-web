@@ -141,7 +141,7 @@ export default function HoursPage() {
                   type="checkbox"
                   checked={!dayHours.closed}
                   onChange={(e) => updateDay(day.key, 'closed', !e.target.checked)}
-                  className="h-4 w-4 rounded border-white/30 bg-white/5 text-neon-green-500 focus:ring-neon-green-500"
+                  className="h-4 w-4 rounded border-white/30 bg-white/5 text-gold-500 focus:ring-gold-500"
                 />
                 <span className="text-xs text-white/50">
                   {dayHours.closed ? 'Closed' : 'Open'}
@@ -154,14 +154,14 @@ export default function HoursPage() {
                     type="time"
                     value={dayHours.open}
                     onChange={(e) => updateDay(day.key, 'open', e.target.value)}
-                    className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white focus:border-neon-green-500 focus:outline-none"
+                    className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white focus:border-gold-500 focus:outline-none"
                   />
                   <span className="text-xs text-white/40">to</span>
                   <input
                     type="time"
                     value={dayHours.close}
                     onChange={(e) => updateDay(day.key, 'close', e.target.value)}
-                    className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white focus:border-neon-green-500 focus:outline-none"
+                    className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white focus:border-gold-500 focus:outline-none"
                   />
                 </div>
               )}
@@ -174,7 +174,7 @@ export default function HoursPage() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="rounded-lg bg-neon-green-500 px-6 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-neon-green-400 disabled:opacity-50"
+          className="rounded-lg bg-gold-500 px-6 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-gold-400 disabled:opacity-50"
         >
           {saving ? 'Saving...' : 'Save Hours'}
         </button>

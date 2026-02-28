@@ -40,12 +40,12 @@ export default function HQSidebar() {
       {/* HQ Header */}
       <div className="p-5 border-b border-white/[0.06]">
         <Link href="/admin-v2/hq" className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.3)]">
+          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-gold-400 to-gold-700 flex items-center justify-center shadow-[0_0_20px_rgba(201,169,110,0.3)]">
             <span className="text-white font-bold text-sm">HQ</span>
           </div>
           <div>
             <p className="text-white font-semibold text-sm leading-tight">Greenline HQ</p>
-            <p className="text-[10px] text-emerald-400/80 tracking-wider font-medium">SUPER ADMIN</p>
+            <p className="text-[10px] text-gold-400/80 tracking-wider font-medium">SUPER ADMIN</p>
           </div>
         </Link>
       </div>
@@ -66,7 +66,7 @@ export default function HQSidebar() {
                     href={item.href}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                       active
-                        ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20'
+                        ? 'bg-gold-500/15 text-gold-400 border border-gold-500/20'
                         : 'text-white/50 hover:text-white/80 hover:bg-white/[0.04] border border-transparent'
                     }`}
                   >
@@ -92,7 +92,7 @@ export default function HQSidebar() {
           Back to Command Center
         </Link>
         <div className="flex items-center gap-2 mt-3 px-3">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_6px_rgba(52,211,153,0.6)]" />
+          <span className="w-1.5 h-1.5 rounded-full bg-gold-400 animate-pulse shadow-[0_0_6px_rgba(201,169,110,0.6)]" />
           <span className="text-[9px] text-white/30 tracking-wider font-medium">PLATFORM ONLINE</span>
         </div>
       </div>

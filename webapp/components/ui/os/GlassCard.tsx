@@ -25,12 +25,12 @@ export function GlassCard({
   const variantStyles = {
     default: 'glass',
     strong: 'glass-strong',
-    green: 'glass-green',
+    green: 'glass-gold',
     teal: 'glass-teal',
   };
   
   const glowStyles = {
-    green: 'shadow-neon-green',
+    green: 'shadow-gold',
     teal: 'shadow-neon-teal',
     none: '',
   };

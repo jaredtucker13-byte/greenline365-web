@@ -103,7 +103,7 @@ const BlueprintCard = ({
       onClick={onClick}
       className={`relative p-4 rounded-xl border-2 transition-all text-left w-full ${
         isSelected 
-          ? 'border-neon-green-500 bg-neon-green-500/20 ring-2 ring-neon-green-500/50' 
+          ? 'border-gold-500 bg-gold-500/20 ring-2 ring-gold-500/50' 
           : `${categoryColors[blueprint.category] || 'border-white/20 bg-white/5'} hover:border-white/40`
       }`}
       whileHover={{ scale: 1.02 }}
@@ -123,7 +123,7 @@ const BlueprintCard = ({
       </div>
       {isSelected && (
         <motion.div 
-          className="absolute top-2 right-2 w-5 h-5 bg-neon-green-500 rounded-full flex items-center justify-center"
+          className="absolute top-2 right-2 w-5 h-5 bg-gold-500 rounded-full flex items-center justify-center"
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
         >
@@ -155,7 +155,7 @@ const RepurposeButton = ({
     disabled={isLoading}
     className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-all ${
       content 
-        ? 'border-neon-green-500/50 bg-neon-green-500/20 text-neon-green-400' 
+        ? 'border-gold-500/50 bg-gold-500/20 text-gold-400' 
         : 'border-white/20 bg-white/5 text-white/70 hover:border-white/40'
     }`}
     whileHover={{ scale: 1.02 }}
@@ -330,7 +330,7 @@ export default function ContentForge2() {
               onClick={() => setActiveTab('create')}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 activeTab === 'create' 
-                  ? 'bg-neon-green-500 text-black' 
+                  ? 'bg-gold-500 text-black' 
                   : 'bg-white/10 text-white/70 hover:bg-white/20'
               }`}
             >
@@ -340,7 +340,7 @@ export default function ContentForge2() {
               onClick={() => setActiveTab('calendar')}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 activeTab === 'calendar' 
-                  ? 'bg-neon-green-500 text-black' 
+                  ? 'bg-gold-500 text-black' 
                   : 'bg-white/10 text-white/70 hover:bg-white/20'
               }`}
             >
@@ -366,7 +366,7 @@ export default function ContentForge2() {
               {/* Blueprint Selector */}
               <div className="bg-white/5 rounded-2xl border border-white/10 p-4">
                 <h2 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
-                  <span className="text-neon-green-500">01</span>
+                  <span className="text-gold-500">01</span>
                   Select Blueprint
                 </h2>
                 <div className="grid grid-cols-1 gap-2 max-h-[300px] overflow-y-auto pr-2">
@@ -384,7 +384,7 @@ export default function ContentForge2() {
               {/* Topic Input */}
               <div className="bg-white/5 rounded-2xl border border-white/10 p-4">
                 <h2 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
-                  <span className="text-neon-green-500">02</span>
+                  <span className="text-gold-500">02</span>
                   Define Topic
                 </h2>
                 
@@ -396,7 +396,7 @@ export default function ContentForge2() {
                       value={topic}
                       onChange={(e) => setTopic(e.target.value)}
                       placeholder="e.g., How to get more 5-star reviews"
-                      className="w-full mt-1 px-3 py-2 bg-black/30 border border-white/20 rounded-lg text-white text-sm placeholder:text-white/30 focus:border-neon-green-500 focus:outline-none"
+                      className="w-full mt-1 px-3 py-2 bg-black/30 border border-white/20 rounded-lg text-white text-sm placeholder:text-white/30 focus:border-gold-500 focus:outline-none"
                     />
                   </div>
                   
@@ -407,7 +407,7 @@ export default function ContentForge2() {
                       value={targetAudience}
                       onChange={(e) => setTargetAudience(e.target.value)}
                       placeholder="e.g., Local restaurant owners"
-                      className="w-full mt-1 px-3 py-2 bg-black/30 border border-white/20 rounded-lg text-white text-sm placeholder:text-white/30 focus:border-neon-green-500 focus:outline-none"
+                      className="w-full mt-1 px-3 py-2 bg-black/30 border border-white/20 rounded-lg text-white text-sm placeholder:text-white/30 focus:border-gold-500 focus:outline-none"
                     />
                   </div>
                   
@@ -416,7 +416,7 @@ export default function ContentForge2() {
                     <select
                       value={tone}
                       onChange={(e) => setTone(e.target.value)}
-                      className="w-full mt-1 px-3 py-2 bg-black/30 border border-white/20 rounded-lg text-white text-sm focus:border-neon-green-500 focus:outline-none"
+                      className="w-full mt-1 px-3 py-2 bg-black/30 border border-white/20 rounded-lg text-white text-sm focus:border-gold-500 focus:outline-none"
                     >
                       <option value="professional">Professional</option>
                       <option value="casual">Casual & Friendly</option>
@@ -429,7 +429,7 @@ export default function ContentForge2() {
                 <button
                   onClick={handleGenerate}
                   disabled={!selectedBlueprint || !topic || isGenerating}
-                  className="w-full mt-4 py-3 bg-gradient-to-r from-neon-green-500 to-gold-600 text-black font-bold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full mt-4 py-3 bg-gradient-to-r from-gold-500 to-gold-600 text-black font-bold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {isGenerating ? (
                     <>
@@ -456,7 +456,7 @@ export default function ContentForge2() {
                   className="bg-white/5 rounded-2xl border border-white/10 p-4"
                 >
                   <h2 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
-                    <span className="text-neon-green-500">📊</span>
+                    <span className="text-gold-500">📊</span>
                     Quality Scores
                   </h2>
                   
@@ -530,7 +530,7 @@ export default function ContentForge2() {
               <div className="bg-white/5 rounded-2xl border border-white/10 p-4 h-full">
                 <div className="flex items-center justify-between mb-3">
                   <h2 className="text-sm font-bold text-white flex items-center gap-2">
-                    <span className="text-neon-green-500">03</span>
+                    <span className="text-gold-500">03</span>
                     Generated Content
                   </h2>
                   {generatedContent && (
@@ -549,7 +549,7 @@ export default function ContentForge2() {
                 <div className="bg-black/30 rounded-xl p-4 h-[600px] overflow-y-auto">
                   {isGenerating ? (
                     <div className="flex flex-col items-center justify-center h-full">
-                      <div className="w-16 h-16 border-4 border-neon-green-500/30 border-t-neon-green-500 rounded-full animate-spin mb-4" />
+                      <div className="w-16 h-16 border-4 border-gold-500/30 border-t-gold-500 rounded-full animate-spin mb-4" />
                       <p className="text-white/50 text-sm">Manifesting content from the future...</p>
                     </div>
                   ) : generatedContent ? (
@@ -592,7 +592,7 @@ export default function ContentForge2() {
                       >
                         <p className="text-sm text-white">{h.headline}</p>
                         <div className="flex items-center gap-2 mt-1">
-                          <span className="text-[10px] px-1.5 py-0.5 bg-neon-green-500/20 text-neon-green-400 rounded">
+                          <span className="text-[10px] px-1.5 py-0.5 bg-gold-500/20 text-gold-400 rounded">
                             CTR: {h.ctr_score}/10
                           </span>
                           <span className="text-[10px] text-white/40">{h.approach}</span>
@@ -658,7 +658,7 @@ export default function ContentForge2() {
                         <span className="text-xs font-bold text-white uppercase">{format.replace('_', ' ')}</span>
                         <button
                           onClick={() => navigator.clipboard.writeText(content)}
-                          className="text-[10px] text-neon-green-400"
+                          className="text-[10px] text-gold-400"
                         >
                           Copy
                         </button>
@@ -689,7 +689,7 @@ export default function ContentForge2() {
                 <button
                   onClick={handleGenerateCalendar}
                   disabled={isGeneratingCalendar}
-                  className="px-4 py-2 bg-gradient-to-r from-neon-green-500 to-gold-600 text-black font-bold rounded-lg disabled:opacity-50 flex items-center gap-2"
+                  className="px-4 py-2 bg-gradient-to-r from-gold-500 to-gold-600 text-black font-bold rounded-lg disabled:opacity-50 flex items-center gap-2"
                 >
                   {isGeneratingCalendar ? (
                     <>
@@ -716,7 +716,7 @@ export default function ContentForge2() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.1 }}
-                      className="bg-black/30 rounded-xl p-4 border border-white/10 hover:border-neon-green-500/50 transition-colors cursor-pointer"
+                      className="bg-black/30 rounded-xl p-4 border border-white/10 hover:border-gold-500/50 transition-colors cursor-pointer"
                     >
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-2xl">{item.blueprint_icon}</span>
@@ -727,7 +727,7 @@ export default function ContentForge2() {
                       <p className="text-xs text-white/50 mb-1">{item.scheduled_date}</p>
                       <h3 className="text-sm font-bold text-white mb-2 line-clamp-2">{item.working_title}</h3>
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] px-1.5 py-0.5 bg-neon-green-500/20 text-neon-green-400 rounded">
+                        <span className="text-[10px] px-1.5 py-0.5 bg-gold-500/20 text-gold-400 rounded">
                           {item.blueprint_name}
                         </span>
                         <span className="text-[10px] text-white/40">{item.pillar_name}</span>

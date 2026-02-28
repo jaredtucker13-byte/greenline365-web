@@ -129,7 +129,7 @@ export default function TenantsPage() {
           placeholder="Search name, slug, or email..."
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-          className="flex-1 max-w-sm px-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-lg text-sm text-white placeholder-white/30 focus:outline-none focus:border-emerald-500/40"
+          className="flex-1 max-w-sm px-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-lg text-sm text-white placeholder-white/30 focus:outline-none focus:border-gold-500/40"
         />
         <select
           value={tierFilter}
@@ -219,7 +219,7 @@ export default function TenantsPage() {
                   <span className="text-sm text-white/60">{t.user_businesses?.length || 0}</span>
                 </td>
                 <td className="px-5 py-4">
-                  <span className={`text-[11px] px-2.5 py-1 rounded-full font-medium ${t.is_active ? 'bg-emerald-500/15 text-emerald-400' : 'bg-red-500/15 text-red-400'}`}>
+                  <span className={`text-[11px] px-2.5 py-1 rounded-full font-medium ${t.is_active ? 'bg-gold-500/15 text-gold-400' : 'bg-red-500/15 text-red-400'}`}>
                     {t.is_active ? 'Active' : 'Inactive'}
                   </span>
                 </td>
@@ -239,7 +239,7 @@ export default function TenantsPage() {
                       className={`px-3 py-1.5 rounded-lg text-[11px] font-medium transition ${
                         t.is_active
                           ? 'bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20'
-                          : 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20'
+                          : 'bg-gold-500/10 border border-gold-500/20 text-gold-400 hover:bg-gold-500/20'
                       }`}
                     >
                       {t.is_active ? 'Deactivate' : 'Activate'}
@@ -295,7 +295,7 @@ export default function TenantsPage() {
                     key={key}
                     className={`text-[11px] px-2.5 py-1 rounded-full font-medium ${
                       enabled
-                        ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20'
+                        ? 'bg-gold-500/15 text-gold-400 border border-gold-500/20'
                         : 'bg-white/[0.04] text-white/20 border border-white/[0.06]'
                     }`}
                   >

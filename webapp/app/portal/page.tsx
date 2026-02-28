@@ -65,7 +65,7 @@ export default function PortalDashboard() {
         </p>
         <Link
           href="/directory"
-          className="mt-4 inline-flex items-center rounded-lg bg-neon-green-500 px-4 py-2 text-sm font-semibold text-black"
+          className="mt-4 inline-flex items-center rounded-lg bg-gold-500 px-4 py-2 text-sm font-semibold text-black"
         >
           Find Your Business
         </Link>

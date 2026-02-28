@@ -410,7 +410,7 @@ export default function CRMDashboard() {
             title="Verified"
             value={kpis?.verifiedLeads ?? stats.verified ?? 0}
             icon="✓"
-            color="emerald"
+            color="gold"
             trend={kpis ? { value: `${kpis.verificationRate}%`, direction: 'up', label: 'rate' } : undefined}
             sparkline={[5, 8, 10, 12, 15, 18, 20]}
             delay={0.1}

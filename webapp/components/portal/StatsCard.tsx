@@ -14,7 +14,7 @@ export default function StatsCard({ label, value, icon, trend }: StatsCardProps)
   return (
     <div className="rounded-xl border border-white/10 bg-white/5 p-5">
       <div className="flex items-start justify-between">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 text-neon-green-500">
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 text-gold-500">
           {icon}
         </div>
         {trend && (

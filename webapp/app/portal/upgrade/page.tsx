@@ -125,7 +125,7 @@ export default function UpgradePage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-neon-green-500 border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-gold-500 border-t-transparent" />
       </div>
     );
   }

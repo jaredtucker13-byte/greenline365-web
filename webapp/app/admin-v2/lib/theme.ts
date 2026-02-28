@@ -14,10 +14,10 @@ export const tacticalTheme = {
     elevated: '#2A3540',     // Elevated surfaces
   },
   
-  // Neon accent colors with glow effects
+  // Accent colors with glow effects
   accent: {
-    neonGreen: '#39FF14',    // Primary neon green
-    emerald: '#C9A96E',      // Softer green for UI elements
+    gold: '#C9A96E',         // Primary gold accent
+    champagne: '#C9A96E',    // Softer gold for UI elements
     teal: '#0CE293',         // Content slots
     gold: '#FFC800',         // Review/Warning stage
     purple: '#8A2BE2',       // Launch stage
@@ -30,13 +30,13 @@ export const tacticalTheme = {
     primary: '#FFFFFF',
     secondary: '#A0AEC0',
     muted: '#718096',
-    accent: '#39FF14',
+    accent: '#C9A96E',
   },
   
   // Border colors
   border: {
     default: '#2D3748',
-    glow: '#39FF14',
+    glow: '#C9A96E',
     subtle: '#1E262E',
   },
   
@@ -66,8 +66,8 @@ export const tacticalTheme = {
   
   // Glow effects
   glow: {
-    green: '0 0 30px rgba(57, 255, 20, 0.3)',
-    greenStrong: '0 0 50px rgba(57, 255, 20, 0.5)',
+    gold: '0 0 30px rgba(201, 169, 110, 0.3)',
+    goldStrong: '0 0 50px rgba(201, 169, 110, 0.5)',
     teal: '0 0 30px rgba(12, 226, 147, 0.3)',
     gold: '0 0 30px rgba(255, 200, 0, 0.3)',
     purple: '0 0 30px rgba(138, 43, 226, 0.3)',

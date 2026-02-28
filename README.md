@@ -9,7 +9,7 @@
 > >
 > > GreenLine365 is a curated, verified home services directory built on a trust-based accountability model. The **Directory is the front door** — a cinematic, glassmorphism-designed platform where only vetted professionals earn a listing. All backend products (Booking, CRM, Home Ledger) are sold as separate, modular B2B services via email outreach — never displayed on the public site.
 > >
-> > **The design language:** Dark, cinematic, premium. Glassmorphism floating over deep-obsidian and cinematic backgrounds. Sage green (#84A98C) as the primary accent. Every screen should feel like a private, elite platform — not a generic SaaS dashboard.
+> > **The design language:** Dark, cinematic, premium. Glassmorphism floating over deep-obsidian and cinematic backgrounds. Champagne Gold (#C9A96E) as the primary accent. Every screen should feel like a private, elite platform — not a generic SaaS dashboard.
 > >
 > > ---
 > >
@@ -72,7 +72,7 @@
 > > > >                  
 > > > >                   - | Token | Value |
 > > > >                   - |-------|-------|
-> > > >                   - | Primary color | Sage Green `#84A98C` |
+> > > >                   - | Primary color | Champagne Gold `#C9A96E` |
 > > > > | Background | Deep dark `#0A0A0A` + cinematic photo overlay |
 > > > > | Glassmorphism | `backdrop-blur-2xl bg-white/10 border border-white/20` |
 > > > > | Heading font | Playfair Display, Poppins |

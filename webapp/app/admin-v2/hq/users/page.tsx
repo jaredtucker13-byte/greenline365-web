@@ -87,7 +87,7 @@ export default function UsersPage() {
           placeholder="Search by email or name..."
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-          className="flex-1 max-w-sm px-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-lg text-sm text-white placeholder-white/30 focus:outline-none focus:border-emerald-500/40"
+          className="flex-1 max-w-sm px-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-lg text-sm text-white placeholder-white/30 focus:outline-none focus:border-gold-500/40"
         />
         <button
           onClick={() => { setAdminOnly(!adminOnly); setPage(1); }}

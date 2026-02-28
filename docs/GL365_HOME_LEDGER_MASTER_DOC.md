@@ -192,7 +192,7 @@
 > > - [ ] - Legal pages (Privacy, Terms, Trust) with DB integration and fallback
 > > - [ ] - Admin panel at /admin/content functional
 > > - [ ] - GSAP 3.14.2 + ScrollTrigger, clsx, tailwind-merge installed
-> > - [ ] - Complete Tailwind OS design system with neon-green/teal/amber color scales
+> > - [ ] - Complete Tailwind OS design system with gold/teal/amber color scales
 > > - [ ] - Glassmorphism utilities: .glass .glass-strong .glass-green .glass-teal .os-panel
 > > - [ ] - Components ready: GlassCard, Button (3 variants), NeonText, OSPanel
 > > - [ ] - Animation library: fadeIn, stagger, parallax, pin, scrub utilities

@@ -27,18 +27,18 @@
           "colors": {
                   "palette": {
                             "primary": {
-                                        "DEFAULT": "#84A98C",
+                                        "DEFAULT": "#C9A96E",
                                         "foreground": "#ffffff",
-                              "50": "#f2f7f4",
-                                        "100": "#e1ede5",
-                                        "200": "#c3dbc9",
-                                        "300": "#9ebfa6",
-                                        "400": "#84a98c",
-                                        "500": "#628b6b",
-                                        "600": "#4a6e52",
-                                        "700": "#3d5843",
-                                        "800": "#334638",
-                                        "900": "#2b3a30"
+                              "50": "#FAF6ED",
+                                        "100": "#F3ECDA",
+                                        "200": "#E6D8B5",
+                                        "300": "#D9C48F",
+                                        "400": "#C9A96E",
+                                        "500": "#B8944F",
+                                        "600": "#9A7A3E",
+                                        "700": "#7C6232",
+                                        "800": "#5E4A26",
+                                        "900": "#40321A"
                             },
                             "gold": {
                                         "DEFAULT": "#C9A84C",
@@ -287,7 +287,7 @@
           "Every interactive element needs a micro-animation (hover lift, glow pulse, scale).",
           "Use sonner for toasts — styled to match the glass theme.",
           "Glassmorphism is the ONLY visual style. No flat colors, no solid fills on cards.",
-          "Directory accent: sage green (#84A98C). Home Ledger accent: gold (#C9A84C) ONLY.",
+          "Champagne Gold (#C9A96E) is the primary accent across all pages.",
           "All text must pass WCAG AA contrast against dark backgrounds.",
           "GSAP ScrollTrigger for all scroll-based entrance animations.",
           "Playfair Display for all hero headlines. Poppins for UI labels."
@@ -300,7 +300,7 @@
                   "Set default text color to rgba(255,255,255,0.85)"
           ],
           "tailwind_config": [
-                  "Add primary (Sage Green #84A98C) palette",
+                  "Add primary (Champagne Gold #C9A96E) palette",
                   "Add gold (#C9A84C) palette",
                   "Add obsidian (#0A0A0A) palette",
                   "Add custom shadow utilities for glow effects",

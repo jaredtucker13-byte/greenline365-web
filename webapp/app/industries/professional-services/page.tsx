@@ -19,18 +19,18 @@ export default function ProfessionalServicesPage() {
         {/* Hero Section */}
         <section className="relative min-h-[70vh] flex items-center overflow-hidden pt-32 pb-20">
           <div className="absolute inset-0 bg-os-dark" />
-          <div className="absolute top-0 left-1/3 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-neon-green-500/10 to-transparent blur-3xl" />
+          <div className="absolute top-0 left-1/3 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-gold-500/10 to-transparent blur-3xl" />
           
           <div className="relative z-10 w-full max-w-[1200px] mx-auto px-4 sm:px-6">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>
-                <div className="mb-4 inline-flex items-center gap-2 px-3 py-1.5 glass-green rounded-full border border-neon-green-500/30">
-                  <span className="w-2 h-2 bg-neon-green-500 rounded-full animate-pulse" />
-                  <span className="text-xs text-neon-green-400 font-semibold tracking-wide">FOR PROFESSIONALS</span>
+                <div className="mb-4 inline-flex items-center gap-2 px-3 py-1.5 glass-gold rounded-full border border-gold-500/30">
+                  <span className="w-2 h-2 bg-gold-500 rounded-full animate-pulse" />
+                  <span className="text-xs text-gold-400 font-semibold tracking-wide">FOR PROFESSIONALS</span>
                 </div>
                 
                 <h1 className="font-display font-bold text-white mb-6" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', lineHeight: '1.1' }}>
-                  Focus on Clients, Not <span className="text-neon-green-500">Admin Work</span>
+                  Focus on Clients, Not <span className="text-gold-500">Admin Work</span>
                 </h1>
                 
                 <p className="text-white/70 text-lg mb-8 leading-relaxed">
@@ -57,7 +57,7 @@ export default function ProfessionalServicesPage() {
                     { value: '24/7', label: 'Availability' }
                   ].map((stat, i) => (
                     <div key={i} className="text-center">
-                      <div className="text-3xl font-display font-bold text-neon-green-500">{stat.value}</div>
+                      <div className="text-3xl font-display font-bold text-gold-500">{stat.value}</div>
                       <div className="text-sm text-white/50 mt-1">{stat.label}</div>
                     </div>
                   ))}
@@ -78,8 +78,8 @@ export default function ProfessionalServicesPage() {
                     </div>
                     
                     <div className="space-y-3">
-                      <div className="p-3 bg-neon-green-500/10 rounded-lg border border-neon-green-500/30">
-                        <div className="text-neon-green-400 text-xs mb-1">✓ New Client</div>
+                      <div className="p-3 bg-gold-500/10 rounded-lg border border-gold-500/30">
+                        <div className="text-gold-400 text-xs mb-1">✓ New Client</div>
                         <div className="text-white font-semibold">Sarah M. - Initial Consultation Scheduled</div>
                       </div>
                       <div className="p-3 bg-white/5 rounded-lg border border-white/10">
@@ -130,7 +130,7 @@ export default function ProfessionalServicesPage() {
           <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
             <div className="text-center mb-16">
               <h2 className="font-display font-bold text-white mb-3 text-4xl">
-                Automate Everything Except <span className="text-neon-green-500">Your Expertise</span>
+                Automate Everything Except <span className="text-gold-500">Your Expertise</span>
               </h2>
             </div>
             
@@ -164,7 +164,7 @@ export default function ProfessionalServicesPage() {
                   <div className="space-y-2">
                     {solution.features.map((feature, j) => (
                       <div key={j} className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-neon-green-500 rounded-full" />
+                        <div className="w-1.5 h-1.5 bg-gold-500 rounded-full" />
                         <span className="text-white/60 text-sm">{feature}</span>
                       </div>
                     ))}
@@ -180,7 +180,7 @@ export default function ProfessionalServicesPage() {
           <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
             <div className="text-center mb-16">
               <h2 className="font-display font-bold text-white mb-3 text-4xl">
-                How Professionals <span className="text-neon-green-500">Scale Up</span>
+                How Professionals <span className="text-gold-500">Scale Up</span>
               </h2>
             </div>
             
@@ -203,8 +203,8 @@ export default function ProfessionalServicesPage() {
               ].map((story, i) => (
                 <div key={i} className="os-card p-8">
                   <div className="flex items-start gap-4 mb-4">
-                    <div className="w-12 h-12 rounded-full bg-neon-green-500/20 border border-neon-green-500/40 flex items-center justify-center flex-shrink-0">
-                      <span className="text-neon-green-400 font-bold text-lg">{i + 1}</span>
+                    <div className="w-12 h-12 rounded-full bg-gold-500/20 border border-gold-500/40 flex items-center justify-center flex-shrink-0">
+                      <span className="text-gold-400 font-bold text-lg">{i + 1}</span>
                     </div>
                     <div>
                       <h3 className="text-white font-bold text-xl">{story.name}</h3>
@@ -217,11 +217,11 @@ export default function ProfessionalServicesPage() {
                       <p className="text-white/70 text-sm">{story.problem}</p>
                     </div>
                     <div>
-                      <div className="text-neon-green-400/80 text-xs font-semibold mb-1">✓ SOLUTION</div>
+                      <div className="text-gold-400/80 text-xs font-semibold mb-1">✓ SOLUTION</div>
                       <p className="text-white/70 text-sm">{story.solution}</p>
                     </div>
                     <div className="pt-3 border-t border-white/10">
-                      <div className="text-neon-green-400 font-bold">{story.result}</div>
+                      <div className="text-gold-400 font-bold">{story.result}</div>
                     </div>
                   </div>
                 </div>
@@ -235,7 +235,7 @@ export default function ProfessionalServicesPage() {
           <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
             <div className="text-center mb-16">
               <h2 className="font-display font-bold text-white mb-3 text-4xl">
-                Built for <span className="text-neon-green-500">Professional Practices</span>
+                Built for <span className="text-gold-500">Professional Practices</span>
               </h2>
             </div>
             
@@ -291,7 +291,7 @@ export default function ProfessionalServicesPage() {
           <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
             <div className="text-center mb-16">
               <h2 className="font-display font-bold text-white mb-3 text-4xl">
-                Tailored for <span className="text-neon-green-500">Your Profession</span>
+                Tailored for <span className="text-gold-500">Your Profession</span>
               </h2>
             </div>
             
@@ -316,7 +316,7 @@ export default function ProfessionalServicesPage() {
           <div className="max-w-[1000px] mx-auto px-4 sm:px-6">
             <div className="text-center mb-16">
               <h2 className="font-display font-bold text-white mb-3 text-4xl">
-                Professional <span className="text-neon-green-500">FAQs</span>
+                Professional <span className="text-gold-500">FAQs</span>
               </h2>
             </div>
             
@@ -353,7 +353,7 @@ export default function ProfessionalServicesPage() {
           <div className="max-w-[1000px] mx-auto px-4 sm:px-6">
             <div className="os-card p-12 text-center">
               <h2 className="font-display font-bold text-white mb-4 text-3xl">
-                Bill More Hours. <span className="text-neon-green-500">Work Less.</span>
+                Bill More Hours. <span className="text-gold-500">Work Less.</span>
               </h2>
               <p className="text-white/70 text-lg mb-8 max-w-2xl mx-auto">
                 Join 300+ professional service providers using AI to scale their practices.

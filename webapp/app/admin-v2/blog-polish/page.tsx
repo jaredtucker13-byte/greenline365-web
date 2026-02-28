@@ -1667,7 +1667,7 @@ export default function BlogPolishPage() {
               <button
                 onClick={() => publishPost(false)}
                 disabled={publishing}
-                className="px-5 py-2.5 bg-gradient-to-r from-[#84A98C] to-[#52796F] text-white rounded-xl font-medium text-sm hover:opacity-90 transition shadow-[0_0_20px_rgba(132,169,140,0.3)] disabled:opacity-50"
+                className="px-5 py-2.5 bg-gradient-to-r from-[#C9A96E] to-[#9A7A3E] text-white rounded-xl font-medium text-sm hover:opacity-90 transition shadow-[0_0_20px_rgba(201,169,110,0.3)] disabled:opacity-50"
               >
                 {publishing ? 'Publishing...' : 'Publish Now'}
               </button>
@@ -1716,7 +1716,7 @@ export default function BlogPolishPage() {
                 value={post.title}
                 onChange={(e) => setPost(prev => ({ ...prev, title: e.target.value }))}
                 placeholder="Enter a compelling title..."
-                className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-4 py-3 text-white text-lg font-medium placeholder:text-white/30 focus:border-[#84A98C]/50 focus:outline-none transition"
+                className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-4 py-3 text-white text-lg font-medium placeholder:text-white/30 focus:border-[#C9A96E]/50 focus:outline-none transition"
                 data-testid="blog-title-input"
               />
               <div className="flex items-center justify-between mt-2">
@@ -1770,7 +1770,7 @@ export default function BlogPolishPage() {
                   onClick={() => setActiveTab('write')}
                   className={`px-5 py-2.5 rounded-xl font-medium text-sm transition ${
                     activeTab === 'write'
-                      ? 'bg-[#84A98C]/20 text-[#A7C957] border border-[#84A98C]/30'
+                      ? 'bg-[#C9A96E]/20 text-[#D9C48F] border border-[#C9A96E]/30'
                       : 'text-white/50 hover:text-white hover:bg-white/[0.08]'
                   }`}
                 >
@@ -1780,7 +1780,7 @@ export default function BlogPolishPage() {
                   onClick={() => setActiveTab('preview')}
                   className={`px-5 py-2.5 rounded-xl font-medium text-sm transition ${
                     activeTab === 'preview'
-                      ? 'bg-[#84A98C]/20 text-[#A7C957] border border-[#84A98C]/30'
+                      ? 'bg-[#C9A96E]/20 text-[#D9C48F] border border-[#C9A96E]/30'
                       : 'text-white/50 hover:text-white hover:bg-white/[0.08]'
                   }`}
                 >
@@ -2818,7 +2818,7 @@ export default function BlogPolishPage() {
                     value={post.content}
                     onChange={(e) => setPost(prev => ({ ...prev, content: e.target.value }))}
                     placeholder="Write your blog post content here. Use markdown for formatting..."
-                    className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-4 py-4 text-white placeholder:text-white/30 focus:border-[#84A98C]/50 focus:outline-none min-h-[400px] font-mono text-sm leading-relaxed transition"
+                    className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-4 py-4 text-white placeholder:text-white/30 focus:border-[#C9A96E]/50 focus:outline-none min-h-[400px] font-mono text-sm leading-relaxed transition"
                     data-testid="blog-content-input"
                   />
                   <div className="mt-4 flex items-center justify-between text-sm">
@@ -3090,7 +3090,7 @@ export default function BlogPolishPage() {
                   <select
                     value={post.category}
                     onChange={(e) => setPost(prev => ({ ...prev, category: e.target.value }))}
-                    className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-[#84A98C]/50 focus:outline-none transition"
+                    className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-[#C9A96E]/50 focus:outline-none transition"
                     data-testid="blog-category-select"
                   >
                     <option value="">Select a category</option>
@@ -3240,11 +3240,11 @@ export default function BlogPolishPage() {
                   onChange={(e) => setTagInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
                   placeholder="Add tag..."
-                  className="flex-1 bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-[#84A98C]/50 focus:outline-none transition"
+                  className="flex-1 bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-[#C9A96E]/50 focus:outline-none transition"
                 />
                 <button
                   onClick={addTag}
-                  className="px-3 py-2 bg-[#84A98C]/20 border border-[#84A98C]/30 rounded-lg text-[#A7C957] text-sm hover:bg-[#84A98C]/30 active:scale-95 transition-all"
+                  className="px-3 py-2 bg-[#C9A96E]/20 border border-[#C9A96E]/30 rounded-lg text-[#D9C48F] text-sm hover:bg-[#C9A96E]/30 active:scale-95 transition-all"
                 >
                   +
                 </button>
@@ -3279,7 +3279,7 @@ export default function BlogPolishPage() {
               <div className={`border-2 border-dashed rounded-xl p-4 text-center transition-colors cursor-pointer ${
                 uploadingImages 
                   ? 'border-amber-500/50 bg-amber-500/5' 
-                  : 'border-white/20 hover:border-[#84A98C]/50'
+                  : 'border-white/20 hover:border-[#C9A96E]/50'
               }`}>
                 <input
                   type="file"
@@ -3347,19 +3347,19 @@ export default function BlogPolishPage() {
               </h3>
               <ul className="space-y-2 text-sm text-white/60">
                 <li className="flex items-start gap-2">
-                  <span className="text-[#84A98C]">•</span>
+                  <span className="text-[#C9A96E]">•</span>
                   Title: 50-60 characters
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-[#84A98C]">•</span>
+                  <span className="text-[#C9A96E]">•</span>
                   Content: 1000-2000 words
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-[#84A98C]">•</span>
+                  <span className="text-[#C9A96E]">•</span>
                   Use ## headings
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-[#84A98C]">•</span>
+                  <span className="text-[#C9A96E]">•</span>
                   3-5 keyword mentions
                 </li>
               </ul>
@@ -3397,7 +3397,7 @@ export default function BlogPolishPage() {
                     type="date"
                     value={scheduleDate}
                     onChange={(e) => setScheduleDate(e.target.value)}
-                    className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-[#84A98C]/50 focus:outline-none"
+                    className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-[#C9A96E]/50 focus:outline-none"
                   />
                 </div>
                 <div>
@@ -3406,7 +3406,7 @@ export default function BlogPolishPage() {
                     type="time"
                     value={scheduleTime}
                     onChange={(e) => setScheduleTime(e.target.value)}
-                    className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-[#84A98C]/50 focus:outline-none"
+                    className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-[#C9A96E]/50 focus:outline-none"
                   />
                 </div>
               </div>
@@ -3421,7 +3421,7 @@ export default function BlogPolishPage() {
                 <button
                   onClick={() => publishPost(true)}
                   disabled={!scheduleDate || !scheduleTime || publishing}
-                  className="flex-1 px-4 py-3 bg-gradient-to-r from-[#84A98C] to-[#52796F] text-white rounded-xl font-medium hover:opacity-90 transition disabled:opacity-50"
+                  className="flex-1 px-4 py-3 bg-gradient-to-r from-[#C9A96E] to-[#9A7A3E] text-white rounded-xl font-medium hover:opacity-90 transition disabled:opacity-50"
                 >
                   {publishing ? 'Scheduling...' : 'Schedule'}
                 </button>

@@ -19,18 +19,18 @@ export default function AIAssistantPage() {
         {/* Hero Section */}
         <section className="relative min-h-[70vh] flex items-center overflow-hidden pt-32 pb-20">
           <div className="absolute inset-0 bg-os-dark" />
-          <div className="absolute top-0 left-1/3 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-neon-green-500/10 to-transparent blur-3xl" />
+          <div className="absolute top-0 left-1/3 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-gold-500/10 to-transparent blur-3xl" />
 
           <div className="relative z-10 w-full max-w-[1200px] mx-auto px-4 sm:px-6">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>
-                <div className="mb-4 inline-flex items-center gap-2 px-3 py-1.5 glass-green rounded-full border border-neon-green-500/30">
-                  <span className="w-2 h-2 bg-neon-green-500 rounded-full animate-pulse" />
-                  <span className="text-xs text-neon-green-400 font-semibold tracking-wide">AI ASSISTANT</span>
+                <div className="mb-4 inline-flex items-center gap-2 px-3 py-1.5 glass-gold rounded-full border border-gold-500/30">
+                  <span className="w-2 h-2 bg-gold-500 rounded-full animate-pulse" />
+                  <span className="text-xs text-gold-400 font-semibold tracking-wide">AI ASSISTANT</span>
                 </div>
 
                 <h1 className="font-display font-bold text-white mb-6" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', lineHeight: '1.1' }}>
-                  Your <span className="text-neon-green-500">24/7 Virtual Employee</span> That Knows Your Business
+                  Your <span className="text-gold-500">24/7 Virtual Employee</span> That Knows Your Business
                 </h1>
 
                 <p className="text-white/70 text-lg mb-8 leading-relaxed">
@@ -57,7 +57,7 @@ export default function AIAssistantPage() {
                     { value: '95%', label: 'Resolution Rate' },
                   ].map((stat, i) => (
                     <div key={i} className="text-center">
-                      <div className="text-3xl font-display font-bold text-neon-green-500">{stat.value}</div>
+                      <div className="text-3xl font-display font-bold text-gold-500">{stat.value}</div>
                       <div className="text-sm text-white/50 mt-1">{stat.label}</div>
                     </div>
                   ))}
@@ -73,8 +73,8 @@ export default function AIAssistantPage() {
                     </div>
                     <div>
                       <div className="text-white font-semibold">GreenLine Assistant</div>
-                      <div className="text-neon-green-400 text-xs flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 bg-neon-green-500 rounded-full" />
+                      <div className="text-gold-400 text-xs flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 bg-gold-500 rounded-full" />
                         Online now
                       </div>
                     </div>
@@ -82,7 +82,7 @@ export default function AIAssistantPage() {
 
                   <div className="space-y-3 mb-4">
                     <div className="flex justify-end">
-                      <div className="bg-neon-green-500/20 border border-neon-green-500/30 rounded-xl rounded-br-sm px-4 py-2.5 max-w-[80%]">
+                      <div className="bg-gold-500/20 border border-gold-500/30 rounded-xl rounded-br-sm px-4 py-2.5 max-w-[80%]">
                         <p className="text-white text-sm">Do you offer same-day HVAC service?</p>
                       </div>
                     </div>
@@ -92,7 +92,7 @@ export default function AIAssistantPage() {
                       </div>
                     </div>
                     <div className="flex justify-end">
-                      <div className="bg-neon-green-500/20 border border-neon-green-500/30 rounded-xl rounded-br-sm px-4 py-2.5 max-w-[80%]">
+                      <div className="bg-gold-500/20 border border-gold-500/30 rounded-xl rounded-br-sm px-4 py-2.5 max-w-[80%]">
                         <p className="text-white text-sm">Yes please, 2:30 works</p>
                       </div>
                     </div>
@@ -107,7 +107,7 @@ export default function AIAssistantPage() {
                     <div className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2">
                       <span className="text-white/30 text-sm">Type a message...</span>
                     </div>
-                    <div className="w-9 h-9 rounded-lg bg-neon-green-500 flex items-center justify-center">
+                    <div className="w-9 h-9 rounded-lg bg-gold-500 flex items-center justify-center">
                       <svg className="w-4 h-4 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                       </svg>
@@ -124,7 +124,7 @@ export default function AIAssistantPage() {
           <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
             <div className="text-center mb-16">
               <h2 className="font-display font-bold text-white mb-3 text-4xl">
-                What Can the <span className="text-neon-green-500">AI Assistant</span> Do?
+                What Can the <span className="text-gold-500">AI Assistant</span> Do?
               </h2>
               <p className="text-white/60 max-w-2xl mx-auto text-lg">
                 Trained on your business data, it handles the work you never have time for
@@ -179,7 +179,7 @@ export default function AIAssistantPage() {
           <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
             <div className="text-center mb-16">
               <h2 className="font-display font-bold text-white mb-3 text-4xl">
-                How Does It <span className="text-neon-green-500">Know Your Business</span>?
+                How Does It <span className="text-gold-500">Know Your Business</span>?
               </h2>
               <p className="text-white/60 max-w-2xl mx-auto text-lg">
                 Three layers of intelligence that make it uniquely yours
@@ -205,8 +205,8 @@ export default function AIAssistantPage() {
                 },
               ].map((step, i) => (
                 <div key={i} className="os-card p-8 text-center">
-                  <div className="w-14 h-14 rounded-full bg-neon-green-500/20 border border-neon-green-500/40 flex items-center justify-center mx-auto mb-5">
-                    <span className="text-neon-green-400 font-bold text-lg">{step.num}</span>
+                  <div className="w-14 h-14 rounded-full bg-gold-500/20 border border-gold-500/40 flex items-center justify-center mx-auto mb-5">
+                    <span className="text-gold-400 font-bold text-lg">{step.num}</span>
                   </div>
                   <h3 className="text-white font-bold text-xl mb-3">{step.title}</h3>
                   <p className="text-white/70 leading-relaxed">{step.desc}</p>
@@ -221,7 +221,7 @@ export default function AIAssistantPage() {
           <div className="max-w-[1000px] mx-auto px-4 sm:px-6">
             <div className="text-center mb-16">
               <h2 className="font-display font-bold text-white mb-3 text-4xl">
-                Frequently Asked <span className="text-neon-green-500">Questions</span>
+                Frequently Asked <span className="text-gold-500">Questions</span>
               </h2>
             </div>
 
@@ -258,7 +258,7 @@ export default function AIAssistantPage() {
           <div className="max-w-[1000px] mx-auto px-4 sm:px-6">
             <div className="os-card p-12 text-center">
               <h2 className="font-display font-bold text-white mb-4 text-3xl">
-                Hire an AI Employee That <span className="text-neon-green-500">Never Sleeps</span>
+                Hire an AI Employee That <span className="text-gold-500">Never Sleeps</span>
               </h2>
               <p className="text-white/70 text-lg mb-8 max-w-2xl mx-auto">
                 Answer every customer, qualify every lead, and never miss an opportunity again.

@@ -154,7 +154,7 @@ export default function HQDashboard() {
           <div className="mt-5 pt-4 border-t border-white/[0.06]">
             <div className="flex items-center justify-between">
               <span className="text-xs text-white/40">New (30d)</span>
-              <span className="text-sm font-semibold text-emerald-400">+{kpis.newBusinesses30d}</span>
+              <span className="text-sm font-semibold text-gold-400">+{kpis.newBusinesses30d}</span>
             </div>
           </div>
         </div>
@@ -163,7 +163,7 @@ export default function HQDashboard() {
         <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-medium text-white/60">Recent Tenants</h3>
-            <Link href="/admin-v2/hq/tenants" className="text-xs text-emerald-400 hover:text-emerald-300 transition">
+            <Link href="/admin-v2/hq/tenants" className="text-xs text-gold-400 hover:text-gold-300 transition">
               View all
             </Link>
           </div>
@@ -182,7 +182,7 @@ export default function HQDashboard() {
                     <p className="text-[11px] text-white/30">{b.slug} &middot; {tierLabels[b.tier]}</p>
                   </div>
                 </div>
-                <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${b.is_active ? 'bg-emerald-500/15 text-emerald-400' : 'bg-red-500/15 text-red-400'}`}>
+                <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${b.is_active ? 'bg-gold-500/15 text-gold-400' : 'bg-red-500/15 text-red-400'}`}>
                   {b.is_active ? 'Active' : 'Inactive'}
                 </span>
               </div>
@@ -207,7 +207,7 @@ export default function HQDashboard() {
                   <p className="text-[11px] text-white/30">{w.company || 'No company'} &middot; {new Date(w.created_at).toLocaleDateString()}</p>
                 </div>
                 <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
-                  w.status === 'approved' ? 'bg-emerald-500/15 text-emerald-400'
+                  w.status === 'approved' ? 'bg-gold-500/15 text-gold-400'
                   : w.status === 'invited' ? 'bg-blue-500/15 text-blue-400'
                   : 'bg-amber-500/15 text-amber-400'
                 }`}>

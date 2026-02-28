@@ -84,7 +84,7 @@ export default function BillingPage() {
       <div className="grid grid-cols-4 gap-4">
         <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-5">
           <p className="text-xs text-white/40 mb-1">Monthly Recurring Revenue</p>
-          <p className="text-2xl font-semibold text-emerald-400">
+          <p className="text-2xl font-semibold text-gold-400">
             ${((summary?.mrr || 0) / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}
           </p>
         </div>

@@ -63,19 +63,7 @@ module.exports = {
           700: '#1A1A1A',
           600: '#252525',
         },
-        'neon-green': {
-          DEFAULT: '#C9A96E',
-          50: '#FAF6ED',
-          100: '#F3ECDA',
-          200: '#E6D8B5',
-          300: '#D9C48F',
-          400: '#C9A96E',
-          500: '#C9A96E',
-          600: '#B8944F',
-          700: '#9A7A3E',
-          800: '#7C6232',
-          900: '#5E4A26',
-        },
+        // DEPRECATED: 'neon-green' removed — use 'gold' instead
         'neon-teal': { DEFAULT: '#E6D8B5' },
         'neon-amber': { DEFAULT: '#FF9500' },
       },
@@ -85,15 +73,15 @@ module.exports = {
         'display': ['Montserrat', 'system-ui', 'sans-serif'],
       },
       backgroundImage: {
-        'radial-green': 'radial-gradient(circle, rgba(201, 169, 110, 0.15) 0%, transparent 70%)',
+        'radial-gold': 'radial-gradient(circle, rgba(201, 169, 110, 0.15) 0%, transparent 70%)',
         'radial-teal': 'radial-gradient(circle, rgba(201, 169, 110, 0.12) 0%, transparent 70%)',
-        'neon-gradient': 'linear-gradient(135deg, #C9A96E 0%, #E6D8B5 100%)',
-        'neon-gradient-reverse': 'linear-gradient(135deg, #E6D8B5 0%, #C9A96E 100%)',
+        'gold-shine': 'linear-gradient(135deg, #C9A96E 0%, #E6D8B5 100%)',
+        'gold-shine-reverse': 'linear-gradient(135deg, #E6D8B5 0%, #C9A96E 100%)',
         'gold-gradient': 'linear-gradient(135deg, #C9A96E, #E6D8B5, #C9A96E)',
         'bentley-gradient': 'linear-gradient(180deg, #0D1B2A 0%, #1C1C1E 100%)',
       },
       boxShadow: {
-        'neon-green': '0 0 20px rgba(201, 169, 110, 0.3), 0 0 40px rgba(201, 169, 110, 0.15)',
+        'gold': '0 0 20px rgba(201, 169, 110, 0.3), 0 0 40px rgba(201, 169, 110, 0.15)',
         'neon-teal': '0 0 20px rgba(201, 169, 110, 0.25), 0 0 40px rgba(201, 169, 110, 0.12)',
         'neon-amber': '0 0 20px rgba(255, 149, 0, 0.3), 0 0 40px rgba(255, 149, 0, 0.15)',
         'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
@@ -155,24 +143,14 @@ module.exports = {
           '-webkit-backdrop-filter': 'blur(12px)',
           'border': '1px solid rgba(201, 169, 110, 0.2)',
         },
-        '.glass-green': {
-          'background': 'rgba(201, 169, 110, 0.06)',
-          'backdrop-filter': 'blur(10px)',
-          '-webkit-backdrop-filter': 'blur(10px)',
-          'border': '1px solid rgba(201, 169, 110, 0.2)',
-        },
+        // .glass-green removed — use .glass-gold instead
         '.text-gradient-gold': {
           'background': 'linear-gradient(135deg, #C9A96E 0%, #E6D8B5 50%, #C9A96E 100%)',
           '-webkit-background-clip': 'text',
           'background-clip': 'text',
           '-webkit-text-fill-color': 'transparent',
         },
-        '.text-gradient-green': {
-          'background': 'linear-gradient(135deg, #C9A96E 0%, #E6D8B5 100%)',
-          '-webkit-background-clip': 'text',
-          'background-clip': 'text',
-          '-webkit-text-fill-color': 'transparent',
-        },
+        // .text-gradient-green removed — use .text-gradient-gold instead
         '.badge-shimmer': {
           'background-size': '200% auto',
           'animation': 'shimmer 3s linear infinite',

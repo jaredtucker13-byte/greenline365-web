@@ -35,7 +35,7 @@ export default function OnboardingChecklist({ items, isPro }: OnboardingChecklis
       {/* Progress bar */}
       <div className="mb-4 h-1.5 overflow-hidden rounded-full bg-white/10">
         <div
-          className="h-full rounded-full bg-neon-green-500 transition-all duration-500"
+          className="h-full rounded-full bg-gold-500 transition-all duration-500"
           style={{ width: `${progress}%` }}
         />
       </div>
@@ -54,7 +54,7 @@ export default function OnboardingChecklist({ items, isPro }: OnboardingChecklis
               <span
                 className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${
                   item.completed
-                    ? 'border-neon-green-500 bg-neon-green-500'
+                    ? 'border-gold-500 bg-gold-500'
                     : 'border-white/30'
                 }`}
               >

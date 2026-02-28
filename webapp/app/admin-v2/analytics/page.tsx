@@ -178,7 +178,7 @@ export default function AnalyticsPage() {
             {/* Overview Metrics */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                { label: 'Total Activities', value: overview?.summary.totalEvents || 0, icon: '📈', color: 'emerald' },
+                { label: 'Total Activities', value: overview?.summary.totalEvents || 0, icon: '📈', color: 'gold' },
                 { label: 'Blog Posts', value: overview?.summary.totalBlogs || 0, icon: '📝', color: 'blue' },
                 { label: 'Images Generated', value: overview?.summary.imagesGenerated || 0, icon: '🖼️', color: 'purple' },
                 { label: 'Knowledge Items', value: overview?.summary.knowledgeChunks || 0, icon: '📚', color: 'amber' },

@@ -12,7 +12,7 @@ import { motion } from 'framer-motion';
 export interface FunnelStage {
   label: string;
   value: number;
-  color?: 'blue' | 'emerald' | 'purple' | 'amber' | 'cyan';
+  color?: 'blue' | 'gold' | 'purple' | 'amber' | 'cyan';
 }
 
 export interface FunnelChartProps {
@@ -26,7 +26,7 @@ export interface FunnelChartProps {
 
 const colorClasses = {
   blue: 'bg-blue-500',
-  emerald: 'bg-gold-500',
+  gold: 'bg-gold-500',
   purple: 'bg-purple-500',
   amber: 'bg-amber-500',
   cyan: 'bg-cyan-500',
@@ -57,7 +57,7 @@ export function FunnelChart({
       
       {stages.map((stage, idx) => {
         const percentage = maxValue > 0 ? (stage.value / maxValue) * 100 : 0;
-        const color = stage.color || ['blue', 'purple', 'emerald'][idx % 3] as 'blue' | 'purple' | 'emerald';
+        const color = stage.color || ['blue', 'purple', 'gold'][idx % 3] as 'blue' | 'purple' | 'gold';
         
         return (
           <div key={stage.label}>

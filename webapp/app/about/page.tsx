@@ -20,7 +20,7 @@ export default function AboutPage() {
               transition={{ duration: 0.6 }}
               className="relative"
             >
-              <div className="relative rounded-2xl overflow-hidden border border-neon-green-500/30">
+              <div className="relative rounded-2xl overflow-hidden border border-gold-500/30">
                 <Image
                   src="/images/jared-family.jpg"
                   alt="Jared Tucker with nephews and dog Ajax in Tampa"
@@ -36,7 +36,7 @@ export default function AboutPage() {
                   </p>
                 </div>
               </div>
-              <div className="absolute -inset-4 bg-neon-green-500/5 rounded-3xl blur-2xl -z-10" />
+              <div className="absolute -inset-4 bg-gold-500/5 rounded-3xl blur-2xl -z-10" />
             </motion.div>
             
             {/* Right - Intro */}
@@ -45,30 +45,30 @@ export default function AboutPage() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <span className="text-neon-green-500 text-xs font-bold tracking-widest uppercase mb-3 block">Meet the Founder</span>
+              <span className="text-gold-500 text-xs font-bold tracking-widest uppercase mb-3 block">Meet the Founder</span>
               <h1 className="font-display font-bold text-white mb-4" style={{ fontSize: 'clamp(2rem, 5vw, 3rem)' }}>
-                I&apos;m <span className="text-neon-green-500">Jared Tucker</span>
+                I&apos;m <span className="text-gold-500">Jared Tucker</span>
               </h1>
               <div className="space-y-4 text-white/70 text-sm leading-relaxed">
                 <p>
                   I&apos;m building GreenLine365 right here in <strong className="text-white">Tampa, Florida</strong>. I&apos;m 42 years old, and my background isn&apos;t in tech or Silicon Valley—it&apos;s in the real world.
                 </p>
                 <p>
-                  I&apos;ve spent <strong className="text-neon-green-500">16 years in professional kitchens</strong> and the last five years crawling through attics as an <strong className="text-neon-green-500">HVAC technician</strong>. I know exactly what it feels like to work a 12-hour day and still have a mountain of &quot;to-do&quot; tasks waiting for you at home.
+                  I&apos;ve spent <strong className="text-gold-500">16 years in professional kitchens</strong> and the last five years crawling through attics as an <strong className="text-gold-500">HVAC technician</strong>. I know exactly what it feels like to work a 12-hour day and still have a mountain of &quot;to-do&quot; tasks waiting for you at home.
                 </p>
               </div>
               
               <div className="mt-6 flex items-center gap-4">
                 <div className="glass rounded-xl p-3 border border-white/10 text-center">
-                  <div className="text-2xl font-bold text-neon-green-500">16</div>
+                  <div className="text-2xl font-bold text-gold-500">16</div>
                   <div className="text-xs text-white/50">Years in Kitchens</div>
                 </div>
                 <div className="glass rounded-xl p-3 border border-white/10 text-center">
-                  <div className="text-2xl font-bold text-neon-green-500">5</div>
+                  <div className="text-2xl font-bold text-gold-500">5</div>
                   <div className="text-xs text-white/50">Years HVAC</div>
                 </div>
                 <div className="glass rounded-xl p-3 border border-white/10 text-center">
-                  <div className="text-2xl font-bold text-neon-green-500">42</div>
+                  <div className="text-2xl font-bold text-gold-500">42</div>
                   <div className="text-xs text-white/50">Years Young</div>
                 </div>
               </div>
@@ -82,7 +82,7 @@ export default function AboutPage() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="glass-strong rounded-2xl p-6 md:p-8 border border-neon-green-500/20"
+            className="glass-strong rounded-2xl p-6 md:p-8 border border-gold-500/20"
           >
             <div className="flex items-start gap-4 mb-6">
               <div className="w-12 h-12 rounded-xl bg-red-500/20 flex items-center justify-center flex-shrink-0">
@@ -116,9 +116,9 @@ export default function AboutPage() {
             viewport={{ once: true }}
             className="text-center mb-8"
           >
-            <span className="text-neon-green-500 text-xs font-bold tracking-widest uppercase mb-3 block">The Work That Started It All</span>
+            <span className="text-gold-500 text-xs font-bold tracking-widest uppercase mb-3 block">The Work That Started It All</span>
             <h2 className="font-display font-bold text-white mb-3" style={{ fontSize: 'clamp(1.5rem, 4vw, 2rem)' }}>
-              These Are My <span className="text-neon-green-500">Actual Products</span>
+              These Are My <span className="text-gold-500">Actual Products</span>
             </h2>
             <p className="text-white/60 text-sm max-w-2xl mx-auto">
               The canvas art and mugs I created that started this whole journey. I&apos;ve been in the trenches and I understand the grind.
@@ -144,7 +144,7 @@ export default function AboutPage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-os-dark via-transparent to-transparent" />
                 <div className="absolute bottom-3 left-3">
-                  <span className="glass-green px-3 py-1 rounded-full text-xs text-neon-green-400 font-semibold">Canvas Art</span>
+                  <span className="glass-gold px-3 py-1 rounded-full text-xs text-gold-400 font-semibold">Canvas Art</span>
                 </div>
               </div>
               <div className="relative rounded-2xl overflow-hidden border border-white/10 group">
@@ -157,7 +157,7 @@ export default function AboutPage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-os-dark via-transparent to-transparent" />
                 <div className="absolute bottom-3 left-3">
-                  <span className="glass-green px-3 py-1 rounded-full text-xs text-neon-green-400 font-semibold">Canvas Art</span>
+                  <span className="glass-gold px-3 py-1 rounded-full text-xs text-gold-400 font-semibold">Canvas Art</span>
                 </div>
               </div>
             </motion.div>
@@ -180,7 +180,7 @@ export default function AboutPage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-os-dark via-transparent to-transparent" />
                 <div className="absolute bottom-3 left-3">
-                  <span className="glass-green px-3 py-1 rounded-full text-xs text-neon-green-400 font-semibold">Custom Mugs</span>
+                  <span className="glass-gold px-3 py-1 rounded-full text-xs text-gold-400 font-semibold">Custom Mugs</span>
                 </div>
               </div>
               <div className="relative rounded-2xl overflow-hidden border border-white/10 group">
@@ -193,7 +193,7 @@ export default function AboutPage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-os-dark via-transparent to-transparent" />
                 <div className="absolute bottom-3 left-3">
-                  <span className="glass-green px-3 py-1 rounded-full text-xs text-neon-green-400 font-semibold">Custom Mugs</span>
+                  <span className="glass-gold px-3 py-1 rounded-full text-xs text-gold-400 font-semibold">Custom Mugs</span>
                 </div>
               </div>
             </motion.div>
@@ -204,10 +204,10 @@ export default function AboutPage() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="glass rounded-2xl p-6 border border-neon-green-500/30 text-center"
+            className="glass rounded-2xl p-6 border border-gold-500/30 text-center"
           >
             <p className="text-white/80 text-base leading-relaxed mb-4">
-              <span className="text-neon-green-500 font-semibold">Imagine what these could have become</span> if GreenLine365 had existed when I was building them. AI-generated descriptions, smart hashtags, automated posting schedules—all the things that ate up my nights and weekends.
+              <span className="text-gold-500 font-semibold">Imagine what these could have become</span> if GreenLine365 had existed when I was building them. AI-generated descriptions, smart hashtags, automated posting schedules—all the things that ate up my nights and weekends.
             </p>
             <p className="text-white/60 text-sm">
               That&apos;s exactly why I&apos;m building this—so you don&apos;t have to go through what I did.
@@ -224,9 +224,9 @@ export default function AboutPage() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
             >
-              <span className="text-neon-green-500 text-xs font-bold tracking-widest uppercase mb-3 block">Built for You</span>
+              <span className="text-gold-500 text-xs font-bold tracking-widest uppercase mb-3 block">Built for You</span>
               <h2 className="font-display font-bold text-white mb-4" style={{ fontSize: 'clamp(1.5rem, 4vw, 2rem)' }}>
-                Built for the <span className="text-neon-green-500">Micro-Business</span>
+                Built for the <span className="text-gold-500">Micro-Business</span>
               </h2>
               <div className="space-y-4 text-white/70 text-sm leading-relaxed">
                 <p>
@@ -235,7 +235,7 @@ export default function AboutPage() {
                 <p>
                   If you&apos;re a shop owner who hates having to lay off staff during slow seasons, or a creator who just wants their time back, I&apos;m building this for you.
                 </p>
-                <p className="text-neon-green-500 font-semibold">
+                <p className="text-gold-500 font-semibold">
                   My goal is to help you win back roughly 15 hours a week by automating the tasks that steal your time.
                 </p>
               </div>
@@ -248,8 +248,8 @@ export default function AboutPage() {
               viewport={{ once: true }}
               className="space-y-4"
             >
-              <div className="glass rounded-xl p-4 border border-neon-green-500/20 flex gap-4 items-start">
-                <div className="w-10 h-10 rounded-lg bg-neon-green-500/20 flex items-center justify-center flex-shrink-0">
+              <div className="glass rounded-xl p-4 border border-gold-500/20 flex gap-4 items-start">
+                <div className="w-10 h-10 rounded-lg bg-gold-500/20 flex items-center justify-center flex-shrink-0">
                   <span className="text-xl">📊</span>
                 </div>
                 <div>
@@ -257,8 +257,8 @@ export default function AboutPage() {
                   <p className="text-white/60 text-xs">Handle your social media presence by feeding the algorithm for you.</p>
                 </div>
               </div>
-              <div className="glass rounded-xl p-4 border border-neon-green-500/20 flex gap-4 items-start">
-                <div className="w-10 h-10 rounded-lg bg-neon-green-500/20 flex items-center justify-center flex-shrink-0">
+              <div className="glass rounded-xl p-4 border border-gold-500/20 flex gap-4 items-start">
+                <div className="w-10 h-10 rounded-lg bg-gold-500/20 flex items-center justify-center flex-shrink-0">
                   <span className="text-xl">💰</span>
                 </div>
                 <div>
@@ -266,8 +266,8 @@ export default function AboutPage() {
                   <p className="text-white/60 text-xs">Simple tracking for growth with print-outs ready for taxes.</p>
                 </div>
               </div>
-              <div className="glass rounded-xl p-4 border border-neon-green-500/20 flex gap-4 items-start">
-                <div className="w-10 h-10 rounded-lg bg-neon-green-500/20 flex items-center justify-center flex-shrink-0">
+              <div className="glass rounded-xl p-4 border border-gold-500/20 flex gap-4 items-start">
+                <div className="w-10 h-10 rounded-lg bg-gold-500/20 flex items-center justify-center flex-shrink-0">
                   <span className="text-xl">🌱</span>
                 </div>
                 <div>
@@ -285,10 +285,10 @@ export default function AboutPage() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="glass-strong rounded-2xl p-6 md:p-8 border border-neon-green-500/20"
+            className="glass-strong rounded-2xl p-6 md:p-8 border border-gold-500/20"
           >
             <div className="flex items-start gap-4 mb-6">
-              <div className="w-12 h-12 rounded-xl bg-neon-green-500/20 flex items-center justify-center flex-shrink-0">
+              <div className="w-12 h-12 rounded-xl bg-gold-500/20 flex items-center justify-center flex-shrink-0">
                 <span className="text-2xl">🚀</span>
               </div>
               <div>
@@ -299,12 +299,12 @@ export default function AboutPage() {
             
             <div className="space-y-4 text-white/70 text-sm leading-relaxed">
               <p>
-                This goes way beyond just a simple software platform. While we&apos;re starting here to build revenue and a great team, I have a <strong className="text-neon-green-500">five-year, five-phase plan</strong> that nobody would expect.
+                This goes way beyond just a simple software platform. While we&apos;re starting here to build revenue and a great team, I have a <strong className="text-gold-500">five-year, five-phase plan</strong> that nobody would expect.
               </p>
               <p>
                 GreenLine365 will eventually evolve into a <strong className="text-white">massive directory and ecosystem</strong> that serves both businesses and consumers. I&apos;m keeping some details quiet for now to protect these &quot;world-changing&quot; ideas.
               </p>
-              <p className="text-neon-green-500 font-semibold">
+              <p className="text-gold-500 font-semibold">
                 This isn&apos;t a project I&apos;m looking to flip—it&apos;s a foundation I&apos;m building to change the game for small businesses everywhere.
               </p>
             </div>
@@ -313,7 +313,7 @@ export default function AboutPage() {
             <div className="mt-6 flex items-center gap-2">
               {[1, 2, 3, 4, 5].map((phase) => (
                 <div key={phase} className="flex-1">
-                  <div className={`h-2 rounded-full ${phase === 1 ? 'bg-neon-green-500' : 'bg-white/10'}`} />
+                  <div className={`h-2 rounded-full ${phase === 1 ? 'bg-gold-500' : 'bg-white/10'}`} />
                   <p className="text-xs text-white/40 mt-1 text-center">Phase {phase}</p>
                 </div>
               ))}
@@ -330,7 +330,7 @@ export default function AboutPage() {
             className="text-center"
           >
             <h2 className="font-display font-bold text-white mb-4" style={{ fontSize: 'clamp(1.5rem, 4vw, 2rem)' }}>
-              My Commitment to <span className="text-neon-green-500">You</span>
+              My Commitment to <span className="text-gold-500">You</span>
             </h2>
             <p className="text-white/70 text-sm max-w-2xl mx-auto mb-6 leading-relaxed">
               If you&apos;re tired of doing 20 jobs just to keep one business alive, join me on this mission to take our time back. I&apos;ve been in the trenches, and I&apos;m building the tools I wish I had.
@@ -359,7 +359,7 @@ export default function AboutPage() {
             className="glass rounded-2xl p-6 border border-white/10 flex flex-col md:flex-row items-center justify-between gap-4"
           >
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-neon-green-500/20 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-full bg-gold-500/20 flex items-center justify-center">
                 <span className="text-2xl">📍</span>
               </div>
               <div>

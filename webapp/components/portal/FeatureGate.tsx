@@ -24,7 +24,7 @@ export default function FeatureGate({ feature, children, fallback }: FeatureGate
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-neon-green-500 border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-gold-500 border-t-transparent" />
       </div>
     );
   }

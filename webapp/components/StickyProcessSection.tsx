@@ -87,7 +87,7 @@ export default function StickyProcessSection() {
           className="text-center mb-20"
         >
           <h2 className="text-5xl md:text-6xl font-display font-bold text-white mb-6">
-            How the <span className="text-gradient-green glow-text">System</span> Works
+            How the <span className="text-gradient-gold glow-text">System</span> Works
           </h2>
           <p className="text-xl text-white/60 max-w-2xl mx-auto">
             Four seamless phases that transform your business into a lead-generating machine

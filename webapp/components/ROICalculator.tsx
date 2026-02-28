@@ -37,7 +37,7 @@ export default function ROICalculator() {
     <section className="py-24 px-6 relative overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-os-dark to-os-dark-900" />
-      <div className="absolute top-0 right-1/4 w-[800px] h-[800px] bg-radial-green opacity-10 blur-3xl" />
+      <div className="absolute top-0 right-1/4 w-[800px] h-[800px] bg-radial-gold opacity-10 blur-3xl" />
       
       <div className="max-w-6xl mx-auto relative z-10">
         <motion.div
@@ -48,7 +48,7 @@ export default function ROICalculator() {
           className="text-center mb-12"
         >
           <h2 className="text-4xl md:text-5xl font-display font-bold text-white mb-4">
-            Calculate Your <span className="text-gradient-green glow-text">ROI</span>
+            Calculate Your <span className="text-gradient-gold glow-text">ROI</span>
           </h2>
           <p className="text-xl text-white/60 max-w-2xl mx-auto">
             See how much time and money you'll save by automating your content creation
@@ -63,7 +63,7 @@ export default function ROICalculator() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.5 }}
-              className="glass-strong rounded-3xl p-8 md:p-12 border border-neon-green-500/20"
+              className="glass-strong rounded-3xl p-8 md:p-12 border border-gold-500/20"
             >
               {/* Slider 1 */}
               <div className="mb-10">
@@ -80,7 +80,7 @@ export default function ROICalculator() {
                     className="flex-1 h-2 bg-white/10 rounded-full appearance-none cursor-pointer slider-green"
                   />
                   <div className="w-20 text-center">
-                    <span className="text-3xl font-display font-bold text-neon-green-500">
+                    <span className="text-3xl font-display font-bold text-gold-500">
                       {blogsPerWeek}
                     </span>
                     <div className="text-xs text-white/50">posts</div>
@@ -104,7 +104,7 @@ export default function ROICalculator() {
                     className="flex-1 h-2 bg-white/10 rounded-full appearance-none cursor-pointer slider-green"
                   />
                   <div className="w-20 text-center">
-                    <span className="text-3xl font-display font-bold text-neon-green-500">
+                    <span className="text-3xl font-display font-bold text-gold-500">
                       ${hourlyRate}
                     </span>
                     <div className="text-xs text-white/50">/hour</div>
@@ -118,7 +118,7 @@ export default function ROICalculator() {
                   💡 Did you know?
                 </label>
                 <p className="text-white/70 text-sm leading-relaxed">
-                  Most local businesses need to post <span className="text-neon-green-500 font-semibold">{postsToStayVisible}+ times per week</span> across 
+                  Most local businesses need to post <span className="text-gold-500 font-semibold">{postsToStayVisible}+ times per week</span> across 
                   all platforms (Google, Facebook, Instagram, etc.) to stay visible to their local community. 
                   That's a lot of time creating, editing, and posting content!
                 </p>
@@ -141,16 +141,16 @@ export default function ROICalculator() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
-              className="glass-green rounded-3xl p-8 md:p-12 border border-neon-green-500/30"
+              className="glass-gold rounded-3xl p-8 md:p-12 border border-gold-500/30"
             >
               <div className="text-center mb-8">
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.2, type: 'spring' }}
-                  className="w-20 h-20 bg-neon-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4"
+                  className="w-20 h-20 bg-gold-500/20 rounded-full flex items-center justify-center mx-auto mb-4"
                 >
-                  <svg className="w-10 h-10 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-10 h-10 text-gold-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </motion.div>
@@ -199,9 +199,9 @@ export default function ROICalculator() {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.4 }}
-                  className="glass-green rounded-2xl p-6 border border-neon-green-500/30"
+                  className="glass-gold rounded-2xl p-6 border border-gold-500/30"
                 >
-                  <h4 className="text-sm font-semibold text-neon-green-400 uppercase tracking-wider mb-4">
+                  <h4 className="text-sm font-semibold text-gold-400 uppercase tracking-wider mb-4">
                     With GreenLine365
                   </h4>
                   <div className="space-y-3">
@@ -232,26 +232,26 @@ export default function ROICalculator() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
-                className="bg-gradient-to-r from-neon-green-500/20 to-neon-green-500/10 rounded-2xl p-8 mb-6"
+                className="bg-gradient-to-r from-gold-500/20 to-gold-500/10 rounded-2xl p-8 mb-6"
               >
-                <h4 className="text-center text-sm font-semibold text-neon-green-400 uppercase tracking-wider mb-6">
+                <h4 className="text-center text-sm font-semibold text-gold-400 uppercase tracking-wider mb-6">
                   Your Potential Savings
                 </h4>
                 <div className="grid grid-cols-3 gap-6 text-center">
                   <div>
-                    <div className="text-4xl font-display font-black text-neon-green-500 mb-2">
+                    <div className="text-4xl font-display font-black text-gold-500 mb-2">
                       {hourlySavings.toFixed(0)}
                     </div>
                     <div className="text-sm text-white/70">Hours Saved<br />Per Month</div>
                   </div>
                   <div>
-                    <div className="text-4xl font-display font-black text-neon-green-500 mb-2">
+                    <div className="text-4xl font-display font-black text-gold-500 mb-2">
                       ${monthlySavings.toFixed(0)}
                     </div>
                     <div className="text-sm text-white/70">Monthly<br />Savings</div>
                   </div>
                   <div>
-                    <div className="text-4xl font-display font-black text-neon-green-500 mb-2">
+                    <div className="text-4xl font-display font-black text-gold-500 mb-2">
                       ${yearlySavings.toFixed(0)}
                     </div>
                     <div className="text-sm text-white/70">Yearly<br />Savings</div>

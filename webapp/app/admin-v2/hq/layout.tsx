@@ -39,7 +39,7 @@ export default function HQLayout({ children }: { children: React.ReactNode }) {
     return (
       <div className="min-h-screen bg-[#0A0E14] flex items-center justify-center">
         <div className="text-center">
-          <div className="w-12 h-12 border-3 border-emerald-500/30 border-t-emerald-400 rounded-full animate-spin mx-auto mb-4" />
+          <div className="w-12 h-12 border-3 border-gold-500/30 border-t-gold-400 rounded-full animate-spin mx-auto mb-4" />
           <p className="text-white/60 text-sm tracking-wider">VERIFYING CLEARANCE...</p>
         </div>
       </div>

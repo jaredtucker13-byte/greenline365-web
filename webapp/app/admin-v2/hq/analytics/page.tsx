@@ -63,7 +63,7 @@ export default function AnalyticsPage() {
               onClick={() => setRange(r.value)}
               className={`px-3 py-1.5 rounded-md text-xs font-medium transition ${
                 range === r.value
-                  ? 'bg-emerald-500/20 text-emerald-400'
+                  ? 'bg-gold-500/20 text-gold-400'
                   : 'text-white/40 hover:text-white/60'
               }`}
             >

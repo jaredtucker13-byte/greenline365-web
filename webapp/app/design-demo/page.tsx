@@ -24,7 +24,7 @@ export default function DesignSystemDemo() {
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="space-y-2">
-              <div className="h-24 bg-neon-green-500 rounded-xl shadow-neon-green"></div>
+              <div className="h-24 bg-gold-500 rounded-xl shadow-gold"></div>
               <p className="text-sm text-white/80 font-medium">Neon Green</p>
               <p className="text-xs text-white/50">#C9A96E</p>
             </div>
@@ -79,8 +79,8 @@ export default function DesignSystemDemo() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <OSPanel>
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-xl bg-neon-green-500/20 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-neon-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="w-12 h-12 rounded-xl bg-gold-500/20 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-gold-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 </div>
