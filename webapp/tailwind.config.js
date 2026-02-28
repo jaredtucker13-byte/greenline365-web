@@ -198,6 +198,12 @@ module.exports = {
           'border': '1px solid rgba(255, 255, 255, 0.06)',
           'box-shadow': '0 24px 64px -12px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
         },
+        '.glass-teal': {
+          'background': 'rgba(230, 216, 181, 0.05)',
+          'backdrop-filter': 'blur(10px)',
+          '-webkit-backdrop-filter': 'blur(10px)',
+          'border': '1px solid rgba(230, 216, 181, 0.15)',
+        },
         '.text-gradient-gold': {
           'background': 'linear-gradient(135deg, #C9A84C 0%, #E8C97A 50%, #C9A84C 100%)',
           '-webkit-background-clip': 'text',
@@ -219,6 +225,7 @@ module.exports = {
         },
       });
       addComponents({
+        // Primary: Solid champagne gold, dark text, editorial refinement
         '.btn-primary': {
           'padding': '0.75rem 1.5rem',
           'background': 'linear-gradient(135deg, #C9A84C 0%, #E8C97A 100%)',
@@ -232,8 +239,9 @@ module.exports = {
             'box-shadow': '0 0 30px rgba(201, 168, 76, 0.5)',
           },
         },
-        '.btn-ghost': {
-          'padding': '0.625rem 1.25rem',
+        // Secondary: Outlined, thin gold border, restrained elegance
+        '.btn-secondary': {
+          'padding': '0.75rem 2rem',
           'background': 'transparent',
           'color': '#C9A84C',
           'font-weight': '500',

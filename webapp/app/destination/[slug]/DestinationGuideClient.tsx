@@ -581,6 +581,10 @@ export default function DestinationGuideClient({ slug }: { slug: string }) {
         </div>
       </section>
 
+      {/* ─── Experience Loops ─── */}
+      <DestinationLoops destinationSlug={slug} destinationLabel={dest.label} />
+
+      {/* ─── All Destinations CTA ─── */}
       {/* ─── Explore More Destinations ─── */}
       <section className="border-t border-white/5 py-16" data-testid="other-destinations">
         <div className="max-w-6xl mx-auto px-6">
@@ -715,5 +719,76 @@ function GuideListingCard({ listing: l, index: i, isFeatured }: { listing: Listi
       </div>
       </motion.div>
     </Link>
+  );
+}
+
+// ─── Destination Loops Section ───
+function DestinationLoops({ destinationSlug, destinationLabel }: { destinationSlug: string; destinationLabel: string }) {
+  const [loops, setLoops] = useState<{ id: string; name: string; slug: string; loop_type: string; cover_image_url?: string; duration_estimate?: string; vibe?: string; short_description?: string; stops_count: number }[]>([]);
+
+  useEffect(() => {
+    fetch(`/api/loops?destination=${destinationSlug}&limit=4`)
+      .then(r => r.json())
+      .then(data => setLoops(data.loops || []))
+      .catch(() => {});
+  }, [destinationSlug]);
+
+  if (loops.length === 0) return null;
+
+  const TYPE_COLORS: Record<string, string> = {
+    'date-night': 'bg-pink-500/20 text-pink-300 border-pink-500/30',
+    'entertainment': 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+    'family': 'bg-blue-500/20 text-blue-300 border-blue-500/30',
+    'foodie': 'bg-orange-500/20 text-orange-300 border-orange-500/30',
+    'adventure': 'bg-green-500/20 text-green-300 border-green-500/30',
+    'nightlife': 'bg-violet-500/20 text-violet-300 border-violet-500/30',
+    'wellness': 'bg-teal-500/20 text-teal-300 border-teal-500/30',
+  };
+
+  return (
+    <section className="border-t border-white/5 py-16" data-testid="destination-loops">
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <p className="text-xs font-heading font-semibold uppercase tracking-[0.2em] text-gold mb-1">Experiences</p>
+            <h3 className="text-xl font-heading font-light text-white tracking-tight">
+              Curated Loops in <span className="font-semibold text-gradient-gold">{destinationLabel}</span>
+            </h3>
+          </div>
+          <Link href={`/loops?destination=${destinationSlug}`} className="text-xs text-gold/70 hover:text-gold transition font-heading font-semibold uppercase tracking-wider">
+            View All &rarr;
+          </Link>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {loops.map(loop => (
+            <Link
+              key={loop.id}
+              href={`/loops/${loop.slug}`}
+              className="rounded-xl overflow-hidden border border-white/10 hover:border-gold/20 transition-all duration-300 group"
+              style={{ background: 'rgba(255,255,255,0.02)' }}
+            >
+              <div className="relative h-32 overflow-hidden">
+                {loop.cover_image_url ? (
+                  <img src={loop.cover_image_url} alt={loop.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-gold/10 via-midnight-800 to-midnight-900" />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-midnight-900/80 to-transparent" />
+                <span className={`absolute top-2 left-2 text-[9px] px-2 py-0.5 rounded-full font-heading font-semibold uppercase tracking-wider border ${TYPE_COLORS[loop.loop_type] || 'bg-gold/20 text-gold border-gold/30'}`}>
+                  {loop.loop_type.replace('-', ' ')}
+                </span>
+              </div>
+              <div className="p-3">
+                <h4 className="text-sm font-heading font-semibold text-white group-hover:text-gold transition-colors truncate">{loop.name}</h4>
+                <p className="text-xs text-white/40 font-body mt-1">
+                  {loop.stops_count} stop{loop.stops_count !== 1 ? 's' : ''}
+                  {loop.duration_estimate ? ` · ${loop.duration_estimate}` : ''}
+                </p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }

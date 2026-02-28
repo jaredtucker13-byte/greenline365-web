@@ -10,18 +10,30 @@ if (typeof window !== 'undefined') {
 
 export { gsap, ScrollTrigger };
 
-// Custom hook for GSAP animations
+// Check if user prefers reduced motion
+export function prefersReducedMotion(): boolean {
+  if (typeof window === 'undefined') return false;
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+// Custom hook for GSAP animations — skips animations when reduced motion is preferred
 export function useGSAP(callback: () => gsap.core.Timeline | void, deps: any[] = []) {
   useEffect(() => {
+    if (prefersReducedMotion()) {
+      // Make all elements visible immediately without animation
+      gsap.globalTimeline.clear();
+      return;
+    }
     const ctx = gsap.context(callback);
     return () => ctx.revert();
   }, deps);
 }
 
-// Scroll animation utilities
+// Scroll animation utilities — all respect prefers-reduced-motion
 export const scrollAnimations = {
   // Fade in elements as they enter viewport
   fadeIn: (element: string | Element, options = {}) => {
+    if (prefersReducedMotion()) return null;
     return gsap.from(element, {
       opacity: 0,
       y: 50,
@@ -38,6 +50,7 @@ export const scrollAnimations = {
 
   // Stagger animation for multiple elements
   staggerFadeIn: (elements: string, options = {}) => {
+    if (prefersReducedMotion()) return null;
     return gsap.from(elements, {
       opacity: 0,
       y: 30,
@@ -55,6 +68,7 @@ export const scrollAnimations = {
 
   // Parallax effect
   parallax: (element: string | Element, speed: number = 0.5) => {
+    if (prefersReducedMotion()) return null;
     return gsap.to(element, {
       y: () => -ScrollTrigger.maxScroll(window) * speed,
       ease: 'none',
@@ -69,6 +83,7 @@ export const scrollAnimations = {
 
   // Pin section while content animates
   pinSection: (element: string | Element, options = {}) => {
+    if (prefersReducedMotion()) return null;
     return ScrollTrigger.create({
       trigger: element,
       pin: true,
@@ -80,6 +95,7 @@ export const scrollAnimations = {
 
   // Scale animation
   scaleIn: (element: string | Element, options = {}) => {
+    if (prefersReducedMotion()) return null;
     return gsap.from(element, {
       scale: 0.8,
       opacity: 0,

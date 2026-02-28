@@ -1,521 +1,97 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useRef } from 'react';
 import Image from 'next/image';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Link from 'next/link';
 import MultiStepBookingForm from '../components/MultiStepBookingForm';
 import BookingWidget from '../components/BookingWidget';
 import DailyTrendHunter from '../components/DailyTrendHunter';
-import PhoneMockup from '../components/PhoneMockup';
-import FloatingShapes from '../components/FloatingShapes';
-import { Button } from '@/components/ui/os';
+import HeroSection from '../components/HeroSection';
+import PhoneDrawAnimation from '../components/PhoneDrawAnimation';
+import NetworkPipeline from '../components/NetworkPipeline';
+import { Button, FlipCard } from '@/components/ui/os';
+import { GlassCard, OSPanel } from '@/components/ui/os';
 import { NeonText } from '@/components/ui/os';
-import { GlassCard } from '@/components/ui/os';
-import { EditableRegion } from '@/components/editor';
-
-// Register GSAP plugins
-if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger);
-}
+import { useGSAP, gsap, ScrollTrigger, scrollAnimations } from '@/lib/gsap';
 
 export default function ServicesPage() {
   const [showFullForm, setShowFullForm] = useState(false);
   const [showWidget, setShowWidget] = useState(false);
-  
-  // GSAP Refs
-  const heroRef = useRef<HTMLElement>(null);
-  const featuresRef = useRef<HTMLElement>(null);
-  const statsRef = useRef<HTMLElement>(null);
-  
-  // Hero GSAP Animation
-  useEffect(() => {
-    if (!heroRef.current) return;
-    
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-      
-      // Hero entrance sequence
-      tl.from('[data-hero-badge]', {
-        y: -40,
-        opacity: 0,
-        duration: 0.8,
-        delay: 0.2,
-      })
-      .from('[data-hero-title] span', {
-        y: 80,
-        opacity: 0,
-        duration: 0.9,
-        stagger: 0.1,
-      }, '-=0.4')
-      .from('[data-hero-subtitle]', {
-        y: 30,
-        opacity: 0,
-        duration: 0.7,
-      }, '-=0.5')
-      .from('[data-hero-cta]', {
-        y: 20,
-        opacity: 0,
-        scale: 0.9,
-        duration: 0.5,
-      }, '-=0.3')
-      .from('[data-hero-image]', {
-        x: 100,
-        opacity: 0,
-        duration: 1,
-        ease: 'power2.out',
-      }, '-=0.7');
-      
-    }, heroRef);
-    
-    return () => ctx.revert();
-  }, []);
-  
-  // Comprehensive scroll-triggered animations for all sections
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      // Section headers animation
-      gsap.utils.toArray('[data-section-header]').forEach((el) => {
-        gsap.from(el as Element, {
-          scrollTrigger: {
-            trigger: el as Element,
-            start: 'top 80%',
-          },
-          y: 50,
-          opacity: 0,
-          duration: 0.8,
-          ease: 'power3.out',
-        });
-      });
+  const pageRef = useRef<HTMLElement>(null);
 
-      // Feature cards stagger
-      gsap.from('[data-feature-card]', {
-        scrollTrigger: {
-          trigger: featuresRef.current,
-          start: 'top 75%',
-        },
-        y: 80,
-        opacity: 0,
-        duration: 0.7,
-        stagger: 0.15,
-        ease: 'power2.out',
-        immediateRender: false,
-      });
+  // Unified GSAP scroll animations via design system
+  useGSAP(() => {
+    // Section headers
+    scrollAnimations.staggerFadeIn('[data-section-header]');
 
-      // Step cards stagger
-      gsap.from('[data-step-card]', {
-        scrollTrigger: {
-          trigger: '[data-step-card]',
-          start: 'top 80%',
-        },
-        x: -60,
-        opacity: 0,
-        duration: 0.7,
-        stagger: 0.15,
-        ease: 'power2.out',
-        immediateRender: false,
-      });
+    // Pain cards
+    scrollAnimations.staggerFadeIn('[data-pain-card]');
 
-      // Progress bars grow animation
-      gsap.from('.gsap-progress-bar', {
-        scrollTrigger: {
-          trigger: '.gsap-progress-bar',
-          start: 'top 85%',
-        },
-        scaleX: 0,
-        transformOrigin: 'left',
-        duration: 1,
-        stagger: 0.2,
-        ease: 'power2.out',
+    // Slide-in pairs (image left, content right)
+    gsap.utils.toArray<Element>('[data-slide-left]').forEach((el) => {
+      gsap.from(el, {
+        scrollTrigger: { trigger: el, start: 'top 80%' },
+        x: -60, opacity: 0, duration: 0.8, ease: 'power2.out',
       });
-
-      // Testimonial card
-      gsap.from('[data-testimonial]', {
-        scrollTrigger: {
-          trigger: '[data-testimonial]',
-          start: 'top 80%',
-        },
-        y: 60,
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power3.out',
-      });
-
-      // Pain cards stagger
-      gsap.from('[data-pain-card]', {
-        scrollTrigger: {
-          trigger: '[data-pain-card]',
-          start: 'top 80%',
-        },
-        y: 40,
-        opacity: 0,
-        duration: 0.6,
-        stagger: 0.12,
-        ease: 'power2.out',
-      });
-
-      // Scroll images and content
-      gsap.from('[data-scroll-image]', {
-        scrollTrigger: {
-          trigger: '[data-scroll-image]',
-          start: 'top 75%',
-        },
-        x: -80,
-        opacity: 0,
-        duration: 0.9,
-        ease: 'power2.out',
-      });
-
-      gsap.from('[data-scroll-content]', {
-        scrollTrigger: {
-          trigger: '[data-scroll-content]',
-          start: 'top 75%',
-        },
-        x: 80,
-        opacity: 0,
-        duration: 0.9,
-        ease: 'power2.out',
-      });
-
-      // Solution section
-      gsap.from('[data-solution-image]', {
-        scrollTrigger: {
-          trigger: '[data-solution-image]',
-          start: 'top 75%',
-        },
-        x: -60,
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power2.out',
-      });
-
-      gsap.from('[data-solution-content]', {
-        scrollTrigger: {
-          trigger: '[data-solution-content]',
-          start: 'top 75%',
-        },
-        x: 60,
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power2.out',
-      });
-
-      gsap.from('[data-solution-feature]', {
-        scrollTrigger: {
-          trigger: '[data-solution-feature]',
-          start: 'top 85%',
-        },
-        y: 30,
-        opacity: 0,
-        duration: 0.5,
-        stagger: 0.1,
-        ease: 'power2.out',
-      });
-
-      gsap.from('[data-floating-badge]', {
-        scrollTrigger: {
-          trigger: '[data-floating-badge]',
-          start: 'top 75%',
-        },
-        scale: 0.8,
-        opacity: 0,
-        duration: 0.6,
-        delay: 0.3,
-        ease: 'back.out(1.7)',
-      });
-
-      // Trend Hunter section
-      gsap.from('[data-trend-content]', {
-        scrollTrigger: {
-          trigger: '[data-trend-content]',
-          start: 'top 75%',
-        },
-        x: -50,
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power2.out',
-      });
-
-      gsap.from('[data-trend-widget]', {
-        scrollTrigger: {
-          trigger: '[data-trend-widget]',
-          start: 'top 75%',
-        },
-        x: 50,
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power2.out',
-      });
-
-      // FAQ cards stagger
-      gsap.from('[data-faq-card]', {
-        scrollTrigger: {
-          trigger: '[data-faq-card]',
-          start: 'top 80%',
-        },
-        y: 60,
-        opacity: 0,
-        duration: 0.6,
-        stagger: 0.08,
-        ease: 'power2.out',
-        immediateRender: false,
-      });
-
-      // Booking section
-      gsap.from('[data-booking-left]', {
-        scrollTrigger: {
-          trigger: '[data-booking-left]',
-          start: 'top 75%',
-        },
-        x: -60,
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power2.out',
-      });
-
-      gsap.from('[data-booking-right]', {
-        scrollTrigger: {
-          trigger: '[data-booking-right]',
-          start: 'top 75%',
-        },
-        x: 60,
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power2.out',
-      });
-
-      // Products section
-      gsap.from('[data-product-left]', {
-        scrollTrigger: {
-          trigger: '[data-product-left]',
-          start: 'top 75%',
-        },
-        x: -50,
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power2.out',
-      });
-
-      gsap.from('[data-product-right]', {
-        scrollTrigger: {
-          trigger: '[data-product-right]',
-          start: 'top 75%',
-        },
-        x: 50,
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power2.out',
-      });
-
-      gsap.from('[data-product-demo]', {
-        scrollTrigger: {
-          trigger: '[data-product-demo]',
-          start: 'top 80%',
-        },
-        x: -50,
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power2.out',
-      });
-
-      gsap.from('[data-product-info]', {
-        scrollTrigger: {
-          trigger: '[data-product-info]',
-          start: 'top 80%',
-        },
-        x: 50,
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power2.out',
-      });
-
-      // Success section
-      gsap.from('[data-success-section]', {
-        scrollTrigger: {
-          trigger: '[data-success-section]',
-          start: 'top 80%',
-        },
-        y: 50,
-        opacity: 0,
-        duration: 0.9,
-        ease: 'power3.out',
-      });
-
-      gsap.from('[data-success-badge]', {
-        scrollTrigger: {
-          trigger: '[data-success-badge]',
-          start: 'top 80%',
-        },
-        scale: 0.9,
-        opacity: 0,
-        duration: 0.6,
-        ease: 'back.out(1.7)',
-      });
-
-      // Background glow animations
-      gsap.to('.gsap-glow', {
-        scale: 1.2,
-        opacity: 0.5,
-        duration: 20,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
-      });
-
-      gsap.to('.gsap-glow-2', {
-        scale: 1.3,
-        x: -50,
-        duration: 15,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
-      });
-
-      // Floating phone animation
-      gsap.to('.gsap-float', {
-        y: -15,
-        duration: 5,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
-      });
-
-      // Parallax effect for background elements
-      gsap.to('.gsap-parallax', {
-        scrollTrigger: {
-          trigger: '.gsap-parallax',
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: true,
-        },
-        y: -100,
-        ease: 'none',
-      });
-
     });
-    
-    return () => ctx.revert();
+    gsap.utils.toArray<Element>('[data-slide-right]').forEach((el) => {
+      gsap.from(el, {
+        scrollTrigger: { trigger: el, start: 'top 80%' },
+        x: 60, opacity: 0, duration: 0.8, ease: 'power2.out',
+      });
+    });
+
+    // Parallax glow
+    gsap.to('.gsap-parallax', {
+      scrollTrigger: { trigger: '.gsap-parallax', start: 'top bottom', end: 'bottom top', scrub: true },
+      y: -100, ease: 'none',
+    });
+
   }, []);
 
   return (
-    <main className="min-h-screen bg-os-dark relative">
-      {/* Floating 3D Shapes Background */}
-      <FloatingShapes />
-      
-      {/* ========== HERO SECTION - 50/50 Split ========== */}
-      <section ref={heroRef} className="relative min-h-[90vh] flex items-center overflow-hidden pt-20">
-        {/* Background Effects */}
-        <div className="absolute inset-0 bg-os-dark" />
-        <div 
-          className="absolute top-0 left-1/4 w-[800px] h-[800px] rounded-full bg-gradient-to-br from-gold-500/5 to-transparent blur-3xl gsap-glow"
-        />
-        <div 
-          className="absolute bottom-1/4 right-0 w-[500px] h-[500px] bg-gradient-radial from-gold-500/10 to-transparent blur-3xl gsap-glow-2"
-        />
-        
-        <div className="relative z-10 w-full max-w-[1280px] mx-auto px-4 sm:px-6">
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            {/* Left Column - Text Content */}
-            <div>
-              <div 
-                data-hero-badge
-                className="mb-6 inline-flex items-center gap-2 px-3 py-1.5 glass-gold rounded-full border border-gold-500/30"
-              >
-                <span 
-                  className="w-2 h-2 bg-gold rounded-full animate-pulse"
-                />
-                <span className="text-xs text-gold-400 font-semibold tracking-wide">STATUS: ONLINE</span>
-              </div>
-              
-              <EditableRegion pageSlug="home" regionKey="hero_title" type="text">
-                <h1 data-hero-title className="font-display font-bold mb-4 leading-tight overflow-hidden" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)' }}>
-                  <span className="text-white block">The Operating System</span>
-                  <span className="text-white block">for the</span>
-                  <span className="text-gold-400 block">Local Economy</span>
-                </h1>
-              </EditableRegion>
-              
-              <EditableRegion pageSlug="home" regionKey="hero_subtitle" type="text">
-                <p data-hero-subtitle className="text-white/70 mb-6 leading-relaxed max-w-xl" style={{ fontSize: 'clamp(1rem, 2vw, 1.25rem)' }}>
-                  Stop competing with algorithms. Start winning. Start running infrastructure that 
-                  connects <span className="text-gold-400 font-semibold">local life</span> with local commerce.
-                </p>
-              </EditableRegion>
-              
-              <div data-hero-cta className="flex flex-wrap gap-3 mb-8">
-                <Button variant="primary" size="lg" onClick={() => window.location.href = '/waitlist'} data-testid="hero-waitlist-btn">
-                  Join the Waitlist
-                </Button>
-                <Button variant="secondary" size="lg" onClick={() => setShowFullForm(true)} data-testid="hero-start-btn">
-                  Book a Demo →
-                </Button>
-              </div>
-              
-              <div data-hero-stats className="grid grid-cols-3 gap-6 max-w-md">
-                {[
-                  { value: 'New', label: 'Platform' },
-                  { value: 'AI', label: 'Powered' },
-                  { value: '24/7', label: 'Always On' }
-                ].map((stat, i) => (
-                  <div key={i} className="text-center px-2">
-                    <div className="text-2xl font-display font-bold text-gold-400">{stat.value}</div>
-                    <div className="text-xs text-white/50 mt-1">{stat.label}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            {/* Right Column - Interactive Phone Mockup */}
-            <div
-              data-hero-image
-              className="relative hidden lg:flex justify-center items-center"
-            >
-              <div className="absolute inset-0 bg-gold-500/20 blur-3xl rounded-full scale-75" />
-              <div className="relative z-10 gsap-float">
-                <PhoneMockup />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+    <main ref={pageRef} className="min-h-screen bg-os-dark relative">
+      {/* ═══════════ HERO ═══════════ */}
+      <HeroSection />
 
-      {/* ========== DISTRESSED OWNERS - Right After Hero ========== */}
-      <section className="py-16 relative z-10" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
-          <div className="grid lg:grid-cols-2 gap-8 items-center">
-            {/* Left - Image (50% width) */}
-            <div data-scroll-image className="order-2 lg:order-1">
-              <div className="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
-                <Image
-                  src="/images/distressed-owners.jpg"
-                  alt="Stressed business owners"
-                  width={600}
-                  height={338}
-                  className="w-full aspect-16-9 object-cover"
-                  loading="lazy"
-                  placeholder="blur"
-                  blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMCwsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wAARCAAIAAoDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAcI/8QAIhAAAgEDAwUBAAAAAAAAAAAAAQIDAAQFBhESEyExQVFh/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAYEQEBAQEBAAAAAAAAAAAAAAABAgADEf/aAAwDAQACEQMRAD8AkOnNT6lzOp7C3mvpXtluY0aIhSrAuAQevvzVyqlaU0/jNN3NxNYWy28s4USMpYl9t9gSST1J6mvlKUzJDHZk/9k="
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-os-dark/80 via-transparent to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4">
-                  <div className="glass rounded-xl p-3 border border-red-500/30">
-                    <div className="flex items-center justify-center gap-2">
-                      <span className="text-red-400 text-lg">😰</span>
-                      <span className="text-white/90 text-sm">Sound familiar?</span>
+      {/* ═══════════ THE PROBLEM ═══════════ */}
+      <section className="py-20 relative z-10">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Image */}
+            <div data-slide-left className="order-2 lg:order-1">
+              <GlassCard variant="default" hover={false} className="p-0 overflow-hidden border border-white/10">
+                <div className="relative">
+                  <Image
+                    src="/images/distressed-owners.jpg"
+                    alt="Stressed business owners"
+                    width={600}
+                    height={338}
+                    className="w-full aspect-video object-cover"
+                    loading="lazy"
+                    placeholder="blur"
+                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMCwsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wAARCAAIAAoDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAcI/8QAIhAAAgEDAwUBAAAAAAAAAAAAAQIDAAQFBhESEyExQVFh/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAYEQEBAQEBAAAAAAAAAAAAAAABAgADEf/aAAwDAQACEQMRAD8AkOnNT6lzOp7C3mvpXtluY0aIhSrAuAQevvzVyqlaU0/jNN3NxNYWy28s4USMpYl9t9gSST1J6mvlKUzJDHZk/9k="
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-os-dark/80 via-transparent to-transparent" />
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <div className="glass rounded-xl p-3 border border-red-500/30">
+                      <div className="flex items-center justify-center gap-2">
+                        <span className="text-red-400 text-lg">😰</span>
+                        <span className="text-white/90 text-sm">Sound familiar?</span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </GlassCard>
             </div>
-            
-            {/* Right - Content (50% width) */}
-            <div data-scroll-content className="order-1 lg:order-2">
+
+            {/* Content */}
+            <div data-slide-right className="order-1 lg:order-2">
               <span className="text-red-400 text-xs font-bold tracking-widest uppercase mb-3 block">The Problem</span>
-              <h2 className="font-display font-bold text-white mb-4" style={{ fontSize: 'clamp(1.5rem, 4vw, 2.25rem)' }}>
+              <h2 className="font-display font-bold text-white mb-4 text-2xl lg:text-4xl">
                 Running a Business Shouldn&apos;t Mean <span className="text-red-400">Running on Empty</span>
               </h2>
-              <p className="text-white/60 mb-6 leading-relaxed" style={{ fontSize: '1rem', lineHeight: '1.6' }}>
+              <p className="text-white/60 mb-6 leading-relaxed text-base">
                 You didn&apos;t start your business to become a full-time social media manager. Yet here you are, drowning in tasks that steal your time and energy.
               </p>
               <div className="space-y-3">
@@ -525,15 +101,15 @@ export default function ServicesPage() {
                   { emoji: '😓', title: 'No Marketing Time', desc: 'Great at your craft, but who has time for social media?' },
                   { emoji: '💸', title: 'Wasted Ad Spend', desc: 'Throwing money at ads that don\'t convert to real customers' }
                 ].map((pain, i) => (
-                  <div key={i} data-pain-card className="os-card p-4 flex gap-4 items-center transition-all duration-300">
-                    <div className="icon-glass flex-shrink-0" style={{ background: 'linear-gradient(135deg, rgba(239,68,68,0.15) 0%, rgba(239,68,68,0.05) 100%)', borderColor: 'rgba(239,68,68,0.2)' }}>
+                  <GlassCard key={i} data-pain-card variant="default" hover={false} className="p-4 flex gap-4 items-center">
+                    <div className="w-10 h-10 rounded-xl bg-red-500/15 border border-red-500/20 flex items-center justify-center flex-shrink-0">
                       <span className="text-xl">{pain.emoji}</span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-white font-semibold" style={{ fontSize: '1rem' }}>{pain.title}</h4>
-                      <p className="text-white/60" style={{ fontSize: '0.875rem', lineHeight: '1.5' }}>{pain.desc}</p>
+                      <h4 className="text-white font-semibold text-base">{pain.title}</h4>
+                      <p className="text-white/60 text-sm leading-snug">{pain.desc}</p>
                     </div>
-                  </div>
+                  </GlassCard>
                 ))}
               </div>
             </div>
@@ -541,81 +117,130 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      {/* ========== FEATURES - 3 Column Grid (Fixed Alignment) ========== */}
-      <section ref={featuresRef} className="py-20 relative" style={{ paddingBlock: 'clamp(4rem, 10vh, 6rem)' }}>
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
-          <div
-            data-section-header
-            className="text-center mb-16"
-          >
-            <h2 className="font-display font-bold text-white mb-3" style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)' }}>
-              Why Choose <span className="text-gold-400">GreenLine365</span>?
+      {/* ═══════════ FEATURES — 3-Column FlipCard Grid (Phase 5) ═══════════ */}
+      <section className="py-20 relative">
+        <div className="max-w-6xl mx-auto px-6">
+          <div data-section-header className="text-center mb-14">
+            <h2 className="font-display font-bold text-white mb-3 text-2xl lg:text-4xl">
+              Why Choose <NeonText variant="gradient" animate={false}>GreenLine365</NeonText>?
             </h2>
             <p className="text-white/60 max-w-xl mx-auto">Built for modern businesses who demand results</p>
+            <p className="text-white/30 text-xs mt-2">Tap any card to learn more</p>
           </div>
-          
-          {/* Fixed 3-Column Feature Grid with CSS Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { icon: '💡', title: 'AI-Powered Insights', desc: 'Get intelligent recommendations based on your business goals and market trends.' },
-              { icon: '📅', title: 'Smart Scheduling', desc: 'Seamlessly integrate with your calendar. Book demos, meetings, and follow-ups.' },
-              { icon: '⚡', title: 'Accountability System', desc: 'Stay on track with daily check-ins and progress tracking.' }
+              {
+                icon: '💡', title: 'AI-Powered Insights',
+                desc: 'Get intelligent recommendations based on your business goals and market trends.',
+                backTitle: 'How AI Insights Work',
+                backDesc: 'Our AI analyzes local market data, customer behavior, and seasonal trends to give you actionable recommendations that drive real results.',
+                backCta: 'Try the Trend Hunter below',
+              },
+              {
+                icon: '📅', title: 'Smart Scheduling',
+                desc: 'Seamlessly integrate with your calendar. Book demos, meetings, and follow-ups.',
+                backTitle: 'Never Miss a Booking',
+                backDesc: 'Embeddable booking widget that syncs with your calendar, prevents double-bookings, and sends automatic confirmations and reminders.',
+                backCta: 'See the widget demo below',
+              },
+              {
+                icon: '⚡', title: 'Always-On System',
+                desc: 'Your business runs 24/7 — even when you\'re off the clock.',
+                backTitle: '24/7 Automation',
+                backDesc: 'AI chat handles customer questions, booking requests happen automatically, and trend alerts keep you ahead of the competition — all while you sleep.',
+                backCta: 'Try the AI chat in the corner',
+              }
             ].map((feature, i) => (
-              <div
+              <FlipCard
                 key={i}
-                data-feature-card
-                className="os-card rounded-2xl p-10 border border-gold-500/30 hover:border-gold-500/50 transition-all duration-300 hover:-translate-y-1"
-                style={{ minHeight: '220px' }}
-              >
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-5 text-2xl bg-gold-500/20 border border-gold-500/30">
-                  {feature.icon}
-                </div>
-                <h3 className="font-display font-bold text-white mb-3" style={{ fontSize: '1.5rem' }}>{feature.title}</h3>
-                <p className="text-white/70 leading-relaxed" style={{ fontSize: '1rem', lineHeight: '1.6' }}>{feature.desc}</p>
-              </div>
+                className="min-h-[240px]"
+                front={
+                  <div className="p-8">
+                    <div className="w-12 h-12 rounded-xl bg-gold/20 border border-gold/30 flex items-center justify-center mb-5 text-2xl">
+                      {feature.icon}
+                    </div>
+                    <h3 className="font-display font-bold text-white mb-3 text-xl">{feature.title}</h3>
+                    <p className="text-white/70 leading-relaxed text-sm">{feature.desc}</p>
+                    <div className="mt-4 text-gold/40 text-xs flex items-center gap-1">
+                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                      Tap to flip
+                    </div>
+                  </div>
+                }
+                back={
+                  <div className="p-8 flex flex-col justify-center h-full">
+                    <h3 className="font-display font-bold text-gold mb-3 text-lg">{feature.backTitle}</h3>
+                    <p className="text-white/80 leading-relaxed text-sm mb-4">{feature.backDesc}</p>
+                    <p className="text-gold text-xs font-semibold">{feature.backCta}</p>
+                  </div>
+                }
+              />
             ))}
           </div>
         </div>
       </section>
 
-      {/* ========== HOW IT WORKS - Numbered Cards ========== */}
-      <section className="py-20 relative" style={{ paddingBlock: 'clamp(4rem, 10vh, 6rem)' }}>
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
-          <div
-            data-section-header
-            className="text-center mb-16"
-          >
-            <h2 className="font-display font-bold text-white mb-3" style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)' }}>
-              How the <span className="text-gold-400">System</span> Works
+      {/* ═══════════ HOW IT WORKS — OSPanel Cards ═══════════ */}
+      <section className="py-20 relative">
+        <div className="max-w-6xl mx-auto px-6">
+          <div data-section-header className="text-center mb-14">
+            <h2 className="font-display font-bold text-white mb-3 text-2xl lg:text-4xl">
+              How the <span className="text-gold">System</span> Works
             </h2>
             <p className="text-white/60 max-w-xl mx-auto">Four seamless phases that transform your business</p>
           </div>
-          
-          {/* 2x2 CSS Grid - Centered with consistent gaps */}
-          <div className="grid md:grid-cols-2 gap-8">
+
+          <div className="grid md:grid-cols-2 gap-6">
             {[
-              { num: '01', title: 'Discovery & Setup', desc: 'We analyze your business, identify ideal customers, and configure your AI-powered system.', icon: '🔍' },
-              { num: '02', title: 'AI Signal Detection', desc: 'Our AI continuously scans social media, forums, and communities for buying signals.', icon: '📡' },
-              { num: '03', title: 'Smart Engagement', desc: 'Automated, personalized outreach at the perfect moment when intent is highest.', icon: '🎯' },
-              { num: '04', title: 'Growth & Optimization', desc: 'Continuous learning and optimization to maximize your conversion rates.', icon: '📈' }
+              { num: '01', title: 'Discovery & Setup', desc: 'We analyze your business, identify ideal customers, and configure your system.', icon: '🔍' },
+              { num: '02', title: 'Local Intelligence', desc: 'Our AI monitors local trends, events, and opportunities relevant to your business.', icon: '📡' },
+              { num: '03', title: 'Content & Scheduling', desc: 'Generate captions, hashtags, and schedule your posts from one dashboard.', icon: '🎯' },
+              { num: '04', title: 'Growth & Booking', desc: 'Convert interest into booked appointments with AI-powered scheduling.', icon: '📈' }
             ].map((step, i) => (
-              <div
-                key={i}
-                data-step-card
-                className="os-card rounded-2xl p-10 border border-gold-500/30 hover:border-gold-500/50 transition-all duration-300 hover:-translate-y-1"
-                style={{ minHeight: '180px' }}
-              >
-                <div className="flex items-start gap-5">
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 text-2xl bg-gold-500/20 border border-gold-500/30">
-                    {step.icon}
+              <OSPanel key={i} className="flex items-start gap-5">
+                <div className="w-12 h-12 rounded-xl bg-gold/20 border border-gold/30 flex items-center justify-center flex-shrink-0 text-2xl">
+                  {step.icon}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xs font-bold text-gold bg-gold/20 px-2.5 py-1 rounded-full border border-gold/30">{step.num}</span>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xs font-bold text-gold-400 bg-gold-500/20 px-2.5 py-1 rounded-full border border-gold-500/30">{step.num}</span>
-                    </div>
-                    <h3 className="font-display font-bold text-white mb-2" style={{ fontSize: '1.5rem' }}>{step.title}</h3>
-                    <p className="text-white/70 leading-relaxed" style={{ fontSize: '1rem', lineHeight: '1.6' }}>{step.desc}</p>
-                  </div>
+                  <h3 className="font-display font-bold text-white mb-2 text-lg">{step.title}</h3>
+                  <p className="text-white/70 leading-relaxed text-sm">{step.desc}</p>
+                </div>
+              </OSPanel>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════ NETWORK PIPELINE — Data Flow Animation (Phase 5) ═══════════ */}
+      <section className="py-20 relative overflow-hidden">
+        <div className="circuit-bg absolute inset-0 opacity-20" />
+        <div className="max-w-6xl mx-auto px-6 relative z-10">
+          <div data-section-header className="text-center mb-14">
+            <h2 className="font-display font-bold text-white mb-3 text-2xl lg:text-4xl">
+              Your Content <span className="text-gold">Pipeline</span>
+            </h2>
+            <p className="text-white/60 max-w-xl mx-auto">
+              From camera roll to customers — watch how GreenLine365 transforms your content into growth
+            </p>
+          </div>
+
+          <NetworkPipeline />
+
+          <div className="flex justify-center mt-10 gap-8 text-center">
+            {[
+              { label: 'Input Sources', desc: 'Your photos, videos, reviews' },
+              { label: 'AI Engine', desc: 'Processes & optimizes' },
+              { label: 'Distribution', desc: 'Reaches your customers' },
+            ].map((step, i) => (
+              <div key={i} className="flex items-center gap-3">
+                {i > 0 && <div className="w-8 h-px bg-gold/30" />}
+                <div>
+                  <div className="text-gold text-xs font-bold">{step.label}</div>
+                  <div className="text-white/40 text-[10px]">{step.desc}</div>
                 </div>
               </div>
             ))}
@@ -623,99 +248,69 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      {/* ========== TESTIMONIAL - Compact Card ========== */}
-      <section className="py-12" style={{ paddingBlock: 'clamp(2rem, 6vh, 4rem)' }}>
-        <div className="max-w-[1100px] mx-auto px-4 sm:px-6">
-          <div
-            data-testimonial
-            className="os-card rounded-2xl p-6 md:p-8 border border-gold-500/30 max-w-2xl mx-auto text-center"
-          >
+      {/* ═══════════ TESTIMONIAL ═══════════ */}
+      <section className="py-16">
+        <div className="max-w-3xl mx-auto px-6">
+          <GlassCard variant="strong" hover={false} className="p-8 md:p-10 text-center border border-gold/20">
             <div className="flex flex-col items-center gap-4">
-              <div className="flex-shrink-0">
-                <div className="w-16 h-16 rounded-full bg-gold-500/20 flex items-center justify-center border border-gold-500/30">
-                  <span className="text-gold-400 font-bold text-xl">MK</span>
-                </div>
+              <div className="w-16 h-16 rounded-full bg-gold/20 flex items-center justify-center border border-gold/30">
+                <span className="text-gold font-bold text-xl">MK</span>
               </div>
-              <div>
-                <div className="flex gap-1 justify-center mb-3">
-                  {[...Array(5)].map((_, i) => (
-                    <svg key={i} className="w-5 h-5 text-gold-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  ))}
-                </div>
-                <p className="text-white/90 text-base leading-relaxed mb-3 max-w-lg mx-auto">
-                  &ldquo;We joined GreenLine365 to get our business discovered by more local customers. The directory puts us right where people are looking.&rdquo;
-                </p>
-                <div className="text-sm">
-                  <span className="text-white font-semibold">Early Adopter</span>
-                  <span className="text-white/50"> · Local Business Owner</span>
-                </div>
+              <div className="flex gap-1 justify-center mb-1">
+                {[...Array(5)].map((_, i) => (
+                  <svg key={i} className="w-5 h-5 text-gold" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                ))}
+              </div>
+              <p className="text-white/90 text-base leading-relaxed max-w-lg">
+                &ldquo;We joined GreenLine365 to get our business discovered by more local customers. The directory puts us right where people are looking.&rdquo;
+              </p>
+              <div className="text-sm">
+                <span className="text-white font-semibold">Early Adopter</span>
+                <span className="text-white/50"> · Local Business Owner</span>
               </div>
             </div>
-          </div>
+          </GlassCard>
         </div>
       </section>
 
-      {/* ========== SOLUTION - 50/50 Split ========== */}
-      <section className="py-16 relative" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
-        {/* Aurora Background */}
+      {/* ═══════════ SOLUTION — Phone Draw Animation + Content (Phase 5) ═══════════ */}
+      <section className="py-20 relative">
         <div className="aurora-bg" />
-        
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-8 items-center">
-            {/* Left - Image (50% width with 16:9 aspect ratio) */}
-            <div
-              data-solution-image
-              className="relative"
-            >
-              <div className="relative rounded-2xl overflow-hidden border border-gold-500/30">
-                <Image
-                  src="/images/barber-selfie.jpg"
-                  alt="Client capturing content"
-                  width={600}
-                  height={338}
-                  className="w-full aspect-16-9 object-cover"
-                  loading="lazy"
-                />
-                <div
-                  data-floating-badge
-                  className="absolute bottom-3 left-3 right-3 glass-gold px-3 py-1.5 rounded-full border border-gold-500/40 text-center"
-                >
-                  <span className="text-gold-400 font-semibold text-xs">📸 Content = Customers</span>
-                </div>
-              </div>
-              <div className="absolute -inset-4 bg-gold-500/10 rounded-3xl blur-2xl -z-10" />
+        <div className="max-w-6xl mx-auto px-6 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Phone SVG Draw Animation */}
+            <div data-slide-left className="relative flex justify-center">
+              <PhoneDrawAnimation />
             </div>
-            
-            {/* Right - Content (50% width) */}
-            <div
-              data-solution-content
-            >
-              <span className="text-gold-400 text-xs font-bold tracking-widest uppercase mb-3 block">The Solution</span>
-              <h2 className="font-display font-bold text-white mb-4" style={{ fontSize: 'clamp(1.5rem, 4vw, 2.25rem)' }}>
-                Your Phone is Already a <span className="text-gold-400">Marketing Machine</span>
+
+            {/* Content */}
+            <div data-slide-right>
+              <span className="text-gold text-xs font-bold tracking-widest uppercase mb-3 block">The Solution</span>
+              <h2 className="font-display font-bold text-white mb-4 text-2xl lg:text-4xl">
+                Your Phone is Already a <span className="text-gold">Marketing Machine</span>
               </h2>
-              <p className="text-white/70 mb-6 leading-relaxed" style={{ fontSize: '1rem', lineHeight: '1.6' }}>
+              <p className="text-white/70 mb-6 leading-relaxed text-base">
                 Every photo you take is a potential post. GreenLine365 transforms your daily snapshots into a content engine.
               </p>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {[
                   { title: 'AI-Powered Captions', desc: 'Upload a photo, get perfect captions in seconds' },
                   { title: 'Smart Hashtags', desc: 'Local + trending tags that get discovered' },
-                  { title: 'One-Click Scheduling', desc: 'Post to all platforms without leaving your chair' }
+                  { title: 'Built-in Scheduling', desc: 'Queue content from your dashboard' }
                 ].map((feature, i) => (
-                  <div key={i} data-solution-feature className="os-card p-4 flex items-center gap-4 transition-all duration-300">
-                    <div className="icon-glass flex-shrink-0">
-                      <svg className="w-5 h-5 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <GlassCard key={i} variant="default" hover={false} className="p-4 flex items-center gap-4">
+                    <div className="w-8 h-8 rounded-lg bg-gold/20 border border-gold/30 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                     </div>
                     <div>
-                      <h4 className="text-white font-semibold" style={{ fontSize: '1rem' }}>{feature.title}</h4>
-                      <p className="text-white/60" style={{ fontSize: '0.875rem', lineHeight: '1.5' }}>{feature.desc}</p>
+                      <h4 className="text-white font-semibold text-sm">{feature.title}</h4>
+                      <p className="text-white/60 text-xs">{feature.desc}</p>
                     </div>
-                  </div>
+                  </GlassCard>
                 ))}
               </div>
             </div>
@@ -723,19 +318,15 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      {/* ========== TREND HUNTER DEMO - 50/50 Split ========== */}
-      <section id="trend-demo" className="py-16 relative" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gold-500/10 rounded-full blur-3xl gsap-parallax" />
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-8 items-center">
-            {/* Left - Content */}
-            <div
-              data-trend-content
-              className="text-center lg:text-left"
-            >
-              <span className="text-gold-400 text-xs font-bold tracking-widest uppercase mb-3 block">Try It Now - FREE</span>
-              <h2 className="font-display font-bold text-white mb-4" style={{ fontSize: 'clamp(1.5rem, 4vw, 2.25rem)' }}>
-                See What&apos;s Trending in <span className="text-gold-400">Your Area</span>
+      {/* ═══════════ TREND HUNTER DEMO ═══════════ */}
+      <section id="trend-demo" className="py-20 relative">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gold/10 rounded-full blur-3xl gsap-parallax pointer-events-none" />
+        <div className="max-w-6xl mx-auto px-6 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div data-slide-left className="text-center lg:text-left">
+              <span className="text-gold text-xs font-bold tracking-widest uppercase mb-3 block">Try It Now - FREE</span>
+              <h2 className="font-display font-bold text-white mb-4 text-2xl lg:text-4xl">
+                See What&apos;s Trending in <span className="text-gold">Your Area</span>
               </h2>
               <p className="text-white/60 mb-6 text-sm leading-relaxed max-w-md mx-auto lg:mx-0">
                 Enter your ZIP code and discover local events, trends, and opportunities you can turn into content and customers.
@@ -749,102 +340,88 @@ export default function ServicesPage() {
                 ))}
               </div>
             </div>
-            
-            {/* Right - Widget */}
-            <div
-              data-trend-widget
-              className="os-card rounded-2xl p-5 border border-gold-500/30 max-w-md mx-auto lg:mx-0 w-full"
-            >
-              <DailyTrendHunter trendType="manual" />
+
+            <div data-slide-right>
+              <OSPanel className="max-w-md mx-auto lg:mx-0 w-full border border-gold/20">
+                <DailyTrendHunter trendType="manual" />
+              </OSPanel>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ========== FAQ - 3 Column Grid ========== */}
-      <section className="py-16" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
-        <div className="max-w-[1100px] mx-auto px-4 sm:px-6">
-          <div
-            data-section-header
-            className="text-center mb-12"
-          >
-            <h2 className="font-display font-bold text-white mb-3" style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)' }}>
-              Frequently Asked <span className="text-gold-400">Questions</span>
+      {/* ═══════════ FAQ — GlassCard Grid ═══════════ */}
+      <section className="py-20">
+        <div className="max-w-6xl mx-auto px-6">
+          <div data-section-header className="text-center mb-14">
+            <h2 className="font-display font-bold text-white mb-3 text-2xl lg:text-4xl">
+              Frequently Asked <span className="text-gold">Questions</span>
             </h2>
           </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { q: "How does GreenLine365 work?", a: "An AI-powered OS that connects your business with the local economy through automated scheduling and smart marketing.", bullets: ['AI-powered insights', '24/7 automation', 'Lead tracking'] },
-              { q: "What makes you different?", a: "Built specifically for local businesses. Our AI understands local markets and optimizes for real-world foot traffic.", bullets: ['Built for local', 'Community-focused', 'Foot traffic optimization'] },
-              { q: "How quickly can I start?", a: "Most businesses are fully onboarded within 24 hours. Our AI handles the heavy lifting.", bullets: ['Quick onboarding', 'Simple setup', 'Instant results'] },
-              { q: "Do you integrate with my tools?", a: "Yes! We integrate with Google Calendar, Facebook, Instagram, Yelp, and 50+ other platforms.", bullets: ['50+ integrations', 'Universal compatibility', 'One-click sync'] },
-              { q: "What's the ROI?", a: "Customers see an average 40% increase in lead conversion within the first 60 days.", bullets: ['40% conversion boost', '60-day ROI', 'First month payback'] },
-              { q: "Is there a contract?", a: "No long-term contracts. Pay monthly and cancel anytime. We don't lock you in.", bullets: ['Monthly billing', 'Cancel anytime', 'No commitments'] }
+              { q: 'How does GreenLine365 work?', a: 'A local business directory and OS that connects your business with customers through smart scheduling and AI content tools.', bullets: ['AI-powered insights', '24/7 scheduling', 'Local directory'] },
+              { q: 'What makes you different?', a: 'Built specifically for local businesses. We combine directory listings with AI tools for content and booking.', bullets: ['Built for local', 'Community-focused', 'All-in-one platform'] },
+              { q: 'How quickly can I start?', a: 'Most businesses are listed within 24 hours. Claim your listing and set up booking in minutes.', bullets: ['Quick onboarding', 'Simple setup', 'Same-day listing'] },
+              { q: 'What tools are included?', a: 'Directory listing, AI caption generator, booking widget, trend hunter, and AI chat — all in one dashboard.', bullets: ['Booking widget', 'AI captions', 'Trend hunter'] },
+              { q: 'Can I try it free?', a: 'Yes! Basic directory listing is free. Try the Trend Hunter and Booking Widget on this page right now.', bullets: ['Free tier', 'Try before buy', 'No credit card'] },
+              { q: 'Is there a contract?', a: 'No long-term contracts. Pay monthly and cancel anytime. We don\'t lock you in.', bullets: ['Monthly billing', 'Cancel anytime', 'No commitments'] }
             ].map((faq, i) => (
-              <div
-                key={i}
-                data-faq-card
-                className="os-card card-uniform p-10 transition-all duration-300"
-              >
-                <div className="icon-glass mb-5 mx-auto">
-                  <span className="text-gold-400 text-lg font-bold">?</span>
+              <GlassCard key={i} variant="strong" className="p-8">
+                <div className="w-10 h-10 rounded-xl bg-gold/20 border border-gold/30 flex items-center justify-center mb-5 mx-auto">
+                  <span className="text-gold text-lg font-bold">?</span>
                 </div>
-                <h3 className="font-display font-bold text-white mb-3 text-center" style={{ fontSize: '1.125rem' }}>{faq.q}</h3>
-                <p className="text-white/60 mb-4 text-center" style={{ fontSize: '0.875rem', lineHeight: '1.6' }}>{faq.a}</p>
+                <h3 className="font-display font-bold text-white mb-3 text-center text-base">{faq.q}</h3>
+                <p className="text-white/60 mb-4 text-center text-sm leading-relaxed">{faq.a}</p>
                 <div className="space-y-2">
                   {faq.bullets.map((b, j) => (
-                    <div key={j} className="flex items-center justify-center gap-2 text-white/50" style={{ fontSize: '0.8125rem' }}>
+                    <div key={j} className="flex items-center justify-center gap-2 text-white/50 text-xs">
                       <div className="w-1.5 h-1.5 bg-gold rounded-full" />
                       <span>{b}</span>
                     </div>
                   ))}
                 </div>
-              </div>
+              </GlassCard>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ========== BOOKING - 50/50 Split ========== */}
-      <section className="py-16 relative" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }} id="booking">
-        {/* Aurora Background */}
+      {/* ═══════════ BOOKING — 50/50 Split ═══════════ */}
+      <section className="py-20 relative" id="booking">
         <div className="aurora-bg" />
-        
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 relative z-10">
+        <div className="max-w-6xl mx-auto px-6 relative z-10">
           <div className="grid lg:grid-cols-2 gap-8 items-stretch">
-            {/* Left - Value Prop */}
-            <div
-              data-booking-left
-              className="os-card p-10 flex flex-col justify-between"
-            >
+            {/* Value Prop */}
+            <OSPanel data-slide-left className="flex flex-col justify-between">
               <div>
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="icon-glass">
-                    <svg className="w-5 h-5 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="w-10 h-10 rounded-xl bg-gold/20 border border-gold/30 flex items-center justify-center">
+                    <svg className="w-5 h-5 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
                   </div>
                   <div>
-                    <div className="font-display font-bold text-white">GreenLine<span className="text-gold-400">365</span></div>
+                    <div className="font-display font-bold text-white">GreenLine<span className="text-gold">365</span></div>
                     <div className="text-xs text-white/40 uppercase tracking-wider">Business OS</div>
                   </div>
                 </div>
-                
-                <h2 className="font-display font-bold mb-3" style={{ fontSize: 'clamp(1.25rem, 3vw, 1.75rem)' }}>
+
+                <h2 className="font-display font-bold mb-3 text-xl lg:text-2xl">
                   <span className="text-white block">Stop Losing</span>
-                  <span className="text-gold-400">Revenue.</span>
+                  <span className="text-gold">Revenue.</span>
                 </h2>
-                
+
                 <p className="text-white/70 text-sm mb-4 leading-relaxed">
                   Turn missed calls into closed deals with AI-powered scheduling that works 24/7.
                 </p>
-                
+
                 <div className="space-y-2 mb-4">
-                  {['Increase lead conversion by 40%', 'Zero missed calls, 24/7/365', 'Integrates with your calendar'].map((text, i) => (
+                  {['Never miss a booking again', 'Zero missed calls, 24/7/365', 'Integrates with your workflow'].map((text, i) => (
                     <div key={i} className="flex items-center gap-2">
-                      <div className="w-4 h-4 rounded-full bg-gold-500/20 flex items-center justify-center">
-                        <svg className="w-2.5 h-2.5 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <div className="w-4 h-4 rounded-full bg-gold/20 flex items-center justify-center">
+                        <svg className="w-2.5 h-2.5 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                         </svg>
                       </div>
@@ -852,41 +429,33 @@ export default function ServicesPage() {
                     </div>
                   ))}
                 </div>
-                
-                {/* Stats Row */}
+
                 <div className="grid grid-cols-3 gap-3 mb-4 py-3 border-t border-b border-white/10">
-                  <div className="text-center">
-                    <div className="text-lg font-bold text-gold-400">40%</div>
-                    <div className="text-[10px] text-white/50 uppercase">More Leads</div>
-                  </div>
-                  <div className="text-center border-x border-white/10">
-                    <div className="text-lg font-bold text-gold-400">24/7</div>
-                    <div className="text-[10px] text-white/50 uppercase">Availability</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-lg font-bold text-gold-400">2min</div>
-                    <div className="text-[10px] text-white/50 uppercase">Setup Time</div>
-                  </div>
+                  {[
+                    { value: '24/7', label: 'Availability' },
+                    { value: 'AI', label: 'Powered' },
+                    { value: '2min', label: 'Setup Time' },
+                  ].map((s, i) => (
+                    <div key={i} className={`text-center ${i === 1 ? 'border-x border-white/10' : ''}`}>
+                      <div className="text-lg font-bold text-gold">{s.value}</div>
+                      <div className="text-[10px] text-white/50 uppercase">{s.label}</div>
+                    </div>
+                  ))}
                 </div>
-                
-                {/* Quick Benefits */}
+
                 <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-xs text-white/60">
-                    <span className="text-gold-400">✓</span> No credit card required
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-white/60">
-                    <span className="text-gold-400">✓</span> Free 15-min strategy call
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-white/60">
-                    <span className="text-gold-400">✓</span> Cancel anytime
-                  </div>
+                  {['No credit card required', 'Free 15-min strategy call', 'Cancel anytime'].map((t, i) => (
+                    <div key={i} className="flex items-center gap-2 text-xs text-white/60">
+                      <span className="text-gold">✓</span> {t}
+                    </div>
+                  ))}
                 </div>
               </div>
-              
+
               <div className="pt-3 border-t border-white/10 mt-4">
                 <div className="flex items-center gap-1 mb-1">
                   {[...Array(5)].map((_, i) => (
-                    <svg key={i} className="w-3 h-3 text-gold-400" fill="currentColor" viewBox="0 0 20 20">
+                    <svg key={i} className="w-3 h-3 text-gold" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
                   ))}
@@ -894,51 +463,42 @@ export default function ServicesPage() {
                 </div>
                 <p className="text-white/50 text-xs">Be one of our first customers</p>
               </div>
-            </div>
-            
-            {/* Right - Form (Compact) */}
-            <div
-              data-booking-right
-              className="glass rounded-xl p-5"
-            >
+            </OSPanel>
+
+            {/* Booking Form */}
+            <GlassCard data-slide-right variant="strong" hover={false} className="p-6">
               <h3 className="text-base font-display font-bold text-white mb-1">Book Your Strategy Session</h3>
               <p className="text-white/60 text-xs mb-3">Quick form - takes 30 seconds</p>
               <MultiStepBookingForm compact={true} />
-            </div>
+            </GlassCard>
           </div>
         </div>
       </section>
 
-      {/* ========== PRODUCTS - 50/50 Splits ========== */}
-      <section className="py-16" style={{ paddingBlock: 'clamp(3rem, 8vh, 5rem)' }}>
-        <div className="max-w-[1100px] mx-auto px-4 sm:px-6">
-          <div
-            data-section-header
-            className="text-center mb-12"
-          >
-            <h2 className="font-display font-bold text-white mb-3" style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)' }}>
-              Our <span className="text-gold-400">Products</span>
+      {/* ═══════════ PRODUCTS — 50/50 Splits ═══════════ */}
+      <section className="py-20">
+        <div className="max-w-6xl mx-auto px-6">
+          <div data-section-header className="text-center mb-14">
+            <h2 className="font-display font-bold text-white mb-3 text-2xl lg:text-4xl">
+              Our <span className="text-gold">Products</span>
             </h2>
             <p className="text-white/60">White-label solutions you can integrate</p>
           </div>
 
-          {/* Product 1 - Booking Widget */}
-          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 mb-12 items-center">
-            <div
-              data-product-left
-              className="text-center lg:text-left"
-            >
-              <div className="inline-flex items-center gap-2 px-3 py-1 glass-gold border border-gold-500/30 rounded-full mb-4">
-                <span className="text-xs text-gold-400 font-semibold uppercase">Product #1</span>
+          {/* Product 1 — Booking Widget */}
+          <div className="grid lg:grid-cols-2 gap-12 mb-16 items-center">
+            <div data-slide-left className="text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 px-3 py-1 glass-gold border border-gold/30 rounded-full mb-4">
+                <span className="text-xs text-gold font-semibold uppercase">Product #1</span>
               </div>
               <h3 className="text-xl font-display font-bold text-white mb-3">Universal Booking Widget</h3>
               <p className="text-white/70 text-sm mb-4 leading-relaxed">
                 Embeddable booking widget for any website. Perfect for seamless scheduling.
               </p>
-              <ul className="space-y-2 mb-4">
-                {['Customizable colors', 'Calendar integrations', 'White-label for agencies'].map((text, i) => (
-                  <li key={i} className="flex items-center gap-2 text-white/80 text-sm">
-                    <svg className="w-4 h-4 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <ul className="space-y-2 mb-6">
+                {['Customizable colors', 'Conflict prevention', 'White-label for agencies'].map((text, i) => (
+                  <li key={i} className="flex items-center gap-2 text-white/80 text-sm justify-center lg:justify-start">
+                    <svg className="w-4 h-4 text-gold flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     {text}
@@ -947,41 +507,36 @@ export default function ServicesPage() {
               </ul>
               <Button variant="primary" onClick={() => setShowWidget(true)}>Try the Widget</Button>
             </div>
-            
-            <div
-              data-product-right
-              className="os-card rounded-2xl p-5 border border-gold-500/30 max-w-md mx-auto lg:mx-0 w-full"
-            >
-              <h4 className="text-base font-display font-bold text-white mb-4 text-center">Quick Book Demo</h4>
-              <BookingWidget source="landing-page-demo" />
+
+            <div data-slide-right>
+              <OSPanel className="max-w-md mx-auto lg:mx-0 w-full border border-gold/20">
+                <h4 className="text-base font-display font-bold text-white mb-4 text-center">Quick Book Demo</h4>
+                <BookingWidget source="landing-page-demo" />
+              </OSPanel>
             </div>
           </div>
 
-          {/* Product 2 - AI Chat */}
-          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-            <div
-              data-product-demo
-              className="os-card rounded-2xl p-5 order-2 lg:order-1 max-w-md mx-auto lg:mx-0 w-full"
-            >
-              <div className="p-4 border-b border-gold-500/20 bg-black/30 rounded-t-xl">
-                <div className="text-[10px] tracking-widest uppercase text-gold-400/80">PROTOCOL: ACTIVE ASSISTANT</div>
-                <div className="text-lg font-bold text-white">Command Center</div>
-              </div>
-              <div className="p-4 space-y-3">
-                <div className="rounded-xl p-3 bg-white/5 border border-white/10 text-sm text-white/90">
-                  <div className="font-semibold text-xs">System Online.</div>
-                  <div className="text-xs text-white/70">How can I help you today?</div>
+          {/* Product 2 — AI Chat */}
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div data-slide-left className="order-2 lg:order-1">
+              <OSPanel className="max-w-md mx-auto lg:mx-0 w-full border border-purple-500/20">
+                <div className="p-4 border-b border-gold/20 bg-black/30 rounded-t-xl -mx-6 -mt-6 mb-4 px-6 pt-4">
+                  <div className="text-[10px] tracking-widest uppercase text-gold/80">PROTOCOL: ACTIVE ASSISTANT</div>
+                  <div className="text-lg font-bold text-white">Command Center</div>
                 </div>
-                <div className="flex justify-end">
-                  <div className="rounded-xl px-3 py-2 text-xs text-black bg-gold">Tell me about your services</div>
+                <div className="space-y-3">
+                  <div className="rounded-xl p-3 bg-white/5 border border-white/10 text-sm text-white/90">
+                    <div className="font-semibold text-xs">System Online.</div>
+                    <div className="text-xs text-white/70">How can I help you today?</div>
+                  </div>
+                  <div className="flex justify-end">
+                    <div className="rounded-xl px-3 py-2 text-xs text-black bg-gold">Tell me about your services</div>
+                  </div>
                 </div>
-              </div>
+              </OSPanel>
             </div>
-            
-            <div
-              data-product-info
-              className="order-1 lg:order-2 text-center lg:text-left"
-            >
+
+            <div data-slide-right className="order-1 lg:order-2 text-center lg:text-left">
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-500/20 border border-purple-500/30 rounded-full mb-4">
                 <span className="text-xs text-purple-300 font-semibold uppercase">Product #2</span>
               </div>
@@ -991,21 +546,21 @@ export default function ServicesPage() {
               </p>
               <ul className="space-y-2 mb-4">
                 {['Powered by advanced AI', 'Train on your content', '24/7 automated support'].map((text, i) => (
-                  <li key={i} className="flex items-center gap-2 text-white/80 text-sm">
-                    <svg className="w-4 h-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <li key={i} className="flex items-center gap-2 text-white/80 text-sm justify-center lg:justify-start">
+                    <svg className="w-4 h-4 text-purple-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     {text}
                   </li>
                 ))}
               </ul>
-              <p className="text-gold-400 text-xs">Try it → Click the chat bubble in the bottom right</p>
+              <p className="text-gold text-xs">Try it → Click the chat bubble in the bottom right</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ========== SUCCESS STORY - Full Width Image at Bottom ========== */}
+      {/* ═══════════ SUCCESS STORY ═══════════ */}
       <section className="relative min-h-[60vh] flex flex-col overflow-hidden">
         <div className="absolute inset-0">
           <Image
@@ -1019,39 +574,79 @@ export default function ServicesPage() {
           <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-os-dark via-os-dark/60 to-transparent" />
         </div>
 
-        <div className="relative z-10 pt-12 pb-6 px-4">
-          <div className="max-w-[1280px] mx-auto text-center">
-            <div data-success-section>
-              <div 
-                data-success-badge
-                className="inline-flex items-center gap-2 px-3 py-1.5 glass-gold rounded-full border border-gold-500/40 mb-3"
-              >
-                <span className="w-2 h-2 bg-gold rounded-full animate-pulse" />
-                <span className="text-xs text-gold-400 font-semibold">THE GREENLINE EFFECT</span>
-              </div>
-
-              <h2 className="font-display font-bold text-white mb-3 drop-shadow-lg" style={{ fontSize: 'clamp(1.5rem, 4vw, 2.5rem)' }}>
-                From Empty Tables to a <span className="text-gold-400">Packed House</span>
-              </h2>
-
-              <p className="text-white/90 text-sm mb-4 max-w-xl mx-auto drop-shadow-md">
-                GreenLine365 turns your camera roll into a marketing engine that fills your seats.
-              </p>
-
-              <Button variant="primary" size="lg" onClick={() => setShowFullForm(true)} data-testid="success-cta-btn" className="shadow-lg">
-                Start Your Success Story
-              </Button>
+        <div className="relative z-10 pt-12 pb-6 px-6">
+          <div className="max-w-6xl mx-auto text-center">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 glass-gold rounded-full border border-gold/40 mb-3">
+              <span className="w-2 h-2 bg-gold rounded-full animate-pulse" />
+              <span className="text-xs text-gold font-semibold">THE GREENLINE EFFECT</span>
             </div>
+
+            <h2 className="font-display font-bold text-white mb-3 drop-shadow-lg text-2xl lg:text-4xl">
+              From Empty Tables to a <span className="text-gold">Packed House</span>
+            </h2>
+
+            <p className="text-white/90 text-sm mb-6 max-w-xl mx-auto drop-shadow-md">
+              GreenLine365 turns your camera roll into a marketing engine that fills your seats.
+            </p>
+
+            <Button variant="primary" size="lg" onClick={() => setShowFullForm(true)} className="shadow-lg">
+              Start Your Success Story
+            </Button>
           </div>
         </div>
 
         <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-os-dark to-transparent" />
       </section>
 
-      {/* Modals */}
+      {/* ═══════════ BIG CTA BAND (Phase 6) — Refined Luxury ═══════════ */}
+      <section className="py-24 relative overflow-hidden">
+        {/* Subtle warm gradient — no circuit board pattern */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0A0E18] via-[#0D1220] to-[#0A0E18]" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-2xl h-[1px] bg-gradient-to-r from-transparent via-gold/20 to-transparent" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-2xl h-[1px] bg-gradient-to-r from-transparent via-gold/20 to-transparent" />
+        {/* Restrained ambient glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-gold/[0.03] rounded-full blur-[100px] pointer-events-none" />
+
+        <div className="relative z-10 max-w-4xl mx-auto text-center px-6">
+          <p className="text-gold/50 text-xs tracking-[0.3em] uppercase mb-8 font-medium">The Next Step</p>
+
+          <h2 className="font-display font-bold text-[#F0ECE4] mb-6 text-3xl lg:text-5xl tracking-tight leading-[1.1]">
+            Ready to <NeonText variant="gradient" animate={false}>Transform</NeonText> Your Business?
+          </h2>
+          <p className="text-[#F0ECE4]/40 mb-10 max-w-2xl mx-auto leading-relaxed font-light">
+            Join local businesses already using GreenLine365 to automate their marketing, fill their calendar, and grow their revenue.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-10">
+            <Link
+              href="/waitlist"
+              className="btn-primary inline-flex items-center justify-center px-10 py-4 transition-all duration-300"
+            >
+              Get Started
+            </Link>
+            <Link
+              href="/demo-calendar"
+              className="btn-secondary inline-flex items-center justify-center px-10 py-4 transition-all duration-300"
+            >
+              Book a Demo
+            </Link>
+          </div>
+
+          <div className="flex justify-center gap-8 text-[#F0ECE4]/30 text-xs tracking-wide">
+            {['Free to start', 'No credit card', 'Cancel anytime'].map((text, i) => (
+              <span key={i} className="flex items-center gap-1.5">
+                <span className="text-gold/50">—</span>
+                {text}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════ MODALS ═══════════ */}
       {showFullForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="relative w-full max-w-xl max-h-[85vh] overflow-y-auto os-card border border-white/10 rounded-2xl p-6">
+          <GlassCard variant="strong" hover={false} className="relative w-full max-w-xl max-h-[85vh] overflow-y-auto p-6 border border-white/10">
             <button onClick={() => setShowFullForm(false)} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition">
               <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -1059,7 +654,7 @@ export default function ServicesPage() {
             </button>
             <h2 className="text-lg font-bold text-white mb-4 text-center">Schedule Your Demo</h2>
             <MultiStepBookingForm />
-          </div>
+          </GlassCard>
         </div>
       )}
 

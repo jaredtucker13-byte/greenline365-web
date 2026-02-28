@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
+import { requireAuth } from '@/lib/api-auth';
 
 let _stripe: Stripe | null = null;
 function getStripe(): Stripe {
@@ -16,9 +17,12 @@ function getServiceClient() {
       return createClient(supabaseUrl, supabaseServiceKey);
 }
 
-// POST /api/stripe/portal - Create Stripe Customer Portal session
+// POST /api/stripe/portal - Create Stripe Customer Portal session (requires auth)
 // Lets customers manage subscriptions: upgrade, downgrade, cancel, update payment method
 export async function POST(request: NextRequest) {
+      const auth = await requireAuth();
+      if (auth.error) return auth.error;
+
       const supabase = getServiceClient();
       const body = await request.json();
       const { listing_id, return_url } = body;

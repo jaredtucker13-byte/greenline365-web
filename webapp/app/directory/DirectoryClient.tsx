@@ -9,6 +9,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import BoostedShowcase from '@/components/BoostedShowcase';
 
 interface Listing {
   id: string;
@@ -990,7 +991,7 @@ function GroupedBrowseView({ activeCategory, sortBy, setSortBy, cityFilter, setC
       <section className="relative pt-20 pb-6 overflow-hidden" style={{ background: '#050505' }}>
         {currentCat && (
           <div className="absolute inset-0 opacity-15">
-            <img src={currentCat.img} alt="" className="w-full h-full object-cover" />
+            <img src={currentCat.img} alt={`${currentCat.label} category background`} className="w-full h-full object-cover" />
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0A]/60 to-[#050505]" />

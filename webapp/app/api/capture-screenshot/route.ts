@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/api-auth';
 
 /**
  * URL Screenshot Capture API
@@ -13,6 +14,9 @@ interface CaptureRequest {
 }
 
 export async function POST(request: NextRequest) {
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
+
   try {
     const body: CaptureRequest = await request.json();
     const { url, fullPage = false, width = 1920, height = 1080 } = body;
@@ -27,10 +31,20 @@ export async function POST(request: NextRequest) {
       normalizedUrl = 'https://' + normalizedUrl;
     }
 
+    let parsedUrl: URL;
     try {
-      new URL(normalizedUrl);
+      parsedUrl = new URL(normalizedUrl);
     } catch {
       return NextResponse.json({ error: 'Invalid URL format' }, { status: 400 });
+    }
+
+    // SSRF protection: only allow http/https and block internal networks
+    if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+      return NextResponse.json({ error: 'Only HTTP/HTTPS URLs are allowed' }, { status: 400 });
+    }
+    const hostname = parsedUrl.hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1' || hostname.startsWith('10.') || hostname.startsWith('192.168.') || hostname.startsWith('172.') || hostname.endsWith('.internal')) {
+      return NextResponse.json({ error: 'Internal URLs are not allowed' }, { status: 400 });
     }
 
     console.log('[Screenshot] Capturing:', normalizedUrl);
