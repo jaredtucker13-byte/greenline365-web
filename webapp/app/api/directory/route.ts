@@ -15,7 +15,7 @@ function applyPhotoGating(listing: any) {
   const allPhotos: string[] = listing.gallery_images || [];
   const industry = listing.industry || 'services';
   const placeholder = getPlaceholderImage(industry);
-  const claimable = isClaimable(listing.business_name || '');
+  const claimable = isClaimable(listing.business_name || '', industry);
 
   // Non-claimable businesses (chains, hospitals, etc): show photos freely
   if (!claimable) {
@@ -66,10 +66,22 @@ function applyPhotoGating(listing: any) {
   };
 }
 
-/** Sort listings by weighted ranking: Property Intelligence > Paid tiers > Free */
+/** Check if a listing has an active featured boost add-on */
+function hasFeaturedBoost(listing: any): boolean {
+  const boost = listing.metadata?.addons?.featured_boost;
+  if (!boost?.active || !boost?.expires_at) return false;
+  return new Date(boost.expires_at) > new Date();
+}
+
+/** Sort listings by weighted ranking: Featured Boost > Property Intelligence > Paid tiers > Free */
 function applyWeightedRanking(listings: any[]) {
   return listings.sort((a, b) => {
-    // Property Intelligence badge holders first
+    // Featured Boost holders first (paid marketplace add-on)
+    const aFeatured = hasFeaturedBoost(a);
+    const bFeatured = hasFeaturedBoost(b);
+    if (aFeatured && !bFeatured) return -1;
+    if (!aFeatured && bFeatured) return 1;
+    // Property Intelligence badge holders next
     if (a.has_property_intelligence && !b.has_property_intelligence) return -1;
     if (!a.has_property_intelligence && b.has_property_intelligence) return 1;
     // Then by search weight (premium > pro > free)
@@ -91,6 +103,7 @@ export async function GET(request: NextRequest) {
   const slug = searchParams.get('slug');
   const destination = searchParams.get('destination');
   const tourismCategory = searchParams.get('tourism_category');
+  const featured = searchParams.get('featured');
   const limit = parseInt(searchParams.get('limit') || '24');
   const userLat = parseFloat(searchParams.get('lat') || '0');
   const userLng = parseFloat(searchParams.get('lng') || '0');
@@ -128,6 +141,11 @@ export async function GET(request: NextRequest) {
   if (search) query = query.or(`business_name.ilike.%${search}%,description.ilike.%${search}%,industry.ilike.%${search}%`);
   if (destination) query = query.contains('tags', [`destination:${destination}`]);
   if (tourismCategory) query = query.contains('tags', [`tourism:${tourismCategory}`]);
+
+  // Featured: return only premium/pro claimed listings (the "Featured" showcase)
+  if (featured === 'true') {
+    query = query.eq('is_claimed', true).in('tier', ['premium', 'pro']);
+  }
 
   const { data, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

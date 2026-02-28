@@ -20,22 +20,45 @@ export function getPlaceholderImage(industry: string): string {
 }
 
 /**
- * Non-claimable business types — chain stores, convenience stores, etc.
+ * Non-claimable business types — chain stores, convenience stores, emergency services, etc.
  * These exist for directory completeness but aren't outreach targets.
  */
 const NON_CLAIMABLE_KEYWORDS = [
-  'walgreens', 'cvs', 'walmart', 'target', 'publix', 'winn-dixie',
+  // Grocery & Convenience
+  'walgreens', 'cvs', 'walmart', 'target', 'publix', 'winn-dixie', 'winn dixie',
+  'kroger', 'aldi', 'trader joe', 'whole foods', 'sprouts',
+  '7-eleven', '7 eleven', 'circle k', 'wawa', 'sheetz', 'racetrac',
+  'costco', 'sam\'s club', 'bj\'s wholesale',
+  // Fast Food / Major Chains
   'mcdonald', 'burger king', 'wendy', 'taco bell', 'subway',
-  'shell', 'bp', 'chevron', 'exxon', '7-eleven', 'circle k',
+  'chick-fil-a', 'popeyes', 'kfc', 'sonic drive', 'arby',
+  'starbucks', 'dunkin', 'panera', 'chipotle', 'five guys',
+  'domino', 'papa john', 'little caesars', 'pizza hut',
+  // Gas Stations
+  'shell', 'bp', 'chevron', 'exxon', 'mobil', 'marathon', 'sunoco', 'valero',
+  // Emergency & Government
+  'hospital', 'police', 'fire station', 'fire department', 'sheriff',
+  'post office', 'usps', 'library', 'dmv', 'courthouse',
+  'emergency room', 'er ', '911',
+  // Big Box Retail
+  'home depot', 'lowe\'s', 'lowes', 'menards',
   'dollar general', 'dollar tree', 'family dollar',
-  'starbucks', 'dunkin',
-  'hospital', 'police', 'fire station', 'fire department',
-  'post office', 'usps', 'library', 'dmv',
-  'costco', 'sam\'s club', 'aldi', 'trader joe',
-  'home depot', 'lowe\'s', 'lowes',
+  'best buy', 'bed bath', 'ross', 'marshalls', 'tj maxx', 'tjmaxx',
+  'autozone', 'advance auto', 'o\'reilly', 'napa auto',
+  // Banks & Major Chains
+  'bank of america', 'chase bank', 'wells fargo', 'td bank', 'pnc bank',
+  'regions bank', 'suntrust', 'truist',
 ];
 
-export function isClaimable(businessName: string): boolean {
+/** Industries that never show "Claim Listing" — non-profits and civic orgs are community resources, not sales targets */
+const NON_CLAIMABLE_INDUSTRIES = ['convenience-grocery', 'emergency-services', 'civic_nonprofit'];
+
+/**
+ * Check if a listing should show the "Claim Listing" CTA.
+ * Chains, franchises, emergency services, and government buildings are excluded.
+ */
+export function isClaimable(businessName: string, industry?: string): boolean {
+  if (industry && NON_CLAIMABLE_INDUSTRIES.includes(industry)) return false;
   const lower = businessName.toLowerCase();
   return !NON_CLAIMABLE_KEYWORDS.some(kw => lower.includes(kw));
 }

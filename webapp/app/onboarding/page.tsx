@@ -231,7 +231,7 @@ export default function OnboardingPage() {
         particleCount: 100,
         spread: 70,
         origin: { y: 0.6 },
-        colors: ['#C9A96E', '#3B82F6', '#8B5CF6'],
+        colors: ['#C9A84C', '#3B82F6', '#8B5CF6'],
       });
 
       // Move to completion step or redirect after brief success display

@@ -58,7 +58,7 @@ export default function FloatingShapes() {
           />
           <defs>
             <linearGradient id="hexGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#C9A96E" />
+              <stop offset="0%" stopColor="#C9A84C" />
               <stop offset="100%" stopColor="#9A7A3E" />
             </linearGradient>
           </defs>
@@ -89,7 +89,7 @@ export default function FloatingShapes() {
           <polygon
             points="50,10 90,90 10,90"
             fill="none"
-            stroke="#C9A96E"
+            stroke="#C9A84C"
             strokeWidth="2"
           />
         </svg>
@@ -149,15 +149,15 @@ export default function FloatingShapes() {
         <motion.path
           d="M0,60 Q40,20 80,40 T160,20"
           fill="none"
-          stroke="#C9A96E"
+          stroke="#C9A84C"
           strokeWidth="2"
           initial={{ pathLength: 0 }}
           animate={{ pathLength: 1 }}
           transition={{ duration: 2, repeat: Infinity, repeatType: 'reverse' }}
         />
-        <circle cx="0" cy="60" r="4" fill="#C9A96E" />
-        <circle cx="80" cy="40" r="4" fill="#C9A96E" />
-        <circle cx="160" cy="20" r="4" fill="#C9A96E" />
+        <circle cx="0" cy="60" r="4" fill="#C9A84C" />
+        <circle cx="80" cy="40" r="4" fill="#C9A84C" />
+        <circle cx="160" cy="20" r="4" fill="#C9A84C" />
       </motion.svg>
 
       {/* Pulse Ring */}

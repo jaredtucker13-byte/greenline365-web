@@ -22,6 +22,7 @@ export default function EditListingPage() {
     industry: '',
     subcategories: [] as string[],
     tags: [] as string[],
+    video_url: '',
   });
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -41,6 +42,7 @@ export default function EditListingPage() {
         industry: activeListing.industry || '',
         subcategories: activeListing.subcategories || [],
         tags: activeListing.tags || [],
+        video_url: (activeListing.metadata?.video_url as string) || '',
       });
     }
   }, [activeListing]);
@@ -253,6 +255,40 @@ export default function EditListingPage() {
             </div>
             <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-os-dark-900/60">
               <UpgradeCTA feature="Category & Tags" variant="inline" />
+            </div>
+          </div>
+        )}
+
+        {/* Premium-only: Video Embed */}
+        {activeListing.tier === 'premium' ? (
+          <div>
+            <label className="block text-sm font-medium text-white/70">
+              Video URL
+            </label>
+            <p className="mt-0.5 text-xs text-white/40">
+              Paste a YouTube, Vimeo, or direct video link. It will appear on your listing page.
+            </p>
+            <input
+              type="url"
+              value={form.video_url}
+              onChange={(e) => setForm({ ...form, video_url: e.target.value })}
+              placeholder="https://youtube.com/watch?v=..."
+              className="mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:border-neon-green-500 focus:outline-none focus:ring-1 focus:ring-neon-green-500"
+            />
+            {form.video_url && (
+              <p className="mt-1 text-xs text-neon-green-500/70">
+                Video will be embedded on your listing detail page.
+              </p>
+            )}
+          </div>
+        ) : (
+          <div className="relative rounded-xl border border-white/10 bg-white/5 p-4 opacity-60">
+            <div>
+              <label className="block text-sm font-medium text-white/40">Video URL</label>
+              <div className="mt-1 h-10 rounded-lg bg-white/5" />
+            </div>
+            <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-os-dark-900/60">
+              <UpgradeCTA feature="Video Embed" variant="inline" />
             </div>
           </div>
         )}

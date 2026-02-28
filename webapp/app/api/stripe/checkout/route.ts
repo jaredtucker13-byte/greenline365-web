@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
+import { createClient as createServerClient } from '@/lib/supabase/server';
 
 let _stripe: Stripe | null = null;
 function getStripe(): Stripe {
@@ -52,6 +53,16 @@ export async function POST(request: NextRequest) {
       const body = await request.json();
       const { tier, listing_id, origin_url } = body;
 
+  // Resolve authenticated user for cache busting after payment
+  let userId: string | undefined;
+  try {
+    const authClient = await createServerClient();
+    const { data: { user } } = await authClient.auth.getUser();
+    userId = user?.id;
+  } catch {
+    // Not authenticated — checkout still works, cache bust will be skipped
+  }
+
   if (!tier || !DIRECTORY_TIERS[tier]) {
           return NextResponse.json({ error: 'Invalid tier. Use: pro, premium' }, { status: 400 });
   }
@@ -92,6 +103,7 @@ export async function POST(request: NextRequest) {
                                             tier,
                                             listing_id: listing_id || '',
                                             platform: 'gl365_directory',
+                                            ...(userId && { user_id: userId }),
                               },
                   },
                   success_url: successUrl,
@@ -100,6 +112,7 @@ export async function POST(request: NextRequest) {
                               tier,
                               listing_id: listing_id || '',
                               platform: 'gl365_directory',
+                              ...(userId && { user_id: userId }),
                   },
                   // Allow promo codes for coupon support
                   allow_promotion_codes: true,
@@ -121,7 +134,7 @@ export async function POST(request: NextRequest) {
                               created_at: new Date().toISOString(),
                   });
         } catch {
-                  console.log('[STRIPE] payment_transactions table not ready');
+                  // payment_transactions table may not exist yet
         }
 
         return NextResponse.json({ url: session.url, session_id: session.id });

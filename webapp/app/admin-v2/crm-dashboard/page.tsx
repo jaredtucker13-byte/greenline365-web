@@ -441,7 +441,7 @@ export default function CRMDashboard() {
             value={kpis ? `$${kpis.pipelineValue.toLocaleString()}` : '$0'}
             icon="📊"
             color="cyan"
-            onDrill={() => console.log('Drill to pipeline view')}
+            onDrill={() => {}}
             delay={0.4}
             testId="kpi-pipeline"
           />
