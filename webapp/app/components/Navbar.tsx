@@ -108,7 +108,7 @@ export default function Navbar() {
         ref={navRef}
         className="main-nav fixed top-0 left-0 right-0 z-50 bg-transparent border-b border-white/5"
       >
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex justify-between items-center h-20">
             {/* ── Futuristic Logo ── */}
             <Link href="/" className="flex items-center gap-3 group">
@@ -149,21 +149,6 @@ export default function Navbar() {
                 <div className="text-[10px] text-white/30 tracking-[0.2em] uppercase font-medium -mt-0.5">Business OS</div>
               </div>
             </Link>
-
-            {/* ── System Status Indicator ── */}
-            <motion.div
-              className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full glass-gold border border-gold/20"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 }}
-            >
-              <motion.div
-                className="w-2 h-2 rounded-full bg-gold shadow-gold-glow"
-                animate={{ opacity: [1, 0.4, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              />
-              <span className="text-xs font-semibold text-gold tracking-wide">LIVE</span>
-            </motion.div>
 
             {/* ── Desktop Navigation ── */}
             <div className="hidden md:flex items-center gap-1">
@@ -354,21 +339,6 @@ export default function Navbar() {
               transition={{ delay: 0.1 }}
               className="relative h-full flex flex-col justify-center items-center p-8"
             >
-              {/* OS-style status bar */}
-              <motion.div
-                className="absolute top-24 left-1/2 -translate-x-1/2 flex items-center gap-2 px-4 py-2 rounded-full glass-gold border border-gold/20"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-              >
-                <motion.div
-                  className="w-2 h-2 rounded-full bg-gold"
-                  animate={{ opacity: [1, 0.4, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                />
-                <span className="text-xs font-semibold text-gold tracking-widest">NAVIGATION</span>
-              </motion.div>
-
               <div className="w-full max-w-sm space-y-3">
                 {navLinks.map((link, index) => (
                   <motion.div

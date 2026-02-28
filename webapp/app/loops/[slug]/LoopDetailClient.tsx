@@ -116,7 +116,7 @@ export default function LoopDetailClient({ slug }: { slug: string }) {
   if (loading) {
     return (
       <main className="min-h-screen bg-midnight-950 pt-24">
-        <div className="max-w-4xl mx-auto px-6">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <div className="h-64 rounded-2xl bg-white/5 animate-pulse mb-8" />
           <div className="space-y-4">
             {Array.from({ length: 4 }).map((_, i) => (
@@ -152,7 +152,7 @@ export default function LoopDetailClient({ slug }: { slug: string }) {
         )}
         {!loop.cover_image_url && <div className="absolute inset-0 bg-gradient-to-b from-midnight-900 to-midnight-950" />}
 
-        <div className="relative max-w-4xl mx-auto px-6">
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6">
           {/* Breadcrumbs */}
           <nav className="flex items-center gap-2 text-xs text-white/40 font-body mb-8">
             <Link href="/" className="hover:text-gold transition">Directory</Link>
@@ -210,7 +210,7 @@ export default function LoopDetailClient({ slug }: { slug: string }) {
       </section>
 
       {/* ─── ITINERARY TIMELINE ─── */}
-      <section className="max-w-4xl mx-auto px-6 py-12" data-testid="loop-timeline">
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 py-12" data-testid="loop-timeline">
         <h2 className="text-2xl font-heading font-light text-white mb-8 tracking-tight">
           Your <span className="font-semibold text-gradient-gold">Itinerary</span>
         </h2>
@@ -312,7 +312,7 @@ export default function LoopDetailClient({ slug }: { slug: string }) {
       </section>
 
       {/* ─── LOOP INFO SIDEBAR (mobile: section) ─── */}
-      <section className="max-w-4xl mx-auto px-6 pb-12">
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 pb-12">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
             { label: 'Duration', value: loop.duration_estimate || 'Flexible', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' },
@@ -334,7 +334,7 @@ export default function LoopDetailClient({ slug }: { slug: string }) {
       {/* ─── RELATED LOOPS ─── */}
       {related.length > 0 && (
         <section className="bg-charcoal-900 py-16">
-          <div className="max-w-7xl mx-auto px-6">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <h2 className="text-2xl font-heading font-light text-white mb-8 text-center tracking-tight">
               More <span className="font-semibold text-gradient-gold">Experiences</span>
             </h2>
@@ -372,7 +372,7 @@ export default function LoopDetailClient({ slug }: { slug: string }) {
 
       {/* ─── CROSS-DIMENSIONAL CTAs ─── */}
       <section className="py-16">
-        <div className="max-w-3xl mx-auto px-6 flex flex-col sm:flex-row gap-4 justify-center">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row gap-4 justify-center">
           <Link
             href={`/destination/${loop.destination_slug}`}
             className="btn-ghost px-6 py-3 rounded-full text-sm text-center"

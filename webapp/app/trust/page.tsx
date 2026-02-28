@@ -49,7 +49,7 @@ const subprocessors = [
   },
   { 
     provider: 'OpenRouter', 
-    role: 'AI Gateway (GPT-4o, Claude 3, etc.)', 
+    role: 'AI Gateway (Multi-Model Routing)', 
     standard: 'GDPR Compliant, No-Log Policy',
     icon: '🤖'
   },
@@ -78,7 +78,7 @@ export default async function TrustPage() {
 
   return (
     <div className="pt-24 py-12 md:py-16">
-      <div className="max-w-5xl mx-auto px-6">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
         {/* Header */}
         <header className="mb-10 md:mb-14">
           <div className="flex items-center gap-2 text-gold-400 text-sm font-medium mb-4">

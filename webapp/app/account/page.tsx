@@ -60,7 +60,7 @@ export default function AccountPage() {
 
   return (
     <div className="py-12">
-      <div className="max-w-2xl mx-auto px-6">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

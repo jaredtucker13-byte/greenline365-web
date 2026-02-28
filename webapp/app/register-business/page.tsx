@@ -185,7 +185,7 @@ function RegisterForm() {
       </div>
 
       {/* Steps indicator */}
-      <div className="max-w-md mx-auto px-6 mb-8">
+      <div className="max-w-md mx-auto px-4 sm:px-6 mb-8">
         <div className="flex items-center gap-3">
           <div className={`flex-1 h-1 rounded-full ${step === 'auth' || step === 'business' ? 'bg-gold-500' : 'bg-white/10'}`} />
           <div className={`flex-1 h-1 rounded-full ${step === 'business' ? 'bg-gold-500' : 'bg-white/10'}`} />
@@ -197,7 +197,7 @@ function RegisterForm() {
       </div>
 
       {/* Form */}
-      <div className="max-w-md mx-auto px-6 pb-20">
+      <div className="max-w-md mx-auto px-4 sm:px-6 pb-20">
         <motion.div
           key={step}
           initial={{ opacity: 0, x: 20 }}
