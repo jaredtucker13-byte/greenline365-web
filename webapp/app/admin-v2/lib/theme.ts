@@ -19,7 +19,7 @@ export const tacticalTheme = {
     gold: '#C9A96E',         // Primary gold accent
     champagne: '#C9A96E',    // Softer gold for UI elements
     teal: '#0CE293',         // Content slots
-    gold: '#FFC800',         // Review/Warning stage
+    warning: '#FFC800',      // Review/Warning stage
     purple: '#8A2BE2',       // Launch stage
     red: '#FF3B3B',          // Error/Cancel
     blue: '#3B82F6',         // Info
@@ -69,7 +69,7 @@ export const tacticalTheme = {
     gold: '0 0 30px rgba(201, 169, 110, 0.3)',
     goldStrong: '0 0 50px rgba(201, 169, 110, 0.5)',
     teal: '0 0 30px rgba(12, 226, 147, 0.3)',
-    gold: '0 0 30px rgba(255, 200, 0, 0.3)',
+    warning: '0 0 30px rgba(255, 200, 0, 0.3)',
     purple: '0 0 30px rgba(138, 43, 226, 0.3)',
   },
 };
