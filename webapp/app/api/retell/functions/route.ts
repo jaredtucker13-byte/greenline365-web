@@ -25,15 +25,17 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const signature = request.headers.get('x-retell-signature') || '';
     
-    // Verify webhook signature (skip if no API key configured)
-    if (RETELL_API_KEY && signature) {
-      const bodyString = JSON.stringify(body);
-      const isValid = Retell.verify(bodyString, RETELL_API_KEY, signature);
-      
-      if (!isValid) {
-        console.error('[Retell Functions] Invalid signature');
-        return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
-      }
+    // Verify webhook signature - ALWAYS require valid signature
+    if (!RETELL_API_KEY) {
+      console.error('[Retell Functions] RETELL_API_KEY not configured');
+      return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 });
+    }
+    const bodyString = JSON.stringify(body);
+    const isValid = Retell.verify(bodyString, RETELL_API_KEY, signature);
+
+    if (!isValid) {
+      console.error('[Retell Functions] Invalid signature');
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
     }
     
     const functionName = body.name;

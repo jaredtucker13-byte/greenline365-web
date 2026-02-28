@@ -16,6 +16,7 @@
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { requireAuth } from '@/lib/api-auth';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -37,6 +38,9 @@ interface ScrapedData {
 }
 
 export async function POST(request: Request) {
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
+
   try {
     const body: ScrapeRequest = await request.json();
     const { url, demo_request_id } = body;
@@ -51,6 +55,15 @@ export async function POST(request: Request) {
       parsedUrl = new URL(url);
     } catch {
       return NextResponse.json({ error: 'Invalid URL format' }, { status: 400 });
+    }
+
+    // SSRF protection: only allow http/https and block internal networks
+    if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+      return NextResponse.json({ error: 'Only HTTP/HTTPS URLs are allowed' }, { status: 400 });
+    }
+    const hostname = parsedUrl.hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1' || hostname.startsWith('10.') || hostname.startsWith('192.168.') || hostname.startsWith('172.') || hostname.endsWith('.internal')) {
+      return NextResponse.json({ error: 'Internal URLs are not allowed' }, { status: 400 });
     }
 
     // Update demo_request status to processing
@@ -242,6 +255,9 @@ function generateSimulatedData(url: string): ScrapedData {
 
 // GET endpoint to check scrape status
 export async function GET(request: Request) {
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
+
   const { searchParams } = new URL(request.url);
   const demo_request_id = searchParams.get('demo_request_id');
 

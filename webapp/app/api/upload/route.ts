@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
 import sharp from 'sharp';
+import { requireAuth } from '@/lib/api-auth';
 
 const BUCKET_NAME = 'blog-images';
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -40,6 +41,9 @@ async function optimizeImage(buffer: Buffer, mimeType: string): Promise<{ data: 
  * POST - Upload image with automatic optimization
  */
 export async function POST(req: NextRequest) {
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
+
   try {
     const formData = await req.formData();
     const file = formData.get('file') as File | null;
@@ -129,6 +133,9 @@ export async function POST(req: NextRequest) {
  * DELETE - Delete image from Supabase Storage
  */
 export async function DELETE(req: NextRequest) {
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
+
   try {
     const { searchParams } = new URL(req.url);
     const path = searchParams.get('path');
@@ -149,6 +156,9 @@ export async function DELETE(req: NextRequest) {
  * GET - List images in a folder
  */
 export async function GET(req: NextRequest) {
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
+
   try {
     const { searchParams } = new URL(req.url);
     const folder = searchParams.get('folder') || 'uploads';

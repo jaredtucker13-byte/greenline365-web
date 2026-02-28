@@ -41,7 +41,9 @@ export async function middleware(request: NextRequest) {
     }
 
     if (isLoginPage && user) {
-      const redirectTo = request.nextUrl.searchParams.get('redirectTo') || '/admin-v2';
+      const rawRedirectTo = request.nextUrl.searchParams.get('redirectTo') || '/admin-v2';
+      // Prevent open redirect: only allow relative paths
+      const redirectTo = (rawRedirectTo.startsWith('/') && !rawRedirectTo.startsWith('//')) ? rawRedirectTo : '/admin-v2';
       return NextResponse.redirect(new URL(redirectTo, request.url));
     }
 

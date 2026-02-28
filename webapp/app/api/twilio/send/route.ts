@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import twilio from 'twilio';
+import { requireAuth } from '@/lib/api-auth';
 
 /**
  * Send SMS API
@@ -18,11 +19,14 @@ const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN || '';
 const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER || '+18135409691';
 
 export async function POST(request: NextRequest) {
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
+
   try {
     const body = await request.json();
-    const { 
-      to, 
-      message, 
+    const {
+      to,
+      message,
       type = 'general',  // 'confirmation', 'reminder', 'followup', 'general'
       booking_id,
       metadata = {}
