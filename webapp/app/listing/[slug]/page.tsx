@@ -956,17 +956,29 @@ export default function ListingDetailPage() {
               {(listing.address_line1 || listing.city) && (
                 <div className="mt-5 pt-5 border-t border-white/5" data-testid="listing-map">
                   <p className="text-[10px] text-white/30 font-heading uppercase tracking-wider mb-3">Location</p>
-                  <div className="rounded-xl overflow-hidden border border-white/5" style={{ aspectRatio: '4/3' }}>
-                    <iframe
-                      width="100%"
-                      height="100%"
-                      style={{ border: 0 }}
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}&q=${encodeURIComponent([listing.business_name, listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', '))}`}
-                      title={`Map showing ${listing.business_name} location`}
-                    />
-                  </div>
+                  {process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ? (
+                    <div className="rounded-xl overflow-hidden border border-white/5" style={{ aspectRatio: '4/3' }}>
+                      <iframe
+                        width="100%"
+                        height="100%"
+                        style={{ border: 0 }}
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${encodeURIComponent([listing.business_name, listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', '))}`}
+                        title={`Map showing ${listing.business_name} location`}
+                      />
+                    </div>
+                  ) : (
+                    <div className="rounded-xl border border-white/5 p-6 text-center" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                      <div className="flex flex-col items-center justify-center gap-3 py-4">
+                        <svg className="w-8 h-8 text-gold/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <p className="text-xs text-white/40 font-body">{[listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', ')}</p>
+                      </div>
+                    </div>
+                  )}
                   <a
                     href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent([listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', '))}`}
                     target="_blank"
