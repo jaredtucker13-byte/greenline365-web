@@ -49,7 +49,7 @@ const subprocessors = [
   },
   { 
     provider: 'OpenRouter', 
-    role: 'AI Gateway (GPT-4o, Claude 3, etc.)', 
+    role: 'AI Gateway (Multi-Model Routing)', 
     standard: 'GDPR Compliant, No-Log Policy',
     icon: '🤖'
   },

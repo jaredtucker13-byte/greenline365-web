@@ -264,9 +264,9 @@ export async function GET() {
     message: 'ContentForge API',
     actions: ['caption', 'keywords', 'description', 'blog', 'hashtags', 'trends'],
     models: {
-      'smart-thinking': 'GPT-4o (for captions, keywords, descriptions)',
-      'blog-content': 'Claude Sonnet (for blogs, hashtags)',
-      'web-search': 'Perplexity (for live trends)'
+      'smart-thinking': 'AI Engine (for captions, keywords, descriptions)',
+      'blog-content': 'AI Engine (for blogs, hashtags)',
+      'web-search': 'AI Engine (for live trends)'
     }
   });
 }
