@@ -61,6 +61,7 @@ export default function ListingDetailPage() {
   const [submittingReview, setSubmittingReview] = useState(false);
   const [reviewMessage, setReviewMessage] = useState('');
   const [reviewSort, setReviewSort] = useState<'newest' | 'highest' | 'lowest'>('newest');
+  const [featuredLoops, setFeaturedLoops] = useState<{ id: string; name: string; slug: string; loop_type: string }[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -80,6 +81,11 @@ export default function ListingDetailPage() {
         fetch(`/api/directory/reviews?listing_id=${data.id}`)
           .then(r => r.json())
           .then(d => { setReviews(d.reviews || []); setReviewStats({ total: d.total, average_rating: d.average_rating }); })
+          .catch(() => {});
+        // Load featured loops
+        fetch(`/api/loops?listing_id=${data.id}&limit=5`)
+          .then(r => r.json())
+          .then(d => setFeaturedLoops(d.loops || []))
           .catch(() => {});
       }
       setLoading(false);
@@ -576,6 +582,35 @@ export default function ListingDetailPage() {
                 <p className="text-xs text-white/30 font-body text-center py-6">No GL365 reviews yet. Be the first to share your experience!</p>
               )}
             </motion.div>
+
+            {/* Featured in Loops */}
+            {featuredLoops.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.25 }}
+                className="mb-8"
+                data-testid="featured-in-loops"
+              >
+                <h3 className="text-sm font-heading font-semibold text-white uppercase tracking-wider mb-3">
+                  Featured in {featuredLoops.length} Experience{featuredLoops.length !== 1 ? 's' : ''}
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {featuredLoops.map(loop => (
+                    <Link
+                      key={loop.id}
+                      href={`/loops/${loop.slug}`}
+                      className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-gold/20 bg-gold/5 hover:bg-gold/10 hover:border-gold/40 transition-all duration-300 group"
+                    >
+                      <svg className="w-3.5 h-3.5 text-gold/60 group-hover:text-gold transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      </svg>
+                      <span className="text-xs font-heading font-medium text-gold/80 group-hover:text-gold transition-colors">{loop.name}</span>
+                    </Link>
+                  ))}
+                </div>
+              </motion.div>
+            )}
 
             {/* Related Businesses */}
             {listing.related?.length > 0 && (

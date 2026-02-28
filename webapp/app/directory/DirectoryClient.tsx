@@ -9,6 +9,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import BoostedShowcase from '@/components/BoostedShowcase';
 
 interface Listing {
   id: string;
@@ -59,11 +60,6 @@ const CATEGORIES = [
     subcategories: ['All', 'Lawyers', 'Accountants', 'Insurance', 'Real Estate', 'Financial Advisors', 'Marketing Agencies'] },
 ];
 
-const TESTIMONIALS = [
-  { name: 'Marcus Johnson', role: 'HVAC Business Owner', rating: 5, text: 'Since listing on GL365, our bookings increased 40%. The verified badge gives customers instant trust — they know we\'re the real deal.' },
-  { name: 'Sarah Chen', role: 'Homeowner, Tampa FL', rating: 5, text: 'I found a certified plumber through the directory in minutes. The trust scores showed me exactly who to call.' },
-  { name: 'David Rodriguez', role: 'Bakery Owner', rating: 5, text: 'The AI built our profile in seconds from our website. Now we get foot traffic from people searching the directory. Best marketing investment we\'ve made.' },
-];
 
 function Stars({ rating, size = 14 }: { rating: number; size?: number }) {
   return (
@@ -98,8 +94,7 @@ export default function DirectoryPage() {
   const [activeSubcategory, setActiveSubcategory] = useState('All');
   const [showListings, setShowListings] = useState(false);
   const [showGroupedBrowse, setShowGroupedBrowse] = useState(false);
-  const [testimonialIdx, setTestimonialIdx] = useState(0);
-  const [stats, setStats] = useState({ totalBusinesses: 0, totalDestinations: 0, totalCategories: 0 });
+  const [stats, setStats] = useState({ totalBusinesses: 0, totalDestinations: 0, totalCategories: 0, foundingMembersClaimed: 0, foundingMembersRemaining: 50 });
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locationCity, setLocationCity] = useState('');
   const [cityFilter, setCityFilter] = useState('');
@@ -249,10 +244,6 @@ export default function DirectoryPage() {
     loadListings(activeCategory || undefined, search || undefined);
   }
 
-  useEffect(() => {
-    const t = setInterval(() => setTestimonialIdx(i => (i + 1) % TESTIMONIALS.length), 5000);
-    return () => clearInterval(t);
-  }, []);
 
   const currentCat = CATEGORIES.find(c => c.id === activeCategory);
   const subcategories = currentCat?.subcategories || ['All'];
@@ -398,7 +389,7 @@ export default function DirectoryPage() {
                       </svg>
                     </div>
                     <div>
-                      <span className="block text-2xl font-heading font-bold text-white">{stat.value > 0 ? `${stat.value}+` : '...'}</span>
+                      <span className="block text-2xl font-heading font-bold text-white">{stat.value > 0 ? stat.value : '...'}</span>
                       <span className="block text-xs text-white/60 uppercase tracking-wider font-heading">{stat.label}</span>
                     </div>
                     {i < 2 && <div className="hidden sm:block w-px h-10 bg-white/15 ml-4 sm:ml-6" />}
@@ -433,6 +424,21 @@ export default function DirectoryPage() {
                   {i === 0 && <span className="absolute top-3 right-3 text-[10px] px-2.5 py-1 rounded-full font-heading font-semibold uppercase tracking-wider" style={{ background: 'rgba(201,169,110,0.9)', color: '#fff' }}>Core</span>}
                 </motion.div>
               ))}
+            </div>
+          </section>
+
+          {/* ─── BOOSTED SCROLL ─── */}
+          <section className="py-16 bg-midnight-900" data-testid="boosted-scroll-section">
+            <div className="max-w-7xl mx-auto px-6">
+              <p className="text-xs font-heading font-semibold uppercase tracking-[0.2em] text-center mb-3 text-gold">Spotlight</p>
+              <h2 className="text-3xl md:text-4xl font-heading font-light text-white text-center mb-3 tracking-tight">
+                This Week&apos;s <span className="font-semibold text-gradient-gold">Featured</span>
+              </h2>
+              <p className="text-white/50 text-center max-w-lg mx-auto mb-10 font-body">Businesses in the spotlight this week.</p>
+              <BoostedShowcase />
+              <p className="text-silver/50 text-xs mt-6 text-center font-body">
+                Want your business here? <Link href="/register-business" className="underline hover:text-gold transition text-gold/70">Get featured for $29/week</Link>
+              </p>
             </div>
           </section>
 
@@ -574,30 +580,69 @@ export default function DirectoryPage() {
             </div>
           </section>
 
-          {/* ─── TESTIMONIALS ─── */}
-          <section className="relative py-20 overflow-hidden" data-testid="testimonials-section">
+          {/* ─── FOUNDERS 50 ─── */}
+          <section className="relative py-20 overflow-hidden" data-testid="founders-50-section">
             <div className="absolute inset-0 opacity-15" style={{ backgroundImage: 'url(/images/hero-directory-alt.png)', backgroundSize: 'cover' }} />
             <div className="absolute inset-0 bg-charcoal-900/95" />
             <div className="relative max-w-4xl mx-auto px-6 text-center">
-              <h2 className="text-3xl font-heading font-light text-white mb-2 tracking-tight">Success <span className="font-semibold text-gradient-gold">Stories</span></h2>
-              <p className="text-white/50 mb-12 font-body">Hear from business owners and customers.</p>
-              <AnimatePresence mode="wait">
-                <motion.div key={testimonialIdx} initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.4 }}
-                  className="rounded-2xl p-8 max-w-lg mx-auto border border-white/10 backdrop-blur-xl" style={{ background: 'rgba(255,255,255,0.04)' }}>
-                  <div className="w-14 h-14 rounded-full mx-auto mb-4 flex items-center justify-center text-xl font-heading font-semibold text-midnight-900" style={{ background: 'linear-gradient(135deg, #C9A96E, #E6D8B5)' }}>
-                    {TESTIMONIALS[testimonialIdx].name[0]}
+              <p className="text-xs font-heading font-semibold uppercase tracking-[0.2em] text-center mb-3 text-gold">Limited Opportunity</p>
+              <h2 className="text-3xl md:text-4xl font-heading font-light text-white mb-2 tracking-tight">
+                The Founding <span className="font-semibold text-gradient-gold">50</span>
+              </h2>
+              <p className="text-white/50 mb-10 font-body max-w-lg mx-auto">Be one of the first 50 businesses to join GL365 and lock in exclusive benefits forever.</p>
+
+              {/* Progress bar */}
+              <div className="max-w-md mx-auto mb-4">
+                <div className="h-3 rounded-full bg-white/10 overflow-hidden" data-testid="founders-progress-bar">
+                  <div
+                    className="h-full rounded-full transition-all duration-1000 ease-out"
+                    style={{
+                      width: `${(stats.foundingMembersClaimed / 50) * 100}%`,
+                      background: 'linear-gradient(90deg, #C9A96E, #E6D8B5, #C9A96E)',
+                      backgroundSize: '200% auto',
+                    }}
+                  />
+                </div>
+              </div>
+              <p className="text-sm text-white/60 mb-10 font-body">
+                {stats.foundingMembersClaimed >= 50
+                  ? <span className="text-gold font-semibold">All 50 Founding Member spots have been claimed!</span>
+                  : <><span className="text-gold font-semibold">{stats.foundingMembersClaimed}</span> of 50 Founding Member Spots Claimed &mdash; <span className="text-gold font-semibold">{stats.foundingMembersRemaining}</span> remaining</>
+                }
+              </p>
+
+              {/* Benefits grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl mx-auto mb-10">
+                {[
+                  { icon: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z', title: 'Locked-In Rates Forever', desc: 'Your listing price never increases' },
+                  { icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', title: 'Founding Member Badge', desc: 'Exclusive badge on your listing' },
+                  { icon: 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z', title: 'Priority Placement', desc: 'Featured positioning in search results' },
+                  { icon: 'M13 10V3L4 14h7v7l9-11h-7z', title: 'Early Access', desc: 'First to try new platform features' },
+                ].map((benefit) => (
+                  <div key={benefit.title} className="flex items-start gap-3 text-left p-4 rounded-xl border border-white/10 backdrop-blur-sm" style={{ background: 'rgba(255,255,255,0.03)' }}>
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 border border-gold/30 bg-gold/10">
+                      <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d={benefit.icon} />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-sm font-heading font-semibold text-white">{benefit.title}</p>
+                      <p className="text-xs text-white/50 font-body">{benefit.desc}</p>
+                    </div>
                   </div>
-                  <h3 className="text-lg font-heading font-semibold text-white">{TESTIMONIALS[testimonialIdx].name}</h3>
-                  <p className="text-sm text-silver mb-3 font-body">{TESTIMONIALS[testimonialIdx].role}</p>
-                  <div className="flex justify-center mb-4"><Stars rating={TESTIMONIALS[testimonialIdx].rating} size={18} /></div>
-                  <p className="text-sm text-white/60 leading-relaxed italic font-body">&ldquo;{TESTIMONIALS[testimonialIdx].text}&rdquo;</p>
-                </motion.div>
-              </AnimatePresence>
-              <div className="flex justify-center gap-2 mt-6">
-                {TESTIMONIALS.map((_, i) => (
-                  <button key={i} onClick={() => setTestimonialIdx(i)} className={`w-2.5 h-2.5 rounded-full transition ${i === testimonialIdx ? 'scale-110 bg-gold' : 'opacity-40 bg-silver'}`} data-testid={`testimonial-dot-${i}`} />
                 ))}
               </div>
+
+              {stats.foundingMembersClaimed < 50 ? (
+                <Link href="/register-business" className="btn-primary px-8 py-3 rounded-full text-sm inline-block" data-testid="founders-cta">
+                  Claim Your Founding Spot
+                </Link>
+              ) : (
+                <Link href="/register-business" className="btn-ghost px-8 py-3 rounded-full text-sm inline-block" data-testid="founders-cta">
+                  Join the Waitlist
+                </Link>
+              )}
+              <p className="text-xs text-white/30 mt-4 font-body">No long-term contracts. Cancel anytime.</p>
             </div>
           </section>
         </>

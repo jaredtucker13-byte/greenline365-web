@@ -92,6 +92,8 @@ export default function Navbar() {
 
   const navLinks: { href: string; label: string; dropdown?: { href: string; label: string }[] }[] = [
     { href: '/', label: 'Directory' },
+    { href: '/loops', label: 'Experiences' },
+    { href: '/home-ledger', label: 'Home Ledger' },
     { href: '/services', label: 'Our Services' },
   ];
 

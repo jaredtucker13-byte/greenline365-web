@@ -33,7 +33,7 @@ const TIER_LIMITS: Record<DirectoryTier, TierLimits> = {
     hasAnalytics: false,
     hasBadgeEarning: false,
     hasQrFeedback: false,
-    hasMarketplaceAccess: false,
+    hasMarketplaceAccess: true,
     hasPrioritySearch: false,
     hasPrioritySupport: false,
     hasPropertyIntelligence: false,
