@@ -33,10 +33,51 @@ interface Listing {
   avg_feedback_rating: number;
   total_feedback_count: number;
   phone?: string;
+  business_hours?: Record<string, { open: string; close: string; closed?: boolean }> | null;
+  service_areas?: string[];
   directory_badges: { id: string; badge_type: string; badge_label: string; badge_color: string }[];
   distance?: number | null;
   metadata?: Record<string, any>;
 }
+
+/** Check if a business is currently open */
+function isBusinessOpen(hours?: Record<string, { open: string; close: string; closed?: boolean }> | null): boolean | null {
+  if (!hours || Object.keys(hours).length === 0) return null;
+  const now = new Date();
+  const dayNames = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+  const today = dayNames[now.getDay()];
+  const todayHours = hours[today];
+  if (!todayHours || todayHours.closed) return false;
+  const parseTime = (t: string): number => {
+    const cleaned = t.trim().toUpperCase();
+    const match = cleaned.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)?$/);
+    if (!match) return -1;
+    let h = parseInt(match[1]);
+    const m = parseInt(match[2]);
+    if (match[3] === 'PM' && h !== 12) h += 12;
+    if (match[3] === 'AM' && h === 12) h = 0;
+    return h * 60 + m;
+  };
+  const nowMin = now.getHours() * 60 + now.getMinutes();
+  const openMin = parseTime(todayHours.open);
+  const closeMin = parseTime(todayHours.close);
+  if (openMin === -1 || closeMin === -1) return null;
+  return nowMin >= openMin && nowMin < closeMin;
+}
+
+// ─── Service Areas for browsing ──────────────────────────────────
+const SERVICE_AREAS = [
+  { id: 'pinellas-county', label: 'Pinellas County', cities: ['St. Petersburg', 'St Pete Beach', 'Clearwater', 'Largo', 'Dunedin', 'Tarpon Springs', 'Pinellas Park', 'Seminole'] },
+  { id: 'hillsborough-county', label: 'Hillsborough County', cities: ['Tampa', 'Brandon', 'Plant City', 'Temple Terrace', 'Riverview', 'Valrico'] },
+  { id: 'manatee-sarasota', label: 'Manatee & Sarasota', cities: ['Sarasota', 'Bradenton', 'Palmetto', 'Lakewood Ranch', 'Venice', 'North Port'] },
+  { id: 'pasco-county', label: 'Pasco County', cities: ['New Port Richey', 'Hudson', 'Wesley Chapel', 'Zephyrhills', 'Dade City', 'Land O Lakes'] },
+  { id: 'polk-county', label: 'Polk County', cities: ['Lakeland', 'Winter Haven', 'Bartow', 'Auburndale', 'Haines City'] },
+  { id: 'orange-county', label: 'Orange County', cities: ['Orlando', 'Winter Park', 'Kissimmee', 'Apopka', 'Ocoee'] },
+  { id: 'miami-dade', label: 'Miami-Dade', cities: ['Miami', 'Miami Beach', 'Coral Gables', 'Hialeah', 'Homestead', 'Doral'] },
+  { id: 'duval-county', label: 'Duval County', cities: ['Jacksonville', 'Jacksonville Beach', 'Neptune Beach', 'Atlantic Beach'] },
+  { id: 'volusia-county', label: 'Volusia County', cities: ['Daytona Beach', 'Ormond Beach', 'Port Orange', 'DeLand', 'New Smyrna Beach'] },
+  { id: 'monroe-county', label: 'Monroe County (The Keys)', cities: ['Key West', 'Key Largo', 'Marathon', 'Islamorada', 'Big Pine Key'] },
+];
 
 // ─── Category & Subcategory Map ────────────────────────────────────
 // Industries where businesses should NOT show "Claim Listing" (chains, franchises, emergency services)
@@ -118,6 +159,10 @@ const CATEGORIES = [
   // === PETS ===
   { id: 'pets', label: 'Pets', sub: 'Vets, grooming & boarding', img: '/images/categories/services.png',
     subcategories: ['All', 'Veterinarians', 'Pet Grooming', 'Pet Boarding', 'Pet Stores', 'Dog Training', 'Pet Sitting', 'Aquarium & Fish'] },
+
+  // === TRAILS & OUTDOOR RECREATION ===
+  { id: 'trails', label: 'Trails & Outdoor', sub: 'Hiking, biking & nature trails', img: '/images/categories/destinations.png',
+    subcategories: ['All', 'Hiking Trails', 'Biking Trails', 'Nature Walks', 'Mountain Biking', 'Running Trails', 'Greenways', 'Boardwalks', 'Waterfront Trails', 'Dog-Friendly Trails', 'Scenic Overlooks'] },
 ];
 
 function Stars({ rating, size = 14 }: { rating: number; size?: number }) {
@@ -162,11 +207,16 @@ export default function DirectoryClient() {
   // Exact stat counters — no fake numbers
   const [stats, setStats] = useState({ businesses: 0, categories: CATEGORIES.length, destinations: 8 });
 
-  useEffect(() => {
-    // Load featured + all listings
+  // Refetch listings with location for distance sorting
+  const fetchListingsWithLocation = useCallback((loc: { lat: number; lng: number } | null) => {
+    const params = new URLSearchParams({ limit: '100' });
+    if (loc) { params.set('lat', String(loc.lat)); params.set('lng', String(loc.lng)); }
+    const featParams = new URLSearchParams({ limit: '6', featured: 'true' });
+    if (loc) { featParams.set('lat', String(loc.lat)); featParams.set('lng', String(loc.lng)); }
+
     Promise.all([
-      fetch('/api/directory?limit=100').then(r => r.json()),
-      fetch('/api/directory?limit=6&featured=true').then(r => r.json()),
+      fetch(`/api/directory?${params}`).then(r => r.json()),
+      fetch(`/api/directory?${featParams}`).then(r => r.json()),
     ]).then(([all, featured]) => {
       const allArr = Array.isArray(all) ? all : [];
       const featArr = Array.isArray(featured) ? featured : [];
@@ -176,15 +226,24 @@ export default function DirectoryClient() {
       setStats(prev => ({ ...prev, businesses: allArr.length }));
       setLoading(false);
     }).catch(() => setLoading(false));
+  }, []);
 
-    // Request geolocation
+  useEffect(() => {
+    // Initial load without location
+    fetchListingsWithLocation(null);
+
+    // Request geolocation then refetch with distance data
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        pos => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        pos => {
+          const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          setUserLocation(loc);
+          fetchListingsWithLocation(loc);
+        },
         () => {}
       );
     }
-  }, []);
+  }, [fetchListingsWithLocation]);
 
   const premierPartners = featuredListings.filter(l => l.tier === 'premium' || l.has_property_intelligence);
   const recentListings = allListings.filter(l => !premierPartners.find(p => p.id === l.id)).slice(0, 6);
@@ -540,6 +599,57 @@ export default function DirectoryClient() {
           </section>
 
           {/* ═══════════════════════════════════════════════════════════
+              BROWSE BY SERVICE AREA
+              ═══════════════════════════════════════════════════════════ */}
+          <section className="py-20" style={{ background: '#0A0A0A' }} data-testid="service-area-section">
+            <div className="max-w-7xl mx-auto px-6">
+              <p className="text-xs font-heading font-semibold uppercase tracking-[0.2em] text-center mb-3" style={{ color: '#C9A84C' }}>Browse By Service Area</p>
+              <h2 className="text-3xl md:text-4xl font-heading font-light text-white text-center mb-3 tracking-tight">
+                Find Pros in <span className="text-gradient-gold font-semibold">Your Area</span>
+              </h2>
+              <p className="text-white/50 text-center max-w-lg mx-auto mb-12 font-body">Browse businesses that service your county or region.</p>
+
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                {SERVICE_AREAS.map((area, i) => {
+                  const areaCount = allListings.filter(l => area.cities.some(c => l.city?.toLowerCase().includes(c.toLowerCase()))).length;
+                  return (
+                    <motion.button
+                      key={area.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.05 }}
+                      onClick={() => {
+                        // Filter by first city in area
+                        setCityFilter('');
+                        setActiveCategory('');
+                        setShowGroupedBrowse(true);
+                        setShowListings(false);
+                        // Set the first matching city as filter
+                        const matchCity = availableCities.find(c => area.cities.some(ac => c.toLowerCase().includes(ac.toLowerCase())));
+                        if (matchCity) setCityFilter(matchCity);
+                      }}
+                      className="rounded-xl border border-white/10 hover:border-gold/30 hover:shadow-gold-glow p-4 text-left transition-all duration-300 group"
+                      style={{ background: 'rgba(255,255,255,0.02)' }}
+                      data-testid={`service-area-${area.id}`}
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <svg className="w-4 h-4 text-gold/60 group-hover:text-gold transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" />
+                        </svg>
+                        <span className="text-sm font-heading font-semibold text-white group-hover:text-gold transition-colors">{area.label}</span>
+                      </div>
+                      <p className="text-[10px] text-white/30 font-body line-clamp-1">{area.cities.slice(0, 3).join(', ')}{area.cities.length > 3 ? ` +${area.cities.length - 3}` : ''}</p>
+                      {areaCount > 0 && (
+                        <p className="text-[10px] text-gold/50 font-heading font-semibold mt-1">{areaCount} business{areaCount !== 1 ? 'es' : ''}</p>
+                      )}
+                    </motion.button>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
+
+          {/* ═══════════════════════════════════════════════════════════
               PRIVATE VAULT CTA — Home Ledger Cross-Sell
               ═══════════════════════════════════════════════════════════ */}
           <section className="py-20 relative overflow-hidden" data-testid="private-vault-section">
@@ -801,7 +911,15 @@ function ListingCard({ listing: l, index: i }: { listing: Listing; index: number
           )}
         </div>
         <div className="p-4">
-          <h3 className="font-heading font-semibold text-sm truncate mb-1" style={{ color: '#C9A84C' }} title={l.business_name}>{l.business_name}</h3>
+          <div className="flex items-center gap-2 mb-1">
+            <h3 className="font-heading font-semibold text-sm truncate flex-1" style={{ color: '#C9A84C' }} title={l.business_name}>{l.business_name}</h3>
+            {(() => { const open = isBusinessOpen(l.business_hours); return open !== null ? (
+              <span className={`flex-shrink-0 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-heading font-bold uppercase tracking-wider ${open ? 'bg-greenline/15 text-greenline' : 'bg-red-500/10 text-red-400'}`}>
+                <span className={`w-1 h-1 rounded-full ${open ? 'bg-greenline' : 'bg-red-400'}`} />
+                {open ? 'Open' : 'Closed'}
+              </span>
+            ) : null; })()}
+          </div>
           {l.city && <p className="text-[11px] text-white/40 flex items-center gap-1 mb-1 font-body">
             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
             {l.city}, {l.state}

@@ -17,33 +17,35 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com';
 export const metadata: Metadata = {
   // Basic Meta Tags - AEO Optimized
   title: {
-    default: 'GreenLine365 - AI Business Automation Platform for Local Businesses',
+    default: 'GreenLine365 — Community Resource Directory for Local Businesses, Trails & Services',
     template: '%s | GreenLine365',
   },
-  description: 'AI-powered business automation platform that connects local businesses with their community. Automated scheduling, AI content creation, and 24/7 smart booking. Built for real-world results.',
+  description: 'Your community resource for finding verified local businesses, trails, and services across Florida. Browse by service area, check live hours of operation, and discover trusted professionals near you.',
   keywords: [
-    // Core AEO Keywords
-    'AI business booking tool',
-    'answer engine optimization',
-    'AI automation platform',
-    // AI Content & Automation
-    'AI-powered content creation at scale',
-    'automated blog generation for B2B',
-    'AI content scheduling automation',
-    // Business & Booking
-    'all-in-one AI business automation',
-    'automated client onboarding system',
-    'AI scheduling software',
-    'intelligent business task management',
+    // Community Resource Directory
+    'local business directory Florida',
+    'find businesses near me',
+    'business hours of operation',
+    'open now near me',
+    // Service Areas
+    'browse by service area',
+    'businesses in Pinellas County',
+    'businesses in Hillsborough County',
+    'Florida business directory',
+    // Trails & Outdoor
+    'hiking trails Florida',
+    'biking trails near me',
+    'outdoor recreation Florida',
+    'nature trails and parks',
+    // Destinations
+    'St Pete Beach guide',
+    'Key West directory',
+    'Florida destination guides',
     // Local Business Focus
-    'local business AI tools',
-    'AI for small businesses',
-    'local economy automation',
-    'foot traffic optimization',
-    // Long-tail variations
-    'best AI booking tool for US small businesses',
-    'remote business automation platform',
-    'unified AI operations platform',
+    'verified local businesses',
+    'community resource platform',
+    'local business reviews',
+    'trusted local professionals',
   ],
   authors: [{ name: 'GreenLine365', url: siteUrl }],
   creator: 'GreenLine365',
@@ -62,8 +64,8 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: siteUrl,
     siteName: 'GreenLine365',
-    title: 'GreenLine365 - AI Business Automation Platform for Local Businesses',
-    description: 'AI-powered business automation that connects local businesses with their community. Automated scheduling, content creation, and smart booking built for real-world results.',
+    title: 'GreenLine365 — Community Resource Directory for Local Businesses, Trails & Services',
+    description: 'Your community resource for finding verified local businesses, trails, and services across Florida. Browse by service area, check live hours, and discover trusted professionals near you.',
     images: [
       {
         url: `${siteUrl}/og-image.png`,
@@ -77,8 +79,8 @@ export const metadata: Metadata = {
   // Twitter Card
   twitter: {
     card: 'summary_large_image',
-    title: 'GreenLine365 - AI Business Automation for Local Businesses',
-    description: 'AI automation platform connecting local businesses with their community. Automated scheduling, content creation, and smart booking.',
+    title: 'GreenLine365 — Community Resource Directory for Local Businesses & Services',
+    description: 'Find verified local businesses, trails, and services across Florida. Browse by service area, check live hours of operation, and discover trusted professionals near you.',
     images: [`${siteUrl}/og-image.png`],
     creator: '@greenline365',
   },
@@ -127,7 +129,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               alternateName: 'GreenLine365 Business OS',
               url: siteUrl,
               logo: `${siteUrl}/logo.png`,
-              description: 'Local business directory connecting consumers with verified businesses across Florida. Find dining, services, nightlife, wellness, and more.',
+              description: 'Community resource platform connecting consumers with verified local businesses, trails, and services across Florida. Browse by service area, find hours of operation, and discover trusted professionals near you.',
               foundingDate: '2024',
               contactPoint: {
                 '@type': 'ContactPoint',
@@ -158,13 +160,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 availability: 'https://schema.org/InStock',
                 'priceValidUntil': '2026-12-31',
               },
-              description: 'Local business directory for Florida. Browse verified businesses across dining, services, nightlife, health & wellness, and more.',
+              description: 'Community resource platform for finding verified local businesses, trails, and services across Florida. Browse by service area, check hours of operation, and find pros nearest to you.',
               featureList: [
-                'Verified local business listings',
-                'Business detail pages with Google reviews',
-                'Destination travel guides',
-                'Category-based search and filtering',
-                'Business owner dashboard',
+                'Verified local business directory with hours of operation',
+                'Open/closed status and real-time business hours',
+                'Browse by service area and proximity',
+                'Destination guides with trails and outdoor recreation',
+                'Category-based search with distance sorting',
+                'Business owner dashboard and analytics',
               ],
               screenshot: `${siteUrl}/app-screenshot.png`,
               author: {
@@ -184,15 +187,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               '@type': 'ProfessionalService',
               name: 'GreenLine365',
               image: `${siteUrl}/logo.png`,
-              description: 'Local business directory serving businesses and consumers across Florida.',
+              description: 'Community resource platform connecting consumers with verified local businesses, trails, and outdoor recreation across Florida. Browse by service area, check business hours, and find trusted pros near you.',
               areaServed: {
-                '@type': 'Country',
-                name: 'United States',
+                '@type': 'State',
+                name: 'Florida',
+                containedIn: { '@type': 'Country', name: 'United States' },
               },
               serviceType: [
-                'Local Business Directory',
-                'Business Listings',
-                'Destination Guides',
+                'Community Resource Directory',
+                'Local Business Listings with Hours',
+                'Service Area Browsing',
+                'Destination Guides with Trails',
+                'Outdoor Recreation Guide',
               ],
               priceRange: '$',
             }),
@@ -212,23 +218,31 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   name: 'What is GreenLine365?',
                   acceptedAnswer: {
                     '@type': 'Answer',
-                    text: 'GreenLine365 is a local business directory that helps consumers find verified, trusted businesses across Florida. We cover dining, services, nightlife, health & wellness, and more across 8+ destinations.',
+                    text: 'GreenLine365 is a community resource platform that helps you find verified local businesses, trails, and services across Florida. Browse by service area, check live hours of operation, and discover trusted professionals nearest to you.',
                   },
                 },
                 {
                   '@type': 'Question',
-                  name: 'How do businesses get listed?',
+                  name: 'Can I see if a business is open right now?',
                   acceptedAnswer: {
                     '@type': 'Answer',
-                    text: 'Businesses are discovered through our data enrichment process using Google Places data. Business owners can then claim and manage their listing through our business dashboard.',
+                    text: 'Yes! GreenLine365 shows real-time open/closed status for businesses that have listed their hours of operation. You can see at a glance whether a business is currently open, when it closes, and when it opens next.',
                   },
                 },
                 {
                   '@type': 'Question',
-                  name: 'What do the directory tiers include?',
+                  name: 'How do I find businesses near me?',
                   acceptedAnswer: {
                     '@type': 'Answer',
-                    text: 'Free listings include basic business info. Pro ($45/mo) adds a Verified badge, CTA buttons, and priority search. Premium ($89/mo) includes featured placement, all photos, analytics, and lead capture.',
+                    text: 'GreenLine365 uses your location to sort businesses by proximity, showing the nearest ones first. You can also browse by service area or county to find businesses that serve your region.',
+                  },
+                },
+                {
+                  '@type': 'Question',
+                  name: 'What are destination guides?',
+                  acceptedAnswer: {
+                    '@type': 'Answer',
+                    text: 'Destination guides are curated regional pages covering 8+ Florida cities. Each guide includes local businesses, trails, outdoor recreation, dining, and things to do — plus curated experience loops to help you explore.',
                   },
                 },
                 {
@@ -236,15 +250,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   name: 'How do I claim my business listing?',
                   acceptedAnswer: {
                     '@type': 'Answer',
-                    text: 'Contact our team at greenline365help@gmail.com to verify your ownership and receive a claim code. Once verified, you can manage your listing through the business dashboard.',
-                  },
-                },
-                {
-                  '@type': 'Question',
-                  name: 'Is there a contract or commitment required?',
-                  acceptedAnswer: {
-                    '@type': 'Answer',
-                    text: 'No long-term contracts required. Directory subscriptions are monthly billing with the flexibility to cancel anytime.',
+                    text: 'Contact our team at greenline365help@gmail.com to verify your ownership and receive a claim code. Once verified, you can manage your listing, add hours of operation, photos, and unlock premium features.',
                   },
                 },
               ],

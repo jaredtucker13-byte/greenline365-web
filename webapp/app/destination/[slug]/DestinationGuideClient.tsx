@@ -54,6 +54,7 @@ const SECTIONS = [
   { id: 'quick-eats',         label: 'Quick Eats',           icon: 'M13 10V3L4 14h7v7l9-11h-7z' },
   { id: 'things-to-do',       label: 'Things To Do',         icon: 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z' },
   { id: 'beaches-nature',     label: 'Beaches & Nature',     icon: 'M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064' },
+  { id: 'trails-outdoor',     label: 'Trails & Outdoor',     icon: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' },
   { id: 'family-fun',         label: 'Family Fun',           icon: 'M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
   { id: 'shopping',           label: 'Shopping',             icon: 'M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z' },
   { id: 'everyday-essentials', label: 'Essentials',          icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4' },

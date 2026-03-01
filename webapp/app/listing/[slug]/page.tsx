@@ -30,8 +30,63 @@ interface Listing {
   total_photos_available: number;
   tags: string[];
   metadata: Record<string, any>;
+  business_hours: Record<string, { open: string; close: string; closed?: boolean }> | null;
+  service_areas: string[] | null;
   directory_badges: { id: string; badge_type: string; badge_label: string; badge_color: string }[];
   related: RelatedListing[];
+}
+
+/** Check if a business is currently open based on business_hours */
+function getOpenStatus(hours: Record<string, { open: string; close: string; closed?: boolean }> | null): { isOpen: boolean; label: string; closesAt?: string; opensAt?: string } {
+  if (!hours || Object.keys(hours).length === 0) return { isOpen: false, label: '' };
+  const now = new Date();
+  const dayNames = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+  const today = dayNames[now.getDay()];
+  const todayHours = hours[today];
+  if (!todayHours || todayHours.closed) {
+    // Find next open day
+    for (let i = 1; i <= 7; i++) {
+      const nextDay = dayNames[(now.getDay() + i) % 7];
+      const nextHours = hours[nextDay];
+      if (nextHours && !nextHours.closed && nextHours.open) {
+        const dayLabel = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][(now.getDay() + i) % 7];
+        return { isOpen: false, label: 'Closed', opensAt: `Opens ${dayLabel} at ${nextHours.open}` };
+      }
+    }
+    return { isOpen: false, label: 'Closed' };
+  }
+  // Parse time strings like "9:00" or "9:00 AM"
+  const parseTime = (t: string): number => {
+    const cleaned = t.trim().toUpperCase();
+    const match = cleaned.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)?$/);
+    if (!match) return -1;
+    let h = parseInt(match[1]);
+    const m = parseInt(match[2]);
+    if (match[3] === 'PM' && h !== 12) h += 12;
+    if (match[3] === 'AM' && h === 12) h = 0;
+    return h * 60 + m;
+  };
+  const nowMin = now.getHours() * 60 + now.getMinutes();
+  const openMin = parseTime(todayHours.open);
+  const closeMin = parseTime(todayHours.close);
+  if (openMin === -1 || closeMin === -1) return { isOpen: false, label: '' };
+  const isOpen = nowMin >= openMin && nowMin < closeMin;
+  if (isOpen) {
+    return { isOpen: true, label: 'Open Now', closesAt: `Closes at ${todayHours.close}` };
+  }
+  if (nowMin < openMin) {
+    return { isOpen: false, label: 'Closed', opensAt: `Opens today at ${todayHours.open}` };
+  }
+  // Already past closing — find next open
+  for (let i = 1; i <= 7; i++) {
+    const nextDay = dayNames[(now.getDay() + i) % 7];
+    const nextHours = hours[nextDay];
+    if (nextHours && !nextHours.closed && nextHours.open) {
+      const dayLabel = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][(now.getDay() + i) % 7];
+      return { isOpen: false, label: 'Closed', opensAt: `Opens ${dayLabel} at ${nextHours.open}` };
+    }
+  }
+  return { isOpen: false, label: 'Closed' };
 }
 
 interface RelatedListing {
@@ -176,7 +231,8 @@ export default function ListingDetailPage() {
   const googleRating = listing.metadata?.google_rating;
   const googleReviews = listing.metadata?.google_review_count;
   const googleMapsUrl = listing.metadata?.google_maps_url;
-  const businessHours = listing.business_hours as Record<string, { open: string; close: string; closed: boolean }> | null;
+  const businessHours = listing.business_hours;
+  const openStatus = getOpenStatus(businessHours);
   const menuSections = listing.menu as { id: string; name: string; items: { id: string; name: string; description: string; price: string }[] }[] | null;
 
   return (
@@ -272,6 +328,18 @@ export default function ListingDetailPage() {
                         <span className="inline-flex items-center gap-1 ml-2 px-2 py-0.5 rounded-full text-[10px] font-heading font-bold uppercase tracking-wider bg-greenline/15 text-greenline border border-greenline/20" data-testid="verified-badge">
                           <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                           Verified
+                        </span>
+                      )}
+                      {openStatus.label && (
+                        <span className={`inline-flex items-center gap-1 ml-2 px-2 py-0.5 rounded-full text-[10px] font-heading font-bold uppercase tracking-wider ${
+                          openStatus.isOpen
+                            ? 'bg-greenline/15 text-greenline border border-greenline/20'
+                            : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                        }`} data-testid="open-status-badge">
+                          <span className={`w-1.5 h-1.5 rounded-full ${openStatus.isOpen ? 'bg-greenline animate-pulse' : 'bg-red-400'}`} />
+                          {openStatus.label}
+                          {openStatus.closesAt && <span className="font-normal normal-case tracking-normal ml-1 opacity-70">· {openStatus.closesAt}</span>}
+                          {!openStatus.isOpen && openStatus.opensAt && <span className="font-normal normal-case tracking-normal ml-1 opacity-70">· {openStatus.opensAt}</span>}
                         </span>
                       )}
                     </div>

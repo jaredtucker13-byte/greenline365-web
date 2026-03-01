@@ -129,7 +129,7 @@ export async function GET(request: NextRequest) {
   // Search/list
   let query = supabase
     .from('directory_listings')
-    .select('id, business_name, slug, industry, subcategories, description, phone, website, city, state, zip_code, logo_url, cover_image_url, gallery_images, tier, is_claimed, trust_score, avg_feedback_rating, total_feedback_count, tags, metadata, directory_badges(id, badge_type, badge_label, badge_color, is_active)')
+    .select('id, business_name, slug, industry, subcategories, description, phone, website, city, state, zip_code, logo_url, cover_image_url, gallery_images, tier, is_claimed, trust_score, avg_feedback_rating, total_feedback_count, tags, metadata, business_hours, service_areas, directory_badges(id, badge_type, badge_label, badge_color, is_active)')
     .eq('is_published', true)
     .order('trust_score', { ascending: false })
     .limit(limit);
