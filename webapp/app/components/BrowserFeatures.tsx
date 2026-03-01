@@ -282,12 +282,14 @@ export function QRCode({
 
   return (
     <div className={`inline-block ${className}`}>
-      <img 
-        src={qrUrl} 
-        alt="QR Code" 
-        width={size} 
+      <img
+        src={qrUrl}
+        alt="QR Code"
+        width={size}
         height={size}
         className="rounded-lg"
+        loading="lazy"
+        decoding="async"
       />
     </div>
   );
@@ -488,10 +490,12 @@ export function LinkPreview({
       className={`block bg-white/10 rounded-xl overflow-hidden hover:bg-white/15 transition ${className}`}
     >
       {preview.image && (
-        <img 
-          src={preview.image} 
-          alt={preview.title || ''} 
+        <img
+          src={preview.image}
+          alt={preview.title || ''}
           className="w-full h-32 object-cover"
+          loading="lazy"
+          decoding="async"
         />
       )}
       <div className="p-3">

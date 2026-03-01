@@ -164,7 +164,7 @@ export default function PhotoLibraryPanel({ listingId }: PhotoLibraryProps) {
                     onClick={() => togglePhoto(url)}
                     data-testid={`photo-${i}`}
                   >
-                    <img src={url} alt={`Photo ${i + 1}`} className="w-full h-full object-cover" />
+                    <img src={url} alt={`Photo ${i + 1}`} className="w-full h-full object-cover" loading="lazy" decoding="async" />
 
                     {/* Selection indicator */}
                     {isSelected && (
@@ -233,7 +233,7 @@ export default function PhotoLibraryPanel({ listingId }: PhotoLibraryProps) {
             <div className="grid grid-cols-2 gap-4">
               {menuImages.map((url, i) => (
                 <div key={i} className="relative rounded-xl overflow-hidden border border-white/10">
-                  <img src={url} alt={`Menu page ${i + 1}`} className="w-full object-contain" style={{ maxHeight: 400 }} />
+                  <img src={url} alt={`Menu page ${i + 1}`} className="w-full object-contain" loading="lazy" decoding="async" style={{ maxHeight: 400 }} />
                   <button
                     onClick={async () => {
                       await fetch('/api/directory/photos', {

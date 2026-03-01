@@ -9,6 +9,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import BoostedShowcase from '@/components/BoostedShowcase';
 
 interface Listing {
@@ -329,10 +330,13 @@ export default function DirectoryClient() {
           <section className="relative min-h-[100vh] flex items-center justify-center overflow-hidden" data-testid="hero-section">
             {/* Background Image Layer */}
             <div className="absolute inset-0">
-              <img
+              <Image
                 src="/images/hero-directory.png"
                 alt=""
                 className="w-full h-full object-cover"
+                fill
+                sizes="100vw"
+                priority
                 style={{ filter: 'brightness(0.35) saturate(1.2)' }}
               />
             </div>
@@ -489,7 +493,7 @@ export default function DirectoryClient() {
                   className={`relative rounded-2xl overflow-hidden cursor-pointer group hover:shadow-gold-glow transition-all duration-500 ${i === 0 ? 'md:col-span-2 md:row-span-2' : ''}`}
                   style={{ minHeight: i === 0 ? 320 : 180 }}
                   onClick={() => handleCategoryClick(cat.id)} data-testid={`cat-${cat.id}`}>
-                  <img src={cat.img} alt={`${cat.label} — ${cat.sub}`} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <Image src={cat.img} alt={`${cat.label} — ${cat.sub}`} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" fill sizes="(max-width: 768px) 100vw, 33vw" loading="lazy" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent group-hover:from-black/95 transition-all duration-500" />
                   <div className="absolute bottom-4 left-4">
                     <span className={`text-white font-heading font-semibold block tracking-tight ${i === 0 ? 'text-2xl' : 'text-base'}`}>{cat.label}</span>
@@ -582,7 +586,7 @@ export default function DirectoryClient() {
                     <Link href={`/destination/${d.slug}`} className="block dest-card-frame group" data-testid={`dest-card-${d.slug}`}>
                       <div className="dest-card-inner">
                         <div className="relative overflow-hidden" style={{ aspectRatio: '4/3' }}>
-                          <img src={d.image} alt={`${d.label} destination guide — ${d.tagline}`} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
+                          <Image src={d.image} alt={`${d.label} destination guide — ${d.tagline}`} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" loading="lazy" />
                         </div>
                         <div className="dest-glass-label px-4 py-3">
                           <h3 className="text-sm sm:text-base font-heading font-bold text-white tracking-tight leading-tight">{d.label}</h3>
@@ -710,7 +714,7 @@ export default function DirectoryClient() {
                 <button onClick={handleBrowseAll} className="mt-10 btn-primary px-8 py-3 rounded-full text-sm" data-testid="find-business-btn">Find a Business</button>
               </div>
               <div className="relative">
-                <img src="/images/hero-directory-alt.png" alt="GreenLine365 connects you with trusted, verified local businesses" className="w-full rounded-2xl object-cover" style={{ maxHeight: 400 }} />
+                <Image src="/images/hero-directory-alt.png" alt="GreenLine365 connects you with trusted, verified local businesses" className="w-full rounded-2xl object-cover" width={800} height={400} sizes="(max-width: 768px) 100vw, 50vw" loading="lazy" />
               </div>
             </div>
           </section>
@@ -747,7 +751,7 @@ export default function DirectoryClient() {
           <section className="relative pt-20 pb-8 overflow-hidden" style={{ background: '#050505' }}>
             {currentCat && (
               <div className="absolute inset-0 opacity-20">
-                <img src={currentCat.img} alt={`${currentCat.label} category background`} className="w-full h-full object-cover" />
+                <Image src={currentCat.img} alt={`${currentCat.label} category background`} className="w-full h-full object-cover" fill sizes="100vw" loading="lazy" />
               </div>
             )}
             <div className="absolute inset-0 bg-gradient-to-b from-[#050505]/60 via-[#050505]/80 to-[#050505]" />
@@ -894,7 +898,7 @@ function ListingCard({ listing: l, index: i }: { listing: Listing; index: number
         data-testid={`listing-${l.slug}`}>
         <div className="relative h-40 overflow-hidden">
           {l.cover_image_url || l.logo_url ? (
-            <img src={l.cover_image_url || l.logo_url!} alt={`${l.business_name} — ${l.industry.replace(/-/g, ' ')} in ${l.city || 'Florida'}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            <Image src={l.cover_image_url || l.logo_url!} alt={`${l.business_name} — ${l.industry.replace(/-/g, ' ')} in ${l.city || 'Florida'}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" loading="lazy" />
           ) : (
             <div className="w-full h-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #111 0%, #1A1A1A 100%)' }}>
               <span className="text-4xl font-heading font-light text-white/10">{l.business_name[0]}</span>
@@ -1044,7 +1048,7 @@ function SubcategoryCarouselRow({ label, subtitle, industry, searchTerm, sortBy,
                 data-testid={`carousel-card-${l.slug}`}>
                 <div className="relative h-32 sm:h-36 overflow-hidden">
                   {l.cover_image_url ? (
-                    <img src={l.cover_image_url} alt={l.business_name} className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500" loading="lazy" />
+                    <Image src={l.cover_image_url} alt={l.business_name} className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500" fill sizes="(max-width: 640px) 80vw, (max-width: 1024px) 40vw, 280px" loading="lazy" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #111 0%, #1A1A1A 100%)' }}>
                       <span className="text-3xl font-heading text-white/10">{l.business_name[0]}</span>
@@ -1108,7 +1112,7 @@ function GroupedBrowseView({ activeCategory, sortBy, setSortBy, cityFilter, setC
       <section className="relative pt-20 pb-6 overflow-hidden" style={{ background: '#050505' }}>
         {currentCat && (
           <div className="absolute inset-0 opacity-15">
-            <img src={currentCat.img} alt={`${currentCat.label} category background`} className="w-full h-full object-cover" />
+            <Image src={currentCat.img} alt={`${currentCat.label} category background`} className="w-full h-full object-cover" fill sizes="100vw" loading="lazy" />
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0A]/60 to-[#050505]" />

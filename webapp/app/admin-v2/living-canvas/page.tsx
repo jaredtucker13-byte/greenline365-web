@@ -514,10 +514,12 @@ export default function LivingCanvasPage() {
                               className="w-full px-3 py-2 rounded-lg bg-black/30 border border-white/10 text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-purple-500/50"
                             />
                             {content[slot.id]?.url && (
-                              <img 
-                                src={content[slot.id].url} 
-                                alt="" 
+                              <img
+                                src={content[slot.id].url}
+                                alt=""
                                 className="mt-2 w-full h-20 object-cover rounded-lg"
+                                loading="lazy"
+                                decoding="async"
                               />
                             )}
                           </div>

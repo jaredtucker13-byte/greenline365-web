@@ -139,8 +139,9 @@ export function OrganicImageContainer({
           className={`w-full h-full object-cover transition-opacity duration-700 ${loaded ? 'opacity-100' : 'opacity-0'}`}
           onLoad={() => setLoaded(true)}
           loading="lazy"
+          decoding="async"
         />
-        
+
         {/* Soft edge fade for organic feel */}
         <div 
           className="absolute inset-0 pointer-events-none"
@@ -216,10 +217,12 @@ export function FramedImageContainer({
         {frameAsset?.url ? (
           // Custom frame asset
           <div className="absolute inset-0">
-            <img 
-              src={frameAsset.url} 
-              alt="Frame" 
+            <img
+              src={frameAsset.url}
+              alt="Frame"
               className="w-full h-full object-fill"
+              loading="lazy"
+              decoding="async"
             />
           </div>
         ) : (
@@ -258,8 +261,9 @@ export function FramedImageContainer({
             className={`w-full h-full object-cover transition-opacity duration-700 ${loaded ? 'opacity-100' : 'opacity-0'}`}
             onLoad={() => setLoaded(true)}
             loading="lazy"
+            decoding="async"
           />
-          
+
           {/* Glass reflection effect */}
           <div 
             className="absolute inset-0 pointer-events-none"
@@ -375,6 +379,8 @@ export function DropCapImage({
         style={{
           clipPath: shapeDefinition.clipPath,
         }}
+        loading="lazy"
+        decoding="async"
       />
     </div>
   );

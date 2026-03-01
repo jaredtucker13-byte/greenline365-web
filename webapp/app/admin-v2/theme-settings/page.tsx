@@ -457,7 +457,7 @@ export default function ThemeSettingsPage() {
                       <div className="flex items-center gap-4">
                         {theme.logo_url ? (
                           <div className="w-32 h-16 rounded-lg bg-white/10 flex items-center justify-center overflow-hidden">
-                            <img src={theme.logo_url} alt="Logo" className="max-w-full max-h-full object-contain" />
+                            <img src={theme.logo_url} alt="Logo" className="max-w-full max-h-full object-contain" loading="lazy" decoding="async" />
                           </div>
                         ) : (
                           <div className="w-32 h-16 rounded-lg bg-white/5 border-2 border-dashed border-white/20 flex items-center justify-center">
@@ -718,7 +718,7 @@ export default function ThemeSettingsPage() {
                     style={{ background: theme?.surface_color || '#1A1A1A' }}
                   >
                     {theme?.logo_url ? (
-                      <img src={theme.logo_url} alt="Logo" className="h-8 w-auto" />
+                      <img src={theme.logo_url} alt="Logo" className="h-8 w-auto" loading="lazy" decoding="async" />
                     ) : (
                       <div 
                         className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold"

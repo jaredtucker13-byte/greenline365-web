@@ -58,6 +58,11 @@ const nextConfig: NextConfig = {
                       hostname: '*.supabase.co',
                       pathname: '/**',
             },
+            {
+                      protocol: 'https',
+                      hostname: 'static.prod-images.emergentagent.com',
+                      pathname: '/**',
+            },
                 ],
           unoptimized: false,
     },

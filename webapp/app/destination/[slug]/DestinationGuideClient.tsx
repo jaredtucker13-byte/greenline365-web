@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface Listing {
   id: string;
@@ -641,8 +642,8 @@ function GuideListingCard({ listing: l, index: i, isFeatured }: { listing: Listi
       {/* Image */}
       <div className="relative h-44 overflow-hidden">
         {l.cover_image_url ? (
-          <img src={l.cover_image_url} alt={l.business_name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+          <Image src={l.cover_image_url} alt={l.business_name}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" loading="lazy" />
         ) : (
           <div className="w-full h-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #111111, #1A1A1A)' }}>
             <span className="text-4xl font-heading font-light text-white/10">{l.business_name[0]}</span>
@@ -770,7 +771,7 @@ function DestinationLoops({ destinationSlug, destinationLabel }: { destinationSl
             >
               <div className="relative h-32 overflow-hidden">
                 {loop.cover_image_url ? (
-                  <img src={loop.cover_image_url} alt={loop.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <Image src={loop.cover_image_url} alt={loop.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 280px" loading="lazy" />
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-gold/10 via-midnight-800 to-midnight-900" />
                 )}

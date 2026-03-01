@@ -338,9 +338,11 @@ export default function DraftsPanel({ userId = 'demo-user', onEditDraft, onPubli
                     {/* Thumbnail or icon */}
                     <div className="w-12 h-12 rounded-lg bg-[#2D3748] flex items-center justify-center flex-shrink-0 overflow-hidden">
                       {item.image_url ? (
-                        <img 
-                          src={item.image_url} 
-                          alt="" 
+                        <img
+                          src={item.image_url}
+                          alt=""
+                          loading="lazy"
+                          decoding="async"
                           className="w-full h-full object-cover"
                         />
                       ) : (

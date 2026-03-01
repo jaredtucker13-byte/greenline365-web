@@ -853,7 +853,7 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
                           </div>
                           {imagePreview ? (
                             <div className="relative rounded-lg overflow-hidden aspect-video" style={{ border: '1px solid var(--theme-glass-border)' }}>
-                              <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                              <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" loading="lazy" decoding="async" />
                               
                               {/* Analysis overlay */}
                               {isAnalyzingImage && (
@@ -1465,7 +1465,7 @@ End with a call to action."
                   {/* Image Preview */}
                   <div className="aspect-square rounded-lg mb-2 overflow-hidden flex items-center justify-center" style={{ background: 'var(--theme-bg-primary)' }}>
                     {imagePreview ? (
-                      <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                      <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" loading="lazy" decoding="async" />
                     ) : (
                       <div className="text-center" style={{ color: 'var(--theme-text-muted)' }}>
                         <span className="text-3xl">🖼️</span>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 
 interface Listing {
@@ -240,10 +241,13 @@ export default function ListingDetailPage() {
       {/* Hero / Cover Image */}
       <section className="relative h-64 sm:h-80 lg:h-96 overflow-hidden">
         {listing.cover_image_url ? (
-          <img
+          <Image
             src={listing.cover_image_url}
             alt={`${listing.business_name} — ${listing.industry.replace(/-/g, ' ')} in ${listing.city}, ${listing.state}`}
             className="w-full h-full object-cover"
+            fill
+            sizes="100vw"
+            priority
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-[#111111] to-charcoal-800 flex items-center justify-center">
@@ -411,6 +415,7 @@ export default function ListingDetailPage() {
                       className="w-full h-full"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
+                      loading="lazy"
                       title={`${listing.business_name} video`}
                     />
                   ) : listing.metadata.video_url.includes('vimeo.com') ? (
@@ -419,12 +424,14 @@ export default function ListingDetailPage() {
                       className="w-full h-full"
                       allow="autoplay; fullscreen; picture-in-picture"
                       allowFullScreen
+                      loading="lazy"
                       title={`${listing.business_name} video`}
                     />
                   ) : (
                     <video
                       src={listing.metadata.video_url}
                       controls
+                      preload="metadata"
                       className="w-full h-full object-cover"
                       poster={listing.cover_image_url || undefined}
                     >
@@ -447,10 +454,12 @@ export default function ListingDetailPage() {
               >
                 {/* Main Photo */}
                 <div className="relative aspect-video">
-                  <img
+                  <Image
                     src={photos[activePhoto]}
                     alt={`${listing.business_name} photo ${activePhoto + 1}`}
                     className="w-full h-full object-cover"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 66vw"
                   />
                   {photos.length > 1 && (
                     <div className="absolute bottom-3 right-3 px-2.5 py-1 rounded-full text-xs font-heading font-semibold text-white/80 backdrop-blur-sm" style={{ background: 'rgba(0,0,0,0.6)' }}>
@@ -470,7 +479,7 @@ export default function ListingDetailPage() {
                         onClick={() => setActivePhoto(i)}
                         className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${i === activePhoto ? 'border-gold' : 'border-transparent opacity-60 hover:opacity-100'}`}
                       >
-                        <img src={photo} alt={`${listing.business_name} photo ${i + 1}`} className="w-full h-full object-cover" />
+                        <Image src={photo} alt={`${listing.business_name} photo ${i + 1}`} className="w-full h-full object-cover" fill sizes="64px" />
                       </button>
                     ))}
                   </div>
@@ -839,7 +848,7 @@ export default function ListingDetailPage() {
                     >
                       <div className="relative h-24">
                         {r.cover_image_url ? (
-                          <img src={r.cover_image_url} alt={r.business_name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                          <Image src={r.cover_image_url} alt={r.business_name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" fill sizes="(max-width: 640px) 50vw, 25vw" loading="lazy" />
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-[#111111] to-charcoal-800 flex items-center justify-center">
                             <span className="text-2xl font-heading font-light text-white/10">{r.business_name[0]}</span>

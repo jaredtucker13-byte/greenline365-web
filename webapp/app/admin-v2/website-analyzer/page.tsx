@@ -917,7 +917,7 @@ Generate a high-quality mockup specifically for this ${section.label} section on
                     {/* Preview Image or Placeholder */}
                     <div className="aspect-video bg-black/40 rounded-xl mb-4 overflow-hidden flex items-center justify-center">
                       {proj.preview_image ? (
-                        <img src={proj.preview_image} alt={proj.name} className="w-full h-full object-cover" />
+                        <img src={proj.preview_image} alt={proj.name} className="w-full h-full object-cover" loading="lazy" decoding="async" />
                       ) : (
                         <span className="text-4xl opacity-30">🌐</span>
                       )}
@@ -1684,7 +1684,7 @@ Generate a high-quality mockup specifically for this ${section.label} section on
               {imagePreview && (
                 <div className="p-4 rounded-xl bg-white/5 border border-white/10">
                   <h3 className="text-sm font-medium text-white/70 mb-2">Source Image</h3>
-                  <img src={imagePreview} alt="Source" className="w-full rounded-lg" />
+                  <img src={imagePreview} alt="Source" className="w-full rounded-lg" loading="lazy" decoding="async" />
                 </div>
               )}
             </div>
