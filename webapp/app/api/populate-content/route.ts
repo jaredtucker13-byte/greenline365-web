@@ -18,15 +18,15 @@ export async function POST() {
                       );
       }
 
-      // Check if user is a superadmin
+      // Check if user is an admin via profiles table
       const supabase = createServerClient();
           const { data: adminCheck } = await supabase
-            .from('super_admins')
-            .select('id')
-            .eq('user_id', user.id)
+            .from('profiles')
+            .select('is_admin')
+            .eq('id', user.id)
             .single();
 
-      if (!adminCheck) {
+      if (!adminCheck?.is_admin) {
               return NextResponse.json(
                 { error: 'Forbidden - superadmin access required' },
                 { status: 403 }

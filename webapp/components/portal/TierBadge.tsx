@@ -12,7 +12,7 @@ const TIER_CONFIG: Record<string, { label: string; className: string }> = {
   },
   directory_pro: {
     label: 'PRO',
-    className: 'bg-neon-green-500/20 text-neon-green-500 border-neon-green-500/40',
+    className: 'bg-gold-500/20 text-gold-500 border-gold-500/40',
   },
   command_center: {
     label: 'COMMAND CENTER',

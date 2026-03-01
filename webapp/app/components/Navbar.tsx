@@ -36,20 +36,15 @@ export default function Navbar() {
       setUser(session?.user || null);
 
       if (session?.user) {
-        const { data: superAdminData } = await supabase
-          .from('super_admins')
-          .select('user_id')
-          .eq('user_id', session.user.id)
-          .single();
-
-        setIsSuperAdmin(!!superAdminData);
-
+        // Check admin status from profiles table
         const { data } = await supabase
           .from('profiles')
           .select('is_admin')
           .eq('id', session.user.id)
           .single();
-        setIsAdmin(data?.is_admin || false);
+        const adminStatus = data?.is_admin || false;
+        setIsAdmin(adminStatus);
+        setIsSuperAdmin(adminStatus);
       }
       setLoading(false);
     };
@@ -59,20 +54,15 @@ export default function Navbar() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       setUser(session?.user || null);
       if (session?.user) {
-        const { data: superAdminData } = await supabase
-          .from('super_admins')
-          .select('user_id')
-          .eq('user_id', session.user.id)
-          .single();
-
-        setIsSuperAdmin(!!superAdminData);
-
+        // Check admin status from profiles table
         const { data } = await supabase
           .from('profiles')
           .select('is_admin')
           .eq('id', session.user.id)
           .single();
-        setIsAdmin(data?.is_admin || false);
+        const adminStatus = data?.is_admin || false;
+        setIsAdmin(adminStatus);
+        setIsSuperAdmin(adminStatus);
       } else {
         setIsAdmin(false);
         setIsSuperAdmin(false);

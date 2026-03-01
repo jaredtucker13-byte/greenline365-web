@@ -26,6 +26,20 @@
           },
           "colors": {
                   "palette": {
+                            "primary": {
+                                        "DEFAULT": "#C9A96E",
+                                        "foreground": "#ffffff",
+                              "50": "#FAF6ED",
+                                        "100": "#F3ECDA",
+                                        "200": "#E6D8B5",
+                                        "300": "#D9C48F",
+                                        "400": "#C9A96E",
+                                        "500": "#B8944F",
+                                        "600": "#9A7A3E",
+                                        "700": "#7C6232",
+                                        "800": "#5E4A26",
+                                        "900": "#40321A"
+                            },
                             "gold": {
                                         "DEFAULT": "#C9A84C",
                               "light": "#E8C97A",
@@ -283,7 +297,7 @@
           "Every interactive element needs a micro-animation (hover lift, glow pulse, scale).",
           "Use sonner for toasts — styled to match the glass theme.",
           "Glassmorphism is the ONLY visual style. No flat colors, no solid fills on cards.",
-          "Gold (#C9A84C) is the ONLY accent across all pages. No sage green anywhere.",
+          "Champagne Gold (#C9A96E) is the primary accent across all pages.",
           "All text must pass WCAG AA contrast against dark backgrounds.",
           "GSAP ScrollTrigger for all scroll-based entrance animations.",
           "Playfair Display for all hero headlines. Poppins for UI labels."
@@ -296,7 +310,8 @@
                   "Remove all sage green references"
           ],
           "tailwind_config": [
-                  "Gold (#C9A84C) is the primary and only accent palette",
+                  "Add primary (Champagne Gold #C9A96E) palette",
+                  "Add gold (#C9A84C) palette",
                   "Add obsidian (#0A0A0A) palette",
                   "Add custom shadow utilities for glow effects",
                   "Remove sage green / primary green references"

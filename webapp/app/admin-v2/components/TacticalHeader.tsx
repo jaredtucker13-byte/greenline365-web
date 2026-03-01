@@ -77,7 +77,7 @@ export default function TacticalHeader({
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={onToday}
-          className="px-5 py-2.5 rounded-xl bg-[#84A98C]/20 border border-[#84A98C]/40 text-[#A7C957] text-sm font-medium hover:bg-[#84A98C]/30 transition-all duration-300 shadow-[0_0_20px_rgba(132,169,140,0.2)]"
+          className="px-5 py-2.5 rounded-xl bg-[#C9A96E]/20 border border-[#C9A96E]/40 text-[#D9C48F] text-sm font-medium hover:bg-[#C9A96E]/30 transition-all duration-300 shadow-[0_0_20px_rgba(201,169,110,0.2)]"
         >
           Today
         </motion.button>
@@ -87,7 +87,7 @@ export default function TacticalHeader({
             onClick={() => onViewChange('month')}
             className={`px-5 py-2.5 text-sm font-medium transition-all duration-300 ${
               viewMode === 'month'
-                ? 'bg-[#84A98C] text-white shadow-[0_0_15px_rgba(132,169,140,0.4)]'
+                ? 'bg-[#C9A96E] text-white shadow-[0_0_15px_rgba(201,169,110,0.4)]'
                 : 'text-white/50 hover:text-white hover:bg-white/[0.08]'
             }`}
           >
@@ -97,7 +97,7 @@ export default function TacticalHeader({
             onClick={() => onViewChange('week')}
             className={`px-5 py-2.5 text-sm font-medium transition-all duration-300 ${
               viewMode === 'week'
-                ? 'bg-[#84A98C] text-white shadow-[0_0_15px_rgba(132,169,140,0.4)]'
+                ? 'bg-[#C9A96E] text-white shadow-[0_0_15px_rgba(201,169,110,0.4)]'
                 : 'text-white/50 hover:text-white hover:bg-white/[0.08]'
             }`}
           >
@@ -122,7 +122,7 @@ export default function TacticalHeader({
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#84A98C] to-[#52796F] flex items-center justify-center text-white font-semibold text-sm shadow-[0_0_20px_rgba(132,169,140,0.3)]"
+          className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#C9A96E] to-[#9A7A3E] flex items-center justify-center text-white font-semibold text-sm shadow-[0_0_20px_rgba(201,169,110,0.3)]"
         >
           GL
         </motion.button>

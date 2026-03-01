@@ -5,7 +5,7 @@ import { createServerClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Trust & Security Whitepaper | GreenLine365 - Enterprise Security',
   description: 'GreenLine365 Trust & Security Whitepaper. Learn about our Zero-Trust architecture, AI privacy protocols, data encryption, GDPR compliance, and enterprise-grade infrastructure.',
-  keywords: 'GreenLine365 security, zero trust architecture, data privacy, GDPR compliance, SOC2, AI privacy, multi-tenant security, encryption',
+  keywords: 'GreenLine365 security, zero trust architecture, data privacy, GDPR compliance, SOC 2 readiness, AI privacy, multi-tenant security, encryption',
   openGraph: {
     title: 'Trust & Security Whitepaper | GreenLine365',
     description: 'Enterprise-grade security protecting your business data 24/7 with Zero-Trust architecture and AI privacy protocols.',
@@ -139,7 +139,7 @@ export default async function TrustPage() {
               <div className="mt-6 pt-6 border-t border-white/10">
                 <p className="text-xs text-white/40 uppercase tracking-wider mb-3">Compliance</p>
                 <div className="flex flex-wrap gap-2">
-                  <span className="px-2 py-1 bg-gold-500/10 text-gold-400 text-xs rounded font-medium">SOC2</span>
+                  <span className="px-2 py-1 bg-gold-500/10 text-gold-400 text-xs rounded font-medium">SOC2 (In Progress)</span>
                   <span className="px-2 py-1 bg-gold-500/10 text-gold-400 text-xs rounded font-medium">GDPR</span>
                   <span className="px-2 py-1 bg-gold-500/10 text-gold-400 text-xs rounded font-medium">HIPAA</span>
                   <span className="px-2 py-1 bg-gold-500/10 text-gold-400 text-xs rounded font-medium">ISO 27001</span>

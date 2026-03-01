@@ -1,5 +1,5 @@
 -- ============================================================
--- AUDIT LOGGING SYSTEM FOR SOC2 COMPLIANCE
+-- AUDIT LOGGING SYSTEM FOR SOC 2 READINESS
 -- Tracks all significant actions for security & compliance
 -- ============================================================
 
@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS audit_logs (
   occurred_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
   
   -- Compliance fields
-  retention_until TIMESTAMPTZ DEFAULT (NOW() + INTERVAL '7 years'), -- SOC2 requires 7 year retention
+  retention_until TIMESTAMPTZ DEFAULT (NOW() + INTERVAL '7 years'), -- 7 year retention aligned with SOC 2 best practices
   is_sensitive BOOLEAN DEFAULT false,  -- Flag for PII-related actions
   compliance_flags TEXT[] DEFAULT '{}'  -- e.g., {'gdpr', 'ccpa', 'hipaa'}
 );
@@ -383,7 +383,7 @@ DECLARE
 BEGIN
   -- In a real implementation, you'd move to an archive table
   -- For now, we just count what would be archived
-  -- SOC2 requires 7 year retention, so we don't actually delete
+  -- 7 year retention per SOC 2 best practices, so we don't actually delete
   
   SELECT COUNT(*) INTO v_archived_count
   FROM audit_logs
@@ -412,5 +412,5 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- 4. Social connections are logged (if table exists)
 -- 5. Admins can view all logs, users see their own
 -- 6. Logs are append-only (tamper-resistant)
--- 7. 7-year retention for SOC2 compliance
+-- 7. 7-year retention aligned with SOC 2 best practices
 -- ============================================

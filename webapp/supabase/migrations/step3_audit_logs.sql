@@ -1,6 +1,6 @@
 -- ============================================================
 -- STEP 3: Create ONLY the audit_logs table
--- This is the most important one for SOC2
+-- This is the most important one for SOC 2 readiness
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS audit_logs (

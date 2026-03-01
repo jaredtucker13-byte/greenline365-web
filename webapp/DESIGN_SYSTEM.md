@@ -319,7 +319,7 @@ import { OSPanel } from '@/components/ui/os';
 
 <OSPanel className="p-6">
   <div className="flex items-center gap-3 mb-4">
-    <div className="w-12 h-12 rounded-xl bg-neon-green-500/20 flex items-center justify-center">
+    <div className="w-12 h-12 rounded-xl bg-gold-500/20 flex items-center justify-center">
       <Icon />
     </div>
     <div>
@@ -615,13 +615,13 @@ Avoid:
 - `.card-hover` - Hover lift effect
 
 **Colors:**
-- `bg-neon-green-500` - Bright green
+- `bg-gold-500` - Bright green
 - `bg-neon-teal-500` - Bright teal
 - `bg-os-dark` - Deep black
-- `text-neon-green-500` - Green text
+- `text-gold-500` - Green text
 
 **Shadows:**
-- `shadow-neon-green` - Green glow shadow
+- `shadow-gold` - Green glow shadow
 - `shadow-neon-teal` - Teal glow shadow
 - `shadow-glass` - Depth shadow
 

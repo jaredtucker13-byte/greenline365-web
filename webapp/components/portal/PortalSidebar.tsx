@@ -33,7 +33,7 @@ export default function PortalSidebar({
       {/* Top bar */}
       <div className="border-b border-white/10 p-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-neon-green-500/20 text-sm font-bold text-neon-green-500">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gold-500/20 text-sm font-bold text-gold-500">
             {businessName.charAt(0).toUpperCase()}
           </div>
           <div className="min-w-0 flex-1">
@@ -43,7 +43,7 @@ export default function PortalSidebar({
         </div>
         <Link
           href="/portal/upgrade"
-          className="mt-3 block w-full rounded-lg border border-neon-green-500/30 py-1.5 text-center text-xs font-medium text-neon-green-500 transition-colors hover:bg-neon-green-500/10"
+          className="mt-3 block w-full rounded-lg border border-gold-500/30 py-1.5 text-center text-xs font-medium text-gold-500 transition-colors hover:bg-gold-500/10"
         >
           {tierSlug === 'free' ? 'Upgrade' : 'Manage Plan'}
         </Link>
@@ -61,7 +61,7 @@ export default function PortalSidebar({
                   onClick={() => setMobileOpen(false)}
                   className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
                     isActive
-                      ? 'bg-neon-green-500/10 text-neon-green-500'
+                      ? 'bg-gold-500/10 text-gold-500'
                       : item.locked
                         ? 'text-white/30 hover:bg-white/5'
                         : 'text-white/70 hover:bg-white/5 hover:text-white'
@@ -122,7 +122,7 @@ export default function PortalSidebar({
           onClick={() => setMobileOpen(false)}
           className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
             pathname === '/portal/settings'
-              ? 'bg-neon-green-500/10 text-neon-green-500'
+              ? 'bg-gold-500/10 text-gold-500'
               : 'text-white/50 hover:bg-white/5 hover:text-white'
           }`}
         >

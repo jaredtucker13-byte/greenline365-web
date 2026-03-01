@@ -50,7 +50,7 @@ export default function StatsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-neon-green-500 border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-gold-500 border-t-transparent" />
       </div>
     );
   }
@@ -123,7 +123,7 @@ export default function StatsPage() {
           <div className="rounded-xl border border-white/10 bg-white/5 p-5">
             <div className="flex items-center justify-between">
               <span className="text-sm text-white/50">Click-Through Rate</span>
-              <span className="text-2xl font-bold text-neon-green-500">
+              <span className="text-2xl font-bold text-gold-500">
                 {advanced.click_through_rate}%
               </span>
             </div>
@@ -143,7 +143,7 @@ export default function StatsPage() {
                     title={`${day}: ${count} views`}
                   >
                     <div
-                      className="w-full rounded-t bg-neon-green-500/60 transition-colors group-hover:bg-neon-green-500"
+                      className="w-full rounded-t bg-gold-500/60 transition-colors group-hover:bg-gold-500"
                       style={{ height: `${height}%`, minHeight: count > 0 ? '2px' : '0' }}
                     />
                   </div>

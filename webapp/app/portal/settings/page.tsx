@@ -168,7 +168,7 @@ export default function SettingsPage() {
           {isFree ? (
             <Link
               href="/portal/upgrade"
-              className="rounded-lg bg-neon-green-500 px-4 py-2 text-sm font-semibold text-black transition-colors hover:bg-neon-green-400"
+              className="rounded-lg bg-gold-500 px-4 py-2 text-sm font-semibold text-black transition-colors hover:bg-gold-400"
             >
               Upgrade
             </Link>
@@ -208,7 +208,7 @@ export default function SettingsPage() {
             {/* Owner (current user) */}
             <div className="flex items-center justify-between rounded-lg bg-white/5 px-4 py-3">
               <div className="flex items-center gap-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-neon-green-500/20 text-xs font-bold text-neon-green-500">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gold-500/20 text-xs font-bold text-gold-500">
                   {(user?.email || 'U').charAt(0).toUpperCase()}
                 </div>
                 <div>
@@ -257,12 +257,12 @@ export default function SettingsPage() {
               value={inviteEmail}
               onChange={(e) => setInviteEmail(e.target.value)}
               placeholder="team@example.com"
-              className="flex-1 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-white placeholder-white/30 focus:border-neon-green-500 focus:outline-none"
+              className="flex-1 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-white placeholder-white/30 focus:border-gold-500 focus:outline-none"
             />
             <select
               value={inviteRoleId}
               onChange={(e) => setInviteRoleId(e.target.value)}
-              className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:border-neon-green-500 focus:outline-none"
+              className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:border-gold-500 focus:outline-none"
             >
               {roles.map((r) => (
                 <option key={r.id} value={r.id}>
@@ -273,7 +273,7 @@ export default function SettingsPage() {
             <button
               onClick={handleInvite}
               disabled={inviting || !inviteEmail.trim()}
-              className="rounded-lg bg-neon-green-500 px-4 py-2 text-sm font-semibold text-black transition-colors hover:bg-neon-green-400 disabled:opacity-50"
+              className="rounded-lg bg-gold-500 px-4 py-2 text-sm font-semibold text-black transition-colors hover:bg-gold-400 disabled:opacity-50"
             >
               {inviting ? 'Inviting...' : 'Invite'}
             </button>

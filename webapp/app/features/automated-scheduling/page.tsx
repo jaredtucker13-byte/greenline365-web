@@ -21,18 +21,18 @@ export default function AutomatedSchedulingPage() {
         {/* Hero Section */}
         <section className="relative min-h-[70vh] flex items-center overflow-hidden pt-32 pb-20">
           <div className="absolute inset-0 bg-os-dark" />
-          <div className="absolute top-0 right-1/4 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-neon-green-500/10 to-transparent blur-3xl" />
+          <div className="absolute top-0 right-1/4 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-gold-500/10 to-transparent blur-3xl" />
           
           <div className="relative z-10 w-full max-w-[1200px] mx-auto px-4 sm:px-6">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>
-                <div className="mb-4 inline-flex items-center gap-2 px-3 py-1.5 glass-green rounded-full border border-neon-green-500/30">
-                  <span className="w-2 h-2 bg-neon-green-500 rounded-full animate-pulse" />
-                  <span className="text-xs text-neon-green-400 font-semibold tracking-wide">24/7 BOOKING SYSTEM</span>
+                <div className="mb-4 inline-flex items-center gap-2 px-3 py-1.5 glass-gold rounded-full border border-gold-500/30">
+                  <span className="w-2 h-2 bg-gold-500 rounded-full animate-pulse" />
+                  <span className="text-xs text-gold-400 font-semibold tracking-wide">24/7 BOOKING SYSTEM</span>
                 </div>
                 
                 <h1 className="font-display font-bold text-white mb-6" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', lineHeight: '1.1' }}>
-                  Never Miss a <span className="text-neon-green-500">Booking</span> Again
+                  Never Miss a <span className="text-gold-500">Booking</span> Again
                 </h1>
                 
                 <p className="text-white/70 text-lg mb-8 leading-relaxed">
@@ -59,7 +59,7 @@ export default function AutomatedSchedulingPage() {
                     { value: '0', label: 'Missed Calls' }
                   ].map((stat, i) => (
                     <div key={i} className="text-center">
-                      <div className="text-3xl font-display font-bold text-neon-green-500">{stat.value}</div>
+                      <div className="text-3xl font-display font-bold text-gold-500">{stat.value}</div>
                       <div className="text-sm text-white/50 mt-1">{stat.label}</div>
                     </div>
                   ))}
@@ -88,13 +88,13 @@ export default function AutomatedSchedulingPage() {
                         <div className="text-white/60 text-xs mb-1">Appointment Type</div>
                         <div className="text-white font-semibold">Strategy Session (30 min)</div>
                       </div>
-                      <div className="p-3 bg-neon-green-500/10 rounded-lg border border-neon-green-500/30">
-                        <div className="text-neon-green-400 text-xs mb-1">✓ Auto-confirmed</div>
+                      <div className="p-3 bg-gold-500/10 rounded-lg border border-gold-500/30">
+                        <div className="text-gold-400 text-xs mb-1">✓ Auto-confirmed</div>
                         <div className="text-white font-semibold">Calendar synced</div>
                       </div>
                     </div>
                     
-                    <button className="w-full py-3 bg-neon-green-500 hover:bg-neon-green-600 text-black font-semibold rounded-lg transition-colors">
+                    <button className="w-full py-3 bg-gold-500 hover:bg-gold-600 text-black font-semibold rounded-lg transition-colors">
                       Confirm Booking
                     </button>
                   </div>
@@ -134,7 +134,7 @@ export default function AutomatedSchedulingPage() {
               
               <div>
                 <h2 className="font-display font-bold text-white mb-6 text-4xl">
-                  Our AI Handles <span className="text-neon-green-500">Everything</span>
+                  Our AI Handles <span className="text-gold-500">Everything</span>
                 </h2>
                 <div className="space-y-4">
                   {[
@@ -144,12 +144,12 @@ export default function AutomatedSchedulingPage() {
                     { solution: 'Automated SMS reminders', benefit: '60% fewer no-shows' }
                   ].map((item, i) => (
                     <div key={i} className="os-card p-4 flex gap-4 items-start">
-                      <div className="w-10 h-10 rounded-full bg-neon-green-500/20 flex items-center justify-center flex-shrink-0">
-                        <span className="text-neon-green-400 text-xl">✓</span>
+                      <div className="w-10 h-10 rounded-full bg-gold-500/20 flex items-center justify-center flex-shrink-0">
+                        <span className="text-gold-400 text-xl">✓</span>
                       </div>
                       <div>
                         <div className="text-white font-semibold mb-1">{item.solution}</div>
-                        <div className="text-neon-green-400/70 text-sm">→ {item.benefit}</div>
+                        <div className="text-gold-400/70 text-sm">→ {item.benefit}</div>
                       </div>
                     </div>
                   ))}
@@ -164,7 +164,7 @@ export default function AutomatedSchedulingPage() {
           <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
             <div className="text-center mb-16">
               <h2 className="font-display font-bold text-white mb-3 text-4xl">
-                Everything You Need to <span className="text-neon-green-500">Automate Scheduling</span>
+                Everything You Need to <span className="text-gold-500">Automate Scheduling</span>
               </h2>
             </div>
             
@@ -218,7 +218,7 @@ export default function AutomatedSchedulingPage() {
           <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
             <div className="text-center mb-16">
               <h2 className="font-display font-bold text-white mb-3 text-4xl">
-                How Does <span className="text-neon-green-500">Automated Scheduling</span> Work?
+                How Does <span className="text-gold-500">Automated Scheduling</span> Work?
               </h2>
               <p className="text-white/60 max-w-2xl mx-auto text-lg">
                 Set it up once, and let AI handle all your bookings forever
@@ -233,8 +233,8 @@ export default function AutomatedSchedulingPage() {
                 { num: '4', title: 'Get Bookings', desc: 'AI handles everything 24/7 automatically' }
               ].map((step, i) => (
                 <div key={i} className="os-card p-6 text-center">
-                  <div className="w-12 h-12 rounded-full bg-neon-green-500/20 border border-neon-green-500/40 flex items-center justify-center mx-auto mb-4">
-                    <span className="text-neon-green-400 font-bold text-lg">{step.num}</span>
+                  <div className="w-12 h-12 rounded-full bg-gold-500/20 border border-gold-500/40 flex items-center justify-center mx-auto mb-4">
+                    <span className="text-gold-400 font-bold text-lg">{step.num}</span>
                   </div>
                   <h3 className="text-white font-bold mb-2">{step.title}</h3>
                   <p className="text-white/70 text-sm leading-relaxed">{step.desc}</p>
@@ -249,7 +249,7 @@ export default function AutomatedSchedulingPage() {
           <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
             <div className="text-center mb-16">
               <h2 className="font-display font-bold text-white mb-3 text-4xl">
-                Perfect for Every <span className="text-neon-green-500">Business Type</span>
+                Perfect for Every <span className="text-gold-500">Business Type</span>
               </h2>
             </div>
             
@@ -278,8 +278,8 @@ export default function AutomatedSchedulingPage() {
               ].map((industry, i) => (
                 <div key={i} className="os-card p-8">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-full bg-neon-green-500/20 flex items-center justify-center">
-                      <span className="text-neon-green-400 font-bold">{i + 1}</span>
+                    <div className="w-10 h-10 rounded-full bg-gold-500/20 flex items-center justify-center">
+                      <span className="text-gold-400 font-bold">{i + 1}</span>
                     </div>
                     <div>
                       <h3 className="text-white font-bold text-lg">{industry.industry}</h3>
@@ -298,7 +298,7 @@ export default function AutomatedSchedulingPage() {
           <div className="max-w-[1000px] mx-auto px-4 sm:px-6">
             <div className="text-center mb-16">
               <h2 className="font-display font-bold text-white mb-3 text-4xl">
-                Common <span className="text-neon-green-500">Questions</span>
+                Common <span className="text-gold-500">Questions</span>
               </h2>
             </div>
             
@@ -335,7 +335,7 @@ export default function AutomatedSchedulingPage() {
           <div className="max-w-[1000px] mx-auto px-4 sm:px-6">
             <div className="os-card p-12 text-center">
               <h2 className="font-display font-bold text-white mb-4 text-3xl">
-                Stop Losing Revenue to <span className="text-neon-green-500">Missed Opportunities</span>
+                Stop Losing Revenue to <span className="text-gold-500">Missed Opportunities</span>
               </h2>
               <p className="text-white/70 text-lg mb-8 max-w-2xl mx-auto">
                 Join 500+ businesses that increased conversions by 40% with automated scheduling.

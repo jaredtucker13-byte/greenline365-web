@@ -104,7 +104,7 @@ Return ONLY a valid JSON array with this exact format, no other text:
     let results = [];
     try {
       // Clean and extract JSON array from response
-      let cleanedContent = content
+      const cleanedContent = content
         .replace(/```json\n?/g, '')
         .replace(/```\n?/g, '')
         .trim();

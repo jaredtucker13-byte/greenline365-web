@@ -25,7 +25,7 @@ CREATE POLICY "Users view own audits" ON audit_logs
   FOR SELECT TO authenticated 
   USING (tenant_id = auth.uid() OR actor_id = auth.uid());
 
--- Block modifications (append-only for SOC2)
+-- Block modifications (append-only per SOC 2 best practices)
 CREATE POLICY "Block audit updates" ON audit_logs 
   FOR UPDATE TO authenticated 
   USING (false);

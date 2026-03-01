@@ -147,12 +147,12 @@ export default function PhotosPage() {
             onChange={(e) => setUrlInput(e.target.value)}
             placeholder="Paste image URL..."
             disabled={atLimit}
-            className="flex-1 rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:border-neon-green-500 focus:outline-none focus:ring-1 focus:ring-neon-green-500 disabled:opacity-50"
+            className="flex-1 rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:border-gold-500 focus:outline-none focus:ring-1 focus:ring-gold-500 disabled:opacity-50"
           />
           <button
             onClick={handleUpload}
             disabled={uploading || atLimit || !urlInput.trim()}
-            className="rounded-lg bg-neon-green-500 px-4 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-neon-green-400 disabled:opacity-50"
+            className="rounded-lg bg-gold-500 px-4 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-gold-400 disabled:opacity-50"
           >
             {uploading ? 'Adding...' : 'Add Photo'}
           </button>
@@ -178,7 +178,7 @@ export default function PhotosPage() {
               onDragEnd={handleDragEnd}
               className={`group relative aspect-square cursor-grab overflow-hidden rounded-xl border transition-all ${
                 photo.is_cover
-                  ? 'border-neon-green-500/40'
+                  ? 'border-gold-500/40'
                   : 'border-white/10'
               } ${draggedId === photo.id ? 'opacity-50' : ''}`}
             >
@@ -189,7 +189,7 @@ export default function PhotosPage() {
                 className="h-full w-full object-cover"
               />
               {photo.is_cover && (
-                <span className="absolute left-2 top-2 rounded bg-neon-green-500 px-2 py-0.5 text-[10px] font-bold text-black">
+                <span className="absolute left-2 top-2 rounded bg-gold-500 px-2 py-0.5 text-[10px] font-bold text-black">
                   COVER
                 </span>
               )}

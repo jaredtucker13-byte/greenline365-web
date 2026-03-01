@@ -62,7 +62,7 @@ export default function PlanComparisonTable({
           onClick={() => setBillingCycle('monthly')}
           className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
             billingCycle === 'monthly'
-              ? 'bg-neon-green-500 text-black'
+              ? 'bg-gold-500 text-black'
               : 'text-white/60 hover:text-white'
           }`}
         >
@@ -72,12 +72,12 @@ export default function PlanComparisonTable({
           onClick={() => setBillingCycle('annual')}
           className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
             billingCycle === 'annual'
-              ? 'bg-neon-green-500 text-black'
+              ? 'bg-gold-500 text-black'
               : 'text-white/60 hover:text-white'
           }`}
         >
           Annual
-          <span className="ml-1.5 rounded bg-neon-green-500/20 px-1.5 py-0.5 text-[10px] text-neon-green-500">
+          <span className="ml-1.5 rounded bg-gold-500/20 px-1.5 py-0.5 text-[10px] text-gold-500">
             Save 17%
           </span>
         </button>
@@ -98,7 +98,7 @@ export default function PlanComparisonTable({
               key={plan.id}
               className={`rounded-xl border p-6 ${
                 isCurrent
-                  ? 'border-neon-green-500/40 bg-neon-green-500/5'
+                  ? 'border-gold-500/40 bg-gold-500/5'
                   : 'border-white/10 bg-white/5'
               }`}
             >
@@ -119,7 +119,7 @@ export default function PlanComparisonTable({
 
               <div className="my-6">
                 {isCurrent ? (
-                  <span className="block w-full rounded-lg border border-neon-green-500/40 py-2 text-center text-sm font-medium text-neon-green-500">
+                  <span className="block w-full rounded-lg border border-gold-500/40 py-2 text-center text-sm font-medium text-gold-500">
                     Current Plan
                   </span>
                 ) : isFree ? (
@@ -130,7 +130,7 @@ export default function PlanComparisonTable({
                   <button
                     onClick={() => onSubscribe(plan.id, billingCycle)}
                     disabled={isLoading}
-                    className="block w-full rounded-lg bg-neon-green-500 py-2 text-center text-sm font-semibold text-black transition-colors hover:bg-neon-green-400 disabled:opacity-50"
+                    className="block w-full rounded-lg bg-gold-500 py-2 text-center text-sm font-semibold text-black transition-colors hover:bg-gold-400 disabled:opacity-50"
                   >
                     {isLoading ? 'Loading...' : 'Subscribe'}
                   </button>
@@ -149,7 +149,7 @@ export default function PlanComparisonTable({
                     <li key={slug} className="flex items-center gap-2 text-xs">
                       {enabled ? (
                         <svg
-                          className="h-4 w-4 shrink-0 text-neon-green-500"
+                          className="h-4 w-4 shrink-0 text-gold-500"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"

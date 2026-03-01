@@ -21,18 +21,18 @@ export default function LocalTrendTrackingPage() {
         {/* Hero Section */}
         <section className="relative min-h-[70vh] flex items-center overflow-hidden pt-32 pb-20">
           <div className="absolute inset-0 bg-os-dark" />
-          <div className="absolute bottom-0 left-1/3 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-neon-green-500/10 to-transparent blur-3xl" />
+          <div className="absolute bottom-0 left-1/3 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-gold-500/10 to-transparent blur-3xl" />
           
           <div className="relative z-10 w-full max-w-[1200px] mx-auto px-4 sm:px-6">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>
-                <div className="mb-4 inline-flex items-center gap-2 px-3 py-1.5 glass-green rounded-full border border-neon-green-500/30">
-                  <span className="w-2 h-2 bg-neon-green-500 rounded-full animate-pulse" />
-                  <span className="text-xs text-neon-green-400 font-semibold tracking-wide">REAL-TIME INTELLIGENCE</span>
+                <div className="mb-4 inline-flex items-center gap-2 px-3 py-1.5 glass-gold rounded-full border border-gold-500/30">
+                  <span className="w-2 h-2 bg-gold-500 rounded-full animate-pulse" />
+                  <span className="text-xs text-gold-400 font-semibold tracking-wide">REAL-TIME INTELLIGENCE</span>
                 </div>
                 
                 <h1 className="font-display font-bold text-white mb-6" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', lineHeight: '1.1' }}>
-                  Know What Your <span className="text-neon-green-500">Community</span> Wants
+                  Know What Your <span className="text-gold-500">Community</span> Wants
                 </h1>
                 
                 <p className="text-white/70 text-lg mb-8 leading-relaxed">
@@ -59,7 +59,7 @@ export default function LocalTrendTrackingPage() {
                     { value: '50+', label: 'Sources' }
                   ].map((stat, i) => (
                     <div key={i} className="text-center">
-                      <div className="text-3xl font-display font-bold text-neon-green-500">{stat.value}</div>
+                      <div className="text-3xl font-display font-bold text-gold-500">{stat.value}</div>
                       <div className="text-sm text-white/50 mt-1">{stat.label}</div>
                     </div>
                   ))}
@@ -80,7 +80,7 @@ export default function LocalTrendTrackingPage() {
           <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
             <div className="text-center mb-16">
               <h2 className="font-display font-bold text-white mb-3 text-4xl">
-                Why <span className="text-neon-green-500">Local Trends</span> Matter
+                Why <span className="text-gold-500">Local Trends</span> Matter
               </h2>
               <p className="text-white/60 max-w-2xl mx-auto text-lg">
                 Your local market is unique. Generic marketing does not work.
@@ -112,7 +112,7 @@ export default function LocalTrendTrackingPage() {
               ].map((item, i) => (
                 <div key={i} className="os-card p-6 text-center">
                   <div className="text-4xl mb-3">{item.icon}</div>
-                  <div className="text-neon-green-400 font-bold text-lg mb-2">{item.stat}</div>
+                  <div className="text-gold-400 font-bold text-lg mb-2">{item.stat}</div>
                   <p className="text-white/70 text-sm leading-relaxed">{item.desc}</p>
                 </div>
               ))}
@@ -125,7 +125,7 @@ export default function LocalTrendTrackingPage() {
           <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
             <div className="text-center mb-16">
               <h2 className="font-display font-bold text-white mb-3 text-4xl">
-                How Does <span className="text-neon-green-500">Trend Tracking</span> Work?
+                How Does <span className="text-gold-500">Trend Tracking</span> Work?
               </h2>
             </div>
             
@@ -155,7 +155,7 @@ export default function LocalTrendTrackingPage() {
                     {step.icon}
                   </div>
                   <div className="flex items-center gap-3 mb-3">
-                    <span className="text-neon-green-500 text-sm font-bold tracking-wider">{step.num}</span>
+                    <span className="text-gold-500 text-sm font-bold tracking-wider">{step.num}</span>
                     <h3 className="text-white font-bold text-xl">{step.title}</h3>
                   </div>
                   <p className="text-white/70 leading-relaxed">{step.desc}</p>
@@ -170,7 +170,7 @@ export default function LocalTrendTrackingPage() {
           <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
             <div className="text-center mb-16">
               <h2 className="font-display font-bold text-white mb-3 text-4xl">
-                What You <span className="text-neon-green-500">Discover</span>
+                What You <span className="text-gold-500">Discover</span>
               </h2>
             </div>
             
@@ -212,7 +212,7 @@ export default function LocalTrendTrackingPage() {
                       <div className="space-y-2">
                         {item.examples.map((example, j) => (
                           <div key={j} className="flex items-center gap-2">
-                            <div className="w-1.5 h-1.5 bg-neon-green-500 rounded-full" />
+                            <div className="w-1.5 h-1.5 bg-gold-500 rounded-full" />
                             <span className="text-white/60 text-sm">{example}</span>
                           </div>
                         ))}
@@ -230,7 +230,7 @@ export default function LocalTrendTrackingPage() {
           <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
             <div className="text-center mb-16">
               <h2 className="font-display font-bold text-white mb-3 text-4xl">
-                Real <span className="text-neon-green-500">Success Stories</span>
+                Real <span className="text-gold-500">Success Stories</span>
               </h2>
             </div>
             
@@ -256,8 +256,8 @@ export default function LocalTrendTrackingPage() {
                 }
               ].map((story, i) => (
                 <div key={i} className="os-card p-6">
-                  <div className="w-12 h-12 rounded-full bg-neon-green-500/20 border border-neon-green-500/40 flex items-center justify-center mb-4">
-                    <span className="text-neon-green-400 font-bold text-lg">{i + 1}</span>
+                  <div className="w-12 h-12 rounded-full bg-gold-500/20 border border-gold-500/40 flex items-center justify-center mb-4">
+                    <span className="text-gold-400 font-bold text-lg">{i + 1}</span>
                   </div>
                   <h3 className="text-white font-bold text-lg mb-3">{story.business}</h3>
                   <div className="space-y-2 mb-4">
@@ -271,7 +271,7 @@ export default function LocalTrendTrackingPage() {
                     </div>
                   </div>
                   <div className="pt-3 border-t border-white/10">
-                    <div className="text-neon-green-400 font-bold text-xl">{story.result}</div>
+                    <div className="text-gold-400 font-bold text-xl">{story.result}</div>
                   </div>
                 </div>
               ))}
@@ -284,7 +284,7 @@ export default function LocalTrendTrackingPage() {
           <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
             <div className="text-center mb-12">
               <h2 className="font-display font-bold text-white mb-3 text-4xl">
-                We Monitor <span className="text-neon-green-500">50+ Data Sources</span>
+                We Monitor <span className="text-gold-500">50+ Data Sources</span>
               </h2>
               <p className="text-white/60 text-lg">Comprehensive coverage of your local market</p>
             </div>
@@ -302,7 +302,7 @@ export default function LocalTrendTrackingPage() {
                     <ul className="space-y-2">
                       {group.sources.map((source, j) => (
                         <li key={j} className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 bg-neon-green-500 rounded-full" />
+                          <div className="w-1.5 h-1.5 bg-gold-500 rounded-full" />
                           <span className="text-white/70 text-sm">{source}</span>
                         </li>
                       ))}
@@ -319,7 +319,7 @@ export default function LocalTrendTrackingPage() {
           <div className="max-w-[1000px] mx-auto px-4 sm:px-6">
             <div className="text-center mb-16">
               <h2 className="font-display font-bold text-white mb-3 text-4xl">
-                Common <span className="text-neon-green-500">Questions</span>
+                Common <span className="text-gold-500">Questions</span>
               </h2>
             </div>
             
@@ -356,7 +356,7 @@ export default function LocalTrendTrackingPage() {
           <div className="max-w-[1000px] mx-auto px-4 sm:px-6">
             <div className="os-card p-12 text-center">
               <h2 className="font-display font-bold text-white mb-4 text-3xl">
-                Stop Guessing. Start <span className="text-neon-green-500">Knowing</span>.
+                Stop Guessing. Start <span className="text-gold-500">Knowing</span>.
               </h2>
               <p className="text-white/70 text-lg mb-8 max-w-2xl mx-auto">
                 Join businesses using local trend intelligence to stay ahead of their market.

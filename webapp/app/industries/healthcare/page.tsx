@@ -19,18 +19,18 @@ export default function HealthcarePage() {
         {/* Hero Section */}
         <section className="relative min-h-[70vh] flex items-center overflow-hidden pt-32 pb-20">
           <div className="absolute inset-0 bg-os-dark" />
-          <div className="absolute bottom-0 left-1/4 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-neon-green-500/10 to-transparent blur-3xl" />
+          <div className="absolute bottom-0 left-1/4 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-gold-500/10 to-transparent blur-3xl" />
           
           <div className="relative z-10 w-full max-w-[1200px] mx-auto px-4 sm:px-6">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>
-                <div className="mb-4 inline-flex items-center gap-2 px-3 py-1.5 glass-green rounded-full border border-neon-green-500/30">
-                  <span className="w-2 h-2 bg-neon-green-500 rounded-full animate-pulse" />
-                  <span className="text-xs text-neon-green-400 font-semibold tracking-wide">FOR HEALTHCARE</span>
+                <div className="mb-4 inline-flex items-center gap-2 px-3 py-1.5 glass-gold rounded-full border border-gold-500/30">
+                  <span className="w-2 h-2 bg-gold-500 rounded-full animate-pulse" />
+                  <span className="text-xs text-gold-400 font-semibold tracking-wide">FOR HEALTHCARE</span>
                 </div>
                 
                 <h1 className="font-display font-bold text-white mb-6" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', lineHeight: '1.1' }}>
-                  More Patients, Less <span className="text-neon-green-500">Admin Burnout</span>
+                  More Patients, Less <span className="text-gold-500">Admin Burnout</span>
                 </h1>
                 
                 <p className="text-white/70 text-lg mb-8 leading-relaxed">
@@ -57,7 +57,7 @@ export default function HealthcarePage() {
                     { value: '+35%', label: 'Patient Volume' }
                   ].map((stat, i) => (
                     <div key={i} className="text-center">
-                      <div className="text-3xl font-display font-bold text-neon-green-500">{stat.value}</div>
+                      <div className="text-3xl font-display font-bold text-gold-500">{stat.value}</div>
                       <div className="text-sm text-white/50 mt-1">{stat.label}</div>
                     </div>
                   ))}
@@ -78,8 +78,8 @@ export default function HealthcarePage() {
                     </div>
                     
                     <div className="space-y-3">
-                      <div className="p-3 bg-neon-green-500/10 rounded-lg border border-neon-green-500/30">
-                        <div className="text-neon-green-400 text-xs mb-1">✓ New Appointment</div>
+                      <div className="p-3 bg-gold-500/10 rounded-lg border border-gold-500/30">
+                        <div className="text-gold-400 text-xs mb-1">✓ New Appointment</div>
                         <div className="text-white font-semibold">Dr. Chen - Tomorrow 10:00 AM</div>
                       </div>
                       <div className="p-3 bg-white/5 rounded-lg border border-white/10">
@@ -130,7 +130,7 @@ export default function HealthcarePage() {
           <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
             <div className="text-center mb-16">
               <h2 className="font-display font-bold text-white mb-3 text-4xl">
-                HIPAA-Compliant <span className="text-neon-green-500">Automation</span>
+                HIPAA-Compliant <span className="text-gold-500">Automation</span>
               </h2>
             </div>
             
@@ -164,7 +164,7 @@ export default function HealthcarePage() {
                   <div className="space-y-2">
                     {solution.features.map((feature, j) => (
                       <div key={j} className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-neon-green-500 rounded-full" />
+                        <div className="w-1.5 h-1.5 bg-gold-500 rounded-full" />
                         <span className="text-white/60 text-sm">{feature}</span>
                       </div>
                     ))}
@@ -180,7 +180,7 @@ export default function HealthcarePage() {
           <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
             <div className="text-center mb-16">
               <h2 className="font-display font-bold text-white mb-3 text-4xl">
-                Real Healthcare <span className="text-neon-green-500">Results</span>
+                Real Healthcare <span className="text-gold-500">Results</span>
               </h2>
             </div>
             
@@ -203,8 +203,8 @@ export default function HealthcarePage() {
               ].map((story, i) => (
                 <div key={i} className="os-card p-8">
                   <div className="flex items-start gap-4 mb-4">
-                    <div className="w-12 h-12 rounded-full bg-neon-green-500/20 border border-neon-green-500/40 flex items-center justify-center flex-shrink-0">
-                      <span className="text-neon-green-400 font-bold text-lg">{i + 1}</span>
+                    <div className="w-12 h-12 rounded-full bg-gold-500/20 border border-gold-500/40 flex items-center justify-center flex-shrink-0">
+                      <span className="text-gold-400 font-bold text-lg">{i + 1}</span>
                     </div>
                     <div>
                       <h3 className="text-white font-bold text-xl">{story.name}</h3>
@@ -217,11 +217,11 @@ export default function HealthcarePage() {
                       <p className="text-white/70 text-sm">{story.problem}</p>
                     </div>
                     <div>
-                      <div className="text-neon-green-400/80 text-xs font-semibold mb-1">✓ SOLUTION</div>
+                      <div className="text-gold-400/80 text-xs font-semibold mb-1">✓ SOLUTION</div>
                       <p className="text-white/70 text-sm">{story.solution}</p>
                     </div>
                     <div className="pt-3 border-t border-white/10">
-                      <div className="text-neon-green-400 font-bold">{story.result}</div>
+                      <div className="text-gold-400 font-bold">{story.result}</div>
                     </div>
                   </div>
                 </div>
@@ -235,7 +235,7 @@ export default function HealthcarePage() {
           <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
             <div className="text-center mb-16">
               <h2 className="font-display font-bold text-white mb-3 text-4xl">
-                Built for <span className="text-neon-green-500">Healthcare Compliance</span>
+                Built for <span className="text-gold-500">Healthcare Compliance</span>
               </h2>
             </div>
             
@@ -243,7 +243,7 @@ export default function HealthcarePage() {
               {[
                 {
                   title: 'HIPAA Compliant',
-                  desc: 'SOC 2 Type II + HIPAA certified. All patient data encrypted, BAA included, regular security audits.',
+                  desc: 'Built to HIPAA standards with BAA included. All patient data encrypted at rest and in transit. Pursuing SOC 2 Type II certification.',
                   icon: '🔒'
                 },
                 {
@@ -291,7 +291,7 @@ export default function HealthcarePage() {
           <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
             <div className="text-center mb-16">
               <h2 className="font-display font-bold text-white mb-3 text-4xl">
-                Every <span className="text-neon-green-500">Specialty</span> Covered
+                Every <span className="text-gold-500">Specialty</span> Covered
               </h2>
             </div>
             
@@ -316,7 +316,7 @@ export default function HealthcarePage() {
           <div className="max-w-[1000px] mx-auto px-4 sm:px-6">
             <div className="text-center mb-16">
               <h2 className="font-display font-bold text-white mb-3 text-4xl">
-                Healthcare Provider <span className="text-neon-green-500">FAQs</span>
+                Healthcare Provider <span className="text-gold-500">FAQs</span>
               </h2>
             </div>
             
@@ -324,7 +324,7 @@ export default function HealthcarePage() {
               {[
                 {
                   q: 'Is this really HIPAA compliant?',
-                  a: 'Yes. We are SOC 2 Type II certified and fully HIPAA compliant. We sign BAAs with all healthcare providers and undergo regular third-party security audits.'
+                  a: 'Yes. Our infrastructure is built to HIPAA standards and we sign BAAs with all healthcare providers. We are actively pursuing SOC 2 Type II certification and undergo regular third-party security audits.'
                 },
                 {
                   q: 'Can patients book specific appointment types?',
@@ -353,7 +353,7 @@ export default function HealthcarePage() {
           <div className="max-w-[1000px] mx-auto px-4 sm:px-6">
             <div className="os-card p-12 text-center">
               <h2 className="font-display font-bold text-white mb-4 text-3xl">
-                See More Patients. <span className="text-neon-green-500">Reduce Burnout.</span>
+                See More Patients. <span className="text-gold-500">Reduce Burnout.</span>
               </h2>
               <p className="text-white/70 text-lg mb-8 max-w-2xl mx-auto">
                 Join 250+ healthcare providers using AI to reduce no-shows and administrative burden.

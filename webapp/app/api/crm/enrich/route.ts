@@ -287,7 +287,7 @@ async function auditWebsite(websiteUrl: string): Promise<{
 
     // Check for SEO basics
     const hasTitle = $('title').text().trim().length > 0;
-    const hasMetaDesc = $('meta[name="description"]').attr('content')?.trim().length! > 0;
+    const hasMetaDesc = ($('meta[name="description"]').attr('content')?.trim().length ?? 0) > 0;
     auditDetails.has_title = hasTitle;
     const hasDescription = !!hasMetaDesc;
     auditDetails.has_meta_description = hasDescription;

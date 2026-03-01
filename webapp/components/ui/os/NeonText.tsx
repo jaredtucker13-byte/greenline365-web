@@ -20,9 +20,9 @@ export function NeonText({
   className,
 }: NeonTextProps) {
   const variantStyles = {
-    green: 'text-gold',
-    teal: 'text-gold-200',
-    gradient: 'text-gradient-gold',
+    green: 'text-gold-500',
+    teal: 'text-neon-teal-500',
+    gradient: 'text-gradient-neon',
   };
   
   const glowStyles = glow ? 'glow-text' : '';

@@ -249,7 +249,7 @@ ${title ? `The blog title context is: "${title}"` : ''}`;
     const aiResponse = data.choices?.[0]?.message?.content || '';
 
     // Parse JSON responses for certain actions
-    let result: any = { raw: aiResponse };
+    const result: any = { raw: aiResponse };
 
     if (['generate_meta', 'suggest_headlines', 'suggest_tags', 'improve_seo', 'enhance_content_with_title'].includes(action)) {
       try {

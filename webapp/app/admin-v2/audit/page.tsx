@@ -2,7 +2,7 @@
 
 /**
  * Audit Log Viewer - Admin Only
- * SOC2 Compliance Dashboard
+ * Audit & Compliance Dashboard (SOC 2 readiness)
  */
 
 import { useState, useEffect } from 'react';
@@ -132,7 +132,7 @@ export default function AuditPage() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-white">Audit Logs</h1>
-                <p className="text-white/60 text-sm">SOC2 Compliance Dashboard</p>
+                <p className="text-white/60 text-sm">Compliance & Audit Dashboard</p>
               </div>
             </div>
           </div>
@@ -310,12 +310,12 @@ export default function AuditPage() {
               className="p-6 rounded-2xl bg-gradient-to-r from-red-500/10 to-orange-500/10 border border-red-500/20"
             >
               <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
-                <span>🛡️</span> SOC2 Compliance
+                <span>🛡️</span> Compliance Readiness
               </h3>
               <div className="grid md:grid-cols-3 gap-4 text-sm text-white/60">
                 <div>
                   <div className="font-medium text-white/80 mb-1">Retention Policy</div>
-                  <p>Audit logs retained for 7 years per SOC2 requirements</p>
+                  <p>Audit logs retained for 7 years, aligned with SOC 2 best practices</p>
                 </div>
                 <div>
                   <div className="font-medium text-white/80 mb-1">Tamper Protection</div>

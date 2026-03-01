@@ -2,7 +2,7 @@
  * Audit Logger Service
  * Server-side utility for logging audit events
  * 
- * SOC2 Compliance: Tracks all significant actions
+ * Compliance Readiness: Tracks all significant actions (aligned with SOC 2 standards)
  */
 
 import { SupabaseClient } from '@supabase/supabase-js';

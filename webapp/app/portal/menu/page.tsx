@@ -201,7 +201,7 @@ function MenuEditor({ listingId }: { listingId: string }) {
                 value={section.name}
                 onChange={(e) => updateSection(section.id, e.target.value)}
                 placeholder="Section name (e.g., Appetizers)"
-                className="flex-1 border-b border-white/10 bg-transparent pb-1 text-lg font-semibold text-white placeholder-white/30 focus:border-neon-green-500 focus:outline-none"
+                className="flex-1 border-b border-white/10 bg-transparent pb-1 text-lg font-semibold text-white placeholder-white/30 focus:border-gold-500 focus:outline-none"
               />
               <button
                 onClick={() => removeSection(section.id)}
@@ -246,7 +246,7 @@ function MenuEditor({ listingId }: { listingId: string }) {
                       value={item.price}
                       onChange={(e) => updateItem(section.id, item.id, 'price', e.target.value)}
                       placeholder="$0.00"
-                      className="w-full rounded bg-transparent px-2 py-1 text-sm text-neon-green-500 placeholder-white/20 focus:outline-none"
+                      className="w-full rounded bg-transparent px-2 py-1 text-sm text-gold-500 placeholder-white/20 focus:outline-none"
                     />
                   </div>
                   <div className="flex items-center justify-end sm:col-span-2">
@@ -265,7 +265,7 @@ function MenuEditor({ listingId }: { listingId: string }) {
 
             <button
               onClick={() => addItem(section.id)}
-              className="mt-3 flex items-center gap-1.5 text-xs font-medium text-neon-green-500 hover:text-neon-green-400"
+              className="mt-3 flex items-center gap-1.5 text-xs font-medium text-gold-500 hover:text-gold-400"
             >
               <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -289,7 +289,7 @@ function MenuEditor({ listingId }: { listingId: string }) {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="rounded-lg bg-neon-green-500 px-6 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-neon-green-400 disabled:opacity-50"
+          className="rounded-lg bg-gold-500 px-6 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-gold-400 disabled:opacity-50"
         >
           {saving ? 'Saving...' : 'Save Menu'}
         </button>

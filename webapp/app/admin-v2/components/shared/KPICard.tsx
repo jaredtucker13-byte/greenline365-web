@@ -28,7 +28,7 @@ export interface KPICardProps {
   };
   
   // Styling
-  color?: 'emerald' | 'blue' | 'purple' | 'amber' | 'red' | 'cyan';
+  color?: 'gold' | 'blue' | 'purple' | 'amber' | 'red' | 'cyan';
   size?: 'sm' | 'md' | 'lg';
   
   // Sparkline data (optional)
@@ -52,7 +52,7 @@ export interface KPICardProps {
 }
 
 const colorConfig = {
-  emerald: {
+  gold: {
     gradient: 'from-gold-500/10 to-gold-600/5',
     border: 'border-gold-500/20',
     text: 'text-gold-400',
@@ -107,7 +107,7 @@ export function KPICard({
   value,
   icon,
   trend,
-  color = 'emerald',
+  color = 'gold',
   size = 'md',
   sparkline,
   meta,

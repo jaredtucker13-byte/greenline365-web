@@ -10,10 +10,7 @@
     "typecheck": "tsc --noEmit",
     "prebuild:check": "npm run typecheck && npm run lint",
     "supabase:seed": "node scripts/seed-simple.js",
-    "validate-env": "node scripts/validate-env.js",
-    "db:migrate": "node scripts/migrate.js",
-    "db:migrate:status": "node scripts/migrate.js --status",
-    "db:seed": "node scripts/seed-simple.js",
+
     "analyze": "ANALYZE=true next build"
   },
   "dependencies": {
@@ -61,7 +58,7 @@
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^15.0.0",
-    "@types/cheerio": "^0.22.35",
+
     "@types/node": "^20",
     "@types/nodemailer": "^7.0.5",
     "@types/qrcode": "^1.5.6",
@@ -75,6 +72,6 @@
     "postcss": "^8.5.6",
     "supabase": "^2.70.5",
     "tailwindcss": "^3.4.19",
-    "typescript": "^5"
+    "typescript": "5.9.3"
   }
 }
