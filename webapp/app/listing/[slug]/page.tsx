@@ -305,8 +305,7 @@ export default function ListingDetailPage() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="rounded-2xl border border-white/10 p-6 backdrop-blur-xl"
-              style={{ background: 'rgba(10,10,10,0.9)' }}
+              className="glass-card-depth rounded-2xl p-6 backdrop-blur-xl"
               data-testid="listing-header"
             >
               <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -485,8 +484,7 @@ export default function ListingDetailPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.15 }}
-                className="rounded-2xl border border-white/10 p-6"
-                style={{ background: 'rgba(255,255,255,0.03)' }}
+                className="glass-card-depth rounded-2xl p-6"
                 data-testid="business-hours"
               >
                 <h3 className="text-sm font-heading font-semibold text-white uppercase tracking-wider mb-4">Business Hours</h3>
@@ -612,8 +610,7 @@ export default function ListingDetailPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.25 }}
-              className="rounded-2xl border border-white/10 p-6"
-              style={{ background: 'rgba(255,255,255,0.03)' }}
+              className="glass-card-depth rounded-2xl p-6"
               data-testid="gl365-reviews-section"
             >
               <div className="flex items-center justify-between mb-6">
@@ -874,8 +871,7 @@ export default function ListingDetailPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="rounded-2xl border border-white/10 p-6 sticky top-24"
-              style={{ background: 'rgba(10,10,10,0.9)', backdropFilter: 'blur(16px)' }}
+              className="glass-card-depth rounded-2xl p-6 sticky top-24 backdrop-blur-xl"
               data-testid="contact-card"
             >
               <h3 className="text-sm font-heading font-semibold text-white uppercase tracking-wider mb-5">Contact</h3>

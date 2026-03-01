@@ -601,7 +601,7 @@ export default function DirectoryClient() {
           {/* ═══════════════════════════════════════════════════════════
               BROWSE BY SERVICE AREA
               ═══════════════════════════════════════════════════════════ */}
-          <section className="py-20" style={{ background: '#0A0A0A' }} data-testid="service-area-section">
+          <section className="py-20 section-depth-elevated relative" data-testid="service-area-section">
             <div className="max-w-7xl mx-auto px-6">
               <p className="text-xs font-heading font-semibold uppercase tracking-[0.2em] text-center mb-3" style={{ color: '#C9A84C' }}>Browse By Service Area</p>
               <h2 className="text-3xl md:text-4xl font-heading font-light text-white text-center mb-3 tracking-tight">
@@ -628,8 +628,7 @@ export default function DirectoryClient() {
                         const matchCity = availableCities.find(c => area.cities.some(ac => c.toLowerCase().includes(ac.toLowerCase())));
                         if (matchCity) setCityFilter(matchCity);
                       }}
-                      className="rounded-xl border border-white/10 hover:border-gold/30 hover:shadow-gold-glow p-4 text-left transition-all duration-300 group"
-                      style={{ background: 'rgba(255,255,255,0.02)' }}
+                      className="glass-card-depth rounded-xl p-4 text-left group"
                       data-testid={`service-area-${area.id}`}
                     >
                       <div className="flex items-center gap-2 mb-2">
@@ -688,7 +687,7 @@ export default function DirectoryClient() {
           {/* ═══════════════════════════════════════════════════════════
               VALUE PROPOSITION — Why GreenLine365
               ═══════════════════════════════════════════════════════════ */}
-          <section className="py-20" style={{ background: '#0A0A0A' }} data-testid="value-prop-section">
+          <section className="py-20 section-depth-dark" data-testid="value-prop-section">
             <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
               <div>
                 <h2 className="text-3xl font-heading font-light text-white mb-4 tracking-tight">A <span className="text-gradient-gold font-semibold">Trusted</span> Resource for Finding Local Pros</h2>
@@ -890,8 +889,8 @@ function ListingCard({ listing: l, index: i }: { listing: Listing; index: number
   return (
     <Link href={`/listing/${l.slug}`}>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
-        className={`rounded-2xl overflow-hidden border transition-all duration-500 group cursor-pointer ${hasIntel ? 'border-[rgba(201,168,76,0.2)] shadow-gold-glow hover:border-[rgba(201,168,76,0.4)]' : 'border-white/5 hover:border-[rgba(201,168,76,0.2)] hover:shadow-gold-glow'}`}
-        style={{ background: 'rgba(255,255,255,0.02)' }}
+        className={`rounded-2xl overflow-hidden border transition-all duration-500 group cursor-pointer ${hasIntel ? 'border-[rgba(201,168,76,0.2)] shadow-gold-glow hover:border-[rgba(201,168,76,0.4)] border-glow-gold' : 'border-white/5 hover:border-[rgba(201,168,76,0.15)] hover:shadow-gold-glow'}`}
+        style={{ background: 'linear-gradient(135deg, rgba(18,18,18,0.95) 0%, rgba(10,10,10,0.95) 100%)', boxShadow: '0 4px 20px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.03)' }}
         data-testid={`listing-${l.slug}`}>
         <div className="relative h-40 overflow-hidden">
           {l.cover_image_url || l.logo_url ? (
