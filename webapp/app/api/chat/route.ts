@@ -519,6 +519,10 @@ export async function POST(req: NextRequest) {
 
     console.log(`[Chat] Session: ${sessionId || 'anonymous'}, Mode: ${mode || 'default'}, Model: ${model}, HasMemory: ${!!aiContext}`);
 
+    const shouldStream = body?.stream === true;
+    const temperature = mode === 'creative' ? 0.8 : 0.7;
+    const maxTokens = mode === 'creative' ? 1000 : (directoryContext ? 800 : 500);
+
     const upstream = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -530,27 +534,88 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({
         model,
         messages: messagesWithSystem,
-        stream: false,
-        temperature: mode === 'creative' ? 0.8 : 0.7,
-        max_tokens: mode === 'creative' ? 1000 : (directoryContext ? 800 : 500),
+        stream: shouldStream,
+        temperature,
+        max_tokens: maxTokens,
       }),
     });
 
-    const json = await upstream.json().catch(async () => ({
-      error: await upstream.text(),
-    }));
-
     // Handle rate limits or errors gracefully
     if (!upstream.ok) {
-      console.error('[Chat] API Error:', json);
+      const errorBody = await upstream.text().catch(() => 'Unknown error');
+      console.error('[Chat] API Error:', errorBody);
       return Response.json(
-        { 
+        {
           error: 'Service temporarily unavailable',
           reply: "I'm experiencing a brief delay. Please try again in a moment."
-        }, 
+        },
         { status: upstream.status }
       );
     }
+
+    // Streaming response — forward the SSE stream directly to the client
+    if (shouldStream && upstream.body) {
+      const reader = upstream.body.getReader();
+      const decoder = new TextDecoder();
+      let fullContent = '';
+
+      const stream = new ReadableStream({
+        async start(controller) {
+          try {
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) {
+                controller.close();
+                // Store the full response in memory buffer after stream completes
+                if (userId && sessionId && fullContent) {
+                  try {
+                    const supabase = await createClient();
+                    const memoryService = new MemoryBucketService(supabase, userId);
+                    await memoryService.addToBuffer(sessionId, {
+                      contextType: 'message',
+                      content: { role: 'assistant', content: fullContent, timestamp: new Date().toISOString() },
+                      importance: 5,
+                    });
+                  } catch {}
+                }
+                break;
+              }
+
+              // Forward the chunk to the client
+              controller.enqueue(value);
+
+              // Parse SSE chunks to accumulate full content for memory storage
+              const text = decoder.decode(value, { stream: true });
+              const lines = text.split('\n').filter(l => l.startsWith('data: '));
+              for (const line of lines) {
+                const data = line.slice(6).trim();
+                if (data === '[DONE]') continue;
+                try {
+                  const parsed = JSON.parse(data);
+                  const delta = parsed?.choices?.[0]?.delta?.content;
+                  if (delta) fullContent += delta;
+                } catch {}
+              }
+            }
+          } catch (err) {
+            controller.error(err);
+          }
+        },
+      });
+
+      return new Response(stream, {
+        headers: {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          Connection: 'keep-alive',
+        },
+      });
+    }
+
+    // Non-streaming response (legacy support)
+    const json = await upstream.json().catch(async () => ({
+      error: await upstream.text(),
+    }));
 
     // Store assistant response in Buffer (Layer 4)
     if (userId && sessionId && json?.choices?.[0]?.message?.content) {
@@ -559,10 +624,10 @@ export async function POST(req: NextRequest) {
         const memoryService = new MemoryBucketService(supabase, userId);
         await memoryService.addToBuffer(sessionId, {
           contextType: 'message',
-          content: { 
-            role: 'assistant', 
-            content: json.choices[0].message.content, 
-            timestamp: new Date().toISOString() 
+          content: {
+            role: 'assistant',
+            content: json.choices[0].message.content,
+            timestamp: new Date().toISOString()
           },
           importance: 5,
         });

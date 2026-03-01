@@ -131,7 +131,7 @@ async function scrapeContactEmails(websiteUrl: string): Promise<{ name: string |
         const local = email.split('@')[0];
         let name: string | null = null;
         if (/^[a-z]+\.[a-z]+$/i.test(local)) {
-          name = local.split('.').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+          name = local.split('.').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
         }
         // Detect role from nearby text
         let role: string | null = null;

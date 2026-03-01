@@ -8,14 +8,16 @@ export async function GET() {
   try {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const [listingsRes, leadsRes] = await Promise.all([
+    const [listingsRes, leadsRes, claimedRes] = await Promise.all([
       supabase.from('directory_listings').select('industry, city, tags', { count: 'exact' }),
       supabase.from('crm_leads').select('id', { count: 'exact' }),
+      supabase.from('directory_listings').select('id', { count: 'exact', head: true }).eq('is_claimed', true),
     ]);
 
     const listings = listingsRes.data || [];
     const totalBusinesses = listingsRes.count || 0;
     const totalLeads = leadsRes.count || 0;
+    const claimedCount = claimedRes.count || 0;
 
     const industries = new Set(listings.map(l => l.industry).filter(Boolean));
     const cities = new Set(listings.map(l => l.city).filter(Boolean));
@@ -34,6 +36,8 @@ export async function GET() {
       totalDestinations: destinations.size || cities.size,
       totalCategories: industries.size,
       totalLeads,
+      foundingMembersClaimed: Math.min(claimedCount, 50),
+      foundingMembersRemaining: Math.max(0, 50 - claimedCount),
     });
   } catch (error: any) {
     return NextResponse.json({

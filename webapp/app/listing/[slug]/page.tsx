@@ -47,6 +47,19 @@ interface RelatedListing {
   metadata: Record<string, any>;
 }
 
+/** Ensure a URL has a protocol prefix */
+function ensureProtocol(url: string): string {
+  if (!url) return url;
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  return `https://${url}`;
+}
+
+/** Clean phone for tel: link (strip non-numeric except leading +) */
+function cleanPhone(phone: string): string {
+  if (!phone) return phone;
+  return phone.replace(/[^\d+]/g, '');
+}
+
 export default function ListingDetailPage() {
   const params = useParams();
   const slug = params.slug as string;
@@ -61,6 +74,9 @@ export default function ListingDetailPage() {
   const [submittingReview, setSubmittingReview] = useState(false);
   const [reviewMessage, setReviewMessage] = useState('');
   const [reviewSort, setReviewSort] = useState<'newest' | 'highest' | 'lowest'>('newest');
+  const [featuredLoops, setFeaturedLoops] = useState<{ id: string; name: string; slug: string; loop_type: string }[]>([]);
+  const [showCallModal, setShowCallModal] = useState(false);
+  const [phoneCopied, setPhoneCopied] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -80,6 +96,11 @@ export default function ListingDetailPage() {
         fetch(`/api/directory/reviews?listing_id=${data.id}`)
           .then(r => r.json())
           .then(d => { setReviews(d.reviews || []); setReviewStats({ total: d.total, average_rating: d.average_rating }); })
+          .catch(() => {});
+        // Load featured loops
+        fetch(`/api/loops?listing_id=${data.id}&limit=5`)
+          .then(r => r.json())
+          .then(d => setFeaturedLoops(d.loops || []))
           .catch(() => {});
       }
       setLoading(false);
@@ -130,7 +151,7 @@ export default function ListingDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-midnight-900 flex items-center justify-center pt-20">
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center pt-20">
         <div className="flex items-center gap-3">
           <div className="w-5 h-5 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
           <span className="text-white/50 font-body text-sm">Loading listing...</span>
@@ -141,7 +162,7 @@ export default function ListingDetailPage() {
 
   if (!listing) {
     return (
-      <div className="min-h-screen bg-midnight-900 flex items-center justify-center pt-20">
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center pt-20">
         <div className="text-center">
           <h1 className="text-2xl font-heading font-light text-white mb-3">Listing Not Found</h1>
           <p className="text-white/50 font-body mb-6">This business doesn&apos;t exist in our directory.</p>
@@ -155,9 +176,11 @@ export default function ListingDetailPage() {
   const googleRating = listing.metadata?.google_rating;
   const googleReviews = listing.metadata?.google_review_count;
   const googleMapsUrl = listing.metadata?.google_maps_url;
+  const businessHours = listing.business_hours as Record<string, { open: string; close: string; closed: boolean }> | null;
+  const menuSections = listing.menu as { id: string; name: string; items: { id: string; name: string; description: string; price: string }[] }[] | null;
 
   return (
-    <div className="min-h-screen bg-midnight-900 pt-20 pb-16" data-testid="listing-detail-page">
+    <div className="min-h-screen bg-[#0A0A0A] pt-20 pb-16" data-testid="listing-detail-page">
       {/* Hero / Cover Image */}
       <section className="relative h-64 sm:h-80 lg:h-96 overflow-hidden">
         {listing.cover_image_url ? (
@@ -167,11 +190,11 @@ export default function ListingDetailPage() {
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-midnight-800 to-charcoal-800 flex items-center justify-center">
+          <div className="w-full h-full bg-gradient-to-br from-[#111111] to-charcoal-800 flex items-center justify-center">
             <span className="text-8xl font-heading font-light text-white/10">{listing.business_name[0]}</span>
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-midnight-900 via-midnight-900/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/40 to-transparent" />
 
         {/* Back button + Directory home */}
         <div className="absolute top-4 left-4 flex items-center gap-2">
@@ -185,7 +208,7 @@ export default function ListingDetailPage() {
               }
             }}
             className="inline-flex items-center gap-2 px-3 py-2 rounded-lg backdrop-blur-sm text-sm text-white/70 hover:text-white border border-white/10 hover:border-white/20 transition-all font-body"
-            style={{ background: 'rgba(13,27,42,0.7)' }}
+            style={{ background: 'rgba(10,10,10,0.7)' }}
             data-testid="back-button"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
@@ -194,7 +217,7 @@ export default function ListingDetailPage() {
           <Link
             href="/"
             className="inline-flex items-center gap-1 px-3 py-2 rounded-lg backdrop-blur-sm text-sm text-white/40 hover:text-white border border-white/5 hover:border-white/15 transition-all font-body"
-            style={{ background: 'rgba(13,27,42,0.5)' }}
+            style={{ background: 'rgba(10,10,10,0.5)' }}
             data-testid="back-to-directory"
           >
             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
@@ -208,7 +231,7 @@ export default function ListingDetailPage() {
             <span
               className="px-3 py-1.5 rounded-full text-xs font-heading font-bold uppercase tracking-wider"
               style={{
-                background: listing.tier === 'premium' ? 'linear-gradient(135deg, #C9A96E, #E6D8B5)' : 'linear-gradient(135deg, #3B82F6, #60A5FA)',
+                background: listing.tier === 'premium' ? 'linear-gradient(135deg, #C9A84C, #E8C97A)' : 'linear-gradient(135deg, #3B82F6, #60A5FA)',
                 color: '#0D1B2A',
               }}
             >
@@ -227,7 +250,7 @@ export default function ListingDetailPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="rounded-2xl border border-white/10 p-6 backdrop-blur-xl"
-              style={{ background: 'rgba(13,27,42,0.9)' }}
+              style={{ background: 'rgba(10,10,10,0.9)' }}
               data-testid="listing-header"
             >
               <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -288,7 +311,7 @@ export default function ListingDetailPage() {
                 <div className="mt-4">
                   <span
                     className="inline-flex items-center gap-1.5 font-semibold rounded-full px-3 py-1.5 text-xs"
-                    style={{ background: 'linear-gradient(135deg, #C9A96E, #E6D8B5)', color: '#fff' }}
+                    style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C97A)', color: '#fff' }}
                     data-testid="pi-badge"
                   >
                     <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
@@ -297,6 +320,53 @@ export default function ListingDetailPage() {
                 </div>
               )}
             </motion.div>
+
+            {/* Featured Video — Premium tier only */}
+            {listing.tier === 'premium' && listing.is_claimed && listing.metadata?.video_url && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.08 }}
+                className="rounded-2xl border border-gold/20 overflow-hidden"
+                style={{ background: 'rgba(201,168,76,0.04)' }}
+                data-testid="featured-video"
+              >
+                <div className="flex items-center gap-2 px-4 py-3 border-b border-gold/10">
+                  <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" />
+                  </svg>
+                  <span className="text-xs font-heading font-semibold text-gold uppercase tracking-wider">Featured Video</span>
+                </div>
+                <div className="relative aspect-video">
+                  {listing.metadata.video_url.includes('youtube.com') || listing.metadata.video_url.includes('youtu.be') ? (
+                    <iframe
+                      src={listing.metadata.video_url.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/')}
+                      className="w-full h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      title={`${listing.business_name} video`}
+                    />
+                  ) : listing.metadata.video_url.includes('vimeo.com') ? (
+                    <iframe
+                      src={listing.metadata.video_url.replace('vimeo.com/', 'player.vimeo.com/video/')}
+                      className="w-full h-full"
+                      allow="autoplay; fullscreen; picture-in-picture"
+                      allowFullScreen
+                      title={`${listing.business_name} video`}
+                    />
+                  ) : (
+                    <video
+                      src={listing.metadata.video_url}
+                      controls
+                      className="w-full h-full object-cover"
+                      poster={listing.cover_image_url || undefined}
+                    >
+                      Your browser does not support the video tag.
+                    </video>
+                  )}
+                </div>
+              </motion.div>
+            )}
 
             {/* Photo Gallery */}
             {photos.length > 0 && (
@@ -333,11 +403,88 @@ export default function ListingDetailPage() {
                         onClick={() => setActivePhoto(i)}
                         className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${i === activePhoto ? 'border-gold' : 'border-transparent opacity-60 hover:opacity-100'}`}
                       >
-                        <img src={photo} alt="" className="w-full h-full object-cover" />
+                        <img src={photo} alt={`${listing.business_name} photo ${i + 1}`} className="w-full h-full object-cover" />
                       </button>
                     ))}
                   </div>
                 )}
+              </motion.div>
+            )}
+
+            {/* ─── BUSINESS HOURS ─── */}
+            {businessHours && Object.keys(businessHours).length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15 }}
+                className="rounded-2xl border border-white/10 p-6"
+                style={{ background: 'rgba(255,255,255,0.03)' }}
+                data-testid="business-hours"
+              >
+                <h3 className="text-sm font-heading font-semibold text-white uppercase tracking-wider mb-4">Business Hours</h3>
+                <div className="space-y-2">
+                  {['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map(day => {
+                    const hours = businessHours[day];
+                    const dayNames: Record<string, string> = { mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday', sun: 'Sunday' };
+                    const today = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase().slice(0, 3);
+                    const isToday = day === today;
+                    return (
+                      <div key={day} className={`flex items-center justify-between py-2 px-3 rounded-lg ${isToday ? 'bg-[rgba(201,168,76,0.08)] border border-[rgba(201,168,76,0.15)]' : ''}`}>
+                        <span className={`text-sm font-body ${isToday ? 'text-[#C9A84C] font-semibold' : 'text-white/60'}`}>
+                          {dayNames[day]}
+                          {isToday && <span className="ml-2 text-[10px] text-[#C9A84C]/60 uppercase">Today</span>}
+                        </span>
+                        {hours?.closed ? (
+                          <span className="text-sm text-white/30 font-body">Closed</span>
+                        ) : hours?.open && hours?.close ? (
+                          <span className={`text-sm font-body ${isToday ? 'text-white font-medium' : 'text-white/60'}`}>
+                            {hours.open} — {hours.close}
+                          </span>
+                        ) : (
+                          <span className="text-sm text-white/20 font-body">—</span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
+
+            {/* ─── MENU / PRICING ─── */}
+            {menuSections && menuSections.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.18 }}
+                className="rounded-2xl border border-white/10 p-6"
+                style={{ background: 'rgba(255,255,255,0.03)' }}
+                data-testid="menu-section"
+              >
+                <h3 className="text-sm font-heading font-semibold text-white uppercase tracking-wider mb-6">Menu & Pricing</h3>
+                <div className="space-y-8">
+                  {menuSections.map(section => (
+                    <div key={section.id}>
+                      <h4 className="text-base font-heading font-semibold text-[#C9A84C] mb-4 pb-2 border-b border-[rgba(201,168,76,0.15)]">{section.name}</h4>
+                      <div className="space-y-3">
+                        {section.items?.map(item => (
+                          <div key={item.id} className="flex items-start justify-between gap-4">
+                            <div className="flex-1 min-w-0">
+                              <span className="text-sm font-body text-white font-medium">{item.name}</span>
+                              {item.description && (
+                                <p className="text-xs text-white/40 font-body mt-0.5">{item.description}</p>
+                              )}
+                            </div>
+                            {item.price && (
+                              <span className="text-sm font-heading font-semibold text-[#C9A84C] flex-shrink-0">
+                                ${item.price}
+                              </span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </motion.div>
             )}
 
@@ -348,7 +495,7 @@ export default function ListingDetailPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
                 className="rounded-2xl border border-gold/15 p-6"
-                style={{ background: 'rgba(201,169,110,0.04)' }}
+                style={{ background: 'rgba(201,168,76,0.04)' }}
                 data-testid="claim-section"
               >
                 <div className="flex items-start gap-4">
@@ -363,7 +510,7 @@ export default function ListingDetailPage() {
                       Claim this listing to update your information, add photos, and unlock premium features. Contact our team to verify ownership and get your claim code.
                     </p>
                     {showClaimInfo ? (
-                      <div className="p-4 rounded-xl border border-gold/10 bg-midnight-900/50 space-y-2">
+                      <div className="p-4 rounded-xl border border-gold/10 bg-[#0A0A0A]/50 space-y-2">
                         <p className="text-xs text-white/60 font-body">Email us to claim this listing:</p>
                         <a
                           href={`mailto:greenline365help@gmail.com?subject=Claim%20Listing%3A%20${encodeURIComponent(listing.business_name)}&body=I%20would%20like%20to%20claim%20the%20listing%20for%20${encodeURIComponent(listing.business_name)}%20(${listing.city}%2C%20${listing.state}).%0A%0AMy%20name%3A%20%0AMy%20role%20at%20the%20business%3A%20`}
@@ -426,7 +573,7 @@ export default function ListingDetailPage() {
                       <span className="text-4xl font-heading font-bold text-white block">{reviewStats.average_rating}</span>
                       <div className="flex gap-0.5 justify-center mt-1">
                         {[1,2,3,4,5].map(s => (
-                          <svg key={s} className="w-3.5 h-3.5" fill={s <= Math.round(reviewStats.average_rating) ? '#C9A96E' : 'none'} stroke={s <= Math.round(reviewStats.average_rating) ? '#C9A96E' : '#555'} strokeWidth={1.5} viewBox="0 0 24 24">
+                          <svg key={s} className="w-3.5 h-3.5" fill={s <= Math.round(reviewStats.average_rating) ? '#C9A84C' : 'none'} stroke={s <= Math.round(reviewStats.average_rating) ? '#C9A84C' : '#555'} strokeWidth={1.5} viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                           </svg>
                         ))}
@@ -438,7 +585,7 @@ export default function ListingDetailPage() {
                       {ratingCounts.map(({ star, count }) => (
                         <div key={star} className="flex items-center gap-2" data-testid={`rating-bar-${star}`}>
                           <span className="text-[11px] text-white/40 font-body w-3 text-right">{star}</span>
-                          <svg className="w-3 h-3 flex-shrink-0" fill="#C9A96E" viewBox="0 0 24 24">
+                          <svg className="w-3 h-3 flex-shrink-0" fill="#C9A84C" viewBox="0 0 24 24">
                             <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                           </svg>
                           <div className="flex-1 h-2 rounded-full bg-white/5 overflow-hidden">
@@ -464,7 +611,7 @@ export default function ListingDetailPage() {
 
               {/* Review Form */}
               {showReviewForm && (
-                <div className="mb-6 p-4 rounded-xl border border-gold/10 bg-midnight-900/50 space-y-3" data-testid="review-form">
+                <div className="mb-6 p-4 rounded-xl border border-gold/10 bg-[#0A0A0A]/50 space-y-3" data-testid="review-form">
                   <input
                     value={reviewForm.reviewer_name}
                     onChange={e => setReviewForm({ ...reviewForm, reviewer_name: e.target.value })}
@@ -477,7 +624,7 @@ export default function ListingDetailPage() {
                     <div className="flex gap-1">
                       {[1,2,3,4,5].map(s => (
                         <button key={s} onClick={() => setReviewForm({ ...reviewForm, rating: s })} className="p-1" data-testid={`star-${s}`}>
-                          <svg className="w-7 h-7 transition-colors" fill={s <= reviewForm.rating ? '#C9A96E' : 'none'} stroke={s <= reviewForm.rating ? '#C9A96E' : '#555'} strokeWidth={1.5} viewBox="0 0 24 24">
+                          <svg className="w-7 h-7 transition-colors" fill={s <= reviewForm.rating ? '#C9A84C' : 'none'} stroke={s <= reviewForm.rating ? '#C9A84C' : '#555'} strokeWidth={1.5} viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                           </svg>
                         </button>
@@ -496,8 +643,8 @@ export default function ListingDetailPage() {
                     <button
                       onClick={submitReview}
                       disabled={submittingReview}
-                      className="px-5 py-2.5 rounded-xl text-xs font-bold font-heading text-midnight-900 transition-all active:scale-95 hover:scale-[1.03] hover:shadow-lg disabled:opacity-50"
-                      style={{ background: 'linear-gradient(135deg, #C9A96E, #E6D8B5)', boxShadow: '0 0 16px rgba(201,169,110,0.3)' }}
+                      className="px-5 py-2.5 rounded-xl text-xs font-bold font-heading text-[#0A0A0A] transition-all active:scale-95 hover:scale-[1.03] hover:shadow-lg disabled:opacity-50"
+                      style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C97A)', boxShadow: '0 0 16px rgba(201,168,76,0.3)' }}
                       data-testid="submit-review-btn"
                     >
                       {submittingReview ? 'Submitting...' : 'Submit Review'}
@@ -552,7 +699,7 @@ export default function ListingDetailPage() {
                             <div className="flex items-center gap-2">
                               <div className="flex gap-0.5">
                                 {[1,2,3,4,5].map((s: number) => (
-                                  <svg key={s} className="w-3 h-3" fill={s <= review.rating ? '#C9A96E' : 'none'} stroke={s <= review.rating ? '#C9A96E' : '#555'} strokeWidth={1.5} viewBox="0 0 24 24">
+                                  <svg key={s} className="w-3 h-3" fill={s <= review.rating ? '#C9A84C' : 'none'} stroke={s <= review.rating ? '#C9A84C' : '#555'} strokeWidth={1.5} viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                                   </svg>
                                 ))}
@@ -577,6 +724,35 @@ export default function ListingDetailPage() {
               )}
             </motion.div>
 
+            {/* Featured in Loops */}
+            {featuredLoops.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.25 }}
+                className="mb-8"
+                data-testid="featured-in-loops"
+              >
+                <h3 className="text-sm font-heading font-semibold text-white uppercase tracking-wider mb-3">
+                  Featured in {featuredLoops.length} Experience{featuredLoops.length !== 1 ? 's' : ''}
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {featuredLoops.map(loop => (
+                    <Link
+                      key={loop.id}
+                      href={`/loops/${loop.slug}`}
+                      className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-gold/20 bg-gold/5 hover:bg-gold/10 hover:border-gold/40 transition-all duration-300 group"
+                    >
+                      <svg className="w-3.5 h-3.5 text-gold/60 group-hover:text-gold transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      </svg>
+                      <span className="text-xs font-heading font-medium text-gold/80 group-hover:text-gold transition-colors">{loop.name}</span>
+                    </Link>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
             {/* Related Businesses */}
             {listing.related?.length > 0 && (
               <motion.div
@@ -600,7 +776,7 @@ export default function ListingDetailPage() {
                         {r.cover_image_url ? (
                           <img src={r.cover_image_url} alt={r.business_name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                         ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-midnight-800 to-charcoal-800 flex items-center justify-center">
+                          <div className="w-full h-full bg-gradient-to-br from-[#111111] to-charcoal-800 flex items-center justify-center">
                             <span className="text-2xl font-heading font-light text-white/10">{r.business_name[0]}</span>
                           </div>
                         )}
@@ -631,30 +807,30 @@ export default function ListingDetailPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
               className="rounded-2xl border border-white/10 p-6 sticky top-24"
-              style={{ background: 'rgba(13,27,42,0.9)', backdropFilter: 'blur(16px)' }}
+              style={{ background: 'rgba(10,10,10,0.9)', backdropFilter: 'blur(16px)' }}
               data-testid="contact-card"
             >
               <h3 className="text-sm font-heading font-semibold text-white uppercase tracking-wider mb-5">Contact</h3>
 
-              {/* CTA Buttons — Pro/Premium only */}
-              {listing.tier !== 'free' && listing.is_claimed && (
+              {/* CTA Buttons — show for all listings with contact info */}
+              {(listing.phone || listing.website) && (
                 <div className="space-y-2 mb-5" data-testid="cta-buttons">
                   {listing.phone && (
-                    <a
-                      href={`tel:${listing.phone}`}
-                      className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-bold font-heading text-midnight-900 transition-all hover:scale-[1.02]"
-                      style={{ background: 'linear-gradient(135deg, #C9A96E, #E6D8B5)', boxShadow: '0 0 16px rgba(201,169,110,0.3)' }}
+                    <button
+                      onClick={() => { setShowCallModal(true); trackEvent('call'); }}
+                      className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-bold font-heading text-[#0A0A0A] transition-all hover:scale-[1.02] cursor-pointer"
+                      style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C97A)', boxShadow: '0 0 16px rgba(201,168,76,0.3)' }}
                       data-testid="cta-call-now"
                     >
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                       </svg>
                       Call Now
-                    </a>
+                    </button>
                   )}
                   {listing.website && (
                     <a
-                      href={listing.website}
+                      href={ensureProtocol(listing.website)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold font-heading text-gold border border-gold/30 hover:bg-gold/5 transition-all"
@@ -672,13 +848,12 @@ export default function ListingDetailPage() {
               <div className="space-y-3">
                 {/* Phone */}
                 {listing.phone && (
-                  <a
-                    href={`tel:${listing.phone}`}
-                    onClick={() => trackEvent('call')}
-                    className="flex items-center gap-3 w-full p-3 rounded-xl border border-white/10 hover:border-gold/30 hover:bg-gold/5 transition-all group"
+                  <button
+                    onClick={() => { setShowCallModal(true); trackEvent('call'); }}
+                    className="flex items-center gap-3 w-full p-3 rounded-xl border border-white/10 hover:border-gold/30 hover:bg-gold/5 transition-all group text-left cursor-pointer"
                     data-testid="contact-phone"
                   >
-                    <div className="w-9 h-9 rounded-lg bg-gold/10 flex items-center justify-center">
+                    <div className="w-9 h-9 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0">
                       <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                       </svg>
@@ -687,13 +862,13 @@ export default function ListingDetailPage() {
                       <span className="text-xs text-white/40 font-body block">Phone</span>
                       <span className="text-sm text-white font-medium font-body group-hover:text-gold transition-colors">{listing.phone}</span>
                     </div>
-                  </a>
+                  </button>
                 )}
 
                 {/* Website */}
                 {listing.website && (
                   <a
-                    href={listing.website}
+                    href={ensureProtocol(listing.website)}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => trackEvent('website')}
@@ -788,7 +963,7 @@ export default function ListingDetailPage() {
                       style={{ border: 0 }}
                       loading="lazy"
                       referrerPolicy="no-referrer-when-downgrade"
-                      src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyDJ5FY_ZL1pqN3lsERdgi9NiuwK_DYcfTo&q=${encodeURIComponent([listing.business_name, listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', '))}`}
+                      src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}&q=${encodeURIComponent([listing.business_name, listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', '))}`}
                       title={`Map showing ${listing.business_name} location`}
                     />
                   </div>
@@ -816,6 +991,104 @@ export default function ListingDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Click-to-Call Modal — keeps user on the website */}
+      {showCallModal && listing.phone && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          onClick={() => { setShowCallModal(false); setPhoneCopied(false); }}
+        >
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+
+          {/* Modal */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="relative w-full max-w-sm rounded-2xl border border-white/10 p-6 text-center"
+            style={{ background: 'rgba(20,20,20,0.98)', backdropFilter: 'blur(24px)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close button */}
+            <button
+              onClick={() => { setShowCallModal(false); setPhoneCopied(false); }}
+              className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors text-white/40 hover:text-white"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            {/* Phone icon */}
+            <div className="w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center" style={{ background: 'linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.05))' }}>
+              <svg className="w-7 h-7 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+              </svg>
+            </div>
+
+            <h3 className="text-lg font-heading font-semibold text-white mb-1">
+              Call {listing.business_name}
+            </h3>
+            <p className="text-white/40 text-xs font-body mb-5">
+              via GreenLine365 Directory
+            </p>
+
+            {/* Phone number display */}
+            <div className="rounded-xl border border-gold/20 bg-gold/5 py-3 px-4 mb-4">
+              <span className="text-2xl font-heading font-bold text-gold tracking-wide">
+                {listing.phone}
+              </span>
+            </div>
+
+            {/* Action buttons */}
+            <div className="space-y-2">
+              {/* Copy number */}
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(listing.phone!).then(() => {
+                    setPhoneCopied(true);
+                    setTimeout(() => setPhoneCopied(false), 2000);
+                  });
+                }}
+                className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold font-heading text-[#0A0A0A] transition-all hover:scale-[1.02] cursor-pointer"
+                style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C97A)', boxShadow: '0 0 16px rgba(201,168,76,0.3)' }}
+              >
+                {phoneCopied ? (
+                  <>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    Copy Number
+                  </>
+                )}
+              </button>
+
+              {/* Open dialer (secondary option) */}
+              <a
+                href={`tel:${cleanPhone(listing.phone)}`}
+                className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold font-heading text-gold border border-gold/30 hover:bg-gold/5 transition-all"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                </svg>
+                Open Dialer
+              </a>
+            </div>
+
+            {/* Branding footer */}
+            <p className="text-[10px] text-white/20 font-body mt-4">
+              Powered by GreenLine365
+            </p>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

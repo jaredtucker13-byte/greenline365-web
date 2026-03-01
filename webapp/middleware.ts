@@ -4,6 +4,23 @@ import { updateSession } from '@/lib/supabase/middleware';
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // --- Super-admin gatekeeper: /greenline-hq must appear as a hard 404 ---
+  const isSuperAdminRoute = pathname.startsWith('/greenline-hq');
+
+  if (isSuperAdminRoute) {
+    try {
+      const { user } = await updateSession(request);
+      if (user?.user_metadata?.role === 'super_admin') {
+        // Authorised — let the request through
+        return NextResponse.next();
+      }
+    } catch {
+      // Supabase unavailable — fall through to 404
+    }
+    // Not super_admin (or no user) → hard 404, no redirect
+    return new NextResponse(null, { status: 404 });
+  }
+
   // Define protected routes that need auth
   const isProtectedRoute = pathname.startsWith('/admin-v2') || pathname.startsWith('/admin') || pathname === '/business-dashboard' || pathname === '/onboarding';
   const isLoginPage = pathname === '/login';
@@ -24,7 +41,9 @@ export async function middleware(request: NextRequest) {
     }
 
     if (isLoginPage && user) {
-      const redirectTo = request.nextUrl.searchParams.get('redirectTo') || '/admin-v2';
+      const rawRedirectTo = request.nextUrl.searchParams.get('redirectTo') || '/admin-v2';
+      // Prevent open redirect: only allow relative paths
+      const redirectTo = (rawRedirectTo.startsWith('/') && !rawRedirectTo.startsWith('//')) ? rawRedirectTo : '/admin-v2';
       return NextResponse.redirect(new URL(redirectTo, request.url));
     }
 

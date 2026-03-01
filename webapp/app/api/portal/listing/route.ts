@@ -102,6 +102,25 @@ export async function PATCH(request: NextRequest) {
     }
   }
 
+  // Handle video_url — stored in metadata JSONB, gated to Premium tier
+  if ('video_url' in updates && typeof updates.video_url === 'string') {
+    // Check if listing is Premium tier (fetch current listing data)
+    const { data: currentListing } = await service
+      .from('directory_listings')
+      .select('tier, metadata')
+      .eq('id', listing_id)
+      .single();
+
+    if (currentListing?.tier === 'premium') {
+      const existingMetadata = (currentListing.metadata as Record<string, unknown>) || {};
+      safeUpdates.metadata = {
+        ...existingMetadata,
+        video_url: updates.video_url || null,
+      };
+    }
+    // Silently skip if not Premium
+  }
+
   safeUpdates.updated_at = new Date().toISOString();
 
   const { data, error } = await service

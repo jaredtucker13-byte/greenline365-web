@@ -1,10 +1,10 @@
 {
     "_meta": {
-          "version": "2.0.0",
-          "last_updated": "2026-02-23",
-          "directive": "Premium Evolution — Main Branch Merge",
+          "version": "3.0.0",
+          "last_updated": "2026-02-26",
+          "directive": "Black & Gold Luxury — Depth-First Design",
           "source_of_truth": true,
-          "note": "Governs ALL pages. Directory and Home Ledger built first. Rest follows."
+          "note": "Governs ALL pages. Sage green is REMOVED. Gold (#C9A84C) is the only accent. Obsidian black base. Depth over flatness."
     },
     "design_system": {
           "aesthetic": "Premium Glassmorphism. UI floats as translucent layer over cinematic backgrounds.",
@@ -44,7 +44,17 @@
                                         "DEFAULT": "#C9A84C",
                               "light": "#E8C97A",
                                         "dark": "#8A6A1C",
-                                        "champagne": "#F0DFA0"
+                                        "champagne": "#F0DFA0",
+                                        "50": "#FDF8ED",
+                                        "100": "#F9EDCF",
+                                        "200": "#F0DFA0",
+                                        "300": "#E8C97A",
+                                        "400": "#C9A84C",
+                                        "500": "#B08F3A",
+                                        "600": "#8A6A1C",
+                                        "700": "#6B5218",
+                                        "800": "#4D3B12",
+                                        "900": "#2E230B"
                             },
                             "obsidian": {
                                         "DEFAULT": "#0A0A0A",
@@ -91,7 +101,7 @@
                   "shadows": {
                             "soft": "0 10px 40px -10px rgba(0,0,0,0.6)",
                             "deep": "0 24px 64px -12px rgba(0,0,0,0.8)",
-                            "glow_green": "0 0 24px rgba(132, 169, 140, 0.25)",
+                            "glow_accent": "0 0 24px rgba(201, 168, 76, 0.25)",
                             "glow_gold": "0 0 24px rgba(201, 168, 76, 0.2)",
                             "inner_highlight": "inset 0 1px 0 rgba(255,255,255,0.1)"
                   }
@@ -253,7 +263,7 @@
                   "path": "/webapp/components/ui/os/Button.tsx",
                   "status": "Ready",
                   "variants": {
-                            "primary": "bg-primary-500 hover:bg-primary-400 text-white px-6 py-3 rounded-full font-medium transition-all duration-200",
+                            "primary": "bg-gradient-to-r from-[#C9A84C] to-[#E8C97A] text-black px-6 py-3 rounded-full font-semibold transition-all duration-200",
                             "gold": "bg-gradient-to-r from-[#C9A84C] to-[#E8C97A] text-black px-6 py-3 rounded-full font-semibold transition-all duration-200",
                     "ghost": "bg-white/[0.08] border border-white/20 text-white px-6 py-3 rounded-full hover:bg-white/[0.15] transition-all duration-200",
                             "find_a_pro": "bg-gradient-to-r from-[#C9A84C] to-[#8A6A1C] text-white px-8 py-3 rounded-full font-bold uppercase text-sm tracking-wide transition-all duration-200"
@@ -265,7 +275,7 @@
                   "status": "Build needed",
                   "note": "ONLY render Free/$0, Pro/$45, Premium/$89. No other prices.",
                   "base_class": "backdrop-blur-2xl bg-white/[0.07] border border-white/[0.12] rounded-3xl p-8 transition-all duration-300",
-                  "featured_class": "border-[rgba(132,169,140,0.5)] shadow-[0_0_40px_rgba(132,169,140,0.1)]",
+                  "featured_class": "border-[rgba(201,168,76,0.5)] shadow-[0_0_40px_rgba(201,168,76,0.1)]",
                   "premium_class": "border-[rgba(201,168,76,0.45)] shadow-[0_0_40px_rgba(201,168,76,0.12)]"
           },
           "SearchPill": {
@@ -279,7 +289,7 @@
                   "title_class": "absolute bottom-4 left-4 text-white font-semibold text-lg"
           },
           "Sidebar": { "style": "fixed left-0 top-0 h-full w-64 bg-black/25 backdrop-blur-xl border-r border-white/[0.08] z-50" },
-          "EventCard": { "style": "bg-white/[0.08] hover:bg-white/[0.15] border-l-2 border-l-primary-400 backdrop-blur-md p-3 rounded-lg text-xs text-white cursor-pointer transition-colors duration-200" }
+          "EventCard": { "style": "bg-white/[0.08] hover:bg-white/[0.15] border-l-2 border-l-[#C9A84C] backdrop-blur-md p-3 rounded-lg text-xs text-white cursor-pointer transition-colors duration-200" }
     },
     "universal_guidelines": [
           "NEVER use generic SaaS layouts. Every screen must feel like a premium, private platform.",
@@ -294,17 +304,17 @@
     ],
     "implementation_checklist": {
           "global_css": [
-                  "Set body background to #0A0A0A",
-                  "Remove circuit-bg classes and neon gradient remnants",
+                  "Set body background to #0A0A0A (deep obsidian black)",
                   "Add Playfair Display + Manrope from Google Fonts",
-                  "Set default text color to rgba(255,255,255,0.85)"
+                  "Set default text color to rgba(255,255,255,0.85)",
+                  "Remove all sage green references"
           ],
           "tailwind_config": [
                   "Add primary (Champagne Gold #C9A96E) palette",
                   "Add gold (#C9A84C) palette",
                   "Add obsidian (#0A0A0A) palette",
                   "Add custom shadow utilities for glow effects",
-                  "Keep os-dark as fallback"
+                  "Remove sage green / primary green references"
           ],
           "shadcn_overrides": [
                   "Override Shadcn backgrounds to transparent",

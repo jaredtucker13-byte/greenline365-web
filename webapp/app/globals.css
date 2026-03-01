@@ -1,19 +1,21 @@
-/* Import Google Fonts - Bentley Standard Typography */
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap');
+/* Import Google Fonts — Black & Gold Luxury Typography */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: #0D1B2A;
+  --background: #0A0A0A;
   --foreground: #f0ece4;
-  --midnight: #0D1B2A;
-  --charcoal: #1C1C1E;
-  --gold: #C9A96E;
-  --gold-light: #E6D8B5;
+  --obsidian: #0A0A0A;
+  --obsidian-surface: #111111;
+  --obsidian-elevated: #1A1A1A;
+  --gold: #C9A84C;
+  --gold-light: #E8C97A;
+  --gold-dark: #8A6A1C;
+  --gold-champagne: #F0DFA0;
   --silver: #A8A9AD;
-  --greenline: #C9A96E;
 }
 
 * {
@@ -30,34 +32,30 @@ body {
 
 body {
   min-height: 100vh;
-  background: #050B18;
-  background-image: 
-    linear-gradient(170deg, #050B18 0%, #0B132B 25%, #0D1B2A 45%, #0A1225 65%, #0B132B 85%, #050B18 100%),
-    radial-gradient(ellipse at 10% 15%, rgba(201, 169, 110, 0.08) 0%, transparent 35%),
-    radial-gradient(ellipse at 90% 10%, rgba(201, 169, 110, 0.05) 0%, transparent 30%),
-    radial-gradient(ellipse at 80% 85%, rgba(201, 169, 110, 0.06) 0%, transparent 35%),
-    radial-gradient(ellipse at 20% 90%, rgba(201, 169, 110, 0.04) 0%, transparent 30%),
-    radial-gradient(ellipse at 50% 50%, rgba(201, 169, 110, 0.02) 0%, transparent 50%);
+  background: #0A0A0A;
+  background-image:
+    radial-gradient(ellipse at 15% 20%, rgba(201, 168, 76, 0.04) 0%, transparent 40%),
+    radial-gradient(ellipse at 85% 80%, rgba(201, 168, 76, 0.03) 0%, transparent 35%);
   color: var(--foreground);
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Manrope', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   position: relative;
 }
 
-/* ─── GLOBAL FILM GRAIN TEXTURE ─── */
+/* ─── SUBTLE FILM GRAIN TEXTURE ─── */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.03;
+  opacity: 0.025;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
   background-repeat: repeat;
 }
 
-/* ─── AMBIENT GOLD GLOW ORBS ─── */
+/* ─── AMBIENT GOLD GLOW ─── */
 body::after {
   content: '';
   position: fixed;
@@ -65,10 +63,8 @@ body::after {
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(800px circle at 15% 25%, rgba(201, 169, 110, 0.04) 0%, transparent 70%),
-    radial-gradient(600px circle at 85% 15%, rgba(201, 169, 110, 0.03) 0%, transparent 60%),
-    radial-gradient(700px circle at 75% 80%, rgba(201, 169, 110, 0.035) 0%, transparent 65%),
-    radial-gradient(500px circle at 25% 85%, rgba(201, 169, 110, 0.025) 0%, transparent 60%);
+    radial-gradient(800px circle at 15% 25%, rgba(201, 168, 76, 0.03) 0%, transparent 70%),
+    radial-gradient(600px circle at 85% 75%, rgba(201, 168, 76, 0.025) 0%, transparent 60%);
   animation: ambientShift 20s ease-in-out infinite alternate;
 }
 
@@ -88,7 +84,7 @@ body > * {
 .section-divider-gold {
   position: relative;
   height: 1px;
-  background: linear-gradient(90deg, transparent 0%, rgba(201,169,110,0.08) 10%, rgba(201,169,110,0.35) 50%, rgba(201,169,110,0.08) 90%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, rgba(201,168,76,0.08) 10%, rgba(201,168,76,0.35) 50%, rgba(201,168,76,0.08) 90%, transparent 100%);
 }
 .section-divider-gold::before,
 .section-divider-gold::after {
@@ -97,9 +93,9 @@ body > * {
   top: -3px;
   width: 7px;
   height: 7px;
-  border: 1px solid rgba(201,169,110,0.5);
+  border: 1px solid rgba(201,168,76,0.5);
   transform: rotate(45deg);
-  background: #050B18;
+  background: #0A0A0A;
 }
 .section-divider-gold::before { left: calc(50% - 3.5px); }
 .section-divider-gold::after { display: none; }
@@ -114,7 +110,7 @@ body > * {
   position: absolute;
   width: 40px;
   height: 40px;
-  border-color: rgba(201,169,110,0.15);
+  border-color: rgba(201,168,76,0.15);
   border-style: solid;
   pointer-events: none;
 }
@@ -144,10 +140,10 @@ img {
   backface-visibility: hidden;
 }
 
-/* Typography defaults - Bentley Standard */
+/* Typography defaults — Playfair Display for headings */
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Montserrat', system-ui, sans-serif;
-  font-weight: 600;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 400;
   letter-spacing: -0.02em;
 }
 
@@ -160,7 +156,7 @@ html {
   html {
     scroll-behavior: auto;
   }
-  
+
   *,
   *::before,
   *::after {
@@ -177,23 +173,26 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(201, 169, 110, 0.3);
+  background: rgba(201, 168, 76, 0.25);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(201, 169, 110, 0.5);
+  background: rgba(201, 168, 76, 0.4);
 }
 
-/* Focus styles */
-input:focus,
-button:focus,
-select:focus,
-textarea:focus {
+/* Focus styles — visible ring for keyboard users, hidden for mouse */
+:focus-visible {
+  outline: 2px solid rgba(201, 169, 110, 0.7);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+:focus:not(:focus-visible) {
   outline: none;
 }
 
@@ -229,6 +228,38 @@ textarea:focus {
   }
 }
 
+/* ─── GSAP Nav Scrolled State ─── */
+.main-nav {
+  transition: background 0.4s ease, backdrop-filter 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.main-nav.nav-scrolled {
+  background: rgba(5, 11, 24, 0.85) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-bottom: 1px solid rgba(201, 169, 110, 0.15) !important;
+  box-shadow:
+    0 4px 30px rgba(0, 0, 0, 0.3),
+    0 1px 0 rgba(201, 169, 110, 0.1) !important;
+}
+
+/* Nav neon accent line - only visible when scrolled */
+.main-nav::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 5%;
+  right: 5%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201, 169, 110, 0.3), transparent);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.main-nav.nav-scrolled::after {
+  opacity: 1;
+}
+
 /* GSAP hover lift effect */
 .gsap-hover-lift {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -236,7 +267,7 @@ textarea:focus {
 
 .gsap-hover-lift:hover {
   transform: translateY(-5px);
-  box-shadow: 0 20px 40px rgba(201, 169, 110, 0.1);
+  box-shadow: 0 20px 40px rgba(201, 168, 76, 0.1);
 }
 
 @keyframes pulse-ring {
@@ -266,9 +297,9 @@ textarea:focus {
   animation: shimmer 2s infinite linear;
   background: linear-gradient(
     to right,
-    rgba(201, 169, 110, 0) 0%,
-    rgba(201, 169, 110, 0.1) 50%,
-    rgba(201, 169, 110, 0) 100%
+    rgba(201, 168, 76, 0) 0%,
+    rgba(201, 168, 76, 0.1) 50%,
+    rgba(201, 168, 76, 0) 100%
   );
   background-size: 1000px 100%;
 }
@@ -276,13 +307,13 @@ textarea:focus {
 /* OS Panel Effect - Layered Depth */
 .os-panel {
   position: relative;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 1rem;
-  box-shadow: 
-    0 8px 32px 0 rgba(0, 0, 0, 0.37),
+  box-shadow:
+    0 8px 32px 0 rgba(0, 0, 0, 0.5),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
@@ -296,7 +327,7 @@ textarea:focus {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(201, 169, 110, 0.3),
+    rgba(201, 168, 76, 0.3),
     transparent
   );
   opacity: 0.5;
@@ -305,58 +336,58 @@ textarea:focus {
 /* Neon Border Effect */
 .neon-border {
   position: relative;
-  border: 1px solid rgba(201, 169, 110, 0.3);
+  border: 1px solid rgba(201, 168, 76, 0.3);
   box-shadow:
-    0 0 10px rgba(201, 169, 110, 0.2),
-    inset 0 0 10px rgba(201, 169, 110, 0.05);
+    0 0 10px rgba(201, 168, 76, 0.2),
+    inset 0 0 10px rgba(201, 168, 76, 0.05);
 }
 
 .neon-border-teal {
   position: relative;
-  border: 1px solid rgba(201, 169, 110, 0.25);
+  border: 1px solid rgba(201, 168, 76, 0.25);
   box-shadow:
-    0 0 10px rgba(201, 169, 110, 0.15),
-    inset 0 0 10px rgba(201, 169, 110, 0.05);
+    0 0 10px rgba(201, 168, 76, 0.15),
+    inset 0 0 10px rgba(201, 168, 76, 0.05);
 }
 
 /* Circuit Board Pattern */
 .circuit-bg {
   background-image:
-    linear-gradient(rgba(201, 169, 110, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(201, 169, 110, 0.03) 1px, transparent 1px);
+    linear-gradient(rgba(201, 168, 76, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201, 168, 76, 0.03) 1px, transparent 1px);
   background-size: 20px 20px;
 }
 
-/* Glow Text */
+/* Glow Text — restrained luxury, subtle warmth */
 .glow-text {
-  text-shadow: 0 0 10px rgba(201, 169, 110, 0.5);
+  text-shadow: 0 0 10px rgba(201, 168, 76, 0.5);
 }
 
 .glow-text-teal {
-  text-shadow: 0 0 10px rgba(201, 169, 110, 0.4);
+  text-shadow: 0 0 10px rgba(201, 168, 76, 0.4);
 }
 
-/* Card Hover Effect */
+/* Card Hover Effect — subtle lift, no neon glow */
 .card-hover {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .card-hover:hover {
   transform: translateY(-4px);
-  box-shadow: 
+  box-shadow:
     0 12px 40px 0 rgba(0, 0, 0, 0.5),
-    0 0 20px rgba(201, 169, 110, 0.2);
+    0 0 20px rgba(201, 168, 76, 0.15);
 }
 
-/* Loading Spinner with Neon */
+/* Loading Spinner with Gold */
 .spinner-neon {
-  border: 3px solid rgba(201, 169, 110, 0.1);
-  border-top-color: #C9A96E;
+  border: 3px solid rgba(201, 168, 76, 0.1);
+  border-top-color: #C9A84C;
   border-radius: 50%;
   width: 40px;
   height: 40px;
   animation: spin 1s linear infinite;
-  box-shadow: 0 0 15px rgba(201, 169, 110, 0.3);
+  box-shadow: 0 0 15px rgba(201, 168, 76, 0.3);
 }
 
 @keyframes spin {
@@ -398,26 +429,26 @@ textarea:focus {
 }
 
 /* ============================================
-   ENHANCED GLASSMORPHISM CARDS - "Late Night DJ" Style
+   ENHANCED GLASSMORPHISM CARDS — Depth-First
    ============================================ */
 
 /* Base OS Card with layered gradient */
 .os-card {
   position: relative;
-  background: linear-gradient(135deg, rgba(55,60,65,0.95) 0%, rgba(30,35,40,0.95) 100%);
+  background: linear-gradient(135deg, rgba(30,30,30,0.95) 0%, rgba(15,15,15,0.95) 100%);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(201,169,110,0.25);
+  border: 1px solid rgba(201,168,76,0.2);
   border-radius: 1rem;
-  box-shadow: 
-    0 0 30px rgba(201,169,110,0.08),
-    0 8px 32px rgba(0,0,0,0.5),
-    inset 0 1px 0 rgba(255,255,255,0.08);
+  box-shadow:
+    0 0 30px rgba(201,168,76,0.06),
+    0 8px 32px rgba(0,0,0,0.6),
+    inset 0 1px 0 rgba(255,255,255,0.06);
   overflow: hidden;
   transition: all 0.3s ease;
 }
 
-/* Noise/scanline texture overlay */
+/* Noise texture overlay */
 .os-card::before {
   content: '';
   position: absolute;
@@ -428,7 +459,7 @@ textarea:focus {
   z-index: 1;
 }
 
-/* Top neon line accent */
+/* Top gold accent line */
 .os-card::after {
   content: '';
   position: absolute;
@@ -436,7 +467,7 @@ textarea:focus {
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(201,169,110,0.4), transparent);
+  background: linear-gradient(90deg, transparent, rgba(201,168,76,0.4), transparent);
   z-index: 2;
 }
 
@@ -446,16 +477,16 @@ textarea:focus {
   z-index: 3;
 }
 
-/* OS Card hover state */
+/* OS Card hover state — restrained luxury lift */
 .os-card:hover {
-  border-color: rgba(201,169,110,0.3);
-  box-shadow: 
-    0 0 30px rgba(201,169,110,0.1),
+  border-color: rgba(201,168,76,0.3);
+  box-shadow:
+    0 0 30px rgba(201,168,76,0.1),
     0 12px 40px rgba(0,0,0,0.5);
   transform: translateY(-4px);
 }
 
-/* Aurora background effect - floating behind cards */
+/* Aurora background effect */
 .aurora-bg {
   position: absolute;
   inset: 0;
@@ -471,7 +502,7 @@ textarea:focus {
   left: 10%;
   width: 500px;
   height: 500px;
-  background: radial-gradient(ellipse, rgba(201,169,110,0.12) 0%, transparent 70%);
+  background: radial-gradient(ellipse, rgba(201,168,76,0.08) 0%, transparent 70%);
   border-radius: 50%;
   filter: blur(80px);
   animation: aurora-drift 15s ease-in-out infinite;
@@ -484,7 +515,7 @@ textarea:focus {
   right: 10%;
   width: 400px;
   height: 400px;
-  background: radial-gradient(ellipse, rgba(201,169,110,0.08) 0%, transparent 70%);
+  background: radial-gradient(ellipse, rgba(201,168,76,0.05) 0%, transparent 70%);
   border-radius: 50%;
   filter: blur(80px);
   animation: aurora-drift 12s ease-in-out infinite reverse;
@@ -513,13 +544,13 @@ textarea:focus {
 .icon-glass {
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, rgba(201,169,110,0.15) 0%, rgba(201,169,110,0.05) 100%);
-  border: 1px solid rgba(201,169,110,0.2);
+  background: linear-gradient(135deg, rgba(201,168,76,0.15) 0%, rgba(201,168,76,0.05) 100%);
+  border: 1px solid rgba(201,168,76,0.2);
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
 /* Consistent card min-height for alignment */
@@ -537,7 +568,7 @@ textarea:focus {
 
 /* Fix select dropdown options for dark theme */
 select option {
-  background-color: #1a1a2e;
+  background-color: #111111;
   color: #ffffff;
   padding: 8px 12px;
 }
@@ -545,7 +576,7 @@ select option {
 select option:hover,
 select option:focus,
 select option:checked {
-  background-color: #2d2d44;
+  background-color: #1A1A1A;
   color: #ffffff;
 }
 
@@ -570,7 +601,7 @@ select {
 .fullscreen-modal-content {
   width: 95vw;
   height: 90vh;
-  background: rgba(20, 20, 30, 0.95);
+  background: rgba(10, 10, 10, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
   overflow: hidden;
@@ -584,139 +615,6 @@ select {
   top: 8px;
   right: 8px;
   padding: 6px;
-
-/* ============================================
-   DESTINATION CARD — METALLIC GOLD FRAME
-   ============================================ */
-
-/* Metallic border frame wrapper */
-.dest-card-frame {
-  position: relative;
-  border-radius: 12px;
-  padding: 3px;
-  background: linear-gradient(
-    145deg,
-    #5A4A25 0%,
-    #C9A96E 12%,
-    #F0E4C8 28%,
-    #C9A96E 45%,
-    #F0E4C8 62%,
-    #C9A96E 78%,
-    #5A4A25 100%
-  );
-  box-shadow:
-    0 0 20px rgba(201, 169, 110, 0.35),
-    0 0 6px rgba(201, 169, 110, 0.5),
-    0 12px 40px rgba(0, 0, 0, 0.7),
-    inset 0 0 3px rgba(230, 216, 181, 0.5);
-  transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  overflow: hidden;
-}
-
-.dest-card-frame:hover {
-  transform: scale(1.02);
-  box-shadow:
-    0 0 24px rgba(201, 169, 110, 0.35),
-    0 0 48px rgba(201, 169, 110, 0.12),
-    0 12px 40px rgba(0, 0, 0, 0.7),
-    inset 0 0 2px rgba(230, 216, 181, 0.5);
-}
-
-/* Inner card content area */
-.dest-card-inner {
-  position: relative;
-  border-radius: 10px;
-  overflow: hidden;
-  background: #0A1628;
-  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.4);
-}
-
-/* Golden hour warm light filter on images */
-.golden-hour-filter {
-  filter: saturate(1.1) contrast(1.05);
-}
-.golden-hour-filter::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(201, 169, 110, 0.05) 0%,
-    transparent 30%,
-    transparent 60%,
-    rgba(201, 169, 110, 0.08) 100%
-  );
-  pointer-events: none;
-}
-
-/* Glassmorphism text label */
-.dest-glass-label {
-  background: rgba(5, 11, 24, 0.82);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-top: 1px solid rgba(201, 169, 110, 0.15);
-}
-
-/* Shimmering gold border animation on hover */
-@keyframes gold-shimmer {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-.dest-card-frame:hover {
-  background-size: 200% 200%;
-  animation: gold-shimmer 3s ease infinite;
-}
-
-/* ─── SECTION BACKGROUND GRADIENTS ─── */
-.section-gradient-blue-gold {
-  background: 
-    linear-gradient(
-      180deg,
-      #050B18 0%,
-      #0A1628 15%,
-      rgba(13, 27, 42, 0.98) 30%,
-      rgba(15, 22, 38, 0.97) 50%,
-      rgba(12, 20, 35, 0.98) 70%,
-      #0B132B 85%,
-      #050B18 100%
-    ),
-    radial-gradient(ellipse at 30% 40%, rgba(201, 169, 110, 0.05) 0%, transparent 50%),
-    radial-gradient(ellipse at 70% 60%, rgba(201, 169, 110, 0.04) 0%, transparent 50%);
-}
-
-/* Charcoal sections get subtle depth via inner shadow + gradient */
-.bg-charcoal-900 {
-  position: relative;
-  background: linear-gradient(180deg, #0C0C0E 0%, #0E0E0F 50%, #0C0C0E 100%);
-  box-shadow: inset 0 1px 0 rgba(201, 169, 110, 0.06), inset 0 -1px 0 rgba(201, 169, 110, 0.06);
-}
-
-/* Subtle gold accent strips in background */
-.bg-gold-accent-top {
-  position: relative;
-}
-.bg-gold-accent-top::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 5%;
-  right: 5%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(201,169,110,0.25), transparent);
-}
-.bg-gold-accent-top::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 200px;
-  background: radial-gradient(ellipse at 50% 0%, rgba(201, 169, 110, 0.04) 0%, transparent 70%);
-  pointer-events: none;
-}
-
   background: rgba(0, 0, 0, 0.5);
   border-radius: 6px;
   cursor: pointer;
@@ -730,4 +628,221 @@ select {
 
 *:hover > .expand-btn {
   opacity: 1;
+}
+
+/* ============================================
+   DESTINATION CARD — METALLIC GOLD FRAME
+   ============================================ */
+
+/* Metallic border frame wrapper */
+.dest-card-frame {
+  position: relative;
+  border-radius: 12px;
+  padding: 3px;
+  background: linear-gradient(
+    145deg,
+    #5A4A25 0%,
+    #C9A84C 12%,
+    #F0DFA0 28%,
+    #C9A84C 45%,
+    #F0DFA0 62%,
+    #C9A84C 78%,
+    #5A4A25 100%
+  );
+  box-shadow:
+    0 0 20px rgba(201, 168, 76, 0.35),
+    0 0 6px rgba(201, 168, 76, 0.5),
+    0 12px 40px rgba(0, 0, 0, 0.7),
+    inset 0 0 3px rgba(230, 216, 181, 0.5);
+  transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  overflow: hidden;
+}
+
+.dest-card-frame:hover {
+  transform: scale(1.02);
+  box-shadow:
+    0 0 24px rgba(201, 168, 76, 0.35),
+    0 0 48px rgba(201, 168, 76, 0.12),
+    0 12px 40px rgba(0, 0, 0, 0.7),
+    inset 0 0 2px rgba(230, 216, 181, 0.5);
+  background-size: 200% 200%;
+  animation: gold-shimmer 3s ease infinite;
+}
+
+/* Inner card content area */
+.dest-card-inner {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #0A0A0A;
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Golden hour warm light filter on images */
+.golden-hour-filter {
+  filter: saturate(1.1) contrast(1.05);
+}
+.golden-hour-filter::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(201, 168, 76, 0.05) 0%,
+    transparent 30%,
+    transparent 60%,
+    rgba(201, 168, 76, 0.08) 100%
+  );
+  pointer-events: none;
+}
+
+/* Glassmorphism text label */
+.dest-glass-label {
+  background: rgba(10, 10, 10, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(201, 168, 76, 0.15);
+}
+
+/* Shimmering gold border animation on hover */
+@keyframes gold-shimmer {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ─── SECTION BACKGROUND GRADIENTS ─── */
+.section-gradient-blue-gold {
+  background:
+    linear-gradient(
+      180deg,
+      #0A0A0A 0%,
+      #0E0E0E 15%,
+      #111111 30%,
+      #0E0E0E 50%,
+      #0A0A0A 70%,
+      #080808 85%,
+      #0A0A0A 100%
+    ),
+    radial-gradient(ellipse at 30% 40%, rgba(201, 168, 76, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 60%, rgba(201, 168, 76, 0.03) 0%, transparent 50%);
+}
+
+/* Charcoal sections get subtle depth via inner shadow + gradient */
+.bg-charcoal-900 {
+  position: relative;
+  background: linear-gradient(180deg, #080808 0%, #0A0A0A 50%, #080808 100%);
+  box-shadow: inset 0 1px 0 rgba(201, 168, 76, 0.04), inset 0 -1px 0 rgba(201, 168, 76, 0.04);
+}
+
+/* Subtle gold accent strips in background */
+.bg-gold-accent-top {
+  position: relative;
+}
+.bg-gold-accent-top::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 5%;
+  right: 5%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201,168,76,0.25), transparent);
+}
+.bg-gold-accent-top::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 200px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(201, 168, 76, 0.03) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ============================================
+   DEPTH UTILITIES — Parallax & 3D Effects
+   ============================================ */
+
+/* Hero depth layers */
+.hero-depth {
+  position: relative;
+}
+
+.hero-depth::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.6) 0%,
+    rgba(0, 0, 0, 0.3) 30%,
+    rgba(0, 0, 0, 0.2) 50%,
+    rgba(0, 0, 0, 0.5) 70%,
+    rgba(10, 10, 10, 0.95) 100%
+  );
+  z-index: 1;
+}
+
+/* Gold light trails effect */
+.gold-light-trails {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(45deg, transparent 40%, rgba(201, 168, 76, 0.03) 50%, transparent 60%),
+    linear-gradient(-45deg, transparent 40%, rgba(201, 168, 76, 0.02) 50%, transparent 60%);
+  animation: lightTrailShift 12s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 2;
+}
+
+@keyframes lightTrailShift {
+  0% { opacity: 0.5; transform: translateX(-5%); }
+  100% { opacity: 1; transform: translateX(5%); }
+}
+
+/* Floating gold particles */
+.gold-particles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.gold-particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: radial-gradient(circle, #C9A84C, transparent);
+  border-radius: 50%;
+  opacity: 0;
+  animation: particleFloat 6s ease-in-out infinite;
+}
+
+@keyframes particleFloat {
+  0% { opacity: 0; transform: translateY(100vh) scale(0); }
+  10% { opacity: 0.8; }
+  90% { opacity: 0.8; }
+  100% { opacity: 0; transform: translateY(-20vh) scale(1.5); }
+}
+
+/* Silk fabric texture for Home Ledger */
+.silk-texture {
+  position: relative;
+}
+
+.silk-texture::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(201, 168, 76, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 30%, rgba(201, 168, 76, 0.03) 0%, transparent 40%),
+    radial-gradient(ellipse at 50% 80%, rgba(201, 168, 76, 0.02) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* 3D Shield/Key visual effect */
+.vault-icon-glow {
+  filter: drop-shadow(0 0 30px rgba(201, 168, 76, 0.4)) drop-shadow(0 0 60px rgba(201, 168, 76, 0.15));
 }
