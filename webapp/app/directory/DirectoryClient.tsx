@@ -103,6 +103,10 @@ const CATEGORIES = [
   { id: 'destinations', label: 'Destinations', sub: 'Florida city guides', img: '/images/categories/destinations.png',
     subcategories: ['All', 'Beaches', 'Museums', 'Parks', 'Historic Sites', 'Tours', 'Nature Trails', 'State Parks'] },
 
+  // === MOBILE SERVICES (on-demand, no brick-and-mortar) ===
+  { id: 'mobile-services', label: 'Mobile Services', sub: 'On-demand pros that come to you', img: '/images/categories/mobile-services.png',
+    subcategories: ['All', 'Mobile Car Wash', 'Ceramic Coating', 'Window Tinting', 'Mobile Tire Service', 'Dent & Glass Repair', 'Mobile Mechanic', 'Mobile Locksmith', 'Mobile Massage', 'IV Therapy', 'Mobile Hair & Beauty', 'Mobile Fitness', 'Mobile Pet Grooming', 'Mobile Vet Care', 'Pressure Washing', 'Mobile Cleaning', 'Pool & Spa Service', 'Mobile Pest Control', 'Mobile Notary', 'Mobile IT & Tech', 'Private Chef', 'Mobile Bartending'] },
+
   // === HOTELS & LODGING ===
   { id: 'hotels-lodging', label: 'Hotels & Lodging', sub: 'Where to stay', img: '/images/categories/destinations.png',
     subcategories: ['All', 'Hotels', 'Resorts', 'Vacation Rentals', 'Boutique Hotels', 'B&Bs', 'Hostels', 'RV Parks'] },
@@ -119,6 +123,27 @@ const CATEGORIES = [
   { id: 'pets', label: 'Pets', sub: 'Vets, grooming & boarding', img: '/images/categories/services.png',
     subcategories: ['All', 'Veterinarians', 'Pet Grooming', 'Pet Boarding', 'Pet Stores', 'Dog Training', 'Pet Sitting', 'Aquarium & Fish'] },
 ];
+
+// ─── Shared industry map: category ID → Supabase industry column value ───
+// Each category maps 1:1 to its own industry value — "All" is always scoped to the parent.
+const INDUSTRY_MAP: Record<string, string> = {
+  'services': 'services',
+  'automotive': 'automotive',
+  'marine-outdoor': 'marine-outdoor',
+  'dining': 'dining',
+  'health-wellness': 'health-wellness',
+  'style-shopping': 'style-shopping',
+  'nightlife': 'nightlife',
+  'convenience-grocery': 'convenience-grocery',
+  'emergency-services': 'emergency-services',
+  'family-entertainment': 'family-entertainment',
+  'destinations': 'destinations',
+  'mobile-services': 'mobile-services',
+  'hotels-lodging': 'hotels-lodging',
+  'professional-services': 'professional-services',
+  'education': 'education',
+  'pets': 'pets',
+};
 
 function Stars({ rating, size = 14 }: { rating: number; size?: number }) {
   return (
@@ -976,16 +1001,6 @@ function GroupedBrowseView({ activeCategory, sortBy, setSortBy, cityFilter, setC
     ? currentCat.subcategories.filter(s => s !== 'All').map(sub => ({ id: sub, label: sub, sub: '', searchTerm: sub }))
     : CATEGORIES.map(c => ({ id: c.id, label: c.label, sub: c.sub, searchTerm: '' }));
 
-  const industryMap: Record<string, string> = {
-    'services': 'services', 'automotive': 'automotive', 'marine-outdoor': 'marine-outdoor',
-    'dining': 'dining', 'health-wellness': 'health-wellness',
-    'style-shopping': 'style-shopping', 'nightlife': 'nightlife',
-    'convenience-grocery': 'convenience-grocery', 'emergency-services': 'emergency-services',
-    'family-entertainment': 'family-entertainment', 'destinations': 'destinations',
-    'hotels-lodging': 'destinations', 'professional-services': 'services',
-    'education': 'education', 'pets': 'pets',
-  };
-
   return (
     <div data-testid="grouped-browse-view">
       <section className="relative pt-20 pb-6 overflow-hidden" style={{ background: '#050505' }}>
@@ -1037,7 +1052,7 @@ function GroupedBrowseView({ activeCategory, sortBy, setSortBy, cityFilter, setC
             key={`${row.id}-${sortBy}-${cityFilter}`}
             label={row.label}
             subtitle={row.sub}
-            industry={currentCat ? (industryMap[activeCategory] || activeCategory) : (industryMap[row.id] || row.id)}
+            industry={currentCat ? (INDUSTRY_MAP[activeCategory] || activeCategory) : (INDUSTRY_MAP[row.id] || row.id)}
             searchTerm={row.searchTerm}
             sortBy={sortBy}
             cityFilter={cityFilter}

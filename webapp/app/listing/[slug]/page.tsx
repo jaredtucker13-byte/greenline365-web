@@ -30,6 +30,8 @@ interface Listing {
   total_photos_available: number;
   tags: string[];
   metadata: Record<string, any>;
+  business_hours: any;
+  menu: any;
   directory_badges: { id: string; badge_type: string; badge_label: string; badge_color: string }[];
   related: RelatedListing[];
 }
@@ -58,6 +60,34 @@ function ensureProtocol(url: string): string {
 function cleanPhone(phone: string): string {
   if (!phone) return phone;
   return phone.replace(/[^\d+]/g, '');
+}
+
+/** Determine if business is currently open based on business_hours.weekday_text */
+function getOpenStatus(businessHours: { weekday_text?: string[] } | null | undefined): { isOpen: boolean; label: string } | null {
+  if (!businessHours?.weekday_text?.length) return null;
+  const now = new Date();
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const today = days[now.getDay()];
+  const todayEntry = businessHours.weekday_text.find((t: string) => t.startsWith(today));
+  if (!todayEntry) return null;
+  const hoursStr = todayEntry.replace(`${today}: `, '');
+  if (hoursStr === 'Closed') return { isOpen: false, label: 'Closed' };
+  if (hoursStr === 'Open 24 hours') return { isOpen: true, label: 'Open 24 hrs' };
+  const match = hoursStr.match(/(\d{1,2}:\d{2}\s*[AP]M)\s*[–-]\s*(\d{1,2}:\d{2}\s*[AP]M)/i);
+  if (!match) return null;
+  const parseTime = (str: string): number => {
+    const [time, meridiem] = str.trim().split(/\s+/);
+    const [h, m] = time.split(':').map(Number);
+    let hours = h;
+    if (meridiem.toUpperCase() === 'PM' && h !== 12) hours += 12;
+    if (meridiem.toUpperCase() === 'AM' && h === 12) hours = 0;
+    return hours * 60 + m;
+  };
+  const openMin = parseTime(match[1]);
+  const closeMin = parseTime(match[2]);
+  const nowMin = now.getHours() * 60 + now.getMinutes();
+  const isOpen = closeMin > openMin ? (nowMin >= openMin && nowMin < closeMin) : (nowMin >= openMin || nowMin < closeMin);
+  return { isOpen, label: isOpen ? 'Open Now' : 'Closed' };
 }
 
 export default function ListingDetailPage() {
@@ -178,6 +208,7 @@ export default function ListingDetailPage() {
   const googleMapsUrl = listing.metadata?.google_maps_url;
   const businessHours = listing.business_hours as Record<string, { open: string; close: string; closed: boolean }> | null;
   const menuSections = listing.menu as { id: string; name: string; items: { id: string; name: string; description: string; price: string }[] }[] | null;
+  const openStatus = getOpenStatus(listing.business_hours);
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] pt-20 pb-16" data-testid="listing-detail-page">
@@ -261,6 +292,16 @@ export default function ListingDetailPage() {
                   <h1 className="text-2xl sm:text-3xl font-heading font-semibold text-white mt-3 mb-2" data-testid="listing-name">
                     {listing.business_name}
                   </h1>
+                  {openStatus && (
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-heading font-bold uppercase tracking-wider mb-2 ${
+                      openStatus.isOpen
+                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                        : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                    }`} data-testid="open-status-badge">
+                      <span className={`w-1.5 h-1.5 rounded-full ${openStatus.isOpen ? 'bg-emerald-400 animate-pulse' : 'bg-red-400'}`} />
+                      {openStatus.label}
+                    </span>
+                  )}
                   {listing.city && (
                     <div className="flex items-center gap-2 text-white/50 text-sm font-body">
                       <svg className="w-4 h-4 text-gold/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -930,6 +971,37 @@ export default function ListingDetailPage() {
                   )}
                 </div>
               </div>
+
+              {/* Business Hours (weekday_text format from Google Places) */}
+              {listing.business_hours?.weekday_text && listing.business_hours.weekday_text.length > 0 && (() => {
+                const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                const todayName = days[new Date().getDay()];
+                return (
+                  <div className="mt-6 pt-5 border-t border-white/5" data-testid="sidebar-business-hours">
+                    <p className="text-[10px] text-white/30 font-heading uppercase tracking-wider mb-3">Business Hours</p>
+                    <div className="space-y-1.5">
+                      {listing.business_hours.weekday_text.map((entry: string, i: number) => {
+                        const [day, ...rest] = entry.split(': ');
+                        const hours = rest.join(': ');
+                        const isToday = day === todayName;
+                        return (
+                          <div
+                            key={i}
+                            className={`flex items-center justify-between py-1.5 px-2.5 rounded-lg text-xs font-body transition-all ${
+                              isToday
+                                ? 'bg-[rgba(201,168,76,0.08)] border border-[rgba(201,168,76,0.15)]'
+                                : ''
+                            }`}
+                          >
+                            <span className={isToday ? 'text-[#C9A84C] font-semibold' : 'text-white/50'}>{day}</span>
+                            <span className={isToday ? 'text-white font-medium' : 'text-white/40'}>{hours}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* Google stats */}
               {(googleRating || googleReviews) && (
