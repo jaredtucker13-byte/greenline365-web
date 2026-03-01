@@ -99,10 +99,6 @@ const CATEGORIES = [
   { id: 'family-entertainment', label: 'Family Entertainment', sub: 'Fun for all ages', img: '/images/categories/family-entertainment.png',
     subcategories: ['All', 'Theme Parks', 'Arcades', 'Mini Golf', 'Bowling', 'Water Parks', 'Zoos & Aquariums', 'Trampoline Parks', 'Escape Rooms'] },
 
-  // === DESTINATIONS ===
-  { id: 'destinations', label: 'Destinations', sub: 'Florida city guides', img: '/images/categories/destinations.png',
-    subcategories: ['All', 'Beaches', 'Museums', 'Parks', 'Historic Sites', 'Tours', 'Nature Trails', 'State Parks'] },
-
   // === HOTELS & LODGING ===
   { id: 'hotels-lodging', label: 'Hotels & Lodging', sub: 'Where to stay', img: '/images/categories/destinations.png',
     subcategories: ['All', 'Hotels', 'Resorts', 'Vacation Rentals', 'Boutique Hotels', 'B&Bs', 'Hostels', 'RV Parks'] },
@@ -981,7 +977,7 @@ function GroupedBrowseView({ activeCategory, sortBy, setSortBy, cityFilter, setC
     'dining': 'dining', 'health-wellness': 'health-wellness',
     'style-shopping': 'style-shopping', 'nightlife': 'nightlife',
     'convenience-grocery': 'convenience-grocery', 'emergency-services': 'emergency-services',
-    'family-entertainment': 'family-entertainment', 'destinations': 'destinations',
+    'family-entertainment': 'family-entertainment',
     'hotels-lodging': 'destinations', 'professional-services': 'services',
     'education': 'education', 'pets': 'pets',
   };
