@@ -2,7 +2,8 @@
  * Email Engine — Send & Track
  * POST /api/email-engine/send
  *
- * Accepts full email package { to, subject, htmlBody, images, qrCode, trackEngagement }
+ * Accepts full email package { to, subject, htmlBody, images, qrCode, trackEngagement, template }
+ * Converts markdown body to styled HTML using GL365 dark theme renderer
  * Assembles final HTML email with GreenLine365 branded template
  * Embeds rating widget (thumbs up/down links to /api/email-engine/feedback)
  * Sends via existing email infrastructure (Gmail SMTP)
@@ -13,11 +14,24 @@ import { createClient } from '@supabase/supabase-js';
 import { sendEmail } from '@/lib/email/gmail-sender';
 import { requireAuth } from '@/lib/api-auth';
 import { randomUUID } from 'crypto';
+import { markdownToEmailHtml } from '@/app/admin-v2/email-engine/lib/email-html-renderer';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
+
+// ── Email Template Styles ──────────────────────────────────
+
+type EmailTemplate = 'campaign' | 'newsletter' | 'report' | 'announcement' | 'personal';
+
+const TEMPLATE_STYLES: Record<EmailTemplate, { maxWidth: string; bodyPadding: string; headerSize: string }> = {
+  campaign:     { maxWidth: '560px', bodyPadding: '28px',  headerSize: '20px' },
+  newsletter:   { maxWidth: '600px', bodyPadding: '32px',  headerSize: '22px' },
+  report:       { maxWidth: '620px', bodyPadding: '36px',  headerSize: '20px' },
+  announcement: { maxWidth: '540px', bodyPadding: '32px',  headerSize: '24px' },
+  personal:     { maxWidth: '520px', bodyPadding: '24px',  headerSize: '18px' },
+};
 
 function assembleHtml(options: {
   subject: string;
@@ -27,19 +41,14 @@ function assembleHtml(options: {
   qrCode: string | null;
   trackEngagement: boolean;
   emailId: string;
+  template: EmailTemplate;
 }): string {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com';
-  const { subject, htmlBody, recipientEmail, images, qrCode, trackEngagement, emailId } = options;
+  const { subject, htmlBody, recipientEmail, images, qrCode, trackEngagement, emailId, template } = options;
+  const style = TEMPLATE_STYLES[template] || TEMPLATE_STYLES.campaign;
 
-  // Convert plain text body to HTML paragraphs if needed
-  const bodyHtml = htmlBody.includes('<')
-    ? htmlBody
-    : htmlBody
-        .split('\n\n')
-        .map(p => p.trim())
-        .filter(Boolean)
-        .map(p => `<p style="color:#a0a0a0;font-size:15px;line-height:1.7;margin:0 0 16px;">${p.replace(/\n/g, '<br>')}</p>`)
-        .join('\n    ');
+  // Convert markdown body to styled HTML
+  const bodyHtml = markdownToEmailHtml(htmlBody);
 
   // Build optional image blocks
   const imageBlocks = images
@@ -65,13 +74,13 @@ function assembleHtml(options: {
 
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
 <body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0a0a0a;">
-<div style="max-width:600px;margin:0 auto;padding:40px 20px;">
+<div style="max-width:${style.maxWidth};margin:0 auto;padding:40px 20px;">
   <div style="text-align:center;margin-bottom:24px;">
     <h1 style="color:#C9A96E;font-size:24px;margin:0;">GreenLine<span style="color:#fff;">365</span></h1>
     <p style="color:#666;font-size:12px;margin:4px 0 0;">Florida's Gold Standard Business Directory</p>
   </div>
-  <div style="background:#1a1a1a;border:1px solid #C9A96E30;border-radius:16px;padding:32px;">
-    <h2 style="color:#fff;font-size:20px;margin:0 0 16px;">${subject}</h2>
+  <div style="background:#1a1a1a;border:1px solid #C9A96E30;border-radius:16px;padding:${style.bodyPadding};">
+    <h2 style="color:#fff;font-size:${style.headerSize};margin:0 0 20px;line-height:1.3;">${subject}</h2>
     ${bodyHtml}
     ${imageBlocks}
     ${qrBlock}
@@ -87,19 +96,21 @@ function assembleHtml(options: {
 </div>
 </body></html>`;
 }
+}
 
 export async function POST(request: NextRequest) {
   const auth = await requireAuth();
   if (auth.error) return auth.error;
 
   try {
-    const { to, subject, htmlBody, images, qrCode, trackEngagement } = await request.json();
+    const { to, subject, htmlBody, images, qrCode, trackEngagement, template } = await request.json();
 
     if (!to || !subject || !htmlBody) {
       return NextResponse.json({ error: 'Missing required fields: to, subject, htmlBody' }, { status: 400 });
     }
 
     const emailId = randomUUID();
+    const emailTemplate: EmailTemplate = (['campaign', 'newsletter', 'report', 'announcement', 'personal'].includes(template)) ? template : 'campaign';
 
     const html = assembleHtml({
       subject,
@@ -109,6 +120,7 @@ export async function POST(request: NextRequest) {
       qrCode: qrCode || null,
       trackEngagement: trackEngagement ?? true,
       emailId,
+      template: emailTemplate,
     });
 
     const result = await sendEmail({ to, subject, html });
@@ -123,7 +135,7 @@ export async function POST(request: NextRequest) {
         status: result.success ? 'sent' : 'failed',
         error_message: result.error || null,
         sent_at: result.success ? new Date().toISOString() : null,
-        metadata: { type: 'email-engine', subject, trackEngagement, imageCount: (images || []).length, hasQR: !!qrCode },
+        metadata: { type: 'email-engine', subject, template: emailTemplate, trackEngagement, imageCount: (images || []).length, hasQR: !!qrCode },
       });
     } catch (_) { /* non-critical */ }
 

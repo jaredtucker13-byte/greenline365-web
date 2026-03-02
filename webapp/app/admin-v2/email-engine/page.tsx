@@ -29,6 +29,7 @@ import type {
   ExecutionLogEntry,
   Toast,
 } from './lib/types';
+import { markdownToEmailHtml } from './lib/email-html-renderer';
 
 // ============ HELPERS ============
 
@@ -224,6 +225,7 @@ export default function EmailEnginePage() {
   // -- Phase 6: Send --
   const [trackEngagement, setTrackEngagement] = useState(true);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [emailTemplate, setEmailTemplate] = useState<'campaign' | 'newsletter' | 'report' | 'announcement' | 'personal'>('campaign');
 
   // -- Sidebar: Content Aggregator --
   const [slackInput, setSlackInput] = useState('');
@@ -483,7 +485,8 @@ export default function EmailEnginePage() {
   const assembledPreviewHtml = (() => {
     const parts: string[] = [];
     if (contentToggles.aiBody && editedDraft) {
-      parts.push(editedDraft.split('\n\n').map(p => `<p style="color:#a0a0a0;font-size:14px;line-height:1.7;margin:0 0 12px;">${p.replace(/\n/g, '<br>')}</p>`).join(''));
+      // Use the markdown-to-HTML renderer for proper formatting
+      parts.push(markdownToEmailHtml(editedDraft));
     }
     if (contentToggles.visionAddendum && visionReport) {
       parts.push(`<div style="border-top:1px solid #333;padding-top:12px;margin-top:12px;"><p style="color:#C9A96E;font-size:12px;font-weight:600;margin:0 0 6px;">VISUAL REPORT</p><p style="color:#a0a0a0;font-size:13px;line-height:1.6;margin:0;">${visionReport.analysis}</p></div>`);
@@ -513,10 +516,11 @@ export default function EmailEnginePage() {
         body: JSON.stringify({
           to: tenantContext.email,
           subject: subjectLine,
-          htmlBody: assembledPreviewHtml || editedDraft,
+          htmlBody: editedDraft,
           images: generatedImage?.url ? [generatedImage.url] : [],
           qrCode: contentToggles.qrCode ? qrCodeUrl : null,
           trackEngagement,
+          template: emailTemplate,
         }),
       });
       const data = await res.json();
@@ -689,12 +693,39 @@ export default function EmailEnginePage() {
       {/* Confirmation Modal */}
       {showConfirmModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl">
-            <h3 className="text-lg font-bold text-white mb-2">Confirm Send</h3>
-            <p className="text-sm text-white/60 mb-1">
-              Send email to <strong className="text-[#C9A96E]">{tenantContext?.email}</strong>?
-            </p>
-            <p className="text-sm text-white/40 mb-6">Subject: {subjectLine}</p>
+          <div className="bg-[#1a1a1a] border border-[#C9A96E]/30 rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-[#C9A96E]/10 flex items-center justify-center">
+                <svg className="w-5 h-5 text-[#C9A96E]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+              </div>
+              <h3 className="text-lg font-bold text-white">Ready to Send</h3>
+            </div>
+            <div className="bg-[#111] rounded-xl p-4 space-y-3 mb-5 border border-[#2a2a2a]">
+              <div className="flex justify-between items-start">
+                <span className="text-xs text-white/40 uppercase tracking-wider">To</span>
+                <span className="text-sm text-[#C9A96E] font-medium">{tenantContext?.email}</span>
+              </div>
+              <div className="flex justify-between items-start">
+                <span className="text-xs text-white/40 uppercase tracking-wider">Subject</span>
+                <span className="text-sm text-white/80 text-right max-w-[260px]">{subjectLine}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-white/40 uppercase tracking-wider">Template</span>
+                <span className="text-xs text-white/60 bg-[#222] px-2 py-1 rounded capitalize">{emailTemplate}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-white/40 uppercase tracking-wider">Tracking</span>
+                <span className={`text-xs px-2 py-1 rounded ${trackEngagement ? 'text-green-400 bg-green-500/10' : 'text-white/40 bg-[#222]'}`}>{trackEngagement ? 'Enabled' : 'Disabled'}</span>
+              </div>
+              {(contentToggles.generatedImage || contentToggles.qrCode) && (
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-white/40 uppercase tracking-wider">Attachments</span>
+                  <span className="text-xs text-white/60">
+                    {[contentToggles.generatedImage && 'Image', contentToggles.qrCode && 'QR Code'].filter(Boolean).join(', ')}
+                  </span>
+                </div>
+              )}
+            </div>
             <div className="flex gap-3 justify-end">
               <button onClick={() => setShowConfirmModal(false)} className="px-4 py-2 rounded-lg border border-[#2a2a2a] text-white/60 hover:text-white text-sm transition">
                 Cancel
@@ -1019,6 +1050,40 @@ export default function EmailEnginePage() {
                     />
                   </div>
 
+                  {/* Email Template Selector */}
+                  <div>
+                    <label className="block text-xs font-medium text-white/50 mb-1.5">Email Template</label>
+                    <div className="flex flex-wrap gap-2">
+                      {([
+                        { value: 'campaign' as const, label: 'Campaign', desc: 'Short & punchy, one CTA' },
+                        { value: 'newsletter' as const, label: 'Newsletter', desc: 'Multi-section, images' },
+                        { value: 'report' as const, label: 'Report', desc: 'Long-form, detailed' },
+                        { value: 'announcement' as const, label: 'Announce', desc: 'Bold header, key message' },
+                        { value: 'personal' as const, label: 'Personal', desc: 'Simple, clean, minimal' },
+                      ]).map(tmpl => (
+                        <button
+                          key={tmpl.value}
+                          onClick={() => setEmailTemplate(tmpl.value)}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition border ${
+                            emailTemplate === tmpl.value
+                              ? 'bg-[#C9A96E]/20 border-[#C9A96E]/50 text-[#C9A96E]'
+                              : 'bg-[#111] border-[#2a2a2a] text-white/50 hover:text-white/70 hover:border-[#3a3a3a]'
+                          }`}
+                          title={tmpl.desc}
+                        >
+                          {tmpl.label}
+                        </button>
+                      ))}
+                    </div>
+                    <p className="text-[11px] text-white/30 mt-1">
+                      {emailTemplate === 'campaign' && 'Short, punchy email with one primary CTA. Max-width 560px.'}
+                      {emailTemplate === 'newsletter' && 'Multi-section layout with room for images. Max-width 600px.'}
+                      {emailTemplate === 'report' && 'Long-form content with full hierarchy. Max-width 620px.'}
+                      {emailTemplate === 'announcement' && 'Bold header with key message. Max-width 540px.'}
+                      {emailTemplate === 'personal' && 'Simple, clean, minimal formatting. Max-width 520px.'}
+                    </p>
+                  </div>
+
                   {/* Content Block Toggles */}
                   <div>
                     <p className="text-xs font-medium text-white/40 uppercase tracking-wide mb-2">Content Blocks</p>
@@ -1105,8 +1170,16 @@ export default function EmailEnginePage() {
                   </GoldButton>
 
                   {phaseStatus[6] === 'complete' && (
-                    <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/30 text-green-400 text-sm">
-                      Email sent successfully!
+                    <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/30 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <svg className="w-5 h-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <span className="text-green-400 text-sm font-semibold">Email Sent Successfully</span>
+                      </div>
+                      <div className="text-xs space-y-1 text-green-400/70">
+                        <p>To: {tenantContext?.email}</p>
+                        <p>Subject: {subjectLine}</p>
+                        <p>Sent: {new Date().toLocaleString()}</p>
+                      </div>
                     </div>
                   )}
                 </div>
