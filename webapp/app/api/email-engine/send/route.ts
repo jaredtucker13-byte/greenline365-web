@@ -96,7 +96,6 @@ function assembleHtml(options: {
 </div>
 </body></html>`;
 }
-}
 
 export async function POST(request: NextRequest) {
   const auth = await requireAuth();
