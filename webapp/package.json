@@ -37,7 +37,7 @@
     "motion": "^12.23.26",
     "motion-dom": "^12.24.11",
     "nanoid": "^5.1.6",
-    "next": "16.0.10",
+    "next": "16.1.5",
     "nodemailer": "^7.0.12",
     "posthog-js": "^1.313.0",
     "qrcode": "^1.5.4",
