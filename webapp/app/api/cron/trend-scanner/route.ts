@@ -1,12 +1,14 @@
 // ============================================================
-// Cron: Trend Scanner — Runs every 3 hours via Vercel Cron
+// Cron: Trend Scanner — Triggered externally by cron-job.org
 // ============================================================
-// 1. Scans for new local trends using Perplexity via OpenRouter
-// 2. Expires stale deals (backup — orchestrator also does this hourly)
+// 1. Checks agent_configs for kill-switch status
+// 2. Scans for new local trends using Perplexity via OpenRouter
+// 3. Expires stale deals (backup — orchestrator also does this hourly)
+// 4. Updates agent_configs with run metadata
 //
 // Thank-you emails are handled by the orchestrator worker, not here.
 //
-// Configure in vercel.json: schedule "0 */3 * * *"
+// Scheduled externally via cron-job.org: "0 */3 * * *" (every 3 hours)
 // ============================================================
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -29,11 +31,34 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  const startTime = Date.now();
+
+  // ── Check agent_configs kill-switch ──────────────────────
+  try {
+    const { data: agentConfig } = await supabase
+      .from('agent_configs')
+      .select('is_active')
+      .eq('agent_id', 'trend_scanner')
+      .single();
+
+    if (agentConfig && !agentConfig.is_active) {
+      return NextResponse.json({
+        agent: 'trend_scanner',
+        status: 'disabled',
+        timestamp: new Date().toISOString(),
+        message: 'Agent disabled via agent_configs dashboard kill-switch',
+      });
+    }
+  } catch {
+    // agent_configs table may not exist yet — proceed anyway
+  }
+
   const results: Record<string, unknown> = {
     timestamp: new Date().toISOString(),
     tasks: {} as Record<string, unknown>,
   };
   const tasks = results.tasks as Record<string, unknown>;
+  let overallSuccess = true;
 
   // Task 1: Scan for new trends for active ZIP codes
   try {
@@ -68,10 +93,12 @@ export async function GET(request: NextRequest) {
         };
       } catch (err: any) {
         tasks[`scan_${zipCode}`] = { error: err.message };
+        overallSuccess = false;
       }
     }
   } catch (error: any) {
     tasks.trend_scan = { error: error.message };
+    overallSuccess = false;
   }
 
   // Task 2: Expire stale deals (backup — orchestrator does this too)
@@ -89,7 +116,29 @@ export async function GET(request: NextRequest) {
     };
   } catch (error: any) {
     tasks.expire_deals = { error: error.message };
+    overallSuccess = false;
   }
 
-  return NextResponse.json({ success: true, ...results });
+  const durationMs = Date.now() - startTime;
+
+  // ── Update agent_configs with run metadata ──────────────
+  try {
+    await supabase
+      .from('agent_configs')
+      .update({
+        last_run: new Date().toISOString(),
+        last_status: overallSuccess ? 'success' : 'failed',
+        last_duration_ms: durationMs,
+      })
+      .eq('agent_id', 'trend_scanner');
+  } catch {
+    // Non-critical — don't fail the response
+  }
+
+  return NextResponse.json({
+    success: overallSuccess,
+    agent: 'trend_scanner',
+    duration_ms: durationMs,
+    ...results,
+  });
 }

@@ -32,6 +32,8 @@ interface Listing {
   metadata: Record<string, any>;
   directory_badges: { id: string; badge_type: string; badge_label: string; badge_color: string }[];
   related: RelatedListing[];
+  business_hours: Record<string, { open: string; close: string; closed: boolean }> | null;
+  menu: { id: string; name: string; items: { id: string; name: string; description: string; price: string }[] }[] | null;
 }
 
 interface RelatedListing {
