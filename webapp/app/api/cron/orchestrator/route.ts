@@ -1,17 +1,19 @@
 // ============================================================
 // /api/cron/orchestrator — Agentic System Orchestrator
 // ============================================================
-// The brain of GL365's production ops. Runs every hour via Vercel Cron.
+// The brain of GL365's production ops. Triggered externally by cron-job.org.
 // This worker is AGENTIC — it doesn't just report, it ACTS:
-//   1. Checks service health (Supabase, OpenRouter, Stripe, SendGrid)
-//   2. Validates seed data — flags what's missing
-//   3. Checks pending migrations
-//   4. Sends scheduled thank-you emails (~5 min after QR scan)
-//   5. Expires stale deals
-//   6. Cleans up old health logs (30-day retention)
-//   7. Logs full report to _system_health_log
+//   1. Checks agent_configs table for kill-switch status
+//   2. Checks service health (Supabase, OpenRouter, Stripe, SendGrid)
+//   3. Validates seed data — flags what's missing
+//   4. Checks pending migrations
+//   5. Sends scheduled thank-you emails (~5 min after QR scan)
+//   6. Expires stale deals
+//   7. Cleans up old health logs (30-day retention)
+//   8. Logs full report to _system_health_log
+//   9. Updates agent_configs with run metadata
 //
-// vercel.json: { "path": "/api/cron/orchestrator", "schedule": "0 * * * *" }
+// Scheduled externally via cron-job.org: "0 * * * *" (every hour)
 // ============================================================
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -315,6 +317,27 @@ export async function GET(request: NextRequest) {
   }
 
   const startTime = Date.now();
+
+  // ── Check agent_configs kill-switch ──────────────────────
+  try {
+    const { data: agentConfig } = await supabase
+      .from('agent_configs')
+      .select('is_active')
+      .eq('agent_id', 'orchestrator')
+      .single();
+
+    if (agentConfig && !agentConfig.is_active) {
+      return NextResponse.json({
+        orchestrator: 'GL365 Agentic System Orchestrator',
+        status: 'disabled',
+        timestamp: new Date().toISOString(),
+        message: 'Agent disabled via agent_configs dashboard kill-switch',
+      });
+    }
+  } catch {
+    // agent_configs table may not exist yet — proceed anyway
+  }
+
   const results: Record<string, TaskResult> = {};
   const allActions: string[] = [];
 
@@ -353,11 +376,27 @@ export async function GET(request: NextRequest) {
   // Log everything
   await logResults(overall, results, allActions);
 
+  const durationMs = Date.now() - startTime;
+
+  // ── Update agent_configs with run metadata ──────────────
+  try {
+    await supabase
+      .from('agent_configs')
+      .update({
+        last_run: new Date().toISOString(),
+        last_status: overall === 'down' ? 'failed' : 'success',
+        last_duration_ms: durationMs,
+      })
+      .eq('agent_id', 'orchestrator');
+  } catch {
+    // Non-critical — don't fail the response
+  }
+
   return NextResponse.json({
     orchestrator: 'GL365 Agentic System Orchestrator',
     status: overall,
     timestamp: new Date().toISOString(),
-    duration_ms: Date.now() - startTime,
+    duration_ms: durationMs,
     tasks: results,
     actions_taken: allActions,
   });
