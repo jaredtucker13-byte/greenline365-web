@@ -10,6 +10,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import BoostedShowcase from '@/components/BoostedShowcase';
+import FeaturedShowcase from '@/components/FeaturedShowcase';
 
 interface Listing {
   id: string;
@@ -140,6 +141,77 @@ function PropertyIntelBadge() {
   );
 }
 
+// ─── Testimonials — Fetches real reviews from the directory ─────
+function TestimonialsSection() {
+  const [reviews, setReviews] = useState<{ id: string; reviewer_name: string; review_text: string; rating: number; business_name: string; slug: string; created_at: string }[]>([]);
+  const [idx, setIdx] = useState(0);
+
+  useEffect(() => {
+    // Fetch real reviews from the directory reviews endpoint
+    fetch('/api/directory/reviews?limit=10&min_rating=4')
+      .then(r => r.ok ? r.json() : { reviews: [] })
+      .then(data => {
+        const list = data.reviews || data || [];
+        if (Array.isArray(list) && list.length > 0) {
+          setReviews(list.filter((r: any) => r.review_text && r.reviewer_name && r.review_text.length > 20));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (reviews.length < 2) return;
+    const t = setInterval(() => setIdx(i => (i + 1) % reviews.length), 6000);
+    return () => clearInterval(t);
+  }, [reviews.length]);
+
+  if (reviews.length === 0) return null;
+
+  const r = reviews[idx];
+  return (
+    <section className="relative py-20 overflow-hidden" data-testid="testimonials-section">
+      <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(201,168,76,0.03) 0%, transparent 60%)' }} />
+      <div className="relative max-w-3xl mx-auto px-6 text-center">
+        <p className="text-xs font-heading font-semibold uppercase tracking-[0.25em] mb-4" style={{ color: 'rgba(201,168,76,0.7)' }}>Real Reviews</p>
+        <h2 className="text-3xl sm:text-4xl font-heading font-light text-white tracking-tight mb-10">
+          What People Are <span className="text-gradient-gold font-semibold">Saying</span>
+        </h2>
+
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={r.id}
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -40 }}
+            transition={{ duration: 0.4 }}
+            className="text-center"
+          >
+            <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center text-xl font-heading font-bold text-white" style={{ background: 'linear-gradient(135deg, rgba(201,168,76,0.2) 0%, rgba(201,168,76,0.1) 100%)', border: '2px solid rgba(201,168,76,0.3)' }}>
+              {r.reviewer_name[0]}
+            </div>
+            <h3 className="text-lg font-heading font-semibold text-white">{r.reviewer_name}</h3>
+            <p className="text-sm mb-3 font-body" style={{ color: 'rgba(201,168,76,0.6)' }}>
+              reviewing <Link href={`/listing/${r.slug}`} className="underline hover:text-[#C9A84C] transition">{r.business_name}</Link>
+            </p>
+            <div className="flex justify-center mb-4"><Stars rating={r.rating} size={18} /></div>
+            <p className="text-sm text-white/60 leading-relaxed italic font-body max-w-lg mx-auto">&ldquo;{r.review_text}&rdquo;</p>
+          </motion.div>
+        </AnimatePresence>
+
+        {reviews.length > 1 && (
+          <div className="flex items-center justify-center gap-2 mt-8">
+            {reviews.map((_, i) => (
+              <button key={i} onClick={() => setIdx(i)} className={`w-2.5 h-2.5 rounded-full transition ${i === idx ? 'scale-110' : 'opacity-40'}`}
+                style={{ background: i === idx ? 'linear-gradient(135deg, #C9A84C, #E8C97A)' : 'rgba(255,255,255,0.3)' }}
+                data-testid={`testimonial-dot-${i}`} />
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
 export default function DirectoryClient() {
   const [allListings, setAllListings] = useState<Listing[]>([]);
   const [featuredListings, setFeaturedListings] = useState<Listing[]>([]);
@@ -159,17 +231,27 @@ export default function DirectoryClient() {
   const [stats, setStats] = useState({ businesses: 0, categories: CATEGORIES.length, destinations: 8 });
 
   useEffect(() => {
-    // Load featured + all listings
+    // Load featured + all listings + dynamic counts
     Promise.all([
       fetch('/api/directory?limit=100').then(r => r.json()),
       fetch('/api/directory?limit=6&featured=true').then(r => r.json()),
-    ]).then(([all, featured]) => {
+      fetch('/api/directory/counts').then(r => r.json()).catch(() => null),
+    ]).then(([all, featured, counts]) => {
       const allArr = Array.isArray(all) ? all : [];
       const featArr = Array.isArray(featured) ? featured : [];
       setAllListings(allArr);
       setFeaturedListings(featArr.length > 0 ? featArr : allArr.slice(0, 6));
       setTotalListingCount(allArr.length);
-      setStats(prev => ({ ...prev, businesses: allArr.length }));
+      // Use dynamic counts from Supabase — no hard-coded numbers
+      if (counts && !counts.error) {
+        setStats({
+          businesses: counts.total_businesses || allArr.length,
+          categories: counts.total_categories || CATEGORIES.length,
+          destinations: counts.total_destinations || 8,
+        });
+      } else {
+        setStats(prev => ({ ...prev, businesses: allArr.length }));
+      }
       setLoading(false);
     }).catch(() => setLoading(false));
 
@@ -439,6 +521,29 @@ export default function DirectoryClient() {
           </section>
 
           {/* ═══════════════════════════════════════════════════════════
+              DYNAMIC FEATURED SHOWCASE — R-to-L CAROUSEL
+              ═══════════════════════════════════════════════════════════ */}
+          <section className="py-20" style={{ background: 'linear-gradient(180deg, #0A0A0A 0%, #060606 50%, #0A0A0A 100%)' }} data-testid="dynamic-showcase-section">
+            <div className="max-w-7xl mx-auto px-6">
+              <FeaturedShowcase className="mb-0" maxSlots={12} />
+            </div>
+          </section>
+
+          {/* ═══════════════════════════════════════════════════════════
+              BOOSTED SHOWCASE — SPONSORED CAROUSEL
+              ═══════════════════════════════════════════════════════════ */}
+          <section className="py-12" style={{ background: '#080808' }} data-testid="boosted-showcase-section">
+            <div className="max-w-7xl mx-auto px-6">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-1 h-6 rounded-full" style={{ background: '#C9A84C' }} />
+                <h3 className="text-sm font-heading font-semibold text-white/60 uppercase tracking-wider">Sponsored</h3>
+                <div className="flex-1 h-px bg-white/5" />
+              </div>
+              <BoostedShowcase maxSlots={12} />
+            </div>
+          </section>
+
+          {/* ═══════════════════════════════════════════════════════════
               FEATURED LISTINGS
               ═══════════════════════════════════════════════════════════ */}
           <section className="py-20" style={{ background: 'linear-gradient(180deg, #080808 0%, #0A0A0A 50%, #080808 100%)' }} data-testid="featured-listings-section">
@@ -601,6 +706,11 @@ export default function DirectoryClient() {
               </div>
             </div>
           </section>
+
+          {/* ═══════════════════════════════════════════════════════════
+              TESTIMONIALS — REAL DATA FROM DIRECTORY REVIEWS
+              ═══════════════════════════════════════════════════════════ */}
+          <TestimonialsSection />
 
           {/* ═══════════════════════════════════════════════════════════
               COMING SOON — Voted Best (Poll-Driven)

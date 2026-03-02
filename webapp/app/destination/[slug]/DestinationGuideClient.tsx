@@ -109,12 +109,20 @@ export default function DestinationGuideClient({ slug }: { slug: string }) {
   const [loading, setLoading] = useState(true);
   const [allCount, setAllCount] = useState(0);
   const [claimedCount, setClaimedCount] = useState(0);
+  // Public Resource Hub state
+  const [tips, setTips] = useState<{ id: string; tip_text: string; tip_category: string; upvotes: number }[]>([]);
+  const [weather, setWeather] = useState<{ temp?: number; condition?: string; humidity?: number; uv_index?: number; wind_speed?: number; icon?: string } | null>(null);
+  const [resources, setResources] = useState<{ id: string; title: string; file_url: string; file_type: string; download_count: number; description?: string; is_featured?: boolean }[]>([]);
 
   const dest = DESTINATIONS[slug];
 
   useEffect(() => {
     if (!dest) return;
     loadGuideData();
+    // Load public resource hub data
+    loadInsiderTips();
+    loadWeather();
+    loadResources();
   }, [slug]);
 
   async function loadGuideData() {
@@ -141,6 +149,55 @@ export default function DestinationGuideClient({ slug }: { slug: string }) {
     }
     setLoading(false);
   }
+
+  // ─── Insider Tips ───
+  async function loadInsiderTips() {
+    try {
+      const res = await fetch(`/api/destination/tips?slug=${slug}`);
+      if (res.ok) {
+        const data = await res.json();
+        setTips(data.tips || data || []);
+      }
+    } catch { /* tips are optional */ }
+  }
+
+  // ─── Live Weather ───
+  async function loadWeather() {
+    if (!dest) return;
+    try {
+      const res = await fetch(`/api/destination/weather?lat=${dest.lat}&lng=${dest.lng}`);
+      if (res.ok) {
+        const data = await res.json();
+        setWeather(data);
+      }
+    } catch { /* weather is optional */ }
+  }
+
+  // ─── Resource Downloads ───
+  async function loadResources() {
+    try {
+      const res = await fetch(`/api/destination/resources?slug=${slug}`);
+      if (res.ok) {
+        const data = await res.json();
+        setResources(data.resources || data || []);
+      }
+    } catch { /* resources are optional */ }
+  }
+
+  const handleDownload = async (resourceId: string, fileUrl: string) => {
+    // Track download
+    try {
+      await fetch('/api/destination/resources/download', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resourceId }),
+      });
+    } catch { /* tracking is best-effort */ }
+    // Open file
+    window.open(fileUrl, '_blank');
+    // Update local count
+    setResources(prev => prev.map(r => r.id === resourceId ? { ...r, download_count: r.download_count + 1 } : r));
+  };
 
   // Group destinations by region for the footer nav
   const destinationsByRegion = Object.entries(DESTINATIONS).reduce<Record<string, { slug: string; label: string }[]>>((acc, [key, d]) => {
@@ -324,6 +381,130 @@ export default function DestinationGuideClient({ slug }: { slug: string }) {
                 {topRated.map((l, i) => (
                   <GuideListingCard key={l.id} listing={l} index={i} />
                 ))}
+              </div>
+            </section>
+          )}
+
+          {/* ─── PUBLIC RESOURCE HUB ─── */}
+
+          {/* Live Weather Widget */}
+          {weather && (
+            <section className="max-w-6xl mx-auto px-6 py-10 border-t border-white/5" data-testid="weather-section">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(201, 168, 76, 0.1)', border: '1px solid rgba(201, 168, 76, 0.2)' }}>
+                  <svg className="w-5 h-5 text-[#C9A84C]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15a4.5 4.5 0 004.5 4.5H18a3.75 3.75 0 001.332-7.257 3 3 0 00-3.758-3.848 5.25 5.25 0 00-10.233 2.33A4.502 4.502 0 002.25 15z" />
+                  </svg>
+                </div>
+                <div>
+                  <h2 className="text-xl font-heading font-semibold text-white">Current Conditions</h2>
+                  <p className="text-xs text-white/30 font-body">Live weather for {dest.label}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {weather.temp != null && (
+                  <div className="rounded-xl p-4 border border-white/5" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                    <p className="text-[10px] text-white/40 uppercase tracking-wider font-body mb-1">Temperature</p>
+                    <p className="text-2xl font-heading font-bold text-white">{weather.temp}&deg;F</p>
+                    {weather.condition && <p className="text-xs text-white/50 font-body mt-1">{weather.condition}</p>}
+                  </div>
+                )}
+                {weather.humidity != null && (
+                  <div className="rounded-xl p-4 border border-white/5" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                    <p className="text-[10px] text-white/40 uppercase tracking-wider font-body mb-1">Humidity</p>
+                    <p className="text-2xl font-heading font-bold text-white">{weather.humidity}%</p>
+                  </div>
+                )}
+                {weather.uv_index != null && (
+                  <div className="rounded-xl p-4 border border-white/5" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                    <p className="text-[10px] text-white/40 uppercase tracking-wider font-body mb-1">UV Index</p>
+                    <p className="text-2xl font-heading font-bold text-white">{weather.uv_index}</p>
+                    <p className="text-xs text-white/50 font-body mt-1">{weather.uv_index <= 2 ? 'Low' : weather.uv_index <= 5 ? 'Moderate' : weather.uv_index <= 7 ? 'High' : 'Very High'}</p>
+                  </div>
+                )}
+                {weather.wind_speed != null && (
+                  <div className="rounded-xl p-4 border border-white/5" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                    <p className="text-[10px] text-white/40 uppercase tracking-wider font-body mb-1">Wind Speed</p>
+                    <p className="text-2xl font-heading font-bold text-white">{weather.wind_speed} mph</p>
+                  </div>
+                )}
+              </div>
+            </section>
+          )}
+
+          {/* Insider Tips */}
+          {tips.length > 0 && (
+            <section className="max-w-6xl mx-auto px-6 py-10 border-t border-white/5" data-testid="insider-tips-section">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(201, 168, 76, 0.1)', border: '1px solid rgba(201, 168, 76, 0.2)' }}>
+                  <svg className="w-5 h-5 text-[#C9A84C]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18" />
+                  </svg>
+                </div>
+                <div>
+                  <h2 className="text-xl font-heading font-semibold text-white">Local Secrets</h2>
+                  <p className="text-xs text-white/30 font-body">Insider tips from people who know {dest.label}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {tips.map(tip => (
+                  <div key={tip.id} className="rounded-xl p-5 border border-[#C9A84C]/10 group hover:border-[#C9A84C]/25 transition-all" style={{ background: 'rgba(201,168,76,0.03)' }}>
+                    <div className="flex items-start gap-3">
+                      <span className="text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-heading font-semibold shrink-0 mt-0.5" style={{ background: 'rgba(201,168,76,0.1)', color: '#C9A84C', border: '1px solid rgba(201,168,76,0.2)' }}>
+                        {tip.tip_category}
+                      </span>
+                      <p className="text-sm text-white/70 font-body leading-relaxed">{tip.tip_text}</p>
+                    </div>
+                    {tip.upvotes > 0 && (
+                      <p className="text-[10px] text-white/30 mt-3 text-right font-body">{tip.upvotes} found this helpful</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Resource Downloads */}
+          {resources.length > 0 && (
+            <section className="max-w-6xl mx-auto px-6 py-10 border-t border-white/5" data-testid="resources-section">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(201, 168, 76, 0.1)', border: '1px solid rgba(201, 168, 76, 0.2)' }}>
+                  <svg className="w-5 h-5 text-[#C9A84C]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                  </svg>
+                </div>
+                <div>
+                  <h2 className="text-xl font-heading font-semibold text-white">Maps &amp; Resources</h2>
+                  <p className="text-xs text-white/30 font-body">Downloadable guides, trail maps, and more</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {resources.map(res => {
+                  const typeIcons: Record<string, string> = { pdf: 'PDF', gpx: 'GPX', jpg: 'IMG', png: 'IMG' };
+                  return (
+                    <button
+                      key={res.id}
+                      onClick={() => handleDownload(res.id, res.file_url)}
+                      className="text-left rounded-xl p-5 border border-white/10 hover:border-[#C9A84C]/30 transition-all group"
+                      style={{ background: 'rgba(255,255,255,0.02)' }}
+                      data-testid={`resource-${res.id}`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <span className="text-[10px] px-2 py-1 rounded-lg font-heading font-bold uppercase tracking-wider shrink-0" style={{ background: 'rgba(201,168,76,0.1)', color: '#C9A84C', border: '1px solid rgba(201,168,76,0.2)' }}>
+                          {typeIcons[res.file_type] || res.file_type.toUpperCase()}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-sm font-heading font-semibold text-white group-hover:text-[#C9A84C] transition truncate">{res.title}</h4>
+                          {res.description && <p className="text-xs text-white/40 font-body mt-1 line-clamp-2">{res.description}</p>}
+                          <p className="text-[10px] text-white/30 font-body mt-2">{res.download_count} downloads</p>
+                        </div>
+                        <svg className="w-5 h-5 text-white/20 group-hover:text-[#C9A84C] transition shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                        </svg>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </section>
           )}
