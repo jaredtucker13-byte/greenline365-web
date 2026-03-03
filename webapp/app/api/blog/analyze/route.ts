@@ -57,13 +57,16 @@ export async function POST(request: NextRequest) {
     // Title length (50-60 chars optimal)
     if (titleLength >= 50 && titleLength <= 60) {
       score += 20;
-      feedback.push({ type: 'success', message: 'Perfect title length for SEO' });
-    } else if (titleLength >= 40 && titleLength <= 70) {
+      feedback.push({ type: 'success', message: `Perfect title length (${titleLength} chars)` });
+    } else if (titleLength >= 40 && titleLength < 50) {
       score += 15;
-      feedback.push({ type: 'info', message: 'Good title length' });
+      feedback.push({ type: 'info', message: `Title slightly short (${titleLength} chars). Aim for 50-60.` });
+    } else if (titleLength > 60 && titleLength <= 70) {
+      score += 12;
+      feedback.push({ type: 'warning', message: `Title slightly long (${titleLength} chars). Aim for 50-60 for optimal SEO.` });
     } else {
       score += 5;
-      feedback.push({ type: 'warning', message: `Title ${titleLength < 40 ? 'too short' : 'too long'}. Aim for 50-60 characters.` });
+      feedback.push({ type: 'warning', message: `Title ${titleLength < 40 ? 'too short' : 'too long'} (${titleLength} chars). Aim for 50-60 characters.` });
     }
     
     // Headings
@@ -76,6 +79,12 @@ export async function POST(request: NextRequest) {
     
     // Readability (Flesch-Kincaid approximation)
     const readabilityScore = 206.835 - 1.015 * avgWordsPerSentence - 84.6 * (wordCount / sentences.length);
+    // Find long sentences (over 25 words)
+    const longSentences = sentences
+      .map((s: string) => s.trim())
+      .filter((s: string) => s.split(/\s+/).filter((w: string) => w).length > 25)
+      .slice(0, 3); // Return up to 3 examples
+
     if (readabilityScore >= 60) {
       score += 20;
       feedback.push({ type: 'success', message: 'Easy to read' });
@@ -84,7 +93,14 @@ export async function POST(request: NextRequest) {
       feedback.push({ type: 'info', message: 'Moderately readable' });
     } else {
       score += 10;
-      feedback.push({ type: 'warning', message: 'Content may be hard to read. Use shorter sentences.' });
+      const longSentenceHint = longSentences.length > 0
+        ? ` Found ${longSentences.length} sentence(s) over 25 words.`
+        : '';
+      feedback.push({
+        type: 'warning',
+        message: `Content may be hard to read. Avg ${Math.round(avgWordsPerSentence)} words/sentence (aim for under 20).${longSentenceHint}`,
+        ...(longSentences.length > 0 ? { longSentences } : {}),
+      });
     }
     
     // Keyword density

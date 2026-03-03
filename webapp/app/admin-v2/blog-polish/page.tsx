@@ -34,6 +34,7 @@ import { sendNotification, vibrate } from '@/lib/browser-apis';
 interface SEOFeedback {
   type: 'success' | 'warning' | 'info' | 'error';
   message: string;
+  longSentences?: string[];
 }
 
 interface SEOAnalysis {
@@ -120,6 +121,8 @@ export default function BlogPolishPage() {
   }>({});
   const [customPromptInput, setCustomPromptInput] = useState('');
   const [expandedPanel, setExpandedPanel] = useState<string | null>(null); // For full-screen panels
+  // Undo state: stores previous content/title before AI changes
+  const [contentHistory, setContentHistory] = useState<{ title: string; content: string }[]>([]);
 
   // Voice Recording state
   const [isRecording, setIsRecording] = useState(false);
@@ -592,7 +595,7 @@ export default function BlogPolishPage() {
 
       const data = await response.json();
       if (response.ok) {
-        setMessage({ type: 'success', text: 'Draft saved successfully!' });
+        setMessage({ type: 'success', text: 'Draft saved to server!' });
         setPost(prev => ({ ...prev, id: data.post.id, slug: data.post.slug }));
         clearLocalStorageDraft(); // Clear localStorage after successful save
       } else {
@@ -714,15 +717,31 @@ export default function BlogPolishPage() {
       const data = await response.json();
       if (response.ok && data.result) {
         // Parse result for both enhanced content and suggested title
-        const result = data.result;
+        let result = data.result;
+        // If the result is a JSON string, parse it
+        if (typeof result === 'string') {
+          try {
+            const jsonMatch = result.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+              const parsed = JSON.parse(jsonMatch[0]);
+              if (parsed.content) {
+                result = parsed;
+              }
+            }
+          } catch {
+            // Not valid JSON, keep as string
+          }
+        }
         if (typeof result === 'object' && result.content) {
-          setAiSuggestions(prev => ({ 
-            ...prev, 
+          setAiSuggestions(prev => ({
+            ...prev,
             enhanced: result.content,
             enhancedTitle: result.title || undefined,
           }));
         } else {
-          setAiSuggestions(prev => ({ ...prev, enhanced: result }));
+          // Ensure we only store string content, not raw JSON objects
+          const contentStr = typeof result === 'string' ? result : (result.content || JSON.stringify(result));
+          setAiSuggestions(prev => ({ ...prev, enhanced: contentStr }));
         }
         setShowAiPanel(true);
       } else {
@@ -740,9 +759,23 @@ export default function BlogPolishPage() {
       return;
     }
     const result = await callAI('suggest_headlines');
-    if (result && Array.isArray(result)) {
-      setAiSuggestions(prev => ({ ...prev, headlines: result }));
-      setShowAiPanel(true);
+    if (result) {
+      let headlines = result;
+      // If result is a JSON string, parse it
+      if (typeof headlines === 'string') {
+        try {
+          const jsonMatch = headlines.match(/\[[\s\S]*\]/);
+          if (jsonMatch) {
+            headlines = JSON.parse(jsonMatch[0]);
+          }
+        } catch {
+          // Not valid JSON
+        }
+      }
+      if (Array.isArray(headlines)) {
+        setAiSuggestions(prev => ({ ...prev, headlines }));
+        setShowAiPanel(true);
+      }
     }
   };
 
@@ -1059,45 +1092,63 @@ export default function BlogPolishPage() {
     setMessage({ type: 'success', text: `Applied question as title` });
   };
 
+  // Save snapshot before AI changes for undo
+  const saveSnapshot = () => {
+    setContentHistory(prev => [...prev.slice(-9), { title: post.title, content: post.content }]);
+  };
+
+  const undoLastAiChange = () => {
+    if (contentHistory.length === 0) return;
+    const prev = contentHistory[contentHistory.length - 1];
+    setPost(p => ({ ...p, title: prev.title, content: prev.content }));
+    setContentHistory(h => h.slice(0, -1));
+    setMessage({ type: 'info', text: 'Reverted to previous version' });
+  };
+
   const applyOutline = () => {
     if (aiSuggestions.outline) {
+      saveSnapshot();
       setPost(prev => ({ ...prev, content: aiSuggestions.outline || '' }));
       setAiSuggestions(prev => ({ ...prev, outline: undefined }));
-      setMessage({ type: 'success', text: 'Outline applied!' });
+      setMessage({ type: 'success', text: 'Outline applied! Click Undo to revert.' });
     }
   };
 
   const applyEnhanced = () => {
     if (aiSuggestions.enhanced) {
+      saveSnapshot();
       setPost(prev => ({ ...prev, content: aiSuggestions.enhanced || '' }));
       setAiSuggestions(prev => ({ ...prev, enhanced: undefined }));
-      setMessage({ type: 'success', text: 'Enhanced content applied!' });
+      setMessage({ type: 'success', text: 'Enhanced content applied! Click Undo to revert.' });
     }
   };
 
   const applyEnhancedTitle = () => {
     if (aiSuggestions.enhancedTitle) {
+      saveSnapshot();
       setPost(prev => ({ ...prev, title: aiSuggestions.enhancedTitle || '' }));
       setAiSuggestions(prev => ({ ...prev, enhancedTitle: undefined }));
-      setMessage({ type: 'success', text: 'New title applied!' });
+      setMessage({ type: 'success', text: 'New title applied! Click Undo to revert.' });
     }
   };
 
   const applyBothEnhanced = () => {
     if (aiSuggestions.enhanced || aiSuggestions.enhancedTitle) {
+      saveSnapshot();
       setPost(prev => ({
         ...prev,
         content: aiSuggestions.enhanced || prev.content,
         title: aiSuggestions.enhancedTitle || prev.title,
       }));
       setAiSuggestions(prev => ({ ...prev, enhanced: undefined, enhancedTitle: undefined }));
-      setMessage({ type: 'success', text: 'Title and content updated!' });
+      setMessage({ type: 'success', text: 'Title and content updated! Click Undo to revert.' });
     }
   };
 
   const applyHeadline = (headline: string) => {
+    saveSnapshot();
     setPost(prev => ({ ...prev, title: headline }));
-    setMessage({ type: 'success', text: 'Headline applied!' });
+    setMessage({ type: 'success', text: 'Headline applied! Click Undo to revert.' });
   };
 
   const applyTag = (tag: string) => {
@@ -1402,7 +1453,7 @@ export default function BlogPolishPage() {
     }
   };
   
-  // Apply image to blog content with layout
+  // Apply image to blog content with layout and sync to Images sidebar
   const applyImageToBlog = (imageUrl: string, layout: 'left' | 'right' | 'center' | 'full-width') => {
     const layoutStyles: Record<string, string> = {
       'left': 'float: left; margin: 0 20px 15px 0; max-width: 45%;',
@@ -1410,17 +1461,22 @@ export default function BlogPolishPage() {
       'center': 'display: block; margin: 20px auto; max-width: 80%;',
       'full-width': 'display: block; width: 100%; margin: 20px 0;',
     };
-    
+
     const imageHtml = `\n\n<img src="${imageUrl}" alt="Blog image" style="${layoutStyles[layout]} border-radius: 8px;" />\n\n`;
-    
+
     // Add to end of content (user can move it)
     setPost(prev => ({
       ...prev,
-      content: prev.content + imageHtml
+      content: prev.content + imageHtml,
+      // Also add to the Images sidebar if not already there
+      images: prev.images.includes(imageUrl) ? prev.images : [...prev.images, imageUrl],
     }));
-    
+
+    // Sync with image previews sidebar
+    setImagePreviews(prev => prev.includes(imageUrl) ? prev : [...prev, imageUrl]);
+
     setApplyingImageId(null);
-    setMessage({ type: 'success', text: `Image added with ${layout} layout. Move it to desired position in your content.` });
+    setMessage({ type: 'success', text: `Image added with ${layout} layout and synced to Images sidebar.` });
   };
 
   // Generate ALL images (with warning)
@@ -1549,11 +1605,23 @@ export default function BlogPolishPage() {
         setMessage({ type: 'success', text: `Style suggestion: "${data.styleGuide.themeName}"` });
       } else {
         console.error('[Style] Failed:', data.error);
-        setMessage({ type: 'error', text: data.error || 'Style analysis failed' });
+        const errorDetail = data.error || 'Style analysis failed';
+        const hint = !response.ok && response.status === 500
+          ? ' The AI service may be temporarily unavailable. Try again in a moment.'
+          : response.status === 429
+            ? ' Rate limit reached. Please wait a moment before trying again.'
+            : ' Try adding more content or selecting a category to improve results.';
+        setMessage({ type: 'error', text: `${errorDetail}.${hint}` });
       }
     } catch (error: any) {
       console.error('[Style] Exception:', error?.message || error);
-      setMessage({ type: 'error', text: 'Failed to analyze style' });
+      const isNetwork = error?.message?.includes('fetch') || error?.message?.includes('network');
+      setMessage({
+        type: 'error',
+        text: isNetwork
+          ? 'Network error — check your connection and try again.'
+          : 'Style analysis failed. Make sure you have at least 100 words of content, then try again.'
+      });
     }
     setAnalyzingStyle(false);
   };
@@ -1716,8 +1784,20 @@ export default function BlogPolishPage() {
                 data-testid="blog-title-input"
               />
               <div className="flex items-center justify-between mt-2">
-                <p className="text-xs text-white/40">
-                  {post.title.length}/60 characters (50-60 optimal for SEO)
+                <p className={`text-xs ${
+                  post.title.length >= 50 && post.title.length <= 60
+                    ? 'text-green-400/70'
+                    : post.title.length > 60
+                      ? 'text-amber-400/70'
+                      : 'text-white/40'
+                }`}>
+                  {post.title.length}/60 characters {
+                    post.title.length >= 50 && post.title.length <= 60
+                      ? '— Perfect for SEO'
+                      : post.title.length > 60
+                        ? `— ${post.title.length - 60} over optimal (50-60)`
+                        : '(50-60 optimal for SEO)'
+                  }
                 </p>
                 {/* Quick Actions */}
                 <div className="flex items-center gap-2">
@@ -1858,6 +1938,18 @@ export default function BlogPolishPage() {
                   >
                     ❤️
                   </button>
+                  {contentHistory.length > 0 && (
+                    <button
+                      onClick={undoLastAiChange}
+                      className="px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all bg-red-500/10 hover:bg-red-500/20 text-red-300/80 hover:text-red-200 active:scale-95 flex items-center gap-1"
+                      title={`Undo last AI change (${contentHistory.length} available)`}
+                    >
+                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                      </svg>
+                      Undo
+                    </button>
+                  )}
                 </div>
                 
                 {/* Secondary Tools Row */}
@@ -2060,9 +2152,10 @@ export default function BlogPolishPage() {
                   exit={{ opacity: 0, height: 0 }}
                   className="overflow-hidden"
                 >
-                  <CopyrightTools 
-                    content={post.content} 
+                  <CopyrightTools
+                    content={post.content}
                     title={post.title}
+                    onClose={() => setShowCopyrightPanel(false)}
                     onAttributionGenerated={(attr) => {
                       // Optionally append attribution to content
                       setMessage({ type: 'success', text: 'Attribution generated!' });
@@ -2830,19 +2923,22 @@ export default function BlogPolishPage() {
                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                               </svg>
-                              Saving...
+                              Auto-saving...
                             </>
                           ) : hasUnsavedChanges ? (
                             <>
                               <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-                              Unsaved
+                              Unsaved changes
                             </>
                           ) : lastAutoSave ? (
                             <>
                               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                               </svg>
-                              Saved locally
+                              Auto-saved to browser
+                              <span className="text-white/30 ml-1" title="This is saved in your browser only. Use 'Save Draft' to save to the server.">
+                                (local)
+                              </span>
                             </>
                           ) : null}
                         </span>
@@ -2903,14 +2999,28 @@ export default function BlogPolishPage() {
                             const voice = availableVoices.find(v => v.name === e.target.value);
                             if (voice) setSelectedVoice(voice);
                           }}
-                          className="px-2 py-2 rounded-lg bg-white/[0.08] border border-white/10 text-white/70 text-xs focus:outline-none focus:border-white/30 max-w-[120px]"
+                          className="px-2 py-2 rounded-lg bg-white/[0.08] border border-white/10 text-white/70 text-xs focus:outline-none focus:border-white/30 max-w-[180px]"
                           title="Select voice"
                         >
-                          {availableVoices.map(voice => (
-                            <option key={voice.name} value={voice.name} className="bg-gray-900 text-white">
-                              {voice.name.replace('Microsoft ', '').replace('Google ', '').slice(0, 15)}
-                            </option>
-                          ))}
+                          {availableVoices.map((voice, idx) => {
+                            // Build a distinguishing label
+                            const cleanName = voice.name
+                              .replace('Microsoft ', '')
+                              .replace('Google ', 'G:')
+                              .replace('Chrome OS ', 'C:');
+                            // Add voice number if names are duplicated
+                            const duplicates = availableVoices.filter(v => v.name === voice.name).length;
+                            const label = duplicates > 1
+                              ? `${cleanName} (#${idx + 1})`
+                              : cleanName.length > 25
+                                ? cleanName.slice(0, 25)
+                                : cleanName;
+                            return (
+                              <option key={`${voice.name}-${idx}`} value={voice.name} className="bg-gray-900 text-white">
+                                {label} {voice.lang !== 'en-US' ? `(${voice.lang})` : ''}
+                              </option>
+                            );
+                          })}
                         </select>
                       )}
                     </div>
@@ -3158,15 +3268,32 @@ export default function BlogPolishPage() {
                   {/* Feedback Items */}
                   <div className="space-y-2">
                     {seoAnalysis.feedback.map((item, i) => (
-                      <div key={i} className="flex items-start gap-2 text-sm">
-                        <span className={
-                          item.type === 'success' ? 'text-gold-400' :
-                          item.type === 'warning' ? 'text-amber-400' :
-                          item.type === 'info' ? 'text-sky-400' : 'text-red-400'
-                        }>
-                          {item.type === 'success' ? '✓' : item.type === 'warning' ? '⚠' : 'ℹ'}
-                        </span>
-                        <span className="text-white/70">{item.message}</span>
+                      <div key={i}>
+                        <div className="flex items-start gap-2 text-sm">
+                          <span className={
+                            item.type === 'success' ? 'text-gold-400' :
+                            item.type === 'warning' ? 'text-amber-400' :
+                            item.type === 'info' ? 'text-sky-400' : 'text-red-400'
+                          }>
+                            {item.type === 'success' ? '✓' : item.type === 'warning' ? '⚠' : 'ℹ'}
+                          </span>
+                          <span className="text-white/70">{item.message}</span>
+                        </div>
+                        {item.longSentences && item.longSentences.length > 0 && (
+                          <details className="ml-6 mt-1">
+                            <summary className="text-xs text-amber-400/70 cursor-pointer hover:text-amber-300 transition">
+                              Show long sentences
+                            </summary>
+                            <ul className="mt-1 space-y-1">
+                              {item.longSentences.map((s, j) => (
+                                <li key={j} className="text-xs text-white/50 bg-amber-500/5 rounded px-2 py-1 border-l-2 border-amber-500/30">
+                                  "{s.slice(0, 120)}{s.length > 120 ? '...' : ''}"
+                                  <span className="text-amber-400/60 ml-1">({s.split(/\s+/).length} words)</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </details>
+                        )}
                       </div>
                     ))}
                   </div>
