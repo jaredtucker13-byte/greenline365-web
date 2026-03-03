@@ -125,10 +125,11 @@ const LICENSE_TYPES: LicenseType[] = [
 interface CopyrightToolsProps {
   content: string;
   title: string;
+  onClose?: () => void;
   onAttributionGenerated?: (attribution: string) => void;
 }
 
-export default function CopyrightTools({ content, title, onAttributionGenerated }: CopyrightToolsProps) {
+export default function CopyrightTools({ content, title, onClose, onAttributionGenerated }: CopyrightToolsProps) {
   const [activeTab, setActiveTab] = useState<'check' | 'license' | 'attribution'>('check');
   const [checkResult, setCheckResult] = useState<CopyrightCheckResult | null>(null);
   const [checking, setChecking] = useState(false);
@@ -203,6 +204,16 @@ export default function CopyrightTools({ content, title, onAttributionGenerated 
         <h3 className="text-sm font-semibold text-blue-300 flex items-center gap-2">
           ⚖️ Copyright Tools
         </h3>
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="p-1 hover:bg-white/10 rounded text-white/50 hover:text-white"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        )}
       </div>
 
       {/* Tabs */}

@@ -116,14 +116,38 @@ export async function POST(request: NextRequest) {
       .single();
     
     if (error) throw error;
-    
+
     // Create analytics entry
     await supabase.from('blog_analytics').insert({
       post_id: data.id,
       views: 0,
       shares: 0,
     });
-    
+
+    // If scheduled, create a content_calendar entry so the calendar reflects it
+    if (status === 'scheduled' && scheduled_for) {
+      try {
+        const scheduledDate = new Date(scheduled_for);
+        await supabase.from('content_calendar').insert({
+          tenant_id: tenant_id || null,
+          scheduled_date: scheduledDate.toISOString().split('T')[0],
+          scheduled_time: scheduledDate.toTimeString().split(' ')[0].slice(0, 5),
+          publish_status: 'scheduled',
+          working_title: title,
+          final_title: title,
+          target_keyword: tags?.[0] || null,
+          hook_preview: excerpt,
+          platforms: ['blog'],
+          content_type: 'evergreen',
+          primary_cta: 'read',
+          cta_type: 'subscribe',
+        });
+      } catch (calendarError: any) {
+        // Non-blocking: log but don't fail the blog save
+        console.error('[Blog API] Calendar entry failed:', calendarError.message);
+      }
+    }
+
     return NextResponse.json({ post: data, seo: seoAnalysis });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
