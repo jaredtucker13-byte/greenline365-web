@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { isDashboardRoute } from '@/lib/navigation/navConfig';
 
 /**
  * Phase 6: Redesigned Footer
@@ -11,12 +12,8 @@ import { usePathname } from 'next/navigation';
 export default function Footer() {
   const pathname = usePathname();
 
-  // Hide footer on dashboard routes
-  const isDashboardRoute = pathname?.startsWith('/admin-v2') ||
-                           pathname?.startsWith('/dashboard') ||
-                           pathname?.startsWith('/god-mode');
-
-  if (isDashboardRoute) {
+  // Hide footer on dashboard routes (single-source config)
+  if (isDashboardRoute(pathname)) {
     return null;
   }
 

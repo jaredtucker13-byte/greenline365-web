@@ -9,9 +9,12 @@
  * 3. Use <NavLink> for tracked navigation links
  * 4. Use <Breadcrumbs> to show current location
  * 5. Use <BackButton> for consistent back behavior
+ * 6. Import navConfig for single-source nav items
  */
 
 export { NavigationProvider, useNavigation, createReturnLink, getReturnToFromUrl, getPageInfo } from './NavigationContext';
 export { NavLink } from './NavLink';
 export { Breadcrumbs } from './Breadcrumbs';
 export { BackButton } from './BackButton';
+export { commandCenterNav, publicNav, isDashboardRoute, filterNavItems } from './navConfig';
+export type { NavItem } from './navConfig';

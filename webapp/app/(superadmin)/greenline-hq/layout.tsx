@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import type { Metadata } from 'next';
+import { HQSignOutButton } from './HQSignOutButton';
 
 export const metadata: Metadata = {
   title: 'Greenline HQ',
@@ -48,9 +49,12 @@ export default async function GreenlineHQLayout({
               Greenline HQ &mdash; Internal Only
             </span>
           </div>
-          <span className="text-[10px] text-white/30 font-mono">
-            {user.email}
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="text-[10px] text-white/30 font-mono">
+              {user.email}
+            </span>
+            <HQSignOutButton />
+          </div>
         </div>
       </header>
 

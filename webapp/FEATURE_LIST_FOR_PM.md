@@ -99,7 +99,7 @@
 | **Custom Domains** | Use your own domain | ✅ Built (UI) |
 | ↳ CNAME Setup | Point domain to platform | 🔄 Backend needed |
 | ↳ SSL Certificates | Automatic HTTPS | 🔄 Backend needed |
-| **Visual Inline Editor** | "God Mode" - Edit pages without code | 🔄 In Progress |
+| **Visual Inline Editor** | Greenline HQ inline page editing | 🔄 In Progress |
 | ↳ Editable Regions | Mark editable content zones | ✅ Foundation Built |
 | ↳ Hover-to-Edit | Click to edit text/images inline | 🔄 In Progress |
 | ↳ Rich Text Editor | Format text directly on page | 🔄 Planned |

@@ -12,18 +12,17 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import { 
-  sendEmail, 
-  generateVerificationToken, 
+import { createServerClient } from '@/lib/supabase/server';
+import { requireAdmin } from '@/lib/api-auth';
+import {
+  sendEmail,
+  generateVerificationToken,
   generateVerificationCode,
-  getVerificationEmailHtml 
+  getVerificationEmailHtml
 } from '@/lib/email/sendgrid-sender';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Admin-only cron endpoint — uses service role for batch operations
+const supabase = createServerClient();
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com';
 
@@ -35,22 +34,14 @@ const RESEND_INTERVALS_HOURS = [0, 48, 168]; // 0, 48 hours, 168 hours (7 days)
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify cron secret or admin access
+    // Allow access via cron secret OR authenticated admin (Greenline HQ)
     const authHeader = request.headers.get('authorization');
     const cronSecret = process.env.CRON_SECRET;
-    
-    // Allow access if cron secret matches or if it's a manual trigger (no auth for dev)
-    const isAuthorized = 
-      (cronSecret && authHeader === `Bearer ${cronSecret}`) ||
-      process.env.NODE_ENV === 'development';
-    
-    if (!isAuthorized) {
-      // For non-cron requests, check if user is admin
-      const supabaseAuth = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      );
-      // In production, add proper admin check here
+    const isCron = cronSecret && authHeader === `Bearer ${cronSecret}`;
+
+    if (!isCron) {
+      const auth = await requireAdmin();
+      if (auth.error) return auth.error;
     }
     
     const now = new Date();

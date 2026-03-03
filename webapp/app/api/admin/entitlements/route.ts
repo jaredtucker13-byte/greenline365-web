@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 /**
  * Entitlement Overrides API
  * 
- * Admin "God Mode" - manually grant/revoke access to any tenant
+ * Greenline HQ - manually grant/revoke access to any tenant
  * 
  * POST /api/admin/entitlements - Grant manual override
  * GET /api/admin/entitlements - List all overrides

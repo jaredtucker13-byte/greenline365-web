@@ -11,12 +11,8 @@
  * DELETE - Delete an event
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { createClient } from '@/lib/supabase/server';
+import { requireAuth } from '@/lib/api-auth';
 
 // Color map for event types
 const EVENT_COLORS: Record<string, string> = {
@@ -39,6 +35,10 @@ const EVENT_ICONS: Record<string, string> = {
 
 export async function GET(request: NextRequest) {
   try {
+    const auth = await requireAuth();
+    if (auth.error) return auth.error;
+
+    const supabase = await createClient();
     const { searchParams } = new URL(request.url);
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
@@ -161,6 +161,10 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await requireAuth();
+    if (auth.error) return auth.error;
+
+    const supabase = await createClient();
     const body = await request.json();
     const { title, description, event_type, scheduled_date, content_type, metadata, color, status } = body;
 
@@ -212,6 +216,10 @@ export async function POST(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   try {
+    const auth = await requireAuth();
+    if (auth.error) return auth.error;
+
+    const supabase = await createClient();
     const body = await request.json();
     const { id, source, ...updates } = body;
 
@@ -246,6 +254,10 @@ export async function PATCH(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
+    const auth = await requireAuth();
+    if (auth.error) return auth.error;
+
+    const supabase = await createClient();
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
     const source = searchParams.get('source');

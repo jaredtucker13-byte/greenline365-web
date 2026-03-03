@@ -13,7 +13,7 @@ I've prepared a complete Supabase cleanup solution for you:
 
 2. **`/app/webapp/database/migrations/001_fix_rls_policies.sql`**
    - Fixes overly permissive `USING (true)` policies
-   - Adds `is_super_admin` column for God Mode
+   - Adds `is_super_admin` column for Greenline HQ access
    - Proper RLS for 18 existing tables
 
 3. **`/app/webapp/database/migrations/002_add_performance_indexes.sql`**
@@ -302,7 +302,7 @@ After running all migrations:
    - UI component with results display
 
 2. **Build Dual Dashboard System**
-   - God Mode (/god-mode)
+   - Greenline HQ (/greenline-hq)
    - Content Command Center (/dashboard)
    - Enhanced navbar with role detection
 

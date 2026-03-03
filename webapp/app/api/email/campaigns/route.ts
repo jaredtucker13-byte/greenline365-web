@@ -1,18 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@/lib/supabase/server';
+import { requireAuth } from '@/lib/api-auth';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
-// GET /api/email/campaigns - List all campaigns
+// GET /api/email/campaigns - List campaigns for the authenticated user
 // POST /api/email/campaigns - Create new campaign
 export async function GET(request: NextRequest) {
   try {
+    const auth = await requireAuth();
+    if (auth.error) return auth.error;
+
+    const supabase = await createClient();
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
-    
+
     let query = supabase
       .from('email_campaigns')
       .select(`
@@ -20,15 +20,15 @@ export async function GET(request: NextRequest) {
         template:email_templates(id, name, slug)
       `)
       .order('created_at', { ascending: false });
-    
+
     if (status) {
       query = query.eq('status', status);
     }
-    
+
     const { data, error } = await query;
-    
+
     if (error) throw error;
-    
+
     return NextResponse.json({ campaigns: data });
   } catch (error: any) {
     console.error('Error fetching campaigns:', error);
@@ -41,25 +41,29 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await requireAuth();
+    if (auth.error) return auth.error;
+
+    const supabase = await createClient();
     const body = await request.json();
-    const { 
-      name, 
-      description, 
-      template_id, 
-      recipient_list, 
+    const {
+      name,
+      description,
+      template_id,
+      recipient_list,
       custom_recipients,
       subject,
       html_content,
-      scheduled_for 
+      scheduled_for
     } = body;
-    
+
     if (!name) {
       return NextResponse.json(
         { error: 'Missing required field: name' },
         { status: 400 }
       );
     }
-    
+
     // Calculate total recipients based on list type
     let totalRecipients = 0;
     if (recipient_list === 'waitlist') {
@@ -71,7 +75,7 @@ export async function POST(request: NextRequest) {
     } else if (recipient_list === 'custom' && custom_recipients) {
       totalRecipients = custom_recipients.length;
     }
-    
+
     const { data, error } = await supabase
       .from('email_campaigns')
       .insert({
@@ -85,12 +89,13 @@ export async function POST(request: NextRequest) {
         scheduled_for,
         total_recipients: totalRecipients,
         status: scheduled_for ? 'scheduled' : 'draft',
+        created_by: auth.user.id,
       })
       .select()
       .single();
-    
+
     if (error) throw error;
-    
+
     return NextResponse.json({ campaign: data }, { status: 201 });
   } catch (error: any) {
     console.error('Error creating campaign:', error);

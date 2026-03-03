@@ -15,8 +15,7 @@ export default function robots(): MetadataRoute.Robots {
         allow: '/',
         disallow: [
           '/admin-v2/',      // Admin dashboard - don't index
-          '/god-mode/',      // Super admin - don't index
-          '/greenline-hq/',  // Super admin HQ - don't index
+          '/greenline-hq/',  // Greenline HQ (internal) - don't index
           '/business-dashboard/', // Business owner dashboard - don't index
           '/api/',           // API routes - don't index
           '/auth/',          // Auth routes - don't index
@@ -27,7 +26,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: 'Googlebot',
         allow: '/',
-        disallow: ['/admin-v2/', '/god-mode/', '/greenline-hq/', '/api/', '/auth/'],
+        disallow: ['/admin-v2/', '/greenline-hq/', '/api/', '/auth/'],
       },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,

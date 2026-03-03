@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createServerClient } from '@/lib/supabase/server';
+import { requireAdmin } from '@/lib/api-auth';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const googleApiKey = process.env.GOOGLE_PLACES_API_KEY!;
 
 function getServiceClient() {
-  return createClient(supabaseUrl, supabaseServiceKey);
+  return createServerClient();
 }
 
 // GL365 category mapping from Google Places types
@@ -322,6 +321,9 @@ async function auditWebsite(websiteUrl: string): Promise<{
  * Body: { lead_ids?: string[], batch_size?: number, create_listings?: boolean }
  */
 export async function POST(request: NextRequest) {
+  const auth = await requireAdmin();
+  if (auth.error) return auth.error;
+
   const supabase = getServiceClient();
 
   if (!googleApiKey) {
@@ -559,6 +561,9 @@ export async function POST(request: NextRequest) {
  * Returns enrichment stats
  */
 export async function GET(request: NextRequest) {
+  const auth = await requireAdmin();
+  if (auth.error) return auth.error;
+
   const supabase = getServiceClient();
   const { searchParams } = new URL(request.url);
   const status = searchParams.get('status') || 'enriched';

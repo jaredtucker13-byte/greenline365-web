@@ -1,7 +1,7 @@
 /**
  * Editor Components
  * 
- * Visual inline editing system for God Mode admins
+ * Visual inline editing system for Greenline HQ admins
  */
 
 export { EditableRegion } from './EditableRegion';

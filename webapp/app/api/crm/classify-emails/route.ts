@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+import { createServerClient } from '@/lib/supabase/server';
+import { requireAdmin } from '@/lib/api-auth';
 
 function getServiceClient() {
-  return createClient(supabaseUrl, supabaseServiceKey);
+  return createServerClient();
 }
 
 type ContactType = 'general_inbox' | 'owner_personal' | 'decision_maker' | 'marketing_team' | 'unknown';
@@ -137,6 +135,9 @@ async function scrapeContactPage(websiteUrl: string): Promise<ScrapedContact[]> 
  * Body: { batch_size?: number, scrape_websites?: boolean }
  */
 export async function POST(request: NextRequest) {
+  const auth = await requireAdmin();
+  if (auth.error) return auth.error;
+
   const supabase = getServiceClient();
   const body = await request.json();
   const { batch_size = 50, scrape_websites = true } = body;
@@ -240,6 +241,9 @@ export async function POST(request: NextRequest) {
  * Returns email classification stats for all leads.
  */
 export async function GET() {
+  const auth = await requireAdmin();
+  if (auth.error) return auth.error;
+
   const supabase = getServiceClient();
 
   const { data: leads, error } = await supabase

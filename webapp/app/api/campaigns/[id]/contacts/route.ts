@@ -5,17 +5,18 @@
  * PATCH - Update a contact's pipeline stage
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { createClient } from '@/lib/supabase/server';
+import { requireAuth } from '@/lib/api-auth';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
+
+  const supabase = await createClient();
+
   try {
     const { id } = await params;
     const { searchParams } = new URL(request.url);
@@ -44,6 +45,11 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
+
+  const supabase = await createClient();
+
   try {
     const { id } = await params;
     const body = await request.json();
@@ -176,6 +182,11 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
+
+  const supabase = await createClient();
+
   try {
     const { id } = await params;
     const body = await request.json();
@@ -208,7 +219,7 @@ export async function PATCH(
     if (pipeline_stage === 'replied') {
       const contact = contacts.find((c: any) => c.email === email);
       if (contact) {
-        await createCrmLead(contact);
+        await createCrmLead(supabase, contact);
       }
     }
 
@@ -228,7 +239,7 @@ export async function PATCH(
   }
 }
 
-async function createCrmLead(contact: any) {
+async function createCrmLead(supabase: any, contact: any) {
   // Check if lead already exists
   const { data: existing } = await supabase
     .from('crm_leads')
