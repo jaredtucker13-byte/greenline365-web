@@ -19,6 +19,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useBusiness } from '@/lib/business';
 import { Lock } from 'lucide-react';
+import { commandCenterNav, filterNavItems } from '@/lib/navigation/navConfig';
 interface SidebarProps {
   activeItem: string; // Dynamic - matches nav item IDs
   onNewBooking: () => void;
@@ -33,38 +34,7 @@ interface SidebarProps {
   onPreviewModeToggle?: () => void;
 }
 
-const navItems = [
-  { id: 'dashboard', label: 'Dashboard', icon: 'grid', href: '/admin-v2', feature: null },
-  { id: 'schedule', label: 'Schedule', icon: 'calendar', href: '/admin-v2?view=schedule', feature: 'calendar' },
-  // --- Property Intelligence ---
-  { id: 'divider-property', label: 'PROPERTY INTEL', icon: '', href: '', feature: null, isDivider: true },
-  { id: 'commander', label: 'Commander', icon: 'commander', href: '/admin-v2/commander', feature: null },
-  { id: 'property-passport', label: 'Passports', icon: 'home', href: '/admin-v2/property-passport', feature: null },
-  { id: 'filing-cabinet', label: 'Filing Cabinet', icon: 'cabinet', href: '/admin-v2/filing-cabinet', feature: null },
-  { id: 'referral-network', label: 'Referral Network', icon: 'network', href: '/admin-v2/referral-network', feature: null },
-  // --- Content & Tools ---
-  { id: 'divider-tools', label: 'TOOLS', icon: '', href: '', feature: null, isDivider: true },
-  { id: 'creative-studio', label: 'Creative Studio', icon: 'sparkles', href: '/admin-v2/creative-studio', feature: 'mockup_generator' },
-  { id: 'blog', label: 'Blog', icon: 'edit', href: '/admin-v2/blog-polish', feature: 'blog' },
-  { id: 'website-builder', label: 'Website Builder', icon: 'paint', href: '/admin-v2/website-analyzer', feature: 'mockup_generator' },
-  { id: 'code-studio', label: 'Code Studio', icon: 'code', href: '/admin-v2/code-studio', feature: 'mockup_generator' },
-  { id: 'incidents', label: 'Incidents', icon: 'alert', href: '/admin-v2/incidents', feature: null },
-  { id: 'campaigns', label: 'Campaigns', icon: 'campaign', href: '/admin-v2/campaigns', feature: null },
-  { id: 'email', label: 'Email Engine', icon: 'mail', href: '/admin-v2/email-engine', feature: 'email' },
-  { id: 'sms', label: 'SMS', icon: 'phone', href: '/admin-v2/sms', feature: 'sms' },
-  { id: 'crm', label: 'CRM', icon: 'users', href: '/admin-v2/crm-dashboard', feature: 'crm' },
-  { id: 'analytics', label: 'Analytics', icon: 'chart', href: '/admin-v2/analytics', feature: 'analytics' },
-  { id: 'access-codes', label: 'Access Codes', icon: 'ticket', href: '/admin-v2/access-codes', feature: null, adminOnly: true },
-  { id: 'brand-voice', label: 'Brand Voice', icon: 'voice', href: '/admin-v2/brand-voice', feature: 'knowledge_base' },
-  { id: 'knowledge', label: 'Knowledge Base', icon: 'database', href: '/admin-v2/knowledge', feature: 'knowledge_base' },
-  { id: 'theme-settings', label: 'Theme Settings', icon: 'palette', href: '/admin-v2/theme-settings', feature: null, whiteLabelOnly: true },
-  { id: 'platform-costs', label: 'API Costs', icon: 'dollar', href: '/admin-v2/platform-costs', feature: null, platformOwnerOnly: true },
-  { id: 'audit', label: 'Audit Logs', icon: 'shield', href: '/admin-v2/audit', feature: null, adminOnly: true },
-  { id: 'settings', label: 'Settings', icon: 'cog', href: '/admin-v2/settings', feature: null },
-  // --- Platform HQ ---
-  { id: 'divider-platform', label: 'PLATFORM', icon: '', href: '', feature: null, isDivider: true, platformOwnerOnly: true },
-  { id: 'hq', label: 'Greenline HQ', icon: 'shield', href: '/admin-v2/hq', feature: null, platformOwnerOnly: true },
-];
+// Nav items imported from single-source config: commandCenterNav
 
 const icons: Record<string, React.ReactElement> = {
   grid: (
@@ -199,53 +169,27 @@ export default function CollapsibleSidebar({
   onPreviewModeToggle,
 }: SidebarProps) {
   const { hasFeature, isAdmin, isWhiteLabel, activeBusiness, userBusinesses, switchBusiness, isSwitchingBusiness } = useBusiness();
-  
-  // Platform owner ID - only this user sees platform-level features
-  const PLATFORM_OWNER_ID = '677b536d-6521-4ac8-a0a5-98278b35f4cc';
+
+  // Platform owner = super_admin role (Greenline HQ operators)
   const [isPlatformOwner, setIsPlatformOwner] = useState(false);
-  
-  // Check if current user is platform owner
+
   useEffect(() => {
     const checkPlatformOwner = async () => {
       const { createClient } = await import('@/lib/supabase/client');
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
-      setIsPlatformOwner(user?.id === PLATFORM_OWNER_ID);
+      setIsPlatformOwner(user?.user_metadata?.role === 'super_admin');
     };
     checkPlatformOwner();
   }, []);
-  
-  // Filter nav items based on features
+
+  // Filter nav items using the shared single-source config
   const visibleNavItems = useMemo(() => {
-    return navItems.filter(item => {
-      // Show dividers (but respect platformOwnerOnly on dividers too)
-      if ((item as any).isDivider) {
-        if ((item as any).platformOwnerOnly && !isPlatformOwner) return false;
-        return true;
-      }
-      
-      // Platform owner only items (API Costs, etc.)
-      if ((item as any).platformOwnerOnly && !isPlatformOwner) {
-        return false;
-      }
-      
-      // Admin-only items
-      if ((item as any).adminOnly && !isAdmin()) {
-        return false;
-      }
-      
-      // White-label only items
-      if ((item as any).whiteLabelOnly && !isWhiteLabel()) {
-        return false;
-      }
-      
-      // Feature-gated items
-      if ((item as any).feature) {
-        return hasFeature((item as any).feature);
-      }
-      
-      // Always show items without feature requirements
-      return true;
+    return filterNavItems(commandCenterNav, {
+      hasFeature,
+      isAdmin: isAdmin(),
+      isWhiteLabel: isWhiteLabel(),
+      isPlatformOwner,
     });
   }, [hasFeature, isAdmin, isWhiteLabel, isPlatformOwner]);
   
@@ -482,8 +426,28 @@ export default function CollapsibleSidebar({
         </div>
       )}
 
-      {/* Status Footer */}
+      {/* Sign Out + Status Footer */}
       <div className={`p-4 ${isCollapsed ? 'p-2' : ''}`} style={{ borderTop: '1px solid var(--theme-glass-border)' }}>
+        {/* Sign Out Button */}
+        <button
+          onClick={async () => {
+            const { createClient } = await import('@/lib/supabase/client');
+            const supabase = createClient();
+            localStorage.removeItem('greenline365_active_business');
+            localStorage.removeItem('greenline365_edit_mode');
+            await supabase.auth.signOut();
+            window.location.href = '/';
+          }}
+          className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition hover:bg-white/10 mb-3 ${isCollapsed ? 'justify-center px-2' : ''}`}
+          style={{ color: 'var(--theme-text-muted)' }}
+          title="Sign Out"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          {!isCollapsed && <span className="font-medium">Sign Out</span>}
+        </button>
+
         {!isCollapsed && (
           <>
             <div className="flex items-center gap-2 mb-3">
@@ -500,7 +464,7 @@ export default function CollapsibleSidebar({
         )}
 
         {/* Version - Triple click to open Demo Controller */}
-        <motion.p 
+        <motion.p
           onClick={handleVersionClick}
           className={`text-[10px] font-medium text-center cursor-pointer select-none transition-colors mt-3 ${isCollapsed ? 'mt-2' : ''}`}
           style={{ color: 'var(--theme-text-muted)' }}

@@ -3,7 +3,7 @@
 /**
  * Editable Region Component
  * 
- * Wraps content that can be edited by God Mode admins.
+ * Wraps content that can be edited by Greenline HQ admins.
  * Shows a pencil icon on hover when edit mode is enabled.
  * 
  * Usage:

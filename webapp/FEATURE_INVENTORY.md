@@ -321,7 +321,7 @@
   - Call analytics and recording
 
 #### Medium Priority
-- ⏳ **God Mode CMS** - Advanced content management system
+- ⏳ **Greenline HQ CMS** - Advanced content management system
 - ⏳ **Product Mockups Generator** - AI-generated product images
 - ⏳ **Newsletter Feature** - Dedicated email newsletter builder
 - ⏳ **Feature Locking** - Subscription tier management

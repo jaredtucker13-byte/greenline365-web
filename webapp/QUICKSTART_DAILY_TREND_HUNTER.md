@@ -157,7 +157,7 @@ Once you confirm Daily Trend Hunter works:
 4. Connect "Forge Content" button
 
 ### Phase 2: Dashboards
-1. Build God Mode (`/god-mode`)
+1. Build Greenline HQ (`/greenline-hq`)
 2. Build Content Command Center (`/dashboard`)
 3. Enhanced navbar with role detection
 4. Integrate Daily Trend Hunter into dashboard

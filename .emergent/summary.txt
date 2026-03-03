@@ -6,7 +6,7 @@ The user's vision is a multi-phase project to build a comprehensive Business Ope
 3.  **Real-Feel AI Booking & Sales Ecosystem:** A high-revenue orchestration layer using Retell AI (for voice), Supabase, Perplexity, and a Weather API. This system should support multiple agent types (Receptionist, Sales, Customer Service) and implement sophisticated business logic like a Nudge Strategy for cancellations and Real-Feel context (e.g., weather awareness for outdoor businesses).
 4.  **Advanced SMS Integration:** Integrate Twilio for three specific use cases: effective meeting confirmations, value bomb follow-ups with dynamic content, and perfect data capture via text replies.
 5.  **Cal.com Integration:** Use Cal.com as the backend for all appointment bookings, managed by the AI agents.
-6.  **Admin God Mode (Visual Inline Editor):** An inline editing system for the admin on public-facing pages.
+6.  **Greenline HQ (Visual Inline Editor):** An inline editing system for the admin on public-facing pages.
 7.  **The Brain - Thought Capture System:** A personal productivity tool integrated with Slack.
 8.  **Tenant Storage Billing:** A system to track, limit, and bill tenants for storage usage, integrated with Stripe.
 
@@ -14,7 +14,7 @@ PRODUCT REQUIREMENTS:
 - **Phase 1 (Foundation):** White-Label + Theme Engine.
 - **Phase 2 (Hero Product):** ArtfulPhusion Creative Studio.
 - **Phase 3 (Real-Feel AI):** Implement the Retell AI voice agents, Cal.com booking, and advanced SMS logic.
-- **Phase 4 (God Mode):** Visual Inline Editor + CMS.
+- **Phase 4 (Greenline HQ):** Visual Inline Editor + CMS.
 - **Phase 5 (Operations):** Storage Billing & Enforcement.
 
 **User's preferred language**: English
@@ -78,7 +78,7 @@ The application is a Next.js frontend with a Supabase backend. The foundation fo
 -   **Upcoming Tasks:**
     *   **(P1) Finalize Retell Agent Setup:** Fully configure and test the  and  agents.
     *   **(P1) Deploy Weather Watcher Cron Job:** Guide the user through deploying the Supabase Edge Function () and setting up  to enable proactive weather alerts.
-    *   **(P2) Complete Visual Inline Editor (God Mode):** Expand the  component and connect the save action to the backend.
+    *   **(P2) Complete Visual Inline Editor (Greenline HQ):** Expand the  component and connect the save action to the backend.
 -   **Future Tasks:**
     *   Build The Brain Full Dashboard & Slack Integration.
     *   Build Newsletter Forge (block-based editor).

@@ -3,7 +3,7 @@
 /**
  * Admin Edit Mode Context
  * 
- * Provides a global "God Mode" editing state for admins.
+ * Provides a global Greenline HQ editing state for admins.
  * When enabled, EditableRegion components show pencil icons on hover.
  */
 

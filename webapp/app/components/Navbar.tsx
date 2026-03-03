@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase/client';
 import type { User } from '@supabase/supabase-js';
 import { Button } from '@/components/ui/os';
 import { gsap, ScrollTrigger, useGSAP, createNavBlur } from '@/lib/gsap';
+import { publicNav, isDashboardRoute as checkDashboardRoute } from '@/lib/navigation/navConfig';
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -18,10 +19,8 @@ export default function Navbar() {
   const [loading, setLoading] = useState(true);
   const navRef = useRef<HTMLElement>(null);
 
-  // Hide navbar on dashboard routes
-  const isDashboardRoute = pathname?.startsWith('/admin-v2') ||
-                           pathname?.startsWith('/dashboard') ||
-                           pathname?.startsWith('/god-mode');
+  // Hide navbar on dashboard routes (single-source config)
+  const isOnDashboard = checkDashboardRoute(pathname);
 
   // GSAP-powered scroll blur effect
   useGSAP(() => {
@@ -73,22 +72,21 @@ export default function Navbar() {
   }, []);
 
   const handleSignOut = async () => {
+    localStorage.removeItem('greenline365_active_business');
+    localStorage.removeItem('greenline365_edit_mode');
     await supabase.auth.signOut();
     setMobileMenuOpen(false);
+    window.location.href = '/';
   };
 
   const [featuresOpen, setFeaturesOpen] = useState(false);
   const [industriesOpen, setIndustriesOpen] = useState(false);
 
-  const navLinks: { href: string; label: string; dropdown?: { href: string; label: string }[] }[] = [
-    { href: '/', label: 'Directory' },
-    { href: '/loops', label: 'Experiences' },
-    { href: '/home-ledger', label: 'Home Ledger' },
-    { href: '/services', label: 'Our Services' },
-  ];
+  // Nav links from single-source config
+  const navLinks = publicNav as { href: string; label: string; dropdown?: { href: string; label: string }[] }[];
 
   // Don't render navbar on dashboard routes
-  if (isDashboardRoute) {
+  if (isOnDashboard) {
     return null;
   }
 
@@ -250,10 +248,10 @@ export default function Navbar() {
                 <div className="flex items-center gap-2 ml-4">
                   {isSuperAdmin && (
                     <Link
-                      href="/god-mode"
-                      className="btn-ghost inline-flex items-center justify-center text-sm px-4 py-2 !text-red-400 !border-red-400/30 hover:!bg-red-400/10 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+                      href="/greenline-hq"
+                      className="btn-ghost inline-flex items-center justify-center text-sm px-4 py-2 !text-yellow-400 !border-yellow-400/30 hover:!bg-yellow-400/10 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
                     >
-                      God Mode
+                      Greenline HQ
                     </Link>
                   )}
                   {isAdmin && (
@@ -414,11 +412,11 @@ export default function Navbar() {
                       <>
                         {isSuperAdmin && (
                           <Link
-                            href="/god-mode"
+                            href="/greenline-hq"
                             onClick={() => setMobileMenuOpen(false)}
-                            className="btn-ghost block w-full text-center text-lg px-8 py-4 !text-red-400 !border-red-400/30 hover:!bg-red-400/10 transition-all duration-300"
+                            className="btn-ghost block w-full text-center text-lg px-8 py-4 !text-yellow-400 !border-yellow-400/30 hover:!bg-yellow-400/10 transition-all duration-300"
                           >
-                            God Mode
+                            Greenline HQ
                           </Link>
                         )}
                         {isAdmin && (

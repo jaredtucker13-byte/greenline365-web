@@ -220,7 +220,7 @@ This document provides comprehensive documentation for all tables in the GreenLi
 - `email` (TEXT): User email (denormalized)
 - `full_name` (TEXT): Display name
 - `is_admin` (BOOLEAN): Admin access flag
-- `is_super_admin` (BOOLEAN): God mode access
+- `is_super_admin` (BOOLEAN): Greenline HQ access
 - `client_id` (TEXT): Multi-tenant association
 
 **Relationships:**
@@ -371,10 +371,10 @@ CREATE INDEX idx_bookings_active
 5. **Service Role Only**
    - ingested_website_data, job_queue
 
-### Super Admin Access
+### Greenline HQ Access
 
-Super admins (`is_super_admin = true`) have:
-- God Mode dashboard access
+System operators (`is_super_admin = true`) have:
+- Greenline HQ dashboard access
 - Full CMS control
 - All table visibility
 - Platform metrics access
