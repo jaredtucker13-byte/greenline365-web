@@ -15,14 +15,16 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-function wrapInBrandedTemplate(subject: string, body: string, recipientEmail: string): string {
+function wrapInBrandedTemplate(subject: string, body: string, recipientEmail: string, isHtml = false): string {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com';
-  const bodyHtml = body
-    .split('\n\n')
-    .map(p => p.trim())
-    .filter(Boolean)
-    .map(p => `<p style="color:#a0a0a0;font-size:15px;line-height:1.7;margin:0 0 16px;">${p.replace(/\n/g, '<br>')}</p>`)
-    .join('\n    ');
+  const bodyHtml = isHtml
+    ? `<div style="color:#a0a0a0;font-size:15px;line-height:1.7;">${body}</div>`
+    : body
+      .split('\n\n')
+      .map(p => p.trim())
+      .filter(Boolean)
+      .map(p => `<p style="color:#a0a0a0;font-size:15px;line-height:1.7;margin:0 0 16px;">${p.replace(/\n/g, '<br>')}</p>`)
+      .join('\n    ');
 
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
 <body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0a0a0a;">
@@ -51,16 +53,19 @@ export async function POST(request: NextRequest) {
   if (auth.error) return auth.error;
 
   try {
-    const { to, subject, body } = await request.json();
+    const { to, subject, body, html_body } = await request.json();
 
-    if (!to || !subject || !body) {
+    if (!to || !subject || (!body && !html_body)) {
       return NextResponse.json(
         { success: false, error: 'Missing required fields: to, subject, body' },
         { status: 400 }
       );
     }
 
-    const html = wrapInBrandedTemplate(subject, body, to);
+    // Use rich HTML body from TipTap editor if provided, otherwise fall back to plain text wrapper
+    const html = html_body
+      ? wrapInBrandedTemplate(subject, html_body, to, true)
+      : wrapInBrandedTemplate(subject, body, to);
     const result = await sendEmail({ to, subject, html });
 
     // Log to email_sends table
