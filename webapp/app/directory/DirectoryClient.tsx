@@ -617,42 +617,6 @@ export default function DirectoryClient() {
           </section>
 
           {/* ═══════════════════════════════════════════════════════════
-              PRIVATE VAULT CTA — Home Ledger Cross-Sell
-              ═══════════════════════════════════════════════════════════ */}
-          <section className="py-20 relative overflow-hidden" data-testid="private-vault-section">
-            {/* Circuit board background pattern */}
-            <div className="absolute inset-0 circuit-bg opacity-30" />
-            <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(201,168,76,0.04) 0%, transparent 60%)' }} />
-
-            <div className="relative max-w-5xl mx-auto px-6 text-center">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border mb-8" style={{ borderColor: 'rgba(201,168,76,0.3)', background: 'rgba(201,168,76,0.05)' }}>
-                <svg className="w-4 h-4" style={{ color: '#C9A84C' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-                </svg>
-                <span className="text-xs font-body uppercase tracking-widest" style={{ color: '#C9A84C' }}>Private Vault</span>
-              </div>
-
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-light text-white tracking-tight mb-4">
-                Your Home&apos;s Heritage.<br />
-                <span className="text-gradient-gold font-semibold">Documented.</span>
-              </h2>
-              <p className="text-white/50 max-w-2xl mx-auto mb-10 font-body leading-relaxed">
-                The GL365 Home Ledger — a military-grade encrypted property file for every home you own or manage. Documents, contractors, warranties, incidents — all in one place.
-              </p>
-
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link href="/home-ledger" className="btn-primary px-8 py-3 rounded-full text-sm inline-block" data-testid="vault-cta">
-                  Learn More
-                </Link>
-                <div className="flex items-center gap-2 text-xs text-white/35 font-body">
-                  <svg className="w-3.5 h-3.5" style={{ color: '#C9A84C' }} fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L3 7v10l9 5 9-5V7l-9-5z" /></svg>
-                  AES-256 Encrypted
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* ═══════════════════════════════════════════════════════════
               VALUE PROPOSITION — Why GreenLine365
               ═══════════════════════════════════════════════════════════ */}
           <section className="py-20" style={{ background: '#0A0A0A' }} data-testid="value-prop-section">
@@ -699,7 +663,7 @@ export default function DirectoryClient() {
                 <span className="text-gradient-gold font-semibold">Voted Best</span> — Powered by You
               </h2>
               <p className="text-white/40 max-w-xl mx-auto mb-8 font-body text-sm leading-relaxed">
-                Soon you&apos;ll be able to vote for your favorite businesses in every category and region. &quot;Voted Best Plumber in St. Pete,&quot; &quot;Top Restaurant in Ybor City&quot; — real rankings from real people.
+                Soon you&apos;ll be able to vote for your favorite businesses in every category and region. &quot;Best Beach Bar in St. Pete,&quot; &quot;Top Hotel in Key West&quot; — real rankings from real people.
               </p>
               <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border" style={{ borderColor: 'rgba(201,168,76,0.2)', background: 'rgba(201,168,76,0.04)' }}>
                 <svg className="w-4 h-4" style={{ color: '#C9A84C' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
