@@ -34,6 +34,10 @@ interface Listing {
   related: RelatedListing[];
   business_hours: Record<string, { open: string; close: string; closed: boolean }> | null;
   menu: { id: string; name: string; items: { id: string; name: string; description: string; price: string }[] }[] | null;
+  is_mobile_business?: boolean;
+  service_radius_miles?: number | null;
+  latitude?: number | null;
+  longitude?: number | null;
 }
 
 interface RelatedListing {
@@ -274,6 +278,16 @@ export default function ListingDetailPage() {
                         <span className="inline-flex items-center gap-1 ml-2 px-2 py-0.5 rounded-full text-[10px] font-heading font-bold uppercase tracking-wider bg-greenline/15 text-greenline border border-greenline/20" data-testid="verified-badge">
                           <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                           Verified
+                        </span>
+                      )}
+                      {(listing.is_mobile_business || listing.industry === 'mobile-services') && (
+                        <span className="inline-flex items-center gap-1 ml-2 px-2.5 py-0.5 rounded-full text-[10px] font-heading font-bold uppercase tracking-wider"
+                          style={{ background: 'linear-gradient(135deg, #10B981, #059669)', color: '#fff' }}
+                          data-testid="mobile-badge-detail">
+                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                          </svg>
+                          We Come to You{listing.service_radius_miles ? ` · ${listing.service_radius_miles}mi` : ''}
                         </span>
                       )}
                     </div>
@@ -954,8 +968,46 @@ export default function ListingDetailPage() {
                 </div>
               )}
 
-              {/* Embedded Google Map */}
-              {(listing.address_line1 || listing.city) && (
+              {/* Embedded Google Map / Service Area for Mobile Businesses */}
+              {(listing.is_mobile_business || listing.industry === 'mobile-services') ? (
+                <div className="mt-5 pt-5 border-t border-white/5" data-testid="listing-service-area">
+                  <p className="text-[10px] text-white/30 font-heading uppercase tracking-wider mb-3">Service Area</p>
+                  <div className="rounded-xl overflow-hidden border border-white/5 relative" style={{ aspectRatio: '4/3', background: '#111' }}>
+                    {/* Service radius visual — concentric circles representing coverage */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      {/* Outer radius ring */}
+                      <div className="absolute rounded-full border border-emerald-500/10" style={{ width: '85%', height: '85%' }} />
+                      <div className="absolute rounded-full border border-emerald-500/15" style={{ width: '65%', height: '65%' }} />
+                      <div className="absolute rounded-full" style={{ width: '45%', height: '45%', background: 'radial-gradient(circle, rgba(16,185,129,0.15) 0%, rgba(16,185,129,0.05) 70%, transparent 100%)' }} />
+                      {/* Center pin */}
+                      <div className="relative z-10 flex flex-col items-center gap-2">
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #10B981, #059669)' }}>
+                          <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                          </svg>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-white text-xs font-heading font-semibold">Mobile Service</p>
+                          {listing.service_radius_miles && (
+                            <p className="text-emerald-400/70 text-[10px] font-body">Up to {listing.service_radius_miles} mile radius</p>
+                          )}
+                          {listing.city && (
+                            <p className="text-white/30 text-[10px] font-body mt-0.5">Based in {listing.city}, {listing.state}</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    {/* Subtle grid overlay */}
+                    <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
+                  </div>
+                  <div className="flex items-center justify-center gap-2 mt-3 py-2.5 rounded-xl text-xs font-body text-emerald-400/70 border border-emerald-500/10" style={{ background: 'rgba(16,185,129,0.05)' }}>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                    </svg>
+                    This business travels to your location
+                  </div>
+                </div>
+              ) : (listing.address_line1 || listing.city) && (
                 <div className="mt-5 pt-5 border-t border-white/5" data-testid="listing-map">
                   <p className="text-[10px] text-white/30 font-heading uppercase tracking-wider mb-3">Location</p>
                   <div className="rounded-xl overflow-hidden border border-white/5" style={{ aspectRatio: '4/3' }}>

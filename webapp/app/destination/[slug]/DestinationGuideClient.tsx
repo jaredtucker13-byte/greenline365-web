@@ -24,6 +24,8 @@ interface Listing {
   tags?: string[];
   metadata?: Record<string, any>;
   directory_badges: { id: string; badge_type: string; badge_label: string; badge_color: string }[];
+  is_mobile_business?: boolean;
+  service_radius_miles?: number | null;
 }
 
 // ─── Destination Config — Region/State Architecture ───
@@ -837,8 +839,22 @@ export default function DestinationGuideClient({ slug }: { slug: string }) {
 }
 
 // ─── Guide Listing Card ───
+function MobileBadge({ radius }: { radius?: number | null }) {
+  return (
+    <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-heading font-semibold uppercase tracking-wider"
+      style={{ background: 'linear-gradient(135deg, #10B981, #059669)', color: '#fff' }}
+      data-testid="mobile-badge">
+      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+      </svg>
+      We Come to You{radius ? ` · ${radius}mi` : ''}
+    </span>
+  );
+}
+
 function GuideListingCard({ listing: l, index: i, isFeatured }: { listing: Listing; index: number; isFeatured?: boolean }) {
   const googleRating = l.metadata?.google_rating;
+  const isMobile = l.is_mobile_business || l.industry === 'mobile-services';
   const googleReviewCount = l.metadata?.google_review_count;
   const googleMapsUrl = l.metadata?.google_maps_url;
 
@@ -897,6 +913,12 @@ function GuideListingCard({ listing: l, index: i, isFeatured }: { listing: Listi
           <div className="absolute bottom-3 left-3 flex items-center gap-1 px-2 py-1 rounded-lg backdrop-blur-md text-[10px] font-heading font-semibold tracking-wider uppercase"
             style={{ background: 'rgba(201, 168, 76, 0.2)', color: '#C9A84C', border: '1px solid rgba(201, 168, 76, 0.3)' }}>
             Featured
+          </div>
+        )}
+        {/* Mobile business badge */}
+        {isMobile && !isFeatured && (
+          <div className="absolute bottom-3 left-3">
+            <MobileBadge radius={l.service_radius_miles} />
           </div>
         )}
       </div>

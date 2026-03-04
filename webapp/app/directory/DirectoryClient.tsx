@@ -37,6 +37,8 @@ interface Listing {
   directory_badges: { id: string; badge_type: string; badge_label: string; badge_color: string }[];
   distance?: number | null;
   metadata?: Record<string, any>;
+  is_mobile_business?: boolean;
+  service_radius_miles?: number | null;
 }
 
 // ─── Category & Subcategory Map ────────────────────────────────────
@@ -820,9 +822,24 @@ export default function DirectoryClient() {
   );
 }
 
+// ─── "We Come to You" Mobile Badge ────────────────────────────────
+function MobileBadge({ radius }: { radius?: number | null }) {
+  return (
+    <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-heading font-semibold uppercase tracking-wider"
+      style={{ background: 'linear-gradient(135deg, #10B981, #059669)', color: '#fff' }}
+      data-testid="mobile-badge">
+      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+      </svg>
+      We Come to You{radius ? ` · ${radius}mi` : ''}
+    </span>
+  );
+}
+
 // ─── Listing Card ──────────────────────────────────────────────────
 function ListingCard({ listing: l, index: i }: { listing: Listing; index: number }) {
   const hasIntel = l.has_property_intelligence;
+  const isMobile = l.is_mobile_business || l.industry === 'mobile-services';
   return (
     <Link href={`/listing/${l.slug}`}>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
@@ -844,6 +861,11 @@ function ListingCard({ listing: l, index: i }: { listing: Listing; index: number
               style={{ background: l.tier === 'premium' ? 'linear-gradient(135deg, #C9A84C, #E8C97A)' : 'linear-gradient(135deg, #A8A9AD, #C0C0C0)' }}>
               {l.tier === 'premium' ? 'Premier' : 'Pro'}
             </span>
+          )}
+          {isMobile && (
+            <div className="absolute bottom-3 left-3">
+              <MobileBadge radius={l.service_radius_miles} />
+            </div>
           )}
         </div>
         <div className="p-4">
