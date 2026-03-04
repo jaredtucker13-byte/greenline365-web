@@ -60,7 +60,6 @@ async function pollForResult(taskId: string, maxAttempts = 60): Promise<{ imageU
     }
 
     const statusData: KieQueryStatusResponse = await statusResponse.json();
-    console.log(`[Nano Banana] Poll ${i + 1}/${maxAttempts} - State: ${statusData.data?.state}`);
     
     if (statusData.data?.state === 'success' && statusData.data?.resultJson) {
       try {
@@ -105,8 +104,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'KIE API key not configured' }, { status: 500 });
     }
 
-    console.log('[Nano Banana] Creating task with prompt:', prompt.slice(0, 100) + '...');
-    console.log('[Nano Banana] Settings:', { aspectRatio, resolution, outputFormat });
 
     // Create task with KIE.ai Nano Banana Pro
     // Following exact API structure from documentation
@@ -164,7 +161,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('[Nano Banana] Task created:', taskId);
 
     // Poll for result
     const result = await pollForResult(taskId);
@@ -176,7 +172,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('[Nano Banana] Image generated successfully');
 
     // Calculate estimated cost based on resolution
     const estimatedCost = resolution === '4K' ? 0.12 : 0.09;

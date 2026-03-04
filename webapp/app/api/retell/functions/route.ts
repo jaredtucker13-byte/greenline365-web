@@ -42,7 +42,6 @@ export async function POST(request: NextRequest) {
     const args = body.args || {};
     const callContext = body.call || {};
     
-    console.log(`[Retell Functions] Function: ${functionName}`, args);
     
     const supabase = await createClient();
     
@@ -368,7 +367,6 @@ async function prepareWarmTransfer(
           }
         }
       } catch (e) {
-        console.log('[prepareWarmTransfer] Weather fetch failed:', e);
       }
     }
     

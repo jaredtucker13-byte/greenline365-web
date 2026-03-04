@@ -179,7 +179,6 @@ REQUIREMENTS:
   }
 
   const taskId = createResult.data.taskId;
-  console.log(`[kie.ai] Task created for ${sceneName}: ${taskId}`);
 
   // Step 2: Poll for result
   const imageUrl = await pollForResult(taskId, sceneName);
@@ -220,7 +219,6 @@ async function pollForResult(taskId: string, sceneName: string, maxAttempts = 60
         const imageUrl = resultJson.resultUrls?.[0];
         
         if (imageUrl) {
-          console.log(`[kie.ai] Generation complete for ${sceneName}: ${imageUrl}`);
           return imageUrl;
         }
       } catch (parseError) {
@@ -235,7 +233,6 @@ async function pollForResult(taskId: string, sceneName: string, maxAttempts = 60
     
     // State is still 'waiting', continue polling
     if (attempt % 10 === 0) {
-      console.log(`[kie.ai] Still waiting for ${sceneName}... (attempt ${attempt + 1})`);
     }
   }
   

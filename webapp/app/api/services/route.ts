@@ -32,7 +32,6 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       // Table might not exist yet - return default services
-      console.log('[Services] Table may not exist:', error.message);
       return NextResponse.json({ 
         services: [
           { id: 'default-1', name: 'Quick Demo', duration_minutes: 10, price: 0, price_type: 'free', color: '#39FF14' },

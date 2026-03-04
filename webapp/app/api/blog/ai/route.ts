@@ -214,7 +214,6 @@ ${title ? `The blog title context is: "${title}"` : ''}`;
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
     }
 
-    console.log(`[Blog AI] Action: ${action}, Model: ${model}`);
 
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
@@ -260,7 +259,6 @@ ${title ? `The blog title context is: "${title}"` : ''}`;
         }
       } catch (e) {
         // Keep raw response if JSON parsing fails
-        console.log('[Blog AI] Could not parse JSON response');
       }
     }
 

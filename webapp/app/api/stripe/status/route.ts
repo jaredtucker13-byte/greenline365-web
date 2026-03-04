@@ -68,7 +68,6 @@ export async function GET(request: NextRequest) {
                     paid_at: new Date().toISOString(),
           }).eq('session_id', sessionId);
 
-          console.log(`[STRIPE] Payment confirmed: ${session.metadata.tier} tier for listing ${session.metadata.listing_id}`);
       }
 
       return NextResponse.json(result);

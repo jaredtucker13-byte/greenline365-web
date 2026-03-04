@@ -97,7 +97,7 @@ export async function GET(request: NextRequest) {
   // Unique cities within this destination's listings
   const cities = [...new Set(allListings.map(l => l.city).filter(Boolean))];
 
-  return NextResponse.json({
+  const response = NextResponse.json({
     destination,
     totalCount,
     sections: tourismSections,
@@ -108,4 +108,6 @@ export async function GET(request: NextRequest) {
     claimedCount: allListings.filter(l => l.is_claimed).length,
     premiumCount: allListings.filter(l => l.tier === 'premium').length,
   });
+  response.headers.set('Cache-Control', 'public, s-maxage=120, stale-while-revalidate=600');
+  return response;
 }

@@ -43,7 +43,9 @@ export async function GET(request: NextRequest) {
         .order('sort_order', { ascending: true })
         .limit(limit);
 
-      return NextResponse.json({ loops: loops || [], total: loops?.length || 0 });
+      const res = NextResponse.json({ loops: loops || [], total: loops?.length || 0 });
+      res.headers.set('Cache-Control', 'public, s-maxage=120, stale-while-revalidate=600');
+      return res;
     }
 
     // Standard query with optional filters
@@ -66,7 +68,9 @@ export async function GET(request: NextRequest) {
       loop_stops: undefined,
     }));
 
-    return NextResponse.json({ loops: loopsWithCounts, total: count || 0 });
+    const res = NextResponse.json({ loops: loopsWithCounts, total: count || 0 });
+    res.headers.set('Cache-Control', 'public, s-maxage=120, stale-while-revalidate=600');
+    return res;
   } catch (error: any) {
     return NextResponse.json({ loops: [], total: 0, error: error.message }, { status: 500 });
   }

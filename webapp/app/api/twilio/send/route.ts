@@ -64,7 +64,6 @@ export async function POST(request: NextRequest) {
     
     if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN) {
       // Mock mode
-      console.log(`[SMS Mock] Would send to ${formattedTo}: ${message}`);
       return NextResponse.json({
         success: true,
         mock: true,

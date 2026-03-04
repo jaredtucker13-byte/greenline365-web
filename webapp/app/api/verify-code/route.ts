@@ -18,7 +18,6 @@ const supabase = createClient(
 
 // Sync verified lead to CRM - matches actual crm_leads schema
 async function syncToCRM(entry: any): Promise<{ success: boolean; error?: string }> {
-  console.log('[CRM Sync] Starting sync for:', entry.email);
   
   try {
     // Check if lead already exists in CRM
@@ -50,7 +49,6 @@ async function syncToCRM(entry: any): Promise<{ success: boolean; error?: string
         return { success: false, error: updateError.message };
       }
       
-      console.log('[CRM Sync] Updated existing lead:', entry.email);
       return { success: true };
     } else {
       // Create new CRM lead using actual table columns
@@ -72,7 +70,6 @@ async function syncToCRM(entry: any): Promise<{ success: boolean; error?: string
         insertData.metadata = { industry: entry.industry };
       }
       
-      console.log('[CRM Sync] Inserting lead:', JSON.stringify(insertData));
       
       const { data: newLead, error: insertError } = await supabase
         .from('crm_leads')
@@ -85,7 +82,6 @@ async function syncToCRM(entry: any): Promise<{ success: boolean; error?: string
         return { success: false, error: insertError.message };
       }
       
-      console.log('[CRM Sync] Created new lead:', entry.email, 'ID:', newLead?.id);
       return { success: true };
     }
   } catch (err: any) {
@@ -154,7 +150,6 @@ export async function POST(request: NextRequest) {
     // Sync to CRM automatically
     const crmResult = await syncToCRM({ ...entry, email: normalizedEmail });
     
-    console.log('[Verify Code] CRM sync result:', crmResult);
 
     return NextResponse.json({
       success: true,

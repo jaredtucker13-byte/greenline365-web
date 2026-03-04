@@ -24,7 +24,6 @@ export async function POST(
       return NextResponse.json({ invalid: true, error: 'Token is required' }, { status: 400 });
     }
 
-    console.log('[Verify Token] Looking up token:', token.substring(0, 8) + '...');
 
     // Find the waitlist entry with this token
     const { data: entry, error: findError } = await supabase
@@ -34,11 +33,9 @@ export async function POST(
       .single();
 
     if (findError || !entry) {
-      console.log('[Verify Token] Token not found in database');
       return NextResponse.json({ invalid: true, error: 'Invalid verification token' }, { status: 400 });
     }
 
-    console.log('[Verify Token] Found entry for:', entry.email);
 
     // Check if already verified
     if (entry.verified) {
@@ -51,7 +48,6 @@ export async function POST(
 
     // Check if expired
     if (entry.verification_expires && new Date(entry.verification_expires) < new Date()) {
-      console.log('[Verify Token] Token expired');
       return NextResponse.json({ expired: true, error: 'Verification link has expired' }, { status: 400 });
     }
 
@@ -72,7 +68,6 @@ export async function POST(
       return NextResponse.json({ error: 'Failed to verify email' }, { status: 500 });
     }
 
-    console.log('[Verify Token] Successfully verified:', entry.email);
 
     return NextResponse.json({
       success: true,

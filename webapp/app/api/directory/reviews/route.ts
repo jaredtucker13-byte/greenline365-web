@@ -68,7 +68,9 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const listingId = searchParams.get('listing_id');
 
-  if (!listingId) return NextResponse.json({ error: 'listing_id required' }, { status: 400 });
+  if (!listingId) {
+    return NextResponse.json({ reviews: [], total: 0, average_rating: 0 });
+  }
 
   const service = getServiceClient();
   const { data: listing } = await service
@@ -94,11 +96,13 @@ export async function GET(request: NextRequest) {
 
   const avgRating = reviews.length > 0 ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length : 0;
 
-  return NextResponse.json({
+  const response = NextResponse.json({
     reviews,
     total: reviews.length,
     average_rating: Math.round(avgRating * 10) / 10,
   });
+  response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
+  return response;
 }
 
 // POST — Public: submit a review

@@ -255,14 +255,10 @@ Remember: positive vibes only. Every trend is a revenue opportunity.`
  */
 async function runTwoStagePipeline(zipCode: string, city: string): Promise<any[]> {
   // Stage 1: Get raw internet data
-  console.log(`[Trend Hunter] Stage 1: Perplexity scanning ${city}...`);
   const rawIntel = await stage1_PerplexityScan(zipCode, city);
-  console.log(`[Trend Hunter] Stage 1 complete: ${rawIntel.length} chars of raw intel`);
 
   // Stage 2: Process with Sonnet 4.6 (even if Stage 1 failed, Sonnet can work from seasonal knowledge)
-  console.log(`[Trend Hunter] Stage 2: Sonnet 4.6 processing...`);
   const trends = await stage2_SonnetManager(rawIntel, zipCode, city);
-  console.log(`[Trend Hunter] Stage 2 complete: ${trends.length} opportunities generated`);
 
   return trends;
 }

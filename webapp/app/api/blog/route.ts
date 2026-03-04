@@ -66,7 +66,9 @@ export async function GET(request: NextRequest) {
     
     if (error) throw error;
     
-    return NextResponse.json({ posts: data });
+    const response = NextResponse.json({ posts: data });
+    response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
+    return response;
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

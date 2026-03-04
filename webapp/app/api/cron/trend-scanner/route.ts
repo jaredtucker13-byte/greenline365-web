@@ -77,12 +77,17 @@ export async function GET(request: NextRequest) {
     const zipsToScan = uniqueZips.length > 0 ? uniqueZips : ['33619'];
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
-    for (const zipCode of zipsToScan) {
+    // Process ZIP codes in parallel with per-request timeout (15s each)
+    const PER_ZIP_TIMEOUT_MS = 15_000;
+    const scanPromises = zipsToScan.map(async (zipCode) => {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), PER_ZIP_TIMEOUT_MS);
       try {
         const scanResponse = await fetch(`${siteUrl}/api/daily-trend-hunter`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ zipCode, userId: null, source: 'cron_3h' }),
+          signal: controller.signal,
         });
 
         const scanData = await scanResponse.json();
@@ -92,10 +97,15 @@ export async function GET(request: NextRequest) {
           source: scanData.metadata?.source,
         };
       } catch (err: any) {
-        tasks[`scan_${zipCode}`] = { error: err.message };
+        const isTimeout = err.name === 'AbortError';
+        tasks[`scan_${zipCode}`] = { error: isTimeout ? 'Scan timed out' : err.message };
         overallSuccess = false;
+      } finally {
+        clearTimeout(timeoutId);
       }
-    }
+    });
+
+    await Promise.allSettled(scanPromises);
   } catch (error: any) {
     tasks.trend_scan = { error: error.message };
     overallSuccess = false;

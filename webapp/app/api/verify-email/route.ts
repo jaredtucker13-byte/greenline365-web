@@ -101,7 +101,6 @@ export async function POST(req: NextRequest) {
         
         // In development, still return success but log the URL
         if (process.env.NODE_ENV === 'development') {
-          console.log(`[DEV] Verification URL: ${verificationUrl}`);
           return NextResponse.json({
             success: true,
             message: 'Verification email would be sent (dev mode)',

@@ -1567,7 +1567,6 @@ export async function POST(request: NextRequest) {
     const toolArgs = body.arguments || body.args || {};
     const call = body.call || {};
     
-    console.log(`[MCP] Function: ${tool_name}`, JSON.stringify(toolArgs));
     
     // Get tenant context
     const tenant = await getTenant(call?.to_number);

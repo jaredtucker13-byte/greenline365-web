@@ -271,8 +271,6 @@ export async function POST(request: NextRequest) {
       aspectRatio
     );
 
-    console.log(`[Generate Mockup] Mode: ${mode}, Page Type: ${pageType}`);
-    console.log('[Generate Mockup] Prompt:', imagePrompt.slice(0, 200) + '...');
 
     // Create task with KIE.ai Nano Banana Pro
     const createTaskResponse = await fetch(KIE_CREATE_TASK_URL, {
@@ -328,7 +326,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('[Generate Mockup] Task created:', taskId);
 
     // Poll for result
     const result = await pollForResult(taskId);
@@ -340,7 +337,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('[Generate Mockup] Mockup generated successfully');
 
     // Calculate estimated cost
     const estimatedCost = resolution === '4K' ? 0.12 : 0.09;

@@ -14,7 +14,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Audio data is required' }, { status: 400 });
     }
 
-    console.log('[Transcribe] Starting transcription with GPT-4o Audio...');
 
     // Use GPT-4o Audio Preview via OpenRouter for transcription
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -73,7 +72,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('[Transcribe] Success, text length:', transcribedText.length);
 
     return NextResponse.json({
       success: true,

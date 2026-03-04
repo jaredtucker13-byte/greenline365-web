@@ -24,7 +24,6 @@ export async function POST(request: NextRequest) {
     }
 
     const normalizedEmail = email.toLowerCase().trim();
-    console.log('[Unsubscribe] Processing unsubscribe for:', normalizedEmail, 'from list:', list);
 
     const results: string[] = [];
     const errors: string[] = [];
@@ -93,7 +92,6 @@ export async function POST(request: NextRequest) {
       // Ignore if table doesn't exist
     }
 
-    console.log('[Unsubscribe] Successfully unsubscribed:', normalizedEmail);
 
     return NextResponse.json({
       success: true,

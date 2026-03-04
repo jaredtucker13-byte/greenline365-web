@@ -138,7 +138,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid URL format' }, { status: 400 });
     }
 
-    console.log('[Crawl Website] Fetching:', normalizedUrl);
 
     // Fetch the webpage
     const response = await fetch(normalizedUrl, {
@@ -357,7 +356,6 @@ export async function POST(request: NextRequest) {
     extracted.content.footerLinks = [...new Set(extracted.content.footerLinks)];
     extracted.colors.all = [...new Set(extracted.colors.all)].slice(0, 30);
 
-    console.log('[Crawl Website] Successfully extracted data from:', normalizedUrl);
 
     return NextResponse.json({
       success: true,

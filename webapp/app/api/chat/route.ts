@@ -482,7 +482,6 @@ export async function POST(req: NextRequest) {
           importance: 5,
         });
         
-        console.log(`[Chat] Memory context loaded for user ${userId}`);
       }
     } catch (memoryError) {
       // Memory system is optional - continue without it
@@ -500,7 +499,6 @@ export async function POST(req: NextRequest) {
       try {
         directoryContext = await searchDirectory(message);
         if (directoryContext) {
-          console.log(`[Chat] Directory search returned results for: "${message.slice(0, 50)}"`);
         }
       } catch (e) {
         console.warn('[Chat] Directory search failed:', e);
@@ -517,7 +515,6 @@ export async function POST(req: NextRequest) {
       ...messages.filter(m => m.role !== 'system'),
     ];
 
-    console.log(`[Chat] Session: ${sessionId || 'anonymous'}, Mode: ${mode || 'default'}, Model: ${model}, HasMemory: ${!!aiContext}`);
 
     const shouldStream = body?.stream === true;
     const temperature = mode === 'creative' ? 0.8 : 0.7;

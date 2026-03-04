@@ -68,7 +68,7 @@ export async function GET(
       .or(`destination_slug.eq.${loop.destination_slug},loop_type.eq.${loop.loop_type}`)
       .limit(3);
 
-    return NextResponse.json({
+    const res = NextResponse.json({
       loop: {
         ...loop,
         stops: stops || [],
@@ -76,6 +76,8 @@ export async function GET(
       },
       related: related || [],
     });
+    res.headers.set('Cache-Control', 'public, s-maxage=120, stale-while-revalidate=600');
+    return res;
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
