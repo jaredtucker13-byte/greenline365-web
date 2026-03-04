@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { getListingDisplayAddress } from '@/lib/utils/listing';
 
 interface Listing {
   id: string;
@@ -34,6 +35,10 @@ interface Listing {
   related: RelatedListing[];
   business_hours: Record<string, { open: string; close: string; closed: boolean }> | null;
   menu: { id: string; name: string; items: { id: string; name: string; description: string; price: string }[] }[] | null;
+  is_mobile_service?: boolean;
+  service_area_radius_miles?: number | null;
+  service_area_display?: string | null;
+  is_public_resource?: boolean;
 }
 
 interface RelatedListing {
@@ -263,13 +268,13 @@ export default function ListingDetailPage() {
                   <h1 className="text-2xl sm:text-3xl font-heading font-semibold text-white mt-3 mb-2" data-testid="listing-name">
                     {listing.business_name}
                   </h1>
-                  {listing.city && (
+                  {(listing.city || listing.is_mobile_service) && (
                     <div className="flex items-center gap-2 text-white/50 text-sm font-body">
                       <svg className="w-4 h-4 text-gold/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
                         <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
                       </svg>
-                      {listing.city}, {listing.state} {listing.zip_code}
+                      {getListingDisplayAddress(listing).displayText}
                       {listing.tier !== 'free' && listing.is_claimed && (
                         <span className="inline-flex items-center gap-1 ml-2 px-2 py-0.5 rounded-full text-[10px] font-heading font-bold uppercase tracking-wider bg-greenline/15 text-greenline border border-greenline/20" data-testid="verified-badge">
                           <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
@@ -955,40 +960,50 @@ export default function ListingDetailPage() {
               )}
 
               {/* Embedded Google Map */}
-              {(listing.address_line1 || listing.city) && (
-                <div className="mt-5 pt-5 border-t border-white/5" data-testid="listing-map">
-                  <p className="text-[10px] text-white/30 font-heading uppercase tracking-wider mb-3">Location</p>
-                  <div className="rounded-xl overflow-hidden border border-white/5" style={{ aspectRatio: '4/3' }}>
-                    <iframe
-                      width="100%"
-                      height="100%"
-                      style={{ border: 0 }}
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}&q=${encodeURIComponent([listing.business_name, listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', '))}`}
-                      title={`Map showing ${listing.business_name} location`}
-                    />
-                  </div>
-                  <a
-                    href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent([listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', '))}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => trackEvent('map')}
-                    className="flex items-center justify-center gap-2 w-full mt-3 py-3 rounded-xl text-xs font-semibold font-heading text-white border border-white/10 hover:border-gold/30 hover:bg-gold/5 transition-all"
-                    data-testid="get-directions-btn"
-                  >
-                    <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" />
-                    </svg>
-                    Get Directions
-                  </a>
-                  {listing.address_line1 && (
-                    <p className="text-[10px] text-white/25 font-body text-center mt-2">
-                      {listing.address_line1}, {listing.city}, {listing.state} {listing.zip_code}
+              {(() => {
+                const addr = getListingDisplayAddress(listing);
+                const mapQuery = addr.showStreetAddress
+                  ? [listing.business_name, listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', ')
+                  : [listing.business_name, listing.city, listing.state].filter(Boolean).join(', ');
+                const showMap = addr.showStreetAddress ? (listing.address_line1 || listing.city) : listing.city;
+                if (!showMap) return null;
+                return (
+                  <div className="mt-5 pt-5 border-t border-white/5" data-testid="listing-map">
+                    <p className="text-[10px] text-white/30 font-heading uppercase tracking-wider mb-3">
+                      {addr.mapType === 'circle' ? 'Service Area' : 'Location'}
                     </p>
-                  )}
-                </div>
-              )}
+                    <div className="rounded-xl overflow-hidden border border-white/5" style={{ aspectRatio: '4/3' }}>
+                      <iframe
+                        width="100%"
+                        height="100%"
+                        style={{ border: 0 }}
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}&q=${encodeURIComponent(mapQuery)}${addr.mapType === 'circle' ? '&zoom=10' : ''}`}
+                        title={`Map showing ${listing.business_name} ${addr.mapType === 'circle' ? 'service area' : 'location'}`}
+                      />
+                    </div>
+                    {addr.showStreetAddress && (
+                      <a
+                        href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent([listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', '))}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => trackEvent('map')}
+                        className="flex items-center justify-center gap-2 w-full mt-3 py-3 rounded-xl text-xs font-semibold font-heading text-white border border-white/10 hover:border-gold/30 hover:bg-gold/5 transition-all"
+                        data-testid="get-directions-btn"
+                      >
+                        <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" />
+                        </svg>
+                        Get Directions
+                      </a>
+                    )}
+                    <p className="text-[10px] text-white/25 font-body text-center mt-2">
+                      {addr.displayText}
+                    </p>
+                  </div>
+                );
+              })()}
             </motion.div>
           </div>
         </div>

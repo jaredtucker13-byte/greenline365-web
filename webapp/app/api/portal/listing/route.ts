@@ -67,6 +67,10 @@ export async function PATCH(request: NextRequest) {
     'zip_code',
     'logo_url',
     'is_published',
+    'is_mobile_service',
+    'service_area_radius_miles',
+    'private_address',
+    'service_area_label',
   ];
 
   // Pro-only fields

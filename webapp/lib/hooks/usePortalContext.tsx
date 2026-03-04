@@ -38,6 +38,12 @@ interface DirectoryListing {
   trust_score: number;
   total_feedback_count: number;
   avg_feedback_rating: number;
+  is_mobile_service: boolean;
+  service_area_radius_miles: number | null;
+  private_address: string | null;
+  service_area_label: string | null;
+  service_area_display: string | null;
+  is_public_resource: boolean;
 }
 
 interface SubscriptionInfo {

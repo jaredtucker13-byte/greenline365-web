@@ -5,6 +5,8 @@ import { usePortalContext } from '@/lib/hooks/usePortalContext';
 import { useFeatureGate } from '@/lib/hooks/useFeatureGate';
 import UpgradeCTA from '@/components/portal/UpgradeCTA';
 
+const RADIUS_OPTIONS = [5, 10, 15, 25, 50];
+
 export default function EditListingPage() {
   const { activeListing, refresh } = usePortalContext();
   const descriptionGate = useFeatureGate('description_long');
@@ -23,6 +25,9 @@ export default function EditListingPage() {
     subcategories: [] as string[],
     tags: [] as string[],
     video_url: '',
+    is_mobile_service: false,
+    service_area_radius_miles: 25,
+    private_address: '',
   });
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -35,7 +40,7 @@ export default function EditListingPage() {
         phone: activeListing.phone || '',
         website: activeListing.website || '',
         email: activeListing.email || '',
-        address_line1: activeListing.address_line1 || '',
+        address_line1: activeListing.is_mobile_service ? '' : (activeListing.address_line1 || ''),
         city: activeListing.city || '',
         state: activeListing.state || '',
         zip_code: activeListing.zip_code || '',
@@ -43,6 +48,9 @@ export default function EditListingPage() {
         subcategories: activeListing.subcategories || [],
         tags: activeListing.tags || [],
         video_url: (activeListing.metadata?.video_url as string) || '',
+        is_mobile_service: activeListing.is_mobile_service || false,
+        service_area_radius_miles: activeListing.service_area_radius_miles || 25,
+        private_address: activeListing.private_address || '',
       });
     }
   }, [activeListing]);
@@ -55,13 +63,44 @@ export default function EditListingPage() {
     setSaving(true);
     setMessage(null);
 
+    // Build the payload — for mobile businesses, address goes to private_address
+    const payload: Record<string, unknown> = {
+      listing_id: activeListing.id,
+      business_name: form.business_name,
+      description: form.description,
+      phone: form.phone,
+      website: form.website,
+      email: form.email,
+      city: form.city,
+      state: form.state,
+      zip_code: form.zip_code,
+      industry: form.industry,
+      subcategories: form.subcategories,
+      tags: form.tags,
+      video_url: form.video_url,
+      is_mobile_service: form.is_mobile_service,
+    };
+
+    if (form.is_mobile_service) {
+      payload.private_address = form.private_address;
+      payload.address_line1 = ''; // Clear public address for mobile businesses
+      payload.service_area_radius_miles = form.service_area_radius_miles;
+      // Auto-generate service area label
+      const areaLabel = [form.city, form.state].filter(Boolean).join(', ');
+      payload.service_area_label = areaLabel
+        ? `${areaLabel} — ${form.service_area_radius_miles} mile radius`
+        : `${form.service_area_radius_miles} mile service radius`;
+    } else {
+      payload.address_line1 = form.address_line1;
+      payload.private_address = '';
+      payload.service_area_radius_miles = null;
+      payload.service_area_label = null;
+    }
+
     const res = await fetch('/api/portal/listing', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        listing_id: activeListing.id,
-        ...form,
-      }),
+      body: JSON.stringify(payload),
     });
 
     const data = await res.json();
@@ -76,6 +115,7 @@ export default function EditListingPage() {
   };
 
   const descCharLimit = descriptionGate.isAvailable ? null : 140;
+  const inputClass = 'mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:border-gold-500 focus:outline-none focus:ring-1 focus:ring-gold-500';
 
   return (
     <div className="space-y-8">
@@ -108,7 +148,7 @@ export default function EditListingPage() {
             type="text"
             value={form.business_name}
             onChange={(e) => setForm({ ...form, business_name: e.target.value })}
-            className="mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:border-gold-500 focus:outline-none focus:ring-1 focus:ring-gold-500"
+            className={inputClass}
           />
         </div>
 
@@ -137,7 +177,7 @@ export default function EditListingPage() {
                 ? 'Tell visitors about your business...'
                 : 'Short description (140 chars). Upgrade for unlimited.'
             }
-            className="mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:border-gold-500 focus:outline-none focus:ring-1 focus:ring-gold-500"
+            className={inputClass}
           />
         </div>
 
@@ -149,7 +189,7 @@ export default function EditListingPage() {
               type="tel"
               value={form.phone}
               onChange={(e) => setForm({ ...form, phone: e.target.value })}
-              className="mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:border-gold-500 focus:outline-none focus:ring-1 focus:ring-gold-500"
+              className={inputClass}
             />
           </div>
           <div>
@@ -159,7 +199,7 @@ export default function EditListingPage() {
               value={form.website}
               onChange={(e) => setForm({ ...form, website: e.target.value })}
               placeholder="https://..."
-              className="mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:border-gold-500 focus:outline-none focus:ring-1 focus:ring-gold-500"
+              className={inputClass}
             />
           </div>
           <div>
@@ -168,50 +208,163 @@ export default function EditListingPage() {
               type="email"
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:border-gold-500 focus:outline-none focus:ring-1 focus:ring-gold-500"
+              className={inputClass}
             />
           </div>
         </div>
 
-        {/* Address */}
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div className="sm:col-span-3">
-            <label className="block text-sm font-medium text-white/70">Address</label>
-            <input
-              type="text"
-              value={form.address_line1}
-              onChange={(e) => setForm({ ...form, address_line1: e.target.value })}
-              className="mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:border-gold-500 focus:outline-none focus:ring-1 focus:ring-gold-500"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-white/70">City</label>
-            <input
-              type="text"
-              value={form.city}
-              onChange={(e) => setForm({ ...form, city: e.target.value })}
-              className="mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:border-gold-500 focus:outline-none focus:ring-1 focus:ring-gold-500"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-white/70">State</label>
-            <input
-              type="text"
-              value={form.state}
-              onChange={(e) => setForm({ ...form, state: e.target.value })}
-              className="mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:border-gold-500 focus:outline-none focus:ring-1 focus:ring-gold-500"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-white/70">ZIP</label>
-            <input
-              type="text"
-              value={form.zip_code}
-              onChange={(e) => setForm({ ...form, zip_code: e.target.value })}
-              className="mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:border-gold-500 focus:outline-none focus:ring-1 focus:ring-gold-500"
-            />
+        {/* ─── Business Type Toggle ─── */}
+        <div className="rounded-xl border border-white/10 bg-white/5 p-5">
+          <label className="block text-sm font-medium text-white/70 mb-3">
+            Business Type
+          </label>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => setForm({ ...form, is_mobile_service: false })}
+              className={`flex-1 rounded-lg border px-4 py-3 text-sm font-medium transition-all ${
+                !form.is_mobile_service
+                  ? 'border-gold-500 bg-gold-500/10 text-gold-500'
+                  : 'border-white/10 bg-white/5 text-white/50 hover:border-white/20'
+              }`}
+            >
+              <span className="block text-base mb-0.5">🏪</span>
+              Brick & Mortar
+            </button>
+            <button
+              type="button"
+              onClick={() => setForm({ ...form, is_mobile_service: true })}
+              className={`flex-1 rounded-lg border px-4 py-3 text-sm font-medium transition-all ${
+                form.is_mobile_service
+                  ? 'border-gold-500 bg-gold-500/10 text-gold-500'
+                  : 'border-white/10 bg-white/5 text-white/50 hover:border-white/20'
+              }`}
+            >
+              <span className="block text-base mb-0.5">🚐</span>
+              Mobile / Service Area
+            </button>
           </div>
         </div>
+
+        {/* ─── Address Section — changes based on business type ─── */}
+        {form.is_mobile_service ? (
+          <div className="space-y-4">
+            {/* Private Address */}
+            <div>
+              <label className="block text-sm font-medium text-white/70">
+                Private Address <span className="text-white/30">(billing only, not shown publicly)</span>
+              </label>
+              <input
+                type="text"
+                value={form.private_address}
+                onChange={(e) => setForm({ ...form, private_address: e.target.value })}
+                placeholder="Your home or billing address (optional)"
+                className={inputClass}
+              />
+              <p className="mt-1.5 text-xs text-white/30">
+                This address is never displayed on your public listing. It is used for billing and internal records only.
+              </p>
+            </div>
+
+            {/* Service Area City/State/Zip */}
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div>
+                <label className="block text-sm font-medium text-white/70">Service Area City</label>
+                <input
+                  type="text"
+                  value={form.city}
+                  onChange={(e) => setForm({ ...form, city: e.target.value })}
+                  placeholder="Primary city you serve"
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-white/70">State</label>
+                <input
+                  type="text"
+                  value={form.state}
+                  onChange={(e) => setForm({ ...form, state: e.target.value })}
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-white/70">ZIP</label>
+                <input
+                  type="text"
+                  value={form.zip_code}
+                  onChange={(e) => setForm({ ...form, zip_code: e.target.value })}
+                  className={inputClass}
+                />
+              </div>
+            </div>
+
+            {/* Service Area Radius */}
+            <div>
+              <label className="block text-sm font-medium text-white/70 mb-2">
+                Service Area Radius
+              </label>
+              <div className="flex gap-2 flex-wrap">
+                {RADIUS_OPTIONS.map((r) => (
+                  <button
+                    key={r}
+                    type="button"
+                    onClick={() => setForm({ ...form, service_area_radius_miles: r })}
+                    className={`rounded-lg border px-4 py-2 text-sm font-medium transition-all ${
+                      form.service_area_radius_miles === r
+                        ? 'border-gold-500 bg-gold-500/10 text-gold-500'
+                        : 'border-white/10 bg-white/5 text-white/50 hover:border-white/20'
+                    }`}
+                  >
+                    {r} mi
+                  </button>
+                ))}
+              </div>
+              <p className="mt-2 text-xs text-white/30">
+                Your listing will show &quot;Servicing {form.city || 'your city'}{form.state ? `, ${form.state}` : ''} &amp; Surrounding Areas&quot; instead of a street address.
+              </p>
+            </div>
+          </div>
+        ) : (
+          /* Brick & Mortar address fields */
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="sm:col-span-3">
+              <label className="block text-sm font-medium text-white/70">Address</label>
+              <input
+                type="text"
+                value={form.address_line1}
+                onChange={(e) => setForm({ ...form, address_line1: e.target.value })}
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-white/70">City</label>
+              <input
+                type="text"
+                value={form.city}
+                onChange={(e) => setForm({ ...form, city: e.target.value })}
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-white/70">State</label>
+              <input
+                type="text"
+                value={form.state}
+                onChange={(e) => setForm({ ...form, state: e.target.value })}
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-white/70">ZIP</label>
+              <input
+                type="text"
+                value={form.zip_code}
+                onChange={(e) => setForm({ ...form, zip_code: e.target.value })}
+                className={inputClass}
+              />
+            </div>
+          </div>
+        )}
 
         {/* Pro-only: Category & Tags */}
         {descriptionGate.isAvailable ? (
@@ -222,7 +375,7 @@ export default function EditListingPage() {
                 type="text"
                 value={form.industry}
                 onChange={(e) => setForm({ ...form, industry: e.target.value })}
-                className="mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:border-gold-500 focus:outline-none focus:ring-1 focus:ring-gold-500"
+                className={inputClass}
               />
             </div>
             <div>
@@ -237,7 +390,7 @@ export default function EditListingPage() {
                   })
                 }
                 placeholder="Comma-separated tags"
-                className="mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:border-gold-500 focus:outline-none focus:ring-1 focus:ring-gold-500"
+                className={inputClass}
               />
             </div>
           </div>

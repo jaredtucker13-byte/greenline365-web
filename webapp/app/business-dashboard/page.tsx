@@ -34,6 +34,10 @@ interface Listing {
   total_feedback_count: number;
   tags: string[];
   metadata: Record<string, any>;
+  is_mobile_service?: boolean;
+  service_area_radius_miles?: number | null;
+  service_area_display?: string | null;
+  is_public_resource?: boolean;
 }
 
 const TIER_FEATURES: Record<DirectoryTier, { features: string[]; locked: string[] }> = {
@@ -444,13 +448,17 @@ export default function BusinessDashboard() {
                           </a>
                         </div>
                       )}
-                      {activeListing?.city && (
+                      {(activeListing?.city || activeListing?.is_mobile_service) && (
                         <div className="flex items-center gap-2">
                           <svg className="w-4 h-4 text-gold/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
                             <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
                           </svg>
-                          <span className="text-sm text-white/70 font-body">{activeListing.city}, {activeListing.state} {activeListing.zip_code}</span>
+                          <span className="text-sm text-white/70 font-body">
+                            {activeListing.is_mobile_service
+                              ? (activeListing.service_area_display || `${activeListing.city || 'Area'} & Surrounding`)
+                              : `${activeListing.city}, ${activeListing.state} ${activeListing.zip_code}`}
+                          </span>
                         </div>
                       )}
                       {activeListing?.email && (

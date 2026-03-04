@@ -186,7 +186,7 @@ export default function CollapsibleSidebar({
   // Filter nav items using the shared single-source config
   const visibleNavItems = useMemo(() => {
     return filterNavItems(commandCenterNav, {
-      hasFeature,
+      hasFeature: (key: string) => hasFeature(key as Parameters<typeof hasFeature>[0]),
       isAdmin: isAdmin(),
       isWhiteLabel: isWhiteLabel(),
       isPlatformOwner,

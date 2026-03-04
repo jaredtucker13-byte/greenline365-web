@@ -134,7 +134,11 @@ export async function GET(request: NextRequest) {
     .order('trust_score', { ascending: false })
     .limit(limit);
 
-  if (industry && industry !== 'all') query = query.eq('industry', industry);
+  if (industry && industry !== 'all') {
+    query = query.eq('industry', industry);
+    // Exclude public resources (community resources) from category browse
+    query = query.or('is_public_resource.is.null,is_public_resource.eq.false');
+  }
   if (city) query = query.ilike('city', `%${city}%`);
   if (zip) query = query.eq('zip_code', zip);
   if (tier && tier !== 'all') query = query.eq('tier', tier);

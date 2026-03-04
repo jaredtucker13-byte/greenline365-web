@@ -37,6 +37,9 @@ interface Listing {
   directory_badges: { id: string; badge_type: string; badge_label: string; badge_color: string }[];
   distance?: number | null;
   metadata?: Record<string, any>;
+  is_mobile_service?: boolean;
+  service_area_display?: string | null;
+  is_public_resource?: boolean;
 }
 
 // ─── Category & Subcategory Map ────────────────────────────────────
@@ -908,9 +911,9 @@ function ListingCard({ listing: l, index: i }: { listing: Listing; index: number
         </div>
         <div className="p-4">
           <h3 className="font-heading font-semibold text-sm truncate mb-1" style={{ color: '#C9A84C' }} title={l.business_name}>{l.business_name}</h3>
-          {l.city && <p className="text-[11px] text-white/40 flex items-center gap-1 mb-1 font-body">
+          {(l.city || l.is_mobile_service) && <p className="text-[11px] text-white/40 flex items-center gap-1 mb-1 font-body">
             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-            {l.city}, {l.state}
+            {l.is_mobile_service ? (l.service_area_display || `${l.city || 'Area'} & Surrounding`) : `${l.city}, ${l.state}`}
             {l.distance != null && <span style={{ color: 'rgba(201,168,76,0.6)' }} className="ml-1">({l.distance} mi)</span>}
           </p>}
           {l.description && <p className="text-xs text-white/35 line-clamp-2 mb-3 font-body">{l.description}</p>}
@@ -1048,7 +1051,7 @@ function SubcategoryCarouselRow({ label, subtitle, industry, searchTerm, sortBy,
                 </div>
                 <div className="p-3">
                   <h4 className="text-sm font-heading font-semibold truncate" style={{ color: '#C9A84C' }}>{l.business_name}</h4>
-                  <p className="text-[11px] text-white/40 font-body truncate">{l.city}{l.distance != null ? ` · ${l.distance} mi` : ''}</p>
+                  <p className="text-[11px] text-white/40 font-body truncate">{l.is_mobile_service ? (l.service_area_display || l.city || 'Mobile') : l.city}{l.distance != null ? ` · ${l.distance} mi` : ''}</p>
                 </div>
               </div>
             </Link>

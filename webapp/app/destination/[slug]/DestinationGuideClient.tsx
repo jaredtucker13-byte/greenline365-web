@@ -24,6 +24,8 @@ interface Listing {
   tags?: string[];
   metadata?: Record<string, any>;
   directory_badges: { id: string; badge_type: string; badge_label: string; badge_color: string }[];
+  is_mobile_service?: boolean;
+  service_area_display?: string | null;
 }
 
 // ─── Destination Config — Region/State Architecture ───
