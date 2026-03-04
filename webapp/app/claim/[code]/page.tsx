@@ -29,6 +29,12 @@ interface DealInfo {
   expires_at: string;
   status: string;
   business_name?: string;
+  business_city?: string;
+  business_state?: string;
+  business_logo_url?: string;
+  business_address?: string;
+  business_phone?: string;
+  business_slug?: string;
 }
 
 export default function ClaimPage() {
@@ -189,7 +195,27 @@ export default function ClaimPage() {
             </div>
             <h1 className="text-2xl font-bold text-white mb-2">{deal.title}</h1>
             {deal.business_name && (
-              <p className="text-[#C9A84C]">at {deal.business_name}</p>
+              <div className="mt-2">
+                <div className="flex items-center justify-center gap-2">
+                  {deal.business_logo_url ? (
+                    <img
+                      src={deal.business_logo_url}
+                      alt={deal.business_name}
+                      className="h-6 w-6 rounded-full object-cover border border-[#C9A84C]/30"
+                    />
+                  ) : null}
+                  <p className="text-[#C9A84C] font-medium">
+                    at {deal.business_slug ? (
+                      <a href={`/listing/${deal.business_slug}`} className="hover:underline">{deal.business_name}</a>
+                    ) : deal.business_name}
+                  </p>
+                </div>
+                {(deal.business_city || deal.business_state) && (
+                  <p className="text-gray-400 text-sm mt-1">
+                    {[deal.business_address, deal.business_city, deal.business_state].filter(Boolean).join(', ')}
+                  </p>
+                )}
+              </div>
             )}
           </div>
 

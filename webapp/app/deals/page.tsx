@@ -21,6 +21,12 @@ interface BlastDeal {
   status: string;
   listing_id: string | null;
   created_at: string;
+  business_name: string | null;
+  business_slug: string | null;
+  business_city: string | null;
+  business_state: string | null;
+  business_logo_url: string | null;
+  business_industry: string | null;
 }
 
 function timeRemaining(expiresAt: string): string {
@@ -180,6 +186,33 @@ export default function DealsPage() {
                   )}
 
                   <div className="p-6 pt-12">
+                    {/* Business Info */}
+                    {deal.business_name && (
+                      <div className="flex items-center gap-2.5 mb-3">
+                        {deal.business_logo_url ? (
+                          <img
+                            src={deal.business_logo_url}
+                            alt={deal.business_name}
+                            className="h-8 w-8 rounded-full object-cover border border-white/10 flex-shrink-0"
+                          />
+                        ) : (
+                          <div className="h-8 w-8 rounded-full bg-gold-500/20 border border-gold-500/30 flex items-center justify-center flex-shrink-0">
+                            <span className="text-gold-400 text-xs font-bold">
+                              {deal.business_name.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                        )}
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-white truncate">{deal.business_name}</p>
+                          {(deal.business_city || deal.business_state) && (
+                            <p className="text-xs text-white/40 truncate">
+                              {[deal.business_city, deal.business_state].filter(Boolean).join(', ')}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
                     {/* Deal Value */}
                     <div className="text-3xl font-bold text-gold-400 mb-2 group-hover:text-gold-300 transition-colors">
                       {deal.deal_value}

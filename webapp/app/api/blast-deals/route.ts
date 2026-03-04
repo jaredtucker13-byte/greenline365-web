@@ -147,7 +147,6 @@ export async function GET(request: NextRequest) {
     const now = new Date();
     const dealsWithStatus = (data || []).map((deal: any) => {
       if (deal.status === 'active' && new Date(deal.expires_at) < now) {
-        // Auto-expire in response (will update DB via cron)
         return { ...deal, status: 'expired' };
       }
       if (deal.status === 'active' && deal.max_claims && deal.current_claims >= deal.max_claims) {
@@ -156,10 +155,41 @@ export async function GET(request: NextRequest) {
       return deal;
     });
 
+    // Enrich deals with business info from directory_listings
+    const listingIds = [...new Set(dealsWithStatus.map((d: any) => d.listing_id).filter(Boolean))];
+    let listingsMap: Record<string, any> = {};
+
+    if (listingIds.length > 0) {
+      const { data: listings } = await supabase
+        .from('directory_listings')
+        .select('id, business_name, slug, city, state, zip_code, logo_url, phone, address_line1, industry')
+        .in('id', listingIds);
+
+      if (listings) {
+        listingsMap = Object.fromEntries(listings.map((l: any) => [l.id, l]));
+      }
+    }
+
+    const enrichedDeals = dealsWithStatus.map((deal: any) => {
+      const listing = deal.listing_id ? listingsMap[deal.listing_id] : null;
+      return {
+        ...deal,
+        business_name: listing?.business_name || null,
+        business_slug: listing?.slug || null,
+        business_city: listing?.city || null,
+        business_state: listing?.state || null,
+        business_zip_code: listing?.zip_code || null,
+        business_logo_url: listing?.logo_url || null,
+        business_phone: listing?.phone || null,
+        business_address: listing?.address_line1 || null,
+        business_industry: listing?.industry || null,
+      };
+    });
+
     return NextResponse.json({
       success: true,
-      deals: dealsWithStatus,
-      count: dealsWithStatus.length,
+      deals: enrichedDeals,
+      count: enrichedDeals.length,
     });
   } catch (error: any) {
     console.error('List blast deals error:', error);
