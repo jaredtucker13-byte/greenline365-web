@@ -20,6 +20,8 @@ import Link from 'next/link';
 import StyleLibrary from '../components/StyleLibrary';
 import CopyrightTools from '../components/CopyrightTools';
 import AIContentDisclaimer from '../components/AIContentDisclaimer';
+import EnhancedInputBar from '../components/shared/EnhancedInputBar';
+import ExportMenu from '../components/shared/ExportMenu';
 import { 
   CopyButton, 
   ShareButton, 
@@ -2511,54 +2513,27 @@ export default function BlogPolishPage() {
                     </button>
                     
                     {showCustomImageChat && (
-                      <div className="mt-3 p-4 rounded-xl bg-purple-500/5 border border-purple-500/20">
-                        <p className="text-xs text-white/60 mb-3">
-                          Describe the image you want to create. Be as detailed as possible - mention subjects, style, mood, colors, and composition.
-                        </p>
-                        <textarea
+                      <div className="mt-3">
+                        <EnhancedInputBar
                           value={customImagePrompt}
-                          onChange={(e) => setCustomImagePrompt(e.target.value)}
-                          placeholder="E.g., A serene mountain lake at sunset with snow-capped peaks reflected in the water, golden hour lighting, cinematic wide shot..."
-                          className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/30 text-sm resize-none focus:outline-none focus:border-purple-500/50"
-                          rows={3}
+                          onChange={setCustomImagePrompt}
+                          onSubmit={() => generateCustomImage()}
+                          placeholder="Describe the image: subjects, style, mood, colors, composition..."
+                          isLoading={generatingCustomImage}
+                          loadingText="Creating..."
+                          submitLabel="Create Image"
+                          submitIcon={<svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>}
+                          multiline
+                          showStyle
+                          showVoice
+                          styleOptions={[
+                            { value: '16:9', label: 'Landscape 16:9' },
+                            { value: '9:16', label: 'Portrait 9:16' },
+                            { value: '1:1', label: 'Square 1:1' },
+                            { value: '21:9', label: 'Cinematic 21:9' },
+                          ]}
+                          defaultOptions={{ style: customImageRatio }}
                         />
-                        <div className="flex items-center gap-3 mt-3">
-                          <div className="flex-1">
-                            <label className="text-xs text-white/50 mb-1 block">Aspect Ratio</label>
-                            <select
-                              value={customImageRatio}
-                              onChange={(e) => setCustomImageRatio(e.target.value as any)}
-                              className="w-full px-2 py-1.5 rounded-lg bg-white/10 border border-white/20 text-white text-xs"
-                            >
-                              <option value="16:9">Landscape (16:9)</option>
-                              <option value="9:16">Portrait (9:16)</option>
-                              <option value="1:1">Square (1:1)</option>
-                              <option value="21:9">Cinematic (21:9)</option>
-                            </select>
-                          </div>
-                          <button
-                            onClick={generateCustomImage}
-                            disabled={generatingCustomImage || !customImagePrompt.trim()}
-                            className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-semibold hover:opacity-90 transition disabled:opacity-50 flex items-center gap-2"
-                          >
-                            {generatingCustomImage ? (
-                              <>
-                                <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                                </svg>
-                                Creating...
-                              </>
-                            ) : (
-                              <>
-                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                                </svg>
-                                Create Image
-                              </>
-                            )}
-                          </button>
-                        </div>
                         
                         {/* Custom Generated Images */}
                         {customGeneratedImages.length > 0 && (
@@ -2572,10 +2547,22 @@ export default function BlogPolishPage() {
                                     className="aspect-video w-full rounded-lg overflow-hidden border border-white/10 hover:border-purple-500/50 transition"
                                   >
                                     <img src={img.url} alt="Custom generated" className="w-full h-full object-cover" />
-                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                                      <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
+                                      <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
                                       </svg>
+                                      <ExportMenu
+                                        imageUrl={img.url}
+                                        title={`Blog Image - ${post.title || 'Custom'}`}
+                                        filenamePrefix="blog_image"
+                                        formats={['pdf', 'png', 'jpg', 'clipboard']}
+                                        variant="icon"
+                                        align="left"
+                                        pdfMeta={{
+                                          subtitle: post.title || 'Custom Blog Image',
+                                          description: customImagePrompt,
+                                        }}
+                                      />
                                     </div>
                                   </button>
                                   <div className="mt-1 flex gap-1">
@@ -3501,20 +3488,17 @@ export default function BlogPolishPage() {
                   </svg>
                   Open Full Size
                 </button>
-                <button
-                  onClick={() => {
-                    const a = document.createElement('a');
-                    a.href = previewImage.url;
-                    a.download = `image-${previewImage.id}.png`;
-                    a.click();
+                <ExportMenu
+                  imageUrl={previewImage.url}
+                  title={`Blog Image - ${post.title || 'Generated'}`}
+                  filenamePrefix={`blog_image_${previewImage.id}`}
+                  formats={['pdf', 'png', 'jpg', 'webp', 'clipboard', 'print']}
+                  variant="button"
+                  pdfMeta={{
+                    subtitle: post.title || 'Blog Image',
+                    description: `Generated image for blog post`,
                   }}
-                  className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition flex items-center gap-2"
-                >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                  </svg>
-                  Download
-                </button>
+                />
                 <select
                   value={selectedLayout}
                   onChange={(e) => setSelectedLayout(e.target.value as any)}

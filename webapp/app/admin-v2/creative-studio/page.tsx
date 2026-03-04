@@ -19,7 +19,8 @@ import { useBusiness } from '@/lib/business';
 import { useCostTracking } from '@/lib/cost-tracking';
 import CollapsibleSidebar from '../components/CollapsibleSidebar';
 import TacticalHeader from '../components/TacticalHeader';
-import { 
+import ExportMenu from '../components/shared/ExportMenu';
+import {
   Upload, Sparkles, Users, Image, Download, Share2, Folder,
   Plus, Camera, Wand2, Eye, ChevronRight, X, Check, Loader2,
   RefreshCw, Trash2, Star, Grid, List, ArrowRight, Link, ExternalLink
@@ -943,14 +944,18 @@ export default function CreativeStudioPage() {
                       <p className="text-white/50">{generatedMockups.length} mockups generated</p>
                     </div>
                     <div className="flex gap-2">
-                      <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20">
-                        <Download className="w-4 h-4" />
-                        Download All
-                      </button>
-                      <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-500 text-white hover:bg-purple-600">
-                        <Share2 className="w-4 h-4" />
-                        Export to Social
-                      </button>
+                      {generatedMockups.length > 0 && (
+                        <ExportMenu
+                          imageUrl={generatedMockups[0]?.url}
+                          title="Creative Studio Mockup"
+                          filenamePrefix="mockup"
+                          formats={['pdf', 'png', 'jpg', 'webp', 'clipboard', 'print']}
+                          pdfMeta={{
+                            subtitle: `${generatedMockups.length} mockups generated`,
+                            description: 'Product mockup generated with ArtfulPhusion Creative Studio',
+                          }}
+                        />
+                      )}
                     </div>
                   </div>
 
@@ -977,17 +982,25 @@ export default function CreativeStudioPage() {
                             <p className="text-xs text-white/70 capitalize">{mockup.scene.replace(/_/g, ' ')}</p>
                           </div>
                           <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
-                            <a 
-                              href={mockup.url} 
-                              target="_blank" 
+                            <a
+                              href={mockup.url}
+                              target="_blank"
                               rel="noopener noreferrer"
                               className="p-2 rounded-lg bg-white/20 hover:bg-white/30"
                             >
                               <ExternalLink className="w-5 h-5 text-white" />
                             </a>
-                            <button className="p-2 rounded-lg bg-white/20 hover:bg-white/30">
-                              <Download className="w-5 h-5 text-white" />
-                            </button>
+                            <ExportMenu
+                              imageUrl={mockup.url}
+                              title={`Mockup - ${mockup.scene.replace(/_/g, ' ')}`}
+                              filenamePrefix={`mockup_${mockup.scene}`}
+                              formats={['pdf', 'png', 'jpg', 'clipboard']}
+                              variant="icon"
+                              pdfMeta={{
+                                subtitle: mockup.scene.replace(/_/g, ' '),
+                                description: 'Product mockup generated with ArtfulPhusion Creative Studio',
+                              }}
+                            />
                             <button className="p-2 rounded-lg bg-white/20 hover:bg-white/30">
                               <Star className="w-5 h-5 text-white" />
                             </button>
@@ -1248,17 +1261,25 @@ export default function CreativeStudioPage() {
                           <div key={mockup.id || i} className="aspect-square rounded-lg overflow-hidden bg-white/10 relative group">
                             <img src={mockup.image_url} alt={`Mockup ${i + 1}`} className="w-full h-full object-cover" />
                             <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
-                              <a 
-                                href={mockup.image_url} 
-                                target="_blank" 
+                              <a
+                                href={mockup.image_url}
+                                target="_blank"
                                 rel="noopener noreferrer"
                                 className="p-2 rounded-lg bg-white/20 hover:bg-white/30"
                               >
                                 <ExternalLink className="w-4 h-4 text-white" />
                               </a>
-                              <button className="p-2 rounded-lg bg-white/20 hover:bg-white/30">
-                                <Download className="w-4 h-4 text-white" />
-                              </button>
+                              <ExportMenu
+                                imageUrl={mockup.image_url}
+                                title={`Product Mockup ${i + 1}`}
+                                filenamePrefix={`product_mockup_${selectedProduct.name}`}
+                                formats={['pdf', 'png', 'jpg', 'clipboard']}
+                                variant="icon"
+                                pdfMeta={{
+                                  subtitle: selectedProduct.name,
+                                  description: selectedProduct.description,
+                                }}
+                              />
                             </div>
                           </div>
                         ))}
