@@ -117,7 +117,6 @@ async function getWeatherAlerts(lat: number, lon: number): Promise<any[]> {
       return data.alerts || [];
     }
   } catch (error) {
-    console.log('[Weather] Alerts not available');
   }
   
   return [];

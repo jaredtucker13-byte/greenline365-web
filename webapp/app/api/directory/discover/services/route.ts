@@ -37,7 +37,6 @@ export async function POST(request: NextRequest) {
   const supabase = getServiceClient();
 
   // Stage 1: Discover via Perplexity
-  console.log(`[Discover Services] Finding ${limit} ${service_type} in ${city}...`);
 
   const discoverPrompt = `Find exactly ${limit} real, currently operating ${searchTerms} businesses in ${city}, Florida.
 
@@ -82,7 +81,6 @@ Focus on local, independently owned businesses (NOT national chains). Include a 
     return NextResponse.json({ error: 'Failed to parse discovery results' }, { status: 500 });
   }
 
-  console.log(`[Discover Services] Found ${businesses.length} businesses`);
 
   const results: any[] = [];
 

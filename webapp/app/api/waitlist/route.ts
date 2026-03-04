@@ -60,7 +60,6 @@ export async function POST(request: NextRequest) {
     }
 
     const normalizedEmail = email.toLowerCase().trim();
-    console.log('[Waitlist] Processing signup for:', normalizedEmail);
 
     // Create Supabase client
     const supabase = await createClient();
@@ -116,7 +115,6 @@ export async function POST(request: NextRequest) {
     // Send verification email with BOTH magic link and code
     const verificationUrl = `${SITE_URL}/verify-email/${token}`;
     
-    console.log('[Waitlist] Sending verification email to:', normalizedEmail);
     
     const emailResult = await sendEmail({
       to: normalizedEmail,
@@ -134,7 +132,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('[Waitlist] Verification email sent successfully to:', normalizedEmail);
 
     return NextResponse.json(
       { 

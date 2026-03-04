@@ -410,12 +410,10 @@ export async function POST(request: NextRequest) {
 
   for (const cat of categoriesToSearch) {
     const catInfo = TOURISM_CATEGORIES[cat];
-    console.log(`[Discover] Searching ${catInfo.label} in ${DESTINATIONS[destination].label}...`);
 
     // Stage 1: Perplexity discovery
     const discovered = await discoverBusinesses(destination, cat, Math.min(limit, 10));
     totalDiscovered += discovered.length;
-    console.log(`[Discover] Found ${discovered.length} businesses via Perplexity`);
 
     const categoryResults: any[] = [];
 

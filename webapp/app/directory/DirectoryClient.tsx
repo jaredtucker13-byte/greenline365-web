@@ -37,6 +37,8 @@ interface Listing {
   directory_badges: { id: string; badge_type: string; badge_label: string; badge_color: string }[];
   distance?: number | null;
   metadata?: Record<string, any>;
+  is_mobile_business?: boolean;
+  service_radius_miles?: number | null;
 }
 
 // ─── Category & Subcategory Map ────────────────────────────────────
@@ -68,41 +70,13 @@ const CATEGORIES = [
   { id: 'automotive', label: 'Automotive', sub: 'Repairs, dealers & body shops', img: '/images/categories/services.png',
     subcategories: ['All', 'Auto Repair', 'Oil Change', 'Tire Shops', 'Body Shops', 'Car Dealers', 'Auto Parts', 'Towing', 'Car Wash', 'Auto Detailing', 'EV Charging'] },
 
-  // === MARINE & OUTDOOR (Key West / Coastal Florida) ===
-  { id: 'marine-outdoor', label: 'Marine & Outdoor', sub: 'Boats, docks & outdoor adventure', img: '/images/categories/destinations.png',
+  // === MARINE & DOCK SERVICES (Coastal Florida) ===
+  { id: 'marine-outdoor', label: 'Marine & Dock Services', sub: 'Boat repair, docks & marine mechanics', img: '/images/categories/destinations.png',
     subcategories: ['All', 'Boat Repair', 'Marine Mechanics', 'Dock & Lift', 'Boat Cleaning', 'Fishing Charters', 'Kayak & Paddleboard', 'Dive Shops', 'Marinas'] },
-
-  // === DINING ===
-  { id: 'dining', label: 'Dining', sub: 'Cafes, casual & fine dining', img: '/images/categories/dining.png',
-    subcategories: ['All', 'Fine Dining', 'Casual', 'Cafes & Bakeries', 'Food Trucks', 'Seafood', 'BBQ', 'Pizza', 'Mexican', 'Asian', 'Italian', 'Breakfast & Brunch', 'Vegan & Vegetarian'] },
 
   // === HEALTH & WELLNESS ===
   { id: 'health-wellness', label: 'Health & Wellness', sub: 'Doctors, dentists, fitness & more', img: '/images/categories/health-wellness.png',
     subcategories: ['All', 'Dental Offices', 'Physical Therapy', 'Medical Clinics', 'Mental Health', 'Fitness', 'Chiropractors', 'Optometrists', 'Urgent Care', 'Pharmacies', 'Dermatology', 'Orthopedics'] },
-
-  // === STYLE & SHOPPING ===
-  { id: 'style-shopping', label: 'Style & Shopping', sub: 'Fashion, grooming & retail', img: '/images/categories/style-shopping.png',
-    subcategories: ['All', 'Barbershops', 'Salons', 'Nail Salons', 'Spas', 'Boutiques', 'Jewelry', 'Tattoo & Piercing', 'Dry Cleaning & Laundry'] },
-
-  // === NIGHTLIFE ===
-  { id: 'nightlife', label: 'Nightlife', sub: 'Bars, lounges & live music', img: '/images/categories/nightlife.png',
-    subcategories: ['All', 'Cocktail Bars', 'Sports Bars', 'Live Music', 'Clubs', 'Breweries', 'Wine Bars', 'Hookah Lounges', 'Karaoke'] },
-
-  // === CONVENIENCE & GROCERY (non-claimable) ===
-  { id: 'convenience-grocery', label: 'Convenience & Grocery', sub: 'Publix, Walmart, gas stations & more', img: '/images/categories/services.png',
-    subcategories: ['All', 'Grocery Stores', 'Convenience Stores', 'Gas Stations', 'Supermarkets', 'Specialty Foods', 'Liquor Stores', 'Farmers Markets'] },
-
-  // === EMERGENCY SERVICES (non-claimable) ===
-  { id: 'emergency-services', label: 'Emergency Services', sub: 'Fire, police, hospitals & urgent care', img: '/images/categories/health-wellness.png',
-    subcategories: ['All', 'Fire Stations', 'Police Stations', 'Hospitals', 'Emergency Rooms', 'Poison Control', 'Crisis Centers'] },
-
-  // === FAMILY ENTERTAINMENT ===
-  { id: 'family-entertainment', label: 'Family Entertainment', sub: 'Fun for all ages', img: '/images/categories/family-entertainment.png',
-    subcategories: ['All', 'Theme Parks', 'Arcades', 'Mini Golf', 'Bowling', 'Water Parks', 'Zoos & Aquariums', 'Trampoline Parks', 'Escape Rooms'] },
-
-  // === HOTELS & LODGING ===
-  { id: 'hotels-lodging', label: 'Hotels & Lodging', sub: 'Where to stay', img: '/images/categories/destinations.png',
-    subcategories: ['All', 'Hotels', 'Resorts', 'Vacation Rentals', 'Boutique Hotels', 'B&Bs', 'Hostels', 'RV Parks'] },
 
   // === PROFESSIONAL SERVICES ===
   { id: 'professional-services', label: 'Professional Services', sub: 'Legal, finance & consulting', img: '/images/categories/services.png',
@@ -115,6 +89,10 @@ const CATEGORIES = [
   // === PETS ===
   { id: 'pets', label: 'Pets', sub: 'Vets, grooming & boarding', img: '/images/categories/services.png',
     subcategories: ['All', 'Veterinarians', 'Pet Grooming', 'Pet Boarding', 'Pet Stores', 'Dog Training', 'Pet Sitting', 'Aquarium & Fish'] },
+
+  // === MOBILE SERVICES ===
+  { id: 'mobile-services', label: 'Mobile Services', sub: 'Detailing, mechanics, grooming & more — they come to you', img: '/images/categories/services.png',
+    subcategories: ['All', 'Mobile Detailing', 'Mobile Mechanics', 'Mobile Pet Grooming', 'Mobile Car Wash', 'Mobile Notary', 'Mobile IV Therapy', 'Mobile Barber', 'Mobile Nail Tech'] },
 ];
 
 function Stars({ rating, size = 14 }: { rating: number; size?: number }) {
@@ -641,42 +619,6 @@ export default function DirectoryClient() {
           </section>
 
           {/* ═══════════════════════════════════════════════════════════
-              PRIVATE VAULT CTA — Home Ledger Cross-Sell
-              ═══════════════════════════════════════════════════════════ */}
-          <section className="py-20 relative overflow-hidden" data-testid="private-vault-section">
-            {/* Circuit board background pattern */}
-            <div className="absolute inset-0 circuit-bg opacity-30" />
-            <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(201,168,76,0.04) 0%, transparent 60%)' }} />
-
-            <div className="relative max-w-5xl mx-auto px-6 text-center">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border mb-8" style={{ borderColor: 'rgba(201,168,76,0.3)', background: 'rgba(201,168,76,0.05)' }}>
-                <svg className="w-4 h-4" style={{ color: '#C9A84C' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-                </svg>
-                <span className="text-xs font-body uppercase tracking-widest" style={{ color: '#C9A84C' }}>Private Vault</span>
-              </div>
-
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-light text-white tracking-tight mb-4">
-                Your Home&apos;s Heritage.<br />
-                <span className="text-gradient-gold font-semibold">Documented.</span>
-              </h2>
-              <p className="text-white/50 max-w-2xl mx-auto mb-10 font-body leading-relaxed">
-                The GL365 Home Ledger — a military-grade encrypted property file for every home you own or manage. Documents, contractors, warranties, incidents — all in one place.
-              </p>
-
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link href="/home-ledger" className="btn-primary px-8 py-3 rounded-full text-sm inline-block" data-testid="vault-cta">
-                  Learn More
-                </Link>
-                <div className="flex items-center gap-2 text-xs text-white/35 font-body">
-                  <svg className="w-3.5 h-3.5" style={{ color: '#C9A84C' }} fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L3 7v10l9 5 9-5V7l-9-5z" /></svg>
-                  AES-256 Encrypted
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* ═══════════════════════════════════════════════════════════
               VALUE PROPOSITION — Why GreenLine365
               ═══════════════════════════════════════════════════════════ */}
           <section className="py-20" style={{ background: '#0A0A0A' }} data-testid="value-prop-section">
@@ -723,7 +665,7 @@ export default function DirectoryClient() {
                 <span className="text-gradient-gold font-semibold">Voted Best</span> — Powered by You
               </h2>
               <p className="text-white/40 max-w-xl mx-auto mb-8 font-body text-sm leading-relaxed">
-                Soon you&apos;ll be able to vote for your favorite businesses in every category and region. &quot;Voted Best Plumber in St. Pete,&quot; &quot;Top Restaurant in Ybor City&quot; — real rankings from real people.
+                Soon you&apos;ll be able to vote for your favorite businesses in every category and region. &quot;Best Beach Bar in St. Pete,&quot; &quot;Top Hotel in Key West&quot; — real rankings from real people.
               </p>
               <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border" style={{ borderColor: 'rgba(201,168,76,0.2)', background: 'rgba(201,168,76,0.04)' }}>
                 <svg className="w-4 h-4" style={{ color: '#C9A84C' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -880,9 +822,24 @@ export default function DirectoryClient() {
   );
 }
 
+// ─── "We Come to You" Mobile Badge ────────────────────────────────
+function MobileBadge({ radius }: { radius?: number | null }) {
+  return (
+    <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-heading font-semibold uppercase tracking-wider"
+      style={{ background: 'linear-gradient(135deg, #10B981, #059669)', color: '#fff' }}
+      data-testid="mobile-badge">
+      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+      </svg>
+      We Come to You{radius ? ` · ${radius}mi` : ''}
+    </span>
+  );
+}
+
 // ─── Listing Card ──────────────────────────────────────────────────
 function ListingCard({ listing: l, index: i }: { listing: Listing; index: number }) {
   const hasIntel = l.has_property_intelligence;
+  const isMobile = l.is_mobile_business || l.industry === 'mobile-services';
   return (
     <Link href={`/listing/${l.slug}`}>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
@@ -904,6 +861,11 @@ function ListingCard({ listing: l, index: i }: { listing: Listing; index: number
               style={{ background: l.tier === 'premium' ? 'linear-gradient(135deg, #C9A84C, #E8C97A)' : 'linear-gradient(135deg, #A8A9AD, #C0C0C0)' }}>
               {l.tier === 'premium' ? 'Premier' : 'Pro'}
             </span>
+          )}
+          {isMobile && (
+            <div className="absolute bottom-3 left-3">
+              <MobileBadge radius={l.service_radius_miles} />
+            </div>
           )}
         </div>
         <div className="p-4">

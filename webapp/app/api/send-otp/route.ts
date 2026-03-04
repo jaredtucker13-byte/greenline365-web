@@ -101,7 +101,6 @@ export async function POST(request: NextRequest) {
         console.error('N8N webhook error:', await webhookResponse.text());
         // Don't fail the request - OTP is stored, just log the webhook issue
       } else {
-        console.log('OTP sent to N8N webhook successfully');
       }
     } catch (webhookError) {
       console.error('Failed to call N8N webhook:', webhookError);

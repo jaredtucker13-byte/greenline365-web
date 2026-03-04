@@ -115,7 +115,6 @@ Return ONLY a valid JSON array with this exact format, no other text:
       }
     } catch (parseError) {
       console.error('[Trending] JSON parse error:', parseError);
-      console.log('[Trending] Raw content:', content.slice(0, 500));
       // Return raw content if parsing fails
       return NextResponse.json({
         success: true,

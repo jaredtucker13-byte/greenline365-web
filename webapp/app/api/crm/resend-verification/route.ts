@@ -52,7 +52,6 @@ export async function POST(request: NextRequest) {
       skipped: 0,
     };
 
-    console.log('[Resend] Starting verification resend job at', now.toISOString());
 
     // Find leads eligible for resend:
     // - status = 'unverified' or 'new'
@@ -75,7 +74,6 @@ export async function POST(request: NextRequest) {
     }
 
     if (!leads || leads.length === 0) {
-      console.log('[Resend] No leads eligible for resend');
       return NextResponse.json({ 
         success: true, 
         message: 'No leads to process',
@@ -144,7 +142,6 @@ export async function POST(request: NextRequest) {
 
       if (emailResult.success) {
         results.sent++;
-        console.log(`[Resend] Sent to ${lead.email} (attempt ${(lead.verification_attempts || 0) + 1})`);
         
         // Log activity
         await supabase.from('crm_lead_activities').insert({
@@ -172,7 +169,6 @@ export async function POST(request: NextRequest) {
       await new Promise(resolve => setTimeout(resolve, 100));
     }
 
-    console.log('[Resend] Job completed:', results);
 
     return NextResponse.json({
       success: true,

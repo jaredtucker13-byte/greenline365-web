@@ -375,14 +375,11 @@ async function generateImages(body: GenerateRequest) {
   const generateCount = Math.min(count, 2); // Always generate 2 images
   const imageSize = getAspectRatioSize(aspectRatio);
 
-  console.log('[Blog Images] Generating', generateCount, 'images using Nano Banana Pro...');
-  console.log('[Blog Images] Aspect ratio:', aspectRatio, '→', imageSize);
 
   // RETRY LOGIC: Both images must succeed, up to 3 attempts
   const MAX_ATTEMPTS = 3;
   
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-    console.log(`[Blog Images] Attempt ${attempt}/${MAX_ATTEMPTS}...`);
     
     const results = await generateImageBatch(finalPrompt, generateCount, imageSize, apiKey, attempt);
     
@@ -406,7 +403,6 @@ async function generateImages(body: GenerateRequest) {
     }
     
     // If we're here, at least one image failed - discard all and retry
-    console.log(`[Blog Images] Attempt ${attempt} failed (${successfulImages.length}/${generateCount} succeeded). Discarding and retrying...`);
     
     if (attempt === MAX_ATTEMPTS) {
       return NextResponse.json({
@@ -456,7 +452,6 @@ async function generateImageBatch(
       });
 
       const data = await response.json();
-      console.log(`[Blog Images] Kie.ai createTask response (attempt ${attemptNum}, image ${index + 1}):`, JSON.stringify(data).slice(0, 300));
 
       if (!response.ok || data.code !== 200) {
         console.error(`[Blog Images] Kie.ai error for image ${index + 1}:`, data.msg || data);
@@ -470,7 +465,6 @@ async function generateImageBatch(
       }
 
       // Poll for result (max 90 seconds)
-      console.log(`[Blog Images] Polling for task ${taskId}...`);
       for (let pollAttempt = 0; pollAttempt < 45; pollAttempt++) {
         await new Promise(resolve => setTimeout(resolve, 2000));
         
@@ -490,7 +484,6 @@ async function generateImageBatch(
               const imageUrl = resultJson.resultUrls?.[0] || resultJson.images?.[0];
               
               if (imageUrl) {
-                console.log(`[Blog Images] Generated image ${index + 1} successfully`);
                 return {
                   id: `img-${Date.now()}-${attemptNum}-${index}`,
                   url: imageUrl,
@@ -508,7 +501,6 @@ async function generateImageBatch(
         }
       }
       
-      console.log(`[Blog Images] Timeout waiting for task ${taskId}`);
       return null;
 
     } catch (error) {
@@ -531,7 +523,6 @@ async function generateImageBatch(
 }
 
 async function generateChartWithGPT(prompt: string, aspectRatio: string) {
-  console.log('[Blog Images] Generating chart/infographic with GPT-5.2...');
   
   const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
@@ -623,9 +614,6 @@ async function generateCustomImage(body: GenerateCustomRequest) {
   }
   const imageSize = getAspectRatioSize(aspectRatio);
 
-  console.log('[Blog Images] Generating custom image from user prompt...');
-  console.log('[Blog Images] User prompt:', userPrompt.slice(0, 100));
-  console.log('[Blog Images] Aspect ratio:', aspectRatio);
 
   // Generate single custom image with retry logic
   const MAX_ATTEMPTS = 3;

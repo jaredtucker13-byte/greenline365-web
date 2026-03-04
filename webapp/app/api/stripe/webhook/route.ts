@@ -77,7 +77,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Webhook signature verification failed' }, { status: 400 });
   }
 
-  console.log(`[STRIPE WEBHOOK] ${event.type} (${event.id})`);
 
   // ── 2. Idempotency — skip if this event ID was already processed ──
   const { data: existing } = await supabase
@@ -87,7 +86,6 @@ export async function POST(request: NextRequest) {
     .maybeSingle();
 
   if (existing) {
-    console.log(`[STRIPE WEBHOOK] Duplicate, skipping: ${event.id}`);
     return NextResponse.json({ received: true, status: 'duplicate' });
   }
 
@@ -144,7 +142,6 @@ export async function POST(request: NextRequest) {
           // Bust feature cache for this account
           if (userId) bustFeatureCache(userId, listingId);
 
-          console.log(`[STRIPE] Subscription activated: ${tier} for listing ${listingId}`);
         }
 
         // Update payment transaction with customer info
@@ -179,7 +176,6 @@ export async function POST(request: NextRequest) {
         const newTier = subscription.metadata?.tier;
         const status = subscription.status;
 
-        console.log(`[STRIPE] Subscription updated: status=${status}, tier=${newTier}, listing=${listingId}`);
 
         // Sync subscriptions table
         await supabase.from('subscriptions').update({
@@ -234,7 +230,6 @@ export async function POST(request: NextRequest) {
             stripe_subscription_id: null,
           }).eq('id', listingId);
 
-          console.log(`[STRIPE] Subscription cancelled for listing ${listingId}`);
         }
 
         // Bust feature cache
@@ -247,7 +242,6 @@ export async function POST(request: NextRequest) {
       case 'invoice.payment_succeeded': {
         const invoice = event.data.object as Stripe.Invoice;
         const subscriptionId = (invoice as any).subscription as string;
-        console.log(`[STRIPE] Invoice paid: $${(invoice.amount_paid || 0) / 100} for subscription ${subscriptionId}`);
 
         if (subscriptionId) {
           // Confirm subscription is active
@@ -307,7 +301,6 @@ export async function POST(request: NextRequest) {
           billing_status: 'paused',
         }).eq('stripe_subscription_id', subscription.id);
 
-        console.log(`[STRIPE] Subscription paused for listing ${listingId}`);
 
         // Bust feature cache
         const account = await findAccountForStripeSubscription(supabase, subscription.id);
@@ -331,7 +324,6 @@ export async function POST(request: NextRequest) {
           billing_status: 'active',
         }).eq('stripe_subscription_id', subscription.id);
 
-        console.log(`[STRIPE] Subscription resumed for listing ${listingId}`);
 
         // Bust feature cache
         const account = await findAccountForStripeSubscription(supabase, subscription.id);
@@ -341,7 +333,6 @@ export async function POST(request: NextRequest) {
       }
 
       default:
-        console.log(`[STRIPE] Unhandled event type: ${event.type}`);
         processingStatus = 'skipped';
     }
   } catch (err: any) {

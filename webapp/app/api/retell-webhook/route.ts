@@ -35,7 +35,6 @@ export async function POST(request: NextRequest) {
   try {
     const event: RetellWebhookEvent = await request.json();
     
-    console.log('Retell webhook received:', event.event, event.call?.call_id);
     
     const { call } = event;
     

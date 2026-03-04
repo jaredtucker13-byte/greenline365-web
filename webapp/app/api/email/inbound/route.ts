@@ -82,7 +82,6 @@ async function sendListingLiveEmail(to: string, businessName: string, slug: stri
     }),
   });
 
-  console.log(`[EMAIL2] Sent "listing live" email to ${to}`);
 }
 
 // POST /api/email/inbound - Enhanced with AI correction parsing
@@ -119,7 +118,6 @@ export async function POST(request: NextRequest) {
   const emailMatch = from.match(/<([^>]+)>/) || [null, from];
   const senderEmail = (emailMatch[1] || from).toLowerCase().trim();
 
-  console.log(`[INBOUND] From: "${senderEmail}" | Subject: "${subject}"`);
 
   if (!senderEmail || !senderEmail.includes('@')) {
     return NextResponse.json({ received: true }, { status: 200 });
@@ -149,7 +147,6 @@ export async function POST(request: NextRequest) {
       .update({ is_published: false, updated_at: new Date().toISOString() })
       .or(`email.eq.${senderEmail},website.ilike.%${domain}%`);
     
-    console.log(`[INBOUND] STOP received from ${senderEmail} — unsubscribed`);
     return NextResponse.json({ received: true, action: 'unsubscribed' });
   }
 
@@ -164,7 +161,6 @@ export async function POST(request: NextRequest) {
   if (listing && text) {
     // AI parses the reply for corrections
     const parsed = await parseCorrections(text, listing);
-    console.log(`[INBOUND] AI parsed: confirmed=${parsed.confirmed}, corrections=${JSON.stringify(parsed.corrections)}`);
 
     // Apply corrections to listing
     const updates: Record<string, any> = { updated_at: new Date().toISOString() };
@@ -182,7 +178,6 @@ export async function POST(request: NextRequest) {
     }
 
     await supabase.from('directory_listings').update(updates).eq('id', listing.id);
-    console.log(`[INBOUND] Listing "${listing.business_name}" updated with`, Object.keys(updates));
 
     // Send Email 2 — listing link
     const replyEmail = listing.email || senderEmail;
@@ -199,7 +194,6 @@ export async function POST(request: NextRequest) {
       last_contact_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     }).eq('id', lead.id);
-    console.log(`[INBOUND] CRM lead "${lead.name}" → verified`);
   }
 
   return NextResponse.json({ received: true, lead_found: !!lead, listing_found: !!listing });

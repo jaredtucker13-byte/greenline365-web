@@ -24,6 +24,8 @@ interface Listing {
   tags?: string[];
   metadata?: Record<string, any>;
   directory_badges: { id: string; badge_type: string; badge_label: string; badge_color: string }[];
+  is_mobile_business?: boolean;
+  service_radius_miles?: number | null;
 }
 
 // ─── Destination Config — Region/State Architecture ───
@@ -47,6 +49,18 @@ const DESTINATIONS: Record<string, {
   'jacksonville':   { label: 'Jacksonville',     tagline: 'Gridiron Grit & Riverfront Views',    state: 'Florida', stateAbbr: 'FL', region: 'North FL',     lat: 30.3322, lng: -81.6557 },
 };
 
+// Hero background images per destination (placeholder Unsplash photos)
+const DESTINATION_HERO_IMAGES: Record<string, string> = {
+  'st-pete-beach':  'https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=1920&q=80&auto=format',
+  'key-west':       'https://images.unsplash.com/photo-1580548834828-36c1c0a3d787?w=1920&q=80&auto=format',
+  'sarasota':       'https://images.unsplash.com/photo-1568572933382-74d440642117?w=1920&q=80&auto=format',
+  'ybor-city':      'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1920&q=80&auto=format',
+  'daytona':        'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&q=80&auto=format',
+  'orlando':        'https://images.unsplash.com/photo-1575089976121-8ed7b2a54265?w=1920&q=80&auto=format',
+  'miami':          'https://images.unsplash.com/photo-1533106418989-88406c7cc8ca?w=1920&q=80&auto=format',
+  'jacksonville':   'https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=1920&q=80&auto=format',
+};
+
 // ─── Tourism Sections ───
 const SECTIONS = [
   { id: 'stay',               label: 'Stay',                 icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
@@ -63,7 +77,6 @@ const SECTIONS = [
 
 // ─── Industry Categories (same as main directory) ───
 const INDUSTRY_LABELS: Record<string, string> = {
-  'services': 'Services',
   'dining': 'Dining',
   'health-wellness': 'Health & Wellness',
   'style-shopping': 'Style & Shopping',
@@ -72,6 +85,11 @@ const INDUSTRY_LABELS: Record<string, string> = {
   'destinations': 'Destinations',
   'hotels-lodging': 'Hotels & Lodging',
   'professional-services': 'Professional Services',
+  'automotive': 'Automotive',
+  'marine-outdoor': 'Marine & Dock Services',
+  'education': 'Education & Childcare',
+  'pets': 'Pets',
+  'mobile-services': 'Mobile Services',
 };
 
 const INDUSTRY_ICONS: Record<string, string> = {
@@ -226,10 +244,21 @@ export default function DestinationGuideClient({ slug }: { slug: string }) {
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] pt-20" data-testid="destination-guide">
-      {/* ─── Cinematic Hero ─── */}
+      {/* ─── Cinematic Hero with Background Image ─── */}
       <section className="relative overflow-hidden" style={{ minHeight: '60vh' }} data-testid="destination-hero">
-        {/* Depth gradient layers */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0A] via-[#111111] to-[#0A0A0A]" />
+        {/* Hero background image */}
+        {DESTINATION_HERO_IMAGES[slug] && (
+          <div className="absolute inset-0">
+            <img
+              src={DESTINATION_HERO_IMAGES[slug]}
+              alt={`${dest.label} skyline`}
+              className="w-full h-full object-cover"
+              loading="eager"
+            />
+          </div>
+        )}
+        {/* Dark overlay for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0A]/70 via-[#0A0A0A]/60 to-[#0A0A0A]" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#0A0A0A]/80 via-transparent to-[#0A0A0A]/80" />
 
         {/* Gold light trails */}
@@ -271,29 +300,39 @@ export default function DestinationGuideClient({ slug }: { slug: string }) {
             {dest.tagline}
           </motion.p>
 
-          {/* Stats Row */}
+          {/* Stats Row — hide any stat that is zero */}
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
             className="flex flex-wrap items-center gap-6">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-heading font-semibold text-[#C9A84C]" data-testid="destination-count">
-                {loading ? '—' : allCount}
-              </span>
-              <span className="text-sm text-white/30 font-body">businesses</span>
-            </div>
-            <span className="w-1 h-1 rounded-full bg-white/10" />
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-heading font-semibold text-white/70">
-                {loading ? '—' : activeIndustries.length}
-              </span>
-              <span className="text-sm text-white/30 font-body">categories</span>
-            </div>
-            <span className="w-1 h-1 rounded-full bg-white/10" />
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-heading font-semibold text-white/70">
-                {loading ? '—' : claimedCount}
-              </span>
-              <span className="text-sm text-white/30 font-body">verified</span>
-            </div>
+            {!loading && allCount > 0 && (
+              <div className="flex items-center gap-2">
+                <span className="text-2xl font-heading font-semibold text-[#C9A84C]" data-testid="destination-count">
+                  {allCount}
+                </span>
+                <span className="text-sm text-white/30 font-body">businesses</span>
+              </div>
+            )}
+            {!loading && activeIndustries.length > 0 && (
+              <>
+                {allCount > 0 && <span className="w-1 h-1 rounded-full bg-white/10" />}
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl font-heading font-semibold text-white/70">
+                    {activeIndustries.length}
+                  </span>
+                  <span className="text-sm text-white/30 font-body">categories</span>
+                </div>
+              </>
+            )}
+            {!loading && claimedCount > 0 && (
+              <>
+                <span className="w-1 h-1 rounded-full bg-white/10" />
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl font-heading font-semibold text-white/70">
+                    {claimedCount}
+                  </span>
+                  <span className="text-sm text-white/30 font-body">verified</span>
+                </div>
+              </>
+            )}
             {cities.length > 1 && (
               <>
                 <span className="w-1 h-1 rounded-full bg-white/10" />
@@ -305,6 +344,7 @@ export default function DestinationGuideClient({ slug }: { slug: string }) {
                 </div>
               </>
             )}
+            {loading && <span className="text-2xl font-heading text-white/20">—</span>}
           </motion.div>
         </div>
 
@@ -537,7 +577,7 @@ export default function DestinationGuideClient({ slug }: { slug: string }) {
                   </p>
 
                   <div className="flex flex-wrap justify-center gap-3">
-                    {['Best Restaurant', 'Best Plumber', 'Best Salon', 'Best HVAC'].map(badge => (
+                    {['Best Restaurant', 'Best Beach Bar', 'Best Hotel', 'Best Attraction'].map(badge => (
                       <span key={badge} className="px-4 py-2 rounded-full text-xs font-heading font-semibold border border-[#C9A84C]/15 text-[#C9A84C]/60" style={{ background: 'rgba(201, 168, 76, 0.05)' }}>
                         {badge}
                       </span>
@@ -799,8 +839,22 @@ export default function DestinationGuideClient({ slug }: { slug: string }) {
 }
 
 // ─── Guide Listing Card ───
+function MobileBadge({ radius }: { radius?: number | null }) {
+  return (
+    <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-heading font-semibold uppercase tracking-wider"
+      style={{ background: 'linear-gradient(135deg, #10B981, #059669)', color: '#fff' }}
+      data-testid="mobile-badge">
+      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+      </svg>
+      We Come to You{radius ? ` · ${radius}mi` : ''}
+    </span>
+  );
+}
+
 function GuideListingCard({ listing: l, index: i, isFeatured }: { listing: Listing; index: number; isFeatured?: boolean }) {
   const googleRating = l.metadata?.google_rating;
+  const isMobile = l.is_mobile_business || l.industry === 'mobile-services';
   const googleReviewCount = l.metadata?.google_review_count;
   const googleMapsUrl = l.metadata?.google_maps_url;
 
@@ -818,16 +872,22 @@ function GuideListingCard({ listing: l, index: i, isFeatured }: { listing: Listi
         style={{ background: isFeatured ? 'rgba(201, 168, 76, 0.03)' : 'rgba(255,255,255,0.02)' }}
         data-testid={`guide-listing-${l.slug}`}
       >
-      {/* Image */}
+      {/* Image with fallback for broken URLs */}
       <div className="relative h-44 overflow-hidden">
         {l.cover_image_url ? (
           <img src={l.cover_image_url} alt={l.business_name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #111111, #1A1A1A)' }}>
-            <span className="text-4xl font-heading font-light text-white/10">{l.business_name[0]}</span>
-          </div>
-        )}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            onError={(e) => {
+              const target = e.currentTarget;
+              target.style.display = 'none';
+              const fallback = target.nextElementSibling as HTMLElement;
+              if (fallback) fallback.style.display = 'flex';
+            }}
+          />
+        ) : null}
+        <div className={`w-full h-full items-center justify-center ${l.cover_image_url ? 'hidden' : 'flex'}`} style={{ background: 'linear-gradient(135deg, #111111, #1A1A1A)' }}>
+          <span className="text-4xl font-heading font-light text-white/10">{l.business_name[0]}</span>
+        </div>
 
         {/* Google Rating Badge */}
         {googleRating && (
@@ -853,6 +913,12 @@ function GuideListingCard({ listing: l, index: i, isFeatured }: { listing: Listi
           <div className="absolute bottom-3 left-3 flex items-center gap-1 px-2 py-1 rounded-lg backdrop-blur-md text-[10px] font-heading font-semibold tracking-wider uppercase"
             style={{ background: 'rgba(201, 168, 76, 0.2)', color: '#C9A84C', border: '1px solid rgba(201, 168, 76, 0.3)' }}>
             Featured
+          </div>
+        )}
+        {/* Mobile business badge */}
+        {isMobile && !isFeatured && (
+          <div className="absolute bottom-3 left-3">
+            <MobileBadge radius={l.service_radius_miles} />
           </div>
         )}
       </div>

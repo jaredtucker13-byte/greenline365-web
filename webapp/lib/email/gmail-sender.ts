@@ -60,7 +60,7 @@ export async function sendEmail(options: EmailOptions): Promise<{ success: boole
       to: options.to,
       subject: options.subject,
       html: options.html,
-      text: options.text || options.html.replace(/<[^>]*>/g, ''),
+      text: options.text || options.html.replace(/<[^<>]*>/g, ''),
     });
 
     console.log('[Email] Sent successfully to:', options.to, '| MessageId:', info.messageId);

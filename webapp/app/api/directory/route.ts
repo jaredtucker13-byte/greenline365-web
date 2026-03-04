@@ -123,7 +123,9 @@ export async function GET(request: NextRequest) {
     if (data.directory_badges) {
       data.directory_badges = data.directory_badges.filter((b: any) => b.is_active);
     }
-    return NextResponse.json(applyPhotoGating(data));
+    const response = NextResponse.json(applyPhotoGating(data));
+    response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
+    return response;
   }
 
   // Search/list
@@ -187,7 +189,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(listings);
   }
 
-  return NextResponse.json(applyWeightedRanking(listings));
+  const response = NextResponse.json(applyWeightedRanking(listings));
+  response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
+  return response;
 }
 
 // POST /api/directory - Create listing (AI scraper or manual)

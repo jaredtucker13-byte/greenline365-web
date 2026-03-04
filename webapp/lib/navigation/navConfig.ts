@@ -67,12 +67,23 @@ export const commandCenterNav: NavItem[] = [
 
 /**
  * Public site navigation items (Navbar).
+ * Audit 2026-03: Stripped to directory-only public nav.
  */
 export const publicNav = [
-  { href: '/', label: 'Directory' },
-  { href: '/loops', label: 'Experiences' },
-  { href: '/home-ledger', label: 'Home Ledger' },
-  { href: '/services', label: 'Our Services' },
+  { href: '/', label: 'Destinations' },
+  { href: '/categories', label: 'Categories' },
+  { href: '/about', label: 'About' },
+  { href: '/contact', label: 'Contact' },
+];
+
+/**
+ * Destination subpage navigation (replaces center links on /destination/* routes).
+ */
+export const destinationSubNav = [
+  { href: '', label: 'Destinations', anchor: true },
+  { href: '', label: 'Things to Do', section: 'things-to-do' },
+  { href: '', label: 'Eat & Drink', section: 'eat-drink' },
+  { href: '', label: 'Stay', section: 'stay' },
 ];
 
 /**

@@ -34,7 +34,6 @@ export async function POST(request: NextRequest) {
     const event = body.event;
     const callData = body.call || {};
     
-    console.log(`[Retell Webhook] Event: ${event}, Call ID: ${callData.call_id}`);
     
     const supabase = await createClient();
     
@@ -61,7 +60,6 @@ export async function POST(request: NextRequest) {
         break;
         
       default:
-        console.log(`[Retell Webhook] Unknown event: ${event}`);
     }
     
     return new NextResponse(null, { status: 204 });

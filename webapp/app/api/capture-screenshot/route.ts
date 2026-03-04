@@ -47,7 +47,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Internal URLs are not allowed' }, { status: 400 });
     }
 
-    console.log('[Screenshot] Capturing:', normalizedUrl);
 
     // Try multiple screenshot services in order of reliability
     let screenshotBase64: string | null = null;
@@ -68,13 +67,11 @@ export async function POST(request: NextRequest) {
           if (imageResponse.ok) {
             const imageBuffer = await imageResponse.arrayBuffer();
             screenshotBase64 = Buffer.from(imageBuffer).toString('base64');
-            console.log('[Screenshot] Success via Microlink');
           }
         }
       }
     } catch (e: any) {
       lastError = e.message;
-      console.log('[Screenshot] Microlink failed:', e.message);
     }
 
     // Service 2: Screenshot Machine (free tier)
@@ -87,11 +84,9 @@ export async function POST(request: NextRequest) {
         if (response.ok && response.headers.get('content-type')?.includes('image')) {
           const imageBuffer = await response.arrayBuffer();
           screenshotBase64 = Buffer.from(imageBuffer).toString('base64');
-          console.log('[Screenshot] Success via Screenshot Machine');
         }
       } catch (e: any) {
         lastError = e.message;
-        console.log('[Screenshot] Screenshot Machine failed:', e.message);
       }
     }
 
@@ -104,11 +99,9 @@ export async function POST(request: NextRequest) {
         if (response.ok && response.headers.get('content-type')?.includes('image')) {
           const imageBuffer = await response.arrayBuffer();
           screenshotBase64 = Buffer.from(imageBuffer).toString('base64');
-          console.log('[Screenshot] Success via thum.io');
         }
       } catch (e: any) {
         lastError = e.message;
-        console.log('[Screenshot] thum.io failed:', e.message);
       }
     }
 
@@ -121,11 +114,9 @@ export async function POST(request: NextRequest) {
         if (response.ok && response.headers.get('content-type')?.includes('image')) {
           const imageBuffer = await response.arrayBuffer();
           screenshotBase64 = Buffer.from(imageBuffer).toString('base64');
-          console.log('[Screenshot] Success via APIFlash');
         }
       } catch (e: any) {
         lastError = e.message;
-        console.log('[Screenshot] APIFlash failed:', e.message);
       }
     }
 

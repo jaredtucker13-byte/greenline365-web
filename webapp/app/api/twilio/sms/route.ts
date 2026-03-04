@@ -38,7 +38,6 @@ export async function POST(request: NextRequest) {
     const body = formData.get('Body') as string;
     const messageSid = formData.get('MessageSid') as string;
     
-    console.log(`[Twilio SMS] Received from ${from}: ${body}`);
     
     const supabase = await createClient();
     
