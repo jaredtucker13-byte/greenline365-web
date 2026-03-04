@@ -68,41 +68,13 @@ const CATEGORIES = [
   { id: 'automotive', label: 'Automotive', sub: 'Repairs, dealers & body shops', img: '/images/categories/services.png',
     subcategories: ['All', 'Auto Repair', 'Oil Change', 'Tire Shops', 'Body Shops', 'Car Dealers', 'Auto Parts', 'Towing', 'Car Wash', 'Auto Detailing', 'EV Charging'] },
 
-  // === MARINE & OUTDOOR (Key West / Coastal Florida) ===
-  { id: 'marine-outdoor', label: 'Marine & Outdoor', sub: 'Boats, docks & outdoor adventure', img: '/images/categories/destinations.png',
+  // === MARINE & DOCK SERVICES (Coastal Florida) ===
+  { id: 'marine-outdoor', label: 'Marine & Dock Services', sub: 'Boat repair, docks & marine mechanics', img: '/images/categories/destinations.png',
     subcategories: ['All', 'Boat Repair', 'Marine Mechanics', 'Dock & Lift', 'Boat Cleaning', 'Fishing Charters', 'Kayak & Paddleboard', 'Dive Shops', 'Marinas'] },
-
-  // === DINING ===
-  { id: 'dining', label: 'Dining', sub: 'Cafes, casual & fine dining', img: '/images/categories/dining.png',
-    subcategories: ['All', 'Fine Dining', 'Casual', 'Cafes & Bakeries', 'Food Trucks', 'Seafood', 'BBQ', 'Pizza', 'Mexican', 'Asian', 'Italian', 'Breakfast & Brunch', 'Vegan & Vegetarian'] },
 
   // === HEALTH & WELLNESS ===
   { id: 'health-wellness', label: 'Health & Wellness', sub: 'Doctors, dentists, fitness & more', img: '/images/categories/health-wellness.png',
     subcategories: ['All', 'Dental Offices', 'Physical Therapy', 'Medical Clinics', 'Mental Health', 'Fitness', 'Chiropractors', 'Optometrists', 'Urgent Care', 'Pharmacies', 'Dermatology', 'Orthopedics'] },
-
-  // === STYLE & SHOPPING ===
-  { id: 'style-shopping', label: 'Style & Shopping', sub: 'Fashion, grooming & retail', img: '/images/categories/style-shopping.png',
-    subcategories: ['All', 'Barbershops', 'Salons', 'Nail Salons', 'Spas', 'Boutiques', 'Jewelry', 'Tattoo & Piercing', 'Dry Cleaning & Laundry'] },
-
-  // === NIGHTLIFE ===
-  { id: 'nightlife', label: 'Nightlife', sub: 'Bars, lounges & live music', img: '/images/categories/nightlife.png',
-    subcategories: ['All', 'Cocktail Bars', 'Sports Bars', 'Live Music', 'Clubs', 'Breweries', 'Wine Bars', 'Hookah Lounges', 'Karaoke'] },
-
-  // === CONVENIENCE & GROCERY (non-claimable) ===
-  { id: 'convenience-grocery', label: 'Convenience & Grocery', sub: 'Publix, Walmart, gas stations & more', img: '/images/categories/services.png',
-    subcategories: ['All', 'Grocery Stores', 'Convenience Stores', 'Gas Stations', 'Supermarkets', 'Specialty Foods', 'Liquor Stores', 'Farmers Markets'] },
-
-  // === EMERGENCY SERVICES (non-claimable) ===
-  { id: 'emergency-services', label: 'Emergency Services', sub: 'Fire, police, hospitals & urgent care', img: '/images/categories/health-wellness.png',
-    subcategories: ['All', 'Fire Stations', 'Police Stations', 'Hospitals', 'Emergency Rooms', 'Poison Control', 'Crisis Centers'] },
-
-  // === FAMILY ENTERTAINMENT ===
-  { id: 'family-entertainment', label: 'Family Entertainment', sub: 'Fun for all ages', img: '/images/categories/family-entertainment.png',
-    subcategories: ['All', 'Theme Parks', 'Arcades', 'Mini Golf', 'Bowling', 'Water Parks', 'Zoos & Aquariums', 'Trampoline Parks', 'Escape Rooms'] },
-
-  // === HOTELS & LODGING ===
-  { id: 'hotels-lodging', label: 'Hotels & Lodging', sub: 'Where to stay', img: '/images/categories/destinations.png',
-    subcategories: ['All', 'Hotels', 'Resorts', 'Vacation Rentals', 'Boutique Hotels', 'B&Bs', 'Hostels', 'RV Parks'] },
 
   // === PROFESSIONAL SERVICES ===
   { id: 'professional-services', label: 'Professional Services', sub: 'Legal, finance & consulting', img: '/images/categories/services.png',
@@ -115,6 +87,10 @@ const CATEGORIES = [
   // === PETS ===
   { id: 'pets', label: 'Pets', sub: 'Vets, grooming & boarding', img: '/images/categories/services.png',
     subcategories: ['All', 'Veterinarians', 'Pet Grooming', 'Pet Boarding', 'Pet Stores', 'Dog Training', 'Pet Sitting', 'Aquarium & Fish'] },
+
+  // === MOBILE SERVICES ===
+  { id: 'mobile-services', label: 'Mobile Services', sub: 'Detailing, mechanics, grooming & more — they come to you', img: '/images/categories/services.png',
+    subcategories: ['All', 'Mobile Detailing', 'Mobile Mechanics', 'Mobile Pet Grooming', 'Mobile Car Wash', 'Mobile Notary', 'Mobile IV Therapy', 'Mobile Barber', 'Mobile Nail Tech'] },
 ];
 
 function Stars({ rating, size = 14 }: { rating: number; size?: number }) {
