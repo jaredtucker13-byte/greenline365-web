@@ -140,7 +140,7 @@ async function processScheduledEmails(): Promise<TaskResult> {
       let businessName = 'your favorite local business';
       if (deal.listing_id) {
         const { data: listing } = await supabase
-          .from('directory_listings')
+          .from('directory_listings_public')
           .select('business_name')
           .eq('id', deal.listing_id)
           .single();

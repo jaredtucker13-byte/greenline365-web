@@ -42,7 +42,7 @@ export async function GET(
         duration_minutes,
         transition_note,
         metadata,
-        listing:directory_listings (
+        listing:directory_listings_public (
           id,
           business_name,
           slug,

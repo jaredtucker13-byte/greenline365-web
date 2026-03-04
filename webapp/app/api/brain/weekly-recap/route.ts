@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
 
     // Directory metrics
     const [listings, reviews, campaigns, leads] = await Promise.all([
-      supabase.from('directory_listings').select('id', { count: 'exact', head: true }),
+      supabase.from('directory_listings_public').select('id', { count: 'exact', head: true }),
       supabase.from('directory_feedback').select('*').gte('created_at', weekStart),
       supabase.from('email_campaigns').select('*').eq('status', 'active'),
       supabase.from('crm_leads').select('*').gte('created_at', weekStart),

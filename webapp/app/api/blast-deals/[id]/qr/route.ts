@@ -41,7 +41,7 @@ export async function GET(
     let businessName = 'Local Business';
     if (deal.listing_id) {
       const { data: listing } = await supabase
-        .from('directory_listings')
+        .from('directory_listings_public')
         .select('business_name')
         .eq('id', deal.listing_id)
         .single();

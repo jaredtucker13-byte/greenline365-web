@@ -44,7 +44,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // All business listing pages
   const { data: listings } = await supabase
-    .from('directory_listings')
+    .from('directory_listings_public')
     .select('slug, updated_at')
     .order('updated_at', { ascending: false });
 

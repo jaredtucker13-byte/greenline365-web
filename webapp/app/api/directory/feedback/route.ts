@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
 
   // Check if feedback triggers a badge
   const { data: listing } = await supabase
-    .from('directory_listings')
+    .from('directory_listings_public')
     .select('id, total_feedback_count, avg_feedback_rating')
     .eq('id', listing_id)
     .single();

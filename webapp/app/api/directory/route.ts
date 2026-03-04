@@ -111,7 +111,7 @@ export async function GET(request: NextRequest) {
   // Single listing by slug
   if (slug) {
     const { data, error } = await supabase
-      .from('directory_listings')
+      .from('directory_listings_public')
       .select('*, directory_badges(id, badge_type, badge_label, badge_color, badge_icon, is_active, earned_at), directory_feedback(id, rating, feedback_text, feedback_type, submitter_name, created_at)')
       .eq('slug', slug)
       .eq('is_published', true)
@@ -128,8 +128,8 @@ export async function GET(request: NextRequest) {
 
   // Search/list
   let query = supabase
-    .from('directory_listings')
-    .select('id, business_name, slug, industry, subcategories, description, phone, website, city, state, zip_code, logo_url, cover_image_url, gallery_images, tier, is_claimed, trust_score, avg_feedback_rating, total_feedback_count, tags, metadata, directory_badges(id, badge_type, badge_label, badge_color, is_active)')
+    .from('directory_listings_public')
+    .select('id, business_name, slug, industry, subcategories, description, phone, website, city, state, zip_code, logo_url, cover_image_url, gallery_images, tier, is_claimed, trust_score, avg_feedback_rating, total_feedback_count, tags, metadata, service_area_display, is_mobile_service, directory_badges(id, badge_type, badge_label, badge_color, is_active)')
     .eq('is_published', true)
     .order('trust_score', { ascending: false })
     .limit(limit);

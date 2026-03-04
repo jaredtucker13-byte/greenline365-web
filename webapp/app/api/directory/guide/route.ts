@@ -44,8 +44,8 @@ export async function GET(request: NextRequest) {
 
   // Single query: get ALL listings for this destination
   const { data, error } = await supabase
-    .from('directory_listings')
-    .select('id, business_name, slug, industry, subcategories, description, phone, website, city, state, zip_code, cover_image_url, gallery_images, tier, is_claimed, trust_score, avg_feedback_rating, total_feedback_count, tags, metadata, directory_badges(id, badge_type, badge_label, badge_color)')
+    .from('directory_listings_public')
+    .select('id, business_name, slug, industry, subcategories, description, phone, website, city, state, zip_code, cover_image_url, gallery_images, tier, is_claimed, trust_score, avg_feedback_rating, total_feedback_count, tags, metadata, service_area_display, is_mobile_service, directory_badges(id, badge_type, badge_label, badge_color)')
     .eq('is_published', true)
     .contains('tags', [`destination:${destination}`])
     .order('trust_score', { ascending: false })

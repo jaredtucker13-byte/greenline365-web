@@ -9,9 +9,9 @@ export async function GET() {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     const [listingsRes, leadsRes, claimedRes] = await Promise.all([
-      supabase.from('directory_listings').select('industry, city, tags', { count: 'exact' }),
+      supabase.from('directory_listings_public').select('industry, city, tags', { count: 'exact' }),
       supabase.from('crm_leads').select('id', { count: 'exact' }),
-      supabase.from('directory_listings').select('id', { count: 'exact', head: true }).eq('is_claimed', true),
+      supabase.from('directory_listings_public').select('id', { count: 'exact', head: true }).eq('is_claimed', true),
     ]);
 
     const listings = listingsRes.data || [];

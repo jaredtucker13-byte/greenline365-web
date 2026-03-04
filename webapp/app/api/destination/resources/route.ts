@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
   try {
     // Find listings tagged with this destination that are public resources
     const { data: listings } = await supabase
-      .from('directory_listings')
+      .from('directory_listings_public')
       .select('id')
       .eq('is_published', true)
       .contains('tags', [`destination:${slug}`]);
