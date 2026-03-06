@@ -39,8 +39,25 @@ interface SEOFeedback {
   message: string;
 }
 
+interface SEOCategoryItem {
+  label: string;
+  status: 'pass' | 'warning' | 'fail';
+  detail: string;
+  fix?: string;
+}
+
+interface SEOCategory {
+  name: string;
+  score: number;
+  maxScore: number;
+  weight: number;
+  status: 'pass' | 'warning' | 'fail';
+  items: SEOCategoryItem[];
+}
+
 interface SEOAnalysis {
   score: number;
+  categories?: SEOCategory[];
   details: {
     wordCount: number;
     sentenceCount: number;
@@ -96,6 +113,7 @@ export default function BlogPolishPage() {
   const [activeTab, setActiveTab] = useState<'write' | 'preview'>('write');
   const [seoAnalysis, setSeoAnalysis] = useState<SEOAnalysis | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
+  const [expandedSeoCategory, setExpandedSeoCategory] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
@@ -411,7 +429,7 @@ export default function BlogPolishPage() {
 
   const analyzeSEO = async () => {
     if (!post.content || !post.title) return;
-    
+
     setAnalyzing(true);
     try {
       const response = await fetch('/api/blog/analyze', {
@@ -420,9 +438,13 @@ export default function BlogPolishPage() {
         body: JSON.stringify({
           content: post.content,
           title: post.title,
+          slug: post.slug,
+          tags: post.tags,
+          featuredImage: post.featured_image,
+          uploadedImageCount: imagePreviews.length,
         }),
       });
-      
+
       if (!response.ok) {
         console.error('SEO analysis failed:', response.status);
         return;
@@ -3095,35 +3117,25 @@ export default function BlogPolishPage() {
           {/* Sidebar (1/3) */}
           <div className="space-y-6">
             
-            {/* SEO Score */}
+            {/* SEO Audit */}
             <div className="backdrop-blur-2xl bg-white/[0.08] rounded-2xl border border-white/[0.15] p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]">
               <h3 className="text-white font-medium mb-4 flex items-center gap-2">
-                <span>📊</span> SEO Analysis
+                <span>📊</span> SEO Audit
               </h3>
-              
+
               {seoAnalysis ? (
                 <>
-                  {/* Score Circle */}
-                  <div className="flex items-center justify-center mb-6">
-                    <div className="relative w-32 h-32">
-                      <svg className="transform -rotate-90 w-32 h-32">
+                  {/* Overall Score Circle */}
+                  <div className="flex items-center justify-center mb-4">
+                    <div className="relative w-28 h-28">
+                      <svg className="transform -rotate-90 w-28 h-28">
+                        <circle cx="56" cy="56" r="48" stroke="rgba(255,255,255,0.1)" strokeWidth="7" fill="none" />
                         <circle
-                          cx="64"
-                          cy="64"
-                          r="56"
-                          stroke="rgba(255,255,255,0.1)"
-                          strokeWidth="8"
-                          fill="none"
-                        />
-                        <circle
-                          cx="64"
-                          cy="64"
-                          r="56"
+                          cx="56" cy="56" r="48"
                           stroke="url(#scoreGradient)"
-                          strokeWidth="8"
-                          fill="none"
-                          strokeDasharray={`${2 * Math.PI * 56}`}
-                          strokeDashoffset={`${2 * Math.PI * 56 * (1 - seoAnalysis.score / 100)}`}
+                          strokeWidth="7" fill="none"
+                          strokeDasharray={`${2 * Math.PI * 48}`}
+                          strokeDashoffset={`${2 * Math.PI * 48 * (1 - seoAnalysis.score / 100)}`}
                           strokeLinecap="round"
                           className="transition-all duration-1000"
                         />
@@ -3135,49 +3147,108 @@ export default function BlogPolishPage() {
                         </defs>
                       </svg>
                       <div className="absolute inset-0 flex items-center justify-center flex-col">
-                        <span className={`text-4xl font-bold ${getScoreColor(seoAnalysis.score)}`}>
-                          {seoAnalysis.score}
-                        </span>
-                        <span className="text-white/40 text-xs">/ 100</span>
+                        <span className={`text-3xl font-bold ${getScoreColor(seoAnalysis.score)}`}>{seoAnalysis.score}</span>
+                        <span className="text-white/40 text-[10px]">/ 100</span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Feedback Items */}
-                  <div className="space-y-2">
-                    {seoAnalysis.feedback.map((item, i) => (
-                      <div key={i} className="flex items-start gap-2 text-sm">
-                        <span className={
-                          item.type === 'success' ? 'text-gold-400' :
-                          item.type === 'warning' ? 'text-amber-400' :
-                          item.type === 'info' ? 'text-sky-400' : 'text-red-400'
-                        }>
-                          {item.type === 'success' ? '✓' : item.type === 'warning' ? '⚠' : 'ℹ'}
-                        </span>
-                        <span className="text-white/70">{item.message}</span>
-                      </div>
-                    ))}
-                  </div>
+                  {/* Pass / Warn / Fail summary */}
+                  {seoAnalysis.categories && (
+                    <div className="flex justify-center gap-4 mb-5 text-xs">
+                      <span className="text-emerald-400">{seoAnalysis.categories.filter(c => c.status === 'pass').length} passed</span>
+                      <span className="text-amber-400">{seoAnalysis.categories.filter(c => c.status === 'warning').length} warnings</span>
+                      <span className="text-red-400">{seoAnalysis.categories.filter(c => c.status === 'fail').length} failed</span>
+                    </div>
+                  )}
 
-                  {/* Keywords */}
+                  {/* Category Breakdown */}
+                  {seoAnalysis.categories && (
+                    <div className="space-y-2 max-h-[520px] overflow-y-auto pr-1 custom-scrollbar">
+                      {seoAnalysis.categories.map((cat) => {
+                        const isExpanded = expandedSeoCategory === cat.name;
+                        const catIcon = cat.status === 'pass' ? '✓' : cat.status === 'warning' ? '!' : '✕';
+                        const catColor = cat.status === 'pass' ? 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20' : cat.status === 'warning' ? 'text-amber-400 bg-amber-400/10 border-amber-400/20' : 'text-red-400 bg-red-400/10 border-red-400/20';
+                        const barColor = cat.status === 'pass' ? 'bg-emerald-400' : cat.status === 'warning' ? 'bg-amber-400' : 'bg-red-400';
+
+                        return (
+                          <div key={cat.name} className="border border-white/[0.08] rounded-xl overflow-hidden">
+                            {/* Category header */}
+                            <button
+                              onClick={() => setExpandedSeoCategory(isExpanded ? null : cat.name)}
+                              className="w-full flex items-center gap-2 px-3 py-2.5 hover:bg-white/[0.04] transition-colors text-left"
+                            >
+                              <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold border ${catColor}`}>
+                                {catIcon}
+                              </span>
+                              <span className="text-white/80 text-xs font-medium flex-1 truncate">{cat.name}</span>
+                              <span className={`text-xs font-semibold ${cat.score >= 70 ? 'text-emerald-400' : cat.score >= 40 ? 'text-amber-400' : 'text-red-400'}`}>{cat.score}</span>
+                              <svg className={`w-3.5 h-3.5 text-white/30 transition-transform ${isExpanded ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                            </button>
+
+                            {/* Score bar */}
+                            <div className="px-3 pb-2">
+                              <div className="h-1 bg-white/[0.06] rounded-full overflow-hidden">
+                                <div className={`h-full rounded-full transition-all duration-700 ${barColor}`} style={{ width: `${cat.score}%` }} />
+                              </div>
+                            </div>
+
+                            {/* Expanded items */}
+                            {isExpanded && (
+                              <div className="px-3 pb-3 space-y-2 border-t border-white/[0.06] pt-2">
+                                {cat.items.map((item, idx) => (
+                                  <div key={idx} className="text-xs">
+                                    <div className="flex items-start gap-1.5">
+                                      <span className={`mt-0.5 flex-shrink-0 ${item.status === 'pass' ? 'text-emerald-400' : item.status === 'warning' ? 'text-amber-400' : 'text-red-400'}`}>
+                                        {item.status === 'pass' ? '✓' : item.status === 'warning' ? '⚠' : '✕'}
+                                      </span>
+                                      <div className="flex-1 min-w-0">
+                                        <span className="text-white/60 font-medium">{item.label}: </span>
+                                        <span className="text-white/50">{item.detail}</span>
+                                        {item.fix && (
+                                          <div className="mt-1.5 p-2 bg-white/[0.04] rounded-lg border border-white/[0.06]">
+                                            <span className="text-sky-400/80 font-medium">Fix: </span>
+                                            <span className="text-white/50">{item.fix}</span>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* Top Keywords */}
                   {seoAnalysis.details.topKeywords.length > 0 && (
                     <div className="mt-4 pt-4 border-t border-white/10">
                       <p className="text-white/50 text-xs mb-2">Top Keywords:</p>
                       <div className="flex flex-wrap gap-1">
-                        {seoAnalysis.details.topKeywords.slice(0, 6).map(kw => (
-                          <span key={kw} className="px-2 py-0.5 bg-white/[0.05] rounded text-xs text-white/60">
-                            {kw}
-                          </span>
+                        {seoAnalysis.details.topKeywords.slice(0, 8).map(kw => (
+                          <span key={kw} className="px-2 py-0.5 bg-white/[0.05] rounded text-xs text-white/60">{kw}</span>
                         ))}
                       </div>
                     </div>
                   )}
+
+                  {/* Re-analyze button */}
+                  <button
+                    onClick={analyzeSEO}
+                    disabled={analyzing}
+                    className="w-full mt-4 py-2 text-xs text-white/50 hover:text-white/80 border border-white/[0.08] rounded-lg hover:bg-white/[0.04] transition-colors disabled:opacity-50"
+                  >
+                    {analyzing ? 'Analyzing...' : 'Re-analyze'}
+                  </button>
                 </>
               ) : (
                 <div className="text-center py-8">
                   <div className="text-4xl mb-3 opacity-50">📝</div>
                   <p className="text-white/40 text-sm">
-                    {analyzing ? 'Analyzing your content...' : 'Write at least 100 words to see SEO analysis'}
+                    {analyzing ? 'Running SEO audit...' : 'Write at least 100 words to see your SEO audit'}
                   </p>
                 </div>
               )}
