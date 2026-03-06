@@ -1,18 +1,48 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import crypto from 'crypto';
 
 /**
  * Social Connections API
- * 
+ *
  * Framework for users to connect their own social media accounts.
  * Users provide their own OAuth credentials/tokens.
- * 
+ * Tokens are encrypted at rest using AES-256-GCM.
+ *
  * Supported platforms:
  * - Instagram (via Meta Business API)
  * - Facebook Pages (via Meta Business API)
  * - X/Twitter
  * - LinkedIn
  */
+
+// Token encryption using AES-256-GCM
+const ENCRYPTION_KEY = process.env.TOKEN_ENCRYPTION_KEY; // 32-byte hex key
+
+function encryptToken(plaintext: string): string {
+  if (!ENCRYPTION_KEY) {
+    console.warn('[Social API] TOKEN_ENCRYPTION_KEY not set - storing tokens in plaintext');
+    return plaintext;
+  }
+  const iv = crypto.randomBytes(12);
+  const key = Buffer.from(ENCRYPTION_KEY, 'hex');
+  const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
+  const encrypted = Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final()]);
+  const tag = cipher.getAuthTag();
+  // Format: iv:tag:ciphertext (all hex)
+  return `${iv.toString('hex')}:${tag.toString('hex')}:${encrypted.toString('hex')}`;
+}
+
+function decryptToken(encrypted: string): string {
+  if (!ENCRYPTION_KEY || !encrypted.includes(':')) {
+    return encrypted; // Not encrypted or no key
+  }
+  const [ivHex, tagHex, ciphertextHex] = encrypted.split(':');
+  const key = Buffer.from(ENCRYPTION_KEY, 'hex');
+  const decipher = crypto.createDecipheriv('aes-256-gcm', key, Buffer.from(ivHex, 'hex'));
+  decipher.setAuthTag(Buffer.from(tagHex, 'hex'));
+  return decipher.update(ciphertextHex, 'hex', 'utf8') + decipher.final('utf8');
+}
 
 interface SocialConnection {
   platform: 'instagram' | 'facebook' | 'twitter' | 'linkedin';
@@ -68,14 +98,14 @@ async function connectAccount(supabase: any, userId: string, connection: SocialC
     }, { status: 400 });
   }
 
-  // Store connection (encrypted in production)
+  // Store connection with encrypted tokens
   const { data, error } = await supabase
     .from('social_connections')
     .upsert({
       user_id: userId,
       platform: connection.platform,
-      access_token: connection.accessToken, // Should be encrypted in production
-      refresh_token: connection.refreshToken,
+      access_token: encryptToken(connection.accessToken),
+      refresh_token: connection.refreshToken ? encryptToken(connection.refreshToken) : null,
       expires_at: connection.expiresAt,
       account_id: validation.accountId,
       account_name: validation.accountName,
@@ -170,7 +200,7 @@ async function verifyConnection(supabase: any, userId: string, platform: string)
 
   const validation = await validateToken({
     platform: data.platform,
-    accessToken: data.access_token,
+    accessToken: decryptToken(data.access_token),
   });
 
   return NextResponse.json({
