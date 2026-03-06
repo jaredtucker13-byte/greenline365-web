@@ -6,6 +6,7 @@ import { PageHeader } from './PageHeader';
 import EnhancedInputBar from './shared/EnhancedInputBar';
 import type { InputBarOptions } from './shared/EnhancedInputBar';
 import ActionBar from './shared/ActionBar';
+import ContentExportMenu from './shared/ContentExportMenu';
 
 // Types
 interface Blueprint {
@@ -511,15 +512,28 @@ export default function ContentForge2() {
                     Generated Content
                   </h2>
                   {generatedContent && (
-                    <button
-                      onClick={() => navigator.clipboard.writeText(generatedContent)}
-                      className="text-xs text-white/50 hover:text-white flex items-center gap-1"
-                    >
-                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                      </svg>
-                      Copy
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => navigator.clipboard.writeText(generatedContent)}
+                        className="text-xs text-white/50 hover:text-white flex items-center gap-1"
+                      >
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                        Copy
+                      </button>
+                      <ContentExportMenu
+                        title={topic || 'Generated Content'}
+                        content={generatedContent}
+                        formats={['html', 'markdown', 'plaintext', 'pdf']}
+                        filenamePrefix={topic ? topic.replace(/\s+/g, '-').toLowerCase() : 'content-forge'}
+                        variant="compact"
+                        socialPosts={Object.entries(repurposedContent).map(([format, text]) => ({
+                          platform: format.replace('_', ' '),
+                          content: text,
+                        }))}
+                      />
+                    </div>
                   )}
                 </div>
                 
@@ -645,6 +659,23 @@ export default function ContentForge2() {
                       </p>
                     </motion.div>
                   ))}
+
+                  {/* Export all repurposed content as social pack */}
+                  {Object.keys(repurposedContent).length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-white/10">
+                      <ContentExportMenu
+                        title={topic || 'Social Content'}
+                        content={generatedContent}
+                        formats={['social-pack', 'plaintext']}
+                        filenamePrefix={`${(topic || 'social').replace(/\s+/g, '-').toLowerCase()}-social`}
+                        variant="compact"
+                        socialPosts={Object.entries(repurposedContent).map(([format, text]) => ({
+                          platform: format.replace('_', '-'),
+                          content: text,
+                        }))}
+                      />
+                    </div>
+                  )}
                 </motion.div>
               )}
             </div>

@@ -12,6 +12,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { PageHeader } from '../components/PageHeader';
 import EnhancedInputBar from '../components/shared/EnhancedInputBar';
 import ExportMenu from '../components/shared/ExportMenu';
+import ContentExportMenu from '../components/shared/ContentExportMenu';
 import ActionBar from '../components/shared/ActionBar';
 import {
   Upload, Trash2, Image as ImageIcon, Sparkles, FolderOpen,
@@ -478,7 +479,19 @@ export default function IngredientsPage() {
                       Generated Mockups
                     </h3>
                     {generatedMockups.length > 0 && (
-                      <span className="text-xs text-white/40">{generatedMockups.length} mockups</span>
+                      <div className="flex items-center gap-2">
+                        <ContentExportMenu
+                          title="Generated Mockups"
+                          formats={['image-pack']}
+                          filenamePrefix="ingredients-mockups"
+                          variant="compact"
+                          images={generatedMockups.map((m, i) => ({
+                            url: m.url,
+                            filename: `mockup-${i + 1}-${m.id}.png`,
+                          }))}
+                        />
+                        <span className="text-xs text-white/40">{generatedMockups.length} mockups</span>
+                      </div>
                     )}
                   </div>
 

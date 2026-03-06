@@ -22,6 +22,7 @@ import CopyrightTools from '../components/CopyrightTools';
 import AIContentDisclaimer from '../components/AIContentDisclaimer';
 import EnhancedInputBar from '../components/shared/EnhancedInputBar';
 import ExportMenu from '../components/shared/ExportMenu';
+import ContentExportMenu from '../components/shared/ContentExportMenu';
 import ActionBar from '../components/shared/ActionBar';
 import { 
   CopyButton, 
@@ -1672,6 +1673,17 @@ export default function BlogPolishPage() {
 
             {/* Actions */}
             <div className="flex items-center gap-3">
+              <ContentExportMenu
+                title={post.title}
+                content={post.content}
+                tags={post.tags}
+                category={post.category}
+                slug={post.slug}
+                featuredImage={post.featured_image}
+                formats={['html', 'markdown', 'plaintext', 'pdf', 'wordpress']}
+                filenamePrefix={post.slug || post.title || 'blog-post'}
+                variant="compact"
+              />
               <button
                 onClick={saveDraft}
                 disabled={saving}

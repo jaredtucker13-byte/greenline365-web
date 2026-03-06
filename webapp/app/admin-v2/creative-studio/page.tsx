@@ -20,6 +20,7 @@ import { useCostTracking } from '@/lib/cost-tracking';
 import CollapsibleSidebar from '../components/CollapsibleSidebar';
 import TacticalHeader from '../components/TacticalHeader';
 import ExportMenu from '../components/shared/ExportMenu';
+import ContentExportMenu from '../components/shared/ContentExportMenu';
 import ActionBar from '../components/shared/ActionBar';
 import {
   Upload, Sparkles, Users, Image, Download, Share2, Folder,
@@ -946,16 +947,28 @@ export default function CreativeStudioPage() {
                     </div>
                     <div className="flex gap-2">
                       {generatedMockups.length > 0 && (
-                        <ExportMenu
-                          imageUrl={generatedMockups[0]?.url}
-                          title="Creative Studio Mockup"
-                          filenamePrefix="mockup"
-                          formats={['pdf', 'png', 'jpg', 'webp', 'clipboard', 'print']}
-                          pdfMeta={{
-                            subtitle: `${generatedMockups.length} mockups generated`,
-                            description: 'Product mockup generated with ArtfulPhusion Creative Studio',
-                          }}
-                        />
+                        <>
+                          <ContentExportMenu
+                            title="All Mockups"
+                            formats={['image-pack']}
+                            filenamePrefix="creative-studio-mockups"
+                            variant="compact"
+                            images={generatedMockups.map((m, i) => ({
+                              url: m.url,
+                              filename: `mockup-${m.scene.replace(/[^a-z0-9]/gi, '-')}-${i + 1}.png`,
+                            }))}
+                          />
+                          <ExportMenu
+                            imageUrl={generatedMockups[0]?.url}
+                            title="Creative Studio Mockup"
+                            filenamePrefix="mockup"
+                            formats={['pdf', 'png', 'jpg', 'webp', 'clipboard', 'print']}
+                            pdfMeta={{
+                              subtitle: `${generatedMockups.length} mockups generated`,
+                              description: 'Product mockup generated with ArtfulPhusion Creative Studio',
+                            }}
+                          />
+                        </>
                       )}
                     </div>
                   </div>
@@ -1247,13 +1260,27 @@ export default function CreativeStudioPage() {
                   <div>
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="text-sm font-medium text-white/70">Generated Mockups</h3>
-                      <button
-                        onClick={() => rerunMockups(selectedProduct)}
-                        className="flex items-center gap-1 px-3 py-1 rounded-lg bg-purple-500/20 text-purple-400 text-xs font-medium hover:bg-purple-500/30"
-                      >
-                        <RefreshCw className="w-3 h-3" />
-                        Generate New
-                      </button>
+                      <div className="flex items-center gap-2">
+                        {selectedProduct.mockups && selectedProduct.mockups.length > 1 && (
+                          <ContentExportMenu
+                            title={`${selectedProduct.name} Mockups`}
+                            formats={['image-pack']}
+                            filenamePrefix={`${selectedProduct.name.replace(/\s+/g, '-').toLowerCase()}-mockups`}
+                            variant="compact"
+                            images={selectedProduct.mockups.map((m, i) => ({
+                              url: m.image_url,
+                              filename: `${selectedProduct.name.replace(/\s+/g, '-').toLowerCase()}-mockup-${i + 1}.png`,
+                            }))}
+                          />
+                        )}
+                        <button
+                          onClick={() => rerunMockups(selectedProduct)}
+                          className="flex items-center gap-1 px-3 py-1 rounded-lg bg-purple-500/20 text-purple-400 text-xs font-medium hover:bg-purple-500/30"
+                        >
+                          <RefreshCw className="w-3 h-3" />
+                          Generate New
+                        </button>
+                      </div>
                     </div>
                     
                     {selectedProduct.mockups && selectedProduct.mockups.length > 0 ? (
