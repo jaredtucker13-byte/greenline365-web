@@ -725,15 +725,18 @@ export default function ContentForge2() {
       </AnimatePresence>
       </div>
 
-      {/* ActionBar - visible when content is generated */}
-      {generatedContent && (
-        <ActionBar
-          copyContent={generatedContent}
-          showExport={false}
-          showShare
-          shareTitle={topic}
-        />
-      )}
+      {/* ActionBar - Command Center Input */}
+      <ActionBar
+        onSubmit={(prompt, toolId) => {
+          if (toolId === 'blog' || toolId === 'social') {
+            setTopic(prompt);
+            handleGenerate();
+          }
+        }}
+        isForging={isGenerating}
+        forgingText="Manifesting Content..."
+        defaultTool="blog"
+      />
     </div>
   );
 }

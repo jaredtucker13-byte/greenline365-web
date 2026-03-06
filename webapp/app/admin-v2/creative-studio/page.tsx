@@ -20,6 +20,7 @@ import { useCostTracking } from '@/lib/cost-tracking';
 import CollapsibleSidebar from '../components/CollapsibleSidebar';
 import TacticalHeader from '../components/TacticalHeader';
 import ExportMenu from '../components/shared/ExportMenu';
+import ActionBar from '../components/shared/ActionBar';
 import {
   Upload, Sparkles, Users, Image, Download, Share2, Folder,
   Plus, Camera, Wand2, Eye, ChevronRight, X, Check, Loader2,
@@ -1325,6 +1326,17 @@ export default function CreativeStudioPage() {
           </motion.div>
         )}
       </AnimatePresence>
+      {/* ActionBar - Command Center Input */}
+      <ActionBar
+        onSubmit={(prompt, toolId) => {
+          if (toolId === 'image') {
+            setProductName(prompt);
+          }
+        }}
+        isForging={isAnalyzing || isGenerating}
+        forgingText={isAnalyzing ? 'Analyzing Product...' : 'Generating Mockups...'}
+        defaultTool="image"
+      />
     </div>
   );
 }

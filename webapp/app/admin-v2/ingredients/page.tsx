@@ -586,16 +586,18 @@ export default function IngredientsPage() {
         )}
       </AnimatePresence>
 
-      {/* ActionBar - visible when mockups are generated */}
-      {generatedMockups.length > 0 && (
-        <ActionBar
-          showCopy={false}
-          showShare
-          exportImageUrl={generatedMockups[0]?.url}
-          exportTitle="Ingredients Mockup"
-          shareTitle="Check out this mockup"
-        />
-      )}
+      {/* ActionBar - Command Center Input */}
+      <ActionBar
+        onSubmit={(prompt, toolId) => {
+          if (toolId === 'image') {
+            setSystemPrompt(prompt);
+            setActiveTab('generate');
+          }
+        }}
+        isForging={isGenerating}
+        forgingText="Generating Mockups..."
+        defaultTool="image"
+      />
     </div>
   );
 }

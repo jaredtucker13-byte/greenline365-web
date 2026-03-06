@@ -3528,21 +3528,17 @@ export default function BlogPolishPage() {
         )}
       </AnimatePresence>
 
-      {/* ActionBar - visible when blog has content */}
-      {post.content && (
-        <ActionBar
-          copyContent={post.content.replace(/<[^>]*>/g, '')}
-          showExport={false}
-          showShare
-          shareTitle={post.title}
-          onSave={() => {
-            // Trigger auto-save
-            setHasUnsavedChanges(true);
-          }}
-          saveLabel="Save Draft"
-          publishLabel="Publish"
-        />
-      )}
+      {/* ActionBar - Command Center Input */}
+      <ActionBar
+        onSubmit={(prompt, toolId) => {
+          if (toolId === 'blog') {
+            setPost(prev => ({ ...prev, title: prompt }));
+          }
+        }}
+        isForging={false}
+        forgingText="Polishing..."
+        defaultTool="blog"
+      />
     </div>
   );
 }
