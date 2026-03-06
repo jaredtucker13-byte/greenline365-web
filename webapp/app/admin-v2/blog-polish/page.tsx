@@ -22,6 +22,7 @@ import CopyrightTools from '../components/CopyrightTools';
 import AIContentDisclaimer from '../components/AIContentDisclaimer';
 import EnhancedInputBar from '../components/shared/EnhancedInputBar';
 import ExportMenu from '../components/shared/ExportMenu';
+import ActionBar from '../components/shared/ActionBar';
 import { 
   CopyButton, 
   ShareButton, 
@@ -3526,6 +3527,22 @@ export default function BlogPolishPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* ActionBar - visible when blog has content */}
+      {post.content && (
+        <ActionBar
+          copyContent={post.content.replace(/<[^>]*>/g, '')}
+          showExport={false}
+          showShare
+          shareTitle={post.title}
+          onSave={() => {
+            // Trigger auto-save
+            setHasUnsavedChanges(true);
+          }}
+          saveLabel="Save Draft"
+          publishLabel="Publish"
+        />
+      )}
     </div>
   );
 }

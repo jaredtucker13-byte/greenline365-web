@@ -22,3 +22,6 @@ export type { EnhancedInputBarProps, InputBarOptions } from './EnhancedInputBar'
 
 export { default as ExportMenu } from './ExportMenu';
 export type { ExportMenuProps, ExportFormat } from './ExportMenu';
+
+export { default as ActionBar } from './ActionBar';
+export type { ActionBarProps } from './ActionBar';

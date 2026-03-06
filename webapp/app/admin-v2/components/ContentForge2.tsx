@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { PageHeader } from './PageHeader';
 import EnhancedInputBar from './shared/EnhancedInputBar';
 import type { InputBarOptions } from './shared/EnhancedInputBar';
+import ActionBar from './shared/ActionBar';
 
 // Types
 interface Blueprint {
@@ -723,6 +724,16 @@ export default function ContentForge2() {
         )}
       </AnimatePresence>
       </div>
+
+      {/* ActionBar - visible when content is generated */}
+      {generatedContent && (
+        <ActionBar
+          copyContent={generatedContent}
+          showExport={false}
+          showShare
+          shareTitle={topic}
+        />
+      )}
     </div>
   );
 }
