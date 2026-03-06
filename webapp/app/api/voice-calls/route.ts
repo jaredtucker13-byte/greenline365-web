@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // Retell AI API configuration
-const RETELL_API_KEY = process.env.RETELL_API_KEY || 'key_f687b4174315717b05fb63c4ed01';
+const RETELL_API_KEY = process.env.RETELL_API_KEY;
 const RETELL_API_URL = 'https://api.retellai.com';
 
 // Twilio configuration (for phone number provisioning)
@@ -73,6 +73,10 @@ async function getCallDetails(callId: string) {
 // POST - Make an outbound call
 export async function POST(request: NextRequest) {
   try {
+    if (!RETELL_API_KEY) {
+      return NextResponse.json({ success: false, error: 'RETELL_API_KEY is not configured' }, { status: 500 });
+    }
+
     const body = await request.json();
     const { action, ...params } = body;
     
@@ -150,6 +154,10 @@ export async function POST(request: NextRequest) {
 // GET - Get available agents and system status
 export async function GET() {
   try {
+    if (!RETELL_API_KEY) {
+      return NextResponse.json({ success: false, error: 'RETELL_API_KEY is not configured' }, { status: 500 });
+    }
+
     const agents = await getAgents();
     
     return NextResponse.json({

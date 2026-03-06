@@ -1,28 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { checkIsAdmin } from '@/lib/api-auth';
 
 /**
  * Audit Log API
  * Query and manage audit logs for compliance
- * 
+ *
  * Access: Admin-only for full logs, users see their own
  */
-
-// Admin emails that can see all logs
-const ADMIN_EMAILS = [
-  'greenline365help@gmail.com',
-];
 
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
-    
+
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const isAdmin = ADMIN_EMAILS.includes(user.email || '');
+    const isAdmin = await checkIsAdmin(user.id);
     const { searchParams } = new URL(request.url);
     
     // Query params
@@ -82,7 +78,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const isAdmin = ADMIN_EMAILS.includes(user.email || '');
+    const isAdmin = await checkIsAdmin(user.id);
     const body = await request.json();
     const { action: queryAction } = body;
 

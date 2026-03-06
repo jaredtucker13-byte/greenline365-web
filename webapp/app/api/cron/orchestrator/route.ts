@@ -29,8 +29,11 @@ const supabase = createClient(
 function verifyCronAuth(request: NextRequest): boolean {
   const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
-  if (cronSecret) return authHeader === `Bearer ${cronSecret}`;
-  return true;
+  if (!cronSecret) {
+    console.error('[Orchestrator] CRON_SECRET env var is not set - denying access');
+    return false;
+  }
+  return authHeader === `Bearer ${cronSecret}`;
 }
 
 // ── Types ───────────────────────────────────────────────────
@@ -55,7 +58,7 @@ async function checkServiceHealth(): Promise<TaskResult> {
 
     return {
       success: data.status !== 'down',
-      details: { overall: data.status, services: data.services, env_vars: data.env_vars },
+      details: { overall: data.status, services: data.services },
     };
   } catch (err: any) {
     // Fallback: direct DB check
