@@ -452,7 +452,7 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId: currentUserId
+          userId: currentUserId,
           title: title || blogTitle || 'Untitled Draft',
           contentType,
           contentData,
@@ -506,7 +506,7 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId: currentUserId
+          userId: currentUserId,
           title: title || blogTitle || 'Scheduled Content',
           contentType,
           contentData,
