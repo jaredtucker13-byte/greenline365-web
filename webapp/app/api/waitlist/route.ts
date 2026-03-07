@@ -9,14 +9,31 @@ import {
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com';
 
-// GET /api/waitlist - Fetch waitlist submissions
+// GET /api/waitlist - Fetch waitlist submissions (admin only)
 export async function GET(request: NextRequest) {
   try {
+    const supabase = await createClient();
+
+    // Require authentication
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Require admin
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', user.id)
+      .single();
+
+    if (!profile?.is_admin) {
+      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+    }
+
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
-    
-    const supabase = await createClient();
-    
+
     let query = supabase
       .from('waitlist_submissions')
       .select('*')

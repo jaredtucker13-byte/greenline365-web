@@ -45,7 +45,7 @@ interface DraftsPanelProps {
   onPublishDraft?: (draft: Draft) => void;
 }
 
-export default function DraftsPanel({ userId = 'demo-user', onEditDraft, onPublishDraft }: DraftsPanelProps) {
+export default function DraftsPanel({ userId, onEditDraft, onPublishDraft }: DraftsPanelProps) {
   const [drafts, setDrafts] = useState<Draft[]>([]);
   const [scheduledContent, setScheduledContent] = useState<Draft[]>([]);
   const [loading, setLoading] = useState(true);

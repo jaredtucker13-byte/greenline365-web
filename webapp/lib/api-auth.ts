@@ -39,7 +39,8 @@ export async function requireAuth(): Promise<
 }
 
 /**
- * Require admin-level access (super_admin role).
+ * Require admin-level access.
+ * Checks the `is_admin` flag on the profiles table.
  */
 export async function requireAdmin(): Promise<
   | { user: { id: string; email?: string; user_metadata: Record<string, unknown> }; error?: never }
@@ -48,14 +49,39 @@ export async function requireAdmin(): Promise<
   const auth = await requireAuth();
   if (auth.error) return auth;
 
-  if (auth.user.user_metadata?.role !== 'super_admin') {
+  const supabase = await createClient();
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('is_admin')
+    .eq('id', auth.user.id)
+    .single();
+
+  if (!profile?.is_admin) {
     return {
       error: NextResponse.json(
-        { error: 'Forbidden' },
+        { error: 'Admin access required' },
         { status: 403 }
       ),
     };
   }
 
   return { user: auth.user };
+}
+
+/**
+ * Check if the current user is an admin (non-throwing helper).
+ * Returns the is_admin boolean without returning an error response.
+ */
+export async function checkIsAdmin(userId: string): Promise<boolean> {
+  try {
+    const supabase = await createClient();
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', userId)
+      .single();
+    return profile?.is_admin === true;
+  } catch {
+    return false;
+  }
 }

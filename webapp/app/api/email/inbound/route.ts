@@ -86,7 +86,20 @@ async function sendListingLiveEmail(to: string, businessName: string, slug: stri
 }
 
 // POST /api/email/inbound - Enhanced with AI correction parsing
+// Protected by shared secret to prevent unauthorized manipulation
 export async function POST(request: NextRequest) {
+  // Verify inbound webhook authenticity via shared secret
+  const webhookSecret = process.env.INBOUND_EMAIL_WEBHOOK_SECRET;
+  if (webhookSecret) {
+    const providedSecret = request.headers.get('x-webhook-secret') ||
+      new URL(request.url).searchParams.get('secret');
+    if (providedSecret !== webhookSecret) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+  } else {
+    console.warn('[INBOUND] INBOUND_EMAIL_WEBHOOK_SECRET not configured - webhook is unprotected');
+  }
+
   const supabase = getServiceClient();
   const contentType = request.headers.get('content-type') || '';
 

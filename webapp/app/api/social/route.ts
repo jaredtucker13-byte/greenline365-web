@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { encrypt as encryptToken, decrypt as decryptToken } from '@/lib/encryption';
 
 /**
  * Social Connections API
- * 
+ *
  * Framework for users to connect their own social media accounts.
  * Users provide their own OAuth credentials/tokens.
- * 
+ * Tokens are encrypted at rest using AES-256-GCM.
+ *
  * Supported platforms:
  * - Instagram (via Meta Business API)
  * - Facebook Pages (via Meta Business API)
@@ -68,14 +70,14 @@ async function connectAccount(supabase: any, userId: string, connection: SocialC
     }, { status: 400 });
   }
 
-  // Store connection (encrypted in production)
+  // Store connection with encrypted tokens
   const { data, error } = await supabase
     .from('social_connections')
     .upsert({
       user_id: userId,
       platform: connection.platform,
-      access_token: connection.accessToken, // Should be encrypted in production
-      refresh_token: connection.refreshToken,
+      access_token: encryptToken(connection.accessToken),
+      refresh_token: connection.refreshToken ? encryptToken(connection.refreshToken) : null,
       expires_at: connection.expiresAt,
       account_id: validation.accountId,
       account_name: validation.accountName,
@@ -170,7 +172,7 @@ async function verifyConnection(supabase: any, userId: string, platform: string)
 
   const validation = await validateToken({
     platform: data.platform,
-    accessToken: data.access_token,
+    accessToken: decryptToken(data.access_token),
   });
 
   return NextResponse.json({

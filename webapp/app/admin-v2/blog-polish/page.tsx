@@ -20,6 +20,10 @@ import Link from 'next/link';
 import StyleLibrary from '../components/StyleLibrary';
 import CopyrightTools from '../components/CopyrightTools';
 import AIContentDisclaimer from '../components/AIContentDisclaimer';
+import EnhancedInputBar from '../components/shared/EnhancedInputBar';
+import ExportMenu from '../components/shared/ExportMenu';
+import ContentExportMenu from '../components/shared/ContentExportMenu';
+import ActionBar from '../components/shared/ActionBar';
 import { 
   CopyButton, 
   ShareButton, 
@@ -36,8 +40,25 @@ interface SEOFeedback {
   message: string;
 }
 
+interface SEOCategoryItem {
+  label: string;
+  status: 'pass' | 'warning' | 'fail';
+  detail: string;
+  fix?: string;
+}
+
+interface SEOCategory {
+  name: string;
+  score: number;
+  maxScore: number;
+  weight: number;
+  status: 'pass' | 'warning' | 'fail';
+  items: SEOCategoryItem[];
+}
+
 interface SEOAnalysis {
   score: number;
+  categories?: SEOCategory[];
   details: {
     wordCount: number;
     sentenceCount: number;
@@ -93,6 +114,7 @@ export default function BlogPolishPage() {
   const [activeTab, setActiveTab] = useState<'write' | 'preview'>('write');
   const [seoAnalysis, setSeoAnalysis] = useState<SEOAnalysis | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
+  const [expandedSeoCategory, setExpandedSeoCategory] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
@@ -408,7 +430,7 @@ export default function BlogPolishPage() {
 
   const analyzeSEO = async () => {
     if (!post.content || !post.title) return;
-    
+
     setAnalyzing(true);
     try {
       const response = await fetch('/api/blog/analyze', {
@@ -417,9 +439,13 @@ export default function BlogPolishPage() {
         body: JSON.stringify({
           content: post.content,
           title: post.title,
+          slug: post.slug,
+          tags: post.tags,
+          featuredImage: post.featured_image,
+          uploadedImageCount: imagePreviews.length,
         }),
       });
-      
+
       if (!response.ok) {
         console.error('SEO analysis failed:', response.status);
         return;
@@ -1647,6 +1673,17 @@ export default function BlogPolishPage() {
 
             {/* Actions */}
             <div className="flex items-center gap-3">
+              <ContentExportMenu
+                title={post.title}
+                content={post.content}
+                tags={post.tags}
+                category={post.category}
+                slug={post.slug}
+                featuredImage={post.featured_image}
+                formats={['html', 'markdown', 'plaintext', 'pdf', 'wordpress']}
+                filenamePrefix={post.slug || post.title || 'blog-post'}
+                variant="compact"
+              />
               <button
                 onClick={saveDraft}
                 disabled={saving}
@@ -2511,54 +2548,27 @@ export default function BlogPolishPage() {
                     </button>
                     
                     {showCustomImageChat && (
-                      <div className="mt-3 p-4 rounded-xl bg-purple-500/5 border border-purple-500/20">
-                        <p className="text-xs text-white/60 mb-3">
-                          Describe the image you want to create. Be as detailed as possible - mention subjects, style, mood, colors, and composition.
-                        </p>
-                        <textarea
+                      <div className="mt-3">
+                        <EnhancedInputBar
                           value={customImagePrompt}
-                          onChange={(e) => setCustomImagePrompt(e.target.value)}
-                          placeholder="E.g., A serene mountain lake at sunset with snow-capped peaks reflected in the water, golden hour lighting, cinematic wide shot..."
-                          className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/30 text-sm resize-none focus:outline-none focus:border-purple-500/50"
-                          rows={3}
+                          onChange={setCustomImagePrompt}
+                          onSubmit={() => generateCustomImage()}
+                          placeholder="Describe the image: subjects, style, mood, colors, composition..."
+                          isLoading={generatingCustomImage}
+                          loadingText="Creating..."
+                          submitLabel="Create Image"
+                          submitIcon={<svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>}
+                          multiline
+                          showStyle
+                          showVoice
+                          styleOptions={[
+                            { value: '16:9', label: 'Landscape 16:9' },
+                            { value: '9:16', label: 'Portrait 9:16' },
+                            { value: '1:1', label: 'Square 1:1' },
+                            { value: '21:9', label: 'Cinematic 21:9' },
+                          ]}
+                          defaultOptions={{ style: customImageRatio }}
                         />
-                        <div className="flex items-center gap-3 mt-3">
-                          <div className="flex-1">
-                            <label className="text-xs text-white/50 mb-1 block">Aspect Ratio</label>
-                            <select
-                              value={customImageRatio}
-                              onChange={(e) => setCustomImageRatio(e.target.value as any)}
-                              className="w-full px-2 py-1.5 rounded-lg bg-white/10 border border-white/20 text-white text-xs"
-                            >
-                              <option value="16:9">Landscape (16:9)</option>
-                              <option value="9:16">Portrait (9:16)</option>
-                              <option value="1:1">Square (1:1)</option>
-                              <option value="21:9">Cinematic (21:9)</option>
-                            </select>
-                          </div>
-                          <button
-                            onClick={generateCustomImage}
-                            disabled={generatingCustomImage || !customImagePrompt.trim()}
-                            className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-semibold hover:opacity-90 transition disabled:opacity-50 flex items-center gap-2"
-                          >
-                            {generatingCustomImage ? (
-                              <>
-                                <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                                </svg>
-                                Creating...
-                              </>
-                            ) : (
-                              <>
-                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                                </svg>
-                                Create Image
-                              </>
-                            )}
-                          </button>
-                        </div>
                         
                         {/* Custom Generated Images */}
                         {customGeneratedImages.length > 0 && (
@@ -2572,10 +2582,22 @@ export default function BlogPolishPage() {
                                     className="aspect-video w-full rounded-lg overflow-hidden border border-white/10 hover:border-purple-500/50 transition"
                                   >
                                     <img src={img.url} alt="Custom generated" className="w-full h-full object-cover" />
-                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                                      <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
+                                      <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
                                       </svg>
+                                      <ExportMenu
+                                        imageUrl={img.url}
+                                        title={`Blog Image - ${post.title || 'Custom'}`}
+                                        filenamePrefix="blog_image"
+                                        formats={['pdf', 'png', 'jpg', 'clipboard']}
+                                        variant="icon"
+                                        align="left"
+                                        pdfMeta={{
+                                          subtitle: post.title || 'Custom Blog Image',
+                                          description: customImagePrompt,
+                                        }}
+                                      />
                                     </div>
                                   </button>
                                   <div className="mt-1 flex gap-1">
@@ -3107,35 +3129,25 @@ export default function BlogPolishPage() {
           {/* Sidebar (1/3) */}
           <div className="space-y-6">
             
-            {/* SEO Score */}
+            {/* SEO Audit */}
             <div className="backdrop-blur-2xl bg-white/[0.08] rounded-2xl border border-white/[0.15] p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]">
               <h3 className="text-white font-medium mb-4 flex items-center gap-2">
-                <span>📊</span> SEO Analysis
+                <span>📊</span> SEO Audit
               </h3>
-              
+
               {seoAnalysis ? (
                 <>
-                  {/* Score Circle */}
-                  <div className="flex items-center justify-center mb-6">
-                    <div className="relative w-32 h-32">
-                      <svg className="transform -rotate-90 w-32 h-32">
+                  {/* Overall Score Circle */}
+                  <div className="flex items-center justify-center mb-4">
+                    <div className="relative w-28 h-28">
+                      <svg className="transform -rotate-90 w-28 h-28">
+                        <circle cx="56" cy="56" r="48" stroke="rgba(255,255,255,0.1)" strokeWidth="7" fill="none" />
                         <circle
-                          cx="64"
-                          cy="64"
-                          r="56"
-                          stroke="rgba(255,255,255,0.1)"
-                          strokeWidth="8"
-                          fill="none"
-                        />
-                        <circle
-                          cx="64"
-                          cy="64"
-                          r="56"
+                          cx="56" cy="56" r="48"
                           stroke="url(#scoreGradient)"
-                          strokeWidth="8"
-                          fill="none"
-                          strokeDasharray={`${2 * Math.PI * 56}`}
-                          strokeDashoffset={`${2 * Math.PI * 56 * (1 - seoAnalysis.score / 100)}`}
+                          strokeWidth="7" fill="none"
+                          strokeDasharray={`${2 * Math.PI * 48}`}
+                          strokeDashoffset={`${2 * Math.PI * 48 * (1 - seoAnalysis.score / 100)}`}
                           strokeLinecap="round"
                           className="transition-all duration-1000"
                         />
@@ -3147,49 +3159,108 @@ export default function BlogPolishPage() {
                         </defs>
                       </svg>
                       <div className="absolute inset-0 flex items-center justify-center flex-col">
-                        <span className={`text-4xl font-bold ${getScoreColor(seoAnalysis.score)}`}>
-                          {seoAnalysis.score}
-                        </span>
-                        <span className="text-white/40 text-xs">/ 100</span>
+                        <span className={`text-3xl font-bold ${getScoreColor(seoAnalysis.score)}`}>{seoAnalysis.score}</span>
+                        <span className="text-white/40 text-[10px]">/ 100</span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Feedback Items */}
-                  <div className="space-y-2">
-                    {seoAnalysis.feedback.map((item, i) => (
-                      <div key={i} className="flex items-start gap-2 text-sm">
-                        <span className={
-                          item.type === 'success' ? 'text-gold-400' :
-                          item.type === 'warning' ? 'text-amber-400' :
-                          item.type === 'info' ? 'text-sky-400' : 'text-red-400'
-                        }>
-                          {item.type === 'success' ? '✓' : item.type === 'warning' ? '⚠' : 'ℹ'}
-                        </span>
-                        <span className="text-white/70">{item.message}</span>
-                      </div>
-                    ))}
-                  </div>
+                  {/* Pass / Warn / Fail summary */}
+                  {seoAnalysis.categories && (
+                    <div className="flex justify-center gap-4 mb-5 text-xs">
+                      <span className="text-emerald-400">{seoAnalysis.categories.filter(c => c.status === 'pass').length} passed</span>
+                      <span className="text-amber-400">{seoAnalysis.categories.filter(c => c.status === 'warning').length} warnings</span>
+                      <span className="text-red-400">{seoAnalysis.categories.filter(c => c.status === 'fail').length} failed</span>
+                    </div>
+                  )}
 
-                  {/* Keywords */}
+                  {/* Category Breakdown */}
+                  {seoAnalysis.categories && (
+                    <div className="space-y-2 max-h-[520px] overflow-y-auto pr-1 custom-scrollbar">
+                      {seoAnalysis.categories.map((cat) => {
+                        const isExpanded = expandedSeoCategory === cat.name;
+                        const catIcon = cat.status === 'pass' ? '✓' : cat.status === 'warning' ? '!' : '✕';
+                        const catColor = cat.status === 'pass' ? 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20' : cat.status === 'warning' ? 'text-amber-400 bg-amber-400/10 border-amber-400/20' : 'text-red-400 bg-red-400/10 border-red-400/20';
+                        const barColor = cat.status === 'pass' ? 'bg-emerald-400' : cat.status === 'warning' ? 'bg-amber-400' : 'bg-red-400';
+
+                        return (
+                          <div key={cat.name} className="border border-white/[0.08] rounded-xl overflow-hidden">
+                            {/* Category header */}
+                            <button
+                              onClick={() => setExpandedSeoCategory(isExpanded ? null : cat.name)}
+                              className="w-full flex items-center gap-2 px-3 py-2.5 hover:bg-white/[0.04] transition-colors text-left"
+                            >
+                              <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold border ${catColor}`}>
+                                {catIcon}
+                              </span>
+                              <span className="text-white/80 text-xs font-medium flex-1 truncate">{cat.name}</span>
+                              <span className={`text-xs font-semibold ${cat.score >= 70 ? 'text-emerald-400' : cat.score >= 40 ? 'text-amber-400' : 'text-red-400'}`}>{cat.score}</span>
+                              <svg className={`w-3.5 h-3.5 text-white/30 transition-transform ${isExpanded ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                            </button>
+
+                            {/* Score bar */}
+                            <div className="px-3 pb-2">
+                              <div className="h-1 bg-white/[0.06] rounded-full overflow-hidden">
+                                <div className={`h-full rounded-full transition-all duration-700 ${barColor}`} style={{ width: `${cat.score}%` }} />
+                              </div>
+                            </div>
+
+                            {/* Expanded items */}
+                            {isExpanded && (
+                              <div className="px-3 pb-3 space-y-2 border-t border-white/[0.06] pt-2">
+                                {cat.items.map((item, idx) => (
+                                  <div key={idx} className="text-xs">
+                                    <div className="flex items-start gap-1.5">
+                                      <span className={`mt-0.5 flex-shrink-0 ${item.status === 'pass' ? 'text-emerald-400' : item.status === 'warning' ? 'text-amber-400' : 'text-red-400'}`}>
+                                        {item.status === 'pass' ? '✓' : item.status === 'warning' ? '⚠' : '✕'}
+                                      </span>
+                                      <div className="flex-1 min-w-0">
+                                        <span className="text-white/60 font-medium">{item.label}: </span>
+                                        <span className="text-white/50">{item.detail}</span>
+                                        {item.fix && (
+                                          <div className="mt-1.5 p-2 bg-white/[0.04] rounded-lg border border-white/[0.06]">
+                                            <span className="text-sky-400/80 font-medium">Fix: </span>
+                                            <span className="text-white/50">{item.fix}</span>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* Top Keywords */}
                   {seoAnalysis.details.topKeywords.length > 0 && (
                     <div className="mt-4 pt-4 border-t border-white/10">
                       <p className="text-white/50 text-xs mb-2">Top Keywords:</p>
                       <div className="flex flex-wrap gap-1">
-                        {seoAnalysis.details.topKeywords.slice(0, 6).map(kw => (
-                          <span key={kw} className="px-2 py-0.5 bg-white/[0.05] rounded text-xs text-white/60">
-                            {kw}
-                          </span>
+                        {seoAnalysis.details.topKeywords.slice(0, 8).map(kw => (
+                          <span key={kw} className="px-2 py-0.5 bg-white/[0.05] rounded text-xs text-white/60">{kw}</span>
                         ))}
                       </div>
                     </div>
                   )}
+
+                  {/* Re-analyze button */}
+                  <button
+                    onClick={analyzeSEO}
+                    disabled={analyzing}
+                    className="w-full mt-4 py-2 text-xs text-white/50 hover:text-white/80 border border-white/[0.08] rounded-lg hover:bg-white/[0.04] transition-colors disabled:opacity-50"
+                  >
+                    {analyzing ? 'Analyzing...' : 'Re-analyze'}
+                  </button>
                 </>
               ) : (
                 <div className="text-center py-8">
                   <div className="text-4xl mb-3 opacity-50">📝</div>
                   <p className="text-white/40 text-sm">
-                    {analyzing ? 'Analyzing your content...' : 'Write at least 100 words to see SEO analysis'}
+                    {analyzing ? 'Running SEO audit...' : 'Write at least 100 words to see your SEO audit'}
                   </p>
                 </div>
               )}
@@ -3501,20 +3572,17 @@ export default function BlogPolishPage() {
                   </svg>
                   Open Full Size
                 </button>
-                <button
-                  onClick={() => {
-                    const a = document.createElement('a');
-                    a.href = previewImage.url;
-                    a.download = `image-${previewImage.id}.png`;
-                    a.click();
+                <ExportMenu
+                  imageUrl={previewImage.url}
+                  title={`Blog Image - ${post.title || 'Generated'}`}
+                  filenamePrefix={`blog_image_${previewImage.id}`}
+                  formats={['pdf', 'png', 'jpg', 'webp', 'clipboard', 'print']}
+                  variant="button"
+                  pdfMeta={{
+                    subtitle: post.title || 'Blog Image',
+                    description: `Generated image for blog post`,
                   }}
-                  className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition flex items-center gap-2"
-                >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                  </svg>
-                  Download
-                </button>
+                />
                 <select
                   value={selectedLayout}
                   onChange={(e) => setSelectedLayout(e.target.value as any)}
@@ -3542,6 +3610,18 @@ export default function BlogPolishPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* ActionBar - Command Center Input */}
+      <ActionBar
+        onSubmit={(prompt, toolId) => {
+          if (toolId === 'blog') {
+            setPost(prev => ({ ...prev, title: prompt }));
+          }
+        }}
+        isForging={false}
+        forgingText="Polishing..."
+        defaultTool="blog"
+      />
     </div>
   );
 }

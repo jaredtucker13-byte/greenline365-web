@@ -3,6 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PageHeader } from './PageHeader';
+import EnhancedInputBar from './shared/EnhancedInputBar';
+import type { InputBarOptions } from './shared/EnhancedInputBar';
+import ActionBar from './shared/ActionBar';
+import ContentExportMenu from './shared/ContentExportMenu';
 
 // Types
 interface Blueprint {
@@ -381,71 +385,45 @@ export default function ContentForge2() {
                 </div>
               </div>
 
-              {/* Topic Input */}
-              <div className="bg-white/5 rounded-2xl border border-white/10 p-4">
+              {/* Topic Input - Enhanced */}
+              <div>
                 <h2 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
                   <span className="text-gold-500">02</span>
                   Define Topic
                 </h2>
-                
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-[10px] text-white/50 uppercase tracking-wider">Topic / Title</label>
-                    <input
-                      type="text"
-                      value={topic}
-                      onChange={(e) => setTopic(e.target.value)}
-                      placeholder="e.g., How to get more 5-star reviews"
-                      className="w-full mt-1 px-3 py-2 bg-black/30 border border-white/20 rounded-lg text-white text-sm placeholder:text-white/30 focus:border-gold-500 focus:outline-none"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="text-[10px] text-white/50 uppercase tracking-wider">Target Audience</label>
-                    <input
-                      type="text"
-                      value={targetAudience}
-                      onChange={(e) => setTargetAudience(e.target.value)}
-                      placeholder="e.g., Local restaurant owners"
-                      className="w-full mt-1 px-3 py-2 bg-black/30 border border-white/20 rounded-lg text-white text-sm placeholder:text-white/30 focus:border-gold-500 focus:outline-none"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="text-[10px] text-white/50 uppercase tracking-wider">Tone</label>
-                    <select
-                      value={tone}
-                      onChange={(e) => setTone(e.target.value)}
-                      className="w-full mt-1 px-3 py-2 bg-black/30 border border-white/20 rounded-lg text-white text-sm focus:border-gold-500 focus:outline-none"
-                    >
-                      <option value="professional">Professional</option>
-                      <option value="casual">Casual & Friendly</option>
-                      <option value="bold">Bold & Contrarian</option>
-                      <option value="empathetic">Empathetic & Supportive</option>
-                    </select>
-                  </div>
-                </div>
-                
-                <button
-                  onClick={handleGenerate}
-                  disabled={!selectedBlueprint || !topic || isGenerating}
-                  className="w-full mt-4 py-3 bg-gradient-to-r from-gold-500 to-gold-600 text-black font-bold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {isGenerating ? (
-                    <>
-                      <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                      </svg>
-                      Manifesting Content...
-                    </>
-                  ) : (
-                    <>
-                      <span>🔮</span>
-                      Generate Content
-                    </>
-                  )}
-                </button>
+                <EnhancedInputBar
+                  value={topic}
+                  onChange={setTopic}
+                  onSubmit={(val, opts) => {
+                    setTopic(val);
+                    if (opts.tone) setTone(opts.tone);
+                    if (opts.audience) setTargetAudience(opts.audience);
+                    handleGenerate();
+                  }}
+                  placeholder="e.g., How to get more 5-star reviews"
+                  isLoading={isGenerating}
+                  loadingText="Manifesting Content..."
+                  submitLabel="Generate Content"
+                  submitIcon={<span className="text-sm">🔮</span>}
+                  showTone
+                  showAudience
+                  showLength
+                  showFormat
+                  showVoice
+                  disabled={!selectedBlueprint}
+                  defaultOptions={{
+                    tone,
+                    audience: targetAudience,
+                    length: 'medium',
+                  }}
+                  formatOptions={[
+                    { value: 'blog', label: 'Blog Post' },
+                    { value: 'social', label: 'Social Post' },
+                    { value: 'email', label: 'Email' },
+                    { value: 'landing', label: 'Landing Page' },
+                    { value: 'newsletter', label: 'Newsletter' },
+                  ]}
+                />
               </div>
 
               {/* Quality Scores */}
@@ -534,15 +512,28 @@ export default function ContentForge2() {
                     Generated Content
                   </h2>
                   {generatedContent && (
-                    <button
-                      onClick={() => navigator.clipboard.writeText(generatedContent)}
-                      className="text-xs text-white/50 hover:text-white flex items-center gap-1"
-                    >
-                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                      </svg>
-                      Copy
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => navigator.clipboard.writeText(generatedContent)}
+                        className="text-xs text-white/50 hover:text-white flex items-center gap-1"
+                      >
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                        Copy
+                      </button>
+                      <ContentExportMenu
+                        title={topic || 'Generated Content'}
+                        content={generatedContent}
+                        formats={['html', 'markdown', 'plaintext', 'pdf']}
+                        filenamePrefix={topic ? topic.replace(/\s+/g, '-').toLowerCase() : 'content-forge'}
+                        variant="compact"
+                        socialPosts={Object.entries(repurposedContent).map(([format, text]) => ({
+                          platform: format.replace('_', ' '),
+                          content: text,
+                        }))}
+                      />
+                    </div>
                   )}
                 </div>
                 
@@ -668,6 +659,23 @@ export default function ContentForge2() {
                       </p>
                     </motion.div>
                   ))}
+
+                  {/* Export all repurposed content as social pack */}
+                  {Object.keys(repurposedContent).length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-white/10">
+                      <ContentExportMenu
+                        title={topic || 'Social Content'}
+                        content={generatedContent}
+                        formats={['social-pack', 'plaintext']}
+                        filenamePrefix={`${(topic || 'social').replace(/\s+/g, '-').toLowerCase()}-social`}
+                        variant="compact"
+                        socialPosts={Object.entries(repurposedContent).map(([format, text]) => ({
+                          platform: format.replace('_', '-'),
+                          content: text,
+                        }))}
+                      />
+                    </div>
+                  )}
                 </motion.div>
               )}
             </div>
@@ -747,6 +755,19 @@ export default function ContentForge2() {
         )}
       </AnimatePresence>
       </div>
+
+      {/* ActionBar - Command Center Input */}
+      <ActionBar
+        onSubmit={(prompt, toolId) => {
+          if (toolId === 'blog' || toolId === 'social') {
+            setTopic(prompt);
+            handleGenerate();
+          }
+        }}
+        isForging={isGenerating}
+        forgingText="Manifesting Content..."
+        defaultTool="blog"
+      />
     </div>
   );
 }

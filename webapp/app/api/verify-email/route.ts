@@ -1,15 +1,16 @@
 /**
  * Email Verification API
- * 
+ *
  * Supports two modes:
  * 1. Code-based (legacy): action='send'/'verify' with 6-digit code
  * 2. Link-based (new): Double opt-in with verification link
- * 
+ *
  * Uses Gmail SMTP (free 500/day) instead of SendGrid ($800/mo)
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import crypto from 'crypto';
 import { sendEmail, generateVerificationToken, getVerificationEmailHtml } from '@/lib/email/gmail-sender';
 
 const supabase = createClient(
@@ -19,11 +20,9 @@ const supabase = createClient(
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com';
 
-// Legacy: Store verification codes temporarily (for code-based verification)
-const verificationCodes = new Map<string, { code: string; expires: number }>();
-
+// Generate a cryptographically secure 6-digit code
 function generateCode(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  return crypto.randomInt(100000, 999999).toString();
 }
 
 function isValidEmail(email: string): boolean {
@@ -52,10 +51,10 @@ export async function POST(req: NextRequest) {
         .single();
 
       if (existing?.verified) {
-        return NextResponse.json({ 
-          success: true, 
+        return NextResponse.json({
+          success: true,
           message: 'Email already verified',
-          alreadyVerified: true 
+          alreadyVerified: true
         });
       }
 
@@ -82,7 +81,6 @@ export async function POST(req: NextRequest) {
 
       if (dbError) {
         console.error('[Verify Email] DB Error:', dbError);
-        // If table doesn't exist, we'll create it - for now just continue
         if (!dbError.message.includes('does not exist')) {
           return NextResponse.json({ error: 'Failed to save verification' }, { status: 500 });
         }
@@ -98,20 +96,18 @@ export async function POST(req: NextRequest) {
 
       if (!emailResult.success) {
         console.error('[Verify Email] Email send failed:', emailResult.error);
-        
+
         // In development, still return success but log the URL
         if (process.env.NODE_ENV === 'development') {
           console.log(`[DEV] Verification URL: ${verificationUrl}`);
           return NextResponse.json({
             success: true,
             message: 'Verification email would be sent (dev mode)',
-            devUrl: verificationUrl,
           });
         }
-        
-        return NextResponse.json({ 
+
+        return NextResponse.json({
           error: 'Failed to send verification email. Please check Gmail configuration.',
-          details: emailResult.error 
         }, { status: 500 });
       }
 
@@ -121,13 +117,28 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // LEGACY: Code-based verification (for existing flows)
+    // LEGACY: Code-based verification stored in DB (not in-memory)
     if (action === 'send') {
       const code = generateCode();
-      verificationCodes.set(normalizedEmail, {
-        code,
-        expires: Date.now() + 10 * 60 * 1000, // 10 minutes
-      });
+      const salt = crypto.randomBytes(16).toString('hex');
+      const codeHash = crypto.createHash('sha256').update(salt + code).digest('hex');
+      const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString(); // 10 minutes
+
+      // Store in DB instead of in-memory Map (survives cold starts, works across instances)
+      await supabase
+        .from('email_verifications')
+        .upsert({
+          email: normalizedEmail,
+          source: 'code_verify',
+          token: codeHash,
+          metadata: { salt },
+          expires_at: expiresAt,
+          verified: false,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }, {
+          onConflict: 'email,source',
+        });
 
       // Send code via Gmail
       const emailResult = await sendEmail({
@@ -149,7 +160,7 @@ export async function POST(req: NextRequest) {
 
       return NextResponse.json({
         success: true,
-        message: emailResult.success 
+        message: emailResult.success
           ? 'Verification code sent to your email'
           : 'Verification code generated (check console in dev)',
         ...(isDev && !emailResult.success && { devCode: code }),
@@ -158,22 +169,37 @@ export async function POST(req: NextRequest) {
 
     if (action === 'verify') {
       const { code } = body;
-      const stored = verificationCodes.get(normalizedEmail);
 
-      if (!stored) {
+      // Look up the stored verification from DB
+      const { data: stored } = await supabase
+        .from('email_verifications')
+        .select('token, metadata, expires_at, verified')
+        .eq('email', normalizedEmail)
+        .eq('source', 'code_verify')
+        .single();
+
+      if (!stored || stored.verified) {
         return NextResponse.json({ error: 'No verification code found. Please request a new one.' }, { status: 400 });
       }
 
-      if (Date.now() > stored.expires) {
-        verificationCodes.delete(normalizedEmail);
+      if (new Date() > new Date(stored.expires_at)) {
         return NextResponse.json({ error: 'Verification code expired. Please request a new one.' }, { status: 400 });
       }
 
-      if (stored.code !== code) {
+      // Verify with stored salt
+      const salt = stored.metadata?.salt || '';
+      const attemptHash = crypto.createHash('sha256').update(salt + code).digest('hex');
+
+      if (!crypto.timingSafeEqual(Buffer.from(attemptHash), Buffer.from(stored.token))) {
         return NextResponse.json({ error: 'Invalid verification code' }, { status: 400 });
       }
 
-      verificationCodes.delete(normalizedEmail);
+      // Mark as verified
+      await supabase
+        .from('email_verifications')
+        .update({ verified: true, updated_at: new Date().toISOString() })
+        .eq('email', normalizedEmail)
+        .eq('source', 'code_verify');
 
       return NextResponse.json({
         success: true,
@@ -185,6 +211,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid action or source' }, { status: 400 });
   } catch (error: any) {
     console.error('[Verify Email] Error:', error);
-    return NextResponse.json({ error: error.message || 'Server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }

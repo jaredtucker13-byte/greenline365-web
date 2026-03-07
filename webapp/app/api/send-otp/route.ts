@@ -3,17 +3,25 @@ import { createServerClient } from '@/lib/supabase/server';
 import { rateLimit, rateLimitResponse } from '@/lib/rate-limit';
 import crypto from 'crypto';
 
-// N8N Webhook URL - Production
-const N8N_WEBHOOK_URL = 'https://n8n.srv1156042.hstgr.cloud/webhook/ab195f12-f784-4317-a7b7-66b0c0361e6f';
+// N8N Webhook URL - must be configured in environment
+const N8N_WEBHOOK_URL = process.env.N8N_OTP_WEBHOOK_URL;
 
-// Generate a random 6-digit OTP
+// Generate a cryptographically secure 6-digit OTP
 function generateOTP(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  return crypto.randomInt(100000, 999999).toString();
 }
 
-// Hash the OTP for secure storage
-function hashOTP(code: string): string {
-  return crypto.createHash('sha256').update(code).digest('hex');
+// Hash the OTP with a random salt for secure storage
+function hashOTP(code: string, salt?: string): { hash: string; salt: string } {
+  const useSalt = salt || crypto.randomBytes(16).toString('hex');
+  const hash = crypto.createHash('sha256').update(useSalt + code).digest('hex');
+  return { hash, salt: useSalt };
+}
+
+// Verify an OTP against a stored hash + salt
+function verifyOTP(code: string, storedHash: string, salt: string): boolean {
+  const { hash } = hashOTP(code, salt);
+  return crypto.timingSafeEqual(Buffer.from(hash), Buffer.from(storedHash));
 }
 
 export async function POST(request: NextRequest) {
@@ -59,10 +67,10 @@ export async function POST(request: NextRequest) {
 
     // Generate OTP
     const code = generateOTP();
-    const codeHash = hashOTP(code);
+    const { hash: codeHash, salt: codeSalt } = hashOTP(code);
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
-    // Store OTP in database
+    // Store OTP in database (hash + salt)
     const { error: otpError } = await supabase
       .from('phone_otp')
       .insert({
@@ -70,6 +78,7 @@ export async function POST(request: NextRequest) {
         phone,
         user_id: existingProfile?.id || null,
         code_hash: codeHash,
+        code_salt: codeSalt,
         expires_at: expiresAt.toISOString(),
         used: false,
       });
@@ -84,6 +93,9 @@ export async function POST(request: NextRequest) {
 
     // Send OTP to N8N webhook
     try {
+      if (!N8N_WEBHOOK_URL) {
+        console.warn('[send-otp] N8N_OTP_WEBHOOK_URL not configured, skipping webhook');
+      } else {
       const webhookResponse = await fetch(N8N_WEBHOOK_URL, {
         method: 'POST',
         headers: {
@@ -102,6 +114,7 @@ export async function POST(request: NextRequest) {
         // Don't fail the request - OTP is stored, just log the webhook issue
       } else {
         console.log('OTP sent to N8N webhook successfully');
+      }
       }
     } catch (webhookError) {
       console.error('Failed to call N8N webhook:', webhookError);

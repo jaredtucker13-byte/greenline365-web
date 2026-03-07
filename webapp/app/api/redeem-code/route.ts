@@ -1,19 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { rateLimit, rateLimitResponse } from '@/lib/rate-limit';
 
 /**
  * Code Redemption API
- * 
- * Public endpoint for redeeming promo codes during onboarding
- * 
- * POST /api/redeem-code - Validate and redeem a code
+ *
+ * POST /api/redeem-code - Validate and redeem a code (auth required)
+ * GET  /api/redeem-code - Validate a code without redeeming (auth + rate-limited)
  */
 
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
-    
+
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error('[Redeem Code API] Error:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: 'Failed to redeem code' }, { status: 500 });
     }
 
     if (!result.success) {
@@ -78,13 +78,24 @@ export async function POST(request: NextRequest) {
 
   } catch (error: any) {
     console.error('[Redeem Code API] Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
-// Validate code without redeeming (for preview)
+// Validate code without redeeming (for preview) - requires auth + rate-limited
 export async function GET(request: NextRequest) {
+  // Rate limit: 5 attempts per minute per IP to prevent enumeration
+  const rl = rateLimit(request, { max: 5, windowMs: 60_000 });
+  if (!rl.allowed) return rateLimitResponse(rl.retryAfter);
+
   try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const code = searchParams.get('code');
 
@@ -95,9 +106,6 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const supabase = await createClient();
-
-    // Check if code exists and is valid (without auth required for preview)
     const { data: accessCode, error } = await supabase
       .from('access_codes')
       .select('id, code, linked_tier, code_type, description, max_uses, current_uses, expires_at, is_active')
@@ -105,6 +113,7 @@ export async function GET(request: NextRequest) {
       .single();
 
     if (error || !accessCode) {
+      // Return generic error to prevent code enumeration
       return NextResponse.json(
         { valid: false, error: 'Invalid code' },
         { status: 404 }
@@ -116,14 +125,12 @@ export async function GET(request: NextRequest) {
     const isMaxedOut = accessCode.current_uses >= accessCode.max_uses;
     const isValid = accessCode.is_active && !isExpired && !isMaxedOut;
 
+    // Return minimal info - don't expose internal details like usesRemaining
     return NextResponse.json({
       valid: isValid,
-      code: accessCode.code,
-      tier: accessCode.linked_tier,
-      codeType: accessCode.code_type,
-      description: accessCode.description,
-      usesRemaining: accessCode.max_uses - accessCode.current_uses,
-      expiresAt: accessCode.expires_at,
+      tier: isValid ? accessCode.linked_tier : undefined,
+      codeType: isValid ? accessCode.code_type : undefined,
+      description: isValid ? accessCode.description : undefined,
       ...(isExpired && { error: 'Code has expired' }),
       ...(isMaxedOut && { error: 'Code has reached maximum uses' }),
       ...(!accessCode.is_active && { error: 'Code is no longer active' }),
@@ -131,6 +138,6 @@ export async function GET(request: NextRequest) {
 
   } catch (error: any) {
     console.error('[Validate Code API] Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

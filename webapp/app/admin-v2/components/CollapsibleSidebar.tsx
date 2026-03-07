@@ -3,11 +3,11 @@
 /**
  * CollapsibleSidebar Component
  * GreenLine365 Admin V2 - Tactical Multi-Command Center
- * 
+ *
  * Features:
  * - Collapsible: Desktop shows icons-only when collapsed (Slack-style)
  * - Mobile: Fully hidden with hamburger toggle
- * - Dashboard, Schedule, Analytics, Settings, Content navigation
+ * - Collapsible nav groups (CONTENT FORGE, CREATIVE STUDIO, etc.)
  * - Action buttons: New Booking, New Content, Pending Approvals
  * - Status indicators: SYSTEM ONLINE, AES-256 ENCRYPTED
  * - Hidden Demo Controller trigger (triple-click on version)
@@ -19,7 +19,15 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useBusiness } from '@/lib/business';
 import { Lock } from 'lucide-react';
-import { commandCenterNav, filterNavItems } from '@/lib/navigation/navConfig';
+import {
+  commandCenterNavGrouped,
+  filterNavEntries,
+  isNavGroup,
+  type NavItem,
+  type NavGroup,
+  type NavEntry,
+} from '@/lib/navigation/navConfig';
+
 interface SidebarProps {
   activeItem: string; // Dynamic - matches nav item IDs
   onNewBooking: () => void;
@@ -34,7 +42,7 @@ interface SidebarProps {
   onPreviewModeToggle?: () => void;
 }
 
-// Nav items imported from single-source config: commandCenterNav
+// Nav items imported from single-source config: commandCenterNavGrouped
 
 const icons: Record<string, React.ReactElement> = {
   grid: (
@@ -155,11 +163,116 @@ const icons: Record<string, React.ReactElement> = {
   ),
 };
 
-export default function CollapsibleSidebar({ 
-  activeItem, 
-  onNewBooking, 
-  onNewContent, 
-  pendingCount, 
+// ─── Collapsible Group Component ────────────────────────────────────
+
+function NavGroupSection({
+  group,
+  activeItem,
+  isCollapsed,
+  expandedGroups,
+  onToggleGroup,
+}: {
+  group: NavGroup;
+  activeItem: string;
+  isCollapsed: boolean;
+  expandedGroups: Record<string, boolean>;
+  onToggleGroup: (id: string) => void;
+}) {
+  const isExpanded = expandedGroups[group.id] ?? (group.defaultOpen || false);
+  const hasActiveChild = group.children.some(c => c.id === activeItem);
+
+  // In collapsed mode, show only a divider line
+  if (isCollapsed) {
+    return (
+      <div>
+        <div className="my-2 border-t" style={{ borderColor: 'var(--theme-glass-border)' }} />
+        {group.children.map(child => (
+          <NavItemLink key={child.id} item={child} isActive={activeItem === child.id} isCollapsed />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      {/* Group Header (clickable) */}
+      <button
+        onClick={() => onToggleGroup(group.id)}
+        className="w-full flex items-center justify-between pt-4 pb-1 px-3 group"
+      >
+        <span
+          className="text-[9px] font-semibold uppercase tracking-[0.15em] transition-colors"
+          style={{ color: hasActiveChild ? 'var(--theme-accent)' : 'var(--theme-text-muted)' }}
+        >
+          {group.label}
+        </span>
+        <svg
+          className={`w-3 h-3 transition-transform duration-200 ${isExpanded ? '' : '-rotate-90'}`}
+          style={{ color: 'var(--theme-text-muted)' }}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {/* Children (animated) */}
+      <AnimatePresence initial={false}>
+        {isExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
+            className="overflow-hidden"
+          >
+            <div className="space-y-0.5 mt-1">
+              {group.children.map(child => (
+                <NavItemLink key={child.id} item={child} isActive={activeItem === child.id} isCollapsed={false} />
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// ─── Single Nav Item Link ───────────────────────────────────────────
+
+function NavItemLink({ item, isActive, isCollapsed }: { item: NavItem; isActive: boolean; isCollapsed: boolean }) {
+  return (
+    <Link
+      href={item.href}
+      className={`flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-300 group ${isCollapsed ? 'justify-center px-2' : ''}`}
+      style={isActive ? {
+        background: 'color-mix(in srgb, var(--theme-primary) 20%, transparent)',
+        color: 'var(--theme-accent)',
+        border: '1px solid color-mix(in srgb, var(--theme-primary) 30%, transparent)',
+      } : {
+        color: 'var(--theme-text-secondary)',
+      }}
+      title={isCollapsed ? item.label : undefined}
+      data-testid={`nav-${item.id}`}
+    >
+      <span style={{ color: isActive ? 'var(--theme-accent)' : 'var(--theme-text-muted)' }}>
+        {icons[item.icon]}
+      </span>
+      {!isCollapsed && (
+        <span className="text-sm font-medium">{item.label}</span>
+      )}
+    </Link>
+  );
+}
+
+// ─── Main Sidebar ───────────────────────────────────────────────────
+
+export default function CollapsibleSidebar({
+  activeItem,
+  onNewBooking,
+  onNewContent,
+  pendingCount,
   onDemoControllerToggle,
   isCollapsed,
   onToggleCollapse,
@@ -183,16 +296,44 @@ export default function CollapsibleSidebar({
     checkPlatformOwner();
   }, []);
 
-  // Filter nav items using the shared single-source config
-  const visibleNavItems = useMemo(() => {
-    return filterNavItems(commandCenterNav, {
-      hasFeature,
+  // Expanded/collapsed state for groups
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
+
+  // Initialize default-open groups once
+  useEffect(() => {
+    const defaults: Record<string, boolean> = {};
+    for (const entry of commandCenterNavGrouped) {
+      if (isNavGroup(entry)) {
+        defaults[entry.id] = entry.defaultOpen || false;
+      }
+    }
+    setExpandedGroups(defaults);
+  }, []);
+
+  // Auto-expand the group containing the active item
+  useEffect(() => {
+    for (const entry of commandCenterNavGrouped) {
+      if (isNavGroup(entry) && entry.children.some(c => c.id === activeItem)) {
+        setExpandedGroups(prev => ({ ...prev, [entry.id]: true }));
+        break;
+      }
+    }
+  }, [activeItem]);
+
+  const toggleGroup = useCallback((groupId: string) => {
+    setExpandedGroups(prev => ({ ...prev, [groupId]: !prev[groupId] }));
+  }, []);
+
+  // Filter nav entries using the shared single-source config
+  const visibleEntries = useMemo(() => {
+    return filterNavEntries(commandCenterNavGrouped, {
+      hasFeature: hasFeature as (key: string) => boolean,
       isAdmin: isAdmin(),
       isWhiteLabel: isWhiteLabel(),
       isPlatformOwner,
     });
   }, [hasFeature, isAdmin, isWhiteLabel, isPlatformOwner]);
-  
+
   // Triple-click handler for hidden Demo Controller
   const [clickCount, setClickCount] = useState(0);
   const [clickTimer, setClickTimer] = useState<NodeJS.Timeout | null>(null);
@@ -239,7 +380,7 @@ export default function CollapsibleSidebar({
             )}
           </Link>
         </div>
-        
+
         {/* Business Switcher Dropdown - Only show if multiple businesses and not collapsed */}
         {!isCollapsed && userBusinesses.length > 1 && (
           <div className="mt-3 relative">
@@ -252,15 +393,15 @@ export default function CollapsibleSidebar({
               }}
               disabled={isSwitchingBusiness}
               className={`w-full px-3 py-2 rounded-lg text-xs appearance-none cursor-pointer transition focus:outline-none focus:ring-2 focus:ring-purple-500/50 ${isSwitchingBusiness ? 'opacity-50 cursor-wait' : ''}`}
-              style={{ 
-                background: 'var(--theme-bg-glass)', 
+              style={{
+                background: 'var(--theme-bg-glass)',
                 border: '1px solid var(--theme-glass-border)',
                 color: 'var(--theme-text-primary)'
               }}
             >
               {userBusinesses.map((ub) => (
-                <option 
-                  key={ub.business.id} 
+                <option
+                  key={ub.business.id}
                   value={ub.business.id}
                   style={{ background: '#1A1A1A', color: '#fff' }}
                 >
@@ -271,10 +412,10 @@ export default function CollapsibleSidebar({
             {isSwitchingBusiness ? (
               <div className="w-4 h-4 absolute right-2 top-1/2 -translate-y-1/2 border-2 border-[#39FF14]/30 border-t-[#39FF14] rounded-full animate-spin" />
             ) : (
-              <svg 
-                className="w-4 h-4 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" 
-                fill="none" 
-                viewBox="0 0 24 24" 
+              <svg
+                className="w-4 h-4 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none"
+                fill="none"
+                viewBox="0 0 24 24"
                 stroke="currentColor"
                 style={{ color: 'var(--theme-text-muted)' }}
               >
@@ -284,7 +425,7 @@ export default function CollapsibleSidebar({
           </div>
         )}
       </div>
-      
+
       {/* Collapse Toggle - Placed BELOW the header line */}
       <div className="hidden lg:flex justify-center py-2" style={{ borderBottom: '1px solid var(--theme-glass-border)' }}>
         <button
@@ -300,46 +441,30 @@ export default function CollapsibleSidebar({
         </button>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-        {visibleNavItems.map((item) => {
-          // Render divider labels
-          if ((item as any).isDivider) {
-            if (isCollapsed) return <div key={item.id} className="my-2 border-t" style={{ borderColor: 'var(--theme-glass-border)' }} />;
+      {/* Navigation - Grouped */}
+      <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
+        {visibleEntries.map(entry => {
+          if (isNavGroup(entry)) {
             return (
-              <div key={item.id} className="pt-4 pb-1 px-3">
-                <span className="text-[9px] font-semibold uppercase tracking-[0.15em]" style={{ color: 'var(--theme-text-muted)' }}>
-                  {item.label}
-                </span>
-              </div>
+              <NavGroupSection
+                key={entry.id}
+                group={entry}
+                activeItem={activeItem}
+                isCollapsed={isCollapsed}
+                expandedGroups={expandedGroups}
+                onToggleGroup={toggleGroup}
+              />
             );
           }
 
-          // Use the ID to check active state instead of relying on prop
-          const isCurrentActive = activeItem === item.id;
-          
+          // Standalone item (Dashboard, Schedule)
           return (
-            <Link
-              key={item.id}
-              href={item.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 group ${isCollapsed ? 'justify-center px-2' : ''}`}
-              style={isCurrentActive ? {
-                background: 'color-mix(in srgb, var(--theme-primary) 20%, transparent)',
-                color: 'var(--theme-accent)',
-                border: '1px solid color-mix(in srgb, var(--theme-primary) 30%, transparent)',
-              } : {
-                color: 'var(--theme-text-secondary)',
-              }}
-              title={isCollapsed ? item.label : undefined}
-              data-testid={`nav-${item.id}`}
-            >
-              <span style={{ color: isCurrentActive ? 'var(--theme-accent)' : 'var(--theme-text-muted)' }}>
-                {icons[item.icon]}
-              </span>
-              {!isCollapsed && (
-                <span className="text-sm font-medium">{item.label}</span>
-              )}
-            </Link>
+            <NavItemLink
+              key={entry.id}
+              item={entry}
+              isActive={activeItem === entry.id}
+              isCollapsed={isCollapsed}
+            />
           );
         })}
       </nav>
@@ -368,7 +493,7 @@ export default function CollapsibleSidebar({
             New Content
           </button>
           {pendingCount > 0 && (
-            <button 
+            <button
               className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm transition"
               style={{ background: 'color-mix(in srgb, var(--theme-warning) 10%, transparent)', color: 'var(--theme-warning)', border: '1px solid color-mix(in srgb, var(--theme-warning) 20%, transparent)' }}
             >
@@ -376,7 +501,7 @@ export default function CollapsibleSidebar({
               Pending ({pendingCount})
             </button>
           )}
-          
+
           {/* Preview Mode Toggle */}
           <button
             onClick={onPreviewModeToggle}
