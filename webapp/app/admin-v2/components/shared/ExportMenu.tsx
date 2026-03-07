@@ -8,6 +8,17 @@ import {
   FileImage, File,
 } from 'lucide-react';
 
+// ─── Helpers ────────────────────────────────────────────────────────
+
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 // ─── Types ──────────────────────────────────────────────────────────
 
 export type ExportFormat = 'pdf' | 'png' | 'jpg' | 'svg' | 'webp' | 'clipboard' | 'print';
@@ -306,11 +317,12 @@ export default function ExportMenu({
           const dataUrl = canvas.toDataURL('image/png');
           const printWindow = window.open('', '_blank');
           if (printWindow) {
+            const safeTitle = escapeHtml(title || '');
             printWindow.document.write(`
               <!DOCTYPE html>
               <html>
               <head>
-                <title>${title}</title>
+                <title>${safeTitle}</title>
                 <style>
                   body { margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: white; }
                   img { max-width: 100%; max-height: 100vh; object-fit: contain; }
@@ -318,7 +330,7 @@ export default function ExportMenu({
                 </style>
               </head>
               <body>
-                <img src="${dataUrl}" alt="${title}" />
+                <img src="${dataUrl}" alt="${safeTitle}" />
               </body>
               </html>
             `);

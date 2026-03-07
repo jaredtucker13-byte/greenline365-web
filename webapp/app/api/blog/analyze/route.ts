@@ -22,8 +22,8 @@ const STOP_WORDS = new Set([
 
 function stripMarkdown(md: string): string {
   return md
-    .replace(/!\[.*?\]\(.*?\)/g, '')          // images
-    .replace(/\[([^\]]*)\]\(.*?\)/g, '$1')    // links → text
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, '')          // images
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')    // links → text
     .replace(/#{1,6}\s*/g, '')                 // headings
     .replace(/[*_~`>]/g, '')                   // emphasis / blockquote / code
     .replace(/\|.*?\|/g, ' ')                  // table cells
@@ -47,7 +47,7 @@ function fleschKincaid(words: number, sentences: number, syllables: number) {
 }
 
 function extractLinks(content: string): { internal: string[]; external: string[] } {
-  const linkRegex = /\[([^\]]*)\]\(([^)]+)\)/g;
+  const linkRegex = /\[([^\]]{0,500})\]\(([^)]{1,2000})\)/g;
   const internal: string[] = [];
   const external: string[] = [];
   let m;
@@ -63,7 +63,7 @@ function extractLinks(content: string): { internal: string[]; external: string[]
 }
 
 function extractImages(content: string): { src: string; alt: string }[] {
-  const imgRegex = /!\[([^\]]*)\]\(([^)]+)\)/g;
+  const imgRegex = /!\[([^\]]{0,500})\]\(([^)]{1,2000})\)/g;
   const imgs: { src: string; alt: string }[] = [];
   let m;
   while ((m = imgRegex.exec(content)) !== null) {
@@ -73,7 +73,7 @@ function extractImages(content: string): { src: string; alt: string }[] {
 }
 
 function extractHeadings(content: string): { level: number; text: string }[] {
-  const headingRegex = /^(#{1,6})\s+(.+)$/gm;
+  const headingRegex = /^(#{1,6})\s+([^\n]+)$/gm;
   const headings: { level: number; text: string }[] = [];
   let m;
   while ((m = headingRegex.exec(content)) !== null) {
@@ -579,7 +579,7 @@ function analyzeSchemaMarkup(content: string, title: string): CategoryResult {
 
   // Check for FAQ pattern
   const hasQuestions = (content.match(/\?/g) || []).length;
-  const hasFaqPattern = /#{2,3}\s*.+\?/gm.test(content);
+  const hasFaqPattern = /#{2,3}\s*[^\n]+\?/gm.test(content);
 
   if (hasFaqPattern) {
     score += 40;
