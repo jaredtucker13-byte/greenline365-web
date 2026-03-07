@@ -22,11 +22,11 @@ const STOP_WORDS = new Set([
 
 function stripMarkdown(md: string): string {
   return md
-    .replace(/!\[[^\]]*\]\([^)]*\)/g, '')          // images
-    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')    // links → text
+    .replace(/!\[[^\]]{0,500}\]\([^)]{0,2000}\)/g, '')          // images
+    .replace(/\[([^\]]{0,500})\]\([^)]{0,2000}\)/g, '$1')    // links → text
     .replace(/#{1,6}\s*/g, '')                 // headings
     .replace(/[*_~`>]/g, '')                   // emphasis / blockquote / code
-    .replace(/\|.*?\|/g, ' ')                  // table cells
+    .replace(/\|[^|\n]*\|/g, ' ')               // table cells
     .replace(/-{3,}/g, '')                     // hr
     .replace(/\n+/g, ' ')
     .trim();
@@ -73,7 +73,7 @@ function extractImages(content: string): { src: string; alt: string }[] {
 }
 
 function extractHeadings(content: string): { level: number; text: string }[] {
-  const headingRegex = /^(#{1,6})\s+([^\n]+)$/gm;
+  const headingRegex = /^(#{1,6})[ \t]+(\S[^\n]*)$/gm;
   const headings: { level: number; text: string }[] = [];
   let m;
   while ((m = headingRegex.exec(content)) !== null) {
@@ -579,7 +579,7 @@ function analyzeSchemaMarkup(content: string, title: string): CategoryResult {
 
   // Check for FAQ pattern
   const hasQuestions = (content.match(/\?/g) || []).length;
-  const hasFaqPattern = /#{2,3}\s*[^\n]+\?/gm.test(content);
+  const hasFaqPattern = /#{2,3}[ \t]+\S[^\n]*\?/gm.test(content);
 
   if (hasFaqPattern) {
     score += 40;
