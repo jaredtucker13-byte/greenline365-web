@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
 import BoostedShowcase from '@/components/BoostedShowcase';
+import CommunityPolls from '@/components/CommunityPolls';
 import FeaturedShowcase from '@/components/FeaturedShowcase';
 
 interface Listing {
@@ -614,6 +615,22 @@ export default function DirectoryClient() {
                   Whether you&apos;re a homeowner searching for a trusted pro or a business owner looking to grow your reputation, GreenLine365 is where Florida&apos;s local economy connects.
                 </p>
               </div>
+            </div>
+          </section>
+
+          {/* ═══════════════════════════════════════════════════════════
+              COMMUNITY POLLS — "YOU VOTED" WIDGET
+              ═══════════════════════════════════════════════════════════ */}
+          <section className="py-16" style={{ background: '#0A0A0A' }} data-testid="community-polls-section">
+            <div className="max-w-7xl mx-auto px-6">
+              <div className="text-center mb-8">
+                <p className="text-xs font-heading font-semibold uppercase tracking-[0.2em] mb-3" style={{ color: '#C9A84C' }}>Community Voice</p>
+                <h2 className="text-3xl md:text-4xl font-heading font-light text-white tracking-tight mb-3">
+                  You <span className="text-gradient-gold font-semibold">Voted</span>
+                </h2>
+                <p className="text-white/50 text-sm max-w-md mx-auto font-body">Help your neighbors find the best local pros.</p>
+              </div>
+              <CommunityPolls />
             </div>
           </section>
 

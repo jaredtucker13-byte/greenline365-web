@@ -78,3 +78,81 @@ CREATE POLICY "No public read on votes"
   USING (false);
 
 -- Service role has full access (handled by Supabase default for service key)
+
+-- ============================================================
+-- RPC: Atomic vote count increment
+-- ============================================================
+CREATE OR REPLACE FUNCTION increment_vote_count(target_option_id uuid)
+RETURNS void AS $$
+BEGIN
+  UPDATE community_poll_options
+  SET vote_count = vote_count + 1
+  WHERE id = target_option_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- ============================================================
+-- Seed Data: Sample community polls so the section isn't empty
+-- ============================================================
+
+-- Poll 1: Best Plumber in Tampa
+INSERT INTO community_polls (id, title, description, category, destination_slug, status, closes_at)
+VALUES (
+  'a1b2c3d4-0001-4000-8000-000000000001',
+  'Best Plumber in Tampa',
+  'Vote for the most reliable plumbing service in the Tampa Bay area.',
+  'plumbing', 'tampa', 'active',
+  now() + interval '90 days'
+);
+
+INSERT INTO community_poll_options (id, poll_id, business_id, business_name, vote_count) VALUES
+  ('b1b2c3d4-0001-4000-8000-000000000001', 'a1b2c3d4-0001-4000-8000-000000000001', gen_random_uuid(), 'Bay Area Plumbing Pros', 47),
+  ('b1b2c3d4-0001-4000-8000-000000000002', 'a1b2c3d4-0001-4000-8000-000000000001', gen_random_uuid(), 'Tampa Flow Masters', 32),
+  ('b1b2c3d4-0001-4000-8000-000000000003', 'a1b2c3d4-0001-4000-8000-000000000001', gen_random_uuid(), 'Clearwater Drain Solutions', 28),
+  ('b1b2c3d4-0001-4000-8000-000000000004', 'a1b2c3d4-0001-4000-8000-000000000001', gen_random_uuid(), 'Gulf Coast Piping Co.', 19);
+
+-- Poll 2: Best AC Repair in Florida
+INSERT INTO community_polls (id, title, description, category, destination_slug, status, closes_at)
+VALUES (
+  'a1b2c3d4-0002-4000-8000-000000000001',
+  'Best AC Repair in Florida',
+  'Which HVAC company keeps your Florida home the coolest?',
+  'hvac', NULL, 'active',
+  now() + interval '90 days'
+);
+
+INSERT INTO community_poll_options (id, poll_id, business_id, business_name, vote_count) VALUES
+  ('b1b2c3d4-0002-4000-8000-000000000001', 'a1b2c3d4-0002-4000-8000-000000000001', gen_random_uuid(), 'Arctic Air Florida', 63),
+  ('b1b2c3d4-0002-4000-8000-000000000002', 'a1b2c3d4-0002-4000-8000-000000000001', gen_random_uuid(), 'Sunshine HVAC', 51),
+  ('b1b2c3d4-0002-4000-8000-000000000003', 'a1b2c3d4-0002-4000-8000-000000000001', gen_random_uuid(), 'CoolBreeze Comfort Systems', 38);
+
+-- Poll 3: Best Restaurant in Daytona Beach
+INSERT INTO community_polls (id, title, description, category, destination_slug, status, closes_at)
+VALUES (
+  'a1b2c3d4-0003-4000-8000-000000000001',
+  'Best Restaurant in Daytona Beach',
+  'Where''s your favorite spot to eat in Daytona?',
+  'dining', 'daytona-beach', 'active',
+  now() + interval '90 days'
+);
+
+INSERT INTO community_poll_options (id, poll_id, business_id, business_name, vote_count) VALUES
+  ('b1b2c3d4-0003-4000-8000-000000000001', 'a1b2c3d4-0003-4000-8000-000000000001', gen_random_uuid(), 'The Garlic', 55),
+  ('b1b2c3d4-0003-4000-8000-000000000002', 'a1b2c3d4-0003-4000-8000-000000000001', gen_random_uuid(), 'Ocean Deck Restaurant & Beach Club', 42),
+  ('b1b2c3d4-0003-4000-8000-000000000003', 'a1b2c3d4-0003-4000-8000-000000000001', gen_random_uuid(), 'Aunt Catfish''s On The River', 39),
+  ('b1b2c3d4-0003-4000-8000-000000000004', 'a1b2c3d4-0003-4000-8000-000000000001', gen_random_uuid(), 'Crabby''s Oceanside', 27);
+
+-- Poll 4: Best Lawn Service in Hillsborough County
+INSERT INTO community_polls (id, title, description, category, destination_slug, status, closes_at)
+VALUES (
+  'a1b2c3d4-0004-4000-8000-000000000001',
+  'Best Lawn Service in Hillsborough County',
+  'Who keeps the best yards in Hillsborough County?',
+  'lawn-care', 'tampa', 'active',
+  now() + interval '90 days'
+);
+
+INSERT INTO community_poll_options (id, poll_id, business_id, business_name, vote_count) VALUES
+  ('b1b2c3d4-0004-4000-8000-000000000001', 'a1b2c3d4-0004-4000-8000-000000000001', gen_random_uuid(), 'Green Horizons Landscaping', 34),
+  ('b1b2c3d4-0004-4000-8000-000000000002', 'a1b2c3d4-0004-4000-8000-000000000001', gen_random_uuid(), 'TurfMasters Tampa Bay', 29),
+  ('b1b2c3d4-0004-4000-8000-000000000003', 'a1b2c3d4-0004-4000-8000-000000000001', gen_random_uuid(), 'Precision Lawn & Garden', 22);
