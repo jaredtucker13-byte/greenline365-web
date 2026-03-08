@@ -603,12 +603,11 @@ export default function DirectoryClient() {
 
             <div className="max-w-7xl mx-auto px-6">
               <div className="text-center mb-14 corner-filigree py-8 px-4">
-                <p className="text-xs font-heading font-semibold uppercase tracking-[0.25em] mb-4" style={{ color: 'rgba(201,168,76,0.7)' }}>Curated Travel Guides</p>
                 <h2 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-light text-white tracking-tight mb-4">
-                  Explore <span className="text-gradient-gold font-semibold">Destinations</span>
+                  Explore Florida&apos;s Best <span className="text-gradient-gold font-semibold">Destinations</span>
                 </h2>
-                <p className="text-sm text-white/50 max-w-lg mx-auto font-body leading-relaxed">
-                  Your personal concierge to Florida&apos;s finest — where to stay, dine, explore, and unwind.
+                <p className="text-sm text-white/50 max-w-xl mx-auto font-body leading-relaxed">
+                  Discover local dining, entertainment, attractions and more in cities across Florida.
                 </p>
               </div>
 
