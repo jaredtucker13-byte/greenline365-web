@@ -192,9 +192,10 @@ export const commandCenterNav: NavItem[] = [
  */
 export const publicNav = [
   { href: '/', label: 'Directory' },
-  { href: '/loops', label: 'Experiences' },
-  { href: '/home-ledger', label: 'Home Ledger' },
-  { href: '/services', label: 'Our Services' },
+  { href: '/destinations', label: 'Destinations' },
+  { href: '/categories', label: 'Categories' },
+  { href: '/about', label: 'About' },
+  { href: '/contact', label: 'Contact' },
 ];
 
 /**
