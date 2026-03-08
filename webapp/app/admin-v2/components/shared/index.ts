@@ -16,3 +16,12 @@ export type { TimeSeriesChartProps, DataPoint } from './TimeSeriesChart';
 
 export { DataTable } from './DataTable';
 export type { DataTableProps, Column } from './DataTable';
+
+export { default as EnhancedInputBar } from './EnhancedInputBar';
+export type { EnhancedInputBarProps, InputBarOptions } from './EnhancedInputBar';
+
+export { default as ExportMenu } from './ExportMenu';
+export type { ExportMenuProps, ExportFormat } from './ExportMenu';
+
+export { default as ActionBar } from './ActionBar';
+export type { ActionBarProps, ActionBarTool } from './ActionBar';

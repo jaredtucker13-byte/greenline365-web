@@ -10,8 +10,9 @@
  * - Live preview with color extraction
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import ExportMenu from '../components/shared/ExportMenu';
 import { 
   TemplateRenderer, 
   Template, 
@@ -340,6 +341,7 @@ export default function LivingCanvasPage() {
   const [palette, setPalette] = useState<ExtractedPalette>(DEFAULT_PALETTE);
   const [showEditor, setShowEditor] = useState(false);
   const [editingSlot, setEditingSlot] = useState<string | null>(null);
+  const canvasRef = useRef<HTMLDivElement>(null);
   
   // Update visual mode when template changes
   useEffect(() => {
@@ -388,12 +390,25 @@ export default function LivingCanvasPage() {
                 </button>
               </div>
               
+              {/* Export */}
+              <ExportMenu
+                targetRef={canvasRef}
+                title={activeTemplate.name}
+                filenamePrefix={`canvas_${activeTemplate.slug}`}
+                formats={['pdf', 'png', 'jpg', 'webp', 'clipboard', 'print']}
+                variant="compact"
+                pdfMeta={{
+                  subtitle: activeTemplate.description,
+                  description: `Template: ${activeTemplate.name} | Mode: ${visualMode} | Slots: ${activeTemplate.structure.slots.length}`,
+                }}
+              />
+
               {/* Editor Toggle */}
               <button
                 onClick={() => setShowEditor(!showEditor)}
                 className={`px-4 py-2 rounded-xl text-sm font-medium transition ${
-                  showEditor 
-                    ? 'bg-white text-black' 
+                  showEditor
+                    ? 'bg-white text-black'
                     : 'bg-white/10 text-white hover:bg-white/20'
                 }`}
               >
@@ -555,7 +570,7 @@ export default function LivingCanvasPage() {
           
           {/* Template Preview */}
           <div className="p-8">
-            <div className="rounded-2xl overflow-hidden border border-white/10">
+            <div ref={canvasRef} className="rounded-2xl overflow-hidden border border-white/10">
               <TemplateRenderer
                 template={activeTemplate}
                 content={content}

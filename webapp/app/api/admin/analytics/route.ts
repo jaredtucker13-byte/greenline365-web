@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { checkIsAdmin } from '@/lib/api-auth';
 
 /**
  * ADMIN-ONLY Analytics API
  * Platform-level metrics for GreenLine365 ROI tracking
- * 
+ *
  * This is NOT visible to tenants - only platform admins
  * Used for:
  * - Marketing campaigns
@@ -13,22 +14,17 @@ import { createClient } from '@/lib/supabase/server';
  * - Business decisions
  */
 
-// Admin email addresses that can access this endpoint
-const ADMIN_EMAILS = [
-  'greenline365help@gmail.com',
-];
-
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
-    
+
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Check if user is admin
-    if (!ADMIN_EMAILS.includes(user.email || '')) {
+    // Check if user is admin via profiles.is_admin
+    if (!await checkIsAdmin(user.id)) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
@@ -51,8 +47,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Check if user is admin
-    if (!ADMIN_EMAILS.includes(user.email || '')) {
+    // Check if user is admin via profiles.is_admin
+    if (!await checkIsAdmin(user.id)) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 

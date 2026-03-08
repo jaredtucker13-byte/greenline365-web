@@ -9,17 +9,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-
-// Allowed admin emails (should match your admin list)
-const ADMIN_EMAILS = [
-  'greenline365help@gmail.com',
-];
-
-async function checkAdmin(supabase: any) {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return false;
-  return ADMIN_EMAILS.includes(user.email || '');
-}
+import { checkIsAdmin } from '@/lib/api-auth';
 
 export async function GET(request: NextRequest) {
   try {
@@ -31,7 +21,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     
-    const isAdmin = ADMIN_EMAILS.includes(user.email || '');
+    const isAdmin = await checkIsAdmin(user.id);
     
     const { searchParams } = new URL(request.url);
     
@@ -204,7 +194,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     
-    const isAdmin = ADMIN_EMAILS.includes(user.email || '');
+    const isAdmin = await checkIsAdmin(user.id);
     
     const body = await request.json();
     const { id, ...updates } = body;
@@ -271,9 +261,10 @@ export async function PUT(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     const supabase = await createClient();
-    
-    if (!await checkAdmin(supabase)) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user || !await checkIsAdmin(user.id)) {
+      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
     
     const { searchParams } = new URL(request.url);

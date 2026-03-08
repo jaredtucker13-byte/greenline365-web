@@ -17,6 +17,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 import ChatWidget from '../../components/ChatWidget';
+import { supabase } from '@/lib/supabase/client';
 
 interface ContentForgeProps {
   isOpen: boolean;
@@ -108,10 +109,18 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
   // Save State
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  
+
   // AI Assistant Panel State
   const [showAssistant, setShowAssistant] = useState(false);
-  
+
+  // Auth: get current user ID
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) setCurrentUserId(user.id);
+    });
+  }, []);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
   const timePickerRef = useRef<HTMLDivElement>(null);
@@ -443,7 +452,7 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId: 'demo-user', // TODO: Replace with actual user ID from auth
+          userId: currentUserId,
           title: title || blogTitle || 'Untitled Draft',
           contentType,
           contentData,
@@ -497,7 +506,7 @@ export default function ContentForge({ isOpen, onClose, selectedDate, onSchedule
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId: 'demo-user', // TODO: Replace with actual user ID from auth
+          userId: currentUserId,
           title: title || blogTitle || 'Scheduled Content',
           contentType,
           contentData,

@@ -3,9 +3,9 @@ import { createServerClient } from '@/lib/supabase/server';
 import { rateLimit, rateLimitResponse } from '@/lib/rate-limit';
 import crypto from 'crypto';
 
-// Hash the OTP for comparison
-function hashOTP(code: string): string {
-  return crypto.createHash('sha256').update(code).digest('hex');
+// Hash the OTP with salt for comparison (must match send-otp's hashing)
+function hashOTP(code: string, salt: string): string {
+  return crypto.createHash('sha256').update(salt + code).digest('hex');
 }
 
 export async function POST(request: NextRequest) {
@@ -55,8 +55,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify the code
-    const codeHash = hashOTP(code);
+    // Verify the code using the stored salt
+    const codeHash = hashOTP(code, otpRecord.code_salt);
     if (codeHash !== otpRecord.code_hash) {
       return NextResponse.json(
         { 

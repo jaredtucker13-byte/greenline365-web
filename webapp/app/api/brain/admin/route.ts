@@ -17,6 +17,18 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Business ID required' }, { status: 400 });
     }
 
+    // Verify user has access to this business
+    const { data: access } = await supabase
+      .from('user_businesses')
+      .select('role')
+      .eq('user_id', user.id)
+      .eq('business_id', businessId)
+      .single();
+
+    if (!access) {
+      return NextResponse.json({ error: 'Access denied to this business' }, { status: 403 });
+    }
+
     const { data: items, error } = await supabase
       .from('brain_admin')
       .select('*')
@@ -43,11 +55,25 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { itemId, completed } = body;
+    const { itemId, completed, businessId } = body;
+
+    // Verify user has access to the business that owns this item
+    if (businessId) {
+      const { data: access } = await supabase
+        .from('user_businesses')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('business_id', businessId)
+        .single();
+
+      if (!access) {
+        return NextResponse.json({ error: 'Access denied to this business' }, { status: 403 });
+      }
+    }
 
     const { error } = await supabase
       .from('brain_admin')
-      .update({ 
+      .update({
         completed,
         completed_at: completed ? new Date().toISOString() : null,
       })
