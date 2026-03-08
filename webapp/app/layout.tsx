@@ -33,8 +33,7 @@ const inter = Inter({
 
 // Lazy-load ChatWidget to reduce initial JS bundle
 const ChatWidget = dynamic(() => import('./components/ChatWidget'), {
-    ssr: false,
-    loading: () => null,
+        loading: () => null,
 });
 
 // ===========================================
