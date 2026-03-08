@@ -1,7 +1,7 @@
 import DirectoryClient from './directory/DirectoryClient';
 import type { Metadata } from 'next';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60; // ISR: revalidate every 60s instead of force-dynamic
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://greenline365.com';
 
