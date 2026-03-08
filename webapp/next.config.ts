@@ -40,6 +40,11 @@ const nextConfig: NextConfig = {
             },
             {
                       protocol: 'https',
+                      hostname: 'static.prod-images.emergentagent.com',
+                      pathname: '/**',
+            },
+            {
+                      protocol: 'https',
                       hostname: '*.kie.ai',
                       pathname: '/**',
             },
