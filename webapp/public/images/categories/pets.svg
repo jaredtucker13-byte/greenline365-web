@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#1e1a2e"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <!-- Large paw print -->
+  <g transform="translate(400, 280)">
+    <!-- Main pad -->
+    <ellipse cx="0" cy="40" rx="65" ry="55" fill="#C9A84C" opacity="0.7"/>
+    <!-- Toe pads -->
+    <ellipse cx="-55" cy="-30" rx="30" ry="35" fill="#C9A84C" opacity="0.6" transform="rotate(-15 -55 -30)"/>
+    <ellipse cx="-15" cy="-60" rx="28" ry="33" fill="#C9A84C" opacity="0.6" transform="rotate(-5 -15 -60)"/>
+    <ellipse cx="30" cy="-58" rx="28" ry="33" fill="#C9A84C" opacity="0.6" transform="rotate(8 30 -58)"/>
+    <ellipse cx="65" cy="-25" rx="30" ry="35" fill="#C9A84C" opacity="0.6" transform="rotate(18 65 -25)"/>
+  </g>
+  <!-- Smaller paw prints trailing -->
+  <g transform="translate(180, 420) scale(0.35)" opacity="0.25">
+    <ellipse cx="0" cy="40" rx="65" ry="55" fill="#C9A84C"/>
+    <ellipse cx="-55" cy="-30" rx="30" ry="35" fill="#C9A84C" transform="rotate(-15 -55 -30)"/>
+    <ellipse cx="-15" cy="-60" rx="28" ry="33" fill="#C9A84C" transform="rotate(-5 -15 -60)"/>
+    <ellipse cx="30" cy="-58" rx="28" ry="33" fill="#C9A84C" transform="rotate(8 30 -58)"/>
+    <ellipse cx="65" cy="-25" rx="30" ry="35" fill="#C9A84C" transform="rotate(18 65 -25)"/>
+  </g>
+  <g transform="translate(600, 140) scale(0.3)" opacity="0.2">
+    <ellipse cx="0" cy="40" rx="65" ry="55" fill="#C9A84C"/>
+    <ellipse cx="-55" cy="-30" rx="30" ry="35" fill="#C9A84C" transform="rotate(-15 -55 -30)"/>
+    <ellipse cx="-15" cy="-60" rx="28" ry="33" fill="#C9A84C" transform="rotate(-5 -15 -60)"/>
+    <ellipse cx="30" cy="-58" rx="28" ry="33" fill="#C9A84C" transform="rotate(8 30 -58)"/>
+    <ellipse cx="65" cy="-25" rx="30" ry="35" fill="#C9A84C" transform="rotate(18 65 -25)"/>
+  </g>
+  <g transform="translate(140, 140) scale(0.25)" opacity="0.15">
+    <ellipse cx="0" cy="40" rx="65" ry="55" fill="#C9A84C"/>
+    <ellipse cx="-55" cy="-30" rx="30" ry="35" fill="#C9A84C" transform="rotate(-15 -55 -30)"/>
+    <ellipse cx="-15" cy="-60" rx="28" ry="33" fill="#C9A84C" transform="rotate(-5 -15 -60)"/>
+    <ellipse cx="30" cy="-58" rx="28" ry="33" fill="#C9A84C" transform="rotate(8 30 -58)"/>
+    <ellipse cx="65" cy="-25" rx="30" ry="35" fill="#C9A84C" transform="rotate(18 65 -25)"/>
+  </g>
+  <!-- Heart -->
+  <g transform="translate(400, 400)" opacity="0.3">
+    <path d="M0 15 Q0 0 -15 0 A15 15 0 0 0 -30 15 Q-30 30 0 45 Q30 30 30 15 A15 15 0 0 0 15 0 Q0 0 0 15Z" fill="#C9A84C"/>
+  </g>
+</svg>

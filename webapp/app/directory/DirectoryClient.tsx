@@ -67,7 +67,7 @@ const CATEGORIES = [
     ] },
 
   // === AUTOMOTIVE ===
-  { id: 'automotive', label: 'Automotive', sub: 'Repairs, dealers & body shops', img: '/images/categories/services.png',
+  { id: 'automotive', label: 'Automotive', sub: 'Repairs, dealers & body shops', img: '/images/categories/automotive.svg',
     subcategories: ['All', 'Auto Repair', 'Oil Change', 'Tire Shops', 'Body Shops', 'Car Dealers', 'Auto Parts', 'Towing', 'Car Wash', 'Auto Detailing', 'EV Charging'] },
 
   // === MARINE & OUTDOOR (Key West / Coastal Florida) ===
@@ -87,15 +87,15 @@ const CATEGORIES = [
     subcategories: ['All', 'Barbershops', 'Salons', 'Nail Salons', 'Spas', 'Boutiques', 'Jewelry', 'Tattoo & Piercing', 'Dry Cleaning & Laundry'] },
 
   // === PROFESSIONAL SERVICES ===
-  { id: 'professional-services', label: 'Professional Services', sub: 'Legal, finance & consulting', img: '/images/categories/services.png',
+  { id: 'professional-services', label: 'Professional Services', sub: 'Legal, finance & consulting', img: '/images/categories/professional-services.svg',
     subcategories: ['All', 'Attorneys', 'Accountants', 'Insurance', 'Real Estate', 'Financial Advisors', 'IT Services', 'Marketing Agencies', 'Notary'] },
 
   // === EDUCATION & CHILDCARE ===
-  { id: 'education', label: 'Education & Childcare', sub: 'Schools, tutoring & daycare', img: '/images/categories/services.png',
+  { id: 'education', label: 'Education & Childcare', sub: 'Schools, tutoring & daycare', img: '/images/categories/education.svg',
     subcategories: ['All', 'Preschools', 'Daycare', 'Tutoring', 'Driving Schools', 'Music Lessons', 'Dance Studios', 'Martial Arts', 'Language Schools'] },
 
   // === PETS ===
-  { id: 'pets', label: 'Pets', sub: 'Vets, grooming & boarding', img: '/images/categories/services.png',
+  { id: 'pets', label: 'Pets', sub: 'Vets, grooming & boarding', img: '/images/categories/pets.svg',
     subcategories: ['All', 'Veterinarians', 'Pet Grooming', 'Pet Boarding', 'Pet Stores', 'Dog Training', 'Pet Sitting', 'Aquarium & Fish'] },
 ];
 

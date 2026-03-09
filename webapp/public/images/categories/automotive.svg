@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#C9A84C"/>
+      <stop offset="100%" style="stop-color:#E8C547"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <!-- Road -->
+  <rect x="0" y="380" width="800" height="120" fill="#2a2a3a" rx="0"/>
+  <rect x="50" y="435" width="80" height="6" rx="3" fill="#C9A84C" opacity="0.5"/>
+  <rect x="180" y="435" width="80" height="6" rx="3" fill="#C9A84C" opacity="0.5"/>
+  <rect x="310" y="435" width="80" height="6" rx="3" fill="#C9A84C" opacity="0.5"/>
+  <rect x="440" y="435" width="80" height="6" rx="3" fill="#C9A84C" opacity="0.5"/>
+  <rect x="570" y="435" width="80" height="6" rx="3" fill="#C9A84C" opacity="0.5"/>
+  <rect x="700" y="435" width="80" height="6" rx="3" fill="#C9A84C" opacity="0.5"/>
+  <!-- Car body -->
+  <path d="M250 340 Q260 280 340 270 L460 270 Q540 280 550 340 L560 370 L240 370 Z" fill="url(#accent)" opacity="0.9"/>
+  <rect x="230" y="340" width="340" height="50" rx="12" fill="#C9A84C"/>
+  <!-- Windows -->
+  <path d="M290 340 L310 285 L390 280 L390 340 Z" fill="#1a1a2e" opacity="0.7"/>
+  <path d="M400 340 L400 280 L490 285 L510 340 Z" fill="#1a1a2e" opacity="0.7"/>
+  <!-- Wheels -->
+  <circle cx="310" cy="390" r="35" fill="#2a2a3a" stroke="#555" stroke-width="4"/>
+  <circle cx="310" cy="390" r="18" fill="#444" stroke="#666" stroke-width="2"/>
+  <circle cx="310" cy="390" r="6" fill="#C9A84C"/>
+  <circle cx="490" cy="390" r="35" fill="#2a2a3a" stroke="#555" stroke-width="4"/>
+  <circle cx="490" cy="390" r="18" fill="#444" stroke="#666" stroke-width="2"/>
+  <circle cx="490" cy="390" r="6" fill="#C9A84C"/>
+  <!-- Headlights -->
+  <ellipse cx="555" cy="355" rx="12" ry="8" fill="#fff" opacity="0.9"/>
+  <ellipse cx="245" cy="355" rx="12" ry="8" fill="#ff4444" opacity="0.7"/>
+  <!-- Wrench icon top-right -->
+  <g transform="translate(620, 80) scale(1.2)" opacity="0.15">
+    <path d="M0 40 L25 15 A20 20 0 1 1 45 35 L20 60 Z" fill="#C9A84C" stroke="#C9A84C" stroke-width="3"/>
+  </g>
+</svg>
