@@ -68,6 +68,11 @@ const nextConfig: NextConfig = {
                       hostname: 'images.unsplash.com',
                       pathname: '/**',
             },
+            {
+                      protocol: 'https',
+                      hostname: 'places.googleapis.com',
+                      pathname: '/**',
+            },
                 ],
           unoptimized: false,
     },

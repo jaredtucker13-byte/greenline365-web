@@ -651,7 +651,7 @@ export default function DirectoryClient() {
                     <Link href={`/destination/${d.slug}`} className="block dest-card-frame group" data-testid={`dest-card-${d.slug}`}>
                       <div className="dest-card-inner">
                         <div className="relative overflow-hidden" style={{ aspectRatio: '4/3' }}>
-                          <Image src={d.image} alt={`${d.label} destination guide — ${d.tagline}`} fill className="object-cover transition-transform duration-700 group-hover:scale-110" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw" />
+                          <DestImage src={d.image} alt={`${d.label} destination guide — ${d.tagline}`} label={d.label} />
                         </div>
                         <div className="dest-glass-label px-4 py-3">
                           <h3 className="text-sm sm:text-base font-heading font-bold text-white tracking-tight leading-tight">{d.label}</h3>
@@ -888,6 +888,8 @@ export default function DirectoryClient() {
 // ─── Listing Card ──────────────────────────────────────────────────
 function ListingCard({ listing: l, index: i }: { listing: Listing; index: number }) {
   const hasIntel = l.has_property_intelligence;
+  const [imgError, setImgError] = useState(false);
+  const imgSrc = l.cover_image_url || l.logo_url;
   return (
     <Link href={`/listing/${l.slug}`}>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
@@ -895,8 +897,8 @@ function ListingCard({ listing: l, index: i }: { listing: Listing; index: number
         style={{ background: 'rgba(255,255,255,0.02)' }}
         data-testid={`listing-${l.slug}`}>
         <div className="relative h-40 overflow-hidden">
-          {l.cover_image_url || l.logo_url ? (
-            <Image src={l.cover_image_url || l.logo_url!} alt={`${l.business_name} — ${l.industry.replace(/-/g, ' ')} in ${l.city || 'Florida'}`} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+          {imgSrc && !imgError ? (
+            <Image src={imgSrc} alt={`${l.business_name} — ${l.industry.replace(/-/g, ' ')} in ${l.city || 'Florida'}`} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" onError={() => setImgError(true)} />
           ) : (
             <div className="w-full h-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #111 0%, #1A1A1A 100%)' }}>
               <span className="text-4xl font-heading font-light text-white/10">{l.business_name[0]}</span>
@@ -932,6 +934,18 @@ function ListingCard({ listing: l, index: i }: { listing: Listing; index: number
   );
 }
 
+// ─── Destination Image with Fallback ─────────────────────────────────
+function DestImage({ src, alt, label }: { src: string; alt: string; label: string }) {
+  const [error, setError] = useState(false);
+  if (error) {
+    return (
+      <div className="w-full h-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #0a1628 0%, #1a0f05 100%)' }}>
+        <span className="text-3xl font-heading font-light text-gold/20">{label[0]}</span>
+      </div>
+    );
+  }
+  return <Image src={src} alt={alt} fill className="object-cover transition-transform duration-700 group-hover:scale-110" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw" onError={() => setError(true)} />;
+}
 
 // ─── Subcategory Carousel Row ──────────────────────────────────────
 function SubcategoryCarouselRow({ label, subtitle, industry, searchTerm, sortBy, cityFilter, userLocation, onViewAll }: {

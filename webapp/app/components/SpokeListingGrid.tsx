@@ -144,21 +144,7 @@ export default function SpokeListingGrid({
           >
             {/* Cover image */}
             <div className="relative h-40 overflow-hidden">
-              {listing.cover_image_url ? (
-                <Image
-                  src={listing.cover_image_url}
-                  alt={listing.business_name}
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-white/[0.03] to-white/[0.01] flex items-center justify-center">
-                  <span className="text-white/20 text-3xl font-heading">
-                    {listing.business_name[0]}
-                  </span>
-                </div>
-              )}
+              <SpokeImage src={listing.cover_image_url} name={listing.business_name} />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A]/80 via-transparent to-transparent" />
 
               {/* Badges */}
@@ -226,6 +212,27 @@ export default function SpokeListingGrid({
           </Link>
         ))}
       </div>
+    </div>
+  );
+}
+
+function SpokeImage({ src, name }: { src: string | null | undefined; name: string }) {
+  const [error, setError] = useState(false);
+  if (src && !error) {
+    return (
+      <Image
+        src={src}
+        alt={name}
+        fill
+        className="object-cover transition-transform duration-500 group-hover:scale-105"
+        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+        onError={() => setError(true)}
+      />
+    );
+  }
+  return (
+    <div className="w-full h-full bg-gradient-to-br from-white/[0.03] to-white/[0.01] flex items-center justify-center">
+      <span className="text-white/20 text-3xl font-heading">{name[0]}</span>
     </div>
   );
 }
