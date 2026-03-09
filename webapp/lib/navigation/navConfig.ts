@@ -187,15 +187,124 @@ export const commandCenterNav: NavItem[] = [
   { id: 'hq', label: 'Greenline HQ', icon: 'shield', href: '/admin-v2/hq', feature: null, platformOwnerOnly: true },
 ];
 
+// ─── PUBLIC MEGA-MENU NAVIGATION ────────────────────────────────────
+// Hub-and-Spoke: 4 mega-menu dropdowns replace flat nav links.
+
+export interface MegaMenuItem {
+  href: string;
+  label: string;
+  description: string;
+  icon: string; // emoji or SVG identifier
+}
+
+export interface MegaMenuGroup {
+  label: string;
+  items: MegaMenuItem[];
+}
+
+export interface MegaMenuDropdown {
+  id: string;
+  label: string;
+  groups: MegaMenuGroup[];
+}
+
+export const publicMegaMenus: MegaMenuDropdown[] = [
+  {
+    id: 'services',
+    label: 'Services',
+    groups: [
+      {
+        label: 'Home Services',
+        items: [
+          { href: '/services/home', label: 'Home Services', description: 'HVAC, Plumbing, Electrical, Roofing & more', icon: '🏠' },
+        ],
+      },
+      {
+        label: 'Professional Experts',
+        items: [
+          { href: '/services/professional', label: 'Professional Experts', description: 'Legal, Financial & Consulting', icon: '💼' },
+        ],
+      },
+      {
+        label: 'Community Resources',
+        items: [
+          { href: '/services/community', label: 'Community Resources', description: 'Education, Childcare & Pet Services', icon: '🤝' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'explore',
+    label: 'Explore',
+    groups: [
+      {
+        label: 'Discover',
+        items: [
+          { href: '/explore/dining', label: 'Quick Eats', description: 'Restaurants, cafes & food trucks', icon: '🍽️' },
+          { href: '/explore/beaches', label: 'Best Beaches', description: 'Sun, sand & coastal adventures', icon: '🏖️' },
+        ],
+      },
+      {
+        label: 'Destinations',
+        items: [
+          { href: '/explore/destinations', label: 'All Destinations', description: 'Explore cities across Florida', icon: '📍' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'why-greenline',
+    label: 'Why GreenLine?',
+    groups: [
+      {
+        label: 'About Us',
+        items: [
+          { href: '/why-greenline', label: 'Our Mission', description: 'What drives GreenLine365', icon: '🎯' },
+          { href: '/why-greenline/story', label: 'Our Story', description: 'The personal background behind GL365', icon: '📖' },
+          { href: '/why-greenline/trust', label: 'Trust & Verification', description: 'How we verify every listing', icon: '🛡️' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'community',
+    label: 'Community Hub',
+    groups: [
+      {
+        label: 'Get Involved',
+        items: [
+          { href: '/community/claim', label: 'Claim Your Listing', description: 'Own and manage your business page', icon: '✅' },
+          { href: '/community/suggest', label: 'Suggest a Spot', description: 'Recommend a local business', icon: '💡' },
+          { href: '/community/faq', label: 'FAQ', description: 'Common questions answered', icon: '❓' },
+          { href: '/community/contact', label: 'Contact Us', description: 'Get in touch with our team', icon: '📬' },
+        ],
+      },
+    ],
+  },
+];
+
 /**
- * Public site navigation items (Navbar).
+ * Legacy publicNav — kept for backwards compatibility but no longer
+ * used by the Navbar (which now uses publicMegaMenus).
  */
-export const publicNav = [
-  { href: '/', label: 'Directory' },
-  { href: '/destinations', label: 'Destinations' },
-  { href: '/categories', label: 'Categories' },
-  { href: '/about', label: 'About' },
-  { href: '/contact', label: 'Contact' },
+export const publicNav = publicMegaMenus.flatMap(menu =>
+  menu.groups.flatMap(group =>
+    group.items.map(item => ({ href: item.href, label: item.label }))
+  )
+);
+
+/**
+ * Florida destination cities for the Explore > Destinations sub-links.
+ */
+export const floridaDestinations = [
+  { slug: 'st-pete-beach', label: 'St. Pete Beach' },
+  { slug: 'key-west', label: 'Key West' },
+  { slug: 'sarasota', label: 'Sarasota' },
+  { slug: 'daytona', label: 'Daytona Beach' },
+  { slug: 'ybor-city', label: 'Ybor City' },
+  { slug: 'orlando', label: 'Orlando' },
+  { slug: 'miami', label: 'Miami' },
+  { slug: 'jacksonville', label: 'Jacksonville' },
 ];
 
 /**
