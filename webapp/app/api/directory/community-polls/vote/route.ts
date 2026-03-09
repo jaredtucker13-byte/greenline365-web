@@ -87,13 +87,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Increment denormalized vote_count
-    await service.rpc('increment_vote_count', { target_option_id: option_id }).catch(() => {
+    const { error: rpcError } = await service.rpc('increment_vote_count', { target_option_id: option_id });
+    if (rpcError) {
       // Fallback: manual increment if RPC doesn't exist yet
-      return service
+      await service
         .from('community_poll_options')
         .update({ vote_count: (option as any).vote_count + 1 })
         .eq('id', option_id);
-    });
+    }
 
     return NextResponse.json({ success: true, message: 'Vote recorded' });
   } catch (error: any) {
