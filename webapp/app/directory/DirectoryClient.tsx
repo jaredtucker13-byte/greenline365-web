@@ -67,7 +67,7 @@ const CATEGORIES = [
     ] },
 
   // === AUTOMOTIVE ===
-  { id: 'automotive', label: 'Automotive', sub: 'Repairs, dealers & body shops', img: '/images/categories/automotive.svg',
+  { id: 'automotive', label: 'Automotive', sub: 'Repairs, dealers & body shops', img: 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800&h=600&fit=crop',
     subcategories: ['All', 'Auto Repair', 'Oil Change', 'Tire Shops', 'Body Shops', 'Car Dealers', 'Auto Parts', 'Towing', 'Car Wash', 'Auto Detailing', 'EV Charging'] },
 
   // === MARINE & OUTDOOR (Key West / Coastal Florida) ===
@@ -87,15 +87,15 @@ const CATEGORIES = [
     subcategories: ['All', 'Barbershops', 'Salons', 'Nail Salons', 'Spas', 'Boutiques', 'Jewelry', 'Tattoo & Piercing', 'Dry Cleaning & Laundry'] },
 
   // === PROFESSIONAL SERVICES ===
-  { id: 'professional-services', label: 'Professional Services', sub: 'Legal, finance & consulting', img: '/images/categories/professional-services.svg',
+  { id: 'professional-services', label: 'Professional Services', sub: 'Legal, finance & consulting', img: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&h=600&fit=crop',
     subcategories: ['All', 'Attorneys', 'Accountants', 'Insurance', 'Real Estate', 'Financial Advisors', 'IT Services', 'Marketing Agencies', 'Notary'] },
 
   // === EDUCATION & CHILDCARE ===
-  { id: 'education', label: 'Education & Childcare', sub: 'Schools, tutoring & daycare', img: '/images/categories/education.svg',
+  { id: 'education', label: 'Education & Childcare', sub: 'Schools, tutoring & daycare', img: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&h=600&fit=crop',
     subcategories: ['All', 'Preschools', 'Daycare', 'Tutoring', 'Driving Schools', 'Music Lessons', 'Dance Studios', 'Martial Arts', 'Language Schools'] },
 
   // === PETS ===
-  { id: 'pets', label: 'Pets', sub: 'Vets, grooming & boarding', img: '/images/categories/pets.svg',
+  { id: 'pets', label: 'Pets', sub: 'Vets, grooming & boarding', img: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800&h=600&fit=crop',
     subcategories: ['All', 'Veterinarians', 'Pet Grooming', 'Pet Boarding', 'Pet Stores', 'Dog Training', 'Pet Sitting', 'Aquarium & Fish'] },
 ];
 
