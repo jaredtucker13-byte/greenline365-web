@@ -527,11 +527,29 @@ async function getPollsData(db: any, params: any) {
 
   const totalVotesCast = (allOptions || []).reduce((s: number, o: any) => s + (o.vote_count || 0), 0);
 
-  // Most popular poll
+  // Most popular poll (global, not just current page)
   let mostPopularTitle = '—';
-  if (enriched.length > 0) {
-    const sorted = [...enriched].sort((a: any, b: any) => b.total_votes - a.total_votes);
-    mostPopularTitle = sorted[0]?.title || '—';
+  const { data: topPollOptions } = await db
+    .from('community_poll_options')
+    .select('poll_id, vote_count');
+  if (topPollOptions && topPollOptions.length > 0) {
+    const votesByPoll = new Map<string, number>();
+    for (const opt of topPollOptions) {
+      votesByPoll.set(opt.poll_id, (votesByPoll.get(opt.poll_id) || 0) + (opt.vote_count || 0));
+    }
+    let topPollId = '';
+    let topVotes = 0;
+    for (const [pollId, votes] of votesByPoll) {
+      if (votes > topVotes) { topPollId = pollId; topVotes = votes; }
+    }
+    if (topPollId) {
+      const { data: topPoll } = await db
+        .from('community_polls')
+        .select('title')
+        .eq('id', topPollId)
+        .single();
+      mostPopularTitle = topPoll?.title || '—';
+    }
   }
 
   return NextResponse.json({

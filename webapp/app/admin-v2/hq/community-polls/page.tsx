@@ -463,7 +463,7 @@ export default function CommunityPollsAdmin() {
         <KPICard
           title="Active Polls"
           value={kpis.totalActive}
-          icon="&#x2713;"
+          icon="✓"
           color="gold"
           size="sm"
           delay={0}
@@ -472,7 +472,7 @@ export default function CommunityPollsAdmin() {
         <KPICard
           title="Total Votes Cast"
           value={kpis.totalVotesCast}
-          icon="&#x2605;"
+          icon="★"
           color="blue"
           size="sm"
           delay={0.05}
@@ -481,7 +481,7 @@ export default function CommunityPollsAdmin() {
         <KPICard
           title="Most Popular Poll"
           value={kpis.mostPopularTitle}
-          icon="&#x1F3C6;"
+          icon="🏆"
           color="purple"
           size="sm"
           delay={0.1}
