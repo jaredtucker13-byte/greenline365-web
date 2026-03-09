@@ -246,11 +246,12 @@ export default function DirectoryClient() {
       setTotalListingCount(allArr.length);
       // Use dynamic counts from Supabase — no hard-coded numbers
       if (counts && !counts.error) {
-        setStats({
+        setStats(prev => ({
+          ...prev,
           businesses: counts.total_businesses || allArr.length,
           categories: counts.total_categories || CATEGORIES.length,
           destinations: counts.total_destinations || 8,
-        });
+        }));
       } else {
         setStats(prev => ({ ...prev, businesses: allArr.length }));
       }
