@@ -43,6 +43,25 @@ export async function POST(request: NextRequest) {
         return getAnalyticsData(serviceClient, params);
       case 'system':
         return getSystemData(serviceClient, params);
+      // ── Community Polls ──
+      case 'polls':
+        return getPollsData(serviceClient, params);
+      case 'poll-detail':
+        return getPollDetail(serviceClient, params);
+      case 'poll-create':
+        return createPoll(serviceClient, params);
+      case 'poll-update':
+        return updatePoll(serviceClient, params);
+      case 'poll-delete':
+        return deletePoll(serviceClient, params);
+      case 'poll-duplicate':
+        return duplicatePoll(serviceClient, params);
+      case 'poll-option-add':
+        return addPollOption(serviceClient, params);
+      case 'poll-option-remove':
+        return removePollOption(serviceClient, params);
+      case 'poll-clear-votes':
+        return clearPollVotes(serviceClient, params);
       default:
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
     }
@@ -440,6 +459,290 @@ async function getSystemData(db: any, params: any) {
     totalPages: Math.ceil((count || 0) / limit),
     tableCounts,
   });
+}
+
+// ─── Community Polls ─────────────────────────────────────────────────────────
+
+async function getPollsData(db: any, params: any) {
+  const { search, status, page = 1, limit = 25 } = params;
+  const offset = (page - 1) * limit;
+
+  let query = db
+    .from('community_polls')
+    .select('*', { count: 'exact' });
+
+  if (search) {
+    query = query.ilike('title', `%${search}%`);
+  }
+  if (status) {
+    query = query.eq('status', status);
+  }
+
+  const { data: polls, count, error } = await query
+    .order('created_at', { ascending: false })
+    .range(offset, offset + limit - 1);
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  // Get options + vote counts for each poll
+  const pollIds = (polls || []).map((p: any) => p.id);
+  let options: any[] = [];
+  if (pollIds.length > 0) {
+    const { data } = await db
+      .from('community_poll_options')
+      .select('id, poll_id, business_id, business_name, business_image, vote_count')
+      .in('poll_id', pollIds)
+      .order('vote_count', { ascending: false });
+    options = data || [];
+  }
+
+  const optionsByPoll = new Map<string, any[]>();
+  for (const opt of options) {
+    const arr = optionsByPoll.get(opt.poll_id) || [];
+    arr.push(opt);
+    optionsByPoll.set(opt.poll_id, arr);
+  }
+
+  const enriched = (polls || []).map((poll: any) => {
+    const opts = optionsByPoll.get(poll.id) || [];
+    return {
+      ...poll,
+      options: opts,
+      options_count: opts.length,
+      total_votes: opts.reduce((s: number, o: any) => s + (o.vote_count || 0), 0),
+    };
+  });
+
+  // KPI summary
+  const { count: totalActive } = await db
+    .from('community_polls')
+    .select('*', { count: 'exact', head: true })
+    .eq('status', 'active');
+
+  const { data: allOptions } = await db
+    .from('community_poll_options')
+    .select('vote_count');
+
+  const totalVotesCast = (allOptions || []).reduce((s: number, o: any) => s + (o.vote_count || 0), 0);
+
+  // Most popular poll
+  let mostPopularTitle = '—';
+  if (enriched.length > 0) {
+    const sorted = [...enriched].sort((a: any, b: any) => b.total_votes - a.total_votes);
+    mostPopularTitle = sorted[0]?.title || '—';
+  }
+
+  return NextResponse.json({
+    polls: enriched,
+    total: count || 0,
+    page,
+    totalPages: Math.ceil((count || 0) / limit),
+    kpis: {
+      totalActive: totalActive || 0,
+      totalVotesCast,
+      mostPopularTitle,
+    },
+  });
+}
+
+async function getPollDetail(db: any, params: any) {
+  const { pollId } = params;
+  if (!pollId) return NextResponse.json({ error: 'pollId required' }, { status: 400 });
+
+  const { data: poll, error } = await db
+    .from('community_polls')
+    .select('*')
+    .eq('id', pollId)
+    .single();
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  const { data: options } = await db
+    .from('community_poll_options')
+    .select('*')
+    .eq('poll_id', pollId)
+    .order('vote_count', { ascending: false });
+
+  const { count: voteCount } = await db
+    .from('community_poll_votes')
+    .select('*', { count: 'exact', head: true })
+    .eq('poll_id', pollId);
+
+  return NextResponse.json({
+    poll,
+    options: options || [],
+    totalVotes: voteCount || 0,
+  });
+}
+
+async function createPoll(db: any, params: any) {
+  const { title, description, category, destination_slug, status: pollStatus, closes_at, options } = params;
+
+  if (!title || !category) {
+    return NextResponse.json({ error: 'title and category required' }, { status: 400 });
+  }
+
+  const { data: poll, error } = await db
+    .from('community_polls')
+    .insert({
+      title,
+      description: description || null,
+      category,
+      destination_slug: destination_slug || null,
+      status: pollStatus || 'draft',
+      closes_at: closes_at || null,
+    })
+    .select()
+    .single();
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  // Add options if provided
+  if (options && Array.isArray(options) && options.length > 0) {
+    const optionRows = options.map((opt: any) => ({
+      poll_id: poll.id,
+      business_id: opt.business_id || crypto.randomUUID(),
+      business_name: opt.business_name,
+      business_image: opt.business_image || null,
+    }));
+
+    await db.from('community_poll_options').insert(optionRows);
+  }
+
+  return NextResponse.json({ success: true, poll });
+}
+
+async function updatePoll(db: any, params: any) {
+  const { pollId, updates } = params;
+  if (!pollId) return NextResponse.json({ error: 'pollId required' }, { status: 400 });
+
+  const { data, error } = await db
+    .from('community_polls')
+    .update(updates)
+    .eq('id', pollId)
+    .select()
+    .single();
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  return NextResponse.json({ success: true, poll: data });
+}
+
+async function deletePoll(db: any, params: any) {
+  const { pollId } = params;
+  if (!pollId) return NextResponse.json({ error: 'pollId required' }, { status: 400 });
+
+  const { error } = await db
+    .from('community_polls')
+    .delete()
+    .eq('id', pollId);
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  return NextResponse.json({ success: true });
+}
+
+async function duplicatePoll(db: any, params: any) {
+  const { pollId } = params;
+  if (!pollId) return NextResponse.json({ error: 'pollId required' }, { status: 400 });
+
+  // Get original poll
+  const { data: original } = await db
+    .from('community_polls')
+    .select('*')
+    .eq('id', pollId)
+    .single();
+
+  if (!original) return NextResponse.json({ error: 'Poll not found' }, { status: 404 });
+
+  // Create duplicate as draft
+  const { data: newPoll, error } = await db
+    .from('community_polls')
+    .insert({
+      title: `${original.title} (Copy)`,
+      description: original.description,
+      category: original.category,
+      destination_slug: original.destination_slug,
+      status: 'draft',
+      closes_at: original.closes_at,
+    })
+    .select()
+    .single();
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  // Copy options (reset vote counts)
+  const { data: originalOptions } = await db
+    .from('community_poll_options')
+    .select('business_id, business_name, business_image')
+    .eq('poll_id', pollId);
+
+  if (originalOptions && originalOptions.length > 0) {
+    const newOptions = originalOptions.map((opt: any) => ({
+      poll_id: newPoll.id,
+      business_id: opt.business_id,
+      business_name: opt.business_name,
+      business_image: opt.business_image,
+      vote_count: 0,
+    }));
+    await db.from('community_poll_options').insert(newOptions);
+  }
+
+  return NextResponse.json({ success: true, poll: newPoll });
+}
+
+async function addPollOption(db: any, params: any) {
+  const { pollId, business_name, business_id, business_image } = params;
+  if (!pollId || !business_name) {
+    return NextResponse.json({ error: 'pollId and business_name required' }, { status: 400 });
+  }
+
+  const { data, error } = await db
+    .from('community_poll_options')
+    .insert({
+      poll_id: pollId,
+      business_id: business_id || crypto.randomUUID(),
+      business_name,
+      business_image: business_image || null,
+    })
+    .select()
+    .single();
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  return NextResponse.json({ success: true, option: data });
+}
+
+async function removePollOption(db: any, params: any) {
+  const { optionId } = params;
+  if (!optionId) return NextResponse.json({ error: 'optionId required' }, { status: 400 });
+
+  const { error } = await db
+    .from('community_poll_options')
+    .delete()
+    .eq('id', optionId);
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  return NextResponse.json({ success: true });
+}
+
+async function clearPollVotes(db: any, params: any) {
+  const { pollId } = params;
+  if (!pollId) return NextResponse.json({ error: 'pollId required' }, { status: 400 });
+
+  // Delete all votes for this poll
+  await db.from('community_poll_votes').delete().eq('poll_id', pollId);
+
+  // Reset all option vote counts to 0
+  await db
+    .from('community_poll_options')
+    .update({ vote_count: 0 })
+    .eq('poll_id', pollId);
+
+  return NextResponse.json({ success: true });
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
