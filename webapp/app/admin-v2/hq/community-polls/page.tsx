@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { DataTable, type Column } from '@/app/admin-v2/components/shared/DataTable';
+import { KPICard } from '@/app/admin-v2/components/shared/KPICard';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -192,7 +194,6 @@ export default function CommunityPollsAdmin() {
 
     try {
       if (editingPollId) {
-        // Update poll metadata
         await hqApi('poll-update', {
           pollId: editingPollId,
           updates: {
@@ -205,7 +206,6 @@ export default function CommunityPollsAdmin() {
           },
         });
       } else {
-        // Create new poll with options
         await hqApi('poll-create', {
           title: form.title,
           description: form.description || null,
@@ -320,6 +320,115 @@ export default function CommunityPollsAdmin() {
     });
   };
 
+  // ─── DataTable Column Definitions ───────────────────────────────────────
+
+  const columns: Column<Poll>[] = [
+    {
+      key: 'title',
+      header: 'Title',
+      sortable: true,
+      render: (poll) => (
+        <div>
+          <p className="text-sm text-white/90 font-medium">{poll.title}</p>
+          {poll.destination_slug && (
+            <p className="text-[11px] text-white/30 mt-0.5">
+              {DESTINATIONS.find(d => d.slug === poll.destination_slug)?.label || poll.destination_slug}
+            </p>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      width: '100px',
+      render: (poll) => {
+        const sc = STATUS_COLORS[poll.status];
+        return (
+          <span className={`text-[11px] px-2.5 py-1 rounded-full font-medium border ${sc.bg} ${sc.text} ${sc.border}`}>
+            {poll.status}
+          </span>
+        );
+      },
+    },
+    {
+      key: 'category',
+      header: 'Category',
+      render: (poll) => (
+        <span className="text-sm text-white/60">
+          {CATEGORIES.find(c => c.id === poll.category)?.label || poll.category}
+        </span>
+      ),
+    },
+    {
+      key: 'total_votes',
+      header: 'Votes',
+      width: '80px',
+      sortable: true,
+      render: (poll) => (
+        <span className="text-sm text-white/80 font-medium">{poll.total_votes.toLocaleString()}</span>
+      ),
+    },
+    {
+      key: 'options_count',
+      header: 'Options',
+      width: '80px',
+      render: (poll) => <span className="text-sm text-white/60">{poll.options_count}</span>,
+    },
+    {
+      key: 'created_at',
+      header: 'Created',
+      width: '110px',
+      sortable: true,
+      render: (poll) => (
+        <span className="text-sm text-white/40">{new Date(poll.created_at).toLocaleDateString()}</span>
+      ),
+    },
+    {
+      key: 'closes_at',
+      header: 'Closes',
+      width: '110px',
+      render: (poll) => (
+        <span className="text-sm text-white/40">
+          {poll.closes_at ? new Date(poll.closes_at).toLocaleDateString() : '—'}
+        </span>
+      ),
+    },
+    {
+      key: 'actions',
+      header: 'Actions',
+      width: '200px',
+      render: (poll) => (
+        <div className="flex items-center justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
+          <button
+            onClick={() => handleEdit(poll)}
+            className="px-2.5 py-1.5 bg-white/[0.06] border border-white/[0.08] rounded-lg text-[11px] text-white/60 hover:bg-white/[0.1] transition"
+          >
+            Edit
+          </button>
+          <button
+            onClick={() => setViewingResults(poll)}
+            className="px-2.5 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-lg text-[11px] text-blue-400 hover:bg-blue-500/20 transition"
+          >
+            Results
+          </button>
+          <button
+            onClick={() => handleDuplicate(poll.id)}
+            className="px-2.5 py-1.5 bg-white/[0.06] border border-white/[0.08] rounded-lg text-[11px] text-white/60 hover:bg-white/[0.1] transition"
+          >
+            Dup
+          </button>
+          <button
+            onClick={() => setDeletingId(poll.id)}
+            className="px-2.5 py-1.5 bg-red-500/10 border border-red-500/20 rounded-lg text-[11px] text-red-400 hover:bg-red-500/20 transition"
+          >
+            Del
+          </button>
+        </div>
+      ),
+    },
+  ];
+
   // ─── Render ─────────────────────────────────────────────────────────────
 
   return (
@@ -349,40 +458,35 @@ export default function CommunityPollsAdmin() {
         </div>
       </div>
 
-      {/* KPI Cards */}
+      {/* KPI Cards — shared KPICard component */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-5 relative overflow-hidden group hover:bg-white/[0.05] transition-all">
-          <div className="absolute top-0 right-0 w-24 h-24 rounded-full opacity-[0.03] -translate-y-1/2 translate-x-1/2 bg-emerald-400" />
-          <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-emerald-500/15 border border-emerald-500/20 mb-3">
-            <svg className="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <p className="text-2xl font-semibold text-white tracking-tight">{kpis.totalActive}</p>
-          <p className="text-xs text-white/40 mt-1">Active Polls</p>
-        </div>
-
-        <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-5 relative overflow-hidden group hover:bg-white/[0.05] transition-all">
-          <div className="absolute top-0 right-0 w-24 h-24 rounded-full opacity-[0.03] -translate-y-1/2 translate-x-1/2 bg-blue-400" />
-          <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-blue-500/15 border border-blue-500/20 mb-3">
-            <svg className="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
-          </div>
-          <p className="text-2xl font-semibold text-white tracking-tight">{kpis.totalVotesCast.toLocaleString()}</p>
-          <p className="text-xs text-white/40 mt-1">Total Votes Cast</p>
-        </div>
-
-        <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-5 relative overflow-hidden group hover:bg-white/[0.05] transition-all">
-          <div className="absolute top-0 right-0 w-24 h-24 rounded-full opacity-[0.03] -translate-y-1/2 translate-x-1/2 bg-gold-400" />
-          <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-gold-500/15 border border-gold-500/20 mb-3">
-            <svg className="w-4 h-4 text-gold-400" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-            </svg>
-          </div>
-          <p className="text-lg font-semibold text-white tracking-tight truncate">{kpis.mostPopularTitle}</p>
-          <p className="text-xs text-white/40 mt-1">Most Popular Poll</p>
-        </div>
+        <KPICard
+          title="Active Polls"
+          value={kpis.totalActive}
+          icon="&#x2713;"
+          color="gold"
+          size="sm"
+          delay={0}
+          testId="kpi-active-polls"
+        />
+        <KPICard
+          title="Total Votes Cast"
+          value={kpis.totalVotesCast}
+          icon="&#x2605;"
+          color="blue"
+          size="sm"
+          delay={0.05}
+          testId="kpi-total-votes"
+        />
+        <KPICard
+          title="Most Popular Poll"
+          value={kpis.mostPopularTitle}
+          icon="&#x1F3C6;"
+          color="purple"
+          size="sm"
+          delay={0.1}
+          testId="kpi-most-popular"
+        />
       </div>
 
       {/* Filters */}
@@ -407,110 +511,16 @@ export default function CommunityPollsAdmin() {
         <span className="text-sm text-white/30 ml-auto">{total} poll{total !== 1 ? 's' : ''}</span>
       </div>
 
-      {/* Polls Table */}
-      <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-white/[0.06]">
-              <th className="text-left px-5 py-3 text-[11px] font-semibold text-white/40 uppercase tracking-wider">Title</th>
-              <th className="text-left px-5 py-3 text-[11px] font-semibold text-white/40 uppercase tracking-wider">Status</th>
-              <th className="text-left px-5 py-3 text-[11px] font-semibold text-white/40 uppercase tracking-wider">Category</th>
-              <th className="text-left px-5 py-3 text-[11px] font-semibold text-white/40 uppercase tracking-wider">Votes</th>
-              <th className="text-left px-5 py-3 text-[11px] font-semibold text-white/40 uppercase tracking-wider">Options</th>
-              <th className="text-left px-5 py-3 text-[11px] font-semibold text-white/40 uppercase tracking-wider">Created</th>
-              <th className="text-left px-5 py-3 text-[11px] font-semibold text-white/40 uppercase tracking-wider">Closes</th>
-              <th className="text-right px-5 py-3 text-[11px] font-semibold text-white/40 uppercase tracking-wider">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              [...Array(4)].map((_, i) => (
-                <tr key={i} className="border-b border-white/[0.04]">
-                  <td colSpan={8} className="px-5 py-4"><div className="h-5 bg-white/[0.04] rounded animate-pulse" /></td>
-                </tr>
-              ))
-            ) : polls.length === 0 ? (
-              <tr>
-                <td colSpan={8} className="px-5 py-12 text-center text-white/30 text-sm">
-                  No polls found. <button onClick={handleCreate} className="text-gold-400 hover:underline">Create your first poll</button>
-                </td>
-              </tr>
-            ) : polls.map((poll) => {
-              const sc = STATUS_COLORS[poll.status];
-              return (
-                <tr key={poll.id} className="border-b border-white/[0.04] hover:bg-white/[0.02] transition">
-                  <td className="px-5 py-4">
-                    <div>
-                      <p className="text-sm text-white/90 font-medium">{poll.title}</p>
-                      {poll.destination_slug && (
-                        <p className="text-[11px] text-white/30 mt-0.5">
-                          {DESTINATIONS.find(d => d.slug === poll.destination_slug)?.label || poll.destination_slug}
-                        </p>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-5 py-4">
-                    <span className={`text-[11px] px-2.5 py-1 rounded-full font-medium border ${sc.bg} ${sc.text} ${sc.border}`}>
-                      {poll.status}
-                    </span>
-                  </td>
-                  <td className="px-5 py-4">
-                    <span className="text-sm text-white/60">
-                      {CATEGORIES.find(c => c.id === poll.category)?.label || poll.category}
-                    </span>
-                  </td>
-                  <td className="px-5 py-4">
-                    <span className="text-sm text-white/80 font-medium">{poll.total_votes.toLocaleString()}</span>
-                  </td>
-                  <td className="px-5 py-4">
-                    <span className="text-sm text-white/60">{poll.options_count}</span>
-                  </td>
-                  <td className="px-5 py-4">
-                    <span className="text-sm text-white/40">{new Date(poll.created_at).toLocaleDateString()}</span>
-                  </td>
-                  <td className="px-5 py-4">
-                    <span className="text-sm text-white/40">
-                      {poll.closes_at ? new Date(poll.closes_at).toLocaleDateString() : '—'}
-                    </span>
-                  </td>
-                  <td className="px-5 py-4 text-right">
-                    <div className="flex items-center justify-end gap-1.5">
-                      <button
-                        onClick={() => handleEdit(poll)}
-                        className="px-2.5 py-1.5 bg-white/[0.06] border border-white/[0.08] rounded-lg text-[11px] text-white/60 hover:bg-white/[0.1] transition"
-                        title="Edit"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => setViewingResults(poll)}
-                        className="px-2.5 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-lg text-[11px] text-blue-400 hover:bg-blue-500/20 transition"
-                        title="View Results"
-                      >
-                        Results
-                      </button>
-                      <button
-                        onClick={() => handleDuplicate(poll.id)}
-                        className="px-2.5 py-1.5 bg-white/[0.06] border border-white/[0.08] rounded-lg text-[11px] text-white/60 hover:bg-white/[0.1] transition"
-                        title="Duplicate"
-                      >
-                        Dup
-                      </button>
-                      <button
-                        onClick={() => setDeletingId(poll.id)}
-                        className="px-2.5 py-1.5 bg-red-500/10 border border-red-500/20 rounded-lg text-[11px] text-red-400 hover:bg-red-500/20 transition"
-                        title="Delete"
-                      >
-                        Del
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+      {/* Polls DataTable — shared DataTable component */}
+      <DataTable<Poll>
+        data={polls}
+        columns={columns}
+        keyField="id"
+        loading={loading}
+        emptyMessage="No polls found. Create your first poll to get started."
+        testId="polls-table"
+        onRowClick={(poll) => setViewingResults(poll)}
+      />
 
       {/* Pagination */}
       {totalPages > 1 && (
@@ -541,7 +551,6 @@ export default function CommunityPollsAdmin() {
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
           <div className="bg-[#0D1117] border border-white/[0.08] rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
-            {/* Modal Header */}
             <div className="sticky top-0 bg-[#0D1117] border-b border-white/[0.06] px-6 py-4 flex items-center justify-between z-10">
               <h2 className="text-lg font-semibold text-white">
                 {editingPollId ? 'Edit Poll' : 'Create New Poll'}
@@ -557,7 +566,6 @@ export default function CommunityPollsAdmin() {
             </div>
 
             <div className="p-6 space-y-5">
-              {/* Title */}
               <div>
                 <label className="block text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-1.5">Title</label>
                 <input
@@ -569,7 +577,6 @@ export default function CommunityPollsAdmin() {
                 />
               </div>
 
-              {/* Description */}
               <div>
                 <label className="block text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-1.5">Description</label>
                 <textarea
@@ -581,7 +588,6 @@ export default function CommunityPollsAdmin() {
                 />
               </div>
 
-              {/* Category + Destination Row */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-1.5">Category</label>
@@ -613,7 +619,6 @@ export default function CommunityPollsAdmin() {
                 </div>
               </div>
 
-              {/* Status + Closes At Row */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-1.5">Status</label>
@@ -650,7 +655,6 @@ export default function CommunityPollsAdmin() {
                 </div>
               </div>
 
-              {/* Options Section */}
               {!editingPollId && (
                 <div>
                   <div className="flex items-center justify-between mb-3">
@@ -670,52 +674,19 @@ export default function CommunityPollsAdmin() {
                   <div className="space-y-2">
                     {form.options.map((opt, idx) => (
                       <div key={idx} className="flex items-center gap-2 group">
-                        {/* Drag handles */}
                         <div className="flex flex-col gap-0.5">
-                          <button
-                            onClick={() => moveFormOption(idx, idx - 1)}
-                            disabled={idx === 0}
-                            className="text-white/20 hover:text-white/50 disabled:opacity-20 transition"
-                          >
-                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
-                            </svg>
+                          <button onClick={() => moveFormOption(idx, idx - 1)} disabled={idx === 0} className="text-white/20 hover:text-white/50 disabled:opacity-20 transition">
+                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" /></svg>
                           </button>
-                          <button
-                            onClick={() => moveFormOption(idx, idx + 1)}
-                            disabled={idx === form.options.length - 1}
-                            className="text-white/20 hover:text-white/50 disabled:opacity-20 transition"
-                          >
-                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                            </svg>
+                          <button onClick={() => moveFormOption(idx, idx + 1)} disabled={idx === form.options.length - 1} className="text-white/20 hover:text-white/50 disabled:opacity-20 transition">
+                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
                           </button>
                         </div>
-
                         <span className="text-[11px] text-white/20 w-5 text-center flex-shrink-0">{idx + 1}</span>
-
-                        <input
-                          type="text"
-                          value={opt.business_name}
-                          onChange={(e) => updateFormOption(idx, 'business_name', e.target.value)}
-                          placeholder="Business name..."
-                          className="flex-1 px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-sm text-white placeholder-white/25 focus:outline-none focus:border-gold-500/40"
-                        />
-                        <input
-                          type="text"
-                          value={opt.business_image}
-                          onChange={(e) => updateFormOption(idx, 'business_image', e.target.value)}
-                          placeholder="Image URL (optional)"
-                          className="w-48 px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-sm text-white placeholder-white/25 focus:outline-none focus:border-gold-500/40"
-                        />
-                        <button
-                          onClick={() => removeFormOption(idx)}
-                          disabled={form.options.length <= 1}
-                          className="p-1.5 text-white/20 hover:text-red-400 disabled:opacity-20 transition"
-                        >
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
+                        <input type="text" value={opt.business_name} onChange={(e) => updateFormOption(idx, 'business_name', e.target.value)} placeholder="Business name..." className="flex-1 px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-sm text-white placeholder-white/25 focus:outline-none focus:border-gold-500/40" />
+                        <input type="text" value={opt.business_image} onChange={(e) => updateFormOption(idx, 'business_image', e.target.value)} placeholder="Image URL (optional)" className="w-48 px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-sm text-white placeholder-white/25 focus:outline-none focus:border-gold-500/40" />
+                        <button onClick={() => removeFormOption(idx)} disabled={form.options.length <= 1} className="p-1.5 text-white/20 hover:text-red-400 disabled:opacity-20 transition">
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                         </button>
                       </div>
                     ))}
@@ -724,19 +695,9 @@ export default function CommunityPollsAdmin() {
               )}
             </div>
 
-            {/* Modal Footer */}
             <div className="sticky bottom-0 bg-[#0D1117] border-t border-white/[0.06] px-6 py-4 flex items-center justify-end gap-3">
-              <button
-                onClick={() => { setShowForm(false); setEditingPollId(null); }}
-                className="px-4 py-2 bg-white/[0.06] border border-white/[0.08] rounded-lg text-white/60 text-sm hover:bg-white/[0.1] transition"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSave}
-                disabled={saving || !form.title || !form.category}
-                className="px-6 py-2 bg-gold-500/20 border border-gold-500/30 rounded-lg text-gold-400 text-sm font-medium hover:bg-gold-500/30 disabled:opacity-40 transition"
-              >
+              <button onClick={() => { setShowForm(false); setEditingPollId(null); }} className="px-4 py-2 bg-white/[0.06] border border-white/[0.08] rounded-lg text-white/60 text-sm hover:bg-white/[0.1] transition">Cancel</button>
+              <button onClick={handleSave} disabled={saving || !form.title || !form.category} className="px-6 py-2 bg-gold-500/20 border border-gold-500/30 rounded-lg text-gold-400 text-sm font-medium hover:bg-gold-500/30 disabled:opacity-40 transition">
                 {saving ? 'Saving...' : editingPollId ? 'Save Changes' : 'Create Poll'}
               </button>
             </div>
@@ -750,7 +711,6 @@ export default function CommunityPollsAdmin() {
       {viewingResults && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
           <div className="bg-[#0D1117] border border-white/[0.08] rounded-2xl w-full max-w-xl max-h-[85vh] overflow-y-auto shadow-2xl">
-            {/* Modal Header */}
             <div className="sticky top-0 bg-[#0D1117] border-b border-white/[0.06] px-6 py-4 z-10">
               <div className="flex items-center justify-between">
                 <div>
@@ -769,17 +729,11 @@ export default function CommunityPollsAdmin() {
                     {viewingResults.total_votes} total votes &middot; {viewingResults.options_count} options
                   </p>
                 </div>
-                <button
-                  onClick={() => setViewingResults(null)}
-                  className="text-white/40 hover:text-white/60 transition"
-                >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                <button onClick={() => setViewingResults(null)} className="text-white/40 hover:text-white/60 transition">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
               </div>
 
-              {/* Action bar */}
               <div className="flex items-center gap-2 mt-3">
                 <button
                   onClick={() => handleToggleStatus(viewingResults)}
@@ -791,19 +745,9 @@ export default function CommunityPollsAdmin() {
                 >
                   {viewingResults.status === 'active' ? 'Close Poll' : 'Reopen Poll'}
                 </button>
-                <button
-                  onClick={() => setClearingVotesId(viewingResults.id)}
-                  className="px-3 py-1.5 bg-white/[0.06] border border-white/[0.08] rounded-lg text-[11px] text-white/50 hover:bg-white/[0.1] transition"
-                >
-                  Clear All Votes
-                </button>
-                <button
-                  onClick={() => exportCSV(viewingResults)}
-                  className="px-3 py-1.5 bg-white/[0.06] border border-white/[0.08] rounded-lg text-[11px] text-white/50 hover:bg-white/[0.1] transition flex items-center gap-1"
-                >
-                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
+                <button onClick={() => setClearingVotesId(viewingResults.id)} className="px-3 py-1.5 bg-white/[0.06] border border-white/[0.08] rounded-lg text-[11px] text-white/50 hover:bg-white/[0.1] transition">Clear All Votes</button>
+                <button onClick={() => exportCSV(viewingResults)} className="px-3 py-1.5 bg-white/[0.06] border border-white/[0.08] rounded-lg text-[11px] text-white/50 hover:bg-white/[0.1] transition flex items-center gap-1">
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                   Export CSV
                 </button>
               </div>
@@ -814,147 +758,62 @@ export default function CommunityPollsAdmin() {
                 <p className="text-white/30 text-sm text-center py-8">No options yet</p>
               ) : (
                 viewingResults.options.map((opt, idx) => {
-                  const pct = viewingResults.total_votes > 0
-                    ? Math.round((opt.vote_count / viewingResults.total_votes) * 100)
-                    : 0;
+                  const pct = viewingResults.total_votes > 0 ? Math.round((opt.vote_count / viewingResults.total_votes) * 100) : 0;
                   const isLeader = idx === 0 && opt.vote_count > 0;
-
                   return (
-                    <div
-                      key={opt.id}
-                      className={`relative rounded-xl border overflow-hidden ${
-                        isLeader ? 'border-gold-500/25 bg-gold-500/[0.04]' : 'border-white/[0.06] bg-white/[0.02]'
-                      }`}
-                    >
-                      {/* Progress bar */}
-                      <div
-                        className="absolute inset-y-0 left-0 transition-all duration-700"
-                        style={{
-                          width: `${pct}%`,
-                          background: isLeader
-                            ? 'linear-gradient(90deg, rgba(201,169,78,0.12), rgba(201,169,78,0.04))'
-                            : 'linear-gradient(90deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01))',
-                        }}
-                      />
-
+                    <div key={opt.id} className={`relative rounded-xl border overflow-hidden ${isLeader ? 'border-gold-500/25 bg-gold-500/[0.04]' : 'border-white/[0.06] bg-white/[0.02]'}`}>
+                      <div className="absolute inset-y-0 left-0 transition-all duration-700" style={{ width: `${pct}%`, background: isLeader ? 'linear-gradient(90deg, rgba(201,169,78,0.12), rgba(201,169,78,0.04))' : 'linear-gradient(90deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01))' }} />
                       <div className="relative flex items-center gap-4 px-5 py-3.5">
-                        {/* Rank */}
-                        <span className={`text-sm font-bold w-6 text-center ${isLeader ? 'text-gold-400' : 'text-white/25'}`}>
-                          #{idx + 1}
-                        </span>
-
-                        {/* Avatar */}
+                        <span className={`text-sm font-bold w-6 text-center ${isLeader ? 'text-gold-400' : 'text-white/25'}`}>#{idx + 1}</span>
                         {opt.business_image ? (
-                          <img
-                            src={opt.business_image}
-                            alt={opt.business_name}
-                            className="w-9 h-9 rounded-lg object-cover border border-white/10 flex-shrink-0"
-                          />
+                          <img src={opt.business_image} alt={opt.business_name} className="w-9 h-9 rounded-lg object-cover border border-white/10 flex-shrink-0" />
                         ) : (
-                          <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 border ${
-                            isLeader ? 'bg-gold-500/15 border-gold-500/20' : 'bg-white/[0.06] border-white/[0.08]'
-                          }`}>
-                            <span className={`text-xs font-bold ${isLeader ? 'text-gold-400' : 'text-white/40'}`}>
-                              {opt.business_name[0]}
-                            </span>
+                          <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 border ${isLeader ? 'bg-gold-500/15 border-gold-500/20' : 'bg-white/[0.06] border-white/[0.08]'}`}>
+                            <span className={`text-xs font-bold ${isLeader ? 'text-gold-400' : 'text-white/40'}`}>{opt.business_name[0]}</span>
                           </div>
                         )}
-
-                        {/* Name + votes */}
                         <div className="flex-1 min-w-0">
-                          <p className={`text-sm font-medium truncate ${isLeader ? 'text-white' : 'text-white/80'}`}>
-                            {opt.business_name}
-                          </p>
+                          <p className={`text-sm font-medium truncate ${isLeader ? 'text-white' : 'text-white/80'}`}>{opt.business_name}</p>
                           <p className="text-[11px] text-white/30">{opt.vote_count} vote{opt.vote_count !== 1 ? 's' : ''}</p>
                         </div>
-
-                        {/* Percentage */}
-                        <span className={`text-sm font-semibold flex-shrink-0 ${isLeader ? 'text-gold-400' : 'text-white/50'}`}>
-                          {pct}%
-                        </span>
-
-                        {/* Remove option */}
-                        <button
-                          onClick={() => handleRemoveOption(opt.id)}
-                          className="p-1 text-white/15 hover:text-red-400 transition flex-shrink-0"
-                          title="Remove option"
-                        >
-                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                          </svg>
+                        <span className={`text-sm font-semibold flex-shrink-0 ${isLeader ? 'text-gold-400' : 'text-white/50'}`}>{pct}%</span>
+                        <button onClick={() => handleRemoveOption(opt.id)} className="p-1 text-white/15 hover:text-red-400 transition flex-shrink-0" title="Remove option">
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
                       </div>
                     </div>
                   );
                 })
               )}
-
-              {/* Add option inline */}
-              <AddOptionInline
-                onAdd={(name) => {
-                  handleAddOption(viewingResults.id, name);
-                  // Re-fetch to update the results view
-                  setTimeout(() => {
-                    fetchPolls();
-                    // We'll close and reopen to refresh
-                  }, 500);
-                }}
-              />
+              <AddOptionInline onAdd={(name) => { handleAddOption(viewingResults.id, name); setTimeout(() => { fetchPolls(); }, 500); }} />
             </div>
           </div>
         </div>
       )}
 
-      {/* ═══════════════════════════════════════════════════════════════════════
-          DELETE CONFIRMATION MODAL
-          ═══════════════════════════════════════════════════════════════════════ */}
+      {/* Delete Confirmation */}
       {deletingId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
           <div className="bg-[#0D1117] border border-white/[0.08] rounded-2xl w-full max-w-sm p-6 shadow-2xl">
             <h3 className="text-lg font-semibold text-white mb-2">Delete Poll?</h3>
-            <p className="text-sm text-white/50 mb-6">
-              This will permanently delete the poll, all its options, and all votes. This action cannot be undone.
-            </p>
+            <p className="text-sm text-white/50 mb-6">This will permanently delete the poll, all its options, and all votes. This action cannot be undone.</p>
             <div className="flex items-center justify-end gap-3">
-              <button
-                onClick={() => setDeletingId(null)}
-                className="px-4 py-2 bg-white/[0.06] border border-white/[0.08] rounded-lg text-white/60 text-sm hover:bg-white/[0.1] transition"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => handleDelete(deletingId)}
-                className="px-4 py-2 bg-red-500/20 border border-red-500/30 rounded-lg text-red-400 text-sm font-medium hover:bg-red-500/30 transition"
-              >
-                Delete Poll
-              </button>
+              <button onClick={() => setDeletingId(null)} className="px-4 py-2 bg-white/[0.06] border border-white/[0.08] rounded-lg text-white/60 text-sm hover:bg-white/[0.1] transition">Cancel</button>
+              <button onClick={() => handleDelete(deletingId)} className="px-4 py-2 bg-red-500/20 border border-red-500/30 rounded-lg text-red-400 text-sm font-medium hover:bg-red-500/30 transition">Delete Poll</button>
             </div>
           </div>
         </div>
       )}
-      {/* ═══════════════════════════════════════════════════════════════════════
-          CLEAR VOTES CONFIRMATION MODAL
-          ═══════════════════════════════════════════════════════════════════════ */}
+
+      {/* Clear Votes Confirmation */}
       {clearingVotesId && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-sm">
           <div className="bg-[#0D1117] border border-white/[0.08] rounded-2xl w-full max-w-sm p-6 shadow-2xl">
             <h3 className="text-lg font-semibold text-white mb-2">Clear All Votes?</h3>
-            <p className="text-sm text-white/50 mb-6">
-              This will reset all vote counts to zero and delete all voter records for this poll. This cannot be undone.
-            </p>
+            <p className="text-sm text-white/50 mb-6">This will reset all vote counts to zero and delete all voter records for this poll. This cannot be undone.</p>
             <div className="flex items-center justify-end gap-3">
-              <button
-                onClick={() => setClearingVotesId(null)}
-                className="px-4 py-2 bg-white/[0.06] border border-white/[0.08] rounded-lg text-white/60 text-sm hover:bg-white/[0.1] transition"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => handleClearVotes(clearingVotesId)}
-                className="px-4 py-2 bg-red-500/20 border border-red-500/30 rounded-lg text-red-400 text-sm font-medium hover:bg-red-500/30 transition"
-              >
-                Clear All Votes
-              </button>
+              <button onClick={() => setClearingVotesId(null)} className="px-4 py-2 bg-white/[0.06] border border-white/[0.08] rounded-lg text-white/60 text-sm hover:bg-white/[0.1] transition">Cancel</button>
+              <button onClick={() => handleClearVotes(clearingVotesId)} className="px-4 py-2 bg-red-500/20 border border-red-500/30 rounded-lg text-red-400 text-sm font-medium hover:bg-red-500/30 transition">Clear All Votes</button>
             </div>
           </div>
         </div>
@@ -971,13 +830,8 @@ function AddOptionInline({ onAdd }: { onAdd: (name: string) => void }) {
 
   if (!expanded) {
     return (
-      <button
-        onClick={() => setExpanded(true)}
-        className="w-full py-3 border border-dashed border-white/[0.08] rounded-xl text-xs text-white/30 hover:text-white/50 hover:border-white/15 transition flex items-center justify-center gap-2"
-      >
-        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-        </svg>
+      <button onClick={() => setExpanded(true)} className="w-full py-3 border border-dashed border-white/[0.08] rounded-xl text-xs text-white/30 hover:text-white/50 hover:border-white/15 transition flex items-center justify-center gap-2">
+        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
         Add Business Option
       </button>
     );
@@ -986,42 +840,13 @@ function AddOptionInline({ onAdd }: { onAdd: (name: string) => void }) {
   return (
     <div className="flex items-center gap-2 p-3 border border-white/[0.08] rounded-xl bg-white/[0.02]">
       <input
-        type="text"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder="Business name..."
-        autoFocus
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' && name.trim()) {
-            onAdd(name.trim());
-            setName('');
-          }
-          if (e.key === 'Escape') {
-            setExpanded(false);
-            setName('');
-          }
-        }}
+        type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Business name..." autoFocus
+        onKeyDown={(e) => { if (e.key === 'Enter' && name.trim()) { onAdd(name.trim()); setName(''); } if (e.key === 'Escape') { setExpanded(false); setName(''); } }}
         className="flex-1 px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-lg text-sm text-white placeholder-white/25 focus:outline-none focus:border-gold-500/40"
       />
-      <button
-        onClick={() => {
-          if (name.trim()) {
-            onAdd(name.trim());
-            setName('');
-          }
-        }}
-        disabled={!name.trim()}
-        className="px-3 py-2 bg-gold-500/20 border border-gold-500/30 rounded-lg text-gold-400 text-xs font-medium hover:bg-gold-500/30 disabled:opacity-40 transition"
-      >
-        Add
-      </button>
-      <button
-        onClick={() => { setExpanded(false); setName(''); }}
-        className="p-2 text-white/30 hover:text-white/50 transition"
-      >
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-        </svg>
+      <button onClick={() => { if (name.trim()) { onAdd(name.trim()); setName(''); } }} disabled={!name.trim()} className="px-3 py-2 bg-gold-500/20 border border-gold-500/30 rounded-lg text-gold-400 text-xs font-medium hover:bg-gold-500/30 disabled:opacity-40 transition">Add</button>
+      <button onClick={() => { setExpanded(false); setName(''); }} className="p-2 text-white/30 hover:text-white/50 transition">
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
       </button>
     </div>
   );
