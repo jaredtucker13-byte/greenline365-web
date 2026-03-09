@@ -42,8 +42,8 @@ interface Listing {
 }
 
 // ─── Category & Subcategory Map ────────────────────────────────────
-// Industries where businesses should NOT show "Claim Listing" (chains, franchises, emergency services)
-const NON_CLAIMABLE_INDUSTRIES = ['convenience-grocery', 'emergency-services'];
+// Industries where businesses should NOT show "Claim Listing" (chains, franchises)
+const NON_CLAIMABLE_INDUSTRIES: string[] = [];
 
 const CATEGORIES = [
   // === HOME SERVICES (The Big Five + all trades) ===
@@ -85,26 +85,6 @@ const CATEGORIES = [
   // === STYLE & SHOPPING ===
   { id: 'style-shopping', label: 'Style & Shopping', sub: 'Fashion, grooming & retail', img: '/images/categories/style-shopping.png',
     subcategories: ['All', 'Barbershops', 'Salons', 'Nail Salons', 'Spas', 'Boutiques', 'Jewelry', 'Tattoo & Piercing', 'Dry Cleaning & Laundry'] },
-
-  // === NIGHTLIFE ===
-  { id: 'nightlife', label: 'Nightlife', sub: 'Bars, lounges & live music', img: '/images/categories/nightlife.png',
-    subcategories: ['All', 'Cocktail Bars', 'Sports Bars', 'Live Music', 'Clubs', 'Breweries', 'Wine Bars', 'Hookah Lounges', 'Karaoke'] },
-
-  // === CONVENIENCE & GROCERY (non-claimable) ===
-  { id: 'convenience-grocery', label: 'Convenience & Grocery', sub: 'Publix, Walmart, gas stations & more', img: '/images/categories/services.png',
-    subcategories: ['All', 'Grocery Stores', 'Convenience Stores', 'Gas Stations', 'Supermarkets', 'Specialty Foods', 'Liquor Stores', 'Farmers Markets'] },
-
-  // === EMERGENCY SERVICES (non-claimable) ===
-  { id: 'emergency-services', label: 'Emergency Services', sub: 'Fire, police, hospitals & urgent care', img: '/images/categories/health-wellness.png',
-    subcategories: ['All', 'Fire Stations', 'Police Stations', 'Hospitals', 'Emergency Rooms', 'Poison Control', 'Crisis Centers'] },
-
-  // === FAMILY ENTERTAINMENT ===
-  { id: 'family-entertainment', label: 'Family Entertainment', sub: 'Fun for all ages', img: '/images/categories/family-entertainment.png',
-    subcategories: ['All', 'Theme Parks', 'Arcades', 'Mini Golf', 'Bowling', 'Water Parks', 'Zoos & Aquariums', 'Trampoline Parks', 'Escape Rooms'] },
-
-  // === HOTELS & LODGING ===
-  { id: 'hotels-lodging', label: 'Hotels & Lodging', sub: 'Where to stay', img: '/images/categories/destinations.png',
-    subcategories: ['All', 'Hotels', 'Resorts', 'Vacation Rentals', 'Boutique Hotels', 'B&Bs', 'Hostels', 'RV Parks'] },
 
   // === PROFESSIONAL SERVICES ===
   { id: 'professional-services', label: 'Professional Services', sub: 'Legal, finance & consulting', img: '/images/categories/services.png',
@@ -504,7 +484,7 @@ export default function DirectoryClient() {
             <h2 className="text-3xl md:text-4xl font-heading font-light text-white text-center mb-3 tracking-tight">
               Explore <span className="text-gradient-gold font-semibold">Categories</span>
             </h2>
-            <p className="text-white/50 text-center max-w-lg mx-auto mb-12 font-body">From home services to nightlife — find exactly what you need.</p>
+            <p className="text-white/50 text-center max-w-lg mx-auto mb-12 font-body">From home services to dining — find exactly what you need.</p>
 
             {/* 9-Category Grid with depth */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -1110,10 +1090,7 @@ function GroupedBrowseView({ activeCategory, sortBy, setSortBy, cityFilter, setC
   const industryMap: Record<string, string> = {
     'services': 'services', 'automotive': 'automotive', 'marine-outdoor': 'marine-outdoor',
     'dining': 'dining', 'health-wellness': 'health-wellness',
-    'style-shopping': 'style-shopping', 'nightlife': 'nightlife',
-    'convenience-grocery': 'convenience-grocery', 'emergency-services': 'emergency-services',
-    'family-entertainment': 'family-entertainment',
-    'hotels-lodging': 'destinations', 'professional-services': 'services',
+    'style-shopping': 'style-shopping', 'professional-services': 'services',
     'education': 'education', 'pets': 'pets',
   };
 
