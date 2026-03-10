@@ -45,6 +45,16 @@ const nextConfig: NextConfig = {
             },
             {
                       protocol: 'https',
+                      hostname: 'places.googleapis.com',
+                      pathname: '/**',
+            },
+            {
+                      protocol: 'https',
+                      hostname: 'maps.googleapis.com',
+                      pathname: '/**',
+            },
+            {
+                      protocol: 'https',
                       hostname: '*.kie.ai',
                       pathname: '/**',
             },
