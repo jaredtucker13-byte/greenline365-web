@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
+import { getPlaceholderImage, getCategoryFallback } from '@/lib/directory-config';
 
 interface BoostedListing {
   id: string;
@@ -125,17 +126,17 @@ export default function BoostedShowcase({ className = '', showSponsoredLabel = t
           >
             {/* Image */}
             <div className="relative h-36 overflow-hidden">
-              {listing.cover_image_url ? (
-                <img
-                  src={listing.cover_image_url}
-                  alt={listing.business_name}
-                  className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500"
-                  onError={(e) => { e.currentTarget.style.display = 'none'; (e.currentTarget.nextElementSibling as HTMLElement | null)?.style.removeProperty('display'); }}
-                />
-              ) : null}
-              <div className="w-full h-full bg-gradient-to-br from-midnight-800 to-midnight-900 flex items-center justify-center" style={{ display: listing.cover_image_url ? 'none' : undefined }}>
-                <span className="text-3xl font-heading font-bold text-gold/20">{listing.business_name[0]}</span>
-              </div>
+              <img
+                src={listing.cover_image_url || getPlaceholderImage(listing.industry)}
+                alt={listing.business_name}
+                className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500"
+                onError={(e) => { e.currentTarget.style.display = 'none'; (e.currentTarget.nextElementSibling as HTMLElement | null)?.style.removeProperty('display'); }}
+              />
+              {(() => { const fb = getCategoryFallback(listing.industry); return (
+                <div className="w-full h-full flex items-center justify-center" style={{ display: 'none', background: fb.gradient }}>
+                  <span className="text-3xl">{fb.icon}</span>
+                </div>
+              ); })()}
               <div className="absolute inset-0 bg-gradient-to-t from-midnight-900/80 to-transparent" />
 
               {/* Sponsored badge */}

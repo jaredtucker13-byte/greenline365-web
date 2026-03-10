@@ -13,10 +13,64 @@ export const PLACEHOLDER_IMAGES: Record<string, string> = {
   'destinations': 'https://static.prod-images.emergentagent.com/jobs/b5fc704f-5976-4877-a35c-beeb0ec1a989/images/2bad0d9c928a57d5d3b00a6e159c3d51e7a55c5af8c40d5f146dc0b11313c4bb.png',
   'hotels-lodging': 'https://static.prod-images.emergentagent.com/jobs/b5fc704f-5976-4877-a35c-beeb0ec1a989/images/56db76a66af0d978931f7baca924f64a23006e9883e7b45fb677b52c5f62be79.png',
   'professional-services': 'https://static.prod-images.emergentagent.com/jobs/b5fc704f-5976-4877-a35c-beeb0ec1a989/images/3b64d4ebcbbef46cdb773ebe76236d63854da48d419c53bd9a49daa1cfc42ef5.png',
+  'automotive': 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800&h=600&fit=crop',
+  'marine-outdoor': 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&h=600&fit=crop',
+  'education': 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&h=600&fit=crop',
+  'pets': 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800&h=600&fit=crop',
+};
+
+/** Category-specific icon + gradient for CSS-only fallback when images fail to load */
+export const CATEGORY_FALLBACK_STYLES: Record<string, { icon: string; gradient: string }> = {
+  'services':              { icon: '🏠', gradient: 'linear-gradient(135deg, #1a2a1a 0%, #0d1f0d 100%)' },
+  'dining':                { icon: '🍽️', gradient: 'linear-gradient(135deg, #2a1a1a 0%, #1f0d0d 100%)' },
+  'automotive':            { icon: '🚗', gradient: 'linear-gradient(135deg, #1a1a2a 0%, #0d0d1f 100%)' },
+  'marine-outdoor':        { icon: '⛵', gradient: 'linear-gradient(135deg, #0d1a2a 0%, #0a1520 100%)' },
+  'health-wellness':       { icon: '🏥', gradient: 'linear-gradient(135deg, #1a2a2a 0%, #0d1f1f 100%)' },
+  'style-shopping':        { icon: '✂️', gradient: 'linear-gradient(135deg, #2a1a2a 0%, #1f0d1f 100%)' },
+  'professional-services': { icon: '💼', gradient: 'linear-gradient(135deg, #1a1a20 0%, #12121a 100%)' },
+  'education':             { icon: '📚', gradient: 'linear-gradient(135deg, #1a201a 0%, #121a12 100%)' },
+  'pets':                  { icon: '🐾', gradient: 'linear-gradient(135deg, #201a1a 0%, #1a1212 100%)' },
+  'nightlife':             { icon: '🌙', gradient: 'linear-gradient(135deg, #1a0d2a 0%, #120a1f 100%)' },
+  'family-entertainment':  { icon: '🎪', gradient: 'linear-gradient(135deg, #2a201a 0%, #1f1a0d 100%)' },
+  'destinations':          { icon: '📍', gradient: 'linear-gradient(135deg, #0d1a2a 0%, #0a1520 100%)' },
+  'hotels-lodging':        { icon: '🏨', gradient: 'linear-gradient(135deg, #1a1520 0%, #12101a 100%)' },
 };
 
 export function getPlaceholderImage(industry: string): string {
   return PLACEHOLDER_IMAGES[industry] || PLACEHOLDER_IMAGES['services'];
+}
+
+export function getCategoryFallback(industry: string): { icon: string; gradient: string } {
+  return CATEGORY_FALLBACK_STYLES[industry] || CATEGORY_FALLBACK_STYLES['services'];
+}
+
+/** Human-readable category labels for fallback descriptions */
+const CATEGORY_LABELS: Record<string, string> = {
+  'services': 'home services',
+  'dining': 'dining',
+  'automotive': 'automotive',
+  'marine-outdoor': 'marine & outdoor',
+  'health-wellness': 'health & wellness',
+  'style-shopping': 'style & shopping',
+  'professional-services': 'professional services',
+  'education': 'education & childcare',
+  'pets': 'pet care',
+  'nightlife': 'nightlife & entertainment',
+  'family-entertainment': 'family entertainment',
+  'destinations': 'local attractions',
+  'hotels-lodging': 'hotels & lodging',
+};
+
+/**
+ * Generate a fallback description when a listing has none.
+ * Format: "[City]-based [category] professionals" or "[Business name] — [category] services in [city]"
+ */
+export function getFallbackDescription(businessName: string, industry: string, city?: string): string {
+  const label = CATEGORY_LABELS[industry] || industry.replace(/-/g, ' ');
+  if (city) {
+    return `${city}-based ${label} professionals`;
+  }
+  return `${businessName} — ${label} services in Florida`;
 }
 
 /**

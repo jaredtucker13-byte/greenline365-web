@@ -115,6 +115,7 @@ export default function CommunityPolls({ className = '', maxPolls = 10 }: Commun
 
   const poll = polls[currentIndex];
   const hasVoted = votedPolls.has(poll.id);
+  const showResults = hasVoted || poll.total_votes >= 10;
   const maxVotes = Math.max(...poll.options.map(o => o.vote_count), 1);
 
   return (
@@ -132,12 +133,16 @@ export default function CommunityPolls({ className = '', maxPolls = 10 }: Commun
           {poll.description && (
             <p className="text-xs text-white/40 font-body mt-1">{poll.description}</p>
           )}
-          <p className="text-[11px] text-white/30 font-body mt-2">
-            {poll.total_votes} vote{poll.total_votes !== 1 ? 's' : ''}
+          <div className="flex items-center gap-2 mt-2">
+            <span className="text-xs font-heading font-semibold" style={{ color: 'rgba(201,168,76,0.7)' }}>
+              {poll.total_votes} vote{poll.total_votes !== 1 ? 's' : ''}
+            </span>
             {poll.destination_slug && (
-              <span> &middot; {poll.destination_slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</span>
+              <span className="text-[11px] text-white/30 font-body">
+                &middot; {poll.destination_slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+              </span>
             )}
-          </p>
+          </div>
         </div>
 
         {/* Options */}
@@ -159,14 +164,12 @@ export default function CommunityPolls({ className = '', maxPolls = 10 }: Commun
                   }
                 `}
               >
-                {/* Progress bar background — always visible when voted */}
+                {/* Progress bar background — shows after voting or when 10+ votes */}
                 <div
                   className="absolute inset-0 rounded-lg transition-all duration-700 ease-out"
                   style={{
-                    width: hasVoted ? `${pct}%` : '0%',
-                    background: option.vote_count === maxVotes && hasVoted
-                      ? 'linear-gradient(90deg, rgba(201,169,78,0.25), rgba(201,169,78,0.1))'
-                      : 'linear-gradient(90deg, rgba(201,169,78,0.12), rgba(201,169,78,0.04))',
+                    width: showResults ? `${pct}%` : '0%',
+                    background: 'linear-gradient(90deg, rgba(201,169,78,0.15), rgba(201,169,78,0.05))',
                   }}
                 />
 
@@ -203,13 +206,11 @@ export default function CommunityPolls({ className = '', maxPolls = 10 }: Commun
                   </div>
 
                   {/* Vote count / button */}
-                  {hasVoted ? (
-                    <div className="flex flex-col items-end flex-shrink-0">
-                      <span className="text-xs font-heading font-semibold text-gold/70">{pct}%</span>
-                      <span className="text-[9px] text-white/25 font-body">{option.vote_count} vote{option.vote_count !== 1 ? 's' : ''}</span>
-                    </div>
-                  ) : (
-                    <span className={`text-[10px] font-heading font-semibold uppercase tracking-wider flex-shrink-0 ${isVoting ? 'text-gold' : 'text-white/30 group-hover:text-gold/60'}`}>
+                  {showResults && (
+                    <span className="text-xs font-heading font-semibold text-gold/70 flex-shrink-0 mr-1">{pct}%</span>
+                  )}
+                  {!hasVoted && (
+                    <span className={`text-[10px] font-heading font-semibold uppercase tracking-wider flex-shrink-0 ${isVoting ? 'text-gold' : 'text-white/30'}`}>
                       {isVoting ? '...' : 'Vote'}
                     </span>
                   )}

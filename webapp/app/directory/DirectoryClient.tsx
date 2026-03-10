@@ -7,12 +7,14 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
 import BoostedShowcase from '@/components/BoostedShowcase';
 import CommunityPolls from '@/components/CommunityPolls';
 import FeaturedShowcase from '@/components/FeaturedShowcase';
+import { getPlaceholderImage, getCategoryFallback, getFallbackDescription } from '@/lib/directory-config';
 
 interface Listing {
   id: string;
@@ -123,6 +125,33 @@ function PropertyIntelBadge() {
   );
 }
 
+// ─── Sponsored Section — Only renders when there are sponsored listings ─────
+function SponsoredSection() {
+  const [hasSlots, setHasSlots] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    fetch('/api/directory/addons/featured?limit=12&backfill=true')
+      .then(r => r.json())
+      .then(data => setHasSlots((data.slots || []).length > 0))
+      .catch(() => setHasSlots(false));
+  }, []);
+
+  if (!hasSlots) return null;
+
+  return (
+    <section className="py-12" style={{ background: '#080808' }} data-testid="boosted-showcase-section">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-1 h-6 rounded-full" style={{ background: '#C9A84C' }} />
+          <h3 className="text-sm font-heading font-semibold text-white/60 uppercase tracking-wider">Sponsored</h3>
+          <div className="flex-1 h-px bg-white/5" />
+        </div>
+        <BoostedShowcase maxSlots={12} />
+      </div>
+    </section>
+  );
+}
+
 // ─── Testimonials — Fetches real reviews from the directory ─────
 function TestimonialsSection() {
   const [reviews, setReviews] = useState<{ id: string; reviewer_name: string; review_text: string; rating: number; business_name: string; slug: string; created_at: string }[]>([]);
@@ -135,7 +164,12 @@ function TestimonialsSection() {
       .then(data => {
         const list = data.reviews || data || [];
         if (Array.isArray(list) && list.length > 0) {
-          setReviews(list.filter((r: any) => r.review_text && r.reviewer_name && r.review_text.length > 20));
+          const filtered = list.filter((r: any) =>
+            r.review_text && r.reviewer_name && r.review_text.length > 20 &&
+            !/test/i.test(r.reviewer_name) &&
+            !/automated testing/i.test(r.review_text)
+          );
+          setReviews(filtered);
         }
       })
       .catch(() => {});
@@ -147,7 +181,7 @@ function TestimonialsSection() {
     return () => clearInterval(t);
   }, [reviews.length]);
 
-  if (reviews.length === 0) return null;
+  if (reviews.length < 3) return null;
 
   const r = reviews[idx];
   return (
@@ -195,13 +229,17 @@ function TestimonialsSection() {
 }
 
 export default function DirectoryClient() {
+  const searchParams = useSearchParams();
+  const initialCategory = searchParams.get('category') || '';
+  const initialQuery = searchParams.get('q') || '';
+
   const [allListings, setAllListings] = useState<Listing[]>([]);
   const [featuredListings, setFeaturedListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [activeCategory, setActiveCategory] = useState('');
+  const [search, setSearch] = useState(initialQuery);
+  const [activeCategory, setActiveCategory] = useState(initialCategory);
   const [activeSubcategory, setActiveSubcategory] = useState('All');
-  const [showListings, setShowListings] = useState(false);
+  const [showListings, setShowListings] = useState(!!initialCategory || !!initialQuery);
   const [showGroupedBrowse, setShowGroupedBrowse] = useState(false);
   const [sortBy, setSortBy] = useState<'nearest' | 'highest' | 'most-reviews'>('nearest');
   const [cityFilter, setCityFilter] = useState('');
@@ -237,6 +275,13 @@ export default function DirectoryClient() {
       }
       setLoading(false);
     }).catch(() => setLoading(false));
+
+    // Scroll to categories section if arriving with ?category= or ?q=
+    if (initialCategory || initialQuery) {
+      setTimeout(() => {
+        document.getElementById('categories')?.scrollIntoView({ behavior: 'smooth' });
+      }, 500);
+    }
 
     // Request geolocation
     if (navigator.geolocation) {
@@ -477,27 +522,27 @@ export default function DirectoryClient() {
           </section>
 
           {/* ═══════════════════════════════════════════════════════════
-              ANCHOR NAV BAR — Quick-jump links to page sections
+              SECTION ANCHOR NAV
               ═══════════════════════════════════════════════════════════ */}
-          <nav className="sticky top-20 z-30 border-b border-white/5" style={{ background: 'rgba(10,10,10,0.85)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }} data-testid="anchor-nav">
-            <div className="max-w-7xl mx-auto px-6 flex items-center gap-1 overflow-x-auto scrollbar-hide py-2" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          <nav className="max-w-3xl mx-auto px-6 py-6" data-testid="anchor-nav">
+            <div className="flex items-center justify-center gap-6 sm:gap-8 flex-wrap">
               {[
                 { href: '#categories', label: 'Categories' },
                 { href: '#featured', label: 'Featured' },
-                { href: '#community-polls', label: 'Polls' },
-                { href: '#testimonials', label: 'Reviews' },
+                { href: '#polls', label: 'Polls' },
                 { href: '#destinations', label: 'Destinations' },
-                { href: '#founding-50', label: 'Founding 50' },
+                { href: '#founding', label: 'Founding Members' },
               ].map((link) => (
                 <a
                   key={link.href}
                   href={link.href}
-                  className="shrink-0 px-4 py-2 rounded-full text-xs font-heading font-medium text-white/50 hover:text-gold hover:bg-gold/5 border border-transparent hover:border-gold/20 transition-all duration-300"
+                  className="text-xs text-white/35 hover:text-gold/70 font-body tracking-wide uppercase transition-colors duration-300"
                 >
                   {link.label}
                 </a>
               ))}
             </div>
+            <div className="mt-4 h-px w-full" style={{ background: 'linear-gradient(90deg, transparent, rgba(201,168,76,0.15), transparent)' }} />
           </nav>
 
           {/* ═══════════════════════════════════════════════════════════
@@ -513,31 +558,20 @@ export default function DirectoryClient() {
             {/* 9-Category Grid with depth */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {CATEGORIES.map((cat, i) => {
-                const catCount = allListings.filter(l => l.industry === cat.id).length;
-                const isComingSoon = catCount === 0;
-
+                const count = allListings.filter(l => l.industry === cat.id).length;
                 return (
                   <motion.div key={cat.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-                    className={`relative rounded-2xl overflow-hidden group transition-all duration-500 ${i === 0 ? 'md:col-span-2 md:row-span-2' : ''} ${isComingSoon ? 'cursor-default' : 'cursor-pointer hover:shadow-gold-glow'}`}
+                    className={`relative rounded-2xl overflow-hidden cursor-pointer group hover:shadow-gold-glow transition-all duration-500 ${i === 0 ? 'md:col-span-2 md:row-span-2' : ''}`}
                     style={{ minHeight: i === 0 ? 320 : 180 }}
-                    onClick={() => !isComingSoon && handleCategoryClick(cat.id)} data-testid={`cat-${cat.id}`}>
-                    <Image src={cat.img} alt={`${cat.label} — ${cat.sub}`} fill className={`absolute inset-0 object-cover transition-transform duration-700 ${isComingSoon ? 'saturate-[0.3] brightness-[0.5]' : 'group-hover:scale-105'}`} sizes="(max-width: 768px) 100vw, 33vw" />
-                    <div className={`absolute inset-0 transition-all duration-500 ${isComingSoon ? 'bg-gradient-to-t from-black/95 via-black/60 to-black/30' : 'bg-gradient-to-t from-black/90 via-black/40 to-transparent group-hover:from-black/95'}`} />
+                    onClick={() => handleCategoryClick(cat.id)} data-testid={`cat-${cat.id}`}>
+                    <Image src={cat.img} alt={`${cat.label} — ${cat.sub}`} fill className="absolute inset-0 object-cover group-hover:scale-105 transition-transform duration-700" sizes="(max-width: 768px) 100vw, 33vw" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent group-hover:from-black/95 transition-all duration-500" />
                     <div className="absolute bottom-4 left-4">
-                      <span className={`font-heading font-semibold block tracking-tight ${i === 0 ? 'text-2xl' : 'text-base'} ${isComingSoon ? 'text-white/50' : 'text-white'}`}>{cat.label}</span>
-                      <span className={`text-xs font-body ${isComingSoon ? 'text-white/30' : 'text-white/50'}`}>{cat.sub}</span>
-                      {!isComingSoon && (
-                        <span className="block mt-1.5 text-[11px] font-heading font-medium tracking-wide" style={{ color: '#C9A84C' }}>
-                          Browse Now &rarr;
-                        </span>
-                      )}
+                      <span className={`text-white font-heading font-semibold block tracking-tight ${i === 0 ? 'text-2xl' : 'text-base'}`}>{cat.label}</span>
+                      <span className="text-white/50 text-xs font-body">{cat.sub}</span>
+                      {count > 0 && <span className="text-[10px] font-body mt-1 block" style={{ color: 'rgba(201,168,76,0.6)' }}>{count} {count === 1 ? 'business' : 'businesses'}</span>}
                     </div>
-                    {i === 0 && !isComingSoon && <span className="absolute top-3 right-3 text-[10px] px-2.5 py-1 rounded-full font-heading font-semibold uppercase tracking-wider text-black" style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C97A)' }}>Core</span>}
-                    {isComingSoon && (
-                      <span className="absolute top-3 right-3 text-[10px] px-2.5 py-1 rounded-full font-heading font-semibold uppercase tracking-wider text-white/60 border border-white/15" style={{ background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(8px)' }}>
-                        Coming Q2 2026
-                      </span>
-                    )}
+                    {i === 0 && <span className="absolute top-3 right-3 text-[10px] px-2.5 py-1 rounded-full font-heading font-semibold uppercase tracking-wider text-black" style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C97A)' }}>Core</span>}
                   </motion.div>
                 );
               })}
@@ -556,21 +590,12 @@ export default function DirectoryClient() {
           {/* ═══════════════════════════════════════════════════════════
               BOOSTED SHOWCASE — SPONSORED CAROUSEL
               ═══════════════════════════════════════════════════════════ */}
-          <section className="py-12" style={{ background: '#080808' }} data-testid="boosted-showcase-section">
-            <div className="max-w-7xl mx-auto px-6">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-1 h-6 rounded-full" style={{ background: '#C9A84C' }} />
-                <h3 className="text-sm font-heading font-semibold text-white/60 uppercase tracking-wider">Sponsored</h3>
-                <div className="flex-1 h-px bg-white/5" />
-              </div>
-              <BoostedShowcase maxSlots={12} />
-            </div>
-          </section>
+          <SponsoredSection />
 
           {/* ═══════════════════════════════════════════════════════════
               FEATURED LISTINGS
               ═══════════════════════════════════════════════════════════ */}
-          <section className="py-20" style={{ background: 'linear-gradient(180deg, #080808 0%, #0A0A0A 50%, #080808 100%)' }} data-testid="featured-listings-section">
+          <section id="featured" className="py-20" style={{ background: 'linear-gradient(180deg, #080808 0%, #0A0A0A 50%, #080808 100%)' }} data-testid="featured-listings-section">
             <div className="max-w-7xl mx-auto px-6">
               <p className="text-xs font-heading font-semibold uppercase tracking-[0.2em] text-center mb-3" style={{ color: '#C9A84C' }}>Showcase</p>
               <h2 className="text-3xl md:text-4xl font-heading font-light text-white text-center mb-3 tracking-tight">
@@ -624,50 +649,41 @@ export default function DirectoryClient() {
               <h2 className="text-3xl sm:text-4xl font-heading font-light text-white tracking-tight mb-4 text-center">
                 Your Trusted Local <span className="text-gradient-gold font-semibold">Home Services</span> Resource
               </h2>
-              <p className="text-white/40 text-sm text-center max-w-2xl mx-auto mb-14 font-body">
-                GreenLine365 is where Florida homeowners find transparent, verified professionals they can trust.
-              </p>
+              <p className="text-sm text-white/40 text-center max-w-2xl mx-auto mb-12 font-body">Where Florida&apos;s local economy connects — homeowners, professionals, and communities.</p>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {/* Transparency */}
+                {/* Shield — Verified Businesses */}
                 <div className="text-center p-6 rounded-2xl border border-white/5 hover:border-gold/15 transition-all duration-300" style={{ background: 'rgba(255,255,255,0.02)' }}>
-                  <div className="w-14 h-14 rounded-2xl mx-auto mb-5 flex items-center justify-center" style={{ background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.2)' }}>
+                  <div className="w-14 h-14 rounded-2xl mx-auto mb-5 flex items-center justify-center" style={{ background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.15)' }}>
                     <svg className="w-7 h-7" style={{ color: '#C9A84C' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                     </svg>
                   </div>
-                  <h3 className="text-base font-heading font-semibold text-white mb-2">Real Ratings &amp; Reviews</h3>
-                  <p className="text-sm text-white/45 font-body leading-relaxed">
-                    Every business listed with real ratings, verified contact info, and honest feedback from your neighbors.
-                  </p>
+                  <h3 className="text-base font-heading font-semibold text-white mb-3">Verified Businesses</h3>
+                  <p className="text-sm text-white/45 font-body leading-relaxed">Every listing includes real ratings, verified contact info, and honest feedback from your neighbors. No anonymous reviews, no fake profiles.</p>
                 </div>
 
-                {/* Coverage */}
+                {/* Star — Real Ratings */}
                 <div className="text-center p-6 rounded-2xl border border-white/5 hover:border-gold/15 transition-all duration-300" style={{ background: 'rgba(255,255,255,0.02)' }}>
-                  <div className="w-14 h-14 rounded-2xl mx-auto mb-5 flex items-center justify-center" style={{ background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.2)' }}>
+                  <div className="w-14 h-14 rounded-2xl mx-auto mb-5 flex items-center justify-center" style={{ background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.15)' }}>
+                    <svg className="w-7 h-7" style={{ color: '#C9A84C' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-base font-heading font-semibold text-white mb-3">Real Ratings</h3>
+                  <p className="text-sm text-white/45 font-body leading-relaxed">Google ratings, QR-verified reviews, and AI-analyzed sentiment — every data point is real and tied to actual customer interactions.</p>
+                </div>
+
+                {/* Map Pin — 8 Florida Cities */}
+                <div className="text-center p-6 rounded-2xl border border-white/5 hover:border-gold/15 transition-all duration-300" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                  <div className="w-14 h-14 rounded-2xl mx-auto mb-5 flex items-center justify-center" style={{ background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.15)' }}>
                     <svg className="w-7 h-7" style={{ color: '#C9A84C' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
                     </svg>
                   </div>
-                  <h3 className="text-base font-heading font-semibold text-white mb-2">Every Trade Covered</h3>
-                  <p className="text-sm text-white/45 font-body leading-relaxed">
-                    HVAC, plumbing, roofing, electrical, pest control — local pros across eight Florida destinations who know your area.
-                  </p>
-                </div>
-
-                {/* Connection */}
-                <div className="text-center p-6 rounded-2xl border border-white/5 hover:border-gold/15 transition-all duration-300" style={{ background: 'rgba(255,255,255,0.02)' }}>
-                  <div className="w-14 h-14 rounded-2xl mx-auto mb-5 flex items-center justify-center" style={{ background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.2)' }}>
-                    <svg className="w-7 h-7" style={{ color: '#C9A84C' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-base font-heading font-semibold text-white mb-2">Community Connected</h3>
-                  <p className="text-sm text-white/45 font-body leading-relaxed">
-                    Whether you&apos;re finding a trusted pro or growing your reputation — this is where Florida&apos;s local economy connects.
-                  </p>
+                  <h3 className="text-base font-heading font-semibold text-white mb-3">8 Florida Cities</h3>
+                  <p className="text-sm text-white/45 font-body leading-relaxed">From HVAC and plumbing to dining and wellness — we cover every trade and category across eight major Florida destinations.</p>
                 </div>
               </div>
             </div>
@@ -676,7 +692,7 @@ export default function DirectoryClient() {
           {/* ═══════════════════════════════════════════════════════════
               COMMUNITY POLLS — "YOU VOTED" WIDGET
               ═══════════════════════════════════════════════════════════ */}
-          <section id="community-polls" className="py-16" style={{ background: '#0A0A0A' }} data-testid="community-polls-section">
+          <section id="polls" className="py-16" style={{ background: '#0A0A0A' }} data-testid="community-polls-section">
             <div className="max-w-7xl mx-auto px-6">
               <div className="text-center mb-8">
                 <p className="text-xs font-heading font-semibold uppercase tracking-[0.2em] mb-3" style={{ color: '#C9A84C' }}>Community Voice</p>
@@ -686,6 +702,11 @@ export default function DirectoryClient() {
                 <p className="text-white/50 text-sm max-w-md mx-auto font-body">Help your neighbors find the best local pros.</p>
               </div>
               <CommunityPolls />
+              <div className="text-center mt-6">
+                <Link href="/community/polls" className="text-xs text-white/35 hover:text-gold/70 font-body transition-colors duration-300">
+                  See all polls &rarr;
+                </Link>
+              </div>
             </div>
           </section>
 
@@ -722,7 +743,7 @@ export default function DirectoryClient() {
                   { slug: 'jacksonville',   label: 'Jacksonville',     tagline: 'Gridiron Grit & Riverfront Views',  image: 'https://static.prod-images.emergentagent.com/jobs/2e119e5c-5e48-4af9-82e4-b66cfaef75d6/images/3044a5e13c46207922e088bcb878b0ded80dcf0c9ca1d9c15c08586ac85cd2e3.png' },
                 ].map((d, i) => (
                   <motion.div key={d.slug} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 + i * 0.07, duration: 0.5 }}>
-                    <Link href={`/destination/${d.slug}`} className="block dest-card-frame group" data-testid={`dest-card-${d.slug}`}>
+                    <Link href={`/directory?q=${encodeURIComponent(d.label)}`} className="block dest-card-frame group" data-testid={`dest-card-${d.slug}`}>
                       <div className="dest-card-inner">
                         <div className="relative overflow-hidden" style={{ aspectRatio: '4/3' }}>
                           <DestImage src={d.image} alt={`${d.label} destination guide — ${d.tagline}`} label={d.label} />
@@ -744,7 +765,7 @@ export default function DirectoryClient() {
           {/* ═══════════════════════════════════════════════════════════
               THE FOUNDING 50 — Directory Founding Members Program
               ═══════════════════════════════════════════════════════════ */}
-          <section id="founding-50" className="py-24 relative overflow-hidden" data-testid="founding-50-section">
+          <section id="founding" className="py-24 relative overflow-hidden" data-testid="founding-50-section">
             {/* Subtle radial glow */}
             <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 50% 30%, rgba(201,168,76,0.06) 0%, transparent 60%)' }} />
 
@@ -761,21 +782,11 @@ export default function DirectoryClient() {
                 </p>
               </div>
 
-              {/* Progress Bar */}
-              <div className="max-w-md mx-auto mb-12">
-                <div className="flex justify-between text-xs font-body mb-2">
-                  <span className="text-white/60">{stats.foundingMembersClaimed} of 50 claimed</span>
-                  <span style={{ color: 'rgba(201,168,76,0.7)' }}>{50 - stats.foundingMembersClaimed} spots remaining</span>
-                </div>
-                <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
-                  <motion.div
-                    className="h-full rounded-full"
-                    style={{ background: 'linear-gradient(90deg, #C9A84C, #E8C97A)' }}
-                    initial={{ width: 0 }}
-                    animate={{ width: `${(stats.foundingMembersClaimed / 50) * 100}%` }}
-                    transition={{ duration: 1.5, ease: 'easeOut' }}
-                  />
-                </div>
+              {/* Launch Status */}
+              <div className="max-w-md mx-auto mb-12 text-center">
+                <p className="text-sm font-heading font-semibold tracking-wide" style={{ color: 'rgba(201,168,76,0.8)' }}>
+                  Applications now open — secure your spot before launch
+                </p>
               </div>
 
               {/* 4 Benefits Grid */}
@@ -805,7 +816,7 @@ export default function DirectoryClient() {
                   className="btn-primary px-10 py-4 rounded-full text-sm font-semibold inline-block"
                   data-testid="founding-50-cta"
                 >
-                  {stats.foundingMembersClaimed >= 50 ? 'Join the Waitlist' : 'Claim Your Founding Spot'}
+                  Claim Your Founding Spot
                 </Link>
                 <p className="text-xs text-white/30 mt-4 font-body">Free listing. No credit card required.</p>
               </div>
@@ -963,21 +974,28 @@ export default function DirectoryClient() {
 function ListingCard({ listing: l, index: i }: { listing: Listing; index: number }) {
   const hasIntel = l.has_property_intelligence;
   const [imgError, setImgError] = useState(false);
-  const imgSrc = l.cover_image_url || l.logo_url;
+  const placeholderUrl = getPlaceholderImage(l.industry);
+  const fallback = getCategoryFallback(l.industry);
+  const imgSrc = l.cover_image_url || l.logo_url || placeholderUrl;
+
+  // Prefer Google data, fall back to internal feedback
+  const rating = l.metadata?.google_rating || l.avg_feedback_rating || 0;
+  const reviewCount = l.metadata?.google_review_count || l.total_feedback_count || 0;
+  const hasRating = rating > 0;
+
   return (
     <Link href={`/listing/${l.slug}`}>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
-        className={`rounded-2xl overflow-hidden border transition-all duration-300 ease-out group cursor-pointer hover:scale-[1.02] ${hasIntel ? 'border-[rgba(201,168,76,0.2)] hover:border-[rgba(201,168,76,0.4)]' : 'border-white/5 hover:border-[rgba(201,168,76,0.25)]'}`}
+        className={`rounded-2xl overflow-hidden border transition-all duration-500 group cursor-pointer hover:scale-[1.02] ${hasIntel ? 'border-[rgba(201,168,76,0.2)] shadow-gold-glow hover:border-[rgba(201,168,76,0.4)]' : 'border-white/5 hover:border-[rgba(201,168,76,0.25)]'}`}
         style={{ background: 'rgba(255,255,255,0.02)' }}
-        onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 0 15px rgba(212,175,55,0.3), 0 8px 30px rgba(0,0,0,0.3)'; }}
-        onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none'; }}
+        whileHover={{ boxShadow: '0 0 15px rgba(212,175,55,0.3)' }}
         data-testid={`listing-${l.slug}`}>
         <div className="relative h-40 overflow-hidden">
-          {imgSrc && !imgError ? (
+          {!imgError ? (
             <Image src={imgSrc} alt={`${l.business_name} — ${l.industry.replace(/-/g, ' ')} in ${l.city || 'Florida'}`} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" onError={() => setImgError(true)} />
           ) : (
-            <div className="w-full h-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #111 0%, #1A1A1A 100%)' }}>
-              <span className="text-4xl font-heading font-light text-white/10">{l.business_name[0]}</span>
+            <div className="w-full h-full flex items-center justify-center" style={{ background: fallback.gradient }}>
+              <span className="text-4xl">{fallback.icon}</span>
             </div>
           )}
           <span className="absolute top-3 left-3 text-[10px] px-2 py-1 rounded-full backdrop-blur-sm capitalize font-body" style={{ background: 'rgba(10,10,10,0.7)', color: 'rgba(255,255,255,0.6)' }}>{l.industry.replace(/-/g, ' ')}</span>
@@ -996,29 +1014,32 @@ function ListingCard({ listing: l, index: i }: { listing: Listing; index: number
             {l.city}, {l.state}
             {l.distance != null && <span style={{ color: 'rgba(201,168,76,0.6)' }} className="ml-1">({l.distance} mi)</span>}
           </p>}
-          <p className="text-xs text-white/35 line-clamp-2 mb-3 font-body">
-            {l.description || `Trusted ${l.industry.replace(/-/g, ' ')} provider${l.city ? ` serving ${l.city}` : ' in Florida'}. View ratings, reviews, and contact info.`}
-          </p>
-
-          {/* Social Proof Row */}
-          <div className="flex items-center gap-2 mb-3 flex-wrap">
-            <div className="flex items-center gap-1">
-              <Stars rating={l.avg_feedback_rating} size={12} />
-              <span className="text-[11px] font-semibold" style={{ color: '#C9A84C' }}>
-                {l.avg_feedback_rating > 0 ? l.avg_feedback_rating.toFixed(1) : 'New'}
-              </span>
-            </div>
-            {l.total_feedback_count > 0 && (
-              <span className="text-[10px] text-white/40 font-body">({l.total_feedback_count} review{l.total_feedback_count !== 1 ? 's' : ''})</span>
-            )}
-            {l.is_claimed && (
-              <span className="inline-flex items-center gap-0.5 text-[10px] text-emerald-400/80 font-body">
-                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
-                Verified
-              </span>
+          <p className="text-xs text-white/35 line-clamp-2 mb-3 font-body">{l.description || getFallbackDescription(l.business_name, l.industry, l.city)}</p>
+          {/* Social proof row: ★ 4.2 (584 reviews) • Verified */}
+          <div className="flex items-center gap-1.5 text-[11px] text-white/40 font-body mb-3">
+            {hasRating ? (
+              <>
+                <span style={{ color: '#C9A84C' }}>&#9733; {Number(rating).toFixed(1)}</span>
+                {reviewCount > 0 && <span>({reviewCount.toLocaleString()} {reviewCount === 1 ? 'review' : 'reviews'})</span>}
+                {l.is_claimed && (
+                  <>
+                    <span className="text-white/15">&bull;</span>
+                    <span className="text-green-400/70">Verified &#10003;</span>
+                  </>
+                )}
+              </>
+            ) : (
+              <>
+                <span className="text-white/25">New listing</span>
+                {l.is_claimed && (
+                  <>
+                    <span className="text-white/15">&bull;</span>
+                    <span className="text-green-400/70">Verified &#10003;</span>
+                  </>
+                )}
+              </>
             )}
           </div>
-
           <div className="flex items-center justify-between">
             <span className="btn-ghost text-xs px-3 py-1.5 rounded-full" data-testid={`view-details-${l.slug}`}>View Details</span>
           </div>
@@ -1164,6 +1185,20 @@ function SubcategoryCarouselRow({ label, subtitle, industry, searchTerm, sortBy,
                 <div className="p-3">
                   <h4 className="text-sm font-heading font-semibold truncate" style={{ color: '#C9A84C' }}>{l.business_name}</h4>
                   <p className="text-[11px] text-white/40 font-body truncate">{l.city}{l.distance != null ? ` · ${l.distance} mi` : ''}</p>
+                  {/* Social proof */}
+                  {(() => {
+                    const r = l.metadata?.google_rating || l.avg_feedback_rating || 0;
+                    const rc = l.metadata?.google_review_count || l.total_feedback_count || 0;
+                    return r > 0 ? (
+                      <p className="text-[10px] text-white/35 font-body mt-1 truncate">
+                        <span style={{ color: '#C9A84C' }}>&#9733; {Number(r).toFixed(1)}</span>
+                        {rc > 0 && <span> ({rc.toLocaleString()})</span>}
+                        {l.is_claimed && <span className="text-green-400/60"> &bull; Verified</span>}
+                      </p>
+                    ) : l.is_claimed ? (
+                      <p className="text-[10px] text-green-400/50 font-body mt-1">Verified &#10003;</p>
+                    ) : null;
+                  })()}
                 </div>
               </div>
             </Link>

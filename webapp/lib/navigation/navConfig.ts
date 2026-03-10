@@ -210,6 +210,32 @@ export interface MegaMenuDropdown {
 
 export const publicMegaMenus: MegaMenuDropdown[] = [
   {
+    id: 'directory',
+    label: 'Directory',
+    groups: [
+      {
+        label: 'Browse Categories',
+        items: [
+          { href: '/directory?category=services', label: 'Home Services', description: 'HVAC, Plumbing, Electrical & more', icon: '🏠' },
+          { href: '/directory?category=dining', label: 'Dining', description: 'Cafes, casual & fine dining', icon: '🍽️' },
+          { href: '/directory?category=health-wellness', label: 'Health & Wellness', description: 'Doctors, dentists & fitness', icon: '💪' },
+          { href: '/directory?category=style-shopping', label: 'Style & Shopping', description: 'Fashion, grooming & retail', icon: '🛍️' },
+          { href: '/directory?category=automotive', label: 'Automotive', description: 'Repairs, dealers & body shops', icon: '🚗' },
+          { href: '/directory?category=marine-outdoor', label: 'Marine & Outdoor', description: 'Boats, docks & adventure', icon: '⛵' },
+          { href: '/directory?category=professional-services', label: 'Professional Services', description: 'Legal, finance & consulting', icon: '💼' },
+          { href: '/directory?category=education', label: 'Education & Childcare', description: 'Schools, tutoring & daycare', icon: '📚' },
+          { href: '/directory?category=pets', label: 'Pets', description: 'Vets, grooming & boarding', icon: '🐾' },
+        ],
+      },
+      {
+        label: 'Quick Links',
+        items: [
+          { href: '/directory', label: 'All Businesses', description: 'Full directory listing', icon: '📋' },
+        ],
+      },
+    ],
+  },
+  {
     id: 'services',
     label: 'Services',
     groups: [
