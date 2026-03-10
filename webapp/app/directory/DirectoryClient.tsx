@@ -522,6 +522,30 @@ export default function DirectoryClient() {
           </section>
 
           {/* ═══════════════════════════════════════════════════════════
+              SECTION ANCHOR NAV
+              ═══════════════════════════════════════════════════════════ */}
+          <nav className="max-w-3xl mx-auto px-6 py-6" data-testid="anchor-nav">
+            <div className="flex items-center justify-center gap-6 sm:gap-8 flex-wrap">
+              {[
+                { href: '#categories', label: 'Categories' },
+                { href: '#featured', label: 'Featured' },
+                { href: '#polls', label: 'Polls' },
+                { href: '#destinations', label: 'Destinations' },
+                { href: '#founding', label: 'Founding Members' },
+              ].map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className="text-xs text-white/35 hover:text-gold/70 font-body tracking-wide uppercase transition-colors duration-300"
+                >
+                  {link.label}
+                </a>
+              ))}
+            </div>
+            <div className="mt-4 h-px w-full" style={{ background: 'linear-gradient(90deg, transparent, rgba(201,168,76,0.15), transparent)' }} />
+          </nav>
+
+          {/* ═══════════════════════════════════════════════════════════
               BROWSE BY CATEGORY
               ═══════════════════════════════════════════════════════════ */}
           <section id="categories" className="max-w-7xl mx-auto px-6 py-20" data-testid="categories-section">
@@ -571,7 +595,7 @@ export default function DirectoryClient() {
           {/* ═══════════════════════════════════════════════════════════
               FEATURED LISTINGS
               ═══════════════════════════════════════════════════════════ */}
-          <section className="py-20" style={{ background: 'linear-gradient(180deg, #080808 0%, #0A0A0A 50%, #080808 100%)' }} data-testid="featured-listings-section">
+          <section id="featured" className="py-20" style={{ background: 'linear-gradient(180deg, #080808 0%, #0A0A0A 50%, #080808 100%)' }} data-testid="featured-listings-section">
             <div className="max-w-7xl mx-auto px-6">
               <p className="text-xs font-heading font-semibold uppercase tracking-[0.2em] text-center mb-3" style={{ color: '#C9A84C' }}>Showcase</p>
               <h2 className="text-3xl md:text-4xl font-heading font-light text-white text-center mb-3 tracking-tight">
@@ -642,7 +666,7 @@ export default function DirectoryClient() {
           {/* ═══════════════════════════════════════════════════════════
               COMMUNITY POLLS — "YOU VOTED" WIDGET
               ═══════════════════════════════════════════════════════════ */}
-          <section className="py-16" style={{ background: '#0A0A0A' }} data-testid="community-polls-section">
+          <section id="polls" className="py-16" style={{ background: '#0A0A0A' }} data-testid="community-polls-section">
             <div className="max-w-7xl mx-auto px-6">
               <div className="text-center mb-8">
                 <p className="text-xs font-heading font-semibold uppercase tracking-[0.2em] mb-3" style={{ color: '#C9A84C' }}>Community Voice</p>
@@ -710,7 +734,7 @@ export default function DirectoryClient() {
           {/* ═══════════════════════════════════════════════════════════
               THE FOUNDING 50 — Directory Founding Members Program
               ═══════════════════════════════════════════════════════════ */}
-          <section className="py-24 relative overflow-hidden" data-testid="founding-50-section">
+          <section id="founding" className="py-24 relative overflow-hidden" data-testid="founding-50-section">
             {/* Subtle radial glow */}
             <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 50% 30%, rgba(201,168,76,0.06) 0%, transparent 60%)' }} />
 

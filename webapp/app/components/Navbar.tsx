@@ -329,8 +329,8 @@ export default function Navbar() {
 
             {/* ── Right side: Search + CTA + Auth ── */}
             <div className="hidden lg:flex items-center gap-3">
-              {/* ── Inline Collapsible Search ── */}
-              <div className="relative flex items-center">
+              {/* ── Inline Collapsible Search (hidden on homepage — hero has Find a Pro) ── */}
+              {pathname !== '/' && <div className="relative flex items-center">
                 <AnimatePresence mode="wait">
                   {searchOpen ? (
                     <motion.form
@@ -393,7 +393,7 @@ export default function Navbar() {
                     </motion.button>
                   )}
                 </AnimatePresence>
-              </div>
+              </div>}
 
               {/* Auth Section */}
               {loading ? null : user ? (
@@ -431,15 +431,17 @@ export default function Navbar() {
 
             {/* ── Mobile Menu Button ── */}
             <div className="flex lg:hidden items-center gap-2">
-              {/* Mobile search icon */}
-              <button
-                onClick={openSearch}
-                className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center hover:border-gold/40 transition-all duration-300"
-              >
-                <svg className="w-4 h-4 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </button>
+              {/* Mobile search icon (hidden on homepage — hero has Find a Pro) */}
+              {pathname !== '/' && (
+                <button
+                  onClick={openSearch}
+                  className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center hover:border-gold/40 transition-all duration-300"
+                >
+                  <svg className="w-4 h-4 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </button>
+              )}
 
               <Link
                 href="/register-business"
