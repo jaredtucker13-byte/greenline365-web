@@ -81,13 +81,14 @@ function SparkleIcon({ className }: { className?: string }) {
 
 /* ─── Dashboard / admin routes where bar is hidden ─────────── */
 const HIDDEN_PREFIXES = ['/admin', '/dashboard', '/greenline-hq', '/portal', '/login', '/register', '/api'];
+const HIDDEN_EXACT = ['/'];
 
 export default function SmartSearchBar() {
   const pathname = usePathname() || '/';
   const router = useRouter();
   const [query, setQuery] = useState('');
 
-  const isHidden = HIDDEN_PREFIXES.some((p) => pathname.startsWith(p));
+  const isHidden = HIDDEN_EXACT.includes(pathname) || HIDDEN_PREFIXES.some((p) => pathname.startsWith(p));
   const theme = useMemo(() => resolveTheme(pathname), [pathname]);
   const placeholder = useMemo(() => resolvePlaceholder(pathname), [pathname]);
 

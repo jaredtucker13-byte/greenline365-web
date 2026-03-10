@@ -185,7 +185,7 @@ function TestimonialsSection() {
 
   const r = reviews[idx];
   return (
-    <section className="relative py-20 overflow-hidden" data-testid="testimonials-section">
+    <section id="testimonials" className="relative py-20 overflow-hidden" data-testid="testimonials-section">
       <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(201,168,76,0.03) 0%, transparent 60%)' }} />
       <div className="relative max-w-3xl mx-auto px-6 text-center">
         <p className="text-xs font-heading font-semibold uppercase tracking-[0.25em] mb-4" style={{ color: 'rgba(201,168,76,0.7)' }}>Real Reviews</p>
@@ -456,7 +456,7 @@ export default function DirectoryClient() {
                 transition={{ duration: 0.7, delay: 1 }}
                 className="text-sm sm:text-base font-body text-white/45 tracking-wider uppercase mb-12"
               >
-                Discover Elite Professionals in Every Field.
+                Your neighbors&apos; most trusted pros — one click away.
               </motion.p>
 
               {/* Search Pill */}
@@ -581,7 +581,7 @@ export default function DirectoryClient() {
           {/* ═══════════════════════════════════════════════════════════
               DYNAMIC FEATURED SHOWCASE — R-to-L CAROUSEL
               ═══════════════════════════════════════════════════════════ */}
-          <section className="py-20" style={{ background: 'linear-gradient(180deg, #0A0A0A 0%, #060606 50%, #0A0A0A 100%)' }} data-testid="dynamic-showcase-section">
+          <section id="featured" className="py-20" style={{ background: 'linear-gradient(180deg, #0A0A0A 0%, #060606 50%, #0A0A0A 100%)' }} data-testid="dynamic-showcase-section">
             <div className="max-w-7xl mx-auto px-6">
               <FeaturedShowcase className="mb-0" maxSlots={12} />
             </div>
@@ -1162,8 +1162,10 @@ function SubcategoryCarouselRow({ label, subtitle, industry, searchTerm, sortBy,
         <div ref={scrollRef} className="flex gap-4 overflow-x-auto px-4 sm:px-6 pb-2 snap-x snap-mandatory scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {items.map((l, i) => (
             <Link key={l.id} href={`/listing/${l.slug}`} className="flex-shrink-0 w-[45%] sm:w-[30%] md:w-[22%] lg:w-[18.5%] snap-start">
-              <div className="rounded-2xl overflow-hidden border border-white/5 hover:border-[rgba(201,168,76,0.2)] transition-all duration-300 group/card cursor-pointer h-full"
+              <div className="rounded-2xl overflow-hidden border border-white/5 hover:border-[rgba(201,168,76,0.25)] hover:scale-[1.02] transition-all duration-300 ease-out group/card cursor-pointer h-full"
                 style={{ background: 'rgba(255,255,255,0.02)' }}
+                onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 0 15px rgba(212,175,55,0.3), 0 8px 30px rgba(0,0,0,0.3)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none'; }}
                 data-testid={`carousel-card-${l.slug}`}>
                 <div className="relative h-32 sm:h-36 overflow-hidden">
                   {l.cover_image_url ? (
