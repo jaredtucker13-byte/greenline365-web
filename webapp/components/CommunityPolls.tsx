@@ -115,6 +115,7 @@ export default function CommunityPolls({ className = '', maxPolls = 10 }: Commun
 
   const poll = polls[currentIndex];
   const hasVoted = votedPolls.has(poll.id);
+  const showResults = hasVoted || poll.total_votes >= 10;
   const maxVotes = Math.max(...poll.options.map(o => o.vote_count), 1);
 
   return (
@@ -159,11 +160,11 @@ export default function CommunityPolls({ className = '', maxPolls = 10 }: Commun
                   }
                 `}
               >
-                {/* Progress bar background */}
+                {/* Progress bar background — shows after voting or when 10+ votes */}
                 <div
                   className="absolute inset-0 transition-all duration-700 ease-out"
                   style={{
-                    width: hasVoted ? `${pct}%` : '0%',
+                    width: showResults ? `${pct}%` : '0%',
                     background: 'linear-gradient(90deg, rgba(201,169,78,0.15), rgba(201,169,78,0.05))',
                   }}
                 />
@@ -185,10 +186,11 @@ export default function CommunityPolls({ className = '', maxPolls = 10 }: Commun
                   <span className="text-sm font-body text-white/90 flex-1 truncate">{option.business_name}</span>
 
                   {/* Vote count / button */}
-                  {hasVoted ? (
-                    <span className="text-xs font-heading font-semibold text-gold/70 flex-shrink-0">{pct}%</span>
-                  ) : (
-                    <span className={`text-[10px] font-heading font-semibold uppercase tracking-wider flex-shrink-0 ${isVoting ? 'text-gold' : 'text-white/30 group-hover:text-gold/60'}`}>
+                  {showResults && (
+                    <span className="text-xs font-heading font-semibold text-gold/70 flex-shrink-0 mr-1">{pct}%</span>
+                  )}
+                  {!hasVoted && (
+                    <span className={`text-[10px] font-heading font-semibold uppercase tracking-wider flex-shrink-0 ${isVoting ? 'text-gold' : 'text-white/30'}`}>
                       {isVoting ? '...' : 'Vote'}
                     </span>
                   )}
