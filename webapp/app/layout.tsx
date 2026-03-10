@@ -3,7 +3,6 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import dynamic from 'next/dynamic';
 import ScrollToTop from './components/ScrollToTop';
-import SmartSearchBar from './components/SmartSearchBar';
 import { ServiceWorkerProvider } from '@/lib/use-service-worker';
 import { AdminEditModeProvider } from '@/components/editor';
 import { ToastProvider } from '@/components/ui/os/Toast';
@@ -293,7 +292,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                                               <AdminEditModeProvider>
                                                             <ScrollToTop />
                                                             <Navbar />
-                                                            <SmartSearchBar />
                                                             <main>{children}</main>
                                                             <ChatWidget />
                                                             <Footer />

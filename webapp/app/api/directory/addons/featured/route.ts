@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
   // Fetch all claimed listings with enough data for both boost check and display
   const { data: listings } = await service
     .from('directory_listings')
-    .select('id, business_name, slug, industry, city, state, cover_image_url, tier, avg_feedback_rating, metadata')
+    .select('id, business_name, slug, industry, city, state, cover_image_url, logo_url, tier, avg_feedback_rating, total_feedback_count, trust_score, voted_by_count, is_claimed, description, metadata')
     .eq('is_claimed', true);
 
   if (!listings) return NextResponse.json({ slots: [], boostedCount: 0, backfilledCount: 0, featured: [] });
