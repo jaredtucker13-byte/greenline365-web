@@ -151,7 +151,7 @@ function TestimonialsSection() {
 
   const r = reviews[idx];
   return (
-    <section className="relative py-20 overflow-hidden" data-testid="testimonials-section">
+    <section id="testimonials" className="relative py-20 overflow-hidden" data-testid="testimonials-section">
       <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(201,168,76,0.03) 0%, transparent 60%)' }} />
       <div className="relative max-w-3xl mx-auto px-6 text-center">
         <p className="text-xs font-heading font-semibold uppercase tracking-[0.25em] mb-4" style={{ color: 'rgba(201,168,76,0.7)' }}>Real Reviews</p>
@@ -477,6 +477,30 @@ export default function DirectoryClient() {
           </section>
 
           {/* ═══════════════════════════════════════════════════════════
+              ANCHOR NAV BAR — Quick-jump links to page sections
+              ═══════════════════════════════════════════════════════════ */}
+          <nav className="sticky top-20 z-30 border-b border-white/5" style={{ background: 'rgba(10,10,10,0.85)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }} data-testid="anchor-nav">
+            <div className="max-w-7xl mx-auto px-6 flex items-center gap-1 overflow-x-auto scrollbar-hide py-2" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              {[
+                { href: '#categories', label: 'Categories' },
+                { href: '#featured', label: 'Featured' },
+                { href: '#community-polls', label: 'Polls' },
+                { href: '#testimonials', label: 'Reviews' },
+                { href: '#destinations', label: 'Destinations' },
+                { href: '#founding-50', label: 'Founding 50' },
+              ].map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className="shrink-0 px-4 py-2 rounded-full text-xs font-heading font-medium text-white/50 hover:text-gold hover:bg-gold/5 border border-transparent hover:border-gold/20 transition-all duration-300"
+                >
+                  {link.label}
+                </a>
+              ))}
+            </div>
+          </nav>
+
+          {/* ═══════════════════════════════════════════════════════════
               BROWSE BY CATEGORY
               ═══════════════════════════════════════════════════════════ */}
           <section id="categories" className="max-w-7xl mx-auto px-6 py-20" data-testid="categories-section">
@@ -508,7 +532,7 @@ export default function DirectoryClient() {
           {/* ═══════════════════════════════════════════════════════════
               DYNAMIC FEATURED SHOWCASE — R-to-L CAROUSEL
               ═══════════════════════════════════════════════════════════ */}
-          <section className="py-20" style={{ background: 'linear-gradient(180deg, #0A0A0A 0%, #060606 50%, #0A0A0A 100%)' }} data-testid="dynamic-showcase-section">
+          <section id="featured" className="py-20" style={{ background: 'linear-gradient(180deg, #0A0A0A 0%, #060606 50%, #0A0A0A 100%)' }} data-testid="dynamic-showcase-section">
             <div className="max-w-7xl mx-auto px-6">
               <FeaturedShowcase className="mb-0" maxSlots={12} />
             </div>
@@ -581,20 +605,55 @@ export default function DirectoryClient() {
               SEO TRUST SECTION — Your Trusted Local Home Services Resource
               ═══════════════════════════════════════════════════════════ */}
           <section className="py-20" style={{ background: '#0A0A0A' }} data-testid="seo-trust-section">
-            <div className="max-w-4xl mx-auto px-6">
-              <h2 className="text-3xl sm:text-4xl font-heading font-light text-white tracking-tight mb-6 text-center">
+            <div className="max-w-6xl mx-auto px-6">
+              <h2 className="text-3xl sm:text-4xl font-heading font-light text-white tracking-tight mb-4 text-center">
                 Your Trusted Local <span className="text-gradient-gold font-semibold">Home Services</span> Resource
               </h2>
-              <div className="space-y-4 text-white/55 font-body leading-relaxed text-center max-w-3xl mx-auto">
-                <p>
-                  Finding a reliable contractor in Florida shouldn&apos;t feel like a gamble. GreenLine365 is built for homeowners who want transparency, accountability, and quality from the professionals they invite into their homes. Every business in our directory is listed with real ratings, verified contact information, and honest feedback from your neighbors.
-                </p>
-                <p>
-                  From HVAC and plumbing to roofing, electrical, and pest control — we cover the trades that keep Florida homes running. Our directory spans eight major destinations across the state, with local professionals who understand your area, your climate, and your needs.
-                </p>
-                <p>
-                  Whether you&apos;re a homeowner searching for a trusted pro or a business owner looking to grow your reputation, GreenLine365 is where Florida&apos;s local economy connects.
-                </p>
+              <p className="text-white/40 text-sm text-center max-w-2xl mx-auto mb-14 font-body">
+                GreenLine365 is where Florida homeowners find transparent, verified professionals they can trust.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {/* Transparency */}
+                <div className="text-center p-6 rounded-2xl border border-white/5 hover:border-gold/15 transition-all duration-300" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                  <div className="w-14 h-14 rounded-2xl mx-auto mb-5 flex items-center justify-center" style={{ background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.2)' }}>
+                    <svg className="w-7 h-7" style={{ color: '#C9A84C' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-base font-heading font-semibold text-white mb-2">Real Ratings &amp; Reviews</h3>
+                  <p className="text-sm text-white/45 font-body leading-relaxed">
+                    Every business listed with real ratings, verified contact info, and honest feedback from your neighbors.
+                  </p>
+                </div>
+
+                {/* Coverage */}
+                <div className="text-center p-6 rounded-2xl border border-white/5 hover:border-gold/15 transition-all duration-300" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                  <div className="w-14 h-14 rounded-2xl mx-auto mb-5 flex items-center justify-center" style={{ background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.2)' }}>
+                    <svg className="w-7 h-7" style={{ color: '#C9A84C' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-base font-heading font-semibold text-white mb-2">Every Trade Covered</h3>
+                  <p className="text-sm text-white/45 font-body leading-relaxed">
+                    HVAC, plumbing, roofing, electrical, pest control — local pros across eight Florida destinations who know your area.
+                  </p>
+                </div>
+
+                {/* Connection */}
+                <div className="text-center p-6 rounded-2xl border border-white/5 hover:border-gold/15 transition-all duration-300" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                  <div className="w-14 h-14 rounded-2xl mx-auto mb-5 flex items-center justify-center" style={{ background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.2)' }}>
+                    <svg className="w-7 h-7" style={{ color: '#C9A84C' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-base font-heading font-semibold text-white mb-2">Community Connected</h3>
+                  <p className="text-sm text-white/45 font-body leading-relaxed">
+                    Whether you&apos;re finding a trusted pro or growing your reputation — this is where Florida&apos;s local economy connects.
+                  </p>
+                </div>
               </div>
             </div>
           </section>
@@ -602,7 +661,7 @@ export default function DirectoryClient() {
           {/* ═══════════════════════════════════════════════════════════
               COMMUNITY POLLS — "YOU VOTED" WIDGET
               ═══════════════════════════════════════════════════════════ */}
-          <section className="py-16" style={{ background: '#0A0A0A' }} data-testid="community-polls-section">
+          <section id="community-polls" className="py-16" style={{ background: '#0A0A0A' }} data-testid="community-polls-section">
             <div className="max-w-7xl mx-auto px-6">
               <div className="text-center mb-8">
                 <p className="text-xs font-heading font-semibold uppercase tracking-[0.2em] mb-3" style={{ color: '#C9A84C' }}>Community Voice</p>
@@ -670,7 +729,7 @@ export default function DirectoryClient() {
           {/* ═══════════════════════════════════════════════════════════
               THE FOUNDING 50 — Directory Founding Members Program
               ═══════════════════════════════════════════════════════════ */}
-          <section className="py-24 relative overflow-hidden" data-testid="founding-50-section">
+          <section id="founding-50" className="py-24 relative overflow-hidden" data-testid="founding-50-section">
             {/* Subtle radial glow */}
             <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 50% 30%, rgba(201,168,76,0.06) 0%, transparent 60%)' }} />
 
@@ -921,12 +980,28 @@ function ListingCard({ listing: l, index: i }: { listing: Listing; index: number
             {l.distance != null && <span style={{ color: 'rgba(201,168,76,0.6)' }} className="ml-1">({l.distance} mi)</span>}
           </p>}
           {l.description && <p className="text-xs text-white/35 line-clamp-2 mb-3 font-body">{l.description}</p>}
+
+          {/* Social Proof Row */}
+          <div className="flex items-center gap-2 mb-3 flex-wrap">
+            <div className="flex items-center gap-1">
+              <Stars rating={l.avg_feedback_rating} size={12} />
+              <span className="text-[11px] font-semibold" style={{ color: '#C9A84C' }}>
+                {l.avg_feedback_rating > 0 ? l.avg_feedback_rating.toFixed(1) : 'New'}
+              </span>
+            </div>
+            {l.total_feedback_count > 0 && (
+              <span className="text-[10px] text-white/40 font-body">({l.total_feedback_count} review{l.total_feedback_count !== 1 ? 's' : ''})</span>
+            )}
+            {l.is_claimed && (
+              <span className="inline-flex items-center gap-0.5 text-[10px] text-emerald-400/80 font-body">
+                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                Verified
+              </span>
+            )}
+          </div>
+
           <div className="flex items-center justify-between">
             <span className="btn-ghost text-xs px-3 py-1.5 rounded-full" data-testid={`view-details-${l.slug}`}>View Details</span>
-            <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold" style={{ background: 'rgba(201,168,76,0.12)', color: '#C9A84C' }}>
-              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
-              {l.avg_feedback_rating > 0 ? l.avg_feedback_rating.toFixed(1) : 'New'}
-            </div>
           </div>
         </div>
       </motion.div>
