@@ -652,33 +652,39 @@ export default function DirectoryClient() {
               <p className="text-sm text-white/40 text-center max-w-2xl mx-auto mb-12 font-body">Where Florida&apos;s local economy connects — homeowners, professionals, and communities.</p>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {[
-                  {
-                    icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
-                    title: 'Verified Businesses',
-                    desc: 'Every listing includes real ratings, verified contact info, and honest feedback from your neighbors. No anonymous reviews, no fake profiles.',
-                  },
-                  {
-                    icon: 'M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
-                    title: 'Local Coverage',
-                    desc: 'From HVAC and plumbing to roofing, electrical, and pest control — we cover every trade across eight Florida destinations.',
-                  },
-                  {
-                    icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z',
-                    title: 'Community Driven',
-                    desc: 'Whether you&apos;re searching for a trusted pro or growing your reputation as a business, GreenLine365 is built by and for locals.',
-                  },
-                ].map(item => (
-                  <div key={item.title} className="text-center p-6 rounded-2xl border border-white/5 hover:border-gold/15 transition-all duration-300" style={{ background: 'rgba(255,255,255,0.02)' }}>
-                    <div className="w-14 h-14 rounded-2xl mx-auto mb-5 flex items-center justify-center" style={{ background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.15)' }}>
-                      <svg className="w-7 h-7" style={{ color: '#C9A84C' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
-                      </svg>
-                    </div>
-                    <h3 className="text-base font-heading font-semibold text-white mb-3">{item.title}</h3>
-                    <p className="text-sm text-white/45 font-body leading-relaxed">{item.desc}</p>
+                {/* Shield — Verified Businesses */}
+                <div className="text-center p-6 rounded-2xl border border-white/5 hover:border-gold/15 transition-all duration-300" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                  <div className="w-14 h-14 rounded-2xl mx-auto mb-5 flex items-center justify-center" style={{ background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.15)' }}>
+                    <svg className="w-7 h-7" style={{ color: '#C9A84C' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
                   </div>
-                ))}
+                  <h3 className="text-base font-heading font-semibold text-white mb-3">Verified Businesses</h3>
+                  <p className="text-sm text-white/45 font-body leading-relaxed">Every listing includes real ratings, verified contact info, and honest feedback from your neighbors. No anonymous reviews, no fake profiles.</p>
+                </div>
+
+                {/* Star — Real Ratings */}
+                <div className="text-center p-6 rounded-2xl border border-white/5 hover:border-gold/15 transition-all duration-300" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                  <div className="w-14 h-14 rounded-2xl mx-auto mb-5 flex items-center justify-center" style={{ background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.15)' }}>
+                    <svg className="w-7 h-7" style={{ color: '#C9A84C' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-base font-heading font-semibold text-white mb-3">Real Ratings</h3>
+                  <p className="text-sm text-white/45 font-body leading-relaxed">Google ratings, QR-verified reviews, and AI-analyzed sentiment — every data point is real and tied to actual customer interactions.</p>
+                </div>
+
+                {/* Map Pin — 8 Florida Cities */}
+                <div className="text-center p-6 rounded-2xl border border-white/5 hover:border-gold/15 transition-all duration-300" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                  <div className="w-14 h-14 rounded-2xl mx-auto mb-5 flex items-center justify-center" style={{ background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.15)' }}>
+                    <svg className="w-7 h-7" style={{ color: '#C9A84C' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-base font-heading font-semibold text-white mb-3">8 Florida Cities</h3>
+                  <p className="text-sm text-white/45 font-body leading-relaxed">From HVAC and plumbing to dining and wellness — we cover every trade and category across eight major Florida destinations.</p>
+                </div>
               </div>
             </div>
           </section>
@@ -971,12 +977,18 @@ function ListingCard({ listing: l, index: i }: { listing: Listing; index: number
   const placeholderUrl = getPlaceholderImage(l.industry);
   const fallback = getCategoryFallback(l.industry);
   const imgSrc = l.cover_image_url || l.logo_url || placeholderUrl;
+
+  // Prefer Google data, fall back to internal feedback
+  const rating = l.metadata?.google_rating || l.avg_feedback_rating || 0;
+  const reviewCount = l.metadata?.google_review_count || l.total_feedback_count || 0;
+  const hasRating = rating > 0;
+
   return (
     <Link href={`/listing/${l.slug}`}>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
         className={`rounded-2xl overflow-hidden border transition-all duration-500 group cursor-pointer hover:scale-[1.02] ${hasIntel ? 'border-[rgba(201,168,76,0.2)] shadow-gold-glow hover:border-[rgba(201,168,76,0.4)]' : 'border-white/5 hover:border-[rgba(201,168,76,0.25)]'}`}
         style={{ background: 'rgba(255,255,255,0.02)' }}
-        whileHover={{ boxShadow: '0 0 15px rgba(201,168,76,0.3)' }}
+        whileHover={{ boxShadow: '0 0 15px rgba(212,175,55,0.3)' }}
         data-testid={`listing-${l.slug}`}>
         <div className="relative h-40 overflow-hidden">
           {!imgError ? (
@@ -1003,20 +1015,28 @@ function ListingCard({ listing: l, index: i }: { listing: Listing; index: number
             {l.distance != null && <span style={{ color: 'rgba(201,168,76,0.6)' }} className="ml-1">({l.distance} mi)</span>}
           </p>}
           <p className="text-xs text-white/35 line-clamp-2 mb-3 font-body">{l.description || getFallbackDescription(l.business_name, l.industry, l.city)}</p>
-          {/* Social proof row */}
+          {/* Social proof row: ★ 4.2 (584 reviews) • Verified */}
           <div className="flex items-center gap-1.5 text-[11px] text-white/40 font-body mb-3">
-            {l.avg_feedback_rating > 0 ? (
+            {hasRating ? (
               <>
-                <span style={{ color: '#C9A84C' }}>&#9733; {l.avg_feedback_rating.toFixed(1)}</span>
-                {l.total_feedback_count > 0 && <span>({l.total_feedback_count} {l.total_feedback_count === 1 ? 'review' : 'reviews'})</span>}
+                <span style={{ color: '#C9A84C' }}>&#9733; {Number(rating).toFixed(1)}</span>
+                {reviewCount > 0 && <span>({reviewCount.toLocaleString()} {reviewCount === 1 ? 'review' : 'reviews'})</span>}
+                {l.is_claimed && (
+                  <>
+                    <span className="text-white/15">&bull;</span>
+                    <span className="text-green-400/70">Verified &#10003;</span>
+                  </>
+                )}
               </>
             ) : (
-              <span className="text-white/25">New listing</span>
-            )}
-            {l.is_claimed && (
               <>
-                <span className="text-white/15">&bull;</span>
-                <span className="text-green-400/70">Verified &#10003;</span>
+                <span className="text-white/25">New listing</span>
+                {l.is_claimed && (
+                  <>
+                    <span className="text-white/15">&bull;</span>
+                    <span className="text-green-400/70">Verified &#10003;</span>
+                  </>
+                )}
               </>
             )}
           </div>
@@ -1163,6 +1183,20 @@ function SubcategoryCarouselRow({ label, subtitle, industry, searchTerm, sortBy,
                 <div className="p-3">
                   <h4 className="text-sm font-heading font-semibold truncate" style={{ color: '#C9A84C' }}>{l.business_name}</h4>
                   <p className="text-[11px] text-white/40 font-body truncate">{l.city}{l.distance != null ? ` · ${l.distance} mi` : ''}</p>
+                  {/* Social proof */}
+                  {(() => {
+                    const r = l.metadata?.google_rating || l.avg_feedback_rating || 0;
+                    const rc = l.metadata?.google_review_count || l.total_feedback_count || 0;
+                    return r > 0 ? (
+                      <p className="text-[10px] text-white/35 font-body mt-1 truncate">
+                        <span style={{ color: '#C9A84C' }}>&#9733; {Number(r).toFixed(1)}</span>
+                        {rc > 0 && <span> ({rc.toLocaleString()})</span>}
+                        {l.is_claimed && <span className="text-green-400/60"> &bull; Verified</span>}
+                      </p>
+                    ) : l.is_claimed ? (
+                      <p className="text-[10px] text-green-400/50 font-body mt-1">Verified &#10003;</p>
+                    ) : null;
+                  })()}
                 </div>
               </div>
             </Link>

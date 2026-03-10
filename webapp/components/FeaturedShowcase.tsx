@@ -41,6 +41,7 @@ interface FeaturedListing {
   description?: string;
   trust_score?: number;
   category_count?: number;
+  metadata?: Record<string, any>;
 }
 
 interface FeaturedShowcaseProps {
@@ -312,44 +313,50 @@ export default function FeaturedShowcase({ className = '', maxSlots = 12 }: Feat
                     </p>
                   </div>
 
-                  {/* Stats Row — REAL data only */}
-                  <div className="flex items-center gap-6 mt-4 pt-4" style={{ borderTop: '1px solid rgba(201,168,76,0.1)' }}>
-                    {/* Rating */}
-                    {current.avg_feedback_rating > 0 && (
-                      <div className="flex items-center gap-2">
-                        <Stars rating={current.avg_feedback_rating} size={14} />
-                        <span className="text-xs text-white/50 font-body">
-                          ({current.total_feedback_count || 0})
-                        </span>
+                  {/* Stats Row — REAL data only, prefers Google data */}
+                  {(() => {
+                    const rating = current.metadata?.google_rating || current.avg_feedback_rating || 0;
+                    const reviewCount = current.metadata?.google_review_count || current.total_feedback_count || 0;
+                    return (
+                      <div className="flex items-center gap-6 mt-4 pt-4" style={{ borderTop: '1px solid rgba(201,168,76,0.1)' }}>
+                        {/* Rating: ★ 4.2 (584 reviews) */}
+                        {rating > 0 && (
+                          <div className="flex items-center gap-2">
+                            <Stars rating={rating} size={14} />
+                            <span className="text-xs text-white/50 font-body">
+                              {Number(rating).toFixed(1)}{reviewCount > 0 ? ` (${reviewCount.toLocaleString()} reviews)` : ''}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Trust Score */}
+                        {current.trust_score != null && current.trust_score > 0 && (
+                          <div className="flex items-center gap-1.5">
+                            <svg className="w-3.5 h-3.5" style={{ color: '#C9A84C' }} fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                            <span className="text-xs font-body" style={{ color: '#C9A84C' }}>
+                              Trust {current.trust_score}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Verified badge */}
+                        {current.is_claimed && (
+                          <span className="text-[11px] font-body text-green-400/70">
+                            Verified &#10003;
+                          </span>
+                        )}
+
+                        {/* Votes */}
+                        {(current.voted_by_count ?? 0) > 0 && (
+                          <span className="text-[11px] text-white/30 font-body">
+                            {current.voted_by_count} votes
+                          </span>
+                        )}
                       </div>
-                    )}
-
-                    {/* Trust Score */}
-                    {current.trust_score != null && current.trust_score > 0 && (
-                      <div className="flex items-center gap-1.5">
-                        <svg className="w-3.5 h-3.5" style={{ color: '#C9A84C' }} fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                        </svg>
-                        <span className="text-xs font-body" style={{ color: '#C9A84C' }}>
-                          Trust {current.trust_score}
-                        </span>
-                      </div>
-                    )}
-
-                    {/* Verified badge */}
-                    {current.is_claimed && (
-                      <span className="text-[11px] font-body text-green-400/70">
-                        Verified &#10003;
-                      </span>
-                    )}
-
-                    {/* Votes */}
-                    {(current.voted_by_count ?? 0) > 0 && (
-                      <span className="text-[11px] text-white/30 font-body">
-                        {current.voted_by_count} votes
-                      </span>
-                    )}
-                  </div>
+                    );
+                  })()}
                 </div>
               </div>
             </Link>
