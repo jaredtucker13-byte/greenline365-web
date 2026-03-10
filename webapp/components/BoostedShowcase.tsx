@@ -130,12 +130,12 @@ export default function BoostedShowcase({ className = '', showSponsoredLabel = t
                   src={listing.cover_image_url}
                   alt={listing.business_name}
                   className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500"
+                  onError={(e) => { e.currentTarget.style.display = 'none'; (e.currentTarget.nextElementSibling as HTMLElement | null)?.style.removeProperty('display'); }}
                 />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-midnight-800 to-midnight-900 flex items-center justify-center">
-                  <span className="text-3xl font-heading font-bold text-gold/20">{listing.business_name[0]}</span>
-                </div>
-              )}
+              ) : null}
+              <div className="w-full h-full bg-gradient-to-br from-midnight-800 to-midnight-900 flex items-center justify-center" style={{ display: listing.cover_image_url ? 'none' : undefined }}>
+                <span className="text-3xl font-heading font-bold text-gold/20">{listing.business_name[0]}</span>
+              </div>
               <div className="absolute inset-0 bg-gradient-to-t from-midnight-900/80 to-transparent" />
 
               {/* Sponsored badge */}

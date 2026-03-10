@@ -73,6 +73,16 @@ const nextConfig: NextConfig = {
                       hostname: '*.supabase.co',
                       pathname: '/**',
             },
+            {
+                      protocol: 'https',
+                      hostname: 'images.unsplash.com',
+                      pathname: '/**',
+            },
+            {
+                      protocol: 'https',
+                      hostname: 'places.googleapis.com',
+                      pathname: '/**',
+            },
                 ],
           unoptimized: false,
     },

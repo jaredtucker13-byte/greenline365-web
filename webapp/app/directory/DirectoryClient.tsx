@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
 import BoostedShowcase from '@/components/BoostedShowcase';
+import CommunityPolls from '@/components/CommunityPolls';
 import FeaturedShowcase from '@/components/FeaturedShowcase';
 
 interface Listing {
@@ -41,8 +42,8 @@ interface Listing {
 }
 
 // ─── Category & Subcategory Map ────────────────────────────────────
-// Industries where businesses should NOT show "Claim Listing" (chains, franchises, emergency services)
-const NON_CLAIMABLE_INDUSTRIES = ['convenience-grocery', 'emergency-services'];
+// Industries where businesses should NOT show "Claim Listing" (chains, franchises)
+const NON_CLAIMABLE_INDUSTRIES: string[] = [];
 
 const CATEGORIES = [
   // === HOME SERVICES (The Big Five + all trades) ===
@@ -66,7 +67,7 @@ const CATEGORIES = [
     ] },
 
   // === AUTOMOTIVE ===
-  { id: 'automotive', label: 'Automotive', sub: 'Repairs, dealers & body shops', img: '/images/categories/services.png',
+  { id: 'automotive', label: 'Automotive', sub: 'Repairs, dealers & body shops', img: 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800&h=600&fit=crop',
     subcategories: ['All', 'Auto Repair', 'Oil Change', 'Tire Shops', 'Body Shops', 'Car Dealers', 'Auto Parts', 'Towing', 'Car Wash', 'Auto Detailing', 'EV Charging'] },
 
   // === MARINE & OUTDOOR (Key West / Coastal Florida) ===
@@ -85,36 +86,16 @@ const CATEGORIES = [
   { id: 'style-shopping', label: 'Style & Shopping', sub: 'Fashion, grooming & retail', img: '/images/categories/style-shopping.png',
     subcategories: ['All', 'Barbershops', 'Salons', 'Nail Salons', 'Spas', 'Boutiques', 'Jewelry', 'Tattoo & Piercing', 'Dry Cleaning & Laundry'] },
 
-  // === NIGHTLIFE ===
-  { id: 'nightlife', label: 'Nightlife', sub: 'Bars, lounges & live music', img: '/images/categories/nightlife.png',
-    subcategories: ['All', 'Cocktail Bars', 'Sports Bars', 'Live Music', 'Clubs', 'Breweries', 'Wine Bars', 'Hookah Lounges', 'Karaoke'] },
-
-  // === CONVENIENCE & GROCERY (non-claimable) ===
-  { id: 'convenience-grocery', label: 'Convenience & Grocery', sub: 'Publix, Walmart, gas stations & more', img: '/images/categories/services.png',
-    subcategories: ['All', 'Grocery Stores', 'Convenience Stores', 'Gas Stations', 'Supermarkets', 'Specialty Foods', 'Liquor Stores', 'Farmers Markets'] },
-
-  // === EMERGENCY SERVICES (non-claimable) ===
-  { id: 'emergency-services', label: 'Emergency Services', sub: 'Fire, police, hospitals & urgent care', img: '/images/categories/health-wellness.png',
-    subcategories: ['All', 'Fire Stations', 'Police Stations', 'Hospitals', 'Emergency Rooms', 'Poison Control', 'Crisis Centers'] },
-
-  // === FAMILY ENTERTAINMENT ===
-  { id: 'family-entertainment', label: 'Family Entertainment', sub: 'Fun for all ages', img: '/images/categories/family-entertainment.png',
-    subcategories: ['All', 'Theme Parks', 'Arcades', 'Mini Golf', 'Bowling', 'Water Parks', 'Zoos & Aquariums', 'Trampoline Parks', 'Escape Rooms'] },
-
-  // === HOTELS & LODGING ===
-  { id: 'hotels-lodging', label: 'Hotels & Lodging', sub: 'Where to stay', img: '/images/categories/destinations.png',
-    subcategories: ['All', 'Hotels', 'Resorts', 'Vacation Rentals', 'Boutique Hotels', 'B&Bs', 'Hostels', 'RV Parks'] },
-
   // === PROFESSIONAL SERVICES ===
-  { id: 'professional-services', label: 'Professional Services', sub: 'Legal, finance & consulting', img: '/images/categories/services.png',
+  { id: 'professional-services', label: 'Professional Services', sub: 'Legal, finance & consulting', img: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&h=600&fit=crop',
     subcategories: ['All', 'Attorneys', 'Accountants', 'Insurance', 'Real Estate', 'Financial Advisors', 'IT Services', 'Marketing Agencies', 'Notary'] },
 
   // === EDUCATION & CHILDCARE ===
-  { id: 'education', label: 'Education & Childcare', sub: 'Schools, tutoring & daycare', img: '/images/categories/services.png',
+  { id: 'education', label: 'Education & Childcare', sub: 'Schools, tutoring & daycare', img: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&h=600&fit=crop',
     subcategories: ['All', 'Preschools', 'Daycare', 'Tutoring', 'Driving Schools', 'Music Lessons', 'Dance Studios', 'Martial Arts', 'Language Schools'] },
 
   // === PETS ===
-  { id: 'pets', label: 'Pets', sub: 'Vets, grooming & boarding', img: '/images/categories/services.png',
+  { id: 'pets', label: 'Pets', sub: 'Vets, grooming & boarding', img: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800&h=600&fit=crop',
     subcategories: ['All', 'Veterinarians', 'Pet Grooming', 'Pet Boarding', 'Pet Stores', 'Dog Training', 'Pet Sitting', 'Aquarium & Fish'] },
 ];
 
@@ -229,7 +210,7 @@ export default function DirectoryClient() {
   const [totalListingCount, setTotalListingCount] = useState(0);
 
   // Exact stat counters — no fake numbers
-  const [stats, setStats] = useState({ businesses: 0, categories: CATEGORIES.length, destinations: 8 });
+  const [stats, setStats] = useState({ businesses: 0, categories: CATEGORIES.length, destinations: 8, foundingMembersClaimed: 0 });
 
   useEffect(() => {
     // Load featured + all listings + dynamic counts
@@ -245,11 +226,12 @@ export default function DirectoryClient() {
       setTotalListingCount(allArr.length);
       // Use dynamic counts from Supabase — no hard-coded numbers
       if (counts && !counts.error) {
-        setStats({
+        setStats(prev => ({
+          ...prev,
           businesses: counts.total_businesses || allArr.length,
           categories: counts.total_categories || CATEGORIES.length,
           destinations: counts.total_destinations || 8,
-        });
+        }));
       } else {
         setStats(prev => ({ ...prev, businesses: allArr.length }));
       }
@@ -502,7 +484,7 @@ export default function DirectoryClient() {
             <h2 className="text-3xl md:text-4xl font-heading font-light text-white text-center mb-3 tracking-tight">
               Explore <span className="text-gradient-gold font-semibold">Categories</span>
             </h2>
-            <p className="text-white/50 text-center max-w-lg mx-auto mb-12 font-body">From home services to nightlife — find exactly what you need.</p>
+            <p className="text-white/50 text-center max-w-lg mx-auto mb-12 font-body">From home services to dining — find exactly what you need.</p>
 
             {/* 9-Category Grid with depth */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -596,19 +578,61 @@ export default function DirectoryClient() {
           </section>
 
           {/* ═══════════════════════════════════════════════════════════
+              SEO TRUST SECTION — Your Trusted Local Home Services Resource
+              ═══════════════════════════════════════════════════════════ */}
+          <section className="py-20" style={{ background: '#0A0A0A' }} data-testid="seo-trust-section">
+            <div className="max-w-4xl mx-auto px-6">
+              <h2 className="text-3xl sm:text-4xl font-heading font-light text-white tracking-tight mb-6 text-center">
+                Your Trusted Local <span className="text-gradient-gold font-semibold">Home Services</span> Resource
+              </h2>
+              <div className="space-y-4 text-white/55 font-body leading-relaxed text-center max-w-3xl mx-auto">
+                <p>
+                  Finding a reliable contractor in Florida shouldn&apos;t feel like a gamble. GreenLine365 is built for homeowners who want transparency, accountability, and quality from the professionals they invite into their homes. Every business in our directory is listed with real ratings, verified contact information, and honest feedback from your neighbors.
+                </p>
+                <p>
+                  From HVAC and plumbing to roofing, electrical, and pest control — we cover the trades that keep Florida homes running. Our directory spans eight major destinations across the state, with local professionals who understand your area, your climate, and your needs.
+                </p>
+                <p>
+                  Whether you&apos;re a homeowner searching for a trusted pro or a business owner looking to grow your reputation, GreenLine365 is where Florida&apos;s local economy connects.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* ═══════════════════════════════════════════════════════════
+              COMMUNITY POLLS — "YOU VOTED" WIDGET
+              ═══════════════════════════════════════════════════════════ */}
+          <section className="py-16" style={{ background: '#0A0A0A' }} data-testid="community-polls-section">
+            <div className="max-w-7xl mx-auto px-6">
+              <div className="text-center mb-8">
+                <p className="text-xs font-heading font-semibold uppercase tracking-[0.2em] mb-3" style={{ color: '#C9A84C' }}>Community Voice</p>
+                <h2 className="text-3xl md:text-4xl font-heading font-light text-white tracking-tight mb-3">
+                  You <span className="text-gradient-gold font-semibold">Voted</span>
+                </h2>
+                <p className="text-white/50 text-sm max-w-md mx-auto font-body">Help your neighbors find the best local pros.</p>
+              </div>
+              <CommunityPolls />
+            </div>
+          </section>
+
+          {/* ═══════════════════════════════════════════════════════════
+              TESTIMONIALS — REAL DATA FROM DIRECTORY REVIEWS
+              ═══════════════════════════════════════════════════════════ */}
+          <TestimonialsSection />
+
+          {/* ═══════════════════════════════════════════════════════════
               DESTINATION GUIDES — GOLD FRAME 8-CARD GRID
               ═══════════════════════════════════════════════════════════ */}
-          <section className="section-gradient-blue-gold py-24 bg-gold-accent-top" data-testid="destination-guides-section">
+          <section id="destinations" className="section-gradient-blue-gold py-24 bg-gold-accent-top" data-testid="destination-guides-section">
             <div className="section-divider-gold max-w-5xl mx-auto mb-16" />
 
             <div className="max-w-7xl mx-auto px-6">
               <div className="text-center mb-14 corner-filigree py-8 px-4">
-                <p className="text-xs font-heading font-semibold uppercase tracking-[0.25em] mb-4" style={{ color: 'rgba(201,168,76,0.7)' }}>Curated Travel Guides</p>
                 <h2 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-light text-white tracking-tight mb-4">
-                  Explore <span className="text-gradient-gold font-semibold">Destinations</span>
+                  Explore Florida&apos;s Best <span className="text-gradient-gold font-semibold">Destinations</span>
                 </h2>
-                <p className="text-sm text-white/50 max-w-lg mx-auto font-body leading-relaxed">
-                  Your personal concierge to Florida&apos;s finest — where to stay, dine, explore, and unwind.
+                <p className="text-sm text-white/50 max-w-xl mx-auto font-body leading-relaxed">
+                  Discover local dining, entertainment, attractions and more in cities across Florida.
                 </p>
               </div>
 
@@ -627,7 +651,7 @@ export default function DirectoryClient() {
                     <Link href={`/destination/${d.slug}`} className="block dest-card-frame group" data-testid={`dest-card-${d.slug}`}>
                       <div className="dest-card-inner">
                         <div className="relative overflow-hidden" style={{ aspectRatio: '4/3' }}>
-                          <Image src={d.image} alt={`${d.label} destination guide — ${d.tagline}`} fill className="object-cover transition-transform duration-700 group-hover:scale-110" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw" />
+                          <DestImage src={d.image} alt={`${d.label} destination guide — ${d.tagline}`} label={d.label} />
                         </div>
                         <div className="dest-glass-label px-4 py-3">
                           <h3 className="text-sm sm:text-base font-heading font-bold text-white tracking-tight leading-tight">{d.label}</h3>
@@ -644,97 +668,75 @@ export default function DirectoryClient() {
           </section>
 
           {/* ═══════════════════════════════════════════════════════════
-              PRIVATE VAULT CTA — Home Ledger Cross-Sell
+              THE FOUNDING 50 — Directory Founding Members Program
               ═══════════════════════════════════════════════════════════ */}
-          <section className="py-20 relative overflow-hidden" data-testid="private-vault-section">
-            {/* Circuit board background pattern */}
-            <div className="absolute inset-0 circuit-bg opacity-30" />
-            <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(201,168,76,0.04) 0%, transparent 60%)' }} />
+          <section className="py-24 relative overflow-hidden" data-testid="founding-50-section">
+            {/* Subtle radial glow */}
+            <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 50% 30%, rgba(201,168,76,0.06) 0%, transparent 60%)' }} />
 
-            <div className="relative max-w-5xl mx-auto px-6 text-center">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border mb-8" style={{ borderColor: 'rgba(201,168,76,0.3)', background: 'rgba(201,168,76,0.05)' }}>
-                <svg className="w-4 h-4" style={{ color: '#C9A84C' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-                </svg>
-                <span className="text-xs font-body uppercase tracking-widest" style={{ color: '#C9A84C' }}>Private Vault</span>
+            <div className="relative max-w-5xl mx-auto px-6">
+              <div className="section-divider-gold mx-auto mb-16" />
+
+              <div className="text-center mb-12">
+                <p className="text-xs font-heading font-semibold uppercase tracking-[0.25em] mb-4" style={{ color: 'rgba(201,168,76,0.7)' }}>Limited to 50 Businesses</p>
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-light text-white tracking-tight mb-4">
+                  Be the Business Everyone Else <span className="text-gradient-gold font-semibold">References</span>
+                </h2>
+                <p className="text-white/50 max-w-2xl mx-auto font-body leading-relaxed">
+                  GreenLine365 is accepting Founding Member listings in the Tampa Bay area. The first 50 verified businesses get featured placement, priority support, and locked-in early pricing — before the platform scales.
+                </p>
               </div>
 
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-light text-white tracking-tight mb-4">
-                Your Home&apos;s Heritage.<br />
-                <span className="text-gradient-gold font-semibold">Documented.</span>
-              </h2>
-              <p className="text-white/50 max-w-2xl mx-auto mb-10 font-body leading-relaxed">
-                The GL365 Home Ledger — a military-grade encrypted property file for every home you own or manage. Documents, contractors, warranties, incidents — all in one place.
-              </p>
-
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link href="/home-ledger" className="btn-primary px-8 py-3 rounded-full text-sm inline-block" data-testid="vault-cta">
-                  Learn More
-                </Link>
-                <div className="flex items-center gap-2 text-xs text-white/35 font-body">
-                  <svg className="w-3.5 h-3.5" style={{ color: '#C9A84C' }} fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L3 7v10l9 5 9-5V7l-9-5z" /></svg>
-                  AES-256 Encrypted
+              {/* Progress Bar */}
+              <div className="max-w-md mx-auto mb-12">
+                <div className="flex justify-between text-xs font-body mb-2">
+                  <span className="text-white/60">{stats.foundingMembersClaimed} of 50 claimed</span>
+                  <span style={{ color: 'rgba(201,168,76,0.7)' }}>{50 - stats.foundingMembersClaimed} spots remaining</span>
+                </div>
+                <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
+                  <motion.div
+                    className="h-full rounded-full"
+                    style={{ background: 'linear-gradient(90deg, #C9A84C, #E8C97A)' }}
+                    initial={{ width: 0 }}
+                    animate={{ width: `${(stats.foundingMembersClaimed / 50) * 100}%` }}
+                    transition={{ duration: 1.5, ease: 'easeOut' }}
+                  />
                 </div>
               </div>
-            </div>
-          </section>
 
-          {/* ═══════════════════════════════════════════════════════════
-              VALUE PROPOSITION — Why GreenLine365
-              ═══════════════════════════════════════════════════════════ */}
-          <section className="py-20" style={{ background: '#0A0A0A' }} data-testid="value-prop-section">
-            <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
-              <div>
-                <h2 className="text-3xl font-heading font-light text-white mb-4 tracking-tight">A <span className="text-gradient-gold font-semibold">Trusted</span> Resource for Finding Local Pros</h2>
-                <p className="text-white/55 mb-10 leading-relaxed font-body">Whether you need emergency plumbing, a master electrician, or the best barber in town — our directory connects you with verified, accountable businesses.</p>
-                <div className="grid grid-cols-2 gap-6">
-                  {[
-                    { icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', label: 'Verified Pros' },
-                    { icon: 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z', label: 'Transparent Ratings' },
-                    { icon: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z', label: 'Easy Navigation' },
-                    { icon: 'M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z', label: 'Direct Contact' },
-                  ].map(f => (
-                    <div key={f.label} className="flex items-center gap-3 group/feat cursor-default">
-                      <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 group-hover/feat:scale-110 transition-transform duration-300 glass-gold">
-                        <svg className="w-5 h-5" style={{ color: '#C9A84C' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d={f.icon} /></svg>
-                      </div>
-                      <span className="text-sm font-medium text-white/80 group-hover/feat:text-white transition-colors duration-300 font-body">{f.label}</span>
+              {/* 4 Benefits Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                {[
+                  { icon: 'M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4', title: 'Locked-In Rates Forever', desc: 'Your listing rate frozen at early pricing, even as prices increase.' },
+                  { icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', title: 'Founding Member Badge', desc: 'A permanent badge on your listing card that signals trust and early adoption.' },
+                  { icon: 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z', title: 'Priority Placement', desc: 'Featured on the homepage and at the top of your category pages.' },
+                  { icon: 'M13 10V3L4 14h7v7l9-11h-7z', title: 'Early Access', desc: 'First to test new features and tools before they go public.' },
+                ].map(b => (
+                  <div key={b.title} className="text-center p-6 rounded-2xl border border-white/5 hover:border-gold/20 transition-all duration-300" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                    <div className="w-12 h-12 rounded-xl mx-auto mb-4 flex items-center justify-center glass-gold">
+                      <svg className="w-6 h-6" style={{ color: '#C9A84C' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d={b.icon} />
+                      </svg>
                     </div>
-                  ))}
-                </div>
-                <button onClick={handleBrowseAll} className="mt-10 btn-primary px-8 py-3 rounded-full text-sm" data-testid="find-business-btn">Find a Business</button>
+                    <h3 className="text-sm font-heading font-semibold text-white mb-2">{b.title}</h3>
+                    <p className="text-xs text-white/40 font-body leading-relaxed">{b.desc}</p>
+                  </div>
+                ))}
               </div>
-              <div className="relative">
-                <Image src="/images/hero-directory-alt.png" alt="GreenLine365 connects you with trusted, verified local businesses" width={1200} height={400} className="w-full rounded-2xl object-cover" style={{ maxHeight: 400 }} sizes="100vw" />
-              </div>
-            </div>
-          </section>
 
-          {/* ═══════════════════════════════════════════════════════════
-              TESTIMONIALS — REAL DATA FROM DIRECTORY REVIEWS
-              ═══════════════════════════════════════════════════════════ */}
-          <TestimonialsSection />
-
-          {/* ═══════════════════════════════════════════════════════════
-              COMING SOON — Voted Best (Poll-Driven)
-              ═══════════════════════════════════════════════════════════ */}
-          <section className="py-16 relative" data-testid="voted-best-section">
-            <div className="max-w-4xl mx-auto px-6 text-center">
-              <div className="section-divider-gold mx-auto mb-12" />
-              <p className="text-xs font-heading font-semibold uppercase tracking-[0.25em] mb-4" style={{ color: 'rgba(201,168,76,0.5)' }}>Coming Soon</p>
-              <h2 className="text-2xl sm:text-3xl font-heading font-light text-white tracking-tight mb-4">
-                <span className="text-gradient-gold font-semibold">Voted Best</span> — Powered by You
-              </h2>
-              <p className="text-white/40 max-w-xl mx-auto mb-8 font-body text-sm leading-relaxed">
-                Soon you&apos;ll be able to vote for your favorite businesses in every category and region. &quot;Voted Best Plumber in St. Pete,&quot; &quot;Top Restaurant in Ybor City&quot; — real rankings from real people.
-              </p>
-              <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border" style={{ borderColor: 'rgba(201,168,76,0.2)', background: 'rgba(201,168,76,0.04)' }}>
-                <svg className="w-4 h-4" style={{ color: '#C9A84C' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
-                </svg>
-                <span className="text-xs font-body" style={{ color: 'rgba(201,168,76,0.7)' }}>Polls launching soon</span>
+              {/* CTA */}
+              <div className="text-center">
+                <Link
+                  href="/register-business"
+                  className="btn-primary px-10 py-4 rounded-full text-sm font-semibold inline-block"
+                  data-testid="founding-50-cta"
+                >
+                  {stats.foundingMembersClaimed >= 50 ? 'Join the Waitlist' : 'Claim Your Founding Spot'}
+                </Link>
+                <p className="text-xs text-white/30 mt-4 font-body">Free listing. No credit card required.</p>
               </div>
-              <div className="section-divider-gold mx-auto mt-12" />
+
+              <div className="section-divider-gold mx-auto mt-16" />
             </div>
           </section>
         </>
@@ -886,6 +888,8 @@ export default function DirectoryClient() {
 // ─── Listing Card ──────────────────────────────────────────────────
 function ListingCard({ listing: l, index: i }: { listing: Listing; index: number }) {
   const hasIntel = l.has_property_intelligence;
+  const [imgError, setImgError] = useState(false);
+  const imgSrc = l.cover_image_url || l.logo_url;
   return (
     <Link href={`/listing/${l.slug}`}>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
@@ -893,8 +897,8 @@ function ListingCard({ listing: l, index: i }: { listing: Listing; index: number
         style={{ background: 'rgba(255,255,255,0.02)' }}
         data-testid={`listing-${l.slug}`}>
         <div className="relative h-40 overflow-hidden">
-          {l.cover_image_url || l.logo_url ? (
-            <Image src={l.cover_image_url || l.logo_url!} alt={`${l.business_name} — ${l.industry.replace(/-/g, ' ')} in ${l.city || 'Florida'}`} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+          {imgSrc && !imgError ? (
+            <Image src={imgSrc} alt={`${l.business_name} — ${l.industry.replace(/-/g, ' ')} in ${l.city || 'Florida'}`} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" onError={() => setImgError(true)} />
           ) : (
             <div className="w-full h-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #111 0%, #1A1A1A 100%)' }}>
               <span className="text-4xl font-heading font-light text-white/10">{l.business_name[0]}</span>
@@ -930,6 +934,18 @@ function ListingCard({ listing: l, index: i }: { listing: Listing; index: number
   );
 }
 
+// ─── Destination Image with Fallback ─────────────────────────────────
+function DestImage({ src, alt, label }: { src: string; alt: string; label: string }) {
+  const [error, setError] = useState(false);
+  if (error) {
+    return (
+      <div className="w-full h-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #0a1628 0%, #1a0f05 100%)' }}>
+        <span className="text-3xl font-heading font-light text-gold/20">{label[0]}</span>
+      </div>
+    );
+  }
+  return <Image src={src} alt={alt} fill className="object-cover transition-transform duration-700 group-hover:scale-110" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw" onError={() => setError(true)} />;
+}
 
 // ─── Subcategory Carousel Row ──────────────────────────────────────
 function SubcategoryCarouselRow({ label, subtitle, industry, searchTerm, sortBy, cityFilter, userLocation, onViewAll }: {
@@ -1088,10 +1104,7 @@ function GroupedBrowseView({ activeCategory, sortBy, setSortBy, cityFilter, setC
   const industryMap: Record<string, string> = {
     'services': 'services', 'automotive': 'automotive', 'marine-outdoor': 'marine-outdoor',
     'dining': 'dining', 'health-wellness': 'health-wellness',
-    'style-shopping': 'style-shopping', 'nightlife': 'nightlife',
-    'convenience-grocery': 'convenience-grocery', 'emergency-services': 'emergency-services',
-    'family-entertainment': 'family-entertainment',
-    'hotels-lodging': 'destinations', 'professional-services': 'services',
+    'style-shopping': 'style-shopping', 'professional-services': 'services',
     'education': 'education', 'pets': 'pets',
   };
 

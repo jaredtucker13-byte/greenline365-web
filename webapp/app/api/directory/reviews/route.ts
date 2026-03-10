@@ -63,14 +63,56 @@ Write a professional, warm, and authentic response (2-4 sentences). Be specific 
   }
 }
 
-// GET — Public: reviews for a listing
+// GET — Public: reviews for a listing, or global reviews feed
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const listingId = searchParams.get('listing_id');
 
-  if (!listingId) return NextResponse.json({ error: 'listing_id required' }, { status: 400 });
-
   const service = getServiceClient();
+
+  // ── Global reviews feed (no listing_id) ──
+  if (!listingId) {
+    const limit = Math.min(parseInt(searchParams.get('limit') || '10', 10) || 10, 50);
+    const minRating = parseInt(searchParams.get('min_rating') || '1', 10) || 1;
+
+    const { data: listings } = await service
+      .from('directory_listings')
+      .select('id, business_name, slug, metadata')
+      .not('metadata->gl365_reviews', 'is', null)
+      .eq('is_published', true);
+
+    const allReviews: { id: string; reviewer_name: string; review_text: string; rating: number; text: string; business_name: string; slug: string; created_at: string; response: Review['response'] }[] = [];
+
+    for (const listing of listings || []) {
+      const reviews: Review[] = listing.metadata?.gl365_reviews || [];
+      for (const r of reviews) {
+        if (r.rating >= minRating) {
+          allReviews.push({
+            id: r.id,
+            reviewer_name: r.reviewer_name,
+            review_text: r.text,
+            text: r.text,
+            rating: r.rating,
+            business_name: listing.business_name,
+            slug: listing.slug,
+            created_at: r.created_at,
+            response: r.response,
+          });
+        }
+      }
+    }
+
+    // Sort newest first, then limit
+    allReviews.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    const limited = allReviews.slice(0, limit);
+
+    return NextResponse.json({
+      reviews: limited,
+      total: allReviews.length,
+    });
+  }
+
+  // ── Single-listing reviews ──
   const { data: listing } = await service
     .from('directory_listings')
     .select('id, business_name, metadata')

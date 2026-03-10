@@ -102,14 +102,15 @@ class TestReviewsAPI:
         assert "average_rating" in data
         print(f"✓ Found {data['total']} reviews, avg rating: {data['average_rating']}")
         
-    def test_get_reviews_requires_listing_id(self):
-        """GET /api/directory/reviews without listing_id returns 400"""
+    def test_get_reviews_global_feed(self):
+        """GET /api/directory/reviews without listing_id returns global reviews feed"""
         response = requests.get(f"{BASE_URL}/api/directory/reviews")
-        assert response.status_code == 400
-        
+        assert response.status_code == 200
+
         data = response.json()
-        assert "error" in data
-        print(f"✓ Correct error: {data['error']}")
+        assert "reviews" in data
+        assert "total" in data
+        print(f"✓ Global feed: {data['total']} reviews")
         
     def test_submit_review(self):
         """POST /api/directory/reviews - Submit review (no auth required)"""

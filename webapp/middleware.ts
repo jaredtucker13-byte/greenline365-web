@@ -4,6 +4,15 @@ import { updateSession } from '@/lib/supabase/middleware';
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // --- Legacy route redirects ---
+  const redirectMap: Record<string, string> = {
+    '/about': '/why-greenline',
+    '/contact': '/community/contact',
+  };
+  if (redirectMap[pathname]) {
+    return NextResponse.redirect(new URL(redirectMap[pathname], request.url), 301);
+  }
+
   // --- Super-admin gatekeeper: /greenline-hq must appear as a hard 404 ---
   const isSuperAdminRoute = pathname.startsWith('/greenline-hq');
 

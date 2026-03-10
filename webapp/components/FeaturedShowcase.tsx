@@ -254,12 +254,12 @@ export default function FeaturedShowcase({ className = '', maxSlots = 12 }: Feat
                       src={current.cover_image_url || current.logo_url!}
                       alt={current.business_name}
                       className="w-full h-full object-cover"
+                      onError={(e) => { e.currentTarget.style.display = 'none'; (e.currentTarget.nextElementSibling as HTMLElement | null)?.style.removeProperty('display'); }}
                     />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #111 0%, #1A1A1A 100%)' }}>
-                      <span className="text-6xl font-heading font-light text-white/10">{current.business_name[0]}</span>
-                    </div>
-                  )}
+                  ) : null}
+                  <div className={`w-full h-full flex items-center justify-center ${current.cover_image_url || current.logo_url ? '' : ''}`} style={{ background: 'linear-gradient(135deg, #111 0%, #1A1A1A 100%)', display: current.cover_image_url || current.logo_url ? 'none' : undefined }}>
+                    <span className="text-6xl font-heading font-light text-white/10">{current.business_name[0]}</span>
+                  </div>
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-[#0f0f0f]/80 hidden md:block" />
 
                   {/* Tier Badge */}
