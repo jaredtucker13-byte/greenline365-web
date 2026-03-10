@@ -240,12 +240,14 @@ export default function FeaturedShowcase({ className = '', maxSlots = 12 }: Feat
           >
             <Link href={`/listing/${current.slug}`} className="block" data-testid={`showcase-card-${current.slug}`}>
               <div
-                className="flex flex-col md:flex-row rounded-2xl overflow-hidden border transition-all duration-500"
+                className="flex flex-col md:flex-row rounded-2xl overflow-hidden border transition-all duration-300 ease-out hover:scale-[1.02]"
                 style={{
                   background: 'linear-gradient(135deg, rgba(15,15,15,0.95) 0%, rgba(25,20,10,0.95) 100%)',
                   borderColor: 'rgba(201, 168, 76, 0.2)',
                   boxShadow: '0 8px 40px rgba(0,0,0,0.5), 0 0 60px rgba(201,168,76,0.06)',
                 }}
+                onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 0 15px rgba(212,175,55,0.3), 0 8px 40px rgba(0,0,0,0.5), 0 0 60px rgba(201,168,76,0.12)'; e.currentTarget.style.borderColor = 'rgba(201,168,76,0.4)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '0 8px 40px rgba(0,0,0,0.5), 0 0 60px rgba(201,168,76,0.06)'; e.currentTarget.style.borderColor = 'rgba(201,168,76,0.2)'; }}
               >
                 {/* Image Side */}
                 <div className="relative w-full md:w-2/5 h-48 md:h-auto overflow-hidden" style={{ minHeight: 280 }}>
@@ -306,11 +308,9 @@ export default function FeaturedShowcase({ className = '', maxSlots = 12 }: Feat
                       {current.business_name}
                     </h3>
 
-                    {current.description && (
-                      <p className="text-sm text-white/50 font-body leading-relaxed mb-4 line-clamp-2">
-                        {current.description}
-                      </p>
-                    )}
+                    <p className="text-sm text-white/50 font-body leading-relaxed mb-4 line-clamp-2">
+                      {current.description || `Trusted ${formatIndustryLabel(current.industry)} provider${current.city ? ` serving ${current.city}` : ' in Florida'}. View ratings, reviews, and contact info.`}
+                    </p>
                   </div>
 
                   {/* Stats Row — REAL data only */}

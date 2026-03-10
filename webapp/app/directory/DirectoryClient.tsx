@@ -411,7 +411,7 @@ export default function DirectoryClient() {
                 transition={{ duration: 0.7, delay: 1 }}
                 className="text-sm sm:text-base font-body text-white/45 tracking-wider uppercase mb-12"
               >
-                Discover Elite Professionals in Every Field.
+                Your neighbors&apos; most trusted pros — one click away.
               </motion.p>
 
               {/* Search Pill */}
@@ -512,20 +512,35 @@ export default function DirectoryClient() {
 
             {/* 9-Category Grid with depth */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {CATEGORIES.map((cat, i) => (
-                <motion.div key={cat.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-                  className={`relative rounded-2xl overflow-hidden cursor-pointer group hover:shadow-gold-glow transition-all duration-500 ${i === 0 ? 'md:col-span-2 md:row-span-2' : ''}`}
-                  style={{ minHeight: i === 0 ? 320 : 180 }}
-                  onClick={() => handleCategoryClick(cat.id)} data-testid={`cat-${cat.id}`}>
-                  <Image src={cat.img} alt={`${cat.label} — ${cat.sub}`} fill className="absolute inset-0 object-cover group-hover:scale-105 transition-transform duration-700" sizes="(max-width: 768px) 100vw, 33vw" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent group-hover:from-black/95 transition-all duration-500" />
-                  <div className="absolute bottom-4 left-4">
-                    <span className={`text-white font-heading font-semibold block tracking-tight ${i === 0 ? 'text-2xl' : 'text-base'}`}>{cat.label}</span>
-                    <span className="text-white/50 text-xs font-body">{cat.sub}</span>
-                  </div>
-                  {i === 0 && <span className="absolute top-3 right-3 text-[10px] px-2.5 py-1 rounded-full font-heading font-semibold uppercase tracking-wider text-black" style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C97A)' }}>Core</span>}
-                </motion.div>
-              ))}
+              {CATEGORIES.map((cat, i) => {
+                const catCount = allListings.filter(l => l.industry === cat.id).length;
+                const isComingSoon = catCount === 0;
+
+                return (
+                  <motion.div key={cat.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+                    className={`relative rounded-2xl overflow-hidden group transition-all duration-500 ${i === 0 ? 'md:col-span-2 md:row-span-2' : ''} ${isComingSoon ? 'cursor-default' : 'cursor-pointer hover:shadow-gold-glow'}`}
+                    style={{ minHeight: i === 0 ? 320 : 180 }}
+                    onClick={() => !isComingSoon && handleCategoryClick(cat.id)} data-testid={`cat-${cat.id}`}>
+                    <Image src={cat.img} alt={`${cat.label} — ${cat.sub}`} fill className={`absolute inset-0 object-cover transition-transform duration-700 ${isComingSoon ? 'saturate-[0.3] brightness-[0.5]' : 'group-hover:scale-105'}`} sizes="(max-width: 768px) 100vw, 33vw" />
+                    <div className={`absolute inset-0 transition-all duration-500 ${isComingSoon ? 'bg-gradient-to-t from-black/95 via-black/60 to-black/30' : 'bg-gradient-to-t from-black/90 via-black/40 to-transparent group-hover:from-black/95'}`} />
+                    <div className="absolute bottom-4 left-4">
+                      <span className={`font-heading font-semibold block tracking-tight ${i === 0 ? 'text-2xl' : 'text-base'} ${isComingSoon ? 'text-white/50' : 'text-white'}`}>{cat.label}</span>
+                      <span className={`text-xs font-body ${isComingSoon ? 'text-white/30' : 'text-white/50'}`}>{cat.sub}</span>
+                      {!isComingSoon && (
+                        <span className="block mt-1.5 text-[11px] font-heading font-medium tracking-wide" style={{ color: '#C9A84C' }}>
+                          Browse Now &rarr;
+                        </span>
+                      )}
+                    </div>
+                    {i === 0 && !isComingSoon && <span className="absolute top-3 right-3 text-[10px] px-2.5 py-1 rounded-full font-heading font-semibold uppercase tracking-wider text-black" style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C97A)' }}>Core</span>}
+                    {isComingSoon && (
+                      <span className="absolute top-3 right-3 text-[10px] px-2.5 py-1 rounded-full font-heading font-semibold uppercase tracking-wider text-white/60 border border-white/15" style={{ background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(8px)' }}>
+                        Coming Q2 2026
+                      </span>
+                    )}
+                  </motion.div>
+                );
+              })}
             </div>
           </section>
 
@@ -952,8 +967,10 @@ function ListingCard({ listing: l, index: i }: { listing: Listing; index: number
   return (
     <Link href={`/listing/${l.slug}`}>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
-        className={`rounded-2xl overflow-hidden border transition-all duration-500 group cursor-pointer ${hasIntel ? 'border-[rgba(201,168,76,0.2)] shadow-gold-glow hover:border-[rgba(201,168,76,0.4)]' : 'border-white/5 hover:border-[rgba(201,168,76,0.2)] hover:shadow-gold-glow'}`}
+        className={`rounded-2xl overflow-hidden border transition-all duration-300 ease-out group cursor-pointer hover:scale-[1.02] ${hasIntel ? 'border-[rgba(201,168,76,0.2)] hover:border-[rgba(201,168,76,0.4)]' : 'border-white/5 hover:border-[rgba(201,168,76,0.25)]'}`}
         style={{ background: 'rgba(255,255,255,0.02)' }}
+        onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 0 15px rgba(212,175,55,0.3), 0 8px 30px rgba(0,0,0,0.3)'; }}
+        onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none'; }}
         data-testid={`listing-${l.slug}`}>
         <div className="relative h-40 overflow-hidden">
           {imgSrc && !imgError ? (
@@ -979,7 +996,9 @@ function ListingCard({ listing: l, index: i }: { listing: Listing; index: number
             {l.city}, {l.state}
             {l.distance != null && <span style={{ color: 'rgba(201,168,76,0.6)' }} className="ml-1">({l.distance} mi)</span>}
           </p>}
-          {l.description && <p className="text-xs text-white/35 line-clamp-2 mb-3 font-body">{l.description}</p>}
+          <p className="text-xs text-white/35 line-clamp-2 mb-3 font-body">
+            {l.description || `Trusted ${l.industry.replace(/-/g, ' ')} provider${l.city ? ` serving ${l.city}` : ' in Florida'}. View ratings, reviews, and contact info.`}
+          </p>
 
           {/* Social Proof Row */}
           <div className="flex items-center gap-2 mb-3 flex-wrap">
@@ -1122,8 +1141,10 @@ function SubcategoryCarouselRow({ label, subtitle, industry, searchTerm, sortBy,
         <div ref={scrollRef} className="flex gap-4 overflow-x-auto px-4 sm:px-6 pb-2 snap-x snap-mandatory scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {items.map((l, i) => (
             <Link key={l.id} href={`/listing/${l.slug}`} className="flex-shrink-0 w-[45%] sm:w-[30%] md:w-[22%] lg:w-[18.5%] snap-start">
-              <div className="rounded-2xl overflow-hidden border border-white/5 hover:border-[rgba(201,168,76,0.2)] transition-all duration-300 group/card cursor-pointer h-full"
+              <div className="rounded-2xl overflow-hidden border border-white/5 hover:border-[rgba(201,168,76,0.25)] hover:scale-[1.02] transition-all duration-300 ease-out group/card cursor-pointer h-full"
                 style={{ background: 'rgba(255,255,255,0.02)' }}
+                onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 0 15px rgba(212,175,55,0.3), 0 8px 30px rgba(0,0,0,0.3)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none'; }}
                 data-testid={`carousel-card-${l.slug}`}>
                 <div className="relative h-32 sm:h-36 overflow-hidden">
                   {l.cover_image_url ? (
