@@ -336,10 +336,10 @@ export default function FeaturedShowcase({ className = '', maxSlots = 12 }: Feat
                       </div>
                     )}
 
-                    {/* Verified Since */}
-                    {current.verified_since_date && (
-                      <span className="text-[11px] text-white/30 font-body">
-                        Verified since {new Date(current.verified_since_date).getFullYear()}
+                    {/* Verified badge */}
+                    {current.is_claimed && (
+                      <span className="text-[11px] font-body text-green-400/70">
+                        Verified &#10003;
                       </span>
                     )}
 
