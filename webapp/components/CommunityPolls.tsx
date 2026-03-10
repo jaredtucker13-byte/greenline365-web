@@ -133,12 +133,16 @@ export default function CommunityPolls({ className = '', maxPolls = 10 }: Commun
           {poll.description && (
             <p className="text-xs text-white/40 font-body mt-1">{poll.description}</p>
           )}
-          <p className="text-[11px] text-white/30 font-body mt-2">
-            {poll.total_votes} vote{poll.total_votes !== 1 ? 's' : ''}
+          <div className="flex items-center gap-2 mt-2">
+            <span className="text-xs font-heading font-semibold" style={{ color: 'rgba(201,168,76,0.7)' }}>
+              {poll.total_votes} vote{poll.total_votes !== 1 ? 's' : ''}
+            </span>
             {poll.destination_slug && (
-              <span> &middot; {poll.destination_slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</span>
+              <span className="text-[11px] text-white/30 font-body">
+                &middot; {poll.destination_slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+              </span>
             )}
-          </p>
+          </div>
         </div>
 
         {/* Options */}

@@ -696,6 +696,11 @@ export default function DirectoryClient() {
                 <p className="text-white/50 text-sm max-w-md mx-auto font-body">Help your neighbors find the best local pros.</p>
               </div>
               <CommunityPolls />
+              <div className="text-center mt-6">
+                <Link href="/community/polls" className="text-xs text-white/35 hover:text-gold/70 font-body transition-colors duration-300">
+                  See all polls &rarr;
+                </Link>
+              </div>
             </div>
           </section>
 
