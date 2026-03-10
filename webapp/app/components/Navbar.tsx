@@ -41,7 +41,7 @@ function shouldAlwaysShow(pathname: string): boolean {
 }
 
 // ─── Custom hook: scroll intelligence ────────────────────────────────────────
-function useSmartScroll(alwaysVisible: boolean, menuOpen: boolean, dropdownOpen: boolean) {
+function useSmartScroll(alwaysVisible: boolean, menuOpen: boolean, dropdownOpen: boolean, searchOpen: boolean) {
   const [hidden, setHidden] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const lastY = useRef(0);
@@ -59,7 +59,7 @@ function useSmartScroll(alwaysVisible: boolean, menuOpen: boolean, dropdownOpen:
         setScrolled(y > 20);
 
         // Never hide if always-visible route, menu open, or dropdown open
-        if (!alwaysVisible && !menuOpen && !dropdownOpen) {
+        if (!alwaysVisible && !menuOpen && !dropdownOpen && !searchOpen) {
           // Hide on scroll down past 80px threshold
           if (y > lastY.current && y > 80) {
             setHidden(true);
@@ -92,7 +92,7 @@ function useSmartScroll(alwaysVisible: boolean, menuOpen: boolean, dropdownOpen:
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', checkShortPage);
     };
-  }, [alwaysVisible, menuOpen, dropdownOpen]);
+  }, [alwaysVisible, menuOpen, dropdownOpen, searchOpen]);
 
   return { hidden, scrolled };
 }
@@ -126,7 +126,8 @@ export default function Navbar() {
   const { hidden, scrolled } = useSmartScroll(
     alwaysVisible,
     mobileMenuOpen,
-    activeDropdown !== null
+    activeDropdown !== null,
+    searchOpen
   );
 
   // ─── Auth ──────────────────────────────────────────────────────
@@ -194,7 +195,10 @@ export default function Navbar() {
   };
 
   // ─── Inline search handlers ────────────────────────────────────
-  const openSearch = useCallback(() => {
+  const openSearch = useCallback((e?: { stopPropagation: () => void }) => {
+    // stopPropagation: prevent search click from being misread as
+    // a "click away" that would close dropdown menus
+    e?.stopPropagation();
     setSearchOpen(true);
     // Auto-focus after the expansion animation starts
     requestAnimationFrame(() => {
@@ -202,7 +206,8 @@ export default function Navbar() {
     });
   }, []);
 
-  const closeSearch = useCallback(() => {
+  const closeSearch = useCallback((e?: { stopPropagation: () => void }) => {
+    e?.stopPropagation();
     setSearchOpen(false);
     setSearchQuery('');
   }, []);
@@ -252,7 +257,7 @@ export default function Navbar() {
         }}
       >
         <div
-          className="main-nav max-w-7xl mx-auto px-6 rounded-[32px] border relative overflow-hidden"
+          className="main-nav max-w-7xl mx-auto px-6 rounded-[32px] border relative"
           style={{
             // Frosted Obsidian: transparent at top, frosted when scrolled
             backdropFilter: scrolled ? 'blur(24px) saturate(1.2)' : 'blur(8px)',
