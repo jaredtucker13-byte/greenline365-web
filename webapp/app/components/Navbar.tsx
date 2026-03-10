@@ -682,6 +682,8 @@ function DesktopDropdown({
 }) {
   // Check if any item in this menu matches current path
   const isActive = menu.groups.some(g => g.items.some(i => pathname.startsWith(i.href)));
+  // Directory menu gets a wider 2-column layout
+  const isWide = menu.id === 'directory';
 
   return (
     <div
@@ -712,7 +714,9 @@ function DesktopDropdown({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.96 }}
             transition={{ duration: 0.2 }}
-            className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-72 rounded-[32px] border border-white/10 shadow-2xl overflow-hidden"
+            className={`absolute top-full mt-3 rounded-[32px] border border-white/10 shadow-2xl overflow-hidden ${
+              isWide ? 'w-[520px] -left-32' : 'w-72 left-1/2 -translate-x-1/2'
+            }`}
             style={{
               backdropFilter: 'blur(16px)',
               WebkitBackdropFilter: 'blur(16px)',
@@ -725,19 +729,21 @@ function DesktopDropdown({
                   {menu.groups.length > 1 && (
                     <p className="text-[10px] uppercase tracking-widest text-gold/40 font-semibold px-3 pt-3 pb-1">{group.label}</p>
                   )}
+                  <div className={isWide && group.items.length > 4 ? 'grid grid-cols-2 gap-0.5' : ''}>
                   {group.items.map((item) => (
                     <Link
                       key={item.href}
                       href={item.href}
-                      className="flex items-center gap-3 px-3 py-3 rounded-2xl hover:bg-white/5 transition-all duration-300 group/item"
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-2xl hover:bg-white/5 transition-all duration-300 group/item"
                     >
-                      <span className="text-lg w-8 h-8 flex items-center justify-center rounded-xl bg-white/5 group-hover/item:bg-gold/10 transition-colors duration-300">{item.icon}</span>
+                      <span className="text-lg w-8 h-8 flex items-center justify-center rounded-xl bg-white/5 group-hover/item:bg-gold/10 transition-colors duration-300 shrink-0">{item.icon}</span>
                       <div className="min-w-0">
                         <div className="text-sm font-medium text-white/80 group-hover/item:text-gold transition-colors duration-300">{item.label}</div>
-                        <div className="text-xs text-white/35 truncate">{item.description}</div>
+                        {!isWide && <div className="text-xs text-white/35 truncate">{item.description}</div>}
                       </div>
                     </Link>
                   ))}
+                  </div>
                   {/* Destinations city sub-links */}
                   {menu.id === 'explore' && group.label === 'Destinations' && (
                     <div className="grid grid-cols-2 gap-1 px-3 pt-1 pb-2">

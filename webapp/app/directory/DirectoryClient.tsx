@@ -7,6 +7,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -195,13 +196,17 @@ function TestimonialsSection() {
 }
 
 export default function DirectoryClient() {
+  const searchParams = useSearchParams();
+  const initialCategory = searchParams.get('category') || '';
+  const initialQuery = searchParams.get('q') || '';
+
   const [allListings, setAllListings] = useState<Listing[]>([]);
   const [featuredListings, setFeaturedListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [activeCategory, setActiveCategory] = useState('');
+  const [search, setSearch] = useState(initialQuery);
+  const [activeCategory, setActiveCategory] = useState(initialCategory);
   const [activeSubcategory, setActiveSubcategory] = useState('All');
-  const [showListings, setShowListings] = useState(false);
+  const [showListings, setShowListings] = useState(!!initialCategory || !!initialQuery);
   const [showGroupedBrowse, setShowGroupedBrowse] = useState(false);
   const [sortBy, setSortBy] = useState<'nearest' | 'highest' | 'most-reviews'>('nearest');
   const [cityFilter, setCityFilter] = useState('');
@@ -237,6 +242,13 @@ export default function DirectoryClient() {
       }
       setLoading(false);
     }).catch(() => setLoading(false));
+
+    // Scroll to categories section if arriving with ?category= or ?q=
+    if (initialCategory || initialQuery) {
+      setTimeout(() => {
+        document.getElementById('categories')?.scrollIntoView({ behavior: 'smooth' });
+      }, 500);
+    }
 
     // Request geolocation
     if (navigator.geolocation) {
