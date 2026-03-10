@@ -14,6 +14,7 @@ import Image from 'next/image';
 import BoostedShowcase from '@/components/BoostedShowcase';
 import CommunityPolls from '@/components/CommunityPolls';
 import FeaturedShowcase from '@/components/FeaturedShowcase';
+import { getPlaceholderImage, getCategoryFallback, getFallbackDescription } from '@/lib/directory-config';
 
 interface Listing {
   id: string;
@@ -532,20 +533,24 @@ export default function DirectoryClient() {
 
             {/* 9-Category Grid with depth */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {CATEGORIES.map((cat, i) => (
-                <motion.div key={cat.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-                  className={`relative rounded-2xl overflow-hidden cursor-pointer group hover:shadow-gold-glow transition-all duration-500 ${i === 0 ? 'md:col-span-2 md:row-span-2' : ''}`}
-                  style={{ minHeight: i === 0 ? 320 : 180 }}
-                  onClick={() => handleCategoryClick(cat.id)} data-testid={`cat-${cat.id}`}>
-                  <Image src={cat.img} alt={`${cat.label} — ${cat.sub}`} fill className="absolute inset-0 object-cover group-hover:scale-105 transition-transform duration-700" sizes="(max-width: 768px) 100vw, 33vw" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent group-hover:from-black/95 transition-all duration-500" />
-                  <div className="absolute bottom-4 left-4">
-                    <span className={`text-white font-heading font-semibold block tracking-tight ${i === 0 ? 'text-2xl' : 'text-base'}`}>{cat.label}</span>
-                    <span className="text-white/50 text-xs font-body">{cat.sub}</span>
-                  </div>
-                  {i === 0 && <span className="absolute top-3 right-3 text-[10px] px-2.5 py-1 rounded-full font-heading font-semibold uppercase tracking-wider text-black" style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C97A)' }}>Core</span>}
-                </motion.div>
-              ))}
+              {CATEGORIES.map((cat, i) => {
+                const count = allListings.filter(l => l.industry === cat.id).length;
+                return (
+                  <motion.div key={cat.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+                    className={`relative rounded-2xl overflow-hidden cursor-pointer group hover:shadow-gold-glow transition-all duration-500 ${i === 0 ? 'md:col-span-2 md:row-span-2' : ''}`}
+                    style={{ minHeight: i === 0 ? 320 : 180 }}
+                    onClick={() => handleCategoryClick(cat.id)} data-testid={`cat-${cat.id}`}>
+                    <Image src={cat.img} alt={`${cat.label} — ${cat.sub}`} fill className="absolute inset-0 object-cover group-hover:scale-105 transition-transform duration-700" sizes="(max-width: 768px) 100vw, 33vw" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent group-hover:from-black/95 transition-all duration-500" />
+                    <div className="absolute bottom-4 left-4">
+                      <span className={`text-white font-heading font-semibold block tracking-tight ${i === 0 ? 'text-2xl' : 'text-base'}`}>{cat.label}</span>
+                      <span className="text-white/50 text-xs font-body">{cat.sub}</span>
+                      {count > 0 && <span className="text-[10px] font-body mt-1 block" style={{ color: 'rgba(201,168,76,0.6)' }}>{count} {count === 1 ? 'business' : 'businesses'}</span>}
+                    </div>
+                    {i === 0 && <span className="absolute top-3 right-3 text-[10px] px-2.5 py-1 rounded-full font-heading font-semibold uppercase tracking-wider text-black" style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C97A)' }}>Core</span>}
+                  </motion.div>
+                );
+              })}
             </div>
           </section>
 
@@ -683,7 +688,7 @@ export default function DirectoryClient() {
                   { slug: 'jacksonville',   label: 'Jacksonville',     tagline: 'Gridiron Grit & Riverfront Views',  image: 'https://static.prod-images.emergentagent.com/jobs/2e119e5c-5e48-4af9-82e4-b66cfaef75d6/images/3044a5e13c46207922e088bcb878b0ded80dcf0c9ca1d9c15c08586ac85cd2e3.png' },
                 ].map((d, i) => (
                   <motion.div key={d.slug} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 + i * 0.07, duration: 0.5 }}>
-                    <Link href={`/destination/${d.slug}`} className="block dest-card-frame group" data-testid={`dest-card-${d.slug}`}>
+                    <Link href={`/directory?q=${encodeURIComponent(d.label)}`} className="block dest-card-frame group" data-testid={`dest-card-${d.slug}`}>
                       <div className="dest-card-inner">
                         <div className="relative overflow-hidden" style={{ aspectRatio: '4/3' }}>
                           <DestImage src={d.image} alt={`${d.label} destination guide — ${d.tagline}`} label={d.label} />
@@ -914,7 +919,9 @@ export default function DirectoryClient() {
 function ListingCard({ listing: l, index: i }: { listing: Listing; index: number }) {
   const hasIntel = l.has_property_intelligence;
   const [imgError, setImgError] = useState(false);
-  const imgSrc = l.cover_image_url || l.logo_url;
+  const placeholderUrl = getPlaceholderImage(l.industry);
+  const fallback = getCategoryFallback(l.industry);
+  const imgSrc = l.cover_image_url || l.logo_url || placeholderUrl;
   return (
     <Link href={`/listing/${l.slug}`}>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
@@ -922,11 +929,11 @@ function ListingCard({ listing: l, index: i }: { listing: Listing; index: number
         style={{ background: 'rgba(255,255,255,0.02)' }}
         data-testid={`listing-${l.slug}`}>
         <div className="relative h-40 overflow-hidden">
-          {imgSrc && !imgError ? (
+          {!imgError ? (
             <Image src={imgSrc} alt={`${l.business_name} — ${l.industry.replace(/-/g, ' ')} in ${l.city || 'Florida'}`} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" onError={() => setImgError(true)} />
           ) : (
-            <div className="w-full h-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #111 0%, #1A1A1A 100%)' }}>
-              <span className="text-4xl font-heading font-light text-white/10">{l.business_name[0]}</span>
+            <div className="w-full h-full flex items-center justify-center" style={{ background: fallback.gradient }}>
+              <span className="text-4xl">{fallback.icon}</span>
             </div>
           )}
           <span className="absolute top-3 left-3 text-[10px] px-2 py-1 rounded-full backdrop-blur-sm capitalize font-body" style={{ background: 'rgba(10,10,10,0.7)', color: 'rgba(255,255,255,0.6)' }}>{l.industry.replace(/-/g, ' ')}</span>
@@ -945,7 +952,7 @@ function ListingCard({ listing: l, index: i }: { listing: Listing; index: number
             {l.city}, {l.state}
             {l.distance != null && <span style={{ color: 'rgba(201,168,76,0.6)' }} className="ml-1">({l.distance} mi)</span>}
           </p>}
-          {l.description && <p className="text-xs text-white/35 line-clamp-2 mb-3 font-body">{l.description}</p>}
+          <p className="text-xs text-white/35 line-clamp-2 mb-3 font-body">{l.description || getFallbackDescription(l.business_name, l.industry, l.city)}</p>
           <div className="flex items-center justify-between">
             <span className="btn-ghost text-xs px-3 py-1.5 rounded-full" data-testid={`view-details-${l.slug}`}>View Details</span>
             <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold" style={{ background: 'rgba(201,168,76,0.12)', color: '#C9A84C' }}>

@@ -20,6 +20,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { getPlaceholderImage, getCategoryFallback, getFallbackDescription } from '@/lib/directory-config';
 
 interface FeaturedListing {
   id: string;
@@ -249,17 +250,17 @@ export default function FeaturedShowcase({ className = '', maxSlots = 12 }: Feat
               >
                 {/* Image Side */}
                 <div className="relative w-full md:w-2/5 h-48 md:h-auto overflow-hidden" style={{ minHeight: 280 }}>
-                  {current.cover_image_url || current.logo_url ? (
-                    <img
-                      src={current.cover_image_url || current.logo_url!}
-                      alt={current.business_name}
-                      className="w-full h-full object-cover"
-                      onError={(e) => { e.currentTarget.style.display = 'none'; (e.currentTarget.nextElementSibling as HTMLElement | null)?.style.removeProperty('display'); }}
-                    />
-                  ) : null}
-                  <div className={`w-full h-full flex items-center justify-center ${current.cover_image_url || current.logo_url ? '' : ''}`} style={{ background: 'linear-gradient(135deg, #111 0%, #1A1A1A 100%)', display: current.cover_image_url || current.logo_url ? 'none' : undefined }}>
-                    <span className="text-6xl font-heading font-light text-white/10">{current.business_name[0]}</span>
-                  </div>
+                  <img
+                    src={current.cover_image_url || current.logo_url || getPlaceholderImage(current.industry)}
+                    alt={current.business_name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => { e.currentTarget.style.display = 'none'; (e.currentTarget.nextElementSibling as HTMLElement | null)?.style.removeProperty('display'); }}
+                  />
+                  {(() => { const fb = getCategoryFallback(current.industry); return (
+                    <div className="w-full h-full flex items-center justify-center" style={{ background: fb.gradient, display: 'none' }}>
+                      <span className="text-6xl">{fb.icon}</span>
+                    </div>
+                  ); })()}
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-[#0f0f0f]/80 hidden md:block" />
 
                   {/* Tier Badge */}
@@ -306,11 +307,9 @@ export default function FeaturedShowcase({ className = '', maxSlots = 12 }: Feat
                       {current.business_name}
                     </h3>
 
-                    {current.description && (
-                      <p className="text-sm text-white/50 font-body leading-relaxed mb-4 line-clamp-2">
-                        {current.description}
-                      </p>
-                    )}
+                    <p className="text-sm text-white/50 font-body leading-relaxed mb-4 line-clamp-2">
+                      {current.description || getFallbackDescription(current.business_name, current.industry, current.city)}
+                    </p>
                   </div>
 
                   {/* Stats Row — REAL data only */}
