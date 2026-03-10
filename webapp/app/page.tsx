@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import DirectoryClient from './directory/DirectoryClient';
 import type { Metadata } from 'next';
 
@@ -23,5 +24,9 @@ export const metadata: Metadata = {
  * Previous homepage content moved to /services
  */
 export default function HomePage() {
-  return <DirectoryClient />;
+  return (
+    <Suspense>
+      <DirectoryClient />
+    </Suspense>
+  );
 }
