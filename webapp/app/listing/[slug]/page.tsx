@@ -414,7 +414,7 @@ export default function ListingDetailPage() {
             )}
 
             {/* ─── BUSINESS HOURS ─── */}
-            {businessHours && Object.keys(businessHours).length > 0 && (
+            {businessHours && Object.keys(businessHours).length > 0 && Object.values(businessHours).some((h: any) => h && (h.closed || (h.open && h.close))) && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}

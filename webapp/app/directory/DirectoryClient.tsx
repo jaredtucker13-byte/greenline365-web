@@ -124,6 +124,33 @@ function PropertyIntelBadge() {
   );
 }
 
+// ─── Sponsored Section — Only renders when there are sponsored listings ─────
+function SponsoredSection() {
+  const [hasSlots, setHasSlots] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    fetch('/api/directory/addons/featured?limit=12&backfill=true')
+      .then(r => r.json())
+      .then(data => setHasSlots((data.slots || []).length > 0))
+      .catch(() => setHasSlots(false));
+  }, []);
+
+  if (!hasSlots) return null;
+
+  return (
+    <section className="py-12" style={{ background: '#080808' }} data-testid="boosted-showcase-section">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-1 h-6 rounded-full" style={{ background: '#C9A84C' }} />
+          <h3 className="text-sm font-heading font-semibold text-white/60 uppercase tracking-wider">Sponsored</h3>
+          <div className="flex-1 h-px bg-white/5" />
+        </div>
+        <BoostedShowcase maxSlots={12} />
+      </div>
+    </section>
+  );
+}
+
 // ─── Testimonials — Fetches real reviews from the directory ─────
 function TestimonialsSection() {
   const [reviews, setReviews] = useState<{ id: string; reviewer_name: string; review_text: string; rating: number; business_name: string; slug: string; created_at: string }[]>([]);
@@ -136,7 +163,12 @@ function TestimonialsSection() {
       .then(data => {
         const list = data.reviews || data || [];
         if (Array.isArray(list) && list.length > 0) {
-          setReviews(list.filter((r: any) => r.review_text && r.reviewer_name && r.review_text.length > 20));
+          const filtered = list.filter((r: any) =>
+            r.review_text && r.reviewer_name && r.review_text.length > 20 &&
+            !/test/i.test(r.reviewer_name) &&
+            !/automated testing/i.test(r.review_text)
+          );
+          setReviews(filtered);
         }
       })
       .catch(() => {});
@@ -148,7 +180,7 @@ function TestimonialsSection() {
     return () => clearInterval(t);
   }, [reviews.length]);
 
-  if (reviews.length === 0) return null;
+  if (reviews.length < 3) return null;
 
   const r = reviews[idx];
   return (
@@ -529,16 +561,7 @@ export default function DirectoryClient() {
           {/* ═══════════════════════════════════════════════════════════
               BOOSTED SHOWCASE — SPONSORED CAROUSEL
               ═══════════════════════════════════════════════════════════ */}
-          <section className="py-12" style={{ background: '#080808' }} data-testid="boosted-showcase-section">
-            <div className="max-w-7xl mx-auto px-6">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-1 h-6 rounded-full" style={{ background: '#C9A84C' }} />
-                <h3 className="text-sm font-heading font-semibold text-white/60 uppercase tracking-wider">Sponsored</h3>
-                <div className="flex-1 h-px bg-white/5" />
-              </div>
-              <BoostedShowcase maxSlots={12} />
-            </div>
-          </section>
+          <SponsoredSection />
 
           {/* ═══════════════════════════════════════════════════════════
               FEATURED LISTINGS
@@ -699,21 +722,11 @@ export default function DirectoryClient() {
                 </p>
               </div>
 
-              {/* Progress Bar */}
-              <div className="max-w-md mx-auto mb-12">
-                <div className="flex justify-between text-xs font-body mb-2">
-                  <span className="text-white/60">{stats.foundingMembersClaimed} of 50 claimed</span>
-                  <span style={{ color: 'rgba(201,168,76,0.7)' }}>{50 - stats.foundingMembersClaimed} spots remaining</span>
-                </div>
-                <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
-                  <motion.div
-                    className="h-full rounded-full"
-                    style={{ background: 'linear-gradient(90deg, #C9A84C, #E8C97A)' }}
-                    initial={{ width: 0 }}
-                    animate={{ width: `${(stats.foundingMembersClaimed / 50) * 100}%` }}
-                    transition={{ duration: 1.5, ease: 'easeOut' }}
-                  />
-                </div>
+              {/* Launch Status */}
+              <div className="max-w-md mx-auto mb-12 text-center">
+                <p className="text-sm font-heading font-semibold tracking-wide" style={{ color: 'rgba(201,168,76,0.8)' }}>
+                  Applications now open — secure your spot before launch
+                </p>
               </div>
 
               {/* 4 Benefits Grid */}
@@ -743,7 +756,7 @@ export default function DirectoryClient() {
                   className="btn-primary px-10 py-4 rounded-full text-sm font-semibold inline-block"
                   data-testid="founding-50-cta"
                 >
-                  {stats.foundingMembersClaimed >= 50 ? 'Join the Waitlist' : 'Claim Your Founding Spot'}
+                  Claim Your Founding Spot
                 </Link>
                 <p className="text-xs text-white/30 mt-4 font-body">Free listing. No credit card required.</p>
               </div>
