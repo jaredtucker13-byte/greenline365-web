@@ -439,7 +439,7 @@ export default function DirectoryClient() {
                   backgroundClip: 'text',
                 }}
               >
-                THE UNRIVALED STANDARD<br />IN HOME SERVICES.
+                YOUR COMMUNITY&apos;S MOST<br />TRUSTED DIRECTORY.
               </motion.h1>
 
               <motion.p
@@ -559,19 +559,34 @@ export default function DirectoryClient() {
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {CATEGORIES.map((cat, i) => {
                 const count = allListings.filter(l => l.industry === cat.id).length;
+                const isEmpty = count === 0;
                 return (
                   <motion.div key={cat.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-                    className={`relative rounded-2xl overflow-hidden cursor-pointer group hover:shadow-gold-glow transition-all duration-500 ${i === 0 ? 'md:col-span-2 md:row-span-2' : ''}`}
-                    style={{ minHeight: i === 0 ? 320 : 180 }}
-                    onClick={() => handleCategoryClick(cat.id)} data-testid={`cat-${cat.id}`}>
-                    <Image src={cat.img} alt={`${cat.label} — ${cat.sub}`} fill className="absolute inset-0 object-cover group-hover:scale-105 transition-transform duration-700" sizes="(max-width: 768px) 100vw, 33vw" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent group-hover:from-black/95 transition-all duration-500" />
+                    className={`relative rounded-2xl overflow-hidden group transition-all duration-500 ${i === 0 ? 'md:col-span-2 md:row-span-2' : ''} ${isEmpty ? 'cursor-default' : 'cursor-pointer hover:shadow-gold-glow'}`}
+                    style={{ minHeight: i === 0 ? 320 : 180, filter: isEmpty ? 'saturate(0.3) brightness(0.7)' : 'none' }}
+                    onClick={() => !isEmpty && handleCategoryClick(cat.id)} data-testid={`cat-${cat.id}`}>
+                    <Image src={cat.img} alt={`${cat.label} — ${cat.sub}`} fill className={`absolute inset-0 object-cover transition-transform duration-700 ${isEmpty ? '' : 'group-hover:scale-105'}`} sizes="(max-width: 768px) 100vw, 33vw" />
+                    <div className={`absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent transition-all duration-500 ${isEmpty ? '' : 'group-hover:from-black/95'}`} />
+                    {/* Coming Soon badge for empty categories */}
+                    {isEmpty && (
+                      <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-heading font-semibold uppercase tracking-wider text-white/70"
+                        style={{ background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                        Coming Q2 2026
+                      </div>
+                    )}
                     <div className="absolute bottom-4 left-4">
-                      <span className={`text-white font-heading font-semibold block tracking-tight ${i === 0 ? 'text-2xl' : 'text-base'}`}>{cat.label}</span>
-                      <span className="text-white/50 text-xs font-body">{cat.sub}</span>
-                      {count > 0 && <span className="text-[10px] font-body mt-1 block" style={{ color: 'rgba(201,168,76,0.6)' }}>{count} {count === 1 ? 'business' : 'businesses'}</span>}
+                      <span className={`text-white font-heading font-semibold block tracking-tight ${i === 0 ? 'text-2xl' : 'text-base'} ${isEmpty ? 'opacity-60' : ''}`}>{cat.label}</span>
+                      <span className={`text-xs font-body ${isEmpty ? 'text-white/30' : 'text-white/50'}`}>{cat.sub}</span>
+                      {count > 0 ? (
+                        <span className="text-[10px] font-body mt-1.5 flex items-center gap-1" style={{ color: 'rgba(201,168,76,0.8)' }}>
+                          Browse Now
+                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-body mt-1 block text-white/25">Coming soon</span>
+                      )}
                     </div>
-                    {i === 0 && <span className="absolute top-3 right-3 text-[10px] px-2.5 py-1 rounded-full font-heading font-semibold uppercase tracking-wider text-black" style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C97A)' }}>Core</span>}
+                    {i === 0 && !isEmpty && <span className="absolute top-3 right-3 text-[10px] px-2.5 py-1 rounded-full font-heading font-semibold uppercase tracking-wider text-black" style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C97A)' }}>Core</span>}
                   </motion.div>
                 );
               })}
@@ -745,7 +760,7 @@ export default function DirectoryClient() {
                   <motion.div key={d.slug} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 + i * 0.07, duration: 0.5 }}>
                     <Link href={`/directory?q=${encodeURIComponent(d.label)}`} className="block dest-card-frame group" data-testid={`dest-card-${d.slug}`}>
                       <div className="dest-card-inner">
-                        <div className="relative overflow-hidden" style={{ aspectRatio: '4/3' }}>
+                        <div className="relative overflow-hidden" style={{ aspectRatio: '4/3', minHeight: '180px' }}>
                           <DestImage src={d.image} alt={`${d.label} destination guide — ${d.tagline}`} label={d.label} />
                         </div>
                         <div className="dest-glass-label px-4 py-3">
@@ -1054,8 +1069,11 @@ function DestImage({ src, alt, label }: { src: string; alt: string; label: strin
   const [error, setError] = useState(false);
   if (error) {
     return (
-      <div className="w-full h-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #0a1628 0%, #1a0f05 100%)' }}>
-        <span className="text-3xl font-heading font-light text-gold/20">{label[0]}</span>
+      <div className="w-full h-full flex flex-col items-center justify-center relative"
+        style={{ background: 'linear-gradient(135deg, #0d1a2e 0%, #1a1008 40%, #0a1020 100%)' }}>
+        <div className="absolute inset-0 opacity-20" style={{ background: 'radial-gradient(ellipse at 50% 40%, rgba(201,168,76,0.3) 0%, transparent 70%)' }} />
+        <span className="text-5xl mb-2 relative z-10">📍</span>
+        <span className="text-sm font-heading font-semibold relative z-10" style={{ color: 'rgba(201,168,76,0.7)' }}>{label}</span>
       </div>
     );
   }
