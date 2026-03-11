@@ -256,57 +256,69 @@ While the owner is being alerted (parallel), the AI asks these **high-value ques
 
 # V. THE PRICING & MODULE ARCHITECTURE
 
-To build a system that scales, we use a **Base + Module** model.
+> **CANONICAL PRICING SOURCE OF TRUTH:** `docs/specs/pricing.md`
+> All prices below are aligned with the canonical SOT as of March 2026.
+> If any price in this document conflicts with `docs/specs/pricing.md`, the SOT wins.
 
-## 1. The Core Engine (The "Founding 30" Package)
+GL365 uses a **3-Layer Pricing Model**: Base Subscriptions → Bundle Discounts → Modular Add-Ons.
 
-| Component | Price |
-|-----------|-------|
-| **Setup Fee** | $2,500 ($1,250 Upfront / $1,250 on Activation) |
-| **Monthly Subscription** | $1,000/month |
+## 1. Directory Listing Tiers (Public — /pricing page)
 
-### Includes:
-- Primary AI Agent (Receptionist persona)
-- Property Intelligence Fetch (Pre-Greeting)
-- A2P Compliance Setup
-- Basic Scheduling (Cal.com integration)
-- SMS Confirmations
-- CRS Tracking
-- Weather Integration
-- Commander Dashboard (Basic)
+| Tier | Price | Best For |
+|------|-------|----------|
+| **Free** | $0/mo | Basic listing — name, address, phone, hours |
+| **Pro** | $45/mo | Verified badge, CTA buttons, business description, priority search |
+| **Premium** | $89/mo | Everything in Pro + all Google photos, featured placement, AI Review Response, lead capture |
 
----
+## 2. Command Center Tiers (Private — email outreach only)
 
-## 2. Add-On Modules (The Upsell)
+> NOT on the public /pricing page. Sold via personalized outreach and onboarding calls only.
 
-| Module | Feature | Price |
-|--------|---------|-------|
-| **The Dispatch Companion** | Dynamic "Swap" Logic & Emergency Rescheduling | +$250/mo |
-| **Proactive Weather Engine** | AI triggers SMS alerts/outbound based on storms/freezes | +$150/mo |
-| **Multi-Agent Expansion** | Extra agents for different departments (Sales vs. Service) | +$200/mo per agent |
-| **Advanced CRM Sync** | Full bi-directional sync with ServiceTitan/Housecall Pro | +$300/mo |
-| **Sentiment Analytics** | Detailed sentiment reports + Relationship Save alerts | +$100/mo |
-| **Custom Persona Training** | Unique voice/personality for brand | +$500 one-time |
+| Tier | Monthly Base | Setup Fee (One-Time) | Best For |
+|------|-------------|---------------------|----------|
+| **Operator** | $1,500/mo | $2,500 (50% Day 1 / 50% on Technical Completion) | Solo or small teams plugging into existing CRM |
+| **Commander** | $2,500/mo | $3,500 (50% Day 1 / 50% on Technical Completion) | Multi-staff with full GL365 CRM + Property Intelligence |
+| **Sovereign** | $3,500/mo | $5,500 (50% Day 1 / 50% on Technical Completion) | Enterprise with external CRM integration (bridge builder) |
 
----
+**Milestone Definition (Technical Completion):**
+- AI Persona programmed and trained on client Knowledge Base and Brand Voice
+- Dashboard access granted (CRM, Command Center, Property Intelligence tools)
+- Directory listing activated
+- All workflows verified functional
+- A2P 10DLC filing completed within 48 hours of Technical Completion
 
-## 3. The "Everything" System (The Elite Partner)
+## 3. Modular Add-Ons (À La Carte)
 
-For the client who wants the **full operational brain**:
+Each module is individually priced and optional. Bundled tier prices are discounted vs. buying individually.
 
-| Component | Price |
-|-----------|-------|
-| **Setup** | $5,000 (White-glove data migration + Custom Persona training) |
-| **Monthly** | $1,850 - $2,250/mo (Based on fleet size: 1-3 trucks vs. 4+ trucks) |
+### Operator-Level Modules
+| Module | Individual Price |
+|--------|-----------------|
+| Weekly Trend Hunter | $149/mo |
+| Live Local Pulse | $149/mo |
+| Campaigns | $199/mo |
+| Referral Network | $129/mo |
+| **All 4 Bundled** | **$500/mo** (saves $126/mo — 20% off) |
 
-### Includes Everything Plus:
-- Unlimited AI agents
-- Full CRM bi-directional sync
-- Dispatch Companion
-- Weather Engine
-- Custom persona
-- Priority support
-- Quarterly strategy calls
+### Commander-Level Modules
+| Module | Individual Price |
+|--------|-----------------|
+| Booking System | $299/mo |
+| Home Ledger / Property Passport | $249/mo |
+| Filing Cabinet | $229/mo |
+| Content Creation Forge | $249/mo |
+| Private Feedback Vault | $279/mo |
+| Technician Performance Radar | $199/mo |
+
+### Sovereign-Level Modules
+| Module | Individual Price |
+|--------|-----------------|
+| External CRM Bridge | $349/mo |
+| Multi-Agent Expansion | $200/mo per agent |
+| Custom Persona Training | $500 one-time |
+| Sentiment Analytics | $100/mo |
+| Advanced Dispatch | $250/mo |
+| Proactive Weather Engine | $150/mo |
 
 ### Value Proposition:
 > "This replaces a full-time office manager, saving the owner $4,000-$5,000/month while providing 24/7 coverage."
@@ -444,12 +456,20 @@ In exchange, they give us:
 - Testimonials and case studies
 - The data to perfect the **Home Service Intelligence Category**
 
-## Founding 30 Benefits:
-- **Locked Rate:** $1,000/mo forever (vs. future $1,500/mo)
-- **Priority Support:** Direct access to development team
-- **Feature Input:** Vote on roadmap priorities
-- **Early Access:** Beta features before general release
-- **Founder Badge:** Recognition on website and marketing
+## Founding Member Benefits:
+
+### Directory Founding Members (First 50 verified businesses)
+- Locked-in listing rate forever — price never increases even when tiers go up
+- Founding Member badge on their listing card
+- Featured placement on homepage and category pages
+- Priority support
+
+### Command Center Founding Members
+- See `docs/brainstorming/founding-members-SOT.md` for full offer details
+- Locked rate at current tier pricing forever
+- Priority support and direct access to development team
+- Feature input — vote on roadmap priorities
+- Early access to beta features
 
 ---
 

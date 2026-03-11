@@ -10,7 +10,7 @@
 -- STEP 1: ADD is_super_admin TO PROFILES
 -- ============================================
 
--- Add super admin flag for god mode access
+-- Add super admin flag for Greenline HQ access
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS is_super_admin BOOLEAN DEFAULT false;
 
 -- Update your account to super admin (replace with your actual user ID)

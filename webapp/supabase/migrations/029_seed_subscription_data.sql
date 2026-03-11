@@ -6,12 +6,34 @@
 -- ============================================
 -- PLANS
 -- ============================================
+-- ============================================
+-- DIRECTORY TIERS (Public — /pricing page)
+-- Free / Pro ($45/mo) / Premium ($89/mo)
+-- See docs/specs/pricing.md Layer 1A
+-- ============================================
 INSERT INTO plans (slug, product_type, name, description, price_monthly_cents, price_annual_cents, trial_days, sort_order)
 VALUES
-  ('free', 'directory', 'Free Listing', 'Basic directory listing with limited features', 0, 0, 0, 0),
-  ('directory_pro', 'directory', 'Directory Pro', 'Enhanced listing with verified badge, menu editor, priority placement, and more', 2900, 29000, 14, 1),
-  ('command_center', 'command_center', 'Command Center', 'Full business management suite: bookings, AI automation, content, and integrations', 7900, 79000, 14, 2),
-  ('bundle', 'bundle', 'Complete Bundle', 'Directory Pro + Command Center at a discounted rate', 9900, 99000, 14, 3)
+  ('free', 'directory', 'Free Listing', 'Basic directory listing — name, address, phone, hours, basic search visibility', 0, 0, 0, 0),
+  ('directory_pro', 'directory', 'Directory Pro', 'Enhanced listing with verified badge, direct CTA buttons, business description, priority search ranking, marketplace add-on access', 4500, 45000, 14, 1),
+  ('directory_premium', 'directory', 'Directory Premium', 'Everything in Pro + all Google Business photos auto-synced, featured homepage placement, AI Review Response engine, lead capture forms, priority support', 8900, 89000, 14, 2),
+
+  -- ============================================
+  -- COMMAND CENTER TIERS (Private — email outreach only)
+  -- Operator ($1,500/mo) / Commander ($2,500/mo) / Sovereign ($3,500/mo)
+  -- Setup fees are one-time, milestone-based (50% Day 1 / 50% on Technical Completion)
+  -- Operator setup: $2,500 | Commander setup: $3,500 | Sovereign setup: $5,500
+  -- See docs/specs/pricing.md Layer 1B
+  -- ============================================
+  ('command_center_operator', 'command_center', 'Command Center — Operator', 'Solo or small teams plugging into their existing CRM. No GL365 CRM included. Setup: $2,500 (milestone-based).', 150000, 1500000, 0, 10),
+  ('command_center_commander', 'command_center', 'Command Center — Commander', 'Multi-staff businesses with full GL365 CRM + Property Intelligence system. Setup: $3,500 (milestone-based).', 250000, 2500000, 0, 11),
+  ('command_center_sovereign', 'command_center', 'Command Center — Sovereign', 'Enterprise operations with external CRM integration (bridge builder). Setup: $5,500 (milestone-based).', 350000, 3500000, 0, 12),
+
+  -- ============================================
+  -- BUNDLE (Directory + Command Center combined)
+  -- Bundle price TBD — always strictly less than sum of individual prices
+  -- See docs/specs/pricing.md Layer 2
+  -- ============================================
+  ('bundle', 'bundle', 'Complete Bundle', 'Directory + Command Center at a bundled discount rate. Bundle pricing TBD.', 0, 0, 0, 20)
 ON CONFLICT (slug) DO NOTHING;
 
 -- ============================================
@@ -43,13 +65,14 @@ ON CONFLICT (slug) DO NOTHING;
 
 -- ============================================
 -- PLAN FEATURE OVERRIDES
+-- See docs/specs/pricing.md "Tier-Based Feature Flags"
 -- ============================================
 
--- directory_pro overrides
+-- Directory Pro ($45/mo) overrides
 INSERT INTO plan_feature_overrides (plan_id, feature_flag_id, value)
 SELECT p.id, f.id, v.val
 FROM (VALUES
-  ('photos_max', '20'),
+  ('photos_max', '2'),
   ('description_long', 'true'),
   ('menu_editor', 'true'),
   ('priority_placement', 'true'),
@@ -62,17 +85,45 @@ JOIN plans p ON p.slug = 'directory_pro'
 JOIN feature_flags f ON f.slug = v.flag_slug
 ON CONFLICT (plan_id, feature_flag_id) DO NOTHING;
 
--- command_center overrides (all directory_pro features + command center features)
+-- Directory Premium ($89/mo) overrides
 INSERT INTO plan_feature_overrides (plan_id, feature_flag_id, value)
 SELECT p.id, f.id, v.val
 FROM (VALUES
-  ('photos_max', '20'),
+  ('photos_max', '10'),
   ('description_long', 'true'),
   ('menu_editor', 'true'),
   ('priority_placement', 'true'),
   ('verified_badge', 'true'),
   ('analytics_advanced', 'true'),
+  ('team_members_max', '5'),
   ('custom_branding', 'true'),
+  ('ai_review_reply', 'true')
+) AS v(flag_slug, val)
+JOIN plans p ON p.slug = 'directory_premium'
+JOIN feature_flags f ON f.slug = v.flag_slug
+ON CONFLICT (plan_id, feature_flag_id) DO NOTHING;
+
+-- Command Center Operator ($1,500/mo) overrides
+-- No GL365 CRM included. Hub-and-spoke calendar dashboard only.
+INSERT INTO plan_feature_overrides (plan_id, feature_flag_id, value)
+SELECT p.id, f.id, v.val
+FROM (VALUES
+  ('booking_engine', 'true'),
+  ('calendar_sync', 'true'),
+  ('ai_automation', 'true'),
+  ('content_manager', 'true'),
+  ('integrations_hub', 'true'),
+  ('team_members_max', '3')
+) AS v(flag_slug, val)
+JOIN plans p ON p.slug = 'command_center_operator'
+JOIN feature_flags f ON f.slug = v.flag_slug
+ON CONFLICT (plan_id, feature_flag_id) DO NOTHING;
+
+-- Command Center Commander ($2,500/mo) overrides
+-- Full GL365 CRM + Property Intelligence system
+INSERT INTO plan_feature_overrides (plan_id, feature_flag_id, value)
+SELECT p.id, f.id, v.val
+FROM (VALUES
   ('booking_engine', 'true'),
   ('calendar_sync', 'true'),
   ('ai_automation', 'true'),
@@ -81,15 +132,32 @@ FROM (VALUES
   ('integrations_hub', 'true'),
   ('team_members_max', '10')
 ) AS v(flag_slug, val)
-JOIN plans p ON p.slug = 'command_center'
+JOIN plans p ON p.slug = 'command_center_commander'
 JOIN feature_flags f ON f.slug = v.flag_slug
 ON CONFLICT (plan_id, feature_flag_id) DO NOTHING;
 
--- bundle overrides (same as command_center — inherits all)
+-- Command Center Sovereign ($3,500/mo) overrides
+-- Enterprise with external CRM integration (bridge builder)
 INSERT INTO plan_feature_overrides (plan_id, feature_flag_id, value)
 SELECT p.id, f.id, v.val
 FROM (VALUES
-  ('photos_max', '20'),
+  ('booking_engine', 'true'),
+  ('calendar_sync', 'true'),
+  ('ai_automation', 'true'),
+  ('ai_review_reply', 'true'),
+  ('content_manager', 'true'),
+  ('integrations_hub', 'true'),
+  ('team_members_max', '25')
+) AS v(flag_slug, val)
+JOIN plans p ON p.slug = 'command_center_sovereign'
+JOIN feature_flags f ON f.slug = v.flag_slug
+ON CONFLICT (plan_id, feature_flag_id) DO NOTHING;
+
+-- Bundle overrides (Directory + Command Center combined — inherits all)
+INSERT INTO plan_feature_overrides (plan_id, feature_flag_id, value)
+SELECT p.id, f.id, v.val
+FROM (VALUES
+  ('photos_max', '10'),
   ('description_long', 'true'),
   ('menu_editor', 'true'),
   ('priority_placement', 'true'),

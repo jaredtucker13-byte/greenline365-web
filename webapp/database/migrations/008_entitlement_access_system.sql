@@ -313,7 +313,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Function to manually grant entitlement (God Mode)
+-- Function to manually grant entitlement (Greenline HQ admin override)
 CREATE OR REPLACE FUNCTION grant_manual_entitlement(
   p_business_id UUID,
   p_tier TEXT,
