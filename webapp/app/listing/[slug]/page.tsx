@@ -49,6 +49,35 @@ interface RelatedListing {
   metadata: Record<string, any>;
 }
 
+/** Compute whether the business is currently open based on business_hours */
+function getOpenStatus(businessHours: Record<string, { open: string; close: string; closed: boolean }> | null): { isOpen: boolean; label: string } | null {
+  if (!businessHours || Object.keys(businessHours).length === 0) return null;
+  const days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+  const now = new Date();
+  const dayKey = days[now.getDay()];
+  const hours = businessHours[dayKey];
+  if (!hours) return null;
+  if (hours.closed) return { isOpen: false, label: 'Closed Today' };
+  if (!hours.open || !hours.close) return null;
+  // Parse time strings like "9:00 AM" or "5:00 PM"
+  const parseTime = (t: string): number => {
+    const match = t.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)?$/i);
+    if (!match) return -1;
+    let h = parseInt(match[1], 10);
+    const m = parseInt(match[2], 10);
+    const period = match[3]?.toUpperCase();
+    if (period === 'PM' && h !== 12) h += 12;
+    if (period === 'AM' && h === 12) h = 0;
+    return h * 60 + m;
+  };
+  const openMin = parseTime(hours.open);
+  const closeMin = parseTime(hours.close);
+  if (openMin < 0 || closeMin < 0) return null;
+  const nowMin = now.getHours() * 60 + now.getMinutes();
+  const isOpen = closeMin > openMin ? (nowMin >= openMin && nowMin < closeMin) : (nowMin >= openMin || nowMin < closeMin);
+  return { isOpen, label: isOpen ? 'Open Now' : 'Closed' };
+}
+
 /** Ensure a URL has a protocol prefix */
 function ensureProtocol(url: string): string {
   if (!url) return url;
@@ -179,6 +208,7 @@ export default function ListingDetailPage() {
   const googleReviews = listing.metadata?.google_review_count;
   const googleMapsUrl = listing.metadata?.google_maps_url;
   const businessHours = listing.business_hours as Record<string, { open: string; close: string; closed: boolean }> | null;
+  const openStatus = getOpenStatus(businessHours);
   const menuSections = listing.menu as { id: string; name: string; items: { id: string; name: string; description: string; price: string }[] }[] | null;
 
   return (
@@ -276,6 +306,33 @@ export default function ListingDetailPage() {
                           Verified
                         </span>
                       )}
+                      {openStatus && (
+                        <span
+                          className={`inline-flex items-center gap-1 ml-2 px-2 py-0.5 rounded-full text-[10px] font-heading font-bold uppercase tracking-wider ${
+                            openStatus.isOpen
+                              ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20'
+                              : 'bg-red-500/15 text-red-400 border border-red-500/20'
+                          }`}
+                          data-testid="open-status-badge"
+                        >
+                          <span className={`w-1.5 h-1.5 rounded-full ${openStatus.isOpen ? 'bg-emerald-400' : 'bg-red-400'}`} />
+                          {openStatus.label}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                  {/* Service Areas */}
+                  {listing.tier !== 'free' && listing.metadata?.service_areas && Array.isArray(listing.metadata.service_areas) && listing.metadata.service_areas.length > 0 && (
+                    <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                      <span className="text-[10px] text-white/30 font-heading uppercase tracking-wider mr-1">Serves</span>
+                      {(listing.metadata.service_areas as string[]).map((area: string) => (
+                        <span
+                          key={area}
+                          className="inline-block px-2 py-0.5 rounded-full text-[10px] font-heading text-white/60 border border-white/10 bg-white/5"
+                        >
+                          {area}
+                        </span>
+                      ))}
                     </div>
                   )}
                 </div>
@@ -819,36 +876,20 @@ export default function ListingDetailPage() {
             >
               <h3 className="text-sm font-heading font-semibold text-white uppercase tracking-wider mb-5">Contact</h3>
 
-              {/* CTA Buttons — show for all listings with contact info */}
-              {(listing.phone || listing.website) && (
-                <div className="space-y-2 mb-5" data-testid="cta-buttons">
-                  {listing.phone && (
-                    <button
-                      onClick={() => { setShowCallModal(true); trackEvent('call'); }}
-                      className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-bold font-heading text-[#0A0A0A] transition-all hover:scale-[1.02] cursor-pointer"
-                      style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C97A)', boxShadow: '0 0 16px rgba(201,168,76,0.3)' }}
-                      data-testid="cta-call-now"
-                    >
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                      </svg>
-                      Call Now
-                    </button>
-                  )}
-                  {listing.website && (
-                    <a
-                      href={ensureProtocol(listing.website)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold font-heading text-gold border border-gold/30 hover:bg-gold/5 transition-all"
-                      data-testid="cta-visit-website"
-                    >
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                      </svg>
-                      Visit Website
-                    </a>
-                  )}
+              {/* CTA Button — primary call action */}
+              {listing.phone && (
+                <div className="mb-5" data-testid="cta-buttons">
+                  <button
+                    onClick={() => { setShowCallModal(true); trackEvent('call'); }}
+                    className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-bold font-heading text-[#0A0A0A] transition-all hover:scale-[1.02] cursor-pointer"
+                    style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C97A)', boxShadow: '0 0 16px rgba(201,168,76,0.3)' }}
+                    data-testid="cta-call-now"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
+                    Call Now
+                  </button>
                 </div>
               )}
 
@@ -894,27 +935,6 @@ export default function ListingDetailPage() {
                   </a>
                 )}
 
-                {/* Google Maps */}
-                {googleMapsUrl && (
-                  <a
-                    href={googleMapsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => trackEvent('map')}
-                    className="flex items-center gap-3 w-full p-3 rounded-xl border border-white/10 hover:border-gold/30 hover:bg-gold/5 transition-all group"
-                    data-testid="contact-map"
-                  >
-                    <div className="w-9 h-9 rounded-lg bg-gold/10 flex items-center justify-center">
-                      <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <span className="text-xs text-white/40 font-body block">Directions</span>
-                      <span className="text-sm text-white font-medium font-body group-hover:text-gold transition-colors">View on Google Maps</span>
-                    </div>
-                  </a>
-                )}
               </div>
 
               {/* Verified Status */}

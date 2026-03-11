@@ -102,23 +102,39 @@ export async function PATCH(request: NextRequest) {
     }
   }
 
-  // Handle video_url — stored in metadata JSONB, gated to Premium tier
-  if ('video_url' in updates && typeof updates.video_url === 'string') {
-    // Check if listing is Premium tier (fetch current listing data)
+  // Handle metadata fields — fetch current listing for tier check
+  const needsMetadataUpdate = 'video_url' in updates || 'service_areas' in updates;
+  if (needsMetadataUpdate) {
     const { data: currentListing } = await service
       .from('directory_listings')
       .select('tier, metadata')
       .eq('id', listing_id)
       .single();
 
-    if (currentListing?.tier === 'premium') {
-      const existingMetadata = (currentListing.metadata as Record<string, unknown>) || {};
-      safeUpdates.metadata = {
-        ...existingMetadata,
-        video_url: updates.video_url || null,
-      };
+    const existingMetadata = (currentListing?.metadata as Record<string, unknown>) || {};
+    let metadataChanged = false;
+
+    // Handle service_areas — stored in metadata JSONB, gated to Pro+ tier
+    if ('service_areas' in updates && Array.isArray(updates.service_areas)) {
+      if (currentListing?.tier === 'pro' || currentListing?.tier === 'premium') {
+        existingMetadata.service_areas = updates.service_areas.length > 0 ? updates.service_areas : null;
+        metadataChanged = true;
+      }
+      // Silently skip if not Pro+
     }
-    // Silently skip if not Premium
+
+    // Handle video_url — stored in metadata JSONB, gated to Premium tier
+    if ('video_url' in updates && typeof updates.video_url === 'string') {
+      if (currentListing?.tier === 'premium') {
+        existingMetadata.video_url = updates.video_url || null;
+        metadataChanged = true;
+      }
+      // Silently skip if not Premium
+    }
+
+    if (metadataChanged) {
+      safeUpdates.metadata = existingMetadata;
+    }
   }
 
   safeUpdates.updated_at = new Date().toISOString();

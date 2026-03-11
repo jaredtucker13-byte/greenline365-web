@@ -365,6 +365,7 @@ export default function DirectoryClient() {
           userLocation={userLocation}
           onViewAll={(sub) => { setActiveSubcategory(sub); setShowListings(true); setShowGroupedBrowse(false); }}
           onBack={() => { setShowGroupedBrowse(false); setActiveCategory(''); }}
+          onCategorySwitch={(catId) => { setActiveCategory(catId); setActiveSubcategory('All'); }}
         />
       </div>
     );
@@ -859,10 +860,28 @@ export default function DirectoryClient() {
             <div className="absolute inset-0 bg-gradient-to-b from-[#050505]/60 via-[#050505]/80 to-[#050505]" />
 
             <div className="relative max-w-7xl mx-auto px-6">
-              <button onClick={() => { setShowListings(false); setShowGroupedBrowse(true); setActiveCategory(''); }} className="text-sm text-white/40 hover:text-white mb-6 flex items-center gap-2 transition font-body" data-testid="back-to-explore-btn">
+              <button type="button" onClick={() => { setShowListings(false); setShowGroupedBrowse(true); setActiveCategory(''); }} className="text-sm text-white/40 hover:text-white mb-6 flex items-center gap-2 transition font-body" data-testid="back-to-explore-btn">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                 Back to All Categories
               </button>
+
+              {/* Category Switcher Pills */}
+              <div className="flex flex-wrap gap-2 mb-5" data-testid="listing-category-switcher">
+                {CATEGORIES.map(cat => (
+                  <button
+                    type="button"
+                    key={cat.id}
+                    onClick={() => { setActiveCategory(cat.id); setActiveSubcategory('All'); }}
+                    className={`px-4 py-2 rounded-full text-xs font-medium transition-all duration-300 font-body ${
+                      activeCategory === cat.id
+                        ? 'bg-[rgba(201,168,76,0.15)] text-[#C9A84C] border border-[rgba(201,168,76,0.3)]'
+                        : 'text-white/40 border border-white/10 hover:text-white/70 hover:border-white/20'
+                    }`}
+                  >
+                    {cat.label}
+                  </button>
+                ))}
+              </div>
 
               <h2 className="text-3xl md:text-4xl font-heading font-light text-white mb-2 tracking-tight">
                 {currentCat?.label || 'All Businesses'}
@@ -938,7 +957,7 @@ export default function DirectoryClient() {
               {/* Subcategory Pill Tabs */}
               <div className="flex flex-wrap gap-2" data-testid="subcategory-tabs">
                 {subcategories.map(sub => (
-                  <button key={sub} onClick={() => setActiveSubcategory(sub)}
+                  <button type="button" key={sub} onClick={() => setActiveSubcategory(sub)}
                     className={`px-4 py-2 rounded-full text-xs font-medium transition-all duration-300 font-body ${
                       activeSubcategory === sub
                         ? 'bg-[rgba(201,168,76,0.15)] text-[#C9A84C] border border-[rgba(201,168,76,0.3)]'
@@ -1238,7 +1257,7 @@ function SubcategoryCarouselRow({ label, subtitle, industry, searchTerm, sortBy,
 }
 
 // ─── Grouped Browse View ───────────────────────────────────────────
-function GroupedBrowseView({ activeCategory, sortBy, setSortBy, cityFilter, setCityFilter, availableCities, userLocation, onViewAll, onBack }: {
+function GroupedBrowseView({ activeCategory, sortBy, setSortBy, cityFilter, setCityFilter, availableCities, userLocation, onViewAll, onBack, onCategorySwitch }: {
   activeCategory: string;
   sortBy: string;
   setSortBy: (s: any) => void;
@@ -1248,6 +1267,7 @@ function GroupedBrowseView({ activeCategory, sortBy, setSortBy, cityFilter, setC
   userLocation: { lat: number; lng: number } | null;
   onViewAll: (sub: string) => void;
   onBack: () => void;
+  onCategorySwitch: (catId: string) => void;
 }) {
   const currentCat = CATEGORIES.find(c => c.id === activeCategory);
   const rows = currentCat
@@ -1271,10 +1291,30 @@ function GroupedBrowseView({ activeCategory, sortBy, setSortBy, cityFilter, setC
         )}
         <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0A]/60 to-[#050505]" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
-          <button onClick={onBack} className="text-sm text-white/40 hover:text-white mb-4 flex items-center gap-2 transition font-body" data-testid="back-from-grouped">
+          <button type="button" onClick={onBack} className="text-sm text-white/40 hover:text-white mb-4 flex items-center gap-2 transition font-body" data-testid="back-from-grouped">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
             Back to Directory
           </button>
+
+          {/* Category Switcher Pills */}
+          <div className="flex flex-wrap gap-2 mb-5" data-testid="category-switcher">
+            {CATEGORIES.map(cat => (
+              <button
+                type="button"
+                key={cat.id}
+                onClick={() => onCategorySwitch(cat.id)}
+                className={`px-4 py-2 rounded-full text-xs font-medium transition-all duration-300 font-body ${
+                  activeCategory === cat.id
+                    ? 'bg-[rgba(201,168,76,0.15)] text-[#C9A84C] border border-[rgba(201,168,76,0.3)]'
+                    : 'text-white/40 border border-white/10 hover:text-white/70 hover:border-white/20'
+                }`}
+                data-testid={`cat-pill-${cat.id}`}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
+
           <h2 className="text-3xl md:text-4xl font-heading font-light text-white mb-2 tracking-tight">
             {currentCat ? currentCat.label : 'Browse'} <span className="text-gradient-gold font-semibold">{currentCat ? '' : 'All Businesses'}</span>
           </h2>

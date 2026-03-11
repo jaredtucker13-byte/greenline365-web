@@ -32,6 +32,7 @@ export default function EditListingPage() {
     industry: '',
     subcategories: [] as string[],
     tags: [] as string[],
+    service_areas: [] as string[],
     video_url: '',
   });
   const [saving, setSaving] = useState(false);
@@ -54,6 +55,7 @@ export default function EditListingPage() {
         industry: activeListing.industry || '',
         subcategories: activeListing.subcategories || [],
         tags: activeListing.tags || [],
+        service_areas: (activeListing.metadata?.service_areas as string[]) || [],
         video_url: (activeListing.metadata?.video_url as string) || '',
       });
     }
@@ -360,6 +362,38 @@ export default function EditListingPage() {
             </div>
             <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-os-dark-900/60">
               <UpgradeCTA feature="Category & Tags" variant="inline" />
+            </div>
+          </div>
+        )}
+
+        {/* Pro-only: Service Areas */}
+        {descriptionGate.isAvailable ? (
+          <div>
+            <label className="block text-sm font-medium text-white/70">Service Areas</label>
+            <p className="mt-0.5 text-xs text-white/40">
+              List the cities and areas your business serves, separated by commas.
+            </p>
+            <input
+              type="text"
+              value={(form.service_areas || []).join(', ')}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  service_areas: e.target.value.split(',').map((t) => t.trim()).filter(Boolean),
+                })
+              }
+              placeholder="Tampa, St. Petersburg, Clearwater..."
+              className="mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:border-gold-500 focus:outline-none focus:ring-1 focus:ring-gold-500"
+            />
+          </div>
+        ) : (
+          <div className="relative rounded-xl border border-white/10 bg-white/5 p-4 opacity-60">
+            <div>
+              <label className="block text-sm font-medium text-white/40">Service Areas</label>
+              <div className="mt-1 h-10 rounded-lg bg-white/5" />
+            </div>
+            <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-os-dark-900/60">
+              <UpgradeCTA feature="Service Areas" variant="inline" />
             </div>
           </div>
         )}
