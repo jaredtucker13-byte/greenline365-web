@@ -6,7 +6,7 @@
  * Shows property history, health score, timeline, warranty vault, and assets.
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { Suspense, useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -91,6 +91,18 @@ const stagger = { animate: { transition: { staggerChildren: 0.05 } } };
 const fadeUp = { initial: { opacity: 0, y: 16 }, animate: { opacity: 1, y: 0, transition: { duration: 0.35 } } };
 
 export default function PropertyPassportPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+      </div>
+    }>
+      <PropertyPassportContent />
+    </Suspense>
+  );
+}
+
+function PropertyPassportContent() {
   const { activeBusiness } = useBusiness();
   const searchParams = useSearchParams();
   const selectedPropertyId = searchParams.get('id');
