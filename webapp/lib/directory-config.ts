@@ -137,7 +137,7 @@ export const SUBCATEGORY_KEYWORDS: Record<string, string[]> = {
   'Marinas':            ['marina'],
   // ─── DINING ───
   'Fine Dining':        ['fine din', 'michelin', 'upscale', 'omakase'],
-  'Casual':             ['casual', 'american restaurant', 'modern american', 'contemporary'],
+  'Casual':             ['casual', 'american restaurant', 'modern american', 'contemporary', 'gastropub', 'steakhouse', 'grill', 'bistro', 'tavern', 'pub', 'brewery', 'taproom', 'bar and', 'mediterranean', 'cuban', 'spanish'],
   'Cafes & Bakeries':   ['cafe', 'bakery', 'coffee', 'pastry', 'pastries', 'bread'],
   'Food Trucks':        ['food truck'],
   'Seafood':            ['seafood', 'oyster', 'fish', 'crab', 'lobster', 'shrimp'],
@@ -165,7 +165,7 @@ export const SUBCATEGORY_KEYWORDS: Record<string, string[]> = {
   'Salons':             ['salon', 'hair'],
   'Nail Salons':        ['nail'],
   'Spas':               ['spa', 'massage', 'facial'],
-  'Boutiques':          ['boutique', 'fashion', 'cloth'],
+  'Boutiques':          ['boutique', 'fashion', 'cloth', 'gift shop', 'gift store', 'home decor', 'souvenir', 'bookstore', 'apparel', 'shopping'],
   'Jewelry':            ['jewel'],
   'Tattoo & Piercing':  ['tattoo', 'pierc'],
   'Dry Cleaning & Laundry': ['dry clean', 'laundry'],
