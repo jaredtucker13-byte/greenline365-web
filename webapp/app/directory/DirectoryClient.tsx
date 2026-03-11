@@ -14,7 +14,7 @@ import Image from 'next/image';
 import BoostedShowcase from '@/components/BoostedShowcase';
 import CommunityPolls from '@/components/CommunityPolls';
 import FeaturedShowcase from '@/components/FeaturedShowcase';
-import { getPlaceholderImage, getCategoryFallback, getFallbackDescription } from '@/lib/directory-config';
+import { getPlaceholderImage, getCategoryFallback, getFallbackDescription, matchesSubcategory } from '@/lib/directory-config';
 
 interface Listing {
   id: string;
@@ -303,7 +303,7 @@ export default function DirectoryClient() {
   const subcategories = currentCat?.subcategories || ['All'];
   const filteredListings = allListings.filter(l => {
     if (activeCategory && l.industry !== activeCategory) return false;
-    if (activeSubcategory !== 'All' && !l.subcategories?.includes(activeSubcategory)) return false;
+    if (activeSubcategory !== 'All' && !matchesSubcategory(activeSubcategory, l.subcategories, l.business_name, l.description)) return false;
     if (search && !l.business_name.toLowerCase().includes(search.toLowerCase()) && !l.description?.toLowerCase().includes(search.toLowerCase())) return false;
     if (cityFilter && l.city !== cityFilter) return false;
     if (maxDistance > 0 && l.distance != null && l.distance > maxDistance) return false;

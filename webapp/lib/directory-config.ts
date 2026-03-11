@@ -74,6 +74,165 @@ export function getFallbackDescription(businessName: string, industry: string, c
 }
 
 /**
+ * Subcategory keyword map — maps UI pill names to search keywords for matching
+ * against granular DB subcategories, business names, and descriptions.
+ * The UI is the master source; this map bridges UI labels → organic DB data.
+ */
+export const SUBCATEGORY_KEYWORDS: Record<string, string[]> = {
+  // ─── HOME SERVICES ───
+  'HVAC':               ['hvac', 'ac repair', 'ac install', 'air condition', 'heating', 'cooling', 'furnace', 'heat pump', 'ductless', 'duct clean'],
+  'Plumbing':           ['plumb', 'drain', 'pipe', 'water heater', 'sewer', 'rooter', 'hydro jet', 'fixture', 'tankless', 'leak detect', 're-pip', 'repip', 'clog', 'faucet'],
+  'Electrical':         ['electri', 'wiring', 'rewir', 'panel upgrade', 'breaker', 'outlet', 'circuit', 'surge protect', 'generator', 'ev charger', 'ceiling fan', 'recessed light', 'lighting install'],
+  'Roofing':            ['roof', 'shingle', 'metal roof', 'tile roof', 'storm restor'],
+  'Pest Control':       ['pest', 'termite', 'exterminator', 'rodent', 'mosquit', 'bug spray'],
+  'House Cleaning':     ['house clean', 'maid', 'home clean', 'cleaning service', 'deep clean'],
+  'Carpet Cleaning':    ['carpet clean'],
+  'Pressure Washing':   ['pressure wash', 'power wash'],
+  'Window Cleaning':    ['window clean'],
+  'Junk Removal':       ['junk', 'debris', 'haul', 'removal'],
+  'Lawn Care':          ['lawn', 'mow', 'edging', 'fertiliz', 'turf', 'grass'],
+  'Landscaping':        ['landscap', 'hardscap', 'garden', 'water feature'],
+  'Tree Service':       ['tree service', 'tree trim', 'tree remov', 'arborist', 'stump'],
+  'Pool & Spa':         ['pool', 'spa', 'hot tub'],
+  'Fencing':            ['fenc'],
+  'Irrigation':         ['irrigat', 'sprinkler'],
+  'Painting':           ['paint'],
+  'Flooring':           ['floor'],
+  'Handyman':           ['handyman', 'odd job', 'general repair'],
+  'Kitchen & Bath':     ['kitchen', 'bath remodel', 'cabinet', 'bathroom remodel'],
+  'Windows & Doors':    ['window install', 'window replac', 'door install', 'door replac', 'windows & doors'],
+  'Garage Doors':       ['garage door'],
+  'Gutters':            ['gutter'],
+  'Smart Home':         ['smart home', 'home automat'],
+  'Security Systems':   ['security system', 'alarm', 'access control', 'surveillance', 'camera', 'security light'],
+  'Home Theater':       ['home theater', 'audio', 'media room'],
+  'Foundations':        ['foundation', 'structural'],
+  'Masonry':            ['mason', 'brick', 'stone', 'concrete'],
+  'Insulation':         ['insulat', 'spray foam'],
+  'Mold Remediation':   ['mold', 'remediat'],
+  'Water Damage':       ['water damage', 'flood restor'],
+  'General Contractors': ['general contract', 'construction', 'build-out', 'tenant improv'],
+  'Locksmith':          ['locksmith', 'lock', 'key duplic', 'lockout'],
+  'Appliance Repair':   ['appliance'],
+  'Septic & Sewer':     ['septic', 'sewer'],
+  // ─── AUTOMOTIVE ───
+  'Auto Repair':        ['auto repair', 'mechanic', 'automotive repair', 'car repair', 'car & truck'],
+  'Oil Change':         ['oil change'],
+  'Tire Shops':         ['tire'],
+  'Body Shops':         ['body shop', 'collision'],
+  'Car Dealers':        ['car dealer', 'dealership'],
+  'Auto Parts':         ['auto part'],
+  'Towing':             ['towing', 'tow service'],
+  'Car Wash':           ['car wash'],
+  'Auto Detailing':     ['detail'],
+  'EV Charging':        ['ev charg'],
+  // ─── MARINE & OUTDOOR ───
+  'Boat Repair':        ['boat repair'],
+  'Marine Mechanics':   ['marine mechanic'],
+  'Dock & Lift':        ['dock', 'lift'],
+  'Boat Cleaning':      ['boat clean', 'boat detail'],
+  'Fishing Charters':   ['fish', 'charter'],
+  'Kayak & Paddleboard': ['kayak', 'paddle'],
+  'Dive Shops':         ['dive', 'scuba'],
+  'Marinas':            ['marina'],
+  // ─── DINING ───
+  'Fine Dining':        ['fine din', 'michelin', 'upscale', 'omakase'],
+  'Casual':             ['casual', 'american restaurant', 'modern american', 'contemporary'],
+  'Cafes & Bakeries':   ['cafe', 'bakery', 'coffee', 'pastry', 'pastries', 'bread'],
+  'Food Trucks':        ['food truck'],
+  'Seafood':            ['seafood', 'oyster', 'fish', 'crab', 'lobster', 'shrimp'],
+  'BBQ':                ['bbq', 'barbecue', 'smok'],
+  'Pizza':              ['pizza'],
+  'Mexican':            ['mexican', 'taco', 'burrito', 'tex-mex'],
+  'Asian':              ['asian', 'chinese', 'japanese', 'thai', 'vietnamese', 'korean', 'sushi'],
+  'Italian':            ['italian'],
+  'Breakfast & Brunch': ['breakfast', 'brunch'],
+  'Vegan & Vegetarian': ['vegan', 'vegetarian', 'plant-based'],
+  // ─── HEALTH & WELLNESS ───
+  'Dental Offices':     ['dent'],
+  'Physical Therapy':   ['physical therap', 'physio', 'pt clinic'],
+  'Medical Clinics':    ['medical', 'clinic', 'doctor', 'physician'],
+  'Mental Health':      ['mental', 'psych', 'counsel', 'therapist'],
+  'Fitness':            ['fitness', 'gym', 'workout', 'yoga', 'pilates', 'crossfit'],
+  'Chiropractors':      ['chiro'],
+  'Optometrists':       ['optom', 'eye care', 'vision'],
+  'Urgent Care':        ['urgent care'],
+  'Pharmacies':         ['pharmac'],
+  'Dermatology':        ['dermat', 'skin care'],
+  'Orthopedics':        ['orthoped', 'ortho'],
+  // ─── STYLE & SHOPPING ───
+  'Barbershops':        ['barber'],
+  'Salons':             ['salon', 'hair'],
+  'Nail Salons':        ['nail'],
+  'Spas':               ['spa', 'massage', 'facial'],
+  'Boutiques':          ['boutique', 'fashion', 'cloth'],
+  'Jewelry':            ['jewel'],
+  'Tattoo & Piercing':  ['tattoo', 'pierc'],
+  'Dry Cleaning & Laundry': ['dry clean', 'laundry'],
+  // ─── PROFESSIONAL SERVICES ───
+  'Attorneys':          ['attorney', 'lawyer', 'law firm', 'legal'],
+  'Accountants':        ['account', 'cpa', 'bookkeep'],
+  'Insurance':          ['insurance'],
+  'Real Estate':        ['real estate', 'realtor'],
+  'Financial Advisors': ['financial', 'wealth', 'invest'],
+  'IT Services':        ['it service', 'tech support', 'computer'],
+  'Marketing Agencies': ['marketing', 'advertis', 'seo', 'digital agency'],
+  'Notary':             ['notary'],
+  // ─── EDUCATION & CHILDCARE ───
+  'Preschools':         ['preschool', 'pre-k'],
+  'Daycare':            ['daycare', 'day care', 'childcare'],
+  'Tutoring':           ['tutor'],
+  'Driving Schools':    ['driving school'],
+  'Music Lessons':      ['music lesson', 'music school'],
+  'Dance Studios':      ['dance'],
+  'Martial Arts':       ['martial', 'karate', 'taekwondo', 'jiu-jitsu'],
+  'Language Schools':   ['language school'],
+  // ─── PETS ───
+  'Veterinarians':      ['vet', 'animal hospital'],
+  'Pet Grooming':       ['groom'],
+  'Pet Boarding':       ['board', 'kennel'],
+  'Pet Stores':         ['pet store', 'pet supply'],
+  'Dog Training':       ['dog train', 'obedience'],
+  'Pet Sitting':        ['pet sit', 'dog walk'],
+  'Aquarium & Fish':    ['aquarium', 'reptile'],
+};
+
+/**
+ * Check if a listing matches a UI subcategory pill based on keyword matching.
+ * Searches subcategories array, business name, and description.
+ */
+export function matchesSubcategory(
+  subcategoryName: string,
+  listingSubcategories: string[] | undefined,
+  businessName: string,
+  description?: string | null,
+): boolean {
+  // Exact match first (case-insensitive)
+  if (listingSubcategories?.some(s => s.toLowerCase() === subcategoryName.toLowerCase())) {
+    return true;
+  }
+
+  const keywords = SUBCATEGORY_KEYWORDS[subcategoryName];
+  if (!keywords) {
+    // Fallback: simple case-insensitive substring match
+    const sub = subcategoryName.toLowerCase();
+    return (
+      listingSubcategories?.some(s => s.toLowerCase().includes(sub)) ||
+      businessName.toLowerCase().includes(sub) ||
+      (description || '').toLowerCase().includes(sub)
+    ) ?? false;
+  }
+
+  const haystack = [
+    ...(listingSubcategories || []).map(s => s.toLowerCase()),
+    businessName.toLowerCase(),
+    (description || '').toLowerCase(),
+  ].join(' ||| ');
+
+  return keywords.some(kw => haystack.includes(kw));
+}
+
+/**
  * Non-claimable business types — chain stores, convenience stores, emergency services, etc.
  * These exist for directory completeness but aren't outreach targets.
  */
