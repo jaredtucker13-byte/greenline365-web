@@ -436,7 +436,7 @@ export default function DirectoryClient() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.5 }}
-                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-heading font-light tracking-tight leading-[1.1] mb-6"
+                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-heading font-medium tracking-[0.05rem] leading-[1.15] mb-6"
                 style={{
                   background: 'linear-gradient(135deg, #C9A84C 0%, #E8C97A 40%, #F0DFA0 60%, #C9A84C 100%)',
                   WebkitBackgroundClip: 'text',
@@ -444,24 +444,16 @@ export default function DirectoryClient() {
                   backgroundClip: 'text',
                 }}
               >
-                YOUR COMMUNITY&apos;S MOST<br />TRUSTED DIRECTORY.
+                Your Neighbor&apos;s Favorite Pros,<br />Places, &amp; Resources&mdash;All on GL365
               </motion.h1>
 
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.8 }}
-                className="text-lg sm:text-xl font-body text-white/70 tracking-wide mb-2"
+                className="text-lg sm:text-xl font-body font-medium text-white/70 tracking-[0.05rem] mb-12"
               >
-                Curated. Verified. Your Home&apos;s Legacy.
-              </motion.p>
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 1 }}
-                className="text-sm sm:text-base font-body text-white/45 tracking-wider uppercase mb-12"
-              >
-                Your neighbors&apos; most trusted pros — one click away.
+                The local guide to everything you need, verified by the people you trust.
               </motion.p>
 
               {/* Search Pill */}
