@@ -288,3 +288,122 @@ export function isClaimable(businessName: string, industry?: string): boolean {
   const lower = businessName.toLowerCase();
   return !NON_CLAIMABLE_KEYWORDS.some(kw => lower.includes(kw));
 }
+
+// ═══════════════════════════════════════════════════════════════════
+// DIRECTORY LANDING PAGE DATA — Categories & Cities
+// Used by /directory/[category] and /directory/[category]/[city]
+// ═══════════════════════════════════════════════════════════════════
+
+export interface CategoryMeta {
+  id: string;
+  label: string;
+  tagline: string;
+  description: string;
+  subcategories: string[];
+}
+
+export const DIRECTORY_CATEGORIES: CategoryMeta[] = [
+  {
+    id: 'services', label: 'Home Services',
+    tagline: 'HVAC, Plumbing, Electrical & Every Trade',
+    description: 'Find trusted home service professionals — from emergency HVAC repair and licensed plumbers to electricians, roofers, landscapers, and every trade in between. Every listing is vetted through our GreenLine365 trust system.',
+    subcategories: ['HVAC', 'Plumbing', 'Electrical', 'Roofing', 'Pest Control', 'House Cleaning', 'Carpet Cleaning', 'Pressure Washing', 'Window Cleaning', 'Junk Removal', 'Lawn Care', 'Landscaping', 'Tree Service', 'Pool & Spa', 'Fencing', 'Irrigation', 'Painting', 'Flooring', 'Handyman', 'Kitchen & Bath', 'Windows & Doors', 'Garage Doors', 'Gutters', 'Smart Home', 'Security Systems', 'Home Theater', 'Foundations', 'Masonry', 'Insulation', 'Mold Remediation', 'Water Damage', 'General Contractors', 'Locksmith', 'Appliance Repair', 'Septic & Sewer'],
+  },
+  {
+    id: 'automotive', label: 'Automotive',
+    tagline: 'Repairs, Dealers & Body Shops',
+    description: 'Reliable auto repair shops, tire centers, body shops, and car dealers across Florida. Compare ratings, see real customer photos, and connect with businesses you can trust.',
+    subcategories: ['Auto Repair', 'Oil Change', 'Tire Shops', 'Body Shops', 'Car Dealers', 'Auto Parts', 'Towing', 'Car Wash', 'Auto Detailing', 'EV Charging'],
+  },
+  {
+    id: 'marine-outdoor', label: 'Marine & Outdoor',
+    tagline: 'Boats, Docks & Outdoor Adventure',
+    description: 'Florida\'s best marine mechanics, fishing charters, boat repair services, marinas, and outdoor adventure outfitters. Built for the coast.',
+    subcategories: ['Boat Repair', 'Marine Mechanics', 'Dock & Lift', 'Boat Cleaning', 'Fishing Charters', 'Kayak & Paddleboard', 'Dive Shops', 'Marinas'],
+  },
+  {
+    id: 'dining', label: 'Dining',
+    tagline: 'Cafes, Casual & Fine Dining',
+    description: 'Discover the best restaurants, cafes, and eateries in your area. From waterfront fine dining to local food trucks, every palate is covered.',
+    subcategories: ['Fine Dining', 'Casual', 'Cafes & Bakeries', 'Food Trucks', 'Seafood', 'BBQ', 'Pizza', 'Mexican', 'Asian', 'Italian', 'Breakfast & Brunch', 'Vegan & Vegetarian'],
+  },
+  {
+    id: 'health-wellness', label: 'Health & Wellness',
+    tagline: 'Doctors, Dentists, Fitness & More',
+    description: 'Top-rated healthcare providers, dental offices, physical therapists, gyms, and wellness centers. Your health, supported by trusted local professionals.',
+    subcategories: ['Dental Offices', 'Physical Therapy', 'Medical Clinics', 'Mental Health', 'Fitness', 'Chiropractors', 'Optometrists', 'Urgent Care', 'Pharmacies', 'Dermatology', 'Orthopedics'],
+  },
+  {
+    id: 'style-shopping', label: 'Style & Shopping',
+    tagline: 'Fashion, Grooming & Retail',
+    description: 'Barbershops, salons, spas, boutiques, and specialty retail. Look your best and shop local with verified businesses.',
+    subcategories: ['Barbershops', 'Salons', 'Nail Salons', 'Spas', 'Boutiques', 'Jewelry', 'Tattoo & Piercing', 'Dry Cleaning & Laundry'],
+  },
+  {
+    id: 'professional-services', label: 'Professional Services',
+    tagline: 'Legal, Finance & Consulting',
+    description: 'Attorneys, accountants, insurance agents, real estate professionals, and IT consultants. Find the expertise you need from trusted local firms.',
+    subcategories: ['Attorneys', 'Accountants', 'Insurance', 'Real Estate', 'Financial Advisors', 'IT Services', 'Marketing Agencies', 'Notary'],
+  },
+  {
+    id: 'education', label: 'Education & Childcare',
+    tagline: 'Schools, Tutoring & Daycare',
+    description: 'Preschools, tutoring centers, driving schools, music lessons, and childcare providers. Invest in education with confidence.',
+    subcategories: ['Preschools', 'Daycare', 'Tutoring', 'Driving Schools', 'Music Lessons', 'Dance Studios', 'Martial Arts', 'Language Schools'],
+  },
+  {
+    id: 'pets', label: 'Pets',
+    tagline: 'Vets, Grooming & Boarding',
+    description: 'Veterinarians, pet groomers, boarding facilities, and pet supply stores. Everything your furry family members need.',
+    subcategories: ['Veterinarians', 'Pet Grooming', 'Pet Boarding', 'Pet Stores', 'Dog Training', 'Pet Sitting', 'Aquarium & Fish'],
+  },
+  {
+    id: 'nightlife', label: 'Nightlife',
+    tagline: 'Bars, Clubs & Live Music',
+    description: 'The best bars, nightclubs, and live music venues for an unforgettable night out. Discover local nightlife hotspots.',
+    subcategories: ['Bars', 'Clubs', 'Live Music Venues'],
+  },
+  {
+    id: 'family-entertainment', label: 'Family Entertainment',
+    tagline: 'Fun for the Whole Family',
+    description: 'Amusement parks, arcades, movie theaters, and family-friendly attractions. Create lasting memories with activities for all ages.',
+    subcategories: ['Amusement Parks', 'Arcades', 'Movie Theaters'],
+  },
+  {
+    id: 'hotels-lodging', label: 'Hotels & Lodging',
+    tagline: 'Hotels, Resorts & Vacation Rentals',
+    description: 'Hotels, resorts, vacation rentals, and boutique lodging options. Find the perfect place to stay during your Florida visit.',
+    subcategories: ['Hotels', 'Resorts', 'Vacation Rentals'],
+  },
+  {
+    id: 'mobile-services', label: 'Mobile Services',
+    tagline: 'DJs, Trainers, Notaries & On-the-Go Pros',
+    description: 'Mobile professionals who come to you — DJs, personal trainers, notaries, photographers, pet groomers, and more.',
+    subcategories: ['Mobile DJs', 'Personal Trainers', 'Mobile Notary', 'Mobile Pet Grooming', 'Mobile Auto Detailing', 'Mobile Car Wash', 'Event Photographers', 'Private Chefs', 'Mobile Barbers'],
+  },
+];
+
+export interface CityMeta {
+  slug: string;
+  label: string;
+  description: string;
+}
+
+export const DIRECTORY_CITIES: CityMeta[] = [
+  { slug: 'st-pete-beach', label: 'St. Pete Beach', description: 'Award-winning beaches, waterfront dining, and Gulf Coast relaxation.' },
+  { slug: 'key-west', label: 'Key West', description: 'Island paradise with ocean adventures, sunset celebrations, and tropical vibes.' },
+  { slug: 'sarasota', label: 'Sarasota', description: 'Arts, culture, pristine Gulf shores, and world-class dining.' },
+  { slug: 'daytona', label: 'Daytona Beach', description: 'Atlantic coast fun, racing heritage, and family entertainment.' },
+  { slug: 'ybor-city', label: 'Ybor City', description: 'Historic district with vibrant nightlife, Cuban heritage, and eclectic dining.' },
+  { slug: 'orlando', label: 'Orlando', description: 'Theme parks, world-class entertainment, and diverse dining scene.' },
+  { slug: 'miami', label: 'Miami', description: 'Art deco architecture, diverse cuisine, beach culture, and nightlife.' },
+  { slug: 'jacksonville', label: 'Jacksonville', description: 'River city with beaches, Southern charm, and a growing food scene.' },
+];
+
+export function getCategoryById(id: string): CategoryMeta | undefined {
+  return DIRECTORY_CATEGORIES.find(c => c.id === id);
+}
+
+export function getCityBySlug(slug: string): CityMeta | undefined {
+  return DIRECTORY_CITIES.find(c => c.slug === slug);
+}
