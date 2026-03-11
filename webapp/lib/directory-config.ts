@@ -14,9 +14,10 @@ export const PLACEHOLDER_IMAGES: Record<string, string> = {
   'hotels-lodging': 'https://static.prod-images.emergentagent.com/jobs/b5fc704f-5976-4877-a35c-beeb0ec1a989/images/56db76a66af0d978931f7baca924f64a23006e9883e7b45fb677b52c5f62be79.png',
   'professional-services': 'https://static.prod-images.emergentagent.com/jobs/b5fc704f-5976-4877-a35c-beeb0ec1a989/images/3b64d4ebcbbef46cdb773ebe76236d63854da48d419c53bd9a49daa1cfc42ef5.png',
   'automotive': 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800&h=600&fit=crop',
-  'marine-outdoor': 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&h=600&fit=crop',
+  'marine-outdoor': 'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=800&h=600&fit=crop',
   'education': 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&h=600&fit=crop',
   'pets': 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800&h=600&fit=crop',
+  'mobile-services': 'https://images.unsplash.com/photo-1556740758-90de374c12ad?w=800&h=600&fit=crop',
 };
 
 /** Category-specific icon + gradient for CSS-only fallback when images fail to load */
@@ -30,6 +31,7 @@ export const CATEGORY_FALLBACK_STYLES: Record<string, { icon: string; gradient: 
   'professional-services': { icon: '💼', gradient: 'linear-gradient(135deg, #1a1a20 0%, #12121a 100%)' },
   'education':             { icon: '📚', gradient: 'linear-gradient(135deg, #1a201a 0%, #121a12 100%)' },
   'pets':                  { icon: '🐾', gradient: 'linear-gradient(135deg, #201a1a 0%, #1a1212 100%)' },
+  'mobile-services':       { icon: '🚐', gradient: 'linear-gradient(135deg, #1a201a 0%, #0d1a12 100%)' },
   'nightlife':             { icon: '🌙', gradient: 'linear-gradient(135deg, #1a0d2a 0%, #120a1f 100%)' },
   'family-entertainment':  { icon: '🎪', gradient: 'linear-gradient(135deg, #2a201a 0%, #1f1a0d 100%)' },
   'destinations':          { icon: '📍', gradient: 'linear-gradient(135deg, #0d1a2a 0%, #0a1520 100%)' },
@@ -55,6 +57,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   'professional-services': 'professional services',
   'education': 'education & childcare',
   'pets': 'pet care',
+  'mobile-services': 'mobile services',
   'nightlife': 'nightlife & entertainment',
   'family-entertainment': 'family entertainment',
   'destinations': 'local attractions',
@@ -195,6 +198,16 @@ export const SUBCATEGORY_KEYWORDS: Record<string, string[]> = {
   'Dog Training':       ['dog train', 'obedience'],
   'Pet Sitting':        ['pet sit', 'dog walk'],
   'Aquarium & Fish':    ['aquarium', 'reptile'],
+  // ─── MOBILE SERVICES ───
+  'Mobile DJs':         ['mobile dj', 'dj service', 'disc jockey'],
+  'Personal Trainers':  ['personal train', 'fitness train', 'outdoor train'],
+  'Mobile Notary':      ['mobile notary', 'traveling notary'],
+  'Mobile Pet Grooming': ['mobile groom', 'mobile pet'],
+  'Mobile Auto Detailing': ['mobile detail', 'mobile auto detail'],
+  'Mobile Car Wash':    ['mobile car wash', 'mobile wash'],
+  'Event Photographers': ['event photo', 'wedding photo', 'photographer'],
+  'Private Chefs':      ['private chef', 'personal chef'],
+  'Mobile Barbers':     ['mobile barber'],
 };
 
 /**

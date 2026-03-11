@@ -73,7 +73,7 @@ const CATEGORIES = [
     subcategories: ['All', 'Auto Repair', 'Oil Change', 'Tire Shops', 'Body Shops', 'Car Dealers', 'Auto Parts', 'Towing', 'Car Wash', 'Auto Detailing', 'EV Charging'] },
 
   // === MARINE & OUTDOOR (Key West / Coastal Florida) ===
-  { id: 'marine-outdoor', label: 'Marine & Outdoor', sub: 'Boats, docks & outdoor adventure', img: '/images/categories/destinations.png',
+  { id: 'marine-outdoor', label: 'Marine & Outdoor', sub: 'Boats, docks & outdoor adventure', img: 'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=800&h=600&fit=crop',
     subcategories: ['All', 'Boat Repair', 'Marine Mechanics', 'Dock & Lift', 'Boat Cleaning', 'Fishing Charters', 'Kayak & Paddleboard', 'Dive Shops', 'Marinas'] },
 
   // === DINING ===
@@ -99,6 +99,10 @@ const CATEGORIES = [
   // === PETS ===
   { id: 'pets', label: 'Pets', sub: 'Vets, grooming & boarding', img: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800&h=600&fit=crop',
     subcategories: ['All', 'Veterinarians', 'Pet Grooming', 'Pet Boarding', 'Pet Stores', 'Dog Training', 'Pet Sitting', 'Aquarium & Fish'] },
+
+  // === MOBILE SERVICES ===
+  { id: 'mobile-services', label: 'Mobile Services', sub: 'DJs, trainers, notaries & on-the-go pros', img: 'https://images.unsplash.com/photo-1556740758-90de374c12ad?w=800&h=600&fit=crop',
+    subcategories: ['All', 'Mobile DJs', 'Personal Trainers', 'Mobile Notary', 'Mobile Pet Grooming', 'Mobile Auto Detailing', 'Mobile Car Wash', 'Event Photographers', 'Private Chefs', 'Mobile Barbers'] },
 ];
 
 function Stars({ rating, size = 14 }: { rating: number; size?: number }) {
