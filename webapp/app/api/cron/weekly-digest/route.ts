@@ -163,7 +163,7 @@ async function sendDigestEmail(html: string, digest: Awaited<ReturnType<typeof c
       body: JSON.stringify({
         personalizations: [{ to: [{ email: adminEmail }] }],
         from: {
-          email: process.env.SENDGRID_FROM_EMAIL || 'hello@greenline365.com',
+          email: process.env.SENDGRID_FROM_EMAIL || 'greenline365help@gmail.com',
           name: 'GreenLine 365 Digest',
         },
         subject: `Weekly Trend Digest — ${digest.total_trends} trends (${new Date(digest.period_start).toLocaleDateString()} - ${new Date(digest.period_end).toLocaleDateString()})`,

@@ -53,7 +53,7 @@ const faqs: FaqItem[] = [
   {
     question: 'How do I contact GreenLine365?',
     answer:
-      'You can reach us through our Contact page, email us at hello@greenline365.com, or use the chat widget on our site. We typically respond within 24 hours. For urgent business listing issues, our support team is available during business hours.',
+      'You can reach us through our Contact page, email us at greenline365help@gmail.com, or use the chat widget on our site. We typically respond within 24 hours. For urgent business listing issues, our support team is available during business hours.',
   },
 ];
 
