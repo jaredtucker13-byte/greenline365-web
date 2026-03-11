@@ -7,7 +7,7 @@
  * This is separate from layout.tsx to keep the layout as a Server Component.
  */
 
-import { ReactNode } from 'react';
+import { ReactNode, Suspense } from 'react';
 import { PageTransition } from './components/PageTransition';
 import { NavigationProgress } from './components/NavigationProgress';
 
@@ -18,7 +18,9 @@ interface PageTransitionWrapperProps {
 export default function PageTransitionWrapper({ children }: PageTransitionWrapperProps) {
   return (
     <>
-      <NavigationProgress />
+      <Suspense fallback={null}>
+        <NavigationProgress />
+      </Suspense>
       <PageTransition>{children}</PageTransition>
     </>
   );

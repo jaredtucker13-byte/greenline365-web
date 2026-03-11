@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
@@ -59,6 +59,18 @@ const demoProfiles: Record<string, {
 };
 
 export default function DemoSessionPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+      </div>
+    }>
+      <DemoSessionContent />
+    </Suspense>
+  );
+}
+
+function DemoSessionContent() {
   const params = useParams();
   const searchParams = useSearchParams();
   const sessionId = params.sessionId as string;
