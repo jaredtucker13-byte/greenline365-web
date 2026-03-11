@@ -101,7 +101,7 @@ const CATEGORIES = [
     subcategories: ['All', 'Veterinarians', 'Pet Grooming', 'Pet Boarding', 'Pet Stores', 'Dog Training', 'Pet Sitting', 'Aquarium & Fish'] },
 
   // === MOBILE SERVICES ===
-  { id: 'mobile-services', label: 'Mobile Services', sub: 'DJs, trainers, notaries & on-the-go pros', img: 'https://images.unsplash.com/photo-1556740758-90de374c12ad?w=800&h=600&fit=crop',
+  { id: 'mobile-services', label: 'Mobile Services', sub: 'DJs, trainers, notaries & on-the-go pros', img: 'https://images.unsplash.com/photo-1601362840469-51e4d8d58785?w=800&h=600&fit=crop',
     subcategories: ['All', 'Mobile DJs', 'Personal Trainers', 'Mobile Notary', 'Mobile Pet Grooming', 'Mobile Auto Detailing', 'Mobile Car Wash', 'Event Photographers', 'Private Chefs', 'Mobile Barbers'] },
 ];
 
