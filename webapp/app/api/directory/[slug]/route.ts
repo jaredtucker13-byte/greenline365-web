@@ -76,6 +76,11 @@ export async function GET(
     related = [...related, ...(byIndustry || [])];
   }
 
+  // Filter out near-duplicate names (e.g. "Foo Inc." vs "Foo")
+  const normalizeName = (name: string) => name.toLowerCase().replace(/\b(inc|llc|llp|corp|co|ltd|company|incorporated|limited|group|services|enterprises)\b\.?/g, '').replace(/[^a-z0-9]/g, '').trim();
+  const selfNorm = normalizeName(listing.business_name || '');
+  related = related.filter((r: any) => normalizeName(r.business_name || '') !== selfNorm);
+
   // Fetch menu data if available (Pro/Premium only)
   let menuData = null;
   if (tier !== 'free' && isClaimed) {

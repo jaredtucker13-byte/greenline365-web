@@ -616,7 +616,7 @@ export default function ListingDetailPage() {
                 <SectionDivider title={`Photos (${allPhotos.length})`} />
                 <div className="mt-4 rounded-2xl border border-white/10 overflow-hidden" style={{ background: 'rgba(255,255,255,0.03)' }} data-testid="photo-gallery">
                   <div className="relative aspect-video">
-                    <img src={allPhotos[activePhoto]} alt={`${listing.business_name} photo ${activePhoto + 1}`} className="w-full h-full object-cover" />
+                    <ImageOrPlaceholder src={allPhotos[activePhoto]} alt={`${listing.business_name} photo ${activePhoto + 1}`} className="w-full h-full object-cover" />
                     {allPhotos.length > 1 && (
                       <>
                         <button onClick={() => setActivePhoto(p => p > 0 ? p - 1 : allPhotos.length - 1)} className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center text-white/70 hover:text-white border border-white/20 hover:border-white/40 transition-all" style={{ background: 'rgba(10,10,10,0.7)' }}>
@@ -635,7 +635,7 @@ export default function ListingDetailPage() {
                     <div className="flex gap-2 p-3 overflow-x-auto">
                       {allPhotos.map((photo, i) => (
                         <button key={i} onClick={() => setActivePhoto(i)} className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${i === activePhoto ? 'border-gold' : 'border-transparent opacity-60 hover:opacity-100'}`}>
-                          <img src={photo} alt={`${listing.business_name} photo ${i + 1}`} className="w-full h-full object-cover" />
+                          <ImageOrPlaceholder src={photo} alt={`${listing.business_name} photo ${i + 1}`} className="w-full h-full object-cover" />
                         </button>
                       ))}
                     </div>
@@ -1057,7 +1057,7 @@ export default function ListingDetailPage() {
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
             </button>
             <div className="flex-1 max-w-4xl max-h-[75vh] relative">
-              <img src={allPhotos[activePhoto]} alt={`${listing.business_name} photo ${activePhoto + 1}`} className="w-full h-full object-contain rounded-lg" />
+              <ImageOrPlaceholder src={allPhotos[activePhoto]} alt={`${listing.business_name} photo ${activePhoto + 1}`} className="w-full h-full object-contain rounded-lg" />
             </div>
             <button onClick={() => setActivePhoto(p => p < allPhotos.length - 1 ? p + 1 : 0)} className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-all ml-4">
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
@@ -1066,7 +1066,7 @@ export default function ListingDetailPage() {
           <div className="flex gap-2 p-4 overflow-x-auto justify-center border-t border-white/10">
             {allPhotos.map((photo, i) => (
               <button key={i} onClick={(e) => { e.stopPropagation(); setActivePhoto(i); }} className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${i === activePhoto ? 'border-gold' : 'border-transparent opacity-50 hover:opacity-80'}`}>
-                <img src={photo} alt={`thumb ${i + 1}`} className="w-full h-full object-cover" />
+                <ImageOrPlaceholder src={photo} alt={`thumb ${i + 1}`} className="w-full h-full object-cover" />
               </button>
             ))}
           </div>
