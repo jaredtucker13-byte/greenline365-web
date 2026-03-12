@@ -37,11 +37,14 @@ async function fetchFreshPhotos(placeId: string): Promise<string[] | null> {
   );
 }
 
-export async function POST(request: NextRequest) {
-  // Protect with service role key as bearer token
-  const auth = request.headers.get('authorization');
-  if (auth !== `Bearer ${supabaseKey}`) {
-    return new Response('Unauthorized', { status: 401 });
+// Simple shared secret — remove this route after use
+const REFRESH_SECRET = 'gl365-refresh-photos-2026';
+
+async function handleRefresh(request: NextRequest) {
+  const url = new URL(request.url);
+  const key = url.searchParams.get('key');
+  if (key !== REFRESH_SECRET) {
+    return new Response('Unauthorized — append ?key=gl365-refresh-photos-2026', { status: 401 });
   }
 
   if (!googleApiKey) {
@@ -160,3 +163,7 @@ export async function POST(request: NextRequest) {
     },
   });
 }
+
+// Support both GET (browser) and POST (curl)
+export async function GET(request: NextRequest) { return handleRefresh(request); }
+export async function POST(request: NextRequest) { return handleRefresh(request); }
