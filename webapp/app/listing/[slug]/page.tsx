@@ -168,6 +168,10 @@ function cleanPhone(phone: string): string {
   return phone.replace(/[^\d+]/g, '');
 }
 
+function cleanDomain(url: string): string {
+  return url.replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/.*$/, '');
+}
+
 /** Star rating component */
 function Stars({ rating, size = 14 }: { rating: number; size?: number }) {
   return (
@@ -211,6 +215,7 @@ export default function ListingDetailPage() {
   const [phoneCopied, setPhoneCopied] = useState(false);
   const [activeSection, setActiveSection] = useState('overview');
   const [showAllPhotos, setShowAllPhotos] = useState(false);
+  const [brokenImages, setBrokenImages] = useState<Set<string>>(new Set());
   const router = useRouter();
   const sectionsRef = useRef<Record<string, HTMLElement | null>>({});
 
@@ -238,6 +243,21 @@ export default function ListingDetailPage() {
       setLoading(false);
     })();
   }, [slug]);
+
+  const handleImgError = (url: string) => {
+    setBrokenImages(prev => new Set(prev).add(url));
+  };
+
+  const ImageOrPlaceholder = ({ src, alt, className }: { src: string; alt: string; className?: string }) => {
+    if (brokenImages.has(src)) {
+      return (
+        <div className={`bg-gradient-to-br from-[#111111] to-[#1a1a1a] flex items-center justify-center ${className || ''}`}>
+          <span className="text-4xl font-heading font-light text-white/10">{alt?.[0] || '?'}</span>
+        </div>
+      );
+    }
+    return <img src={src} alt={alt} className={className} onError={() => handleImgError(src)} />;
+  };
 
   const trackEvent = (eventType: string) => {
     if (!listing) return;
@@ -327,11 +347,11 @@ export default function ListingDetailPage() {
           {allPhotos.length >= 3 ? (
             <div className="grid grid-cols-4 grid-rows-2 gap-1 h-full">
               <div className="col-span-2 row-span-2 relative overflow-hidden cursor-pointer group" onClick={() => setShowAllPhotos(true)}>
-                <img src={allPhotos[0]} alt={`${listing.business_name} main`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                <ImageOrPlaceholder src={allPhotos[0]} alt={listing.business_name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
               </div>
               {allPhotos.slice(1, 5).map((p, i) => (
                 <div key={i} className="relative overflow-hidden cursor-pointer group" onClick={() => { setActivePhoto(i + 1); setShowAllPhotos(true); }}>
-                  <img src={p} alt={`${listing.business_name} photo ${i + 2}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <ImageOrPlaceholder src={p} alt={listing.business_name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   {i === 3 && allPhotos.length > 5 && (
                     <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
                       <span className="text-white font-heading font-bold text-lg">+{allPhotos.length - 5}</span>
@@ -340,8 +360,8 @@ export default function ListingDetailPage() {
                 </div>
               ))}
             </div>
-          ) : listing.cover_image_url ? (
-            <img src={listing.cover_image_url} alt={`${listing.business_name} — ${listing.industry.replace(/-/g, ' ')} in ${listing.city}, ${listing.state}`} className="w-full h-full object-cover" />
+          ) : listing.cover_image_url && !brokenImages.has(listing.cover_image_url) ? (
+            <img src={listing.cover_image_url} alt={`${listing.business_name} — ${listing.industry.replace(/-/g, ' ')} in ${listing.city}, ${listing.state}`} className="w-full h-full object-cover" onError={() => handleImgError(listing.cover_image_url!)} />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-[#111111] to-[#1a1a1a] flex items-center justify-center">
               <span className="text-8xl font-heading font-light text-white/10">{listing.business_name[0]}</span>
@@ -422,16 +442,10 @@ export default function ListingDetailPage() {
                 {listing.business_name}
               </h1>
 
-              {/* Location line */}
+              {/* Location + subcategories line */}
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-white/50 font-body">
                 {listing.city && (
-                  <span className="inline-flex items-center gap-1.5">
-                    <svg className="w-4 h-4 text-gold/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-                    </svg>
-                    {listing.address_line1 ? `${listing.address_line1}, ` : ''}{listing.city}, {listing.state} {listing.zip_code}
-                  </span>
+                  <span>{listing.city}, {listing.state}</span>
                 )}
                 {listing.subcategories?.length > 0 && (
                   <span className="text-white/30">·</span>
@@ -472,22 +486,10 @@ export default function ListingDetailPage() {
 
           {/* ── Action Buttons Row ── */}
           <div className="flex flex-wrap gap-2 mt-6 pt-6 border-t border-white/5">
-            {listing.phone && (
-              <button onClick={() => { setShowCallModal(true); trackEvent('call'); }} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-heading font-bold text-[#0A0A0A] transition-all hover:scale-[1.02]" style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C97A)', boxShadow: '0 0 16px rgba(201,168,76,0.25)' }} data-testid="cta-call-now">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
-                Call
-              </button>
-            )}
             {(listing.address_line1 || listing.city) && (
               <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent([listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', '))}`} target="_blank" rel="noopener noreferrer" onClick={() => trackEvent('map')} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-heading font-semibold text-white border border-white/15 hover:border-gold/30 hover:bg-gold/5 transition-all">
                 <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" /></svg>
                 Directions
-              </a>
-            )}
-            {listing.website && (
-              <a href={ensureProtocol(listing.website)} target="_blank" rel="noopener noreferrer" onClick={() => trackEvent('website')} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-heading font-semibold text-white border border-white/15 hover:border-gold/30 hover:bg-gold/5 transition-all">
-                <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" /></svg>
-                Website
               </a>
             )}
             <button onClick={() => { if (navigator.share) { navigator.share({ title: listing.business_name, url: window.location.href }); } else { navigator.clipboard.writeText(window.location.href); } }} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-heading font-semibold text-white border border-white/15 hover:border-gold/30 hover:bg-gold/5 transition-all">
@@ -540,45 +542,20 @@ export default function ListingDetailPage() {
                 {listing.description ? (
                   <p className="text-sm sm:text-base text-white/65 font-body leading-relaxed">{listing.description}</p>
                 ) : (
-                  <p className="text-sm text-white/30 font-body italic">No description available yet. {!listing.is_claimed && 'Business owners can add details by claiming this listing.'}</p>
+                  <div className="text-sm text-white/40 font-body">
+                    <p>This business hasn&apos;t added a description yet.</p>
+                    {!listing.is_claimed && (
+                      <p className="mt-2">
+                        Are you the owner?{' '}
+                        <button onClick={() => setShowClaimInfo(true)} className="text-gold hover:text-gold-300 underline underline-offset-2 font-medium transition-colors">
+                          Claim this listing
+                        </button>{' '}
+                        to add your business details.
+                      </p>
+                    )}
+                  </div>
                 )}
 
-                {/* Quick Info Grid */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-6">
-                  {listing.phone && (
-                    <div className="flex items-center gap-3 p-3 rounded-xl border border-white/5 bg-white/[0.02]">
-                      <div className="w-9 h-9 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0">
-                        <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
-                      </div>
-                      <div className="min-w-0">
-                        <span className="text-[10px] text-white/30 font-heading uppercase tracking-wider block">Phone</span>
-                        <span className="text-xs text-white/70 font-body truncate block">{listing.phone}</span>
-                      </div>
-                    </div>
-                  )}
-                  {listing.website && (
-                    <div className="flex items-center gap-3 p-3 rounded-xl border border-white/5 bg-white/[0.02]">
-                      <div className="w-9 h-9 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0">
-                        <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3" /></svg>
-                      </div>
-                      <div className="min-w-0">
-                        <span className="text-[10px] text-white/30 font-heading uppercase tracking-wider block">Website</span>
-                        <span className="text-xs text-white/70 font-body truncate block">{listing.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}</span>
-                      </div>
-                    </div>
-                  )}
-                  {listing.city && (
-                    <div className="flex items-center gap-3 p-3 rounded-xl border border-white/5 bg-white/[0.02]">
-                      <div className="w-9 h-9 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0">
-                        <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>
-                      </div>
-                      <div className="min-w-0">
-                        <span className="text-[10px] text-white/30 font-heading uppercase tracking-wider block">Location</span>
-                        <span className="text-xs text-white/70 font-body truncate block">{listing.city}, {listing.state}</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
               </div>
             </motion.div>
 
@@ -887,7 +864,7 @@ export default function ListingDetailPage() {
                     <Link key={r.id} href={`/listing/${r.slug}`} className="rounded-xl border border-white/5 overflow-hidden hover:border-[rgba(201,168,76,0.25)] hover:scale-[1.02] transition-all duration-300 ease-out group" style={{ background: 'rgba(255,255,255,0.02)' }}>
                       <div className="relative h-28 overflow-hidden">
                         {r.cover_image_url ? (
-                          <img src={r.cover_image_url} alt={r.business_name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                          <ImageOrPlaceholder src={r.cover_image_url} alt={r.business_name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-[#111111] to-[#1a1a1a] flex items-center justify-center"><span className="text-2xl font-heading font-light text-white/10">{r.business_name[0]}</span></div>
                         )}
@@ -975,7 +952,7 @@ export default function ListingDetailPage() {
                     </div>
                     <div className="min-w-0">
                       <span className="text-xs text-white/40 font-body block">Website</span>
-                      <span className="text-sm text-white font-medium font-body group-hover:text-gold transition-colors truncate block">{listing.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}</span>
+                      <span className="text-sm text-white font-medium font-body group-hover:text-gold transition-colors truncate block">{cleanDomain(listing.website)}</span>
                     </div>
                   </a>
                 )}
@@ -1018,26 +995,6 @@ export default function ListingDetailPage() {
                 </div>
               </div>
 
-              {/* Google stats */}
-              {(googleRating || googleReviews) && (
-                <div className="px-5 py-4 border-t border-white/5">
-                  <p className="text-[10px] text-white/30 font-heading uppercase tracking-wider mb-3">Google Business Data</p>
-                  <div className="grid grid-cols-2 gap-3">
-                    {googleRating && (
-                      <div>
-                        <span className="block text-lg font-heading font-bold text-white">{googleRating}/5</span>
-                        <span className="text-[10px] text-white/30 font-body">Rating</span>
-                      </div>
-                    )}
-                    {googleReviews && (
-                      <div>
-                        <span className="block text-lg font-heading font-bold text-white">{googleReviews.toLocaleString()}</span>
-                        <span className="text-[10px] text-white/30 font-body">Reviews</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
 
               {/* Powered by GL365 */}
               <div className="px-5 py-3 border-t border-white/5 text-center">

@@ -176,18 +176,27 @@ export async function GET(request: NextRequest) {
     };
   });
 
+  // Deduplicate by business_name + city (scraped data may have duplicates)
+  const seen = new Set<string>();
+  const deduped = listings.filter((l: any) => {
+    const key = `${(l.business_name || '').toLowerCase().trim()}|${(l.city || '').toLowerCase().trim()}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
   // Sort: if user location provided, sort by distance first (then weighted ranking)
   if (userLat && userLng) {
-    listings.sort((a: any, b: any) => {
+    deduped.sort((a: any, b: any) => {
       if (a.distance !== null && b.distance !== null) return a.distance - b.distance;
       if (a.distance !== null) return -1;
       if (b.distance !== null) return 1;
       return 0;
     });
-    return NextResponse.json(listings);
+    return NextResponse.json(deduped);
   }
 
-  return NextResponse.json(applyWeightedRanking(listings));
+  return NextResponse.json(applyWeightedRanking(deduped));
 }
 
 // POST /api/directory - Create listing (AI scraper or manual)
