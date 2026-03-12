@@ -16,10 +16,12 @@
  *   /scan/openhouse/:id   → Open house sign-in
  *   /scan/game/:qr_id     → Game box scan → load game template
  *   /scan/facility/:id    → Facility/court info
+ *   /scan/feedback/:id    → QR feedback form (industry-matched poll template)
  *
  * Note: /claim/[code] (deals) and /invite/[code] (groups) have their own routes.
  */
 import { redirect } from 'next/navigation';
+import FeedbackClient from './FeedbackClient';
 
 // Route map: type → handler page (for types with dedicated pages)
 const REDIRECT_MAP: Record<string, (id: string) => string> = {
@@ -42,6 +44,11 @@ export default async function ScanPage({
   // If this type has a dedicated page, redirect there
   if (REDIRECT_MAP[type]) {
     redirect(REDIRECT_MAP[type](id));
+  }
+
+  // QR feedback form — industry-matched poll template
+  if (type === 'feedback') {
+    return <FeedbackClient listingId={id} />;
   }
 
   // For inline types, show the check-in UI
