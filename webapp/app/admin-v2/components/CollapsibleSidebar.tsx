@@ -38,8 +38,6 @@ interface SidebarProps {
   onToggleCollapse: () => void;
   isMobileOpen: boolean;
   onMobileToggle: () => void;
-  isPreviewMode?: boolean;
-  onPreviewModeToggle?: () => void;
 }
 
 // Nav items imported from single-source config: commandCenterNavGrouped
@@ -278,8 +276,6 @@ export default function CollapsibleSidebar({
   onToggleCollapse,
   isMobileOpen,
   onMobileToggle,
-  isPreviewMode,
-  onPreviewModeToggle,
 }: SidebarProps) {
   const { hasFeature, isAdmin, isWhiteLabel, activeBusiness, userBusinesses, switchBusiness, isSwitchingBusiness } = useBusiness();
 
@@ -502,26 +498,6 @@ export default function CollapsibleSidebar({
             </button>
           )}
 
-          {/* Preview Mode Toggle */}
-          <button
-            onClick={onPreviewModeToggle}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-medium text-sm transition"
-            style={isPreviewMode ? {
-              background: 'color-mix(in srgb, var(--theme-warning) 20%, transparent)',
-              color: 'var(--theme-warning)',
-              border: '1px solid color-mix(in srgb, var(--theme-warning) 30%, transparent)',
-            } : {
-              background: 'color-mix(in srgb, #8B5CF6 10%, transparent)',
-              color: '#A78BFA',
-              border: '1px solid color-mix(in srgb, #8B5CF6 20%, transparent)',
-            }}
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-            </svg>
-            {isPreviewMode ? 'Exit Preview' : 'Preview as Customer'}
-          </button>
         </div>
       )}
 

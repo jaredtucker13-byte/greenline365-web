@@ -225,6 +225,7 @@ export default function HQDashboard() {
       {/* Quick Links */}
       <div className="grid grid-cols-5 gap-3">
         {[
+          { label: 'Listings Management', href: '/admin-v2/hq/listings', color: '#C9A84C' },
           { label: 'Manage Tenants', href: '/admin-v2/hq/tenants', color: '#34D399' },
           { label: 'User Management', href: '/admin-v2/hq/users', color: '#60A5FA' },
           { label: 'Billing Overview', href: '/admin-v2/hq/billing', color: '#A78BFA' },

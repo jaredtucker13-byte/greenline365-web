@@ -1100,7 +1100,7 @@ export default function ListingDetailPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-12">
           <SectionDivider title="Location" id="map" />
           <div className="mt-4 rounded-2xl border border-white/10 overflow-hidden" data-testid="listing-map">
-            <div className="aspect-[21/9] w-full">
+            <div className="aspect-[4/3] sm:aspect-[16/9] w-full max-h-[280px]">
               <iframe
                 width="100%"
                 height="100%"

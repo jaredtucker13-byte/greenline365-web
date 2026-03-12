@@ -43,6 +43,13 @@ export async function POST(request: NextRequest) {
         return getAnalyticsData(serviceClient, params);
       case 'system':
         return getSystemData(serviceClient, params);
+      // ── Directory Listings Management ──
+      case 'listings':
+        return getListingsData(serviceClient, params);
+      case 'listing-toggle-status':
+        return toggleListingStatus(serviceClient, params);
+      case 'listing-toggle-verified':
+        return toggleListingVerified(serviceClient, params);
       // ── Community Polls ──
       case 'polls':
         return getPollsData(serviceClient, params);
@@ -761,6 +768,105 @@ async function clearPollVotes(db: any, params: any) {
     .eq('poll_id', pollId);
 
   return NextResponse.json({ success: true });
+}
+
+// ─── Directory Listings Management ────────────────────────────────────────────
+
+async function getListingsData(db: any, params: any) {
+  const { search, claimStatus, status, page = 1, limit = 25 } = params;
+  const offset = (page - 1) * limit;
+
+  let query = db
+    .from('directory_listings')
+    .select('id, business_name, slug, industry, phone, website, email, city, state, tier, is_claimed, is_published, cover_image_url, trust_score, avg_feedback_rating, total_feedback_count, metadata, created_at, updated_at', { count: 'exact' });
+
+  if (search) {
+    query = query.or(`business_name.ilike.%${search}%,slug.ilike.%${search}%,website.ilike.%${search}%`);
+  }
+  if (claimStatus === 'claimed') {
+    query = query.eq('is_claimed', true);
+  } else if (claimStatus === 'unclaimed') {
+    query = query.eq('is_claimed', false);
+  }
+  if (status === 'published') {
+    query = query.eq('is_published', true);
+  } else if (status === 'draft') {
+    query = query.eq('is_published', false);
+  }
+
+  const { data, count, error } = await query
+    .order('business_name', { ascending: true })
+    .range(offset, offset + limit - 1);
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  // KPI counts
+  const [
+    { count: totalListings },
+    { count: claimedCount },
+    { count: publishedCount },
+    { count: premiumCount },
+  ] = await Promise.all([
+    db.from('directory_listings').select('*', { count: 'exact', head: true }),
+    db.from('directory_listings').select('*', { count: 'exact', head: true }).eq('is_claimed', true),
+    db.from('directory_listings').select('*', { count: 'exact', head: true }).eq('is_published', true),
+    db.from('directory_listings').select('*', { count: 'exact', head: true }).eq('tier', 'premium'),
+  ]);
+
+  return NextResponse.json({
+    listings: data || [],
+    total: count || 0,
+    page,
+    totalPages: Math.ceil((count || 0) / limit),
+    kpis: {
+      totalListings: totalListings || 0,
+      claimed: claimedCount || 0,
+      published: publishedCount || 0,
+      premium: premiumCount || 0,
+    },
+  });
+}
+
+async function toggleListingStatus(db: any, params: any) {
+  const { listingId, is_published } = params;
+  if (!listingId) {
+    return NextResponse.json({ error: 'listingId required' }, { status: 400 });
+  }
+
+  const { data, error } = await db
+    .from('directory_listings')
+    .update({ is_published, updated_at: new Date().toISOString() })
+    .eq('id', listingId)
+    .select('id, business_name, is_published')
+    .single();
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ success: true, listing: data });
+}
+
+async function toggleListingVerified(db: any, params: any) {
+  const { listingId, is_claimed } = params;
+  if (!listingId) {
+    return NextResponse.json({ error: 'listingId required' }, { status: 400 });
+  }
+
+  const { data, error } = await db
+    .from('directory_listings')
+    .update({ is_claimed, updated_at: new Date().toISOString() })
+    .eq('id', listingId)
+    .select('id, business_name, is_claimed')
+    .single();
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ success: true, listing: data });
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
