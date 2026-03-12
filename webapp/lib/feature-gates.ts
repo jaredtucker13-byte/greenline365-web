@@ -20,6 +20,7 @@ export interface TierLimits {
   hasPrioritySearch: boolean;
   hasPrioritySupport: boolean;
   hasPropertyIntelligence: boolean;
+  hasServiceAreas: boolean;
   searchWeight: number;
   transactionFee: number;
 }
@@ -37,6 +38,7 @@ const TIER_LIMITS: Record<DirectoryTier, TierLimits> = {
     hasPrioritySearch: false,
     hasPrioritySupport: false,
     hasPropertyIntelligence: false,
+    hasServiceAreas: false,
     searchWeight: 1,
     transactionFee: 0.60,
   },
@@ -52,6 +54,7 @@ const TIER_LIMITS: Record<DirectoryTier, TierLimits> = {
     hasPrioritySearch: true,
     hasPrioritySupport: false,
     hasPropertyIntelligence: true,
+    hasServiceAreas: true,
     searchWeight: 3,
     transactionFee: 0.60,
   },
@@ -67,6 +70,7 @@ const TIER_LIMITS: Record<DirectoryTier, TierLimits> = {
     hasPrioritySearch: true,
     hasPrioritySupport: true,
     hasPropertyIntelligence: true,
+    hasServiceAreas: true,
     searchWeight: 5,
     transactionFee: 0.60,
   },

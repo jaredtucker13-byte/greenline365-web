@@ -86,7 +86,7 @@ a more detailed breakdown. Just reply and I'll send it over.
 
 ### Notes / Open Questions
 
-- [ ] Who sends this? Should it come from jared@greenline365.com (personal) or hello@greenline365.com (brand)?
+- [ ] Who sends this? Should it come from jared@greenline365.com (personal) or greenline365help@gmail.com (brand)?
 - [ ] Recommended: personal email address for Email 1 — feels more genuine
 - [ ] The P.S. is a soft reply-bait — important for deliverability and engagement signal
 - [ ] If no Local Pulse data available: use seasonal fallback (see live-local-pulse-spec.md)

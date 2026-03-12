@@ -14,7 +14,7 @@ import Image from 'next/image';
 import BoostedShowcase from '@/components/BoostedShowcase';
 import CommunityPolls from '@/components/CommunityPolls';
 import FeaturedShowcase from '@/components/FeaturedShowcase';
-import { getPlaceholderImage, getCategoryFallback, getFallbackDescription } from '@/lib/directory-config';
+import { getPlaceholderImage, getCategoryFallback, getFallbackDescription, matchesSubcategory } from '@/lib/directory-config';
 
 interface Listing {
   id: string;
@@ -73,7 +73,7 @@ const CATEGORIES = [
     subcategories: ['All', 'Auto Repair', 'Oil Change', 'Tire Shops', 'Body Shops', 'Car Dealers', 'Auto Parts', 'Towing', 'Car Wash', 'Auto Detailing', 'EV Charging'] },
 
   // === MARINE & OUTDOOR (Key West / Coastal Florida) ===
-  { id: 'marine-outdoor', label: 'Marine & Outdoor', sub: 'Boats, docks & outdoor adventure', img: '/images/categories/destinations.png',
+  { id: 'marine-outdoor', label: 'Marine & Outdoor', sub: 'Boats, docks & outdoor adventure', img: 'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=800&h=600&fit=crop',
     subcategories: ['All', 'Boat Repair', 'Marine Mechanics', 'Dock & Lift', 'Boat Cleaning', 'Fishing Charters', 'Kayak & Paddleboard', 'Dive Shops', 'Marinas'] },
 
   // === DINING ===
@@ -99,6 +99,10 @@ const CATEGORIES = [
   // === PETS ===
   { id: 'pets', label: 'Pets', sub: 'Vets, grooming & boarding', img: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800&h=600&fit=crop',
     subcategories: ['All', 'Veterinarians', 'Pet Grooming', 'Pet Boarding', 'Pet Stores', 'Dog Training', 'Pet Sitting', 'Aquarium & Fish'] },
+
+  // === MOBILE SERVICES ===
+  { id: 'mobile-services', label: 'Mobile Services', sub: 'DJs, trainers, notaries & on-the-go pros', img: 'https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&h=600&fit=crop',
+    subcategories: ['All', 'Mobile DJs', 'Personal Trainers', 'Mobile Notary', 'Mobile Pet Grooming', 'Mobile Auto Detailing', 'Mobile Car Wash', 'Event Photographers', 'Private Chefs', 'Mobile Barbers'] },
 ];
 
 function Stars({ rating, size = 14 }: { rating: number; size?: number }) {
@@ -303,7 +307,7 @@ export default function DirectoryClient() {
   const subcategories = currentCat?.subcategories || ['All'];
   const filteredListings = allListings.filter(l => {
     if (activeCategory && l.industry !== activeCategory) return false;
-    if (activeSubcategory !== 'All' && !l.subcategories?.includes(activeSubcategory)) return false;
+    if (activeSubcategory !== 'All' && !matchesSubcategory(activeSubcategory, l.subcategories, l.business_name, l.description)) return false;
     if (search && !l.business_name.toLowerCase().includes(search.toLowerCase()) && !l.description?.toLowerCase().includes(search.toLowerCase())) return false;
     if (cityFilter && l.city !== cityFilter) return false;
     if (maxDistance > 0 && l.distance != null && l.distance > maxDistance) return false;
@@ -361,6 +365,7 @@ export default function DirectoryClient() {
           userLocation={userLocation}
           onViewAll={(sub) => { setActiveSubcategory(sub); setShowListings(true); setShowGroupedBrowse(false); }}
           onBack={() => { setShowGroupedBrowse(false); setActiveCategory(''); }}
+          onCategorySwitch={(catId) => { setActiveCategory(catId); setActiveSubcategory('All'); }}
         />
       </div>
     );
@@ -431,7 +436,7 @@ export default function DirectoryClient() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.5 }}
-                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-heading font-light tracking-tight leading-[1.1] mb-6"
+                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-heading font-medium tracking-[0.05rem] leading-[1.15] mb-6"
                 style={{
                   background: 'linear-gradient(135deg, #C9A84C 0%, #E8C97A 40%, #F0DFA0 60%, #C9A84C 100%)',
                   WebkitBackgroundClip: 'text',
@@ -439,24 +444,16 @@ export default function DirectoryClient() {
                   backgroundClip: 'text',
                 }}
               >
-                THE UNRIVALED STANDARD<br />IN HOME SERVICES.
+                Your Neighbor&apos;s Favorite Pros,<br />Places, &amp; Resources&mdash;All on GL365
               </motion.h1>
 
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.8 }}
-                className="text-lg sm:text-xl font-body text-white/70 tracking-wide mb-2"
+                className="text-lg sm:text-xl font-body font-medium text-white/70 tracking-[0.05rem] mb-12"
               >
-                Curated. Verified. Your Home&apos;s Legacy.
-              </motion.p>
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 1 }}
-                className="text-sm sm:text-base font-body text-white/45 tracking-wider uppercase mb-12"
-              >
-                Your neighbors&apos; most trusted pros — one click away.
+                The local guide to everything you need, verified by the people you trust.
               </motion.p>
 
               {/* Search Pill */}
@@ -559,19 +556,34 @@ export default function DirectoryClient() {
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {CATEGORIES.map((cat, i) => {
                 const count = allListings.filter(l => l.industry === cat.id).length;
+                const isEmpty = count === 0;
                 return (
                   <motion.div key={cat.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-                    className={`relative rounded-2xl overflow-hidden cursor-pointer group hover:shadow-gold-glow transition-all duration-500 ${i === 0 ? 'md:col-span-2 md:row-span-2' : ''}`}
-                    style={{ minHeight: i === 0 ? 320 : 180 }}
-                    onClick={() => handleCategoryClick(cat.id)} data-testid={`cat-${cat.id}`}>
-                    <Image src={cat.img} alt={`${cat.label} — ${cat.sub}`} fill className="absolute inset-0 object-cover group-hover:scale-105 transition-transform duration-700" sizes="(max-width: 768px) 100vw, 33vw" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent group-hover:from-black/95 transition-all duration-500" />
+                    className={`relative rounded-2xl overflow-hidden group transition-all duration-500 ${i === 0 ? 'md:col-span-2 md:row-span-2' : ''} ${isEmpty ? 'cursor-default' : 'cursor-pointer hover:shadow-gold-glow'}`}
+                    style={{ minHeight: i === 0 ? 320 : 180, filter: isEmpty ? 'saturate(0.3) brightness(0.7)' : 'none' }}
+                    onClick={() => !isEmpty && handleCategoryClick(cat.id)} data-testid={`cat-${cat.id}`}>
+                    <Image src={cat.img} alt={`${cat.label} — ${cat.sub}`} fill className={`absolute inset-0 object-cover transition-transform duration-700 ${isEmpty ? '' : 'group-hover:scale-105'}`} sizes="(max-width: 768px) 100vw, 33vw" />
+                    <div className={`absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent transition-all duration-500 ${isEmpty ? '' : 'group-hover:from-black/95'}`} />
+                    {/* Coming Soon badge for empty categories */}
+                    {isEmpty && (
+                      <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-heading font-semibold uppercase tracking-wider text-white/70"
+                        style={{ background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                        Coming Q2 2026
+                      </div>
+                    )}
                     <div className="absolute bottom-4 left-4">
-                      <span className={`text-white font-heading font-semibold block tracking-tight ${i === 0 ? 'text-2xl' : 'text-base'}`}>{cat.label}</span>
-                      <span className="text-white/50 text-xs font-body">{cat.sub}</span>
-                      {count > 0 && <span className="text-[10px] font-body mt-1 block" style={{ color: 'rgba(201,168,76,0.6)' }}>{count} {count === 1 ? 'business' : 'businesses'}</span>}
+                      <span className={`text-white font-heading font-semibold block tracking-tight ${i === 0 ? 'text-2xl' : 'text-base'} ${isEmpty ? 'opacity-60' : ''}`}>{cat.label}</span>
+                      <span className={`text-xs font-body ${isEmpty ? 'text-white/30' : 'text-white/50'}`}>{cat.sub}</span>
+                      {count > 0 ? (
+                        <span className="text-[10px] font-body mt-1.5 flex items-center gap-1" style={{ color: 'rgba(201,168,76,0.8)' }}>
+                          Browse Now
+                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-body mt-1 block text-white/25">Coming soon</span>
+                      )}
                     </div>
-                    {i === 0 && <span className="absolute top-3 right-3 text-[10px] px-2.5 py-1 rounded-full font-heading font-semibold uppercase tracking-wider text-black" style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C97A)' }}>Core</span>}
+                    {i === 0 && !isEmpty && <span className="absolute top-3 right-3 text-[10px] px-2.5 py-1 rounded-full font-heading font-semibold uppercase tracking-wider text-black" style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C97A)' }}>Core</span>}
                   </motion.div>
                 );
               })}
@@ -745,7 +757,7 @@ export default function DirectoryClient() {
                   <motion.div key={d.slug} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 + i * 0.07, duration: 0.5 }}>
                     <Link href={`/directory?q=${encodeURIComponent(d.label)}`} className="block dest-card-frame group" data-testid={`dest-card-${d.slug}`}>
                       <div className="dest-card-inner">
-                        <div className="relative overflow-hidden" style={{ aspectRatio: '4/3' }}>
+                        <div className="relative overflow-hidden" style={{ aspectRatio: '4/3', minHeight: '180px' }}>
                           <DestImage src={d.image} alt={`${d.label} destination guide — ${d.tagline}`} label={d.label} />
                         </div>
                         <div className="dest-glass-label px-4 py-3">
@@ -840,10 +852,28 @@ export default function DirectoryClient() {
             <div className="absolute inset-0 bg-gradient-to-b from-[#050505]/60 via-[#050505]/80 to-[#050505]" />
 
             <div className="relative max-w-7xl mx-auto px-6">
-              <button onClick={() => { setShowListings(false); setShowGroupedBrowse(true); setActiveCategory(''); }} className="text-sm text-white/40 hover:text-white mb-6 flex items-center gap-2 transition font-body" data-testid="back-to-explore-btn">
+              <button type="button" onClick={() => { setShowListings(false); setShowGroupedBrowse(true); setActiveCategory(''); }} className="text-sm text-white/40 hover:text-white mb-6 flex items-center gap-2 transition font-body" data-testid="back-to-explore-btn">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                 Back to All Categories
               </button>
+
+              {/* Category Switcher Pills */}
+              <div className="flex flex-wrap gap-2 mb-5" data-testid="listing-category-switcher">
+                {CATEGORIES.map(cat => (
+                  <button
+                    type="button"
+                    key={cat.id}
+                    onClick={() => { setActiveCategory(cat.id); setActiveSubcategory('All'); }}
+                    className={`px-4 py-2 rounded-full text-xs font-medium transition-all duration-300 font-body ${
+                      activeCategory === cat.id
+                        ? 'bg-[rgba(201,168,76,0.15)] text-[#C9A84C] border border-[rgba(201,168,76,0.3)]'
+                        : 'text-white/40 border border-white/10 hover:text-white/70 hover:border-white/20'
+                    }`}
+                  >
+                    {cat.label}
+                  </button>
+                ))}
+              </div>
 
               <h2 className="text-3xl md:text-4xl font-heading font-light text-white mb-2 tracking-tight">
                 {currentCat?.label || 'All Businesses'}
@@ -919,7 +949,7 @@ export default function DirectoryClient() {
               {/* Subcategory Pill Tabs */}
               <div className="flex flex-wrap gap-2" data-testid="subcategory-tabs">
                 {subcategories.map(sub => (
-                  <button key={sub} onClick={() => setActiveSubcategory(sub)}
+                  <button type="button" key={sub} onClick={() => setActiveSubcategory(sub)}
                     className={`px-4 py-2 rounded-full text-xs font-medium transition-all duration-300 font-body ${
                       activeSubcategory === sub
                         ? 'bg-[rgba(201,168,76,0.15)] text-[#C9A84C] border border-[rgba(201,168,76,0.3)]'
@@ -1054,8 +1084,11 @@ function DestImage({ src, alt, label }: { src: string; alt: string; label: strin
   const [error, setError] = useState(false);
   if (error) {
     return (
-      <div className="w-full h-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #0a1628 0%, #1a0f05 100%)' }}>
-        <span className="text-3xl font-heading font-light text-gold/20">{label[0]}</span>
+      <div className="w-full h-full flex flex-col items-center justify-center relative"
+        style={{ background: 'linear-gradient(135deg, #0d1a2e 0%, #1a1008 40%, #0a1020 100%)' }}>
+        <div className="absolute inset-0 opacity-20" style={{ background: 'radial-gradient(ellipse at 50% 40%, rgba(201,168,76,0.3) 0%, transparent 70%)' }} />
+        <span className="text-5xl mb-2 relative z-10">📍</span>
+        <span className="text-sm font-heading font-semibold relative z-10" style={{ color: 'rgba(201,168,76,0.7)' }}>{label}</span>
       </div>
     );
   }
@@ -1216,7 +1249,7 @@ function SubcategoryCarouselRow({ label, subtitle, industry, searchTerm, sortBy,
 }
 
 // ─── Grouped Browse View ───────────────────────────────────────────
-function GroupedBrowseView({ activeCategory, sortBy, setSortBy, cityFilter, setCityFilter, availableCities, userLocation, onViewAll, onBack }: {
+function GroupedBrowseView({ activeCategory, sortBy, setSortBy, cityFilter, setCityFilter, availableCities, userLocation, onViewAll, onBack, onCategorySwitch }: {
   activeCategory: string;
   sortBy: string;
   setSortBy: (s: any) => void;
@@ -1226,6 +1259,7 @@ function GroupedBrowseView({ activeCategory, sortBy, setSortBy, cityFilter, setC
   userLocation: { lat: number; lng: number } | null;
   onViewAll: (sub: string) => void;
   onBack: () => void;
+  onCategorySwitch: (catId: string) => void;
 }) {
   const currentCat = CATEGORIES.find(c => c.id === activeCategory);
   const rows = currentCat
@@ -1249,10 +1283,30 @@ function GroupedBrowseView({ activeCategory, sortBy, setSortBy, cityFilter, setC
         )}
         <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0A]/60 to-[#050505]" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
-          <button onClick={onBack} className="text-sm text-white/40 hover:text-white mb-4 flex items-center gap-2 transition font-body" data-testid="back-from-grouped">
+          <button type="button" onClick={onBack} className="text-sm text-white/40 hover:text-white mb-4 flex items-center gap-2 transition font-body" data-testid="back-from-grouped">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
             Back to Directory
           </button>
+
+          {/* Category Switcher Pills */}
+          <div className="flex flex-wrap gap-2 mb-5" data-testid="category-switcher">
+            {CATEGORIES.map(cat => (
+              <button
+                type="button"
+                key={cat.id}
+                onClick={() => onCategorySwitch(cat.id)}
+                className={`px-4 py-2 rounded-full text-xs font-medium transition-all duration-300 font-body ${
+                  activeCategory === cat.id
+                    ? 'bg-[rgba(201,168,76,0.15)] text-[#C9A84C] border border-[rgba(201,168,76,0.3)]'
+                    : 'text-white/40 border border-white/10 hover:text-white/70 hover:border-white/20'
+                }`}
+                data-testid={`cat-pill-${cat.id}`}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
+
           <h2 className="text-3xl md:text-4xl font-heading font-light text-white mb-2 tracking-tight">
             {currentCat ? currentCat.label : 'Browse'} <span className="text-gradient-gold font-semibold">{currentCat ? '' : 'All Businesses'}</span>
           </h2>

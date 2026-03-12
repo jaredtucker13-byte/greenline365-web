@@ -262,7 +262,7 @@ Modules are NOT tier-locked — any Command Center tier can purchase any module.
 | Property Transfer Kit | TBD | Buyer-accessible records package for home sales |
 | Multi-Property Dashboard | TBD | Manage multiple properties from one account |
 
-> Home Ledger standalone pricing and add-ons are TBD — see `docs/brainstorming/pricing-strategy.md`
+> Home Ledger standalone pricing and add-ons are TBD — will be defined in a future update to this document
 
 ---
 
@@ -462,38 +462,40 @@ The existing `metadata.addons` JSON blob approach in `directory_listings` will b
 
 ---
 
-## STALE REFERENCES — Must Be Cleaned Up
+## STALE REFERENCES — Cleanup Status
 
-### Stale Pricing
+> Last audit: March 2026
 
-| File | Problem | Correct Value |
+### Stale Pricing — RESOLVED
+
+| File | Problem | Status |
 |---|---|---|
-| `supabase/migrations/029_seed_subscription_data.sql` | directory_pro: 2900 cents ($29) | Should be 4500 ($45) |
-| `supabase/migrations/029_seed_subscription_data.sql` | command_center: 7900 cents ($79) | Should be 150000 ($1,500) |
-| `supabase/migrations/029_seed_subscription_data.sql` | bundle: 9900 cents ($99) | TBD — bundle price not finalized |
-| `docs/PROJECT_BIBLE.md` | Various legacy prices ($299-$1,200) | See this document |
-| `docs/brainstorming/pricing-strategy.md` | TBD prices, brainstorming ranges | This document supersedes |
+| `supabase/migrations/029_seed_subscription_data.sql` | Had $29 Pro / $79 CC / $99 bundle | FIXED — Now $45/$89 directory, $1,500/$2,500/$3,500 CC tiers |
+| `docs/PROJECT_BIBLE.md` | Had legacy $1,000/mo and $2,500 setup | FIXED — Updated to match canonical pricing |
+| `docs/brainstorming/pricing-strategy.md` | TBD prices, brainstorming ranges | SUPERSEDED — This document is the SOT |
 
-### Stale Naming ("God Mode" / "Super Admin" → "Greenline HQ" / "System Operator")
+### Stale Naming ("God Mode" → "Greenline HQ") — RESOLVED
 
-User-facing references must be updated. Internal DB role `super_admin` stays as-is.
+Internal DB role `super_admin` stays as-is (internal only, never user-facing).
 
-| File | Problem |
+| File | Status |
 |---|---|
-| `QUICKSTART_DAILY_TREND_HUNTER.md` | References "Build God Mode (`/god-mode`)" |
-| `FEATURE_LIST_FOR_PM.md` | References "God Mode" for Visual Inline Editor |
-| `FEATURE_INVENTORY.md` | References "God Mode CMS" and "Super Admin" role |
-| `components/editor/index.ts` | Comment: "God Mode admins" |
-| `components/editor/EditableRegion.tsx` | Comment: "God Mode admins" |
-| `components/editor/AdminEditModeContext.tsx` | Comment: "God Mode editing state" |
-| `app/robots.ts` | Disallow list still includes `/god-mode/` alongside `/greenline-hq/` — remove `/god-mode/` after route is deleted |
-| `.emergent/summary.txt` | Multiple "God Mode" references |
+| `QUICKSTART_DAILY_TREND_HUNTER.md` | ALREADY FIXED — no God Mode references remain |
+| `FEATURE_LIST_FOR_PM.md` | ALREADY FIXED — no God Mode references remain |
+| `FEATURE_INVENTORY.md` | ALREADY FIXED — no God Mode references remain |
+| `components/editor/index.ts` | ALREADY FIXED — no God Mode references remain |
+| `components/editor/EditableRegion.tsx` | ALREADY FIXED — no God Mode references remain |
+| `components/editor/AdminEditModeContext.tsx` | ALREADY FIXED — no God Mode references remain |
+| `app/robots.ts` | ALREADY FIXED — `/god-mode/` was already removed |
+| `.emergent/summary.txt` | ALREADY FIXED — says "Greenline HQ" |
+| `database/migrations/001_fix_rls_policies.sql` | FIXED — comment updated |
+| `database/migrations/008_entitlement_access_system.sql` | FIXED — comment updated |
 
 ---
 
 ## RELATED DOCUMENTS
 
-- `docs/brainstorming/pricing-strategy.md` — Historical brainstorming (superseded by this doc)
+- `docs/archive/pricing-strategy.md` — Historical brainstorming (superseded by this doc, archived)
 - `docs/brainstorming/founding-members-SOT.md` — Full founding member offer details
 - `webapp/lib/feature-gates.ts` — Directory tier feature gates (V1, needs V2 update)
 - `webapp/lib/services/feature-resolution.ts` — Feature resolution service (needs add-on support)

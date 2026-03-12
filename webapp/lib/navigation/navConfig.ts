@@ -225,6 +225,7 @@ export const publicMegaMenus: MegaMenuDropdown[] = [
           { href: '/directory?category=professional-services', label: 'Professional Services', description: 'Legal, finance & consulting', icon: '💼' },
           { href: '/directory?category=education', label: 'Education & Childcare', description: 'Schools, tutoring & daycare', icon: '📚' },
           { href: '/directory?category=pets', label: 'Pets', description: 'Vets, grooming & boarding', icon: '🐾' },
+          { href: '/directory?category=mobile-services', label: 'Mobile Services', description: 'DJs, trainers & on-the-go pros', icon: '🚐' },
         ],
       },
       {

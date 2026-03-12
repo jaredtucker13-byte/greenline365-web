@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { usePortalContext } from '@/lib/hooks/usePortalContext';
 import StatsCard from '@/components/portal/StatsCard';
 import UpgradeCTA from '@/components/portal/UpgradeCTA';
@@ -20,12 +20,115 @@ interface AdvancedStats {
   click_through_rate: number;
 }
 
+/** Fill missing days in a date-keyed record so charts show continuous data */
+function fillDays(data: Record<string, number>, days: number): Array<{ date: string; label: string; value: number }> {
+  const result: Array<{ date: string; label: string; value: number }> = [];
+  const now = new Date();
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(now.getTime() - i * 86400000);
+    const key = d.toISOString().split('T')[0];
+    const label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    result.push({ date: key, label, value: data[key] || 0 });
+  }
+  return result;
+}
+
+/** Pure CSS bar chart component */
+function BarChart({
+  data,
+  color = 'gold',
+  height = 160,
+}: {
+  data: Array<{ date: string; label: string; value: number }>;
+  color?: 'gold' | 'teal';
+  height?: number;
+}) {
+  const maxVal = Math.max(...data.map((d) => d.value), 1);
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+
+  const barColor = color === 'gold' ? 'bg-gold-500' : 'bg-neon-teal-500';
+  const barColorMuted = color === 'gold' ? 'bg-gold-500/40' : 'bg-neon-teal-500/40';
+
+  return (
+    <div className="relative">
+      {/* Y-axis labels */}
+      <div className="absolute left-0 top-0 flex h-full flex-col justify-between pr-2 text-right" style={{ height }}>
+        <span className="text-[10px] text-white/30">{maxVal}</span>
+        <span className="text-[10px] text-white/30">{Math.round(maxVal / 2)}</span>
+        <span className="text-[10px] text-white/30">0</span>
+      </div>
+
+      {/* Chart area */}
+      <div className="ml-8">
+        <div className="flex items-end gap-[2px]" style={{ height }}>
+          {data.map((d, i) => {
+            const pct = (d.value / maxVal) * 100;
+            return (
+              <div
+                key={d.date}
+                className="group relative flex-1 cursor-pointer"
+                onMouseEnter={() => setHoveredIdx(i)}
+                onMouseLeave={() => setHoveredIdx(null)}
+              >
+                <div
+                  className={`w-full rounded-t transition-all duration-200 ${
+                    hoveredIdx === i ? barColor : barColorMuted
+                  }`}
+                  style={{ height: `${pct}%`, minHeight: d.value > 0 ? '2px' : '0' }}
+                />
+                {/* Tooltip */}
+                {hoveredIdx === i && (
+                  <div className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-lg bg-os-dark-900 border border-white/10 px-2.5 py-1 text-xs shadow-lg">
+                    <span className="font-medium text-white">{d.value}</span>
+                    <span className="text-white/40 ml-1">{d.label}</span>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* X-axis labels — show every 5th */}
+        <div className="mt-1 flex">
+          {data.map((d, i) => (
+            <div key={d.date} className="flex-1 text-center">
+              {i % 5 === 0 ? (
+                <span className="text-[10px] text-white/30">{d.label.split(' ')[1]}</span>
+              ) : null}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Referrer bar with proportional width */
+function ReferrerBar({ source, count, maxCount }: { source: string; count: number; maxCount: number }) {
+  const pct = (count / maxCount) * 100;
+  return (
+    <li className="space-y-1">
+      <div className="flex items-center justify-between text-sm">
+        <span className="text-white/60 truncate max-w-[200px]">{source}</span>
+        <span className="font-medium text-white tabular-nums">{count}</span>
+      </div>
+      <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
+        <div
+          className="h-full rounded-full bg-gold-500/60 transition-all duration-500"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+    </li>
+  );
+}
+
 export default function StatsPage() {
   const { activeListing } = usePortalContext();
   const [basic, setBasic] = useState<BasicStats | null>(null);
   const [advanced, setAdvanced] = useState<AdvancedStats | null>(null);
   const [hasAdvanced, setHasAdvanced] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [chartView, setChartView] = useState<'views' | 'clicks' | 'both'>('both');
 
   useEffect(() => {
     if (!activeListing) return;
@@ -42,6 +145,15 @@ export default function StatsPage() {
         setLoading(false);
       });
   }, [activeListing]);
+
+  const viewsData = useMemo(
+    () => (advanced ? fillDays(advanced.daily_views, 30) : []),
+    [advanced]
+  );
+  const clicksData = useMemo(
+    () => (advanced ? fillDays(advanced.daily_clicks, 30) : []),
+    [advanced]
+  );
 
   if (!activeListing) {
     return <p className="text-white/50">No listing found.</p>;
@@ -119,68 +231,131 @@ export default function StatsPage() {
         <div className="space-y-6">
           <h2 className="text-lg font-semibold text-white">Advanced Analytics</h2>
 
-          {/* CTR */}
-          <div className="rounded-xl border border-white/10 bg-white/5 p-5">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-white/50">Click-Through Rate</span>
-              <span className="text-2xl font-bold text-gold-500">
+          {/* CTR + Summary row */}
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="rounded-xl border border-white/10 bg-white/5 p-5">
+              <span className="text-xs text-white/50">Click-Through Rate</span>
+              <p className="mt-1 text-3xl font-bold text-gold-500">
                 {advanced.click_through_rate}%
-              </span>
+              </p>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-white/5 p-5">
+              <span className="text-xs text-white/50">Avg Daily Views</span>
+              <p className="mt-1 text-3xl font-bold text-white">
+                {viewsData.length > 0
+                  ? (viewsData.reduce((s, d) => s + d.value, 0) / viewsData.length).toFixed(1)
+                  : '0'}
+              </p>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-white/5 p-5">
+              <span className="text-xs text-white/50">Avg Daily Clicks</span>
+              <p className="mt-1 text-3xl font-bold text-white">
+                {clicksData.length > 0
+                  ? (clicksData.reduce((s, d) => s + d.value, 0) / clicksData.length).toFixed(1)
+                  : '0'}
+              </p>
             </div>
           </div>
 
-          {/* Views chart (simple bar representation) */}
+          {/* Chart toggle + Views chart */}
           <div className="rounded-xl border border-white/10 bg-white/5 p-5">
-            <h3 className="mb-4 text-sm font-medium text-white/70">Views Over Time (30 days)</h3>
-            <div className="flex h-32 items-end gap-1">
-              {Object.entries(advanced.daily_views).map(([day, count]) => {
-                const maxCount = Math.max(...Object.values(advanced.daily_views), 1);
-                const height = (count / maxCount) * 100;
-                return (
-                  <div
-                    key={day}
-                    className="group relative flex-1"
-                    title={`${day}: ${count} views`}
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-sm font-medium text-white/70">Traffic (30 days)</h3>
+              <div className="flex gap-1 rounded-lg bg-white/5 p-0.5">
+                {(['views', 'clicks', 'both'] as const).map((v) => (
+                  <button
+                    key={v}
+                    onClick={() => setChartView(v)}
+                    className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
+                      chartView === v
+                        ? 'bg-gold-500 text-black'
+                        : 'text-white/50 hover:text-white'
+                    }`}
                   >
-                    <div
-                      className="w-full rounded-t bg-gold-500/60 transition-colors group-hover:bg-gold-500"
-                      style={{ height: `${height}%`, minHeight: count > 0 ? '2px' : '0' }}
-                    />
-                  </div>
-                );
-              })}
+                    {v === 'both' ? 'Both' : v.charAt(0).toUpperCase() + v.slice(1)}
+                  </button>
+                ))}
+              </div>
             </div>
+
+            {(chartView === 'views' || chartView === 'both') && (
+              <div className={chartView === 'both' ? 'mb-6' : ''}>
+                {chartView === 'both' && (
+                  <div className="mb-2 flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-gold-500" />
+                    <span className="text-xs text-white/50">Views</span>
+                  </div>
+                )}
+                <BarChart data={viewsData} color="gold" />
+              </div>
+            )}
+
+            {(chartView === 'clicks' || chartView === 'both') && (
+              <div>
+                {chartView === 'both' && (
+                  <div className="mb-2 flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-neon-teal-500" />
+                    <span className="text-xs text-white/50">Clicks</span>
+                  </div>
+                )}
+                <BarChart data={clicksData} color="teal" />
+              </div>
+            )}
           </div>
 
           {/* Top Referrers */}
-          {advanced.top_referrers.length > 0 && (
-            <div className="rounded-xl border border-white/10 bg-white/5 p-5">
-              <h3 className="mb-4 text-sm font-medium text-white/70">Top Referrers</h3>
-              <ul className="space-y-2">
+          <div className="rounded-xl border border-white/10 bg-white/5 p-5">
+            <h3 className="mb-4 text-sm font-medium text-white/70">Top Referrers</h3>
+            {advanced.top_referrers.length > 0 ? (
+              <ul className="space-y-3">
                 {advanced.top_referrers.map((ref) => (
-                  <li key={ref.source} className="flex items-center justify-between text-sm">
-                    <span className="text-white/60">{ref.source}</span>
-                    <span className="font-medium text-white">{ref.count}</span>
-                  </li>
+                  <ReferrerBar
+                    key={ref.source}
+                    source={ref.source}
+                    count={ref.count}
+                    maxCount={advanced.top_referrers[0].count}
+                  />
                 ))}
               </ul>
-            </div>
-          )}
+            ) : (
+              <p className="text-sm text-white/40">No referrer data yet.</p>
+            )}
+          </div>
         </div>
       ) : (
         <div className="relative">
           <div className="pointer-events-none space-y-4 opacity-30 blur-[3px]">
+            <div className="grid gap-4 sm:grid-cols-3">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="rounded-xl border border-white/10 bg-white/5 p-5">
+                  <div className="h-4 w-24 rounded bg-white/10" />
+                  <div className="mt-2 h-8 w-16 rounded bg-white/10" />
+                </div>
+              ))}
+            </div>
             <div className="rounded-xl border border-white/10 bg-white/5 p-5">
               <div className="h-6 w-48 rounded bg-white/10" />
-              <div className="mt-4 h-32 rounded bg-white/5" />
+              <div className="mt-4 flex h-40 items-end gap-1">
+                {Array.from({ length: 30 }, (_, i) => (
+                  <div key={i} className="flex-1">
+                    <div
+                      className="w-full rounded-t bg-white/10"
+                      style={{ height: `${20 + Math.random() * 60}%` }}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
             <div className="rounded-xl border border-white/10 bg-white/5 p-5">
               <div className="h-6 w-32 rounded bg-white/10" />
-              <div className="mt-4 space-y-2">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="flex justify-between">
-                    <div className="h-4 w-24 rounded bg-white/10" />
-                    <div className="h-4 w-8 rounded bg-white/10" />
+              <div className="mt-4 space-y-3">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="space-y-1">
+                    <div className="flex justify-between">
+                      <div className="h-4 w-24 rounded bg-white/10" />
+                      <div className="h-4 w-8 rounded bg-white/10" />
+                    </div>
+                    <div className="h-1.5 rounded-full bg-white/10" />
                   </div>
                 ))}
               </div>
@@ -188,7 +363,7 @@ export default function StatsPage() {
           </div>
           <UpgradeCTA
             feature="Detailed Analytics"
-            description="Upgrade for views over time, click-through rates, and top referrers."
+            description="Upgrade for daily traffic charts, click-through rates, and referrer insights."
             variant="overlay"
           />
         </div>

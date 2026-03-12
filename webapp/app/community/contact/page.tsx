@@ -14,7 +14,7 @@ const jsonLd = {
   mainEntity: {
     '@type': 'Organization',
     name: 'GreenLine365',
-    email: 'hello@greenline365.com',
+    email: 'greenline365help@gmail.com',
     url: 'https://greenline365.com',
     areaServed: {
       '@type': 'State',
@@ -35,7 +35,7 @@ const contactOptions = [
   {
     icon: '📧',
     title: 'Email Us',
-    desc: 'hello@greenline365.com',
+    desc: 'greenline365help@gmail.com',
     detail: 'We typically respond within 24 hours.',
   },
   {

@@ -184,7 +184,7 @@ async function processScheduledEmails(): Promise<TaskResult> {
             headers: { Authorization: `Bearer ${sendgridKey}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({
               personalizations: [{ to: [{ email: redemption.consumer_email }] }],
-              from: { email: process.env.SENDGRID_FROM_EMAIL || 'hello@greenline365.com', name: `${businessName} via GreenLine 365` },
+              from: { email: process.env.SENDGRID_FROM_EMAIL || 'greenline365help@gmail.com', name: `${businessName} via GreenLine 365` },
               subject: `Thank you for your purchase at ${businessName}!`,
               content: [{ type: 'text/plain', value: body }],
             }),
