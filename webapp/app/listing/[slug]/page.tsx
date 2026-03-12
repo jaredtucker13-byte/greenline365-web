@@ -486,12 +486,6 @@ export default function ListingDetailPage() {
 
           {/* ── Action Buttons Row ── */}
           <div className="flex flex-wrap gap-2 mt-6 pt-6 border-t border-white/5">
-            {(listing.address_line1 || listing.city) && (
-              <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent([listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', '))}`} target="_blank" rel="noopener noreferrer" onClick={() => trackEvent('map')} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-heading font-semibold text-white border border-white/15 hover:border-gold/30 hover:bg-gold/5 transition-all">
-                <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" /></svg>
-                Directions
-              </a>
-            )}
             <button onClick={() => { if (navigator.share) { navigator.share({ title: listing.business_name, url: window.location.href }); } else { navigator.clipboard.writeText(window.location.href); } }} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-heading font-semibold text-white border border-white/15 hover:border-gold/30 hover:bg-gold/5 transition-all">
               <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" /></svg>
               Share
@@ -898,28 +892,6 @@ export default function ListingDetailPage() {
               style={{ background: 'rgba(10,10,10,0.92)', backdropFilter: 'blur(16px)' }}
               data-testid="contact-card"
             >
-              {/* Map at top of sidebar */}
-              {(listing.address_line1 || listing.city) && (
-                <div data-testid="listing-map">
-                  <div className="aspect-[4/3] w-full">
-                    <iframe
-                      width="100%"
-                      height="100%"
-                      style={{ border: 0 }}
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}&q=${encodeURIComponent([listing.business_name, listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', '))}`}
-                      title={`Map showing ${listing.business_name} location`}
-                    />
-                  </div>
-                  {listing.address_line1 && (
-                    <div className="px-5 py-3 border-b border-white/5">
-                      <p className="text-xs text-white/50 font-body">{listing.address_line1}, {listing.city}, {listing.state} {listing.zip_code}</p>
-                    </div>
-                  )}
-                </div>
-              )}
-
               {/* Contact details */}
               <div className="p-5 space-y-3">
                 <h3 className="text-sm font-heading font-semibold text-white uppercase tracking-wider mb-4">Contact</h3>
@@ -929,19 +901,6 @@ export default function ListingDetailPage() {
                   <button onClick={() => { setShowCallModal(true); trackEvent('call'); }} className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-bold font-heading text-[#0A0A0A] transition-all hover:scale-[1.02] cursor-pointer" style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C97A)', boxShadow: '0 0 16px rgba(201,168,76,0.3)' }} data-testid="sidebar-call-now">
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
                     Call Now
-                  </button>
-                )}
-
-                {/* Contact rows */}
-                {listing.phone && (
-                  <button onClick={() => { setShowCallModal(true); trackEvent('call'); }} className="flex items-center gap-3 w-full p-3 rounded-xl border border-white/10 hover:border-gold/30 hover:bg-gold/5 transition-all group text-left cursor-pointer" data-testid="contact-phone">
-                    <div className="w-9 h-9 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0">
-                      <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
-                    </div>
-                    <div>
-                      <span className="text-xs text-white/40 font-body block">Phone</span>
-                      <span className="text-sm text-white font-medium font-body group-hover:text-gold transition-colors">{listing.phone}</span>
-                    </div>
                   </button>
                 )}
 
@@ -969,11 +928,16 @@ export default function ListingDetailPage() {
                   </a>
                 )}
 
-                {/* Get Directions */}
+                {/* Address + Directions */}
                 {(listing.address_line1 || listing.city) && (
-                  <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent([listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', '))}`} target="_blank" rel="noopener noreferrer" onClick={() => trackEvent('map')} className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-xs font-semibold font-heading text-white border border-white/10 hover:border-gold/30 hover:bg-gold/5 transition-all" data-testid="get-directions-btn">
-                    <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" /></svg>
-                    Get Directions
+                  <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent([listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', '))}`} target="_blank" rel="noopener noreferrer" onClick={() => trackEvent('map')} className="flex items-center gap-3 w-full p-3 rounded-xl border border-white/10 hover:border-gold/30 hover:bg-gold/5 transition-all group" data-testid="get-directions-btn">
+                    <div className="w-9 h-9 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" /></svg>
+                    </div>
+                    <div className="min-w-0">
+                      <span className="text-xs text-white/40 font-body block">Directions</span>
+                      <span className="text-sm text-white font-medium font-body group-hover:text-gold transition-colors truncate block">{[listing.address_line1, listing.city, listing.state].filter(Boolean).join(', ')}</span>
+                    </div>
                   </a>
                 )}
               </div>
@@ -1004,6 +968,35 @@ export default function ListingDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* ═══════════════════════════════════════════════════════════════
+          MAP — Bottom of Page
+      ═══════════════════════════════════════════════════════════════ */}
+      {(listing.address_line1 || listing.city) && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-12">
+          <SectionDivider title="Location" id="map" />
+          <div className="mt-4 rounded-2xl border border-white/10 overflow-hidden" data-testid="listing-map">
+            <div className="aspect-[21/9] w-full">
+              <iframe
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}&q=${encodeURIComponent([listing.business_name, listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', '))}`}
+                title={`Map showing ${listing.business_name} location`}
+              />
+            </div>
+            <div className="flex items-center justify-between px-5 py-3 border-t border-white/5" style={{ background: 'rgba(10,10,10,0.92)' }}>
+              <p className="text-xs text-white/50 font-body">{[listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', ')}</p>
+              <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent([listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', '))}`} target="_blank" rel="noopener noreferrer" onClick={() => trackEvent('map')} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold font-heading text-gold border border-gold/30 hover:bg-gold/5 transition-all">
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" /></svg>
+                Get Directions
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ═══════════════════════════════════════════════════════════════
           MODALS
