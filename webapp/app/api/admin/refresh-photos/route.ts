@@ -19,7 +19,7 @@ function sleep(ms: number) {
 /**
  * Ensure the listing-photos bucket exists (creates if missing).
  */
-async function ensureBucket(supabase: ReturnType<typeof createClient>) {
+async function ensureBucket(supabase: any) {
   const { data: buckets } = await supabase.storage.listBuckets();
   if (!buckets?.some(b => b.name === BUCKET_NAME)) {
     await supabase.storage.createBucket(BUCKET_NAME, {
@@ -57,7 +57,7 @@ async function getPlacePhotoNames(placeId: string): Promise<string[]> {
  * Returns the permanent public URL.
  */
 async function downloadAndUpload(
-  supabase: ReturnType<typeof createClient>,
+  supabase: any,
   photoName: string,
   listingId: string,
   index: number,
