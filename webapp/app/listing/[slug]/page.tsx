@@ -32,7 +32,7 @@ interface Listing {
   metadata: Record<string, any>;
   directory_badges: { id: string; badge_type: string; badge_label: string; badge_color: string }[];
   related: RelatedListing[];
-  business_hours: Record<string, { open: string; close: string; closed: boolean }> | null;
+  business_hours: Record<string, any> | null;
   menu: { id: string; name: string; items: { id: string; name: string; description: string; price: string }[] }[] | null;
 }
 
@@ -49,16 +49,95 @@ interface RelatedListing {
   metadata: Record<string, any>;
 }
 
-/** Compute whether the business is currently open based on business_hours */
-function getOpenStatus(businessHours: Record<string, { open: string; close: string; closed: boolean }> | null): { isOpen: boolean; label: string } | null {
-  if (!businessHours || Object.keys(businessHours).length === 0) return null;
+interface NormalizedDayHours { open: string; close: string; closed: boolean; display?: string }
+
+const LONG_TO_SHORT: Record<string, string> = {
+  monday: 'mon', tuesday: 'tue', wednesday: 'wed', thursday: 'thu',
+  friday: 'fri', saturday: 'sat', sunday: 'sun',
+};
+
+/**
+ * Parse a scraped hours string like "Monday: 8:00 AM – 6:00 PM" or "Monday: Closed"
+ * into a structured { open, close, closed } object.
+ */
+function parseHoursString(raw: string): NormalizedDayHours {
+  // Strip day prefix "Monday: " if present
+  const cleaned = raw.replace(/^\w+:\s*/, '').trim();
+  if (/closed/i.test(cleaned)) return { open: '', close: '', closed: true, display: 'Closed' };
+
+  // Match patterns like "8:00 AM – 6:00 PM", "4:00 – 10:00 PM", "12:00 PM – 5:00 AM"
+  // Also handles split shifts like "9:00 AM – 1:30 PM, 2:00 – 8:00 PM" — use full range
+  const timePattern = /(\d{1,2}:\d{2}\s*(?:AM|PM)?)\s*[–\-]\s*(\d{1,2}:\d{2}\s*(?:AM|PM)?)/gi;
+  const matches = [...cleaned.matchAll(timePattern)];
+  if (matches.length === 0) return { open: '', close: '', closed: false, display: cleaned || '—' };
+
+  const openStr = matches[0][1].trim();
+  const closeStr = matches[matches.length - 1][2].trim();
+  return { open: openStr, close: closeStr, closed: false, display: cleaned };
+}
+
+/**
+ * Normalize business_hours from any DB format into { mon: { open, close, closed, display }, ... }
+ *
+ * Handles:
+ *  1. Structured objects: { "mon": { "open": "09:00", "close": "17:00", "closed": false } }
+ *  2. String per full-day key: { "monday": "Monday: 8:00 AM – 6:00 PM" }
+ *  3. Array in a single key: { "hours": ["Monday: 8:00 AM – 5:00 PM", ...] }
+ */
+function normalizeBusinessHours(raw: Record<string, any> | null): Record<string, NormalizedDayHours> | null {
+  if (!raw || Object.keys(raw).length === 0) return null;
+
+  const result: Record<string, NormalizedDayHours> = {};
+
+  // Format 3: Array stored under a key (e.g. "hours" or any key whose value is an array of strings)
+  for (const val of Object.values(raw)) {
+    if (Array.isArray(val)) {
+      for (const entry of val) {
+        if (typeof entry !== 'string') continue;
+        const dayMatch = entry.match(/^(\w+):/i);
+        if (!dayMatch) continue;
+        const shortKey = LONG_TO_SHORT[dayMatch[1].toLowerCase()] || dayMatch[1].toLowerCase().slice(0, 3);
+        result[shortKey] = parseHoursString(entry);
+      }
+      if (Object.keys(result).length > 0) return result;
+    }
+  }
+
+  for (const [key, val] of Object.entries(raw)) {
+    const shortKey = LONG_TO_SHORT[key.toLowerCase()] || key.toLowerCase().slice(0, 3);
+
+    // Format 1: Already structured
+    if (val && typeof val === 'object' && !Array.isArray(val) && ('open' in val || 'close' in val || 'closed' in val)) {
+      result[shortKey] = {
+        open: val.open || '',
+        close: val.close || '',
+        closed: !!val.closed,
+        display: val.closed ? 'Closed' : (val.open && val.close ? `${val.open} — ${val.close}` : '—'),
+      };
+      continue;
+    }
+
+    // Format 2: String value
+    if (typeof val === 'string') {
+      result[shortKey] = parseHoursString(val);
+      continue;
+    }
+  }
+
+  return Object.keys(result).length > 0 ? result : null;
+}
+
+/** Compute whether the business is currently open based on normalized hours */
+function getOpenStatus(hours: Record<string, NormalizedDayHours> | null): { isOpen: boolean; label: string } | null {
+  if (!hours || Object.keys(hours).length === 0) return null;
   const days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
   const now = new Date();
   const dayKey = days[now.getDay()];
-  const hours = businessHours[dayKey];
-  if (!hours) return null;
-  if (hours.closed) return { isOpen: false, label: 'Closed Today' };
-  if (!hours.open || !hours.close) return null;
+  const today = hours[dayKey];
+  if (!today) return null;
+  if (today.closed) return { isOpen: false, label: 'Closed Today' };
+  if (!today.open || !today.close) return null;
+
   const parseTime = (t: string): number => {
     const match = t.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)?$/i);
     if (!match) return -1;
@@ -69,8 +148,9 @@ function getOpenStatus(businessHours: Record<string, { open: string; close: stri
     if (period === 'AM' && h === 12) h = 0;
     return h * 60 + m;
   };
-  const openMin = parseTime(hours.open);
-  const closeMin = parseTime(hours.close);
+
+  const openMin = parseTime(today.open);
+  const closeMin = parseTime(today.close);
   if (openMin < 0 || closeMin < 0) return null;
   const nowMin = now.getHours() * 60 + now.getMinutes();
   const isOpen = closeMin > openMin ? (nowMin >= openMin && nowMin < closeMin) : (nowMin >= openMin || nowMin < closeMin);
@@ -228,10 +308,10 @@ export default function ListingDetailPage() {
   const googleRating = listing.metadata?.google_rating;
   const googleReviews = listing.metadata?.google_review_count;
   const googleMapsUrl = listing.metadata?.google_maps_url;
-  const businessHours = listing.business_hours as Record<string, { open: string; close: string; closed: boolean }> | null;
+  const businessHours = normalizeBusinessHours(listing.business_hours);
   const openStatus = getOpenStatus(businessHours);
   const menuSections = listing.menu as { id: string; name: string; items: { id: string; name: string; description: string; price: string }[] }[] | null;
-  const hasHours = businessHours && Object.keys(businessHours).length > 0 && Object.values(businessHours).some((h: any) => h && (h.closed || (h.open && h.close)));
+  const hasHours = businessHours && Object.keys(businessHours).length > 0 && Object.values(businessHours).some((h) => h.closed || h.open || h.display);
   const hasMenu = menuSections && menuSections.length > 0;
   const serviceAreas = listing.tier !== 'free' && listing.metadata?.service_areas && Array.isArray(listing.metadata.service_areas) ? listing.metadata.service_areas as string[] : [];
 
@@ -594,20 +674,20 @@ export default function ListingDetailPage() {
                 <div className="mt-4 rounded-2xl border border-white/10 p-5" style={{ background: 'rgba(255,255,255,0.03)' }} data-testid="business-hours">
                   <div className="space-y-1">
                     {['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map(day => {
-                      const hours = businessHours[day];
+                      const h = businessHours[day];
                       const dayNames: Record<string, string> = { mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday', sun: 'Sunday' };
-                      const today = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase().slice(0, 3);
-                      const isToday = day === today;
+                      const todayKey = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase().slice(0, 3);
+                      const isToday = day === todayKey;
                       return (
                         <div key={day} className={`flex items-center justify-between py-2.5 px-4 rounded-lg ${isToday ? 'bg-[rgba(201,168,76,0.08)] border border-[rgba(201,168,76,0.15)]' : ''}`}>
                           <span className={`text-sm font-body ${isToday ? 'text-[#C9A84C] font-semibold' : 'text-white/60'}`}>
                             {dayNames[day]}
                             {isToday && <span className="ml-2 text-[10px] text-[#C9A84C]/60 uppercase">Today</span>}
                           </span>
-                          {hours?.closed ? (
+                          {h?.closed ? (
                             <span className="text-sm text-white/30 font-body">Closed</span>
-                          ) : hours?.open && hours?.close ? (
-                            <span className={`text-sm font-body ${isToday ? 'text-white font-medium' : 'text-white/60'}`}>{hours.open} — {hours.close}</span>
+                          ) : h?.display ? (
+                            <span className={`text-sm font-body ${isToday ? 'text-white font-medium' : 'text-white/60'}`}>{h.display}</span>
                           ) : (
                             <span className="text-sm text-white/20 font-body">—</span>
                           )}
