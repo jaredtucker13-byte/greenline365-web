@@ -3,7 +3,65 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { SUBCATEGORY_KEYWORDS } from '@/lib/directory-config';
+
+/**
+ * Group a listing's subcategories into logical service pillars using the
+ * SUBCATEGORY_KEYWORDS mapping. Subcategories that don't match any group
+ * go into "Other".
+ */
+function groupSubcategories(subs: string[]): { group: string; items: string[] }[] {
+  // Build a reverse map: keyword-parent → group label
+  // Group labels come from the comment-style groupings in SUBCATEGORY_KEYWORDS
+  const PARENT_GROUPS: Record<string, string> = {};
+  for (const parentName of Object.keys(SUBCATEGORY_KEYWORDS)) {
+    PARENT_GROUPS[parentName.toLowerCase()] = parentName;
+  }
+
+  // For each raw subcategory, find the best matching parent
+  const grouped: Record<string, string[]> = {};
+  const matched = new Set<number>();
+
+  for (let i = 0; i < subs.length; i++) {
+    const sub = subs[i];
+    const subLower = sub.toLowerCase();
+
+    // Check direct match to a parent name first
+    if (PARENT_GROUPS[subLower]) {
+      const group = PARENT_GROUPS[subLower];
+      if (!grouped[group]) grouped[group] = [];
+      // Don't add the parent name as a child of itself
+      matched.add(i);
+      if (!grouped[group].includes(sub)) grouped[group].push(sub);
+      continue;
+    }
+
+    // Check if the sub matches any parent's keywords
+    let found = false;
+    for (const [parentName, keywords] of Object.entries(SUBCATEGORY_KEYWORDS)) {
+      if (keywords.some(kw => subLower.includes(kw) || kw.includes(subLower))) {
+        if (!grouped[parentName]) grouped[parentName] = [];
+        if (!grouped[parentName].includes(sub)) grouped[parentName].push(sub);
+        matched.add(i);
+        found = true;
+        break;
+      }
+    }
+
+    if (!found) {
+      if (!grouped['Other']) grouped['Other'] = [];
+      grouped['Other'].push(sub);
+      matched.add(i);
+    }
+  }
+
+  // If everything ended up in one group, don't bother grouping — show flat
+  const groups = Object.entries(grouped);
+  if (groups.length <= 1) return [{ group: '', items: subs }];
+
+  return groups.map(([group, items]) => ({ group, items }));
+}
 
 interface Listing {
   id: string;
@@ -216,6 +274,7 @@ export default function ListingDetailPage() {
   const [activeSection, setActiveSection] = useState('overview');
   const [showAllPhotos, setShowAllPhotos] = useState(false);
   const [brokenImages, setBrokenImages] = useState<Set<string>>(new Set());
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
   const router = useRouter();
   const sectionsRef = useRef<Record<string, HTMLElement | null>>({});
 
@@ -553,23 +612,88 @@ export default function ListingDetailPage() {
               </div>
             </motion.div>
 
-            {/* ─── SERVICES & CATEGORIES ─── */}
-            {listing.subcategories?.length > 0 && (
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
-                <SectionDivider title="Services & Specialties" />
-                <div className="flex flex-wrap gap-2 mt-4">
-                  {listing.subcategories.map((sub, i) => (
-                    <span key={i} className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm text-white/60 border border-white/10 hover:border-gold/20 hover:bg-gold/5 transition-all font-body">
-                      <svg className="w-3.5 h-3.5 text-gold/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                      {sub}
-                    </span>
-                  ))}
-                  {listing.tags?.length > 0 && listing.tags.map((tag, i) => (
-                    <span key={`tag-${i}`} className="px-3 py-2 rounded-xl text-xs text-white/40 border border-white/5 font-body">{tag}</span>
-                  ))}
-                </div>
-              </motion.div>
-            )}
+            {/* ─── SERVICES & CATEGORIES (Grouped Accordion) ─── */}
+            {listing.subcategories?.length > 0 && (() => {
+              const groups = groupSubcategories(listing.subcategories);
+              const isGrouped = groups.length > 1 || (groups.length === 1 && groups[0].group !== '');
+              const toggleGroup = (group: string) => {
+                setExpandedGroups(prev => {
+                  const next = new Set(prev);
+                  next.has(group) ? next.delete(group) : next.add(group);
+                  return next;
+                });
+              };
+
+              return (
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
+                  <SectionDivider title="Services & Specialties" />
+
+                  {isGrouped ? (
+                    <div className="mt-4 space-y-2">
+                      {groups.map(({ group, items }) => {
+                        const isExpanded = expandedGroups.has(group);
+                        return (
+                          <div key={group} className="rounded-xl border border-white/8 overflow-hidden" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                            <button
+                              onClick={() => toggleGroup(group)}
+                              className="flex items-center justify-between w-full px-4 py-3 text-left hover:bg-white/[0.03] transition-colors"
+                            >
+                              <div className="flex items-center gap-2.5">
+                                <span className="w-1.5 h-1.5 rounded-full bg-gold/60" />
+                                <span className="text-sm font-heading font-semibold text-white/80">{group}</span>
+                                <span className="text-[10px] text-white/25 font-body">{items.length}</span>
+                              </div>
+                              <svg className={`w-4 h-4 text-white/30 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                              </svg>
+                            </button>
+                            <AnimatePresence initial={false}>
+                              {isExpanded && (
+                                <motion.div
+                                  initial={{ height: 0, opacity: 0 }}
+                                  animate={{ height: 'auto', opacity: 1 }}
+                                  exit={{ height: 0, opacity: 0 }}
+                                  transition={{ duration: 0.2 }}
+                                  className="overflow-hidden"
+                                >
+                                  <div className="flex flex-wrap gap-2 px-4 pb-4">
+                                    {items.map((sub, i) => (
+                                      <span key={i} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs text-white/60 border border-white/10 font-body">
+                                        <svg className="w-3 h-3 text-gold/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                        {sub}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    /* Flat layout for listings with few or ungrouped subcategories */
+                    <div className="flex flex-wrap gap-2 mt-4">
+                      {listing.subcategories.map((sub, i) => (
+                        <span key={i} className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm text-white/60 border border-white/10 hover:border-gold/20 hover:bg-gold/5 transition-all font-body">
+                          <svg className="w-3.5 h-3.5 text-gold/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                          {sub}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Tags below groups */}
+                  {listing.tags?.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {listing.tags.map((tag, i) => (
+                        <span key={`tag-${i}`} className="px-3 py-1.5 rounded-lg text-[11px] text-white/30 border border-white/5 font-body">{tag}</span>
+                      ))}
+                    </div>
+                  )}
+                </motion.div>
+              );
+            })()}
 
             {/* ─── DIRECTORY BADGES ─── */}
             {listing.directory_badges?.length > 0 && (
