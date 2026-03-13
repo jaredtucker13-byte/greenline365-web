@@ -275,6 +275,7 @@ export default function ListingDetailPage() {
   const [showAllPhotos, setShowAllPhotos] = useState(false);
   const [brokenImages, setBrokenImages] = useState<Set<string>>(new Set());
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
+  const [showMapExpanded, setShowMapExpanded] = useState(false);
   const router = useRouter();
   const sectionsRef = useRef<Record<string, HTMLElement | null>>({});
 
@@ -973,33 +974,66 @@ export default function ListingDetailPage() {
               </motion.div>
             )}
 
-            {/* ─── SIMILAR BUSINESSES ─── */}
-            {listing.related?.length > 0 && (
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} data-testid="related-listings">
-                <SectionDivider title={`Similar Businesses${listing.city ? ` in ${listing.city}` : ''}`} />
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
-                  {listing.related.slice(0, 4).map((r) => (
-                    <Link key={r.id} href={`/listing/${r.slug}`} className="rounded-xl border border-white/5 overflow-hidden hover:border-[rgba(201,168,76,0.25)] hover:scale-[1.02] transition-all duration-300 ease-out group" style={{ background: 'rgba(255,255,255,0.02)' }}>
-                      <div className="relative h-28 overflow-hidden">
-                        {r.cover_image_url ? (
-                          <ImageOrPlaceholder src={r.cover_image_url} alt={r.business_name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-[#111111] to-[#1a1a1a] flex items-center justify-center"><span className="text-2xl font-heading font-light text-white/10">{r.business_name[0]}</span></div>
-                        )}
-                        {r.avg_feedback_rating > 0 && (
-                          <span className="absolute top-2 right-2 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold" style={{ background: 'rgba(201,168,76,0.9)', color: '#1a1a1a' }}>
-                            <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
-                            {r.avg_feedback_rating.toFixed(1)}
-                          </span>
-                        )}
+            {/* ─── SIMILAR BUSINESSES + COMPACT MAP ─── */}
+            {(listing.related?.length > 0 || listing.address_line1 || listing.city) && (
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+                {listing.related?.length > 0 && (
+                  <div data-testid="related-listings">
+                    <SectionDivider title={`Similar Businesses${listing.city ? ` in ${listing.city}` : ''}`} />
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
+                      {listing.related.slice(0, 4).map((r) => (
+                        <Link key={r.id} href={`/listing/${r.slug}`} className="rounded-xl border border-white/5 overflow-hidden hover:border-[rgba(201,168,76,0.25)] hover:scale-[1.02] transition-all duration-300 ease-out group" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                          <div className="relative h-28 overflow-hidden">
+                            {r.cover_image_url ? (
+                              <ImageOrPlaceholder src={r.cover_image_url} alt={r.business_name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                            ) : (
+                              <div className="w-full h-full bg-gradient-to-br from-[#111111] to-[#1a1a1a] flex items-center justify-center"><span className="text-2xl font-heading font-light text-white/10">{r.business_name[0]}</span></div>
+                            )}
+                            {r.avg_feedback_rating > 0 && (
+                              <span className="absolute top-2 right-2 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold" style={{ background: 'rgba(201,168,76,0.9)', color: '#1a1a1a' }}>
+                                <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
+                                {r.avg_feedback_rating.toFixed(1)}
+                              </span>
+                            )}
+                          </div>
+                          <div className="p-3">
+                            <p className="text-xs font-heading font-semibold text-gold truncate">{r.business_name}</p>
+                            <p className="text-[10px] text-white/35 font-body mt-0.5">{r.city}{r.state ? `, ${r.state}` : ''}</p>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Compact Map — click to expand */}
+                {(listing.address_line1 || listing.city) && (
+                  <div className="mt-6 rounded-xl border border-white/8 overflow-hidden cursor-pointer group" onClick={() => setShowMapExpanded(true)} data-testid="listing-map">
+                    <div className="h-[140px] relative">
+                      <iframe
+                        width="100%"
+                        height="100%"
+                        style={{ border: 0, pointerEvents: 'none' }}
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}&q=${encodeURIComponent([listing.business_name, listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', '))}`}
+                        title={`Map showing ${listing.business_name} location`}
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                        <span className="opacity-0 group-hover:opacity-100 transition-opacity px-3 py-1.5 rounded-lg text-xs font-heading font-semibold text-white backdrop-blur-sm" style={{ background: 'rgba(10,10,10,0.8)' }}>
+                          <svg className="w-3.5 h-3.5 inline mr-1.5 -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" /></svg>
+                          Expand Map
+                        </span>
                       </div>
-                      <div className="p-3">
-                        <p className="text-xs font-heading font-semibold text-gold truncate">{r.business_name}</p>
-                        <p className="text-[10px] text-white/35 font-body mt-0.5">{r.city}{r.state ? `, ${r.state}` : ''}</p>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
+                    </div>
+                    <div className="flex items-center justify-between px-4 py-2.5 border-t border-white/5" style={{ background: 'rgba(10,10,10,0.92)' }}>
+                      <p className="text-[11px] text-white/40 font-body truncate">{[listing.address_line1, listing.city, listing.state].filter(Boolean).join(', ')}</p>
+                      <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent([listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', '))}`} target="_blank" rel="noopener noreferrer" onClick={(e) => { e.stopPropagation(); trackEvent('map'); }} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[10px] font-semibold font-heading text-gold border border-gold/20 hover:bg-gold/5 transition-all flex-shrink-0">
+                        Directions
+                      </a>
+                    </div>
+                  </div>
+                )}
               </motion.div>
             )}
 
@@ -1094,35 +1128,6 @@ export default function ListingDetailPage() {
       </div>
 
       {/* ═══════════════════════════════════════════════════════════════
-          MAP — Bottom of Page
-      ═══════════════════════════════════════════════════════════════ */}
-      {(listing.address_line1 || listing.city) && (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-12">
-          <SectionDivider title="Location" id="map" />
-          <div className="mt-4 rounded-2xl border border-white/10 overflow-hidden" data-testid="listing-map">
-            <div className="aspect-[4/3] sm:aspect-[16/9] w-full max-h-[280px]">
-              <iframe
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}&q=${encodeURIComponent([listing.business_name, listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', '))}`}
-                title={`Map showing ${listing.business_name} location`}
-              />
-            </div>
-            <div className="flex items-center justify-between px-5 py-3 border-t border-white/5" style={{ background: 'rgba(10,10,10,0.92)' }}>
-              <p className="text-xs text-white/50 font-body">{[listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', ')}</p>
-              <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent([listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', '))}`} target="_blank" rel="noopener noreferrer" onClick={() => trackEvent('map')} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold font-heading text-gold border border-gold/30 hover:bg-gold/5 transition-all">
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" /></svg>
-                Get Directions
-              </a>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ═══════════════════════════════════════════════════════════════
           MODALS
       ═══════════════════════════════════════════════════════════════ */}
 
@@ -1157,6 +1162,40 @@ export default function ListingDetailPage() {
             </div>
             <p className="text-[10px] text-white/20 font-body mt-4">Powered by GreenLine365</p>
           </motion.div>
+        </div>
+      )}
+
+      {/* Expanded Map Modal */}
+      {showMapExpanded && (listing.address_line1 || listing.city) && (
+        <div className="fixed inset-0 z-50 flex flex-col" onClick={() => setShowMapExpanded(false)}>
+          <div className="absolute inset-0 bg-black/90 backdrop-blur-sm" />
+          <div className="relative flex-1 flex flex-col z-10">
+            <div className="flex items-center justify-between p-4 border-b border-white/10">
+              <div>
+                <h3 className="text-sm font-heading font-semibold text-white">{listing.business_name}</h3>
+                <p className="text-[11px] text-white/40 font-body">{[listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', ')}</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent([listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', '))}`} target="_blank" rel="noopener noreferrer" onClick={(e) => { e.stopPropagation(); trackEvent('map'); }} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold font-heading text-[#0A0A0A]" style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C97A)' }}>
+                  Directions
+                </a>
+                <button onClick={() => setShowMapExpanded(false)} className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors text-white/60 hover:text-white">
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+              </div>
+            </div>
+            <div className="flex-1" onClick={(e) => e.stopPropagation()}>
+              <iframe
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}&q=${encodeURIComponent([listing.business_name, listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', '))}`}
+                title={`Map showing ${listing.business_name} location`}
+              />
+            </div>
+          </div>
         </div>
       )}
 
