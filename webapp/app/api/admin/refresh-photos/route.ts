@@ -21,7 +21,7 @@ function sleep(ms: number) {
  */
 async function ensureBucket(supabase: any) {
   const { data: buckets } = await supabase.storage.listBuckets();
-  if (!buckets?.some(b => b.name === BUCKET_NAME)) {
+  if (!buckets?.some((b: any) => b.name === BUCKET_NAME)) {
     await supabase.storage.createBucket(BUCKET_NAME, {
       public: true,
       fileSizeLimit: 10 * 1024 * 1024, // 10MB
