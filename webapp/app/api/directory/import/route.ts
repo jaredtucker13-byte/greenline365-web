@@ -3,6 +3,36 @@ import { NextRequest, NextResponse } from 'next/server';
 const googlePlacesKey = process.env.GOOGLE_PLACES_API_KEY || '';
 
 /**
+ * Validate that a place ID matches the expected Google Places format
+ * to prevent SSRF via path traversal in the API URL.
+ */
+function isValidPlaceId(placeId: string): boolean {
+  return /^[A-Za-z0-9_-]{20,200}$/.test(placeId);
+}
+
+/**
+ * Validate that a URL is safe to fetch (not an internal/private resource).
+ * Blocks private IPs, localhost, and non-HTTP(S) schemes to prevent SSRF.
+ */
+function isSafeUrl(urlString: string): boolean {
+  try {
+    const parsed = new URL(urlString);
+    // Only allow http(s)
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return false;
+    const hostname = parsed.hostname.toLowerCase();
+    // Block localhost and common internal hostnames
+    if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]' || hostname === '0.0.0.0') return false;
+    // Block private IP ranges
+    if (/^(10\.|172\.(1[6-9]|2\d|3[01])\.|192\.168\.|169\.254\.|fc00:|fd)/.test(hostname)) return false;
+    // Block metadata endpoints
+    if (hostname === 'metadata.google.internal' || hostname === '169.254.169.254') return false;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * POST /api/directory/import — Extract business info from a URL or Google Places
  *
  * Returns extracted fields for form pre-fill (does NOT create a listing).
@@ -87,6 +117,8 @@ function extractGoogleMapsSearchText(url: string): string | null {
 // ─── Google Places API ─────────────────────────────────────────────────────
 
 async function lookupGooglePlace(placeId: string) {
+  if (!isValidPlaceId(placeId)) return null;
+
   const fieldMask = [
     'displayName',
     'formattedAddress',
@@ -101,7 +133,7 @@ async function lookupGooglePlace(placeId: string) {
     'photos',
   ].join(',');
 
-  const res = await fetch(`https://places.googleapis.com/v1/places/${placeId}`, {
+  const res = await fetch(`https://places.googleapis.com/v1/places/${encodeURIComponent(placeId)}`, {
     headers: {
       'X-Goog-Api-Key': googlePlacesKey,
       'X-Goog-FieldMask': fieldMask,
@@ -220,6 +252,10 @@ function mapGoogleTypeToIndustry(primaryType: string | undefined, types: string[
 async function scrapeMetaTags(url: string) {
   let normalizedUrl = url;
   if (!normalizedUrl.startsWith('http')) normalizedUrl = 'https://' + normalizedUrl;
+
+  if (!isSafeUrl(normalizedUrl)) {
+    return { business_name: '', description: '', error: 'URL is not allowed (internal or private address)' };
+  }
 
   const res = await fetch(normalizedUrl, {
     headers: {

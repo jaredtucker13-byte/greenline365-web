@@ -13,12 +13,18 @@ import { createServerClient } from '@/lib/supabase/server';
 import { logAuditEvent } from '@/lib/audit-logger';
 
 function slugify(text: string): string {
-  return text
+  const slug = text
+    .substring(0, 200)
     .toLowerCase()
     .replace(/[^\w\s-]/g, '')
     .replace(/[\s_]+/g, '-')
-    .replace(/^-+|-+$/g, '')
     .substring(0, 80);
+  // Trim leading/trailing dashes without backtracking regex
+  let start = 0;
+  let end = slug.length;
+  while (start < end && slug[start] === '-') start++;
+  while (end > start && slug[end - 1] === '-') end--;
+  return slug.substring(start, end);
 }
 
 // ─── GET: List with search/filter/sort/pagination ───────────────────────────
@@ -133,7 +139,7 @@ export async function POST(request: NextRequest) {
   const errors: string[] = [];
   if (!business_name?.trim()) errors.push('Business name is required');
   if (!industry?.trim()) errors.push('Category is required');
-  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.push('Invalid email format');
+  if (email && !/^[^\s@]{1,64}@[^\s@.]{1,63}(?:\.[^\s@.]{1,63})+$/.test(email)) errors.push('Invalid email format');
   if (phone && !/^[\d\s()+-]{7,20}$/.test(phone)) errors.push('Invalid phone format');
   if (website && !/^https?:\/\/.+/.test(website)) errors.push('Website must start with http:// or https://');
 
