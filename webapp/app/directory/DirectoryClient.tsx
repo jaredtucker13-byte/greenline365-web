@@ -274,7 +274,7 @@ export default function DirectoryClient() {
         setStats(prev => ({
           ...prev,
           businesses: counts.total_businesses || allArr.length,
-          categories: counts.total_categories || CATEGORIES.length,
+          categories: CATEGORIES.length,
           destinations: counts.total_destinations || 8,
         }));
       } else {
