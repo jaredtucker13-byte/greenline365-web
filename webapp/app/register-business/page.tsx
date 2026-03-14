@@ -137,7 +137,7 @@ function RegisterForm() {
       setUser(data.user);
       setStep('business');
     } else if (data.user) {
-      setError('Check your email for a confirmation link, then come back to complete registration.');
+      setError('Check your email for a confirmation link, then come back to complete registration. Check your spam folder — emails from GreenLine365help@gmail.com may be filtered automatically.');
     }
     setLoading(false);
   };

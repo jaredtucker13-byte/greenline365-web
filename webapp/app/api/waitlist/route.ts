@@ -155,7 +155,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       { 
-        message: 'Check your email to verify! You can click the link or enter the code.',
+        message: 'Check your email to verify! You can click the link or enter the code. Check your spam folder — emails from GreenLine365help@gmail.com may be filtered automatically.',
         requiresVerification: true,
       },
       { status: 201 }
