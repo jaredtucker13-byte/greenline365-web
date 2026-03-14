@@ -537,8 +537,9 @@ export default function CollapsibleSidebar({
         {/* Sign Out Button */}
         <button
           onClick={async () => {
-            const { createClient } = await import('@/lib/supabase/client');
-            const supabase = createClient();
+            // Import the singleton client — createClient() returns a fresh instance
+            // with no active session, making signOut() a no-op.
+            const { supabase } = await import('@/lib/supabase/client');
             localStorage.removeItem('greenline365_active_business');
             localStorage.removeItem('greenline365_edit_mode');
             await supabase.auth.signOut();
