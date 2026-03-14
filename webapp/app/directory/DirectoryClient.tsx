@@ -11,9 +11,11 @@ import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
-import BoostedShowcase from '@/components/BoostedShowcase';
-import CommunityPolls from '@/components/CommunityPolls';
-import FeaturedShowcase from '@/components/FeaturedShowcase';
+import dynamic from 'next/dynamic';
+
+const BoostedShowcase = dynamic(() => import('@/components/BoostedShowcase'), { ssr: false });
+const CommunityPolls = dynamic(() => import('@/components/CommunityPolls'), { ssr: false });
+const FeaturedShowcase = dynamic(() => import('@/components/FeaturedShowcase'), { ssr: false });
 import { getPlaceholderImage, getCategoryFallback, getFallbackDescription, matchesSubcategory } from '@/lib/directory-config';
 
 interface Listing {
@@ -49,7 +51,7 @@ const NON_CLAIMABLE_INDUSTRIES: string[] = [];
 
 const CATEGORIES = [
   // === HOME SERVICES (The Big Five + all trades) ===
-  { id: 'services', label: 'Home Services', sub: 'HVAC, Plumbing, Electrical & Every Trade', img: '/images/categories/services.png',
+  { id: 'services', label: 'Home Services', sub: 'HVAC, Plumbing, Electrical & Every Trade', img: '/images/categories/services.webp',
     subcategories: [
       'All',
       // Big Five
@@ -77,15 +79,15 @@ const CATEGORIES = [
     subcategories: ['All', 'Boat Repair', 'Marine Mechanics', 'Dock & Lift', 'Boat Cleaning', 'Fishing Charters', 'Kayak & Paddleboard', 'Dive Shops', 'Marinas'] },
 
   // === DINING ===
-  { id: 'dining', label: 'Dining', sub: 'Cafes, casual & fine dining', img: '/images/categories/dining.png',
+  { id: 'dining', label: 'Dining', sub: 'Cafes, casual & fine dining', img: '/images/categories/dining.webp',
     subcategories: ['All', 'Fine Dining', 'Casual', 'Cafes & Bakeries', 'Food Trucks', 'Seafood', 'BBQ', 'Pizza', 'Mexican', 'Asian', 'Italian', 'Breakfast & Brunch', 'Vegan & Vegetarian'] },
 
   // === HEALTH & WELLNESS ===
-  { id: 'health-wellness', label: 'Health & Wellness', sub: 'Doctors, dentists, fitness & more', img: '/images/categories/health-wellness.png',
+  { id: 'health-wellness', label: 'Health & Wellness', sub: 'Doctors, dentists, fitness & more', img: '/images/categories/health-wellness.webp',
     subcategories: ['All', 'Dental Offices', 'Physical Therapy', 'Medical Clinics', 'Mental Health', 'Fitness', 'Chiropractors', 'Optometrists', 'Urgent Care', 'Pharmacies', 'Dermatology', 'Orthopedics'] },
 
   // === STYLE & SHOPPING ===
-  { id: 'style-shopping', label: 'Style & Shopping', sub: 'Fashion, grooming & retail', img: '/images/categories/style-shopping.png',
+  { id: 'style-shopping', label: 'Style & Shopping', sub: 'Fashion, grooming & retail', img: '/images/categories/style-shopping.webp',
     subcategories: ['All', 'Barbershops', 'Salons', 'Nail Salons', 'Spas', 'Boutiques', 'Jewelry', 'Tattoo & Piercing', 'Dry Cleaning & Laundry'] },
 
   // === PROFESSIONAL SERVICES ===
@@ -255,9 +257,10 @@ export default function DirectoryClient() {
   const [stats, setStats] = useState({ businesses: 0, categories: CATEGORIES.length, destinations: 8, foundingMembersClaimed: 0 });
 
   useEffect(() => {
-    // Load featured + all listings + dynamic counts
+    // Load featured + initial listings + dynamic counts
+    // Only fetch 24 listings initially — load more when user browses categories
     Promise.all([
-      fetch('/api/directory?limit=100').then(r => r.json()),
+      fetch('/api/directory?limit=24').then(r => r.json()),
       fetch('/api/directory?limit=6&featured=true').then(r => r.json()),
       fetch('/api/directory/counts').then(r => r.json()).catch(() => null),
     ]).then(([all, featured, counts]) => {
@@ -265,7 +268,7 @@ export default function DirectoryClient() {
       const featArr = Array.isArray(featured) ? featured : [];
       setAllListings(allArr);
       setFeaturedListings(featArr.length > 0 ? featArr : allArr.slice(0, 6));
-      setTotalListingCount(allArr.length);
+      setTotalListingCount(counts?.total_businesses || allArr.length);
       // Use dynamic counts from Supabase — no hard-coded numbers
       if (counts && !counts.error) {
         setStats(prev => ({
@@ -286,15 +289,34 @@ export default function DirectoryClient() {
         document.getElementById('categories')?.scrollIntoView({ behavior: 'smooth' });
       }, 500);
     }
+  }, []);
 
-    // Request geolocation
-    if (navigator.geolocation) {
+  // Lazy geolocation — only request when user interacts with directory (not on page load)
+  const geoRequested = useRef(false);
+  const requestGeolocation = useCallback(() => {
+    if (geoRequested.current || userLocation) return;
+    geoRequested.current = true;
+    if (typeof navigator !== 'undefined' && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         pos => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
         () => {}
       );
     }
-  }, []);
+  }, [userLocation]);
+
+  // Load more listings when user browses a category (initial load is only 24)
+  const fullLoadDone = useRef(false);
+  const loadAllListings = useCallback(() => {
+    if (fullLoadDone.current) return;
+    fullLoadDone.current = true;
+    const params = userLocation ? `&lat=${userLocation.lat}&lng=${userLocation.lng}` : '';
+    fetch(`/api/directory?limit=100${params}`)
+      .then(r => r.json())
+      .then(data => {
+        if (Array.isArray(data)) setAllListings(data);
+      })
+      .catch(() => {});
+  }, [userLocation]);
 
   const premierPartners = featuredListings.filter(l => l.tier === 'premium' || l.has_property_intelligence);
   const recentListings = allListings.filter(l => !premierPartners.find(p => p.id === l.id)).slice(0, 6);
@@ -324,6 +346,8 @@ export default function DirectoryClient() {
     setActiveSubcategory('All');
     setShowGroupedBrowse(true);
     setShowListings(false);
+    requestGeolocation();
+    loadAllListings();
   };
 
   const handleSearch = () => {
@@ -331,12 +355,16 @@ export default function DirectoryClient() {
       setShowGroupedBrowse(false);
       setShowListings(true);
       setActiveCategory('');
+      requestGeolocation();
+      loadAllListings();
     }
   };
 
   const handleBrowseAll = () => {
     setShowGroupedBrowse(true);
     setActiveCategory('');
+    requestGeolocation();
+    loadAllListings();
   };
 
   // Hero search handler
@@ -345,6 +373,8 @@ export default function DirectoryClient() {
       setShowGroupedBrowse(false);
       setShowListings(true);
       setActiveCategory('');
+      requestGeolocation();
+      loadAllListings();
       document.getElementById('categories')?.scrollIntoView({ behavior: 'smooth' });
     } else {
       document.getElementById('categories')?.scrollIntoView({ behavior: 'smooth' });
@@ -382,7 +412,7 @@ export default function DirectoryClient() {
             {/* Background Image Layer */}
             <div className="absolute inset-0">
               <Image
-                src="/images/hero-directory.png"
+                src="/images/hero-directory.webp"
                 alt="GreenLine365 Directory"
                 fill
                 priority
