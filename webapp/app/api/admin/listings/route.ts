@@ -180,6 +180,14 @@ export async function POST(request: NextRequest) {
   };
   if (publish_at) metadata.publish_at = publish_at;
 
+  // Look up the user's business (tenant) for the FK, if they have one
+  const { data: userBusiness } = await service
+    .from('businesses')
+    .select('id')
+    .eq('owner_id', user.id)
+    .limit(1)
+    .maybeSingle();
+
   const { data, error } = await service
     .from('directory_listings')
     .insert({
@@ -196,12 +204,13 @@ export async function POST(request: NextRequest) {
       email: email?.trim() || null,
       website: website?.trim() || null,
       logo_url: logo_url || null,
-      hours: hours || null,
+      business_hours: hours || {},
       tags: tags || [],
       tier: 'free',
       is_published: false,
       is_claimed: true,
       claimed_by: user.id,
+      tenant_id: userBusiness?.id || null,
       metadata,
     })
     .select()

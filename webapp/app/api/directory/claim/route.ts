@@ -58,12 +58,22 @@ export async function POST(request: NextRequest) {
 
     // Claim the listing
     const now = new Date().toISOString();
+
+    // Look up the user's business for the tenant_id FK (references businesses table, not auth.users)
+    const { data: userBusiness } = await service
+      .from('businesses')
+      .select('id')
+      .eq('owner_id', user.id)
+      .limit(1)
+      .maybeSingle();
+
     const { data: updated, error: updateError } = await service
       .from('directory_listings')
       .update({
         is_claimed: true,
         claimed_by: user.id,
-        tenant_id: user.id,
+        tenant_id: userBusiness?.id || null,
+        claimed_at: now,
         updated_at: now,
       })
       .eq('id', listing_id)
