@@ -203,10 +203,23 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const supabase = getServiceClient();
   const body = await request.json();
-  const { business_name, industry, website, phone, email, address_line1, city, state, zip_code, description, tenant_id, logo_url } = body;
+  const {
+    business_name, industry, website, phone, email,
+    address_line1, city, state, zip_code, description,
+    tenant_id, logo_url, is_mobile_business, service_area,
+  } = body;
 
   if (!business_name || !industry) {
     return NextResponse.json({ error: 'business_name and industry required' }, { status: 400 });
+  }
+
+  // Build metadata with service area info for mobile businesses
+  const metadata: Record<string, unknown> = {};
+  if (is_mobile_business) {
+    metadata.is_mobile_business = true;
+    if (service_area) {
+      metadata.service_areas = [service_area];
+    }
   }
 
   const { data, error } = await supabase
@@ -214,12 +227,16 @@ export async function POST(request: NextRequest) {
     .insert({
       business_name, industry, description: description || null,
       website: website || null, phone: phone || null, email: email || null,
-      address_line1: address_line1 || null, city: city || null, state: state || null, zip_code: zip_code || null,
+      address_line1: address_line1 || null,
+      city: is_mobile_business ? null : (city || null),
+      state: is_mobile_business ? null : (state || null),
+      zip_code: is_mobile_business ? null : (zip_code || null),
       logo_url: logo_url || null,
       tenant_id: tenant_id || null,
       tier: 'free',
       is_claimed: !!tenant_id,
       claimed_by: null,
+      metadata: Object.keys(metadata).length > 0 ? metadata : {},
     })
     .select()
     .single();

@@ -393,7 +393,8 @@ export default function ListingDetailPage() {
   const menuSections = listing.menu as { id: string; name: string; items: { id: string; name: string; description: string; price: string }[] }[] | null;
   const hasHours = businessHours && Object.keys(businessHours).length > 0 && Object.values(businessHours).some((h) => h.closed || h.open || h.display);
   const hasMenu = menuSections && menuSections.length > 0;
-  const serviceAreas = listing.tier !== 'free' && listing.metadata?.service_areas && Array.isArray(listing.metadata.service_areas) ? listing.metadata.service_areas as string[] : [];
+  const isMobileBusiness = listing.metadata?.is_mobile_business === true;
+  const serviceAreas = (listing.metadata?.service_areas && Array.isArray(listing.metadata.service_areas)) ? listing.metadata.service_areas as string[] : [];
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] pt-20 pb-16" data-testid="listing-detail-page">
@@ -504,10 +505,15 @@ export default function ListingDetailPage() {
 
               {/* Location + subcategories line */}
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-white/50 font-body">
-                {listing.city && (
+                {isMobileBusiness && serviceAreas.length > 0 ? (
+                  <span className="flex items-center gap-1.5">
+                    <svg className="w-3.5 h-3.5 text-gold/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                    Serves {serviceAreas[0]}
+                  </span>
+                ) : listing.city ? (
                   <span>{listing.city}, {listing.state}</span>
-                )}
-                {listing.subcategories?.length > 0 && (
+                ) : null}
+                {listing.subcategories?.length > 0 && (listing.city || (isMobileBusiness && serviceAreas.length > 0)) && (
                   <span className="text-white/30">·</span>
                 )}
                 {listing.subcategories?.length > 0 && (
@@ -515,7 +521,7 @@ export default function ListingDetailPage() {
                 )}
               </div>
 
-              {/* Service areas */}
+              {/* Service areas — show all areas as pills */}
               {serviceAreas.length > 0 && (
                 <div className="flex flex-wrap items-center gap-1.5 mt-3">
                   <span className="text-[10px] text-white/30 font-heading uppercase tracking-wider mr-1">Serves</span>
@@ -975,7 +981,7 @@ export default function ListingDetailPage() {
             )}
 
             {/* ─── SIMILAR BUSINESSES + COMPACT MAP ─── */}
-            {(listing.related?.length > 0 || listing.address_line1 || listing.city) && (
+            {(listing.related?.length > 0 || ((!isMobileBusiness) && (listing.address_line1 || listing.city))) && (
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
                 {listing.related?.length > 0 && (
                   <div data-testid="related-listings">
@@ -1007,7 +1013,7 @@ export default function ListingDetailPage() {
                 )}
 
                 {/* Compact Map — click to expand */}
-                {(listing.address_line1 || listing.city) && (
+                {!isMobileBusiness && (listing.address_line1 || listing.city) && (
                   <div className="mt-6 rounded-xl border border-white/8 overflow-hidden cursor-pointer group" onClick={() => setShowMapExpanded(true)} data-testid="listing-map">
                     <div className="h-[140px] relative">
                       <iframe
@@ -1086,8 +1092,18 @@ export default function ListingDetailPage() {
                   </a>
                 )}
 
-                {/* Address + Directions */}
-                {(listing.address_line1 || listing.city) && (
+                {/* Address + Directions (or Service Area for mobile businesses) */}
+                {isMobileBusiness && serviceAreas.length > 0 ? (
+                  <div className="flex items-center gap-3 w-full p-3 rounded-xl border border-white/10 bg-white/[0.02]">
+                    <div className="w-9 h-9 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                    </div>
+                    <div className="min-w-0">
+                      <span className="text-xs text-white/40 font-body block">Service Area</span>
+                      <span className="text-sm text-white font-medium font-body truncate block">{serviceAreas.join(', ')}</span>
+                    </div>
+                  </div>
+                ) : (listing.address_line1 || listing.city) ? (
                   <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent([listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', '))}`} target="_blank" rel="noopener noreferrer" onClick={() => trackEvent('map')} className="flex items-center gap-3 w-full p-3 rounded-xl border border-white/10 hover:border-gold/30 hover:bg-gold/5 transition-all group" data-testid="get-directions-btn">
                     <div className="w-9 h-9 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0">
                       <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" /></svg>
@@ -1097,7 +1113,7 @@ export default function ListingDetailPage() {
                       <span className="text-sm text-white font-medium font-body group-hover:text-gold transition-colors truncate block">{[listing.address_line1, listing.city, listing.state].filter(Boolean).join(', ')}</span>
                     </div>
                   </a>
-                )}
+                ) : null}
               </div>
 
               {/* Verified / Claimed status */}

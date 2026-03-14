@@ -23,6 +23,8 @@ const TIER_INFO: Record<string, { name: string; price: string; color: string }> 
   premium: { name: 'Premium', price: '$89/mo', color: '#FF8C00' },
 };
 
+const inputClass = 'w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition';
+
 function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -34,6 +36,14 @@ function RegisterForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Import state
+  const [importUrl, setImportUrl] = useState('');
+  const [importing, setImporting] = useState(false);
+  const [importSuccess, setImportSuccess] = useState<string | null>(null);
+
+  // Mobile/service area business toggle
+  const [isMobileBusiness, setIsMobileBusiness] = useState(false);
+
   const [authData, setAuthData] = useState({ email: '', password: '', fullName: '' });
   const [businessData, setBusinessData] = useState({
     business_name: '',
@@ -44,6 +54,7 @@ function RegisterForm() {
     state: '',
     zip_code: '',
     description: '',
+    service_area: '',
   });
 
   useEffect(() => {
@@ -57,6 +68,52 @@ function RegisterForm() {
     };
     check();
   }, []);
+
+  // ─── Import from URL / Google ─────────────────────────────────────────────
+
+  const handleImport = async () => {
+    if (!importUrl.trim()) return;
+    setImporting(true);
+    setError(null);
+    setImportSuccess(null);
+
+    try {
+      const res = await fetch('/api/directory/import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: importUrl.trim() }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || 'Failed to import business info');
+        setImporting(false);
+        return;
+      }
+
+      // Pre-fill form with extracted data
+      setBusinessData(prev => ({
+        ...prev,
+        business_name: data.business_name || prev.business_name,
+        industry: INDUSTRIES.includes(data.industry) ? data.industry : prev.industry,
+        phone: data.phone || prev.phone,
+        website: data.website || prev.website,
+        city: data.city || prev.city,
+        state: data.state || prev.state,
+        zip_code: data.zip_code || prev.zip_code,
+        description: data.description || prev.description,
+        service_area: data.service_area || prev.service_area,
+      }));
+
+      const source = data.source === 'google_places' ? 'Google Places' : 'website';
+      setImportSuccess(`Imported from ${source}: ${data.business_name || 'business info'}`);
+    } catch {
+      setError('Import failed. Check the URL and try again.');
+    }
+    setImporting(false);
+  };
+
+  // ─── Auth ─────────────────────────────────────────────────────────────────
 
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,6 +151,8 @@ function RegisterForm() {
     }
   };
 
+  // ─── Business Submit ──────────────────────────────────────────────────────
+
   const handleBusinessSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -120,6 +179,9 @@ function RegisterForm() {
         slug,
         tenant_id: user?.id,
         tier: selectedTier === 'free' ? 'free' : selectedTier,
+        is_mobile_business: isMobileBusiness,
+        // If mobile business, clear physical address fields
+        ...(isMobileBusiness ? { city: null, state: null, zip_code: null } : {}),
       }),
     });
 
@@ -240,7 +302,7 @@ function RegisterForm() {
                     value={authData.fullName}
                     onChange={(e) => setAuthData({ ...authData, fullName: e.target.value })}
                     required
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
+                    className={inputClass}
                     placeholder="John Smith"
                     data-testid="register-name-input"
                   />
@@ -252,7 +314,7 @@ function RegisterForm() {
                     value={authData.email}
                     onChange={(e) => setAuthData({ ...authData, email: e.target.value })}
                     required
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
+                    className={inputClass}
                     placeholder="you@company.com"
                     data-testid="register-email-input"
                   />
@@ -265,7 +327,7 @@ function RegisterForm() {
                     onChange={(e) => setAuthData({ ...authData, password: e.target.value })}
                     required
                     minLength={6}
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
+                    className={inputClass}
                     placeholder="Min 6 characters"
                     data-testid="register-password-input"
                   />
@@ -294,6 +356,53 @@ function RegisterForm() {
                 Logged in as <span className="text-white/70">{user?.email}</span>
               </div>
 
+              {/* ── Quick Start — Import from URL ── */}
+              <div className="rounded-xl border border-gold-500/20 bg-gold-500/5 p-4 mb-2">
+                <div className="flex items-center gap-2 mb-3">
+                  <svg className="w-4 h-4 text-gold-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  <span className="text-sm font-semibold text-gold-400">Quick Start — Import Your Business Info</span>
+                </div>
+                <p className="text-xs text-white/40 mb-3">
+                  Paste your website URL or Google Maps link to auto-fill the form.
+                </p>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={importUrl}
+                    onChange={(e) => setImportUrl(e.target.value)}
+                    placeholder="https://yourbusiness.com or Google Maps link"
+                    className="flex-1 px-3 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm text-white placeholder:text-white/25 focus:border-gold-500/50 outline-none transition"
+                    onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleImport(); } }}
+                    data-testid="import-url-input"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleImport}
+                    disabled={importing || !importUrl.trim()}
+                    className="px-4 py-2.5 rounded-lg bg-gold-500/20 border border-gold-500/30 text-sm font-semibold text-gold-400 hover:bg-gold-500/30 transition disabled:opacity-40 flex items-center gap-1.5 whitespace-nowrap"
+                    data-testid="import-btn"
+                  >
+                    {importing ? (
+                      <div className="w-4 h-4 border-2 border-gold-400/30 border-t-gold-400 rounded-full animate-spin" />
+                    ) : (
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      </svg>
+                    )}
+                    Import
+                  </button>
+                </div>
+                {importSuccess && (
+                  <div className="flex items-center gap-2 mt-2.5 text-xs text-emerald-400">
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                    {importSuccess}
+                  </div>
+                )}
+              </div>
+
+              {/* ── Business Name ── */}
               <div>
                 <label className="block text-sm font-medium text-white/70 mb-1.5">Business Name *</label>
                 <input
@@ -301,19 +410,20 @@ function RegisterForm() {
                   value={businessData.business_name}
                   onChange={(e) => setBusinessData({ ...businessData, business_name: e.target.value })}
                   required
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
+                  className={inputClass}
                   placeholder="Acme Plumbing LLC"
                   data-testid="register-business-name"
                 />
               </div>
 
+              {/* ── Industry ── */}
               <div>
                 <label className="block text-sm font-medium text-white/70 mb-1.5">Industry *</label>
                 <select
                   value={businessData.industry}
                   onChange={(e) => setBusinessData({ ...businessData, industry: e.target.value })}
                   required
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
+                  className={inputClass}
                   data-testid="register-industry-select"
                 >
                   <option value="" className="bg-gray-900">Select industry...</option>
@@ -321,6 +431,7 @@ function RegisterForm() {
                 </select>
               </div>
 
+              {/* ── Phone & Website ── */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-sm font-medium text-white/70 mb-1.5">Phone</label>
@@ -328,7 +439,7 @@ function RegisterForm() {
                     type="tel"
                     value={businessData.phone}
                     onChange={(e) => setBusinessData({ ...businessData, phone: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-gold-500/50 outline-none transition"
+                    className={inputClass}
                     placeholder="(555) 123-4567"
                     data-testid="register-phone"
                   />
@@ -339,56 +450,95 @@ function RegisterForm() {
                     type="url"
                     value={businessData.website}
                     onChange={(e) => setBusinessData({ ...businessData, website: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-gold-500/50 outline-none transition"
+                    className={inputClass}
                     placeholder="https://..."
                     data-testid="register-website"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-3">
-                <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1.5">City</label>
-                  <input
-                    type="text"
-                    value={businessData.city}
-                    onChange={(e) => setBusinessData({ ...businessData, city: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-gold-500/50 outline-none transition"
-                    placeholder="Tampa"
-                    data-testid="register-city"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1.5">State</label>
-                  <input
-                    type="text"
-                    value={businessData.state}
-                    onChange={(e) => setBusinessData({ ...businessData, state: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-gold-500/50 outline-none transition"
-                    placeholder="FL"
-                    data-testid="register-state"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1.5">ZIP</label>
-                  <input
-                    type="text"
-                    value={businessData.zip_code}
-                    onChange={(e) => setBusinessData({ ...businessData, zip_code: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-gold-500/50 outline-none transition"
-                    placeholder="33601"
-                    data-testid="register-zip"
-                  />
-                </div>
+              {/* ── Mobile Business Toggle ── */}
+              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                <label className="flex items-center gap-3 cursor-pointer" data-testid="mobile-business-toggle">
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={isMobileBusiness}
+                    onClick={() => setIsMobileBusiness(!isMobileBusiness)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${isMobileBusiness ? 'bg-gold-500' : 'bg-white/15'}`}
+                  >
+                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isMobileBusiness ? 'translate-x-6' : 'translate-x-1'}`} />
+                  </button>
+                  <div>
+                    <span className="text-sm font-medium text-white/80 block">Service Area Business</span>
+                    <span className="text-xs text-white/40">No physical storefront — you serve a region (e.g. plumber, landscaper, mobile detailer)</span>
+                  </div>
+                </label>
               </div>
 
+              {/* ── Location Fields — conditional on mobile business toggle ── */}
+              {isMobileBusiness ? (
+                <div>
+                  <label className="block text-sm font-medium text-white/70 mb-1.5">Service Area *</label>
+                  <input
+                    type="text"
+                    value={businessData.service_area}
+                    onChange={(e) => setBusinessData({ ...businessData, service_area: e.target.value })}
+                    required
+                    className={inputClass}
+                    placeholder="Tampa Bay Area, Hillsborough County, etc."
+                    data-testid="register-service-area"
+                  />
+                  <p className="text-xs text-white/30 mt-1.5">
+                    Describe the area you serve. This will display as &quot;Serves: Tampa Bay Area&quot; on your listing.
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-white/70 mb-1.5">City</label>
+                    <input
+                      type="text"
+                      value={businessData.city}
+                      onChange={(e) => setBusinessData({ ...businessData, city: e.target.value })}
+                      className={inputClass}
+                      placeholder="Tampa"
+                      data-testid="register-city"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white/70 mb-1.5">State</label>
+                    <input
+                      type="text"
+                      value={businessData.state}
+                      onChange={(e) => setBusinessData({ ...businessData, state: e.target.value })}
+                      className={inputClass}
+                      placeholder="FL"
+                      data-testid="register-state"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white/70 mb-1.5">ZIP</label>
+                    <input
+                      type="text"
+                      value={businessData.zip_code}
+                      onChange={(e) => setBusinessData({ ...businessData, zip_code: e.target.value })}
+                      className={inputClass}
+                      placeholder="33601"
+                      data-testid="register-zip"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* ── Description ── */}
               <div>
                 <label className="block text-sm font-medium text-white/70 mb-1.5">Description</label>
                 <textarea
                   value={businessData.description}
                   onChange={(e) => setBusinessData({ ...businessData, description: e.target.value })}
                   rows={3}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-gold-500/50 outline-none transition resize-none"
+                  className={`${inputClass} resize-none`}
                   placeholder="Tell customers what you do..."
                   data-testid="register-description"
                 />

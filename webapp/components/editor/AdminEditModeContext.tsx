@@ -57,15 +57,21 @@ export function AdminEditModeProvider({ children }: { children: ReactNode }) {
         .eq('id', user.id)
         .single();
 
-      const adminStatus = profile?.is_admin || false;
+      const adminStatus = profile?.is_admin === true;
       setIsAdmin(adminStatus);
-      
-      // Restore edit mode from localStorage if admin
+
       if (adminStatus && typeof window !== 'undefined') {
+        // Restore edit mode from localStorage if admin
         const savedMode = localStorage.getItem('greenline365_edit_mode');
         setIsEditMode(savedMode === 'true');
+      } else {
+        // Non-admin: ensure edit mode is off and clear any stale localStorage
+        setIsEditMode(false);
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('greenline365_edit_mode');
+        }
       }
-      
+
       setIsChecked(true);
     } catch (error) {
       console.error('[AdminEditMode] Error checking status:', error);
