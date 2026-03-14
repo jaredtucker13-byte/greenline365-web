@@ -98,6 +98,22 @@ export default function HQSidebar() {
           </svg>
           Back to Command Center
         </Link>
+        <button
+          onClick={async () => {
+            localStorage.removeItem('greenline365_active_business');
+            localStorage.removeItem('greenline365_edit_mode');
+            try {
+              await fetch('/api/auth/signout', { method: 'POST' });
+            } catch { /* ignore */ }
+            window.location.href = '/';
+          }}
+          className="flex items-center gap-2 px-3 py-2 mt-1 w-full rounded-lg text-white/40 hover:text-white/60 hover:bg-white/[0.04] transition text-xs font-medium"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          Sign Out
+        </button>
         <div className="flex items-center gap-2 mt-3 px-3">
           <span className="w-1.5 h-1.5 rounded-full bg-gold-400 animate-pulse shadow-[0_0_6px_rgba(201,169,110,0.6)]" />
           <span className="text-[9px] text-white/30 tracking-wider font-medium">PLATFORM ONLINE</span>
