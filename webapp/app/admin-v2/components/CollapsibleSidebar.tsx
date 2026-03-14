@@ -536,13 +536,18 @@ export default function CollapsibleSidebar({
       <div className={`p-4 ${isCollapsed ? 'p-2' : ''}`} style={{ borderTop: '1px solid var(--theme-glass-border)' }}>
         {/* Sign Out Button */}
         <button
-          onClick={async () => {
-            // Import the singleton client — createClient() returns a fresh instance
-            // with no active session, making signOut() a no-op.
-            const { supabase } = await import('@/lib/supabase/client');
-            localStorage.removeItem('greenline365_active_business');
-            localStorage.removeItem('greenline365_edit_mode');
-            await supabase.auth.signOut();
+          onClick={async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            try {
+              const { supabase } = await import('@/lib/supabase/client');
+              localStorage.removeItem('greenline365_active_business');
+              localStorage.removeItem('greenline365_edit_mode');
+              await supabase.auth.signOut();
+            } catch (err) {
+              console.error('[SignOut] Error:', err);
+            }
+            // Always redirect, even if signOut errors
             window.location.href = '/';
           }}
           className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition hover:bg-white/10 mb-3 ${isCollapsed ? 'justify-center px-2' : ''}`}
