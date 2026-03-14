@@ -539,15 +539,12 @@ export default function CollapsibleSidebar({
           onClick={async (e) => {
             e.preventDefault();
             e.stopPropagation();
+            localStorage.removeItem('greenline365_active_business');
+            localStorage.removeItem('greenline365_edit_mode');
+            // Server-side sign out — clears cookies reliably
             try {
-              const { supabase } = await import('@/lib/supabase/client');
-              localStorage.removeItem('greenline365_active_business');
-              localStorage.removeItem('greenline365_edit_mode');
-              await supabase.auth.signOut();
-            } catch (err) {
-              console.error('[SignOut] Error:', err);
-            }
-            // Always redirect, even if signOut errors
+              await fetch('/api/auth/signout', { method: 'POST' });
+            } catch { /* ignore fetch errors */ }
             window.location.href = '/';
           }}
           className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition hover:bg-white/10 mb-3 ${isCollapsed ? 'justify-center px-2' : ''}`}
