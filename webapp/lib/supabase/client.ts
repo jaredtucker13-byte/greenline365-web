@@ -13,13 +13,14 @@ export function createClient() {
 }
 
 // Auth helper functions
-export async function signUp(email: string, password: string, fullName?: string) {
+export async function signUp(email: string, password: string, fullName?: string, accountType?: 'consumer' | 'business') {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
       data: {
         full_name: fullName || email,
+        account_type: accountType || 'consumer',
       },
     },
   });
@@ -34,11 +35,15 @@ export async function signIn(email: string, password: string) {
   return { data, error };
 }
 
-export async function signInWithGoogle() {
+export async function signInWithGoogle(accountType?: 'consumer' | 'business') {
+  const origin = typeof window !== 'undefined' ? window.location.origin : '';
+  const redirectTo = accountType
+    ? `${origin}/auth/callback?account_type=${accountType}`
+    : `${origin}/auth/callback`;
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${typeof window !== 'undefined' ? window.location.origin : ''}/auth/callback`,
+      redirectTo,
     },
   });
   return { data, error };
@@ -76,6 +81,23 @@ export async function isAdmin(userId: string): Promise<boolean> {
     .eq('id', userId)
     .single();
   return data?.is_admin || false;
+}
+
+export interface UserProfile {
+  account_type: 'consumer' | 'business';
+  email_verified: boolean;
+  is_admin: boolean;
+  full_name: string | null;
+  avatar_url: string | null;
+}
+
+export async function getProfile(userId: string): Promise<UserProfile | null> {
+  const { data } = await supabase
+    .from('profiles')
+    .select('account_type, email_verified, is_admin, full_name, avatar_url')
+    .eq('id', userId)
+    .single();
+  return data as UserProfile | null;
 }
 
 // Type definitions for your booking data

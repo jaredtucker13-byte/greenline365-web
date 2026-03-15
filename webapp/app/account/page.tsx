@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { supabase, signOut, isAdmin } from '@/lib/supabase/client';
+import { supabase, signOut, isAdmin, getProfile } from '@/lib/supabase/client';
 import type { User } from '@supabase/supabase-js';
 
 export default function AccountPage() {
@@ -12,6 +12,7 @@ export default function AccountPage() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isUserAdmin, setIsUserAdmin] = useState(false);
+  const [accountType, setAccountType] = useState<string>('consumer');
 
   useEffect(() => {
     async function getUser() {
@@ -24,10 +25,15 @@ export default function AccountPage() {
 
       setUser(session.user);
       
-      // Check if user is admin
+      // Check if user is admin and get account type
       const adminStatus = await isAdmin(session.user.id);
       setIsUserAdmin(adminStatus);
-      
+
+      const profile = await getProfile(session.user.id);
+      if (profile?.account_type) {
+        setAccountType(profile.account_type);
+      }
+
       setLoading(false);
     }
 
@@ -86,14 +92,25 @@ export default function AccountPage() {
                 {user?.user_metadata?.full_name || user?.email}
               </h2>
               <p className="text-white/60">{user?.email}</p>
-              {isUserAdmin && (
-                <span className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 bg-gold-500/20 text-gold-400 text-xs rounded-full">
-                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                  </svg>
-                  Admin
-                </span>
-              )}
+              <div className="flex items-center gap-2 mt-1">
+                {isUserAdmin && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gold-500/20 text-gold-400 text-xs rounded-full">
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    Admin
+                  </span>
+                )}
+                {!isUserAdmin && (
+                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded-full ${
+                    accountType === 'business'
+                      ? 'bg-blue-500/20 text-blue-400'
+                      : 'bg-green-500/20 text-green-400'
+                  }`}>
+                    {accountType === 'business' ? 'Business Owner' : 'Consumer'}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
@@ -101,7 +118,7 @@ export default function AccountPage() {
           <div className="space-y-4">
             <h3 className="text-sm text-white/50 uppercase tracking-wider mb-4">Quick Actions</h3>
             
-            {isUserAdmin && (
+            {(isUserAdmin || accountType === 'business') && (
               <Link
                 href="/admin-v2"
                 className="flex items-center justify-between w-full p-4 bg-gold-500/10 border border-gold-500/30 rounded-xl hover:bg-gold-500/20 transition group"
@@ -113,11 +130,33 @@ export default function AccountPage() {
                     </svg>
                   </div>
                   <div>
-                    <p className="font-semibold text-white">Command Center</p>
-                    <p className="text-sm text-white/60">Access admin dashboard</p>
+                    <p className="font-semibold text-white">{isUserAdmin ? 'Command Center' : 'Business Portal'}</p>
+                    <p className="text-sm text-white/60">{isUserAdmin ? 'Access admin dashboard' : 'Manage your listings'}</p>
                   </div>
                 </div>
                 <svg className="w-5 h-5 text-white/40 group-hover:text-gold-400 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
+            )}
+
+            {accountType === 'consumer' && (
+              <Link
+                href="/portal/consumer"
+                className="flex items-center justify-between w-full p-4 bg-green-500/10 border border-green-500/30 rounded-xl hover:bg-green-500/20 transition group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
+                    <svg className="w-5 h-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-white">Consumer Portal</p>
+                    <p className="text-sm text-white/60">Deals, favorites & profile</p>
+                  </div>
+                </div>
+                <svg className="w-5 h-5 text-white/40 group-hover:text-green-400 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </Link>

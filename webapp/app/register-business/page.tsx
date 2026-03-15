@@ -100,7 +100,7 @@ function RegisterForm() {
       return;
     }
 
-    const { data, error: authError } = await signUp(authData.email, authData.password, authData.fullName);
+    const { data, error: authError } = await signUp(authData.email, authData.password, authData.fullName, 'business');
     if (authError) {
       setError(authError.message);
       setLoading(false);

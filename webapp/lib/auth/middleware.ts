@@ -219,6 +219,61 @@ export async function requirePermission(
 }
 
 /**
+ * Require a specific account type. Returns 401 if not authenticated, 403 if wrong type.
+ */
+export async function requireAccountType(
+  request: Request,
+  accountType: 'consumer' | 'business'
+): Promise<{ user: User; supabase: SupabaseClient } | Response> {
+  const authResult = await requireAuth(request);
+  if (authResult instanceof Response) return authResult;
+
+  const { user, supabase } = authResult;
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('account_type')
+    .eq('id', user.id)
+    .single();
+
+  if (!profile || profile.account_type !== accountType) {
+    return Response.json(
+      { error: `${accountType} account required` },
+      { status: 403 }
+    );
+  }
+
+  return { user, supabase };
+}
+
+/**
+ * Require email to be verified. Returns 401 if not authenticated, 403 if not verified.
+ */
+export async function requireVerifiedEmail(
+  request: Request
+): Promise<{ user: User; supabase: SupabaseClient } | Response> {
+  const authResult = await requireAuth(request);
+  if (authResult instanceof Response) return authResult;
+
+  const { user, supabase } = authResult;
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('email_verified')
+    .eq('id', user.id)
+    .single();
+
+  if (!profile?.email_verified) {
+    return Response.json(
+      { error: 'Email verification required' },
+      { status: 403 }
+    );
+  }
+
+  return { user, supabase };
+}
+
+/**
  * Require a specific feature to be enabled for the authenticated user.
  * Returns 401 if not authenticated, 403 if the feature is not available.
  *

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { supabase } from '@/lib/supabase/client';
 
 interface Listing {
   id: string;
@@ -129,6 +130,8 @@ export default function ListingDetailPage() {
   const [featuredLoops, setFeaturedLoops] = useState<{ id: string; name: string; slug: string; loop_type: string }[]>([]);
   const [showCallModal, setShowCallModal] = useState(false);
   const [phoneCopied, setPhoneCopied] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
   const [activeSection, setActiveSection] = useState('overview');
   const [showAllPhotos, setShowAllPhotos] = useState(false);
   const router = useRouter();
@@ -154,6 +157,20 @@ export default function ListingDetailPage() {
           .then(r => r.json())
           .then(d => setFeaturedLoops(d.loops || []))
           .catch(() => {});
+        // Check if user has favorited this listing
+        supabase.auth.getSession().then(({ data: { session } }) => {
+          if (session) {
+            supabase
+              .from('consumer_favorites')
+              .select('id')
+              .eq('user_id', session.user.id)
+              .eq('listing_id', data.id)
+              .maybeSingle()
+              .then(({ data: fav }) => {
+                if (fav) setIsFavorite(true);
+              });
+          }
+        });
       }
       setLoading(false);
     })();
@@ -192,6 +209,31 @@ export default function ListingDetailPage() {
     }
     setSubmittingReview(false);
     setTimeout(() => setReviewMessage(''), 4000);
+  };
+
+  const toggleFavorite = async () => {
+    if (!listing) return;
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      router.push('/login');
+      return;
+    }
+    setFavoriteLoading(true);
+    if (isFavorite) {
+      await supabase
+        .from('consumer_favorites')
+        .delete()
+        .eq('user_id', session.user.id)
+        .eq('listing_id', listing.id);
+      setIsFavorite(false);
+    } else {
+      await supabase
+        .from('consumer_favorites')
+        .insert({ user_id: session.user.id, listing_id: listing.id });
+      setIsFavorite(true);
+      trackEvent('favorite');
+    }
+    setFavoriteLoading(false);
   };
 
   const scrollToSection = (sectionId: string) => {
@@ -410,6 +452,10 @@ export default function ListingDetailPage() {
                 Website
               </a>
             )}
+            <button onClick={toggleFavorite} disabled={favoriteLoading} className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-heading font-semibold transition-all ${isFavorite ? 'text-red-400 border border-red-400/30 bg-red-400/5' : 'text-white border border-white/15 hover:border-gold/30 hover:bg-gold/5'}`} aria-label={isFavorite ? 'Remove from favorites' : 'Save to favorites'}>
+              <svg className="w-4 h-4" fill={isFavorite ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+              {isFavorite ? 'Saved' : 'Save'}
+            </button>
             <button onClick={() => { if (navigator.share) { navigator.share({ title: listing.business_name, url: window.location.href }); } else { navigator.clipboard.writeText(window.location.href); } }} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-heading font-semibold text-white border border-white/15 hover:border-gold/30 hover:bg-gold/5 transition-all">
               <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" /></svg>
               Share

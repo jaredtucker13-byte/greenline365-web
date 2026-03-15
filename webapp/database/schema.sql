@@ -493,6 +493,10 @@ CREATE TABLE IF NOT EXISTS profiles (
   full_name TEXT,
   avatar_url TEXT,
   is_admin BOOLEAN DEFAULT false,
+  account_type TEXT DEFAULT 'consumer' CHECK (account_type IN ('consumer', 'business')),
+  email_verified BOOLEAN DEFAULT false,
+  phone TEXT,
+  zip_code TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ
 );
@@ -610,11 +614,12 @@ GRANT ALL ON site_settings TO authenticated;
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.profiles (id, email, full_name)
+  INSERT INTO public.profiles (id, email, full_name, account_type)
   VALUES (
     NEW.id,
     NEW.email,
-    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.email)
+    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.email),
+    COALESCE(NEW.raw_user_meta_data->>'account_type', 'consumer')
   );
   RETURN NEW;
 END;

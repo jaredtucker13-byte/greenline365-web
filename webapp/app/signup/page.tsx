@@ -18,6 +18,7 @@ export default function SignUpPage() {
   const [authMethod, setAuthMethod] = useState<'magic-link' | 'password'>('magic-link');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [accountType, setAccountType] = useState<'consumer' | 'business'>('consumer');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [termsError, setTermsError] = useState(false);
   const [fieldTouched, setFieldTouched] = useState<Record<string, boolean>>({});
@@ -65,7 +66,7 @@ export default function SignUpPage() {
       return;
     }
 
-    const { data, error } = await signUp(formData.email, formData.password, formData.fullName);
+    const { data, error } = await signUp(formData.email, formData.password, formData.fullName, accountType);
 
     if (error) {
       setError(error.message);
@@ -75,9 +76,9 @@ export default function SignUpPage() {
 
     if (data.user) {
       setSuccess(true);
-      // If email confirmation is disabled, redirect to dashboard
+      // Redirect to email verification
       if (data.session) {
-        router.push('/dashboard');
+        router.push('/verify-email');
       }
     }
 
@@ -91,7 +92,7 @@ export default function SignUpPage() {
       return;
     }
     setLoading(true);
-    const { error } = await signInWithGoogle();
+    const { error } = await signInWithGoogle(accountType);
     if (error) {
       setError(error.message);
       setLoading(false);
@@ -218,6 +219,44 @@ export default function SignUpPage() {
           <h1 className="text-3xl font-bold text-white mb-2">Create Account</h1>
           <p className="text-white/60">Join GreenLine365 and start automating your business</p>
         </motion.div>
+
+        {/* Account Type Selector */}
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          <button
+            type="button"
+            onClick={() => setAccountType('consumer')}
+            className={`p-4 rounded-xl border-2 text-left transition-all ${
+              accountType === 'consumer'
+                ? 'border-gold-500 bg-gold-500/10'
+                : 'border-white/10 bg-white/[0.03] hover:border-white/20'
+            }`}
+          >
+            <div className="flex items-center gap-2 mb-1.5">
+              <svg className={`w-5 h-5 ${accountType === 'consumer' ? 'text-gold-400' : 'text-white/40'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              <span className={`text-sm font-bold ${accountType === 'consumer' ? 'text-gold-400' : 'text-white/70'}`}>Consumer</span>
+            </div>
+            <p className="text-xs text-white/40">Browse, earn rewards, leave reviews</p>
+          </button>
+          <button
+            type="button"
+            onClick={() => setAccountType('business')}
+            className={`p-4 rounded-xl border-2 text-left transition-all ${
+              accountType === 'business'
+                ? 'border-gold-500 bg-gold-500/10'
+                : 'border-white/10 bg-white/[0.03] hover:border-white/20'
+            }`}
+          >
+            <div className="flex items-center gap-2 mb-1.5">
+              <svg className={`w-5 h-5 ${accountType === 'business' ? 'text-gold-400' : 'text-white/40'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+              <span className={`text-sm font-bold ${accountType === 'business' ? 'text-gold-400' : 'text-white/70'}`}>Business</span>
+            </div>
+            <p className="text-xs text-white/40">List your business, manage listings</p>
+          </button>
+        </div>
 
         <motion.div
           initial={{ opacity: 0, y: 30 }}
