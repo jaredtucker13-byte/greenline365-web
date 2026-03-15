@@ -129,6 +129,9 @@ export default function SignUpPage() {
               We've sent a confirmation link to <strong className="text-white">{formData.email}</strong>.
               Click the link to activate your account.
             </p>
+            <p className="text-yellow-400 text-sm mt-3">
+              Check your spam folder. Emails from GreenLine365help@gmail.com may be filtered automatically.
+            </p>
             <Link href="/login" className="inline-block mt-6 text-gold-400 hover:text-gold-300">
               Go to Login →
             </Link>
@@ -156,8 +159,11 @@ export default function SignUpPage() {
             <p className="text-white/60 mb-4">
               We sent a magic link to <span className="text-gold-400 font-medium">{formData.email}</span>
             </p>
-            <p className="text-white/40 text-sm mb-6">
+            <p className="text-white/40 text-sm mb-4">
               Click the link in the email to sign in instantly. If you're new, your account will be created automatically!
+            </p>
+            <p className="text-yellow-400 text-sm mb-6">
+              Check your spam folder. Emails from GreenLine365help@gmail.com may be filtered automatically.
             </p>
             <button
               onClick={() => {

@@ -113,7 +113,7 @@ export async function POST(req: NextRequest) {
 
       return NextResponse.json({
         success: true,
-        message: 'Verification email sent! Check your inbox.',
+        message: 'Verification email sent! Check your inbox and spam folder.',
       });
     }
 
@@ -152,6 +152,10 @@ export async function POST(req: NextRequest) {
               ${code}
             </div>
             <p style="color: #888; text-align: center; font-size: 14px;">This code expires in 10 minutes.</p>
+            <div style="margin-top: 24px; padding: 12px; background: rgba(255, 193, 7, 0.08); border: 1px solid rgba(255, 193, 7, 0.2); border-radius: 8px;">
+              <p style="color: #ffc107; text-align: center; font-size: 13px; font-weight: 600; margin: 0 0 4px;">Don't see this email in your inbox?</p>
+              <p style="color: #888; text-align: center; font-size: 12px; margin: 0;">Check your spam folder. Emails from GreenLine365help@gmail.com may be filtered automatically.</p>
+            </div>
           </div>
         `,
       });

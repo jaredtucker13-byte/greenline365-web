@@ -123,9 +123,6 @@ export default function TacticalCommandCenter() {
   const [showDemoController, setShowDemoController] = useState(false);
   const [demoConfig, setDemoConfig] = useState<DemoConfig>(defaultDemoConfig);
 
-  // Preview Mode - See what customers will see
-  const [isPreviewMode, setIsPreviewMode] = useState(false);
-
   // Sidebar State
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -237,19 +234,6 @@ export default function TacticalCommandCenter() {
       {/* Dark Overlay */}
       <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px]" />
       
-      {/* Preview Mode Banner */}
-      {isPreviewMode && (
-        <div className="fixed top-0 left-0 right-0 z-[60] bg-gradient-to-r from-amber-500/90 to-orange-500/90 backdrop-blur-sm text-white text-center py-2 px-4 flex items-center justify-center gap-4">
-          <span className="font-medium">👁️ PREVIEW MODE - Viewing as Customer</span>
-          <button
-            onClick={() => setIsPreviewMode(false)}
-            className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg text-sm font-medium transition"
-          >
-            Exit Preview
-          </button>
-        </div>
-      )}
-
       {/* Collapsible Sidebar */}
       <CollapsibleSidebar
         activeItem="schedule"
@@ -264,8 +248,6 @@ export default function TacticalCommandCenter() {
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
         isMobileOpen={mobileMenuOpen}
         onMobileToggle={() => setMobileMenuOpen(!mobileMenuOpen)}
-        isPreviewMode={isPreviewMode}
-        onPreviewModeToggle={() => setIsPreviewMode(!isPreviewMode)}
       />
 
       {/* Main Content */}

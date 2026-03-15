@@ -59,6 +59,7 @@ export function isNavGroup(entry: NavEntry): entry is NavGroup {
 export const commandCenterNavGrouped: NavEntry[] = [
   // Top-level items (always visible, no group)
   { id: 'dashboard', label: 'Dashboard', icon: 'grid', href: '/admin-v2', feature: null },
+  { id: 'listings', label: 'Listings', icon: 'store', href: '/admin-v2/listings', feature: null },
   { id: 'schedule', label: 'Schedule', icon: 'calendar', href: '/admin-v2?view=schedule', feature: 'calendar' },
 
   // ─── CONTENT FORGE ──────────────────────────────────────────────
@@ -148,6 +149,7 @@ export const commandCenterNavGrouped: NavEntry[] = [
  */
 export const commandCenterNav: NavItem[] = [
   { id: 'dashboard', label: 'Dashboard', icon: 'grid', href: '/admin-v2', feature: null },
+  { id: 'listings', label: 'Listings', icon: 'store', href: '/admin-v2/listings', feature: null },
   { id: 'schedule', label: 'Schedule', icon: 'calendar', href: '/admin-v2?view=schedule', feature: 'calendar' },
   // --- Content Forge ---
   { id: 'divider-content', label: 'CONTENT FORGE', icon: '', href: '', feature: null, isDivider: true },

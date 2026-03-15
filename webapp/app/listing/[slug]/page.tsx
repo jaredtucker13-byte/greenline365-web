@@ -3,7 +3,65 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { SUBCATEGORY_KEYWORDS } from '@/lib/directory-config';
+
+/**
+ * Group a listing's subcategories into logical service pillars using the
+ * SUBCATEGORY_KEYWORDS mapping. Subcategories that don't match any group
+ * go into "Other".
+ */
+function groupSubcategories(subs: string[]): { group: string; items: string[] }[] {
+  // Build a reverse map: keyword-parent → group label
+  // Group labels come from the comment-style groupings in SUBCATEGORY_KEYWORDS
+  const PARENT_GROUPS: Record<string, string> = {};
+  for (const parentName of Object.keys(SUBCATEGORY_KEYWORDS)) {
+    PARENT_GROUPS[parentName.toLowerCase()] = parentName;
+  }
+
+  // For each raw subcategory, find the best matching parent
+  const grouped: Record<string, string[]> = {};
+  const matched = new Set<number>();
+
+  for (let i = 0; i < subs.length; i++) {
+    const sub = subs[i];
+    const subLower = sub.toLowerCase();
+
+    // Check direct match to a parent name first
+    if (PARENT_GROUPS[subLower]) {
+      const group = PARENT_GROUPS[subLower];
+      if (!grouped[group]) grouped[group] = [];
+      // Don't add the parent name as a child of itself
+      matched.add(i);
+      if (!grouped[group].includes(sub)) grouped[group].push(sub);
+      continue;
+    }
+
+    // Check if the sub matches any parent's keywords
+    let found = false;
+    for (const [parentName, keywords] of Object.entries(SUBCATEGORY_KEYWORDS)) {
+      if (keywords.some(kw => subLower.includes(kw) || kw.includes(subLower))) {
+        if (!grouped[parentName]) grouped[parentName] = [];
+        if (!grouped[parentName].includes(sub)) grouped[parentName].push(sub);
+        matched.add(i);
+        found = true;
+        break;
+      }
+    }
+
+    if (!found) {
+      if (!grouped['Other']) grouped['Other'] = [];
+      grouped['Other'].push(sub);
+      matched.add(i);
+    }
+  }
+
+  // If everything ended up in one group, don't bother grouping — show flat
+  const groups = Object.entries(grouped);
+  if (groups.length <= 1) return [{ group: '', items: subs }];
+
+  return groups.map(([group, items]) => ({ group, items }));
+}
 
 interface Listing {
   id: string;
@@ -32,7 +90,7 @@ interface Listing {
   metadata: Record<string, any>;
   directory_badges: { id: string; badge_type: string; badge_label: string; badge_color: string }[];
   related: RelatedListing[];
-  business_hours: Record<string, { open: string; close: string; closed: boolean }> | null;
+  business_hours: Record<string, any> | null;
   menu: { id: string; name: string; items: { id: string; name: string; description: string; price: string }[] }[] | null;
 }
 
@@ -49,16 +107,95 @@ interface RelatedListing {
   metadata: Record<string, any>;
 }
 
-/** Compute whether the business is currently open based on business_hours */
-function getOpenStatus(businessHours: Record<string, { open: string; close: string; closed: boolean }> | null): { isOpen: boolean; label: string } | null {
-  if (!businessHours || Object.keys(businessHours).length === 0) return null;
+interface NormalizedDayHours { open: string; close: string; closed: boolean; display?: string }
+
+const LONG_TO_SHORT: Record<string, string> = {
+  monday: 'mon', tuesday: 'tue', wednesday: 'wed', thursday: 'thu',
+  friday: 'fri', saturday: 'sat', sunday: 'sun',
+};
+
+/**
+ * Parse a scraped hours string like "Monday: 8:00 AM – 6:00 PM" or "Monday: Closed"
+ * into a structured { open, close, closed } object.
+ */
+function parseHoursString(raw: string): NormalizedDayHours {
+  // Strip day prefix "Monday: " if present
+  const cleaned = raw.replace(/^\w+:\s*/, '').trim();
+  if (/closed/i.test(cleaned)) return { open: '', close: '', closed: true, display: 'Closed' };
+
+  // Match patterns like "8:00 AM – 6:00 PM", "4:00 – 10:00 PM", "12:00 PM – 5:00 AM"
+  // Also handles split shifts like "9:00 AM – 1:30 PM, 2:00 – 8:00 PM" — use full range
+  const timePattern = /(\d{1,2}:\d{2}\s*(?:AM|PM)?)\s*[–\-]\s*(\d{1,2}:\d{2}\s*(?:AM|PM)?)/gi;
+  const matches = [...cleaned.matchAll(timePattern)];
+  if (matches.length === 0) return { open: '', close: '', closed: false, display: cleaned || '—' };
+
+  const openStr = matches[0][1].trim();
+  const closeStr = matches[matches.length - 1][2].trim();
+  return { open: openStr, close: closeStr, closed: false, display: cleaned };
+}
+
+/**
+ * Normalize business_hours from any DB format into { mon: { open, close, closed, display }, ... }
+ *
+ * Handles:
+ *  1. Structured objects: { "mon": { "open": "09:00", "close": "17:00", "closed": false } }
+ *  2. String per full-day key: { "monday": "Monday: 8:00 AM – 6:00 PM" }
+ *  3. Array in a single key: { "hours": ["Monday: 8:00 AM – 5:00 PM", ...] }
+ */
+function normalizeBusinessHours(raw: Record<string, any> | null): Record<string, NormalizedDayHours> | null {
+  if (!raw || Object.keys(raw).length === 0) return null;
+
+  const result: Record<string, NormalizedDayHours> = {};
+
+  // Format 3: Array stored under a key (e.g. "hours" or any key whose value is an array of strings)
+  for (const val of Object.values(raw)) {
+    if (Array.isArray(val)) {
+      for (const entry of val) {
+        if (typeof entry !== 'string') continue;
+        const dayMatch = entry.match(/^(\w+):/i);
+        if (!dayMatch) continue;
+        const shortKey = LONG_TO_SHORT[dayMatch[1].toLowerCase()] || dayMatch[1].toLowerCase().slice(0, 3);
+        result[shortKey] = parseHoursString(entry);
+      }
+      if (Object.keys(result).length > 0) return result;
+    }
+  }
+
+  for (const [key, val] of Object.entries(raw)) {
+    const shortKey = LONG_TO_SHORT[key.toLowerCase()] || key.toLowerCase().slice(0, 3);
+
+    // Format 1: Already structured
+    if (val && typeof val === 'object' && !Array.isArray(val) && ('open' in val || 'close' in val || 'closed' in val)) {
+      result[shortKey] = {
+        open: val.open || '',
+        close: val.close || '',
+        closed: !!val.closed,
+        display: val.closed ? 'Closed' : (val.open && val.close ? `${val.open} — ${val.close}` : '—'),
+      };
+      continue;
+    }
+
+    // Format 2: String value
+    if (typeof val === 'string') {
+      result[shortKey] = parseHoursString(val);
+      continue;
+    }
+  }
+
+  return Object.keys(result).length > 0 ? result : null;
+}
+
+/** Compute whether the business is currently open based on normalized hours */
+function getOpenStatus(hours: Record<string, NormalizedDayHours> | null): { isOpen: boolean; label: string } | null {
+  if (!hours || Object.keys(hours).length === 0) return null;
   const days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
   const now = new Date();
   const dayKey = days[now.getDay()];
-  const hours = businessHours[dayKey];
-  if (!hours) return null;
-  if (hours.closed) return { isOpen: false, label: 'Closed Today' };
-  if (!hours.open || !hours.close) return null;
+  const today = hours[dayKey];
+  if (!today) return null;
+  if (today.closed) return { isOpen: false, label: 'Closed Today' };
+  if (!today.open || !today.close) return null;
+
   const parseTime = (t: string): number => {
     const match = t.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)?$/i);
     if (!match) return -1;
@@ -69,8 +206,9 @@ function getOpenStatus(businessHours: Record<string, { open: string; close: stri
     if (period === 'AM' && h === 12) h = 0;
     return h * 60 + m;
   };
-  const openMin = parseTime(hours.open);
-  const closeMin = parseTime(hours.close);
+
+  const openMin = parseTime(today.open);
+  const closeMin = parseTime(today.close);
   if (openMin < 0 || closeMin < 0) return null;
   const nowMin = now.getHours() * 60 + now.getMinutes();
   const isOpen = closeMin > openMin ? (nowMin >= openMin && nowMin < closeMin) : (nowMin >= openMin || nowMin < closeMin);
@@ -86,6 +224,10 @@ function ensureProtocol(url: string): string {
 function cleanPhone(phone: string): string {
   if (!phone) return phone;
   return phone.replace(/[^\d+]/g, '');
+}
+
+function cleanDomain(url: string): string {
+  return url.replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/.*$/, '');
 }
 
 /** Star rating component */
@@ -131,6 +273,9 @@ export default function ListingDetailPage() {
   const [phoneCopied, setPhoneCopied] = useState(false);
   const [activeSection, setActiveSection] = useState('overview');
   const [showAllPhotos, setShowAllPhotos] = useState(false);
+  const [brokenImages, setBrokenImages] = useState<Set<string>>(new Set());
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
+  const [showMapExpanded, setShowMapExpanded] = useState(false);
   const router = useRouter();
   const sectionsRef = useRef<Record<string, HTMLElement | null>>({});
 
@@ -158,6 +303,21 @@ export default function ListingDetailPage() {
       setLoading(false);
     })();
   }, [slug]);
+
+  const handleImgError = (url: string) => {
+    setBrokenImages(prev => new Set(prev).add(url));
+  };
+
+  const ImageOrPlaceholder = ({ src, alt, className }: { src: string; alt: string; className?: string }) => {
+    if (brokenImages.has(src)) {
+      return (
+        <div className={`bg-gradient-to-br from-[#111111] to-[#1a1a1a] flex items-center justify-center ${className || ''}`}>
+          <span className="text-4xl font-heading font-light text-white/10">{alt?.[0] || '?'}</span>
+        </div>
+      );
+    }
+    return <img src={src} alt={alt} className={className} onError={() => handleImgError(src)} />;
+  };
 
   const trackEvent = (eventType: string) => {
     if (!listing) return;
@@ -228,12 +388,13 @@ export default function ListingDetailPage() {
   const googleRating = listing.metadata?.google_rating;
   const googleReviews = listing.metadata?.google_review_count;
   const googleMapsUrl = listing.metadata?.google_maps_url;
-  const businessHours = listing.business_hours as Record<string, { open: string; close: string; closed: boolean }> | null;
+  const businessHours = normalizeBusinessHours(listing.business_hours);
   const openStatus = getOpenStatus(businessHours);
   const menuSections = listing.menu as { id: string; name: string; items: { id: string; name: string; description: string; price: string }[] }[] | null;
-  const hasHours = businessHours && Object.keys(businessHours).length > 0 && Object.values(businessHours).some((h: any) => h && (h.closed || (h.open && h.close)));
+  const hasHours = businessHours && Object.keys(businessHours).length > 0 && Object.values(businessHours).some((h) => h.closed || h.open || h.display);
   const hasMenu = menuSections && menuSections.length > 0;
-  const serviceAreas = listing.tier !== 'free' && listing.metadata?.service_areas && Array.isArray(listing.metadata.service_areas) ? listing.metadata.service_areas as string[] : [];
+  const isMobileBusiness = listing.metadata?.is_mobile_business === true;
+  const serviceAreas = (listing.metadata?.service_areas && Array.isArray(listing.metadata.service_areas)) ? listing.metadata.service_areas as string[] : [];
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] pt-20 pb-16" data-testid="listing-detail-page">
@@ -247,11 +408,11 @@ export default function ListingDetailPage() {
           {allPhotos.length >= 3 ? (
             <div className="grid grid-cols-4 grid-rows-2 gap-1 h-full">
               <div className="col-span-2 row-span-2 relative overflow-hidden cursor-pointer group" onClick={() => setShowAllPhotos(true)}>
-                <img src={allPhotos[0]} alt={`${listing.business_name} main`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                <ImageOrPlaceholder src={allPhotos[0]} alt={listing.business_name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
               </div>
               {allPhotos.slice(1, 5).map((p, i) => (
                 <div key={i} className="relative overflow-hidden cursor-pointer group" onClick={() => { setActivePhoto(i + 1); setShowAllPhotos(true); }}>
-                  <img src={p} alt={`${listing.business_name} photo ${i + 2}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <ImageOrPlaceholder src={p} alt={listing.business_name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   {i === 3 && allPhotos.length > 5 && (
                     <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
                       <span className="text-white font-heading font-bold text-lg">+{allPhotos.length - 5}</span>
@@ -260,8 +421,8 @@ export default function ListingDetailPage() {
                 </div>
               ))}
             </div>
-          ) : listing.cover_image_url ? (
-            <img src={listing.cover_image_url} alt={`${listing.business_name} — ${listing.industry.replace(/-/g, ' ')} in ${listing.city}, ${listing.state}`} className="w-full h-full object-cover" />
+          ) : listing.cover_image_url && !brokenImages.has(listing.cover_image_url) ? (
+            <img src={listing.cover_image_url} alt={`${listing.business_name} — ${listing.industry.replace(/-/g, ' ')} in ${listing.city}, ${listing.state}`} className="w-full h-full object-cover" onError={() => handleImgError(listing.cover_image_url!)} />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-[#111111] to-[#1a1a1a] flex items-center justify-center">
               <span className="text-8xl font-heading font-light text-white/10">{listing.business_name[0]}</span>
@@ -342,18 +503,17 @@ export default function ListingDetailPage() {
                 {listing.business_name}
               </h1>
 
-              {/* Location line */}
+              {/* Location + subcategories line */}
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-white/50 font-body">
-                {listing.city && (
-                  <span className="inline-flex items-center gap-1.5">
-                    <svg className="w-4 h-4 text-gold/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-                    </svg>
-                    {listing.address_line1 ? `${listing.address_line1}, ` : ''}{listing.city}, {listing.state} {listing.zip_code}
+                {isMobileBusiness && serviceAreas.length > 0 ? (
+                  <span className="flex items-center gap-1.5">
+                    <svg className="w-3.5 h-3.5 text-gold/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                    Serves {serviceAreas[0]}
                   </span>
-                )}
-                {listing.subcategories?.length > 0 && (
+                ) : listing.city ? (
+                  <span>{listing.city}, {listing.state}</span>
+                ) : null}
+                {listing.subcategories?.length > 0 && (listing.city || (isMobileBusiness && serviceAreas.length > 0)) && (
                   <span className="text-white/30">·</span>
                 )}
                 {listing.subcategories?.length > 0 && (
@@ -361,7 +521,7 @@ export default function ListingDetailPage() {
                 )}
               </div>
 
-              {/* Service areas */}
+              {/* Service areas — show all areas as pills */}
               {serviceAreas.length > 0 && (
                 <div className="flex flex-wrap items-center gap-1.5 mt-3">
                   <span className="text-[10px] text-white/30 font-heading uppercase tracking-wider mr-1">Serves</span>
@@ -392,24 +552,6 @@ export default function ListingDetailPage() {
 
           {/* ── Action Buttons Row ── */}
           <div className="flex flex-wrap gap-2 mt-6 pt-6 border-t border-white/5">
-            {listing.phone && (
-              <button onClick={() => { setShowCallModal(true); trackEvent('call'); }} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-heading font-bold text-[#0A0A0A] transition-all hover:scale-[1.02]" style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C97A)', boxShadow: '0 0 16px rgba(201,168,76,0.25)' }} data-testid="cta-call-now">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
-                Call
-              </button>
-            )}
-            {(listing.address_line1 || listing.city) && (
-              <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent([listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', '))}`} target="_blank" rel="noopener noreferrer" onClick={() => trackEvent('map')} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-heading font-semibold text-white border border-white/15 hover:border-gold/30 hover:bg-gold/5 transition-all">
-                <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" /></svg>
-                Directions
-              </a>
-            )}
-            {listing.website && (
-              <a href={ensureProtocol(listing.website)} target="_blank" rel="noopener noreferrer" onClick={() => trackEvent('website')} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-heading font-semibold text-white border border-white/15 hover:border-gold/30 hover:bg-gold/5 transition-all">
-                <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" /></svg>
-                Website
-              </a>
-            )}
             <button onClick={() => { if (navigator.share) { navigator.share({ title: listing.business_name, url: window.location.href }); } else { navigator.clipboard.writeText(window.location.href); } }} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-heading font-semibold text-white border border-white/15 hover:border-gold/30 hover:bg-gold/5 transition-all">
               <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" /></svg>
               Share
@@ -460,65 +602,105 @@ export default function ListingDetailPage() {
                 {listing.description ? (
                   <p className="text-sm sm:text-base text-white/65 font-body leading-relaxed">{listing.description}</p>
                 ) : (
-                  <p className="text-sm text-white/30 font-body italic">No description available yet. {!listing.is_claimed && 'Business owners can add details by claiming this listing.'}</p>
+                  <div className="text-sm text-white/40 font-body">
+                    <p>This business hasn&apos;t added a description yet.</p>
+                    {!listing.is_claimed && (
+                      <p className="mt-2">
+                        Are you the owner?{' '}
+                        <button onClick={() => setShowClaimInfo(true)} className="text-gold hover:text-gold-300 underline underline-offset-2 font-medium transition-colors">
+                          Claim this listing
+                        </button>{' '}
+                        to add your business details.
+                      </p>
+                    )}
+                  </div>
                 )}
 
-                {/* Quick Info Grid */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-6">
-                  {listing.phone && (
-                    <div className="flex items-center gap-3 p-3 rounded-xl border border-white/5 bg-white/[0.02]">
-                      <div className="w-9 h-9 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0">
-                        <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
-                      </div>
-                      <div className="min-w-0">
-                        <span className="text-[10px] text-white/30 font-heading uppercase tracking-wider block">Phone</span>
-                        <span className="text-xs text-white/70 font-body truncate block">{listing.phone}</span>
-                      </div>
-                    </div>
-                  )}
-                  {listing.website && (
-                    <div className="flex items-center gap-3 p-3 rounded-xl border border-white/5 bg-white/[0.02]">
-                      <div className="w-9 h-9 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0">
-                        <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3" /></svg>
-                      </div>
-                      <div className="min-w-0">
-                        <span className="text-[10px] text-white/30 font-heading uppercase tracking-wider block">Website</span>
-                        <span className="text-xs text-white/70 font-body truncate block">{listing.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}</span>
-                      </div>
-                    </div>
-                  )}
-                  {listing.city && (
-                    <div className="flex items-center gap-3 p-3 rounded-xl border border-white/5 bg-white/[0.02]">
-                      <div className="w-9 h-9 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0">
-                        <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>
-                      </div>
-                      <div className="min-w-0">
-                        <span className="text-[10px] text-white/30 font-heading uppercase tracking-wider block">Location</span>
-                        <span className="text-xs text-white/70 font-body truncate block">{listing.city}, {listing.state}</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
               </div>
             </motion.div>
 
-            {/* ─── SERVICES & CATEGORIES ─── */}
-            {listing.subcategories?.length > 0 && (
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
-                <SectionDivider title="Services & Specialties" />
-                <div className="flex flex-wrap gap-2 mt-4">
-                  {listing.subcategories.map((sub, i) => (
-                    <span key={i} className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm text-white/60 border border-white/10 hover:border-gold/20 hover:bg-gold/5 transition-all font-body">
-                      <svg className="w-3.5 h-3.5 text-gold/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                      {sub}
-                    </span>
-                  ))}
-                  {listing.tags?.length > 0 && listing.tags.map((tag, i) => (
-                    <span key={`tag-${i}`} className="px-3 py-2 rounded-xl text-xs text-white/40 border border-white/5 font-body">{tag}</span>
-                  ))}
-                </div>
-              </motion.div>
-            )}
+            {/* ─── SERVICES & CATEGORIES (Grouped Accordion) ─── */}
+            {listing.subcategories?.length > 0 && (() => {
+              const groups = groupSubcategories(listing.subcategories);
+              const isGrouped = groups.length > 1 || (groups.length === 1 && groups[0].group !== '');
+              const toggleGroup = (group: string) => {
+                setExpandedGroups(prev => {
+                  const next = new Set(prev);
+                  next.has(group) ? next.delete(group) : next.add(group);
+                  return next;
+                });
+              };
+
+              return (
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
+                  <SectionDivider title="Services & Specialties" />
+
+                  {isGrouped ? (
+                    <div className="mt-4 space-y-2">
+                      {groups.map(({ group, items }) => {
+                        const isExpanded = expandedGroups.has(group);
+                        return (
+                          <div key={group} className="rounded-xl border border-white/8 overflow-hidden" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                            <button
+                              onClick={() => toggleGroup(group)}
+                              className="flex items-center justify-between w-full px-4 py-3 text-left hover:bg-white/[0.03] transition-colors"
+                            >
+                              <div className="flex items-center gap-2.5">
+                                <span className="w-1.5 h-1.5 rounded-full bg-gold/60" />
+                                <span className="text-sm font-heading font-semibold text-white/80">{group}</span>
+                                <span className="text-[10px] text-white/25 font-body">{items.length}</span>
+                              </div>
+                              <svg className={`w-4 h-4 text-white/30 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                              </svg>
+                            </button>
+                            <AnimatePresence initial={false}>
+                              {isExpanded && (
+                                <motion.div
+                                  initial={{ height: 0, opacity: 0 }}
+                                  animate={{ height: 'auto', opacity: 1 }}
+                                  exit={{ height: 0, opacity: 0 }}
+                                  transition={{ duration: 0.2 }}
+                                  className="overflow-hidden"
+                                >
+                                  <div className="flex flex-wrap gap-2 px-4 pb-4">
+                                    {items.map((sub, i) => (
+                                      <span key={i} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs text-white/60 border border-white/10 font-body">
+                                        <svg className="w-3 h-3 text-gold/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                        {sub}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    /* Flat layout for listings with few or ungrouped subcategories */
+                    <div className="flex flex-wrap gap-2 mt-4">
+                      {listing.subcategories.map((sub, i) => (
+                        <span key={i} className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm text-white/60 border border-white/10 hover:border-gold/20 hover:bg-gold/5 transition-all font-body">
+                          <svg className="w-3.5 h-3.5 text-gold/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                          {sub}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Tags below groups */}
+                  {listing.tags?.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {listing.tags.map((tag, i) => (
+                        <span key={`tag-${i}`} className="px-3 py-1.5 rounded-lg text-[11px] text-white/30 border border-white/5 font-body">{tag}</span>
+                      ))}
+                    </div>
+                  )}
+                </motion.div>
+              );
+            })()}
 
             {/* ─── DIRECTORY BADGES ─── */}
             {listing.directory_badges?.length > 0 && (
@@ -559,7 +741,7 @@ export default function ListingDetailPage() {
                 <SectionDivider title={`Photos (${allPhotos.length})`} />
                 <div className="mt-4 rounded-2xl border border-white/10 overflow-hidden" style={{ background: 'rgba(255,255,255,0.03)' }} data-testid="photo-gallery">
                   <div className="relative aspect-video">
-                    <img src={allPhotos[activePhoto]} alt={`${listing.business_name} photo ${activePhoto + 1}`} className="w-full h-full object-cover" />
+                    <ImageOrPlaceholder src={allPhotos[activePhoto]} alt={`${listing.business_name} photo ${activePhoto + 1}`} className="w-full h-full object-cover" />
                     {allPhotos.length > 1 && (
                       <>
                         <button onClick={() => setActivePhoto(p => p > 0 ? p - 1 : allPhotos.length - 1)} className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center text-white/70 hover:text-white border border-white/20 hover:border-white/40 transition-all" style={{ background: 'rgba(10,10,10,0.7)' }}>
@@ -578,7 +760,7 @@ export default function ListingDetailPage() {
                     <div className="flex gap-2 p-3 overflow-x-auto">
                       {allPhotos.map((photo, i) => (
                         <button key={i} onClick={() => setActivePhoto(i)} className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${i === activePhoto ? 'border-gold' : 'border-transparent opacity-60 hover:opacity-100'}`}>
-                          <img src={photo} alt={`${listing.business_name} photo ${i + 1}`} className="w-full h-full object-cover" />
+                          <ImageOrPlaceholder src={photo} alt={`${listing.business_name} photo ${i + 1}`} className="w-full h-full object-cover" />
                         </button>
                       ))}
                     </div>
@@ -594,20 +776,20 @@ export default function ListingDetailPage() {
                 <div className="mt-4 rounded-2xl border border-white/10 p-5" style={{ background: 'rgba(255,255,255,0.03)' }} data-testid="business-hours">
                   <div className="space-y-1">
                     {['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map(day => {
-                      const hours = businessHours[day];
+                      const h = businessHours[day];
                       const dayNames: Record<string, string> = { mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday', sun: 'Sunday' };
-                      const today = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase().slice(0, 3);
-                      const isToday = day === today;
+                      const todayKey = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase().slice(0, 3);
+                      const isToday = day === todayKey;
                       return (
                         <div key={day} className={`flex items-center justify-between py-2.5 px-4 rounded-lg ${isToday ? 'bg-[rgba(201,168,76,0.08)] border border-[rgba(201,168,76,0.15)]' : ''}`}>
                           <span className={`text-sm font-body ${isToday ? 'text-[#C9A84C] font-semibold' : 'text-white/60'}`}>
                             {dayNames[day]}
                             {isToday && <span className="ml-2 text-[10px] text-[#C9A84C]/60 uppercase">Today</span>}
                           </span>
-                          {hours?.closed ? (
+                          {h?.closed ? (
                             <span className="text-sm text-white/30 font-body">Closed</span>
-                          ) : hours?.open && hours?.close ? (
-                            <span className={`text-sm font-body ${isToday ? 'text-white font-medium' : 'text-white/60'}`}>{hours.open} — {hours.close}</span>
+                          ) : h?.display ? (
+                            <span className={`text-sm font-body ${isToday ? 'text-white font-medium' : 'text-white/60'}`}>{h.display}</span>
                           ) : (
                             <span className="text-sm text-white/20 font-body">—</span>
                           )}
@@ -798,33 +980,66 @@ export default function ListingDetailPage() {
               </motion.div>
             )}
 
-            {/* ─── SIMILAR BUSINESSES ─── */}
-            {listing.related?.length > 0 && (
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} data-testid="related-listings">
-                <SectionDivider title={`Similar Businesses${listing.city ? ` in ${listing.city}` : ''}`} />
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
-                  {listing.related.slice(0, 4).map((r) => (
-                    <Link key={r.id} href={`/listing/${r.slug}`} className="rounded-xl border border-white/5 overflow-hidden hover:border-[rgba(201,168,76,0.25)] hover:scale-[1.02] transition-all duration-300 ease-out group" style={{ background: 'rgba(255,255,255,0.02)' }}>
-                      <div className="relative h-28 overflow-hidden">
-                        {r.cover_image_url ? (
-                          <img src={r.cover_image_url} alt={r.business_name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-[#111111] to-[#1a1a1a] flex items-center justify-center"><span className="text-2xl font-heading font-light text-white/10">{r.business_name[0]}</span></div>
-                        )}
-                        {r.avg_feedback_rating > 0 && (
-                          <span className="absolute top-2 right-2 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold" style={{ background: 'rgba(201,168,76,0.9)', color: '#1a1a1a' }}>
-                            <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
-                            {r.avg_feedback_rating.toFixed(1)}
-                          </span>
-                        )}
+            {/* ─── SIMILAR BUSINESSES + COMPACT MAP ─── */}
+            {(listing.related?.length > 0 || ((!isMobileBusiness) && (listing.address_line1 || listing.city))) && (
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+                {listing.related?.length > 0 && (
+                  <div data-testid="related-listings">
+                    <SectionDivider title={`Similar Businesses${listing.city ? ` in ${listing.city}` : ''}`} />
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
+                      {listing.related.slice(0, 4).map((r) => (
+                        <Link key={r.id} href={`/listing/${r.slug}`} className="rounded-xl border border-white/5 overflow-hidden hover:border-[rgba(201,168,76,0.25)] hover:scale-[1.02] transition-all duration-300 ease-out group" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                          <div className="relative h-28 overflow-hidden">
+                            {r.cover_image_url ? (
+                              <ImageOrPlaceholder src={r.cover_image_url} alt={r.business_name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                            ) : (
+                              <div className="w-full h-full bg-gradient-to-br from-[#111111] to-[#1a1a1a] flex items-center justify-center"><span className="text-2xl font-heading font-light text-white/10">{r.business_name[0]}</span></div>
+                            )}
+                            {r.avg_feedback_rating > 0 && (
+                              <span className="absolute top-2 right-2 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold" style={{ background: 'rgba(201,168,76,0.9)', color: '#1a1a1a' }}>
+                                <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
+                                {r.avg_feedback_rating.toFixed(1)}
+                              </span>
+                            )}
+                          </div>
+                          <div className="p-3">
+                            <p className="text-xs font-heading font-semibold text-gold truncate">{r.business_name}</p>
+                            <p className="text-[10px] text-white/35 font-body mt-0.5">{r.city}{r.state ? `, ${r.state}` : ''}</p>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Compact Map — click to expand */}
+                {!isMobileBusiness && (listing.address_line1 || listing.city) && (
+                  <div className="mt-6 rounded-xl border border-white/8 overflow-hidden cursor-pointer group" onClick={() => setShowMapExpanded(true)} data-testid="listing-map">
+                    <div className="h-[140px] relative">
+                      <iframe
+                        width="100%"
+                        height="100%"
+                        style={{ border: 0, pointerEvents: 'none' }}
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}&q=${encodeURIComponent([listing.business_name, listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', '))}`}
+                        title={`Map showing ${listing.business_name} location`}
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                        <span className="opacity-0 group-hover:opacity-100 transition-opacity px-3 py-1.5 rounded-lg text-xs font-heading font-semibold text-white backdrop-blur-sm" style={{ background: 'rgba(10,10,10,0.8)' }}>
+                          <svg className="w-3.5 h-3.5 inline mr-1.5 -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" /></svg>
+                          Expand Map
+                        </span>
                       </div>
-                      <div className="p-3">
-                        <p className="text-xs font-heading font-semibold text-gold truncate">{r.business_name}</p>
-                        <p className="text-[10px] text-white/35 font-body mt-0.5">{r.city}{r.state ? `, ${r.state}` : ''}</p>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
+                    </div>
+                    <div className="flex items-center justify-between px-4 py-2.5 border-t border-white/5" style={{ background: 'rgba(10,10,10,0.92)' }}>
+                      <p className="text-[11px] text-white/40 font-body truncate">{[listing.address_line1, listing.city, listing.state].filter(Boolean).join(', ')}</p>
+                      <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent([listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', '))}`} target="_blank" rel="noopener noreferrer" onClick={(e) => { e.stopPropagation(); trackEvent('map'); }} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[10px] font-semibold font-heading text-gold border border-gold/20 hover:bg-gold/5 transition-all flex-shrink-0">
+                        Directions
+                      </a>
+                    </div>
+                  </div>
+                )}
               </motion.div>
             )}
 
@@ -841,28 +1056,6 @@ export default function ListingDetailPage() {
               style={{ background: 'rgba(10,10,10,0.92)', backdropFilter: 'blur(16px)' }}
               data-testid="contact-card"
             >
-              {/* Map at top of sidebar */}
-              {(listing.address_line1 || listing.city) && (
-                <div data-testid="listing-map">
-                  <div className="aspect-[4/3] w-full">
-                    <iframe
-                      width="100%"
-                      height="100%"
-                      style={{ border: 0 }}
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}&q=${encodeURIComponent([listing.business_name, listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', '))}`}
-                      title={`Map showing ${listing.business_name} location`}
-                    />
-                  </div>
-                  {listing.address_line1 && (
-                    <div className="px-5 py-3 border-b border-white/5">
-                      <p className="text-xs text-white/50 font-body">{listing.address_line1}, {listing.city}, {listing.state} {listing.zip_code}</p>
-                    </div>
-                  )}
-                </div>
-              )}
-
               {/* Contact details */}
               <div className="p-5 space-y-3">
                 <h3 className="text-sm font-heading font-semibold text-white uppercase tracking-wider mb-4">Contact</h3>
@@ -875,19 +1068,6 @@ export default function ListingDetailPage() {
                   </button>
                 )}
 
-                {/* Contact rows */}
-                {listing.phone && (
-                  <button onClick={() => { setShowCallModal(true); trackEvent('call'); }} className="flex items-center gap-3 w-full p-3 rounded-xl border border-white/10 hover:border-gold/30 hover:bg-gold/5 transition-all group text-left cursor-pointer" data-testid="contact-phone">
-                    <div className="w-9 h-9 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0">
-                      <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
-                    </div>
-                    <div>
-                      <span className="text-xs text-white/40 font-body block">Phone</span>
-                      <span className="text-sm text-white font-medium font-body group-hover:text-gold transition-colors">{listing.phone}</span>
-                    </div>
-                  </button>
-                )}
-
                 {listing.website && (
                   <a href={ensureProtocol(listing.website)} target="_blank" rel="noopener noreferrer" onClick={() => trackEvent('website')} className="flex items-center gap-3 w-full p-3 rounded-xl border border-white/10 hover:border-gold/30 hover:bg-gold/5 transition-all group" data-testid="contact-website">
                     <div className="w-9 h-9 rounded-lg bg-gold/10 flex items-center justify-center">
@@ -895,7 +1075,7 @@ export default function ListingDetailPage() {
                     </div>
                     <div className="min-w-0">
                       <span className="text-xs text-white/40 font-body block">Website</span>
-                      <span className="text-sm text-white font-medium font-body group-hover:text-gold transition-colors truncate block">{listing.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}</span>
+                      <span className="text-sm text-white font-medium font-body group-hover:text-gold transition-colors truncate block">{cleanDomain(listing.website)}</span>
                     </div>
                   </a>
                 )}
@@ -912,13 +1092,28 @@ export default function ListingDetailPage() {
                   </a>
                 )}
 
-                {/* Get Directions */}
-                {(listing.address_line1 || listing.city) && (
-                  <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent([listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', '))}`} target="_blank" rel="noopener noreferrer" onClick={() => trackEvent('map')} className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-xs font-semibold font-heading text-white border border-white/10 hover:border-gold/30 hover:bg-gold/5 transition-all" data-testid="get-directions-btn">
-                    <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" /></svg>
-                    Get Directions
+                {/* Address + Directions (or Service Area for mobile businesses) */}
+                {isMobileBusiness && serviceAreas.length > 0 ? (
+                  <div className="flex items-center gap-3 w-full p-3 rounded-xl border border-white/10 bg-white/[0.02]">
+                    <div className="w-9 h-9 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                    </div>
+                    <div className="min-w-0">
+                      <span className="text-xs text-white/40 font-body block">Service Area</span>
+                      <span className="text-sm text-white font-medium font-body truncate block">{serviceAreas.join(', ')}</span>
+                    </div>
+                  </div>
+                ) : (listing.address_line1 || listing.city) ? (
+                  <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent([listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', '))}`} target="_blank" rel="noopener noreferrer" onClick={() => trackEvent('map')} className="flex items-center gap-3 w-full p-3 rounded-xl border border-white/10 hover:border-gold/30 hover:bg-gold/5 transition-all group" data-testid="get-directions-btn">
+                    <div className="w-9 h-9 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-4 h-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" /></svg>
+                    </div>
+                    <div className="min-w-0">
+                      <span className="text-xs text-white/40 font-body block">Directions</span>
+                      <span className="text-sm text-white font-medium font-body group-hover:text-gold transition-colors truncate block">{[listing.address_line1, listing.city, listing.state].filter(Boolean).join(', ')}</span>
+                    </div>
                   </a>
-                )}
+                ) : null}
               </div>
 
               {/* Verified / Claimed status */}
@@ -938,26 +1133,6 @@ export default function ListingDetailPage() {
                 </div>
               </div>
 
-              {/* Google stats */}
-              {(googleRating || googleReviews) && (
-                <div className="px-5 py-4 border-t border-white/5">
-                  <p className="text-[10px] text-white/30 font-heading uppercase tracking-wider mb-3">Google Business Data</p>
-                  <div className="grid grid-cols-2 gap-3">
-                    {googleRating && (
-                      <div>
-                        <span className="block text-lg font-heading font-bold text-white">{googleRating}/5</span>
-                        <span className="text-[10px] text-white/30 font-body">Rating</span>
-                      </div>
-                    )}
-                    {googleReviews && (
-                      <div>
-                        <span className="block text-lg font-heading font-bold text-white">{googleReviews.toLocaleString()}</span>
-                        <span className="text-[10px] text-white/30 font-body">Reviews</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
 
               {/* Powered by GL365 */}
               <div className="px-5 py-3 border-t border-white/5 text-center">
@@ -1006,6 +1181,40 @@ export default function ListingDetailPage() {
         </div>
       )}
 
+      {/* Expanded Map Modal */}
+      {showMapExpanded && (listing.address_line1 || listing.city) && (
+        <div className="fixed inset-0 z-50 flex flex-col" onClick={() => setShowMapExpanded(false)}>
+          <div className="absolute inset-0 bg-black/90 backdrop-blur-sm" />
+          <div className="relative flex-1 flex flex-col z-10">
+            <div className="flex items-center justify-between p-4 border-b border-white/10">
+              <div>
+                <h3 className="text-sm font-heading font-semibold text-white">{listing.business_name}</h3>
+                <p className="text-[11px] text-white/40 font-body">{[listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', ')}</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent([listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', '))}`} target="_blank" rel="noopener noreferrer" onClick={(e) => { e.stopPropagation(); trackEvent('map'); }} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold font-heading text-[#0A0A0A]" style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C97A)' }}>
+                  Directions
+                </a>
+                <button onClick={() => setShowMapExpanded(false)} className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors text-white/60 hover:text-white">
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+              </div>
+            </div>
+            <div className="flex-1" onClick={(e) => e.stopPropagation()}>
+              <iframe
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}&q=${encodeURIComponent([listing.business_name, listing.address_line1, listing.city, listing.state, listing.zip_code].filter(Boolean).join(', '))}`}
+                title={`Map showing ${listing.business_name} location`}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Full Photo Gallery Lightbox */}
       {showAllPhotos && allPhotos.length > 0 && (
         <div className="fixed inset-0 z-50 bg-black/95 flex flex-col" onClick={() => setShowAllPhotos(false)}>
@@ -1020,7 +1229,7 @@ export default function ListingDetailPage() {
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
             </button>
             <div className="flex-1 max-w-4xl max-h-[75vh] relative">
-              <img src={allPhotos[activePhoto]} alt={`${listing.business_name} photo ${activePhoto + 1}`} className="w-full h-full object-contain rounded-lg" />
+              <ImageOrPlaceholder src={allPhotos[activePhoto]} alt={`${listing.business_name} photo ${activePhoto + 1}`} className="w-full h-full object-contain rounded-lg" />
             </div>
             <button onClick={() => setActivePhoto(p => p < allPhotos.length - 1 ? p + 1 : 0)} className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-all ml-4">
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
@@ -1029,7 +1238,7 @@ export default function ListingDetailPage() {
           <div className="flex gap-2 p-4 overflow-x-auto justify-center border-t border-white/10">
             {allPhotos.map((photo, i) => (
               <button key={i} onClick={(e) => { e.stopPropagation(); setActivePhoto(i); }} className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${i === activePhoto ? 'border-gold' : 'border-transparent opacity-50 hover:opacity-80'}`}>
-                <img src={photo} alt={`thumb ${i + 1}`} className="w-full h-full object-cover" />
+                <ImageOrPlaceholder src={photo} alt={`thumb ${i + 1}`} className="w-full h-full object-cover" />
               </button>
             ))}
           </div>

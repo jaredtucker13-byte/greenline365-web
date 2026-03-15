@@ -215,7 +215,7 @@ export async function POST(request: NextRequest) {
             body: JSON.stringify({
               personalizations,
               from: {
-                email: process.env.SENDGRID_FROM_EMAIL || 'deals@greenline365.com',
+                email: process.env.SENDGRID_FROM_EMAIL || 'GreenLine365help@gmail.com',
                 name: 'GreenLine365 Deals',
               },
               subject,

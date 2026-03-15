@@ -175,8 +175,10 @@ export default function Navbar() {
   const handleSignOut = async () => {
     localStorage.removeItem('greenline365_active_business');
     localStorage.removeItem('greenline365_edit_mode');
-    await supabase.auth.signOut();
     setMobileMenuOpen(false);
+    try {
+      await fetch('/api/auth/signout', { method: 'POST' });
+    } catch { /* ignore */ }
     window.location.href = '/';
   };
 

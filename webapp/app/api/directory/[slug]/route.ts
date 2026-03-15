@@ -46,14 +46,40 @@ export async function GET(
   const bestBusinessPhoto = allPhotos[0] || listing.cover_image_url || placeholder;
   const coverImage = (isFreeOrUnclaimed && claimable) ? bestBusinessPhoto : (visiblePhotos[0] || allPhotos[0] || listing.cover_image_url || placeholder);
 
-  // Get related listings (same city + industry, limit 4)
-  const { data: related } = await supabase
-    .from('directory_listings')
-    .select('id, business_name, slug, industry, city, state, cover_image_url, tier, avg_feedback_rating, metadata')
-    .eq('city', listing.city)
-    .eq('industry', listing.industry)
-    .neq('id', listing.id)
-    .limit(4);
+  // Get related listings — prefer matching subcategories, fall back to same industry
+  const relatedSelect = 'id, business_name, slug, industry, city, state, cover_image_url, tier, avg_feedback_rating, metadata';
+  let related: any[] = [];
+
+  // First: same city + overlapping subcategories (most relevant matches)
+  if (listing.subcategories?.length > 0) {
+    const { data: bySubcat } = await supabase
+      .from('directory_listings')
+      .select(relatedSelect)
+      .eq('city', listing.city)
+      .eq('industry', listing.industry)
+      .neq('id', listing.id)
+      .overlaps('subcategories', listing.subcategories)
+      .limit(4);
+    related = bySubcat || [];
+  }
+
+  // If not enough, fill with same city + industry
+  if (related.length < 4) {
+    const excludeIds = [listing.id, ...related.map((r: any) => r.id)];
+    const { data: byIndustry } = await supabase
+      .from('directory_listings')
+      .select(relatedSelect)
+      .eq('city', listing.city)
+      .eq('industry', listing.industry)
+      .not('id', 'in', `(${excludeIds.join(',')})`)
+      .limit(4 - related.length);
+    related = [...related, ...(byIndustry || [])];
+  }
+
+  // Filter out near-duplicate names (e.g. "Foo Inc." vs "Foo")
+  const normalizeName = (name: string) => name.toLowerCase().replace(/\b(inc|llc|llp|corp|co|ltd|company|incorporated|limited|group|services|enterprises)\b\.?/g, '').replace(/[^a-z0-9]/g, '').trim();
+  const selfNorm = normalizeName(listing.business_name || '');
+  related = related.filter((r: any) => normalizeName(r.business_name || '') !== selfNorm);
 
   // Fetch menu data if available (Pro/Premium only)
   let menuData = null;

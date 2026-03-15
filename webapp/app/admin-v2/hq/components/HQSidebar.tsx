@@ -13,6 +13,7 @@ const navSections = [
   {
     label: 'MANAGEMENT',
     items: [
+      { id: 'listings', label: 'Listings', href: '/admin-v2/hq/listings', icon: ListingsIcon },
       { id: 'tenants', label: 'Tenants', href: '/admin-v2/hq/tenants', icon: BuildingIcon },
       { id: 'users', label: 'Users', href: '/admin-v2/hq/users', icon: UsersIcon },
       { id: 'billing', label: 'Billing', href: '/admin-v2/hq/billing', icon: CreditCardIcon },
@@ -97,6 +98,22 @@ export default function HQSidebar() {
           </svg>
           Back to Command Center
         </Link>
+        <button
+          onClick={async () => {
+            localStorage.removeItem('greenline365_active_business');
+            localStorage.removeItem('greenline365_edit_mode');
+            try {
+              await fetch('/api/auth/signout', { method: 'POST' });
+            } catch { /* ignore */ }
+            window.location.href = '/';
+          }}
+          className="flex items-center gap-2 px-3 py-2 mt-1 w-full rounded-lg text-white/40 hover:text-white/60 hover:bg-white/[0.04] transition text-xs font-medium"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          Sign Out
+        </button>
         <div className="flex items-center gap-2 mt-3 px-3">
           <span className="w-1.5 h-1.5 rounded-full bg-gold-400 animate-pulse shadow-[0_0_6px_rgba(201,169,110,0.6)]" />
           <span className="text-[9px] text-white/30 tracking-wider font-medium">PLATFORM ONLINE</span>
@@ -152,6 +169,14 @@ function PollIcon({ active }: { active: boolean }) {
   return (
     <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2 : 1.5}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+    </svg>
+  );
+}
+
+function ListingsIcon({ active }: { active: boolean }) {
+  return (
+    <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2 : 1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
     </svg>
   );
 }

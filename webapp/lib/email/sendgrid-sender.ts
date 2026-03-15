@@ -152,6 +152,16 @@ export function getVerificationEmailHtml(
       </p>
     </div>
     
+    <!-- Spam Folder Disclosure -->
+    <div style="text-align: center; margin-top: 24px; padding: 16px; background: rgba(255, 193, 7, 0.08); border: 1px solid rgba(255, 193, 7, 0.2); border-radius: 12px;">
+      <p style="color: #ffc107; font-size: 13px; font-weight: 600; margin: 0 0 4px;">
+        Don't see this email in your inbox?
+      </p>
+      <p style="color: #a0a0a0; font-size: 12px; margin: 0;">
+        Check your spam folder. Emails from GreenLine365help@gmail.com may be filtered automatically.
+      </p>
+    </div>
+
     <!-- Footer with Unsubscribe -->
     <div style="text-align: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid #333;">
       <p style="color: #606060; font-size: 12px; margin: 0;">

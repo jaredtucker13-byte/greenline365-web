@@ -142,7 +142,7 @@ export default function PricingPage() {
     <div className="min-h-screen bg-white">
       {/* Hero */}
       <section className="relative bg-[#0f0f0f] pt-28 pb-20 overflow-hidden">
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'url(/images/hero-directory.png)', backgroundSize: 'cover', backgroundPosition: 'center' }} />
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'url(/images/hero-directory.webp)', backgroundSize: 'cover', backgroundPosition: 'center' }} />
         <div className="absolute inset-0 bg-gradient-to-b from-[#0f0f0f]/80 to-[#0f0f0f]" />
         <div className="relative max-w-4xl mx-auto px-6 text-center">
           <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-sm font-semibold uppercase tracking-widest mb-3" style={{ color: '#FF8C00' }}>

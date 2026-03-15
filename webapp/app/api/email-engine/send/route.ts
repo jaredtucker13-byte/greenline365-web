@@ -77,6 +77,10 @@ function assembleHtml(options: {
     ${qrBlock}
     ${ratingWidget}
   </div>
+  <div style="text-align:center;margin-top:16px;padding:12px;background:rgba(255,193,7,0.08);border:1px solid rgba(255,193,7,0.2);border-radius:8px;">
+    <p style="color:#ffc107;font-size:12px;font-weight:600;margin:0 0 4px;">Don't see this email in your inbox?</p>
+    <p style="color:#888;font-size:11px;margin:0;">Check your spam folder. Emails from GreenLine365help@gmail.com may be filtered automatically.</p>
+  </div>
   <div style="text-align:center;margin-top:24px;">
     <p style="color:#444;font-size:11px;">GreenLine365 &middot; Tampa, FL &middot; Florida Business Directory</p>
     <p style="color:#333;font-size:10px;margin:4px 0 0;">

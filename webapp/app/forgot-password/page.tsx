@@ -62,6 +62,9 @@ export default function ForgotPasswordPage() {
               <p className="text-white/70 text-sm">
                 If an account exists for <strong className="text-white">{email}</strong>, you&apos;ll receive a password reset link shortly.
               </p>
+              <p className="text-yellow-400 text-sm mt-2">
+                Check your spam folder. Emails from GreenLine365help@gmail.com may be filtered automatically.
+              </p>
               <Link
                 href="/login"
                 className="inline-block mt-4 px-6 py-3 bg-gold-500 text-black font-bold rounded-xl hover:bg-gold-400 transition"
