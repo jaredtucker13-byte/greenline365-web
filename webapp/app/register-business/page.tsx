@@ -1,10 +1,13 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { supabase, signUp, signInWithGoogle } from '@/lib/supabase/client';
+import { validatePassword, getPasswordStrength, validateEmail } from '@/lib/auth/password-validation';
+import PasswordStrengthIndicator from '@/components/ui/PasswordStrengthIndicator';
+import TermsCheckbox from '@/components/ui/TermsCheckbox';
 import type { User } from '@supabase/supabase-js';
 
 const INDUSTRIES = [
@@ -34,7 +37,13 @@ function RegisterForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [authData, setAuthData] = useState({ email: '', password: '', fullName: '' });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [termsError, setTermsError] = useState(false);
+  const [fieldTouched, setFieldTouched] = useState<Record<string, boolean>>({});
+
+  const [authData, setAuthData] = useState({ email: '', password: '', confirmPassword: '', fullName: '' });
   const [businessData, setBusinessData] = useState({
     business_name: '',
     industry: '',
@@ -45,6 +54,11 @@ function RegisterForm() {
     zip_code: '',
     description: '',
   });
+
+  const passwordValidation = useMemo(() => validatePassword(authData.password), [authData.password]);
+  const passwordStrength = useMemo(() => getPasswordStrength(authData.password), [authData.password]);
+  const emailValid = useMemo(() => validateEmail(authData.email), [authData.email]);
+  const passwordsMatch = authData.password === authData.confirmPassword;
 
   useEffect(() => {
     const check = async () => {
@@ -58,13 +72,30 @@ function RegisterForm() {
     check();
   }, []);
 
+  const handleFieldBlur = (fieldName: string) => {
+    setFieldTouched(prev => ({ ...prev, [fieldName]: true }));
+  };
+
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    if (authData.password.length < 6) {
-      setError('Password must be at least 6 characters');
+    if (!passwordValidation.isValid) {
+      setError('Password does not meet all requirements');
+      setLoading(false);
+      return;
+    }
+
+    if (!passwordsMatch) {
+      setError('Passwords do not match');
+      setLoading(false);
+      return;
+    }
+
+    if (!agreedToTerms) {
+      setTermsError(true);
+      setError('You must agree to the Terms of Service and Privacy Policy');
       setLoading(false);
       return;
     }
@@ -86,6 +117,11 @@ function RegisterForm() {
   };
 
   const handleGoogleAuth = async () => {
+    if (!agreedToTerms) {
+      setTermsError(true);
+      setError('You must agree to the Terms of Service and Privacy Policy');
+      return;
+    }
     setLoading(true);
     const { error } = await signInWithGoogle();
     if (error) {
@@ -157,6 +193,27 @@ function RegisterForm() {
     router.push(`/register-business/success?listing=${listing.id}&tier=free`);
   };
 
+  // Eye toggle button for show/hide password
+  const EyeToggle = ({ show, onClick, label }: { show: boolean; onClick: () => void; label: string }) => (
+    <button
+      type="button"
+      onClick={onClick}
+      className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70 transition"
+      aria-label={label}
+    >
+      {show ? (
+        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+        </svg>
+      ) : (
+        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        </svg>
+      )}
+    </button>
+  );
+
   if (checkingAuth) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#0f0f0f]">
@@ -185,14 +242,31 @@ function RegisterForm() {
       </div>
 
       {/* Steps indicator */}
-      <div className="max-w-md mx-auto px-6 mb-8">
-        <div className="flex items-center gap-3">
-          <div className={`flex-1 h-1 rounded-full ${step === 'auth' || step === 'business' ? 'bg-gold-500' : 'bg-white/10'}`} />
-          <div className={`flex-1 h-1 rounded-full ${step === 'business' ? 'bg-gold-500' : 'bg-white/10'}`} />
+      <div className="max-w-md mx-auto px-6 mb-8" role="navigation" aria-label="Registration progress">
+        <div className="flex items-center">
+          <div className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all ${
+            step === 'auth'
+              ? 'bg-gold-500 border-gold-500 text-black'
+              : 'bg-gold-500/20 border-gold-500 text-gold-400'
+          }`} aria-current={step === 'auth' ? 'step' : undefined}>
+            {step === 'business' ? (
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/>
+              </svg>
+            ) : '1'}
+          </div>
+          <div className={`flex-1 h-0.5 mx-3 transition-all ${step === 'business' ? 'bg-gold-500' : 'bg-white/10'}`} />
+          <div className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all ${
+            step === 'business'
+              ? 'bg-gold-500 border-gold-500 text-black'
+              : 'border-white/20 text-white/40'
+          }`} aria-current={step === 'business' ? 'step' : undefined}>
+            2
+          </div>
         </div>
-        <div className="flex justify-between mt-2 text-xs text-white/40">
-          <span className={step === 'auth' ? 'text-gold-400' : 'text-white/60'}>1. Account</span>
-          <span className={step === 'business' ? 'text-gold-400' : ''}>2. Business Info</span>
+        <div className="flex justify-between mt-2 text-xs">
+          <span className={step === 'auth' ? 'text-gold-400 font-medium' : 'text-gold-400/60'}>Account</span>
+          <span className={step === 'business' ? 'text-gold-400 font-medium' : 'text-white/40'}>Business Info</span>
         </div>
       </div>
 
@@ -205,13 +279,22 @@ function RegisterForm() {
           className="bg-white/[0.03] border border-white/10 rounded-2xl p-8"
         >
           {error && (
-            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 text-red-400 text-sm mb-6" data-testid="register-error">
+            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 text-red-400 text-sm mb-6" role="alert" data-testid="register-error">
               {error}
             </div>
           )}
 
           {step === 'auth' && (
             <>
+              {/* Terms checkbox - applies to both Google and email auth */}
+              <div className="mb-6">
+                <TermsCheckbox
+                  checked={agreedToTerms}
+                  onChange={(checked) => { setAgreedToTerms(checked); if (checked) setTermsError(false); }}
+                  error={termsError}
+                />
+              </div>
+
               <button
                 onClick={handleGoogleAuth}
                 disabled={loading}
@@ -234,41 +317,103 @@ function RegisterForm() {
 
               <form onSubmit={handleAuthSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1.5">Full Name</label>
+                  <label htmlFor="reg-fullname" className="block text-sm font-medium text-white/70 mb-1.5">Full Name</label>
                   <input
+                    id="reg-fullname"
                     type="text"
                     value={authData.fullName}
                     onChange={(e) => setAuthData({ ...authData, fullName: e.target.value })}
+                    onBlur={() => handleFieldBlur('fullName')}
                     required
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
                     placeholder="John Smith"
+                    aria-invalid={fieldTouched.fullName && !authData.fullName.trim() ? 'true' : undefined}
                     data-testid="register-name-input"
                   />
+                  {fieldTouched.fullName && !authData.fullName.trim() && (
+                    <p className="text-red-400 text-xs mt-1">Full name is required</p>
+                  )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1.5">Email</label>
+                  <label htmlFor="reg-email" className="block text-sm font-medium text-white/70 mb-1.5">Email</label>
                   <input
+                    id="reg-email"
                     type="email"
                     value={authData.email}
                     onChange={(e) => setAuthData({ ...authData, email: e.target.value })}
+                    onBlur={() => handleFieldBlur('email')}
                     required
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
+                    className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white placeholder:text-white/40 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition ${
+                      fieldTouched.email && authData.email && !emailValid ? 'border-red-500/50' : 'border-white/10'
+                    }`}
                     placeholder="you@company.com"
+                    aria-invalid={fieldTouched.email && authData.email && !emailValid ? 'true' : undefined}
+                    aria-describedby="reg-email-error"
                     data-testid="register-email-input"
                   />
+                  {fieldTouched.email && authData.email && !emailValid && (
+                    <p id="reg-email-error" className="text-red-400 text-xs mt-1">Please enter a valid email address</p>
+                  )}
+                  {fieldTouched.email && emailValid && (
+                    <p className="text-green-400 text-xs mt-1 flex items-center gap-1">
+                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/>
+                      </svg>
+                      Valid email
+                    </p>
+                  )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1.5">Password</label>
-                  <input
-                    type="password"
-                    value={authData.password}
-                    onChange={(e) => setAuthData({ ...authData, password: e.target.value })}
-                    required
-                    minLength={6}
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
-                    placeholder="Min 6 characters"
-                    data-testid="register-password-input"
-                  />
+                  <label htmlFor="reg-password" className="block text-sm font-medium text-white/70 mb-1.5">Password</label>
+                  <div className="relative">
+                    <input
+                      id="reg-password"
+                      type={showPassword ? 'text' : 'password'}
+                      value={authData.password}
+                      onChange={(e) => setAuthData({ ...authData, password: e.target.value })}
+                      onBlur={() => handleFieldBlur('password')}
+                      required
+                      minLength={8}
+                      className="w-full px-4 py-3 pr-12 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
+                      placeholder="8+ chars, mixed case, number, symbol"
+                      aria-describedby="password-strength"
+                      data-testid="register-password-input"
+                    />
+                    <EyeToggle show={showPassword} onClick={() => setShowPassword(!showPassword)} label={showPassword ? 'Hide password' : 'Show password'} />
+                  </div>
+                  <PasswordStrengthIndicator password={authData.password} />
+                </div>
+                <div>
+                  <label htmlFor="reg-confirm-password" className="block text-sm font-medium text-white/70 mb-1.5">Confirm Password</label>
+                  <div className="relative">
+                    <input
+                      id="reg-confirm-password"
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      value={authData.confirmPassword}
+                      onChange={(e) => setAuthData({ ...authData, confirmPassword: e.target.value })}
+                      onBlur={() => handleFieldBlur('confirmPassword')}
+                      required
+                      className={`w-full px-4 py-3 pr-12 rounded-xl bg-white/5 border text-white placeholder:text-white/40 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition ${
+                        fieldTouched.confirmPassword && authData.confirmPassword && !passwordsMatch ? 'border-red-500/50' : 'border-white/10'
+                      }`}
+                      placeholder="Re-enter your password"
+                      aria-invalid={fieldTouched.confirmPassword && authData.confirmPassword && !passwordsMatch ? 'true' : undefined}
+                      aria-describedby="reg-confirm-error"
+                      data-testid="register-confirm-password-input"
+                    />
+                    <EyeToggle show={showConfirmPassword} onClick={() => setShowConfirmPassword(!showConfirmPassword)} label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'} />
+                  </div>
+                  {fieldTouched.confirmPassword && authData.confirmPassword && !passwordsMatch && (
+                    <p id="reg-confirm-error" className="text-red-400 text-xs mt-1">Passwords do not match</p>
+                  )}
+                  {fieldTouched.confirmPassword && authData.confirmPassword && passwordsMatch && (
+                    <p className="text-green-400 text-xs mt-1 flex items-center gap-1">
+                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/>
+                      </svg>
+                      Passwords match
+                    </p>
+                  )}
                 </div>
                 <button
                   type="submit"
@@ -295,21 +440,23 @@ function RegisterForm() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-white/70 mb-1.5">Business Name *</label>
+                <label htmlFor="reg-business-name" className="block text-sm font-medium text-white/70 mb-1.5">Business Name *</label>
                 <input
+                  id="reg-business-name"
                   type="text"
                   value={businessData.business_name}
                   onChange={(e) => setBusinessData({ ...businessData, business_name: e.target.value })}
                   required
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
                   placeholder="Acme Plumbing LLC"
                   data-testid="register-business-name"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-white/70 mb-1.5">Industry *</label>
+                <label htmlFor="reg-industry" className="block text-sm font-medium text-white/70 mb-1.5">Industry *</label>
                 <select
+                  id="reg-industry"
                   value={businessData.industry}
                   onChange={(e) => setBusinessData({ ...businessData, industry: e.target.value })}
                   required
@@ -323,23 +470,25 @@ function RegisterForm() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1.5">Phone</label>
+                  <label htmlFor="reg-phone" className="block text-sm font-medium text-white/70 mb-1.5">Phone</label>
                   <input
+                    id="reg-phone"
                     type="tel"
                     value={businessData.phone}
                     onChange={(e) => setBusinessData({ ...businessData, phone: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-gold-500/50 outline-none transition"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:border-gold-500/50 outline-none transition"
                     placeholder="(555) 123-4567"
                     data-testid="register-phone"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1.5">Website</label>
+                  <label htmlFor="reg-website" className="block text-sm font-medium text-white/70 mb-1.5">Website</label>
                   <input
+                    id="reg-website"
                     type="url"
                     value={businessData.website}
                     onChange={(e) => setBusinessData({ ...businessData, website: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-gold-500/50 outline-none transition"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:border-gold-500/50 outline-none transition"
                     placeholder="https://..."
                     data-testid="register-website"
                   />
@@ -348,34 +497,37 @@ function RegisterForm() {
 
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1.5">City</label>
+                  <label htmlFor="reg-city" className="block text-sm font-medium text-white/70 mb-1.5">City</label>
                   <input
+                    id="reg-city"
                     type="text"
                     value={businessData.city}
                     onChange={(e) => setBusinessData({ ...businessData, city: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-gold-500/50 outline-none transition"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:border-gold-500/50 outline-none transition"
                     placeholder="Tampa"
                     data-testid="register-city"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1.5">State</label>
+                  <label htmlFor="reg-state" className="block text-sm font-medium text-white/70 mb-1.5">State</label>
                   <input
+                    id="reg-state"
                     type="text"
                     value={businessData.state}
                     onChange={(e) => setBusinessData({ ...businessData, state: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-gold-500/50 outline-none transition"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:border-gold-500/50 outline-none transition"
                     placeholder="FL"
                     data-testid="register-state"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1.5">ZIP</label>
+                  <label htmlFor="reg-zip" className="block text-sm font-medium text-white/70 mb-1.5">ZIP</label>
                   <input
+                    id="reg-zip"
                     type="text"
                     value={businessData.zip_code}
                     onChange={(e) => setBusinessData({ ...businessData, zip_code: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-gold-500/50 outline-none transition"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:border-gold-500/50 outline-none transition"
                     placeholder="33601"
                     data-testid="register-zip"
                   />
@@ -383,12 +535,13 @@ function RegisterForm() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-white/70 mb-1.5">Description</label>
+                <label htmlFor="reg-description" className="block text-sm font-medium text-white/70 mb-1.5">Description</label>
                 <textarea
+                  id="reg-description"
                   value={businessData.description}
                   onChange={(e) => setBusinessData({ ...businessData, description: e.target.value })}
                   rows={3}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:border-gold-500/50 outline-none transition resize-none"
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:border-gold-500/50 outline-none transition resize-none"
                   placeholder="Tell customers what you do..."
                   data-testid="register-description"
                 />

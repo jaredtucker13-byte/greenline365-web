@@ -1,10 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { signUp, signInWithGoogle, signInWithMagicLink } from '@/lib/supabase/client';
+import { validatePassword, validateEmail } from '@/lib/auth/password-validation';
+import PasswordStrengthIndicator from '@/components/ui/PasswordStrengthIndicator';
+import TermsCheckbox from '@/components/ui/TermsCheckbox';
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -15,6 +18,9 @@ export default function SignUpPage() {
   const [authMethod, setAuthMethod] = useState<'magic-link' | 'password'>('magic-link');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [termsError, setTermsError] = useState(false);
+  const [fieldTouched, setFieldTouched] = useState<Record<string, boolean>>({});
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -22,9 +28,17 @@ export default function SignUpPage() {
     confirmPassword: '',
   });
 
+  const passwordValidation = useMemo(() => validatePassword(formData.password), [formData.password]);
+  const emailValid = useMemo(() => validateEmail(formData.email), [formData.email]);
+  const passwordsMatch = formData.password === formData.confirmPassword;
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setError(null);
+  };
+
+  const handleFieldBlur = (fieldName: string) => {
+    setFieldTouched(prev => ({ ...prev, [fieldName]: true }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -38,8 +52,15 @@ export default function SignUpPage() {
       return;
     }
 
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
+    if (!passwordValidation.isValid) {
+      setError('Password does not meet all requirements');
+      setLoading(false);
+      return;
+    }
+
+    if (!agreedToTerms) {
+      setTermsError(true);
+      setError('You must agree to the Terms of Service and Privacy Policy');
       setLoading(false);
       return;
     }
@@ -64,6 +85,11 @@ export default function SignUpPage() {
   };
 
   const handleGoogleSignIn = async () => {
+    if (!agreedToTerms) {
+      setTermsError(true);
+      setError('You must agree to the Terms of Service and Privacy Policy');
+      return;
+    }
     setLoading(true);
     const { error } = await signInWithGoogle();
     if (error) {
@@ -78,7 +104,13 @@ export default function SignUpPage() {
       setError('Please enter your email address');
       return;
     }
-    
+
+    if (!agreedToTerms) {
+      setTermsError(true);
+      setError('You must agree to the Terms of Service and Privacy Policy');
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -95,11 +127,12 @@ export default function SignUpPage() {
   };
 
   // Eye icon component for show/hide password
-  const EyeIcon = ({ show, onClick }: { show: boolean; onClick: () => void }) => (
+  const EyeIcon = ({ show, onClick, label }: { show: boolean; onClick: () => void; label: string }) => (
     <button
       type="button"
       onClick={onClick}
       className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70 transition"
+      aria-label={label}
     >
       {show ? (
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -192,6 +225,15 @@ export default function SignUpPage() {
           transition={{ delay: 0.1 }}
           className="bg-gradient-to-br from-gray-900/80 to-gray-900/40 border border-white/10 rounded-2xl p-8"
         >
+          {/* Terms checkbox - applies to all auth methods */}
+          <div className="mb-6">
+            <TermsCheckbox
+              checked={agreedToTerms}
+              onChange={(checked) => { setAgreedToTerms(checked); if (checked) setTermsError(false); }}
+              error={termsError}
+            />
+          </div>
+
           {/* Google Sign In */}
           <button
             onClick={handleGoogleSignIn}
@@ -220,24 +262,26 @@ export default function SignUpPage() {
           <div className="flex gap-2 p-1 bg-white/5 rounded-xl mb-6">
             <button
               type="button"
-              onClick={() => setAuthMethod('magic-link')}
+              onClick={() => { setAuthMethod('magic-link'); setFieldTouched({}); }}
               className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition ${
                 authMethod === 'magic-link'
                   ? 'bg-gold-500 text-black'
                   : 'text-white/60 hover:text-white'
               }`}
+              aria-label="Sign up with magic link"
               data-testid="signup-magic-link-tab"
             >
               ✨ Magic Link
             </button>
             <button
               type="button"
-              onClick={() => setAuthMethod('password')}
+              onClick={() => { setAuthMethod('password'); setFieldTouched({}); }}
               className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition ${
                 authMethod === 'password'
                   ? 'bg-gold-500 text-black'
                   : 'text-white/60 hover:text-white'
               }`}
+              aria-label="Sign up with password"
               data-testid="signup-password-tab"
             >
               🔐 Password
@@ -245,7 +289,7 @@ export default function SignUpPage() {
           </div>
 
           {error && (
-            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 text-red-400 text-sm mb-4">
+            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 text-red-400 text-sm mb-4" role="alert">
               {error}
             </div>
           )}
@@ -254,17 +298,25 @@ export default function SignUpPage() {
           {authMethod === 'magic-link' ? (
             <form onSubmit={handleMagicLink} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-white/80 mb-2">Email</label>
+                <label htmlFor="signup-ml-email" className="block text-sm font-medium text-white/80 mb-2">Email</label>
                 <input
+                  id="signup-ml-email"
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
+                  onBlur={() => handleFieldBlur('email')}
                   required
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
+                  className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white placeholder:text-white/40 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition ${
+                    fieldTouched.email && formData.email && !emailValid ? 'border-red-500/50' : 'border-white/10'
+                  }`}
                   placeholder="you@company.com"
+                  aria-invalid={fieldTouched.email && formData.email && !emailValid ? 'true' : undefined}
                   data-testid="signup-email-input"
                 />
+                {fieldTouched.email && formData.email && !emailValid && (
+                  <p className="text-red-400 text-xs mt-1">Please enter a valid email address</p>
+                )}
               </div>
 
               <p className="text-white/40 text-sm">
@@ -296,61 +348,106 @@ export default function SignUpPage() {
             /* Password Form */
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-white/80 mb-2">Full Name</label>
+                <label htmlFor="signup-fullname" className="block text-sm font-medium text-white/80 mb-2">Full Name</label>
                 <input
+                  id="signup-fullname"
                   type="text"
                   name="fullName"
                   value={formData.fullName}
                   onChange={handleChange}
+                  onBlur={() => handleFieldBlur('fullName')}
                   required
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
                   placeholder="John Smith"
+                  aria-invalid={fieldTouched.fullName && !formData.fullName.trim() ? 'true' : undefined}
                 />
+                {fieldTouched.fullName && !formData.fullName.trim() && (
+                  <p className="text-red-400 text-xs mt-1">Full name is required</p>
+                )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-white/80 mb-2">Email</label>
+                <label htmlFor="signup-email" className="block text-sm font-medium text-white/80 mb-2">Email</label>
                 <input
+                  id="signup-email"
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
+                  onBlur={() => handleFieldBlur('email')}
                   required
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
+                  className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white placeholder:text-white/40 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition ${
+                    fieldTouched.email && formData.email && !emailValid ? 'border-red-500/50' : 'border-white/10'
+                  }`}
                   placeholder="john@company.com"
+                  aria-invalid={fieldTouched.email && formData.email && !emailValid ? 'true' : undefined}
+                  aria-describedby="signup-email-error"
                 />
+                {fieldTouched.email && formData.email && !emailValid && (
+                  <p id="signup-email-error" className="text-red-400 text-xs mt-1">Please enter a valid email address</p>
+                )}
+                {fieldTouched.email && emailValid && (
+                  <p className="text-green-400 text-xs mt-1 flex items-center gap-1">
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Valid email
+                  </p>
+                )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-white/80 mb-2">Password</label>
+                <label htmlFor="signup-password" className="block text-sm font-medium text-white/80 mb-2">Password</label>
                 <div className="relative">
                   <input
+                    id="signup-password"
                     type={showPassword ? 'text' : 'password'}
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
+                    onBlur={() => handleFieldBlur('password')}
                     required
-                    className="w-full px-4 py-3 pr-12 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
-                    placeholder="••••••••"
+                    minLength={8}
+                    className="w-full px-4 py-3 pr-12 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
+                    placeholder="8+ chars, mixed case, number, symbol"
+                    aria-describedby="password-strength"
                   />
-                  <EyeIcon show={showPassword} onClick={() => setShowPassword(!showPassword)} />
+                  <EyeIcon show={showPassword} onClick={() => setShowPassword(!showPassword)} label={showPassword ? 'Hide password' : 'Show password'} />
                 </div>
+                <PasswordStrengthIndicator password={formData.password} />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-white/80 mb-2">Confirm Password</label>
+                <label htmlFor="signup-confirm-password" className="block text-sm font-medium text-white/80 mb-2">Confirm Password</label>
                 <div className="relative">
                   <input
+                    id="signup-confirm-password"
                     type={showConfirmPassword ? 'text' : 'password'}
                     name="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleChange}
+                    onBlur={() => handleFieldBlur('confirmPassword')}
                     required
-                    className="w-full px-4 py-3 pr-12 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition"
-                    placeholder="••••••••"
+                    className={`w-full px-4 py-3 pr-12 rounded-xl bg-white/5 border text-white placeholder:text-white/40 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 outline-none transition ${
+                      fieldTouched.confirmPassword && formData.confirmPassword && !passwordsMatch ? 'border-red-500/50' : 'border-white/10'
+                    }`}
+                    placeholder="Re-enter your password"
+                    aria-invalid={fieldTouched.confirmPassword && formData.confirmPassword && !passwordsMatch ? 'true' : undefined}
+                    aria-describedby="signup-confirm-error"
                   />
-                  <EyeIcon show={showConfirmPassword} onClick={() => setShowConfirmPassword(!showConfirmPassword)} />
+                  <EyeIcon show={showConfirmPassword} onClick={() => setShowConfirmPassword(!showConfirmPassword)} label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'} />
                 </div>
+                {fieldTouched.confirmPassword && formData.confirmPassword && !passwordsMatch && (
+                  <p id="signup-confirm-error" className="text-red-400 text-xs mt-1">Passwords do not match</p>
+                )}
+                {fieldTouched.confirmPassword && formData.confirmPassword && passwordsMatch && (
+                  <p className="text-green-400 text-xs mt-1 flex items-center gap-1">
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Passwords match
+                  </p>
+                )}
               </div>
 
               <button
